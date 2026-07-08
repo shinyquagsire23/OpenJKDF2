@@ -234,7 +234,7 @@ int main(int argc, char** argv)
     hs.messagePrint = stdConsolePrintf;
     hs.errorPrint = stdConsolePrintf;
     pHS = &hs;
-    std_pHS = &hs;
+    std_g_pHS = &hs;
     rdroid_g_pHS = &hs;
 
     stdStartup(&hs); // Added
@@ -244,17 +244,17 @@ int main(int argc, char** argv)
     int has_pal = argc <= 2 ? 0 : rdColormap_LoadEntry(argv[2], &colormap);
     
     printf("%lx %lx %lx\n", fp, sizeof(header), sizeof(header_ext));
-    std_pHS->fileRead(fp, &header, sizeof(header));
-    std_pHS->fileRead(fp, &header_ext, sizeof(header_ext));
-    std_pHS->fileRead(fp, pal_stored, sizeof(pal_stored));
+    std_g_pHS->fileRead(fp, &header, sizeof(header));
+    std_g_pHS->fileRead(fp, &header_ext, sizeof(header_ext));
+    std_g_pHS->fileRead(fp, pal_stored, sizeof(pal_stored));
 
     if (!header_ext.data_length)
     {
         header_ext.data_length = header.total_size - header.data_start;
     }
-    void* pAlloc = std_pHS->alloc(header_ext.data_length);
-    std_pHS->fseek(fp, header.data_start, SEEK_SET);
-    std_pHS->fileRead(fp, pAlloc, header_ext.data_length);
+    void* pAlloc = std_g_pHS->alloc(header_ext.data_length);
+    std_g_pHS->fseek(fp, header.data_start, SEEK_SET);
+    std_g_pHS->fileRead(fp, pAlloc, header_ext.data_length);
 
     printf("Header:\n");
     printf("magic:      %02x\n", header.magic);
@@ -285,8 +285,8 @@ int main(int argc, char** argv)
     bitmapExtent dstExtent = {0,0, header_ext.width, header_ext.height};
     bitmapExtent srcExtent = {0,0, header_ext.width, header_ext.height};
 
-    uint8_t* out_data = std_pHS->alloc(header_ext.width * header_ext.height);
-    uint8_t* out_data_converted = std_pHS->alloc(header_ext.width * header_ext.height * 3);
+    uint8_t* out_data = std_g_pHS->alloc(header_ext.width * header_ext.height);
+    uint8_t* out_data_converted = std_g_pHS->alloc(header_ext.width * header_ext.height * 3);
     memset(out_data, 0, header_ext.width * header_ext.height);
     memset(out_data_converted, 0, header_ext.width * header_ext.height * 3);
     RLE_decompress_type1(out_data, header_ext.width, pAlloc, &dstExtent, &srcExtent);

@@ -504,8 +504,8 @@ void sithCogFunctionThing_WaitForStop(sithCog *ctx)
         if ( ctx->flags & SITH_COG_DEBUG)
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_genBuffer, "Cog %s: Waiting for stop on object %d.\n", ctx->cogscript_fpath, idx);
-            sithConsole_PrintString(std_genBuffer);
+            _sprintf(std_g_genBuffer, "Cog %s: Waiting for stop on object %d.\n", ctx->cogscript_fpath, idx);
+            sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
     }
@@ -1876,10 +1876,10 @@ void sithCogFunctionThing_ParseArg(sithCog *ctx)
 
     if (str && pThing)
     {
-        _strncpy(std_genBuffer, str, 0x3FFu);
-        std_genBuffer[1023] = 0;
+        _strncpy(std_g_genBuffer, str, 0x3FFu);
+        std_g_genBuffer[1023] = 0;
 
-        stdConffile_ReadArgsFromStr(std_genBuffer);
+        stdConffile_ReadArgsFromStr(std_g_genBuffer);
         for (int i = 0 ; i < stdConffile_entry.numArgs; i++)
         {
             stdConffileArg* arg = &stdConffile_entry.args[i];

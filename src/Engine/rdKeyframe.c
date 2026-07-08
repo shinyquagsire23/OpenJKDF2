@@ -92,7 +92,7 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
     if (!stdConffile_ReadLine())
       goto read_fail;
 
-    if (_sscanf(stdConffile_aLine, " section: %s", std_genBuffer) != 1)
+    if (_sscanf(stdConffile_aLine, " section: %s", std_g_genBuffer) != 1)
       goto read_fail;
 
     if (!stdConffile_ReadLine())
@@ -136,10 +136,10 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
     stdPlatform_Memzero32(paJoints, sizeof(rdJoint) * (keyframe->numJoints+1)); // Added: word-safe
     keyframe->numJoints2 = keyframe->numJoints;
 
-    if (!stdConffile_ReadLine() || _sscanf(stdConffile_aLine, " section: %s", std_genBuffer) != 1)
+    if (!stdConffile_ReadLine() || _sscanf(stdConffile_aLine, " section: %s", std_g_genBuffer) != 1)
       goto read_fail;
 
-    if (!_memcmp(std_genBuffer, "markers", 8u))
+    if (!_memcmp(std_g_genBuffer, "markers", 8u))
     {
       if (!stdConffile_ReadLine())
         goto read_fail;
@@ -168,7 +168,7 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
       if (!stdConffile_ReadLine())
         goto read_fail;
 
-      if (_sscanf(stdConffile_aLine, " section: %s", std_genBuffer) != 1)
+      if (_sscanf(stdConffile_aLine, " section: %s", std_g_genBuffer) != 1)
         goto read_fail;
     }
     

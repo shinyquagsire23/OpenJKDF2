@@ -22,9 +22,9 @@ static tHashLink* stdHashtbl_NodeAlloc(void)
     if (!stdHashtbl_pFreeNodes)
     {
         stdHashPoolChunk* pChunk;
-        { TWL_EXTRAM_SUGGEST(std_pHS);
+        { TWL_EXTRAM_SUGGEST(std_g_pHS);
         pChunk = (stdHashPoolChunk*)STD_ALLOC(sizeof(stdHashPoolChunk) + sizeof(tHashLink) * STDHASHTABLE_POOL_CHUNK_NODES);
-        TWL_EXTRAM_RESTORE(std_pHS); }
+        TWL_EXTRAM_RESTORE(std_g_pHS); }
         if (!pChunk)
             return NULL;
         pChunk->pNext = stdHashtbl_pPoolChunks;
@@ -178,9 +178,9 @@ loop_escape:
     }
 
     hashtable->numBuckets = actualNumBuckets;
-    { TWL_EXTRAM_SUGGEST(std_pHS); // Added: CRC-keyed links are word-safe
+    { TWL_EXTRAM_SUGGEST(std_g_pHS); // Added: CRC-keyed links are word-safe
     hashtable->buckets = (tHashLink *)STD_ALLOC(sizeof(tHashLink) * actualNumBuckets);
-    TWL_EXTRAM_RESTORE(std_pHS); }
+    TWL_EXTRAM_RESTORE(std_g_pHS); }
     if ( hashtable->buckets )
     {
       stdPlatform_Memzero32(hashtable->buckets, sizeof(tHashLink) * hashtable->numBuckets); // Added: word-safe
@@ -280,9 +280,9 @@ int stdHashtbl_Add(stdHashTable *hashmap, const char *key, void *value)
         new_child = stdHashtbl_NodeAlloc(); // Added: slab pool
 #else
         tHashLink *new_child_alloc; // Added: see below
-        { TWL_EXTRAM_SUGGEST(std_pHS);
+        { TWL_EXTRAM_SUGGEST(std_g_pHS);
         new_child_alloc = (tHashLink *)STD_ALLOC(sizeof(tHashLink));
-        TWL_EXTRAM_RESTORE(std_pHS); }
+        TWL_EXTRAM_RESTORE(std_g_pHS); }
         new_child = new_child_alloc;
 #endif
         if (!new_child)
@@ -534,8 +534,8 @@ void stdHashtbl_PrintTableDiagnostics(stdHashTable *hashtable)
     signed int numFilled; // [esp+14h] [ebp-Ch]
     signed int totalChildren; // [esp+18h] [ebp-8h]
 
-    std_pHS->debugPrint("HASHTABLE Diagnostics\n");
-    std_pHS->debugPrint("---------------------\n");
+    std_g_pHS->debugPrint("HASHTABLE Diagnostics\n");
+    std_g_pHS->debugPrint("---------------------\n");
     maxLookups = 0;
     bucketIdx2 = 0;
     numFilled = 0;
@@ -562,11 +562,11 @@ void stdHashtbl_PrintTableDiagnostics(stdHashTable *hashtable)
         }
         while ( bucketIdx2 < hashtable->numBuckets );
     }
-    std_pHS->debugPrint(" Maximum Lookups = %d\n", maxLookups);
-    std_pHS->debugPrint(" Filled Indices = %d/%d (%2.2f%%)\n", numFilled, hashtable->numBuckets, (flex_t)numFilled * 100.0 / (flex_t)hashtable->numBuckets); // FLEXTODO
-    std_pHS->debugPrint(" Average Lookup = %2.2f\n", (flex_t)totalChildren / (flex_t)numFilled); // FLEXTODO
-    std_pHS->debugPrint(" Weighted Lookup = %2.2f\n", (flex_t)totalChildren / (flex_t)hashtable->numBuckets); // FLEXTODO
-    std_pHS->debugPrint("---------------------\n");
+    std_g_pHS->debugPrint(" Maximum Lookups = %d\n", maxLookups);
+    std_g_pHS->debugPrint(" Filled Indices = %d/%d (%2.2f%%)\n", numFilled, hashtable->numBuckets, (flex_t)numFilled * 100.0 / (flex_t)hashtable->numBuckets); // FLEXTODO
+    std_g_pHS->debugPrint(" Average Lookup = %2.2f\n", (flex_t)totalChildren / (flex_t)numFilled); // FLEXTODO
+    std_g_pHS->debugPrint(" Weighted Lookup = %2.2f\n", (flex_t)totalChildren / (flex_t)hashtable->numBuckets); // FLEXTODO
+    std_g_pHS->debugPrint("---------------------\n");
 }
 
 void stdHashtbl_DumpTable(stdHashTable *hashtable)
@@ -574,18 +574,18 @@ void stdHashtbl_DumpTable(stdHashTable *hashtable)
     int index;
     tHashLink *key_iter;
 
-    std_pHS->debugPrint("HASHTABLE\n---------\n");
+    std_g_pHS->debugPrint("HASHTABLE\n---------\n");
     index = 0;
     if ( hashtable->numBuckets > 0 )
     {
         do
         {
-            std_pHS->debugPrint("Index: %d\t", index);
+            std_g_pHS->debugPrint("Index: %d\t", index);
             key_iter = &hashtable->buckets[index];
-            std_pHS->debugPrint("Strings:", index);
+            std_g_pHS->debugPrint("Strings:", index);
             for ( ; key_iter; key_iter = key_iter->next )
-                std_pHS->debugPrint(" '%s'", key_iter->key);
-            std_pHS->debugPrint("\n");
+                std_g_pHS->debugPrint(" '%s'", key_iter->key);
+            std_g_pHS->debugPrint("\n");
             ++index;
         }
         while ( index < hashtable->numBuckets );

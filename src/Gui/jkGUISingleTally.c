@@ -44,8 +44,8 @@ int jkGuiSingleTally_Show()
     jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiSingleTally_menu, &jkGuiSingleTally_buttons[6]);
     jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiSingleTally_menu, &jkGuiSingleTally_buttons[5]);
     jkGuiSingleTally_buttons[0].wstr = jkPlayer_playerShortName;
-    stdString_snprintf(std_genBuffer, 1024, "RANK_%d_%c", jkPlayer_GetJediRank(), (jkPlayer_CalcAlignment(0) >= 0.0) ? 'L' : 'D');
-    jkGuiSingleTally_buttons[1].wstr = jkStrings_GetUniStringWithFallback(std_genBuffer);
+    stdString_snprintf(std_g_genBuffer, 1024, "RANK_%d_%c", jkPlayer_GetJediRank(), (jkPlayer_CalcAlignment(0) >= 0.0) ? 'L' : 'D');
+    jkGuiSingleTally_buttons[1].wstr = jkStrings_GetUniStringWithFallback(std_g_genBuffer);
     if ( (int)sithPlayer_GetInvItemAmount(SITHBIN_MAXSECRETS) <= 0 )
     {
         jk_snwprintf(v14, 0x20u, L"%ls %ls", jkStrings_GetUniStringWithFallback("GUI_SECRETS_FOUND"), jkStrings_GetUniStringWithFallback("GUI_NO_SECRETS"));

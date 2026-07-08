@@ -260,9 +260,9 @@ stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surfac
     //out->format.width_in_bytes = 0;
     // vbuffer pixel data is only accessed word-safe on this port, so allow
     // placement in word-addressable-only memory (e.g. future slot-2 RAM heap).
-    int prevSuggest = std_pHS->suggestHeap(HEAP_WORD_ADDRESSABLE);
+    int prevSuggest = std_g_pHS->suggestHeap(HEAP_WORD_ADDRESSABLE);
     out->surface_lock_alloc = (char*)STD_ALLOC(out->format.texture_size_in_bytes);
-    std_pHS->suggestHeap(prevSuggest);
+    std_g_pHS->suggestHeap(prevSuggest);
     if (!out->surface_lock_alloc) {
         STD_FREE(out);
         return NULL;

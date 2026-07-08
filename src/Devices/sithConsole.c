@@ -144,19 +144,19 @@ int sithConsole_ExeCommand(const char *cmd)
             if (pCvar->flags & CVARFLAG_READONLY) {
                 if (!_strtok(v3, ", \t\n\r")) {
                     sithCvar_ToString(pCvar->pName, tmp_cvar, SITHCVAR_MAX_STRLEN);
-                    _sprintf(std_genBuffer, "%s = \"%s\"", pCvar->pName, tmp_cvar);
+                    _sprintf(std_g_genBuffer, "%s = \"%s\"", pCvar->pName, tmp_cvar);
                     if ( DebugGui_fnPrint )
                     {
-                        DebugGui_fnPrint(std_genBuffer);
+                        DebugGui_fnPrint(std_g_genBuffer);
                     }
                     free((void*)pCmdMutable); // Added: mutable copy of cmd
                     return 0;
                 }
 
-                _sprintf(std_genBuffer, "Cvar %s is read-only.", pCvar->pName);
+                _sprintf(std_g_genBuffer, "Cvar %s is read-only.", pCvar->pName);
                 if ( DebugGui_fnPrint )
                 {
-                    DebugGui_fnPrint(std_genBuffer);
+                    DebugGui_fnPrint(std_g_genBuffer);
                 }
                 free((void*)pCmdMutable); // Added: mutable copy of cmd
                 return 0;
@@ -166,10 +166,10 @@ int sithConsole_ExeCommand(const char *cmd)
             if (!sithCvar_SetFromString(pCvar->pName, v3))
             {
                 sithCvar_ToString(pCvar->pName, tmp_cvar, SITHCVAR_MAX_STRLEN);
-                _sprintf(std_genBuffer, "%s = \"%s\"", pCvar->pName, tmp_cvar);
+                _sprintf(std_g_genBuffer, "%s = \"%s\"", pCvar->pName, tmp_cvar);
                 if ( DebugGui_fnPrint )
                 {
-                    DebugGui_fnPrint(std_genBuffer);
+                    DebugGui_fnPrint(std_g_genBuffer);
                 }
                 free((void*)pCmdMutable); // Added: mutable copy of cmd
                 return 0;
@@ -186,10 +186,10 @@ int sithConsole_ExeCommand(const char *cmd)
             free((void*)pCmdMutable);
             return 1;
         }
-        _sprintf(std_genBuffer, "Console command %s not recognized.", v1);
+        _sprintf(std_g_genBuffer, "Console command %s not recognized.", v1);
         if ( DebugGui_fnPrint )
         {
-            DebugGui_fnPrint(std_genBuffer);
+            DebugGui_fnPrint(std_g_genBuffer);
             free((void*)pCmdMutable); // Added: mutable copy of cmd
             return 0;
         }
@@ -197,7 +197,7 @@ int sithConsole_ExeCommand(const char *cmd)
         if ( DebugGui_some_num_lines == DebugGui_some_line_amt )
             DebugGui_some_line_amt = (DebugGui_some_line_amt + 1) % DebugGui_maxLines;
 
-        stdString_SafeStrCopy(&DebugLog_buffer[128 * DebugGui_some_num_lines], std_genBuffer, 0x80);
+        stdString_SafeStrCopy(&DebugLog_buffer[128 * DebugGui_some_num_lines], std_g_genBuffer, 0x80);
         DebugGui_aIdk[DebugGui_some_num_lines] = stdPlatform_GetTimeMsec();
     }
     free((void*)pCmdMutable); // Added: mutable copy of cmd

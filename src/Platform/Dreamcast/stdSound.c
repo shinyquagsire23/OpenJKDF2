@@ -133,7 +133,7 @@ static void* stdSound_dcStreamThread(void* arg)
                 stdSound_dcStreamOn = 0;
                 // Added: cutscene over -- return the ring + scratch to the heap.
                 if (stdSound_dcRing) {
-                    std_pHS->free(stdSound_dcRing);
+                    std_g_pHS->free(stdSound_dcRing);
                     stdSound_dcRing = NULL;
                 }
                 if (stdSound_dcScratch) {
@@ -160,7 +160,7 @@ static void stdSound_dcStreamQueue(stdSound_buffer_t* buf)
     // memalign because snd_stream fills the scratch via 32-byte SQ bursts. A
     // fresh ring is a fresh stream, so rewind the cursors when we (re)allocate it.
     if (!stdSound_dcRing) {
-        stdSound_dcRing = (uint8_t*)std_pHS->alloc(DC_STREAM_RING);
+        stdSound_dcRing = (uint8_t*)std_g_pHS->alloc(DC_STREAM_RING);
         if (!stdSound_dcRing) { mutex_unlock(&stdSound_dcRingMtx); return; }
         stdSound_dcRingR = stdSound_dcRingW = 0;
     }
@@ -418,10 +418,10 @@ void* stdSound_BufferSetData(stdSound_buffer_t* sound, int bufferBytes, int32_t*
         uint16_t chans = sound->bStereo ? 2 : 1;
         uint32_t bps   = (bits / 8) * chans;
         int bLong = bps && (uint32_t)bufferBytes / bps > 65534;
-        int prevSuggest = bLong ? std_pHS->suggestHeap(HEAP_WORD_ADDRESSABLE) : 0;
+        int prevSuggest = bLong ? std_g_pHS->suggestHeap(HEAP_WORD_ADDRESSABLE) : 0;
         smp->data = STD_ALLOC(bufferBytes);
         if (bLong) {
-            std_pHS->suggestHeap(prevSuggest);
+            std_g_pHS->suggestHeap(prevSuggest);
             stdPlatform_Printf("stdSound: long sample %u KB -> %08x\n",
                                (unsigned)(bufferBytes / 1024), (unsigned)(uintptr_t)smp->data);
         }

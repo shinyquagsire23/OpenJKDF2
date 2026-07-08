@@ -416,8 +416,8 @@ void jkQuakeConsole_ExecuteCommand(const char* pCmd)
 {
     if ( jkHud_dword_552D10 == -1 && sithNet_isMulti )
     {
-        _sprintf(std_genBuffer, "You say, '%s'", pCmd);
-        jkDev_DebugLog(std_genBuffer);
+        _sprintf(std_g_genBuffer, "You say, '%s'", pCmd);
+        jkDev_DebugLog(std_g_genBuffer);
         sithMulti_SendChat(pCmd, -1, playerThingIdx);
     }
     else if ( !jkDev_TryCommand(pCmd) )

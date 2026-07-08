@@ -18,7 +18,7 @@ stdBitmap* stdPcx_Load(char *fpath, int create_ddraw_surface, int gpu_mem)
     stdVBufferTexFmt format;
     stdPcx_Header pcxHeader;
 
-    int fhand = std_pHS->fileOpen(fpath, "rb");
+    int fhand = std_g_pHS->fileOpen(fpath, "rb");
     if ( !fhand )
         return 0;
 
@@ -27,7 +27,7 @@ stdBitmap* stdPcx_Load(char *fpath, int create_ddraw_surface, int gpu_mem)
         goto fail; // TODO will this nullptr deref?
 
     _memset(bitmap, 0, sizeof(stdBitmap));
-    std_pHS->fileRead(fhand, &pcxHeader, sizeof(stdPcx_Header));
+    std_g_pHS->fileRead(fhand, &pcxHeader, sizeof(stdPcx_Header));
     if ( pcxHeader.magic != 10 )
         goto fail;
 
@@ -86,8 +86,8 @@ stdBitmap* stdPcx_Load(char *fpath, int create_ddraw_surface, int gpu_mem)
     if ( paletteAlloc )
     {
         stdFGetc(fhand);
-        std_pHS->fileRead(fhand, (void *)bitmap->palette, 0x300);
-        std_pHS->fileClose(fhand);
+        std_g_pHS->fileRead(fhand, (void *)bitmap->palette, 0x300);
+        std_g_pHS->fileClose(fhand);
     }
     else
     {
@@ -96,7 +96,7 @@ stdBitmap* stdPcx_Load(char *fpath, int create_ddraw_surface, int gpu_mem)
     return bitmap;
     
 fail:
-    std_pHS->fileClose(fhand);
+    std_g_pHS->fileClose(fhand);
     stdBitmap_Free(bitmap);
     return NULL;
 }
@@ -125,11 +125,11 @@ int stdPcx_Write(char *fpath, stdBitmap *bitmap)
     _memset(&pcxHeader.width, 0, 0x38u);
     *(uint16_t*)&pcxHeader.reserved_4A[52] = 0;
     
-    int fhand = std_pHS->fileOpen(fpath, "wb");
+    int fhand = std_g_pHS->fileOpen(fpath, "wb");
     if ( !fhand )
         return 0;
 
-    std_pHS->fileWrite(fhand, &pcxHeader, sizeof(stdPcx_Header));
+    std_g_pHS->fileWrite(fhand, &pcxHeader, sizeof(stdPcx_Header));
     mipSurface = *bitmap->mipSurfaces;
     lockAlloc = (uint8_t*)mipSurface->surface_lock_alloc;
     for (int i = 0; i < mipSurface->format.height; i++)
@@ -155,7 +155,7 @@ int stdPcx_Write(char *fpath, stdBitmap *bitmap)
     }
 
     stdFPutc(0xC, fhand);
-    std_pHS->fileWrite(fhand, bitmap->palette, 0x300);
-    std_pHS->fileClose(fhand);
+    std_g_pHS->fileWrite(fhand, bitmap->palette, 0x300);
+    std_g_pHS->fileClose(fhand);
     return 1;
 }

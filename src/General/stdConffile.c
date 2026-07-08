@@ -19,7 +19,7 @@ int stdConffile_OpenWrite(char *a1)
     if ( writeFile )
         return 0;
 
-    // Added: std_pHS -> pLowLevelHS
+    // Added: std_g_pHS -> pLowLevelHS
     stdConffile_pHS = pLowLevelHS;
     writeFile = stdConffile_pHS->fileOpen(a1, "wb");
     if (writeFile)
@@ -64,7 +64,7 @@ int stdConffile_OpenModeCommon(char *fpath, const char* mode, BOOL bBypassGobs)
         stdConffile_pHS = pLowLevelHS;
     }
     else {
-        stdConffile_pHS = std_pHS;
+        stdConffile_pHS = std_g_pHS;
     }
 
     if (!_memcmp(fpath, "none", 5u))
@@ -73,7 +73,7 @@ int stdConffile_OpenModeCommon(char *fpath, const char* mode, BOOL bBypassGobs)
     }
     else
     {
-        openFile = stdConffile_pHS->fileOpen(fpath, mode); // Added: std_pHS -> stdConffile_pHS
+        openFile = stdConffile_pHS->fileOpen(fpath, mode); // Added: std_g_pHS -> stdConffile_pHS
         if (!openFile)
             goto fail_open;
     }
@@ -97,7 +97,7 @@ fail_open:
     openFile = openFileStack[stackLevel];
     stdConffile_linenum = linenumStack[stackLevel];
     stdConffile_aLine = apBufferStack[stackLevel];
-    stdConffile_pHS = openFileIsBypass[stackLevel] ? pLowLevelHS : std_pHS; // Added: Split off local file access from GOB access
+    stdConffile_pHS = openFileIsBypass[stackLevel] ? pLowLevelHS : std_g_pHS; // Added: Split off local file access from GOB access
 
     _memcpy(&stdConffile_entry, (const void *)(aEntryStack + ((STDCONF_LINEBUFFER_LEN+4) * stackLevel)), sizeof(stdConffileEntry));
     return 0;
@@ -136,7 +136,7 @@ void stdConffile_Close()
         return;
 
     if (openFile) {
-        stdConffile_pHS->fileClose(openFile); // Added: std_pHS -> stdConffile_pHS
+        stdConffile_pHS->fileClose(openFile); // Added: std_g_pHS -> stdConffile_pHS
     }
 
     openFile = 0;
@@ -152,7 +152,7 @@ void stdConffile_Close()
     openFile = openFileStack[stackLevel];
     stdConffile_linenum = linenumStack[stackLevel];
     stdConffile_aLine = apBufferStack[stackLevel];
-    stdConffile_pHS = openFileIsBypass[stackLevel] ? pLowLevelHS : std_pHS; // Added: Split off local file access from GOB access
+    stdConffile_pHS = openFileIsBypass[stackLevel] ? pLowLevelHS : std_g_pHS; // Added: Split off local file access from GOB access
     _memcpy(&stdConffile_entry, (const void *)(aEntryStack + ((STDCONF_LINEBUFFER_LEN+4) * stackLevel)), sizeof(stdConffileEntry));
 }
 
@@ -160,7 +160,7 @@ void stdConffile_CloseWrite()
 {
     if (writeFile)
     {
-        stdConffile_pHS->fileClose(writeFile); // Added: std_pHS -> stdConffile_pHS
+        stdConffile_pHS->fileClose(writeFile); // Added: std_g_pHS -> stdConffile_pHS
         writeFile = 0;
         stdString_SafeStrCopy(stdConffile_aWriteFilename, "NOT_OPEN", 128);
     }
@@ -176,7 +176,7 @@ int stdConffile_Write(const char* line, int amt)
     if ( !writeFile || !line )
         return 0;
 
-    // Added: std_pHS -> stdConffile_pHS
+    // Added: std_g_pHS -> stdConffile_pHS
     return (amt) == stdConffile_pHS->fileWrite(writeFile, (void *)line, (amt));
 }
 
@@ -194,13 +194,13 @@ int stdConffile_Printf(char *fmt, ...)
     len = __vsnprintf(printfBuffer, STDCONF_LINEBUFFER_LEN, fmt, va);
     va_end(va);
 
-    // Added: std_pHS -> stdConffile_pHS
+    // Added: std_g_pHS -> stdConffile_pHS
     return stdConffile_pHS->fileWrite(writeFile, printfBuffer, len) == len;
 }
 
 int stdConffile_Read(void* out, int len)
 {
-    // Added: std_pHS -> stdConffile_pHS
+    // Added: std_g_pHS -> stdConffile_pHS
     if (stdConffile_bOpen && openFile)
         return stdConffile_pHS->fileRead(openFile, out, len) == len;
     else
@@ -272,7 +272,7 @@ int stdConffile_ReadLine()
   buf_left = (STDCONF_LINEBUFFER_LEN-1);
   while (buf_left)
   {
-    // Added: std_pHS -> stdConffile_pHS
+    // Added: std_g_pHS -> stdConffile_pHS
     if (!stdConffile_pHS->fileGets(openFile, line_iter, buf_left))
       return 0;
 

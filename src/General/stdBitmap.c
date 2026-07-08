@@ -20,7 +20,7 @@ stdBitmap* stdBitmap_LoadCommon(char *fpath, int bCreateDDrawSurface, int gpuMem
     outAlloc = (stdBitmap *)STD_ALLOC(sizeof(stdBitmap));
     if (!outAlloc)
     {
-        stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 68, "Error: Unable to allocate memory for bitmap '%s'\n", fpath);
+        stdPrintf(std_g_pHS->errorPrint, ".\\General\\stdBitmap.c", 68, "Error: Unable to allocate memory for bitmap '%s'\n", fpath);
         return NULL;
     }
 
@@ -81,7 +81,7 @@ stdBitmap* stdBitmap_LoadFromFile(stdFile_t fd, int bCreateDDrawSurface, int gpu
     stdBitmap* outAlloc = (stdBitmap*)STD_ALLOC(sizeof(stdBitmap));
     if (!outAlloc)
     {
-        stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 103, "Error: Unable to allocate memory for bitmap.\n", 0, 0, 0, 0);
+        stdPrintf(std_g_pHS->errorPrint, ".\\General\\stdBitmap.c", 103, "Error: Unable to allocate memory for bitmap.\n", 0, 0, 0, 0);
         return NULL;
     }
 
@@ -105,19 +105,19 @@ int stdBitmap_LoadEntry(char *fpath, stdBitmap *out, int bCreateDDrawSurface, in
     stdString_SafeStrCopy(out->fpath_full, fpath, 128);
 #endif
 
-    fd = std_pHS->fileOpen(fpath, "rb");
+    fd = std_g_pHS->fileOpen(fpath, "rb");
     if ( fd )
     {
 #ifndef OPTIMIZE_AWAY_UNUSED_FIELDS
         stdString_SafeStrCopy(out->fpath, stdFileFromPath(fpath), 32);
 #endif
         v7 = stdBitmap_LoadEntryFromFile(fd, out, bCreateDDrawSurface, gpuMem, bPartial);
-        std_pHS->fileClose(fd);
+        std_g_pHS->fileClose(fd);
         return v7;
     }
     else
     {
-        stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 147, "Error: Invalid load filename '%s'.\n", fpath);
+        stdPrintf(std_g_pHS->errorPrint, ".\\General\\stdBitmap.c", 147, "Error: Invalid load filename '%s'.\n", fpath);
         return 0;
     }
 }
@@ -149,15 +149,15 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
     // Added: Moved this up
     _memset(&out->field_20, 0, sizeof(stdBitmap)-offsetof(stdBitmap, field_20));
 
-    std_pHS->fileRead(fp, &bmp_header, sizeof(bitmapHeader));
+    std_g_pHS->fileRead(fp, &bmp_header, sizeof(bitmapHeader));
     if ( _memcmp((const char *)&bmp_header, "BM  ", 4u) )
     {
-        stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 213, "Error: Bad signature in header of bitmap file (%x).\n", *(uint32_t*)&bmp_header);
+        stdPrintf(std_g_pHS->errorPrint, ".\\General\\stdBitmap.c", 213, "Error: Bad signature in header of bitmap file (%x).\n", *(uint32_t*)&bmp_header);
         return 0;
     }
     if ( bmp_header.field_4 != 70 )
     {
-        stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 220, "Error: Bad version %d for bitmap file\n", bmp_header.field_4);
+        stdPrintf(std_g_pHS->errorPrint, ".\\General\\stdBitmap.c", 220, "Error: Bad version %d for bitmap file\n", bmp_header.field_4);
         return 0;
     }
     palFmt = bmp_header.palFmt;
@@ -179,7 +179,7 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
     }
     else
     {
-        stdPrintf(std_pHS->messagePrint, ".\\General\\stdBitmap.c", 843, "Ran out of memory trying allocate bitmap.\n", 0, 0, 0, 0);
+        stdPrintf(std_g_pHS->messagePrint, ".\\General\\stdBitmap.c", 843, "Ran out of memory trying allocate bitmap.\n", 0, 0, 0, 0);
         // Added: Don't crash
         return 0;
     }
@@ -190,7 +190,7 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
     _memset(&vbufTexFmt, 0, sizeof(vbufTexFmt));
     for (mipCount = 0; mipCount < out->numMips; mipCount++)
     {
-        std_pHS->fileRead(fp, v21, 8);
+        std_g_pHS->fileRead(fp, v21, 8);
         vbufTexFmt.height = v21[1];
         vbufTexFmt.width = v21[0];
 
@@ -198,7 +198,7 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
 
         if (bPartial) {
             out->mipSurfaces[mipCount] = NULL;
-            std_pHS->fseek(fp, vbufTexFmt.width*vbufTexFmt.height*((unsigned int)vbufTexFmt.format.bpp >> 3), SEEK_CUR);
+            std_g_pHS->fseek(fp, vbufTexFmt.width*vbufTexFmt.height*((unsigned int)vbufTexFmt.format.bpp >> 3), SEEK_CUR);
             continue;
         }
 
@@ -219,10 +219,10 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
         for ( i = 0; i < vbufTexFmt.height; ++i )
         {
             if (pRowTmp) {
-                std_pHS->fileRead(fp, pRowTmp, v15);
+                std_g_pHS->fileRead(fp, pRowTmp, v15);
                 stdPlatform_Memcpy32(lockAlloc, pRowTmp, v15);
             } else {
-                std_pHS->fileRead(fp, lockAlloc, v15);
+                std_g_pHS->fileRead(fp, lockAlloc, v15);
             }
             lockAlloc += surface->format.width_in_bytes;
         }
@@ -232,7 +232,7 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
 #else
         for ( i = 0; i < vbufTexFmt.height; ++i )
         {
-            std_pHS->fileRead(fp, lockAlloc, v15);
+            std_g_pHS->fileRead(fp, lockAlloc, v15);
             lockAlloc += surface->format.width_in_bytes;
         }
 #endif
@@ -257,7 +257,7 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
         if ( !palette_map )
         {
 LABEL_17:
-            stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 297, "Error: Out of memory trying to load bitmap.\n", 0, 0, 0, 0);
+            stdPrintf(std_g_pHS->errorPrint, ".\\General\\stdBitmap.c", 297, "Error: Out of memory trying to load bitmap.\n", 0, 0, 0, 0);
             return 0;
         }
         // Added: checked read -- a short read here left a garbage palette
@@ -265,7 +265,7 @@ LABEL_17:
         {
             int gotPal = 0;
             while (gotPal < 0x300) {
-                int r = (int)std_pHS->fileRead(fp, (char*)palette_map + gotPal, 0x300 - gotPal);
+                int r = (int)std_g_pHS->fileRead(fp, (char*)palette_map + gotPal, 0x300 - gotPal);
                 if (r <= 0) {
                     stdPlatform_Printf("OpenJKDF2: bitmap palette short read %d/768!\n", gotPal);
                     break;
@@ -317,7 +317,7 @@ void stdBitmap_ConvertColorFormat(rdTexFormat *formatTo, stdBitmap *bitmap)
                 v5 = stdDisplay_VBufferConvertColorFormat(formatTo, bitmap->mipSurfaces[v4]);
                 bitmap->mipSurfaces[v4] = v5;
                 if ( !v5 )
-                    ((void (__cdecl *)(const char *, const char *, int))std_pHS->assert)(
+                    ((void (__cdecl *)(const char *, const char *, int))std_g_pHS->assert)(
                         "Unable to allocate a new frame when converting image from 24 to 16bpp.",
                         ".\\General\\stdBitmap.c",
                         570);
@@ -374,14 +374,14 @@ void stdBitmap_FreeEntry(stdBitmap *pBitmap)
 #ifdef STDBITMAP_PARTIAL_LOAD
     pBitmap->bLoaded = 0;
 #endif
-    //stdPrintf(std_pHS->debugPrint, ".\\General\\stdBitmap.c", 359, "Bitmap elements successfully freed.\n", 0, 0, 0, 0);
+    //stdPrintf(std_g_pHS->debugPrint, ".\\General\\stdBitmap.c", 359, "Bitmap elements successfully freed.\n", 0, 0, 0, 0);
 }
 
 void stdBitmap_Free(stdBitmap *pBitmap)
 {
     stdBitmap_FreeEntry(pBitmap);
     STD_FREE(pBitmap);
-    //stdPrintf(std_pHS->debugPrint, ".\\General\\stdBitmap.c", 322, "Bitmap successfully freed.\n", 0, 0, 0, 0);
+    //stdPrintf(std_g_pHS->debugPrint, ".\\General\\stdBitmap.c", 322, "Bitmap successfully freed.\n", 0, 0, 0, 0);
 }
 
 // Added
@@ -412,10 +412,10 @@ int stdBitmap_AppendToFile(stdFile_t fhand, stdBitmap *pBitmap)
     header.colorkey = pBitmap->colorkey;
     _memcpy(&header.format, &pBitmap->format, sizeof(rdTexFormat));
 
-    written = std_pHS->fileWrite(fhand, &header, sizeof(bitmapHeader));
+    written = std_g_pHS->fileWrite(fhand, &header, sizeof(bitmapHeader));
     if ( written != sizeof(bitmapHeader) )
     {
-        stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 0x1AC,
+        stdPrintf(std_g_pHS->errorPrint, ".\\General\\stdBitmap.c", 0x1AC,
                   "Error: Unable to write %d bytes to file.", sizeof(bitmapHeader));
         return 0;
     }
@@ -426,10 +426,10 @@ int stdBitmap_AppendToFile(stdFile_t fhand, stdBitmap *pBitmap)
         int dims[2];
         dims[0] = vbuf->format.width;
         dims[1] = vbuf->format.height;
-        written = std_pHS->fileWrite(fhand, dims, 8);
+        written = std_g_pHS->fileWrite(fhand, dims, 8);
         if ( written != 8 )
         {
-            stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 0x1C3,
+            stdPrintf(std_g_pHS->errorPrint, ".\\General\\stdBitmap.c", 0x1C3,
                       "Error: Unable to write %d bytes to file.", 8);
             return 0;
         }
@@ -439,10 +439,10 @@ int stdBitmap_AppendToFile(stdFile_t fhand, stdBitmap *pBitmap)
         uint8_t *pixels = (uint8_t *)vbuf->surface_lock_alloc;
         for (uint32_t row = 0; row < (uint32_t)dims[1]; row++)
         {
-            written = std_pHS->fileWrite(fhand, pixels, rowBytes);
+            written = std_g_pHS->fileWrite(fhand, pixels, rowBytes);
             if ( written != (int)rowBytes )
             {
-                stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 0x1D4,
+                stdPrintf(std_g_pHS->errorPrint, ".\\General\\stdBitmap.c", 0x1D4,
                           "Error: Unable to write %d bytes to file.", rowBytes);
                 return 0;
             }
@@ -453,10 +453,10 @@ int stdBitmap_AppendToFile(stdFile_t fhand, stdBitmap *pBitmap)
 
     if ( (pBitmap->palFmt & 2) && pBitmap->palette )
     {
-        written = std_pHS->fileWrite(fhand, pBitmap->palette, 0x300);
+        written = std_g_pHS->fileWrite(fhand, pBitmap->palette, 0x300);
         if ( written != 0x300 )
         {
-            stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 0x1E5,
+            stdPrintf(std_g_pHS->errorPrint, ".\\General\\stdBitmap.c", 0x1E5,
                       "Error: Unable to write %d bytes to file.", 0x300);
             return 0;
         }
@@ -466,21 +466,21 @@ int stdBitmap_AppendToFile(stdFile_t fhand, stdBitmap *pBitmap)
 
 int stdBitmap_Write(const char *fpath, stdBitmap *pBitmap)
 {
-    stdFile_t fhand = std_pHS->fileOpen(fpath, "wb");
+    stdFile_t fhand = std_g_pHS->fileOpen(fpath, "wb");
     if ( !fhand )
     {
-        stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 0x206,
+        stdPrintf(std_g_pHS->errorPrint, ".\\General\\stdBitmap.c", 0x206,
                   "Error: Invalid write filename: '%s'.", fpath);
         return 0;
     }
     if ( !stdBitmap_AppendToFile(fhand, pBitmap) )
     {
-        stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 0x20D,
+        stdPrintf(std_g_pHS->errorPrint, ".\\General\\stdBitmap.c", 0x20D,
                   "Error writing to file '%s'.", fpath);
-        std_pHS->fileClose(fhand);
+        std_g_pHS->fileClose(fhand);
         return 0;
     }
-    std_pHS->fileClose(fhand);
+    std_g_pHS->fileClose(fhand);
     return 1;
 }
 
@@ -494,7 +494,7 @@ stdBitmap* stdBitmap_New(uint32_t numMips, int palFmt, int field_20, int field_6
     stdBitmap *bitmap = (stdBitmap *)STD_ALLOC(sizeof(stdBitmap));
     if ( !bitmap )
     {
-        stdPrintf(std_pHS->statusPrint, ".\\General\\stdBitmap.c", 0x316,
+        stdPrintf(std_g_pHS->statusPrint, ".\\General\\stdBitmap.c", 0x316,
                   "Ran out of memory trying allocating bitmap.");
         return NULL;
     }
@@ -504,7 +504,7 @@ stdBitmap* stdBitmap_New(uint32_t numMips, int palFmt, int field_20, int field_6
     bitmap->mipSurfaces = surfaces;
     if ( !surfaces )
     {
-        stdPrintf(std_pHS->statusPrint, ".\\General\\stdBitmap.c", 0x34B,
+        stdPrintf(std_g_pHS->statusPrint, ".\\General\\stdBitmap.c", 0x34B,
                   "Ran out of memory trying allocating bitmap.");
         STD_FREE(bitmap);
         return NULL;
@@ -527,7 +527,7 @@ int stdBitmap_NewEntry(stdBitmap *bitmap, uint32_t numMips, int palFmt, int fiel
     bitmap->mipSurfaces = surfaces;
     if ( !surfaces )
     {
-        stdPrintf(std_pHS->statusPrint, ".\\General\\stdBitmap.c", 0x34B,
+        stdPrintf(std_g_pHS->statusPrint, ".\\General\\stdBitmap.c", 0x34B,
                   "Ran out of memory trying allocating bitmap.");
         return 0;
     }

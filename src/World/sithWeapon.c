@@ -779,8 +779,8 @@ int sithWeapon_SurfaceCollisionHandler(sithThing *thing, sithSurface *surface, s
             v5 = v4->mat_fpath;
         else
             v5 = "none";
-        _sprintf(std_genBuffer, "Weapon hit surface %d, sector %d, material '%s'.\n", surface->index, surface->parent_sector->id, v5);
-        sithConsole_PrintString(std_genBuffer);
+        _sprintf(std_g_genBuffer, "Weapon hit surface %d, sector %d, material '%s'.\n", surface->index, surface->parent_sector->id, v5);
+        sithConsole_PrintString(std_g_genBuffer);
     }
     v6 = surface->surfaceFlags;
     if (v6 & (SITH_SURFACE_CEILING_SKY|SITH_SURFACE_HORIZON_SKY)) {

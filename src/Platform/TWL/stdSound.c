@@ -21,36 +21,36 @@ uint32_t stdSound_ParseWav(stdFile_t sound_file, uint32_t *nSamplesPerSec, int32
     stdWaveFormat v10; // [esp+10h] [ebp-10h] BYREF
     uint32_t seekPos;
 
-    std_pHS->fseek(sound_file, 8, 0);
-    std_pHS->fileRead(sound_file, v9, 4);
+    std_g_pHS->fseek(sound_file, 8, 0);
+    std_g_pHS->fileRead(sound_file, v9, 4);
     result = 0;
     if ( !_memcmp(v9, "WAVE", 4) )
     {
-        std_pHS->fseek(sound_file, 4, SEEK_CUR);
-        std_pHS->fileRead(sound_file, &seekPos, 4);
-        std_pHS->fileRead(sound_file, &v10, sizeof(stdWaveFormat));
+        std_g_pHS->fseek(sound_file, 4, SEEK_CUR);
+        std_g_pHS->fileRead(sound_file, &seekPos, 4);
+        std_g_pHS->fileRead(sound_file, &v10, sizeof(stdWaveFormat));
         *nSamplesPerSec = v10.nSamplesPerSec;
         *bitsPerSample = 8 * (v10.nBlockAlign / (int)v10.nChannels);
         *bStereo = v10.nChannels == 2;
 
         if (seekPos > 0x10 )
-            std_pHS->fseek(sound_file, seekPos - 16, 1);
+            std_g_pHS->fseek(sound_file, seekPos - 16, 1);
 
         // MoTS removed
-        //std_pHS->fseek(sound_file, 4, SEEK_CUR);
-        //std_pHS->fileRead(sound_file, &seekPos, 4);
+        //std_g_pHS->fseek(sound_file, 4, SEEK_CUR);
+        //std_g_pHS->fileRead(sound_file, &seekPos, 4);
 
         // MoTS added
-        while (!std_pHS->fileEof(sound_file))
+        while (!std_g_pHS->fileEof(sound_file))
         {
-            std_pHS->fileRead(sound_file, v9, 4);
-            std_pHS->fileRead(sound_file, &seekPos, 4);
+            std_g_pHS->fileRead(sound_file, v9, 4);
+            std_g_pHS->fileRead(sound_file, &seekPos, 4);
 
             if (!_memcmp(v9, "data", 4)) break;
-            std_pHS->fseek(sound_file, seekPos, SEEK_CUR);
+            std_g_pHS->fseek(sound_file, seekPos, SEEK_CUR);
         }
 
-        *seekOffset = std_pHS->ftell(sound_file);
+        *seekOffset = std_g_pHS->ftell(sound_file);
         result = seekPos;
 #ifdef AL_FORMAT_WAVE_EXT
         //*seekOffset = 0;

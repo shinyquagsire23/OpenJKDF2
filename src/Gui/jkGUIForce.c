@@ -551,17 +551,17 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *p
     flex_t darklight_float = jkPlayer_CalcAlignment(jkGuiForce_isMulti);
     if (Main_bMotsCompat) {
         if (!isMulti || jkPlayer_personality == 1) {
-            stdString_snprintf(std_genBuffer, 1024, "RANK_%d_%c",jkPlayer_GetJediRank(),'L');
+            stdString_snprintf(std_g_genBuffer, 1024, "RANK_%d_%c",jkPlayer_GetJediRank(),'L');
         }
         else {
-            stdString_snprintf(std_genBuffer, 1024, "GUI_PERSONALITY%d",jkPlayer_personality);
+            stdString_snprintf(std_g_genBuffer, 1024, "GUI_PERSONALITY%d",jkPlayer_personality);
         }
     }
     else {
-        stdString_snprintf(std_genBuffer, 1024, "RANK_%d_%c", jkPlayer_GetJediRank(), (darklight_float >= 0.0) ? 'L' : 'D');
+        stdString_snprintf(std_g_genBuffer, 1024, "RANK_%d_%c", jkPlayer_GetJediRank(), (darklight_float >= 0.0) ? 'L' : 'D');
     }
 
-    jkGuiForce_pElements[EIDX_FLAVORTEXT].wstr = jkStrings_GetUniStringWithFallback(std_genBuffer);
+    jkGuiForce_pElements[EIDX_FLAVORTEXT].wstr = jkStrings_GetUniStringWithFallback(std_g_genBuffer);
     if ( Main_bMotsCompat || (!Main_bMotsCompat && a4 == 0) )
     {
         newStars = (int)sithPlayer_GetInvItemAmount(SITHBIN_NEW_STARS);

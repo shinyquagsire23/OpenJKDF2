@@ -232,7 +232,7 @@ int jkGame_Update()
                 v6 = v2->sector->id;
                 Video_flt_55289C = (flex_d_t)(Video_dword_5528A0 - Video_dword_5528A4) * 1000.0 / (flex_d_t)v0;
                 _sprintf(
-                    std_genBuffer,
+                    std_g_genBuffer,
                     "%02.3f (%02d%%)f %3ds %3da %3dz %4dp %3d curSector %3d fo",
                     Video_flt_55289C,
                     (unsigned int)(__int64)((flex_d_t)(unsigned int)jkGame_updateMsecsTotal / (flex_d_t)(int)v0 * 100.0),
@@ -243,8 +243,8 @@ int jkGame_Update()
                     v6,
                     sithNet_thingsIdx);
                 if ( sithNet_isMulti )
-                    _sprintf(&std_genBuffer[_strlen(std_genBuffer)], " %d m %d b", stdComm_dword_8321F4, stdComm_dword_8321F0);
-                jkDev_sub_41FC40(100, std_genBuffer);
+                    _sprintf(&std_g_genBuffer[_strlen(std_g_genBuffer)], " %d m %d b", stdComm_dword_8321F4, stdComm_dword_8321F0);
+                jkDev_sub_41FC40(100, std_g_genBuffer);
                 v3 = Video_dword_5528A8;
             }
             Video_lastTimeMsec = v3;
@@ -263,8 +263,8 @@ int jkGame_Update()
         {
             v4 = (flex_d_t)(Video_dword_5528A0 - Video_dword_5528A4) * 1000.0 / (flex_d_t)(unsigned int)(Video_dword_5528A8 - Video_lastTimeMsec);
             Video_flt_55289C = v4;
-            _sprintf(std_genBuffer, "%02.3f", v4);
-            jkDev_sub_41FC40(100, std_genBuffer);
+            _sprintf(std_g_genBuffer, "%02.3f", v4);
+            jkDev_sub_41FC40(100, std_g_genBuffer);
             Video_lastTimeMsec = Video_dword_5528A8;
             Video_dword_5528A4 = Video_dword_5528A0;
         }

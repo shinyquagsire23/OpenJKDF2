@@ -56,18 +56,18 @@ int jkSmack_SmackPlay(const char *fname)
         jkSmack_nextGuiState = JK_GAMEMODE_TITLE;
         return 1;
     }
-    _sprintf(std_genBuffer, "video%c%s", LEC_PATH_SEPARATOR_CHR, fname);
+    _sprintf(std_g_genBuffer, "video%c%s", LEC_PATH_SEPARATOR_CHR, fname);
 
 #ifdef FS_POSIX
-    char *r = (char*)malloc(strlen(std_genBuffer) + 16);
-    if (casepath(std_genBuffer, r))
+    char *r = (char*)malloc(strlen(std_g_genBuffer) + 16);
+    if (casepath(std_g_genBuffer, r))
     {
-        strcpy(std_genBuffer, r);
+        strcpy(std_g_genBuffer, r);
     }
     free(r);
 #endif
 
-    if ( !util_FileExists(std_genBuffer) )
+    if ( !util_FileExists(std_g_genBuffer) )
     {
         if ( jkGuiRend_thing_five )
             jkGuiRend_thing_four = 1;
@@ -76,7 +76,7 @@ int jkSmack_SmackPlay(const char *fname)
         jkSmack_nextGuiState = JK_GAMEMODE_TITLE;
         return 1;
     }
-    jkRes_FileExists(std_genBuffer, jkMain_aLevelJklFname, 128);
+    jkRes_FileExists(std_g_genBuffer, jkMain_aLevelJklFname, 128);
 
     if ( jkGuiRend_thing_five )
         jkGuiRend_thing_four = 1;

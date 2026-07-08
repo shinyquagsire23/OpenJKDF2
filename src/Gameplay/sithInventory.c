@@ -618,10 +618,10 @@ void sithInventory_SerializedWrite(sithThing *thing)
         sithItemInfo* iteminfo = &thing->actorParams.playerinfo->iteminfo[i];
         if ( sithInventory_g_aTypes[i].flags & 1 )
         {
-            *(flex32_t *)&std_genBuffer[0] = iteminfo->ammoAmt; // FLEXTODO
-            *(int*)&std_genBuffer[4] = iteminfo->field_4;
-            *(flex32_t *)&std_genBuffer[8] = iteminfo->state; // FLEXTODO
-            stdConffile_Write(std_genBuffer, 12);
+            *(flex32_t *)&std_g_genBuffer[0] = iteminfo->ammoAmt; // FLEXTODO
+            *(int*)&std_g_genBuffer[4] = iteminfo->field_4;
+            *(flex32_t *)&std_g_genBuffer[8] = iteminfo->state; // FLEXTODO
+            stdConffile_Write(std_g_genBuffer, 12);
         }
     }
 }

@@ -102,9 +102,9 @@ void  stdPlatform_PrintAllocStats(void);
 uint32_t stdPlatform_AllocSize(void* p);
 
 #ifdef STDPLATFORM_ALLOC_TRACKING
-#define STD_ALLOC(len)       stdPlatform_TrackedAlloc(std_pHS->alloc, (len), __FILE__)
-#define STD_FREE(p)          stdPlatform_TrackedFree(std_pHS->free, (p), __FILE__)
-#define STD_REALLOC(p, len)  stdPlatform_TrackedRealloc(std_pHS->realloc, (p), (len), __FILE__)
+#define STD_ALLOC(len)       stdPlatform_TrackedAlloc(std_g_pHS->alloc, (len), __FILE__)
+#define STD_FREE(p)          stdPlatform_TrackedFree(std_g_pHS->free, (p), __FILE__)
+#define STD_REALLOC(p, len)  stdPlatform_TrackedRealloc(std_g_pHS->realloc, (p), (len), __FILE__)
 #define SITH_ALLOC(len)      stdPlatform_TrackedAlloc(pSithHS->alloc, (len), __FILE__)
 #define SITH_FREE(p)         stdPlatform_TrackedFree(pSithHS->free, (p), __FILE__)
 #define SITH_REALLOC(p, len) stdPlatform_TrackedRealloc(pSithHS->realloc, (p), (len), __FILE__)
@@ -114,9 +114,9 @@ uint32_t stdPlatform_AllocSize(void* p);
 #define JK_ALLOC(len)        stdPlatform_TrackedAlloc(pHS->alloc, (len), __FILE__)
 #define JK_FREE(p)           stdPlatform_TrackedFree(pHS->free, (p), __FILE__)
 #else
-#define STD_ALLOC(len)       std_pHS->alloc(len)
-#define STD_FREE(p)          std_pHS->free(p)
-#define STD_REALLOC(p, len)  std_pHS->realloc((p), (len))
+#define STD_ALLOC(len)       std_g_pHS->alloc(len)
+#define STD_FREE(p)          std_g_pHS->free(p)
+#define STD_REALLOC(p, len)  std_g_pHS->realloc((p), (len))
 #define SITH_ALLOC(len)      pSithHS->alloc(len)
 #define SITH_FREE(p)         pSithHS->free(p)
 #define SITH_REALLOC(p, len) pSithHS->realloc((p), (len))

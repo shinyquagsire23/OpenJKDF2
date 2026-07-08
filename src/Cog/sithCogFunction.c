@@ -104,8 +104,8 @@ void sithCogFunction_Sleep(sithCog *ctx)
     if ( ctx_->flags & SITH_COG_DEBUG )
     {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-        _sprintf(std_genBuffer, "Cog %s: Sleeping for %f seconds.\n", ctx_->cogscript_fpath, fSecs);
-        sithConsole_PrintString(std_genBuffer);
+        _sprintf(std_g_genBuffer, "Cog %s: Sleeping for %f seconds.\n", ctx_->cogscript_fpath, fSecs);
+        sithConsole_PrintString(std_g_genBuffer);
 #endif
     }
     ctx_->script_running = 2;
@@ -321,8 +321,8 @@ void sithCogFunction_SetPulse(sithCog *ctx)
         if ( ctx->flags & SITH_COG_DEBUG )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_genBuffer, "Cog %s: Pulse disabled.\n", ctx->cogscript_fpath);
-            sithConsole_PrintString(std_genBuffer);
+            _sprintf(std_g_genBuffer, "Cog %s: Pulse disabled.\n", ctx->cogscript_fpath);
+            sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
         ctx->flags &= ~SITH_COG_PULSE_SET;
@@ -332,8 +332,8 @@ void sithCogFunction_SetPulse(sithCog *ctx)
         if ( ctx->flags & SITH_COG_DEBUG )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_genBuffer, "Cog %s: Pulse set to %f seconds.\n", ctx->cogscript_fpath, popFlex);
-            sithConsole_PrintString(std_genBuffer);
+            _sprintf(std_g_genBuffer, "Cog %s: Pulse set to %f seconds.\n", ctx->cogscript_fpath, popFlex);
+            sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
         ctx->flags |= SITH_COG_PULSE_SET;
@@ -350,8 +350,8 @@ void sithCogFunction_SetTimer(sithCog *ctx)
         if ( ctx->flags & SITH_COG_DEBUG )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_genBuffer, "Cog %s: Timer cancelled.\n", ctx->cogscript_fpath);
-            sithConsole_PrintString(std_genBuffer);
+            _sprintf(std_g_genBuffer, "Cog %s: Timer cancelled.\n", ctx->cogscript_fpath);
+            sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
         ctx->flags &= ~SITH_COG_TIMER_SET;
@@ -361,8 +361,8 @@ void sithCogFunction_SetTimer(sithCog *ctx)
         if ( ctx->flags & SITH_COG_DEBUG )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_genBuffer, "Cog %s: Timer set for %f seconds.\n", ctx->cogscript_fpath, popFlex);
-            sithConsole_PrintString(std_genBuffer);
+            _sprintf(std_g_genBuffer, "Cog %s: Timer set for %f seconds.\n", ctx->cogscript_fpath, popFlex);
+            sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
         ctx->flags |= SITH_COG_TIMER_SET;

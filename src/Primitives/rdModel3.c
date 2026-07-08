@@ -124,7 +124,7 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
     if (!stdConffile_ReadLine())
         return 0;
 
-    if ( _sscanf(stdConffile_aLine, " section: %s", std_genBuffer) != 1 ) {
+    if ( _sscanf(stdConffile_aLine, " section: %s", std_g_genBuffer) != 1 ) {
         rdModel3_HelpDebug("OpenJKDF2: %s: Failed to parse section line\n", __func__); // Added
         return 0;
     }
@@ -140,7 +140,7 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
         return 0;
     }
 
-    if ( _sscanf(stdConffile_aLine, " section: %s", std_genBuffer) != 1
+    if ( _sscanf(stdConffile_aLine, " section: %s", std_g_genBuffer) != 1
       || !stdConffile_ReadLine()
       || _sscanf(stdConffile_aLine, " materials %d", &model->numMaterials) != 1 ) {
 
@@ -161,13 +161,13 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
         if (!stdConffile_ReadLine())
             goto fail;
 
-        if ( _sscanf(stdConffile_aLine, " %d: %s", &geoset_num, std_genBuffer) != 2 )
+        if ( _sscanf(stdConffile_aLine, " %d: %s", &geoset_num, std_g_genBuffer) != 2 )
             goto fail;
 
-        model->materials[i] = rdMaterial_Load(std_genBuffer, 0, 0);
+        model->materials[i] = rdMaterial_Load(std_g_genBuffer, 0, 0);
 
         if ( !model->materials[i] ) {
-            rdModel3_HelpDebug("OpenJKDF2: %s: Failed to load material %s\n", __func__, std_genBuffer); // Added
+            rdModel3_HelpDebug("OpenJKDF2: %s: Failed to load material %s\n", __func__, std_g_genBuffer); // Added
             goto fail;
         }
     }
@@ -175,7 +175,7 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
     if (!stdConffile_ReadLine())
         goto fail;
 
-    if ( _sscanf(stdConffile_aLine, " section: %s", std_genBuffer) != 1 ) {
+    if ( _sscanf(stdConffile_aLine, " section: %s", std_g_genBuffer) != 1 ) {
         rdModel3_HelpDebug("OpenJKDF2: %s: Failed to parse section line %s\n", __func__, stdConffile_aLine); // Added
         goto fail;
     }
@@ -243,18 +243,18 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
             mesh->mesh_num = i;
             if ( !stdConffile_ReadLine() )
                 goto fail;
-            if ( _sscanf(stdConffile_aLine, " mesh %d", std_genBuffer) != 1 ) {
+            if ( _sscanf(stdConffile_aLine, " mesh %d", std_g_genBuffer) != 1 ) {
                 rdModel3_HelpDebug("OpenJKDF2: %s: Failed to parse mesh %s\n", __func__, stdConffile_aLine); // Added
                 goto fail;
             }
             if ( !stdConffile_ReadLine() )
                 goto fail;
-            if ( _sscanf(stdConffile_aLine, " name %s", std_genBuffer) != 1 ) {
+            if ( _sscanf(stdConffile_aLine, " name %s", std_g_genBuffer) != 1 ) {
                 rdModel3_HelpDebug("OpenJKDF2: %s: Failed to parse name %s\n", __func__, stdConffile_aLine); // Added
                 goto fail;
             }
 
-            stdString_SafeStrCopy(mesh->name, std_genBuffer, 32);
+            stdString_SafeStrCopy(mesh->name, std_g_genBuffer, 32);
 
             if ( !stdConffile_ReadLine()
               || _sscanf(stdConffile_aLine, " radius %f", &radius) != 1
@@ -584,7 +584,7 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
     if (!stdConffile_ReadLine() )
         goto fail;
 
-    if ( _sscanf(stdConffile_aLine, " section: %s", std_genBuffer) != 1 )
+    if ( _sscanf(stdConffile_aLine, " section: %s", std_g_genBuffer) != 1 )
         goto fail;
 
     if (!stdConffile_ReadLine())

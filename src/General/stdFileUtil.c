@@ -50,8 +50,8 @@ stdFileSearch* stdFileUtil_NewFind(const char *path, int a2, const char *extensi
         return search;
     if ( *extension == '.' )
         extension = extension + 1;
-    stdString_snprintf(std_genBuffer, 1024, "*.%s", extension);
-    stdFnames_MakePath(search->path, 128, path, std_genBuffer);
+    stdString_snprintf(std_g_genBuffer, 1024, "*.%s", extension);
+    stdFnames_MakePath(search->path, 128, path, std_g_genBuffer);
     
 #ifdef FS_POSIX
     for (int i = 0; i < strlen(search->path); i++)

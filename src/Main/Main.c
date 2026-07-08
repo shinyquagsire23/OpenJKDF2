@@ -736,10 +736,10 @@ void Main_ParseCmdLine(char *cmdline)
 int Main_FPrintf(const char* fmt, ...) {
     va_list args;
     va_start (args, fmt);
-    int ret = __vsnprintf(std_genBuffer, 0x400, fmt, args);
+    int ret = __vsnprintf(std_g_genBuffer, 0x400, fmt, args);
     va_end (args);
 
-    fputs(std_genBuffer, (FILE*)debug_log_fp);
+    fputs(std_g_genBuffer, (FILE*)debug_log_fp);
     fflush((FILE*)debug_log_fp);
 
     return ret;

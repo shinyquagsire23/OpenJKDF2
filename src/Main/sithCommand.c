@@ -201,8 +201,8 @@ int sithCommand_Tick(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     }
     else
     {
-        _sprintf(std_genBuffer, "Current tick rate is %d msec", sithNet_tickrate);
-        sithConsole_PrintString(std_genBuffer);
+        _sprintf(std_g_genBuffer, "Current tick rate is %d msec", sithNet_tickrate);
+        sithConsole_PrintString(std_g_genBuffer);
         result = 1;
     }
     return result;
@@ -217,8 +217,8 @@ int sithCommand_Session(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     if ( !sithNet_isMulti )
         return 0;
     DirectPlay_EnumPlayers(0);
-    _sprintf(std_genBuffer, "%d players in session", DirectPlay_numPlayers);
-    sithConsole_PrintString(std_genBuffer);
+    _sprintf(std_g_genBuffer, "%d players in session", DirectPlay_numPlayers);
+    sithConsole_PrintString(std_g_genBuffer);
     v3 = 0;
     if ( DirectPlay_numPlayers )
     {
@@ -226,8 +226,8 @@ int sithCommand_Session(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         do
         {
             v5 = sithMulti_GetPlayerIndexByID(v4->field_80);
-            _sprintf(std_genBuffer, "Player %x (%S) is in the session", v4->field_80, jkPlayer_playerInfos[v5].player_name);
-            sithConsole_PrintString(std_genBuffer);
+            _sprintf(std_g_genBuffer, "Player %x (%S) is in the session", v4->field_80, jkPlayer_playerInfos[v5].player_name);
+            sithConsole_PrintString(std_g_genBuffer);
             ++v3;
             ++v4;
         }
@@ -338,18 +338,18 @@ int sithCommand_CogList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     if ( sithWorld_g_pCurrentWorld )
     {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-        _sprintf(std_genBuffer, "World cogs = %d.", sithWorld_g_pCurrentWorld->numCogsLoaded);
-        sithConsole_PrintString(std_genBuffer);
+        _sprintf(std_g_genBuffer, "World cogs = %d.", sithWorld_g_pCurrentWorld->numCogsLoaded);
+        sithConsole_PrintString(std_g_genBuffer);
         v3 = 0;
         for ( i = sithWorld_g_pCurrentWorld->cogs; v3 < sithWorld_g_pCurrentWorld->numCogsLoaded; ++i )
         {
-            _sprintf(std_genBuffer, "%d: %-16s %-16s ", v3, i->cogscript_fpath, i->cogscript->cog_fpath);
+            _sprintf(std_g_genBuffer, "%d: %-16s %-16s ", v3, i->cogscript_fpath, i->cogscript->cog_fpath);
             if ( (i->flags & SITH_COG_DISABLED) != 0 )
-                _sprintf(&std_genBuffer[strlen(std_genBuffer)], "(paused) ");
+                _sprintf(&std_g_genBuffer[strlen(std_g_genBuffer)], "(paused) ");
             if ( (i->flags & SITH_COG_DEBUG) != 0 )
-                _sprintf(&std_genBuffer[strlen(std_genBuffer)], "(trace)  ");
-            _sprintf(&std_genBuffer[strlen(std_genBuffer)], sithCommand_aIdk);
-            sithConsole_PrintString(std_genBuffer);
+                _sprintf(&std_g_genBuffer[strlen(std_g_genBuffer)], "(trace)  ");
+            _sprintf(&std_g_genBuffer[strlen(std_g_genBuffer)], sithCommand_aIdk);
+            sithConsole_PrintString(std_g_genBuffer);
             ++v3;
         }
 #endif
@@ -418,30 +418,30 @@ int sithCommand_Memory(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         return 0;
     }
     sithWorld_GetMemoryUsage(pWorld, worldAllocatedAmt, worldQuantityAmt);
-    _sprintf(std_genBuffer, "%5d Materials        %8d bytes.", worldQuantityAmt[0], worldAllocatedAmt[0]);
-    sithConsole_PrintString(std_genBuffer);
-    _sprintf(std_genBuffer, "%5d Models           %8d bytes.", worldQuantityAmt[10], worldAllocatedAmt[10]);
-    sithConsole_PrintString(std_genBuffer);
-    _sprintf(std_genBuffer, "%5d Sounds", worldQuantityAmt[6]);
-    sithConsole_PrintString(std_genBuffer);
-    _sprintf(std_genBuffer, "%5d Keyframes        %8d bytes.", worldQuantityAmt[11], worldAllocatedAmt[11]);
-    sithConsole_PrintString(std_genBuffer);
-    _sprintf(std_genBuffer, "%5d World Vertices   %8d bytes.", worldQuantityAmt[1], worldAllocatedAmt[1]);
-    sithConsole_PrintString(std_genBuffer);
-    _sprintf(std_genBuffer, "%5d World TexVerts   %8d bytes.", worldQuantityAmt[2], worldAllocatedAmt[2]);
-    sithConsole_PrintString(std_genBuffer);
-    _sprintf(std_genBuffer, "%5d Surfaces         %8d bytes.", worldQuantityAmt[3], worldAllocatedAmt[3]);
-    sithConsole_PrintString(std_genBuffer);
-    _sprintf(std_genBuffer, "%5d Sectors          %8d bytes.", worldQuantityAmt[5], worldAllocatedAmt[5]);
-    sithConsole_PrintString(std_genBuffer);
-    _sprintf(std_genBuffer, "%5d Cog Scripts\t\t%8d bytes.", worldQuantityAmt[8], worldAllocatedAmt[8]);
-    sithConsole_PrintString(std_genBuffer);
-    _sprintf(std_genBuffer, "%5d Cogs             %8d bytes.", worldQuantityAmt[7], worldAllocatedAmt[7]);
-    sithConsole_PrintString(std_genBuffer);
-    _sprintf(std_genBuffer, "%5d Adjoins          %8d bytes.", worldQuantityAmt[4], worldAllocatedAmt[4]);
-    sithConsole_PrintString(std_genBuffer);
-    _sprintf(std_genBuffer, "Total Memory Used:   %8d bytes.", worldAllocatedAmt[4] + worldAllocatedAmt[5] + worldAllocatedAmt[3] + worldAllocatedAmt[2] + worldAllocatedAmt[1] + worldAllocatedAmt[11] + worldAllocatedAmt[10] + worldAllocatedAmt[0]);
-    sithConsole_PrintString(std_genBuffer);
+    _sprintf(std_g_genBuffer, "%5d Materials        %8d bytes.", worldQuantityAmt[0], worldAllocatedAmt[0]);
+    sithConsole_PrintString(std_g_genBuffer);
+    _sprintf(std_g_genBuffer, "%5d Models           %8d bytes.", worldQuantityAmt[10], worldAllocatedAmt[10]);
+    sithConsole_PrintString(std_g_genBuffer);
+    _sprintf(std_g_genBuffer, "%5d Sounds", worldQuantityAmt[6]);
+    sithConsole_PrintString(std_g_genBuffer);
+    _sprintf(std_g_genBuffer, "%5d Keyframes        %8d bytes.", worldQuantityAmt[11], worldAllocatedAmt[11]);
+    sithConsole_PrintString(std_g_genBuffer);
+    _sprintf(std_g_genBuffer, "%5d World Vertices   %8d bytes.", worldQuantityAmt[1], worldAllocatedAmt[1]);
+    sithConsole_PrintString(std_g_genBuffer);
+    _sprintf(std_g_genBuffer, "%5d World TexVerts   %8d bytes.", worldQuantityAmt[2], worldAllocatedAmt[2]);
+    sithConsole_PrintString(std_g_genBuffer);
+    _sprintf(std_g_genBuffer, "%5d Surfaces         %8d bytes.", worldQuantityAmt[3], worldAllocatedAmt[3]);
+    sithConsole_PrintString(std_g_genBuffer);
+    _sprintf(std_g_genBuffer, "%5d Sectors          %8d bytes.", worldQuantityAmt[5], worldAllocatedAmt[5]);
+    sithConsole_PrintString(std_g_genBuffer);
+    _sprintf(std_g_genBuffer, "%5d Cog Scripts\t\t%8d bytes.", worldQuantityAmt[8], worldAllocatedAmt[8]);
+    sithConsole_PrintString(std_g_genBuffer);
+    _sprintf(std_g_genBuffer, "%5d Cogs             %8d bytes.", worldQuantityAmt[7], worldAllocatedAmt[7]);
+    sithConsole_PrintString(std_g_genBuffer);
+    _sprintf(std_g_genBuffer, "%5d Adjoins          %8d bytes.", worldQuantityAmt[4], worldAllocatedAmt[4]);
+    sithConsole_PrintString(std_g_genBuffer);
+    _sprintf(std_g_genBuffer, "Total Memory Used:   %8d bytes.", worldAllocatedAmt[4] + worldAllocatedAmt[5] + worldAllocatedAmt[3] + worldAllocatedAmt[2] + worldAllocatedAmt[1] + worldAllocatedAmt[11] + worldAllocatedAmt[10] + worldAllocatedAmt[0]);
+    sithConsole_PrintString(std_g_genBuffer);
     sithConsole_PrintString("(Total does not include sounds & cogs)"); 
     
     return 1;
@@ -450,12 +450,12 @@ int sithCommand_Memory(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 int sithCommand_DynamicMemory(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     _sprintf(
-        std_genBuffer,
+        std_g_genBuffer,
         "NumAllocs: %d TotalMemAlloc: %d bytes MaxMemAlloc: %d bytes",
         stdMemory_info.nextNum,
         stdMemory_info.allocCur,
         stdMemory_info.allocMax);
-    sithConsole_PrintString(std_genBuffer);
+    sithConsole_PrintString(std_g_genBuffer);
     return 1;
 }
 
@@ -499,7 +499,7 @@ int sithCommand_Coords(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         {
             rdMatrix_ExtractAngles34(&player->lookOrientation, &a2);
             _sprintf(
-                std_genBuffer,
+                std_g_genBuffer,
                 "Pos: (%.2f, %.2f, %.2f) PYR: (%.2f, %.2f, %.2f) Sector: %d.",
                 player->position.x,
                 player->position.y,
@@ -508,7 +508,7 @@ int sithCommand_Coords(stdDebugConsoleCmd *pCmd, const char *pArgStr)
                 a2.y,
                 a2.z,
                 player->sector->id);
-            sithConsole_PrintString(std_genBuffer);
+            sithConsole_PrintString(std_g_genBuffer);
         }
         else
         {
@@ -643,8 +643,8 @@ int sithCommand_Players(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     int v5; // ecx
     char v7[32]; // [esp+8h] [ebp-20h] BYREF
 
-    _sprintf(std_genBuffer, "Maxplayers = %d", jkPlayer_maxPlayers);
-    sithConsole_PrintString(std_genBuffer);
+    _sprintf(std_g_genBuffer, "Maxplayers = %d", jkPlayer_maxPlayers);
+    sithConsole_PrintString(std_g_genBuffer);
     v2 = 0;
     if ( jkPlayer_maxPlayers )
     {
@@ -655,8 +655,8 @@ int sithCommand_Players(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             v4 = v3->net_id;
             v5 = v3->flags;
             v7[31] = 0;
-            _sprintf(std_genBuffer, "Player %d:  Name: %s  Flags: %x  ID: %x", v2, v7, v5, v4);
-            sithConsole_PrintString(std_genBuffer);
+            _sprintf(std_g_genBuffer, "Player %d:  Name: %s  Flags: %x  ID: %x", v2, v7, v5, v4);
+            sithConsole_PrintString(std_g_genBuffer);
             ++v2;
             ++v3;
         }
@@ -680,8 +680,8 @@ int sithCommand_PingPlayer(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         v2 = sithPlayer_GetPlayerNumByName(v4);
         if ( v2 < 0 )
         {
-            _sprintf(std_genBuffer, "Player %s not found", (const char *)v4);
-            sithConsole_PrintString(std_genBuffer);
+            _sprintf(std_g_genBuffer, "Player %s not found", (const char *)v4);
+            sithConsole_PrintString(std_g_genBuffer);
         }
     }
     sithMulti_Ping(jkPlayer_playerInfos[v2].net_id);
@@ -706,8 +706,8 @@ int sithCommand_Kick(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         {
             if ( (v3->flags & 1) != 0 && !__wcsicmp(v3->player_name, a1) )
             {
-                _sprintf(std_genBuffer, "Kicked %S", v3->player_name);
-                sithConsole_PrintString(std_genBuffer);
+                _sprintf(std_g_genBuffer, "Kicked %S", v3->player_name);
+                sithConsole_PrintString(std_g_genBuffer);
                 sithMulti_QuitPlayer(v3->net_id);
             }
             ++v2;
@@ -776,10 +776,10 @@ int sithCommand_MatList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     {
         if ( matInfo[i][2] != 0 )
         {
-            _sprintf(std_genBuffer, "%-16s  %d faces, %d bytes, %d bytes/face",
+            _sprintf(std_g_genBuffer, "%-16s  %d faces, %d bytes, %d bytes/face",
                      pWorld->materials[matInfo[i][0]].mat_fpath,
                      matInfo[i][1], matInfo[i][3], matInfo[i][2]);
-            sithConsole_PrintString(std_genBuffer);
+            sithConsole_PrintString(std_g_genBuffer);
         }
     }
 
@@ -797,8 +797,8 @@ int sithCommand_CmdThingNpc(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 
     char* pArgIter = _strtok(pArgStrMutable, ", \t\n\r");
     if ( !pArgIter ){
-        _sprintf(std_genBuffer, "Usage: %s [spawn]\n", pCmd->cmdStr);
-        sithConsole_PrintString(std_genBuffer);
+        _sprintf(std_g_genBuffer, "Usage: %s [spawn]\n", pCmd->cmdStr);
+        sithConsole_PrintString(std_g_genBuffer);
         free((void*)pArgStrMutable);
         return 1;
     }
@@ -806,8 +806,8 @@ int sithCommand_CmdThingNpc(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     if (!__strcmpi(pArgIter, "spawn")) {
         pArgIter = _strtok(NULL, ", \t\n\r");
         if (!pArgIter) {
-            _sprintf(std_genBuffer, "Usage: %s spawn <template>\n", pCmd->cmdStr);
-            sithConsole_PrintString(std_genBuffer);
+            _sprintf(std_g_genBuffer, "Usage: %s spawn <template>\n", pCmd->cmdStr);
+            sithConsole_PrintString(std_g_genBuffer);
             free((void*)pArgStrMutable);
             return 1;
         }
@@ -839,8 +839,8 @@ int sithCommand_CmdBind(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 
     char* pArgIter = _strtok(pArgStrMutable, ", \t\n\r");
     if ( !pArgIter || strlen(pArgIter) > 1) {
-        _sprintf(std_genBuffer, "Usage: %s <key> <command...args>\n", pCmd->cmdStr);
-        sithConsole_PrintString(std_genBuffer);
+        _sprintf(std_g_genBuffer, "Usage: %s <key> <command...args>\n", pCmd->cmdStr);
+        sithConsole_PrintString(std_g_genBuffer);
         free((void*)pArgStrMutable);
         return 1;
     }
@@ -861,8 +861,8 @@ int sithCommand_CmdBind(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         sithCommand_AddBind(key, tmp);
     }
     else {
-        _sprintf(std_genBuffer, "Usage: %s <key> <command...args>\n", pCmd->cmdStr);
-        sithConsole_PrintString(std_genBuffer);
+        _sprintf(std_g_genBuffer, "Usage: %s <key> <command...args>\n", pCmd->cmdStr);
+        sithConsole_PrintString(std_g_genBuffer);
     }
     free((void*)pArgStrMutable);
     return 1;
@@ -879,8 +879,8 @@ int sithCommand_CmdUnbind(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 
     char* pArgIter = _strtok(pArgStrMutable, ", \t\n\r");
     if ( !pArgIter || strlen(pArgIter) > 1) {
-        _sprintf(std_genBuffer, "Usage: %s <key>\n", pCmd->cmdStr);
-        sithConsole_PrintString(std_genBuffer);
+        _sprintf(std_g_genBuffer, "Usage: %s <key>\n", pCmd->cmdStr);
+        sithConsole_PrintString(std_g_genBuffer);
         free((void*)pArgStrMutable);
         return 1;
     }

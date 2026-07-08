@@ -529,14 +529,14 @@ int sithAI_AIList(stdDebugConsoleCmd* a, const char* b)
                 if ( i->thing )
                 {
                     _sprintf(
-                        std_genBuffer,
+                        std_g_genBuffer,
                         "Block %2d: Class '%s', Owner '%s' (%d), Flags 0x%x\n",
                         v1,
                         v3->fpath,
                         i->thing->template_name,
                         i->thing->thingIdx,
                         i->flags);
-                    sithConsole_PrintString(std_genBuffer);
+                    sithConsole_PrintString(std_g_genBuffer);
                 }
             }
             ++v1;
@@ -568,10 +568,10 @@ int sithAI_AIStatus(stdDebugConsoleCmd* a1, const char *idxStr)
         v4 = &sithAI_actors[actorIdx];
         if ( v3 )
         {
-            _sprintf(std_genBuffer, "AI Status dump for thing %d (%s).\n", v3->thingIdx, v3->template_name);
-            sithConsole_PrintString(std_genBuffer);
+            _sprintf(std_g_genBuffer, "AI Status dump for thing %d (%s).\n", v3->thingIdx, v3->template_name);
+            sithConsole_PrintString(std_g_genBuffer);
             _sprintf(
-                std_genBuffer,
+                std_g_genBuffer,
                 "Class '%s', Flags=0x%x, Moods %d/%d/%d, NextUpdate=%d\n",
                 v4->pAIClass->fpath,
                 v4->flags,
@@ -579,7 +579,7 @@ int sithAI_AIStatus(stdDebugConsoleCmd* a1, const char *idxStr)
                 v4->mood1,
                 v4->mood2,
                 v4->nextUpdate);
-            sithConsole_PrintString(std_genBuffer);
+            sithConsole_PrintString(std_g_genBuffer);
             sithConsole_PrintString("Current instincts:\n");
             if ( v4->numAIClassEntries )
             {
@@ -588,7 +588,7 @@ int sithAI_AIStatus(stdDebugConsoleCmd* a1, const char *idxStr)
                 do
                 {
                     _sprintf(
-                        std_genBuffer,
+                        std_g_genBuffer,
                         "Instinct %d: Params: %f/%f/%f/%f, nextUpdate=%d, mask=0x%x, mode=0x%x.\n",
                         v2,
                         v6->param0,
@@ -598,7 +598,7 @@ int sithAI_AIStatus(stdDebugConsoleCmd* a1, const char *idxStr)
                         v6->nextUpdate,
                         v4->pAIClass->entries[v7].param3,
                         v4->pAIClass->entries[v7].param1);
-                    sithConsole_PrintString(std_genBuffer);
+                    sithConsole_PrintString(std_g_genBuffer);
                     ++v2;
                     ++v6;
                     ++v7;

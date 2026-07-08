@@ -395,15 +395,15 @@ void jkHud_Draw()
             {
                 tmpFloat1 = 0.0;
             }
-            stdString_snprintf(std_genBuffer, 1024, "force: %3.0f, ", tmpFloat1);
+            stdString_snprintf(std_g_genBuffer, 1024, "force: %3.0f, ", tmpFloat1);
             jkHud_GetWeaponAmmo(playerThing);
             if ( playerThing->type == SITH_THING_PLAYER )
             {
                 v2 = playerThing->actorParams.playerinfo->curItem;
                 if ( v2 >= 0 )
                     stdString_snprintf(
-                        &std_genBuffer[_strlen(std_genBuffer)],
-                        1024 - _strlen(std_genBuffer),
+                        &std_g_genBuffer[_strlen(std_g_genBuffer)],
+                        1024 - _strlen(std_g_genBuffer),
                         " item: %s,",
                         sithInventory_g_aTypes[v2].fpath);
                 if ( playerThing->type == SITH_THING_PLAYER )
@@ -411,14 +411,14 @@ void jkHud_Draw()
                     v3 = playerThing->actorParams.playerinfo->curPower;
                     if ( v3 >= 0 )
                         stdString_snprintf(
-                            &std_genBuffer[_strlen(std_genBuffer)],
-                            1024 - _strlen(std_genBuffer),
+                            &std_g_genBuffer[_strlen(std_g_genBuffer)],
+                            1024 - _strlen(std_g_genBuffer),
                             " force: %s,",
                             sithInventory_g_aTypes[v3].fpath);
                 }
             }
         }
-        jkDev_sub_41FC40(0x66, std_genBuffer);
+        jkDev_sub_41FC40(0x66, std_g_genBuffer);
     }
 #endif
 
@@ -1669,8 +1669,8 @@ void jkHud_SendChat(char a1)
         {
             if ( jkHud_dword_552D10 == -1 && sithNet_isMulti )
             {
-                _sprintf(std_genBuffer, "You say, '%s'", jkHud_chatStr);
-                jkDev_DebugLog(std_genBuffer);
+                _sprintf(std_g_genBuffer, "You say, '%s'", jkHud_chatStr);
+                jkDev_DebugLog(std_g_genBuffer);
                 sithMulti_SendChat(jkHud_chatStr, -1, playerThingIdx);
             }
             else if ( !jkDev_TryCommand(jkHud_chatStr) )

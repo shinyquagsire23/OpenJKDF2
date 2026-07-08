@@ -40,19 +40,19 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
     numMsgs = 0;
     strtable->hashtable = 0;
     strtable->magic_sTbl = 0;
-    fhand = std_pHS->fileOpen(fpath, "rt");
+    fhand = std_g_pHS->fileOpen(fpath, "rt");
 
     if ( !fhand )
         return 0;
 
     do
     {
-        std_pHS->fileGets(fhand, a1a, 255);
+        std_g_pHS->fileGets(fhand, a1a, 255);
         if ( !_strchr(a1a, 10) )
         {
             do
             {
-                std_pHS->fileGets(fhand, v32, 64);
+                std_g_pHS->fileGets(fhand, v32, 64);
             }
             while ( !_strchr(v32, '\n') );
         }
@@ -66,20 +66,20 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
 
     if ( _sscanf(a1a, "MSGS %d", &numMsgs) != 1 )
     {
-        std_pHS->fileClose(fhand);
-        std_pHS->errorPrint("Bad 'MSG n' line in string table file '%s'\n", fpath);
+        std_g_pHS->fileClose(fhand);
+        std_g_pHS->errorPrint("Bad 'MSG n' line in string table file '%s'\n", fpath);
         return 0;
     }
     strtable->numMsgs = numMsgs;
-    { TWL_EXTRAM_SUGGEST(std_pHS); // Added: msg table is word-safe (ptrs/ints)
+    { TWL_EXTRAM_SUGGEST(std_g_pHS); // Added: msg table is word-safe (ptrs/ints)
     strtable->msgs = (stdStrMsg*)STD_ALLOC(sizeof(stdStrMsg) * numMsgs);
-    TWL_EXTRAM_RESTORE(std_pHS); }
+    TWL_EXTRAM_RESTORE(std_g_pHS); }
     if ( !strtable->msgs )
-        std_pHS->assert("Out of memory--cannot load string table", ".\\General\\stdStrTable.c", 120);
+        std_g_pHS->assert("Out of memory--cannot load string table", ".\\General\\stdStrTable.c", 120);
     stdPlatform_Memzero32(strtable->msgs, sizeof(stdStrMsg) * numMsgs); // Added: word-safe
     strtable->hashtable = stdHashtbl_New(numMsgs + (numMsgs/2));
     if ( !strtable->hashtable )
-        std_pHS->assert("Out of memory--cannot load string table", ".\\General\\stdStrTable.c", 126);
+        std_g_pHS->assert("Out of memory--cannot load string table", ".\\General\\stdStrTable.c", 126);
     v11 = 1;
     v30 = 0;
     value = strtable->msgs;
@@ -90,11 +90,11 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
         v12 = 0;
         do
         {
-            std_pHS->fileGets(fhand, a1a, 255);
+            std_g_pHS->fileGets(fhand, a1a, 255);
             if ( !_strchr(a1a, '\n') )
             {
                 do
-                    std_pHS->fileGets(fhand, v32, 64);
+                    std_g_pHS->fileGets(fhand, v32, 64);
                 while ( !_strchr(v32, '\n') );
             }
             for ( j = a1a; __isspace(*j); ++j )
@@ -110,16 +110,16 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
             v16 = v30;
             strtable->numMsgs = v30;
             v11 = 0;
-            std_pHS->errorPrint("Premature 'END' found after only %d lines in '%s'.  Check number in 'MSG xxx' header.\n", v16, fpath);
+            std_g_pHS->errorPrint("Premature 'END' found after only %d lines in '%s'.  Check number in 'MSG xxx' header.\n", v16, fpath);
         }
         if ( v11 )
         {
             v17 = stdString_GetQuotedStringContents(a1a, v34, 256);
             if ( v17 )
             {
-                { TWL_EXTRAM_SUGGEST(std_pHS); // Added: keys are read-only after insert
+                { TWL_EXTRAM_SUGGEST(std_g_pHS); // Added: keys are read-only after insert
                 v18 = (char *)STD_ALLOC(_strlen(v34) + 1);
-                TWL_EXTRAM_RESTORE(std_pHS); }
+                TWL_EXTRAM_RESTORE(std_g_pHS); }
                 stdPlatform_Memcpy32(v18, v34, _strlen(v34) + 1); // Added: word-safe
                 v19 = value;
                 value->key = v18;
@@ -131,7 +131,7 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
                     v19->uniStr = stdString_CstrCopy(v34);
                     if ( !stdHashtbl_Add(strtable->hashtable, v19->key, v19) )
                         stdPrintf(
-                            std_pHS->errorPrint,
+                            std_g_pHS->errorPrint,
                             ".\\General\\stdStrTable.c",
                             177,
                             "The key '%s' is in the string table '%s' more than once.\n   >>>%s\n",
@@ -142,7 +142,7 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
                 else
                 {
                     stdPrintf(
-                        std_pHS->errorPrint,
+                        std_g_pHS->errorPrint,
                         ".\\General\\stdStrTable.c",
                         164,
                         "Cannot understand this line in string table '%s'.\n   >>> %s\n",
@@ -153,7 +153,7 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
             else
             {
                 stdPrintf(
-                    std_pHS->errorPrint,
+                    std_g_pHS->errorPrint,
                     ".\\General\\stdStrTable.c",
                     155,
                     "Cannot understand this line in string table '%s'.\n   >>> %s\n",
@@ -171,11 +171,11 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
         v21 = 0;
         do
         {
-            std_pHS->fileGets(fhand, a1a, 255);
+            std_g_pHS->fileGets(fhand, a1a, 255);
             if ( !_strchr(a1a, '\n') )
             {
                 do
-                    std_pHS->fileGets(fhand, v32, 64);
+                    std_g_pHS->fileGets(fhand, v32, 64);
                 while ( !_strchr(v32, '\n') );
             }
             for ( k = a1a; __isspace(*k); ++k )
@@ -189,11 +189,11 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
         if ( __strcmpi(v25, "end") )
         {
             v11 = 0;
-            std_pHS->errorPrint("'END' not found in '%s'.  Enlarge number in 'MSG xxx' header.\n", fpath);
+            std_g_pHS->errorPrint("'END' not found in '%s'.  Enlarge number in 'MSG xxx' header.\n", fpath);
         }
     }
     strtable->magic_sTbl = 0x7354626C;
-    std_pHS->fileClose(fhand);
+    std_g_pHS->fileClose(fhand);
     return v11;
 }
 
@@ -252,11 +252,11 @@ int stdStrTable_ReadLine(stdFile_t fhand, char *buf, int bufLen)
     found = 0;
     do
     {
-        std_pHS->fileGets(fhand, buf, bufLen);
+        std_g_pHS->fileGets(fhand, buf, bufLen);
         if ( !_strchr(buf, '\n') )
         {
             do
-                std_pHS->fileGets(fhand, tmpBuf, 64);
+                std_g_pHS->fileGets(fhand, tmpBuf, 64);
             while ( !_strchr(tmpBuf, '\n') );
         }
         for ( p = buf; __isspace(*p); ++p )
@@ -277,11 +277,11 @@ int stdStrTable_ParseUniLine(stdFile_t fhand, wchar_t *buf)
     found = 0;
     do
     {
-        std_pHS->fileGetws(fhand, buf, 10);
+        std_g_pHS->fileGetws(fhand, buf, 10);
         if ( !__wcschr(buf, L'\n') )
         {
             do
-                std_pHS->fileGetws(fhand, tmpBuf, 10);
+                std_g_pHS->fileGetws(fhand, tmpBuf, 10);
             while ( !__wcschr(tmpBuf, L'\n') );
         }
         for ( p = buf; iswspace(*p); ++p )

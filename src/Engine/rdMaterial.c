@@ -309,7 +309,7 @@ LABEL_21:
 
 #if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
         if (!bDoLoad) {
-            std_pHS->fseek(mat_file__, format.width*format.height*(format.format.is16bit?2:1), SEEK_CUR);
+            std_g_pHS->fseek(mat_file__, format.width*format.height*(format.format.is16bit?2:1), SEEK_CUR);
             goto no_loading;
         }
 #endif
@@ -350,7 +350,7 @@ LABEL_21:
                 /*mat_file_ = mat_file__;
                 rdroid_g_pHS->fileClose(mat_file_);
                 return 1;*/
-                std_pHS->fseek(mat_file__, format.width*format.height*(format.format.is16bit?2:1), SEEK_CUR);
+                std_g_pHS->fseek(mat_file__, format.width*format.height*(format.format.is16bit?2:1), SEEK_CUR);
                 goto no_loading;
             }
             (*texture_struct)->format.texture_size_in_bytes = format.width*format.height*(format.format.is16bit?2:1);
@@ -376,7 +376,7 @@ LABEL_21:
 #endif
         }
         else {
-            std_pHS->fseek(mat_file__, format.width*format.height*(format.format.is16bit?2:1), SEEK_CUR);
+            std_g_pHS->fseek(mat_file__, format.width*format.height*(format.format.is16bit?2:1), SEEK_CUR);
         }
 #endif
 no_loading:

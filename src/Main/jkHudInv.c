@@ -768,8 +768,8 @@ int jkHudInv_InitItems()
     int v4; // ecx
     sithItemDescriptor *v5; // eax
 
-    _sprintf(std_genBuffer, "misc\\%s", "items.dat");
-    if (!jkHudInv_ItemDatLoad(std_genBuffer))
+    _sprintf(std_g_genBuffer, "misc\\%s", "items.dat");
+    if (!jkHudInv_ItemDatLoad(std_g_genBuffer))
         return 0;
 
     sithInventory_KeybindInit();
@@ -875,10 +875,10 @@ void jkHudInv_LoadItemRes()
             jkHudInv_aBitmaps[2] = 0;
         }
         if ( v0 == 8 )
-            stdString_snprintf(std_genBuffer, 1024, "ui\\bm\\%s", "IcDefau8.bm");
+            stdString_snprintf(std_g_genBuffer, 1024, "ui\\bm\\%s", "IcDefau8.bm");
         else
-            stdString_snprintf(std_genBuffer, 1024, "ui\\bm\\%s", "IcDefau16.bm");
-        jkHudInv_aBitmaps[2] = stdBitmap_Load(std_genBuffer, 0, 0);
+            stdString_snprintf(std_g_genBuffer, 1024, "ui\\bm\\%s", "IcDefau16.bm");
+        jkHudInv_aBitmaps[2] = stdBitmap_Load(std_g_genBuffer, 0, 0);
 #ifndef RDMATERIAL_MINIMIZE_STRUCTS
         stdBitmap_ConvertColorFormat(&Video_format.format, jkHudInv_aBitmaps[2]);
 #endif

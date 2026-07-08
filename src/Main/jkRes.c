@@ -107,10 +107,10 @@ void jkRes_LoadGob(char *a1)
 
     if ( jkRes_curDir[0] && Windows_installType < 1 )
     {
-        stdString_snprintf(std_genBuffer, 0x80u, "%s\\gamedata\\episode", jkRes_curDir);
+        stdString_snprintf(std_g_genBuffer, 0x80u, "%s\\gamedata\\episode", jkRes_curDir);
         stdString_snprintf(jkRes_gCtx.aGobDirectories[2].name, 0x80u, "%s\\gamedata\\episode\\%s", jkRes_curDir, jkRes_episodeGobName);
         
-        jkRes_NewGob(&jkRes_gCtx.aGobDirectories[2], std_genBuffer, v30);
+        jkRes_NewGob(&jkRes_gCtx.aGobDirectories[2], std_g_genBuffer, v30);
     }
 }
 
@@ -410,9 +410,9 @@ int jkRes_LoadCD(int cdNumberNeeded)
                     {
                         if ( Windows_installType < 1 )
                         {
-                            stdString_snprintf(std_genBuffer, 0x80u, "%s%cgamedata%cepisode", jkRes_curDir, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR);
+                            stdString_snprintf(std_g_genBuffer, 0x80u, "%s%cgamedata%cepisode", jkRes_curDir, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR);
                             stdString_snprintf(jkRes_gCtx.aGobDirectories[2].name, 0x80u, "%s%cgamedata%cepisode%c%s", jkRes_curDir, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR, jkRes_episodeGobName);
-                            jkRes_NewGob(&jkRes_gCtx.aGobDirectories[2], std_genBuffer, v26);
+                            jkRes_NewGob(&jkRes_gCtx.aGobDirectories[2], std_g_genBuffer, v26);
                         }
                     }
                 }
@@ -464,9 +464,9 @@ LABEL_39:
         {
             if ( Windows_installType < 1 )
             {
-                stdString_snprintf(std_genBuffer, 0x80u, "%s%cgamedata%cepisode", jkRes_curDir, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR);
+                stdString_snprintf(std_g_genBuffer, 0x80u, "%s%cgamedata%cepisode", jkRes_curDir, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR);
                 stdString_snprintf(jkRes_gCtx.aGobDirectories[2].name, 0x80u, "%s%cgamedata%cepisode%c%s", jkRes_curDir, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR, LEC_PATH_SEPARATOR_CHR, jkRes_episodeGobName);
-                jkRes_NewGob(&jkRes_gCtx.aGobDirectories[2], std_genBuffer, v26);
+                jkRes_NewGob(&jkRes_gCtx.aGobDirectories[2], std_g_genBuffer, v26);
             }
         }
     }
@@ -664,12 +664,12 @@ int jkRes_FilePrintf(stdFile_t fd, const char* fmt, ...)
     
     jkResFile* resFile = &jkRes_aFiles[fd - 1];
     
-    int v3 = __vsnprintf(std_genBuffer, 0x400u, fmt, va);
+    int v3 = __vsnprintf(std_g_genBuffer, 0x400u, fmt, va);
     va_end(va);
     
     // No GOB impl
     if ( resFile->useLowLevel )
-        return pLowLevelHS->filePrintf(resFile->fsHandle, std_genBuffer, v3);
+        return pLowLevelHS->filePrintf(resFile->fsHandle, std_g_genBuffer, v3);
 
     return 0;
 }

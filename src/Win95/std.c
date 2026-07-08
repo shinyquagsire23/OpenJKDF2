@@ -9,7 +9,7 @@ static int std_bInitialized;
 void stdStartup(HostServices* pServices)
 {
     uint16_t v1;
-    std_pHS = pServices;
+    std_g_pHS = pServices;
     if ( stdPlatform_Startup() )
     {
 #if defined(__i386__)
@@ -76,11 +76,11 @@ int stdCalcBitPos(signed int val)
 
 int stdReadRaw(char *fpath, void *out, signed int len)
 {
-    int fd = std_pHS->fileOpen(fpath, "rb");
+    int fd = std_g_pHS->fileOpen(fpath, "rb");
     if (fd)
     {
-        std_pHS->fileRead(fd, out, len);
-        std_pHS->fileClose(fd);
+        std_g_pHS->fileRead(fd, out, len);
+        std_g_pHS->fileClose(fd);
         return 1;
     }
     return 0;
@@ -89,13 +89,13 @@ int stdReadRaw(char *fpath, void *out, signed int len)
 char stdFGetc(stdFile_t fd)
 {
     char tmp;
-    std_pHS->fileRead(fd, &tmp, 1);
+    std_g_pHS->fileRead(fd, &tmp, 1);
     return tmp;
 }
 
 void stdFPutc(char c, stdFile_t fd)
 {
-    std_pHS->fileWrite(fd, &c, 1);
+    std_g_pHS->fileWrite(fd, &c, 1);
 }
 
 int stdConsolePrintf(const char *fmt, ...)
@@ -103,12 +103,12 @@ int stdConsolePrintf(const char *fmt, ...)
     va_list va; // [esp+8h] [ebp+8h] BYREF
 
     va_start(va, fmt);
-    __vsnprintf(std_genBuffer, 0x400u, fmt, va);
+    __vsnprintf(std_g_genBuffer, 0x400u, fmt, va);
     va_end(va);
 #ifndef PLATFORM_POSIX
-    stdConsole_WriteConsole(std_genBuffer, 7u);
+    stdConsole_WriteConsole(std_g_genBuffer, 7u);
 #else
-    jk_printf("%s", std_genBuffer);
+    jk_printf("%s", std_g_genBuffer);
 #endif
     return 1024;
 }
@@ -155,8 +155,8 @@ void* stdDebugRealloc(void *p, unsigned int amt)
 
 void stdDelay(int unk, flex_t dur)
 {
-    int ts = (__int64)(dur * std_pHS->some_float - -0.5) + std_pHS->getTimerTick();
-    while ( std_pHS->getTimerTick() < ts ) {
+    int ts = (__int64)(dur * std_g_pHS->some_float - -0.5) + std_g_pHS->getTimerTick();
+    while ( std_g_pHS->getTimerTick() < ts ) {
         ;
     }
 }

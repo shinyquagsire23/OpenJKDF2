@@ -12,9 +12,9 @@ char* stdString_FastCopy(const char *str)
     char *v5; // edi
     const char *v6; // esi
 
-    { TWL_EXTRAM_SUGGEST(std_pHS); // Added: strings are read-only after creation
+    { TWL_EXTRAM_SUGGEST(std_g_pHS); // Added: strings are read-only after creation
     result = (char *)STD_ALLOC(_strlen(str) + 1);
-    TWL_EXTRAM_RESTORE(std_pHS); }
+    TWL_EXTRAM_RESTORE(std_g_pHS); }
     v2 = result;
     if ( result )
     {
@@ -30,9 +30,9 @@ wchar_t* stdString_FastWCopy(const wchar_t *str)
     if (!str) return NULL;
 
     wchar_t* result;
-    { TWL_EXTRAM_SUGGEST(std_pHS); // Added: wchar stores are 16-bit -> word-safe
+    { TWL_EXTRAM_SUGGEST(std_g_pHS); // Added: wchar stores are 16-bit -> word-safe
     result = (wchar_t*)STD_ALLOC((_wcslen(str) + 1)* sizeof(wchar_t));
-    TWL_EXTRAM_RESTORE(std_pHS); }
+    TWL_EXTRAM_RESTORE(std_g_pHS); }
     stdString_SafeWStrCopy(result, str, _wcslen(str)+1);
     return result;
 }
@@ -246,9 +246,9 @@ wchar_t* stdString_CstrCopy(const char *a1)
     signed int v4; // ecx
     uint8_t v5; // dl
 
-    { TWL_EXTRAM_SUGGEST(std_pHS); // Added: fill loop below stores 16-bit wchars
+    { TWL_EXTRAM_SUGGEST(std_g_pHS); // Added: fill loop below stores 16-bit wchars
     v1 = (wchar_t *)STD_ALLOC(sizeof(wchar_t) * (_strlen(a1) + 1));
-    TWL_EXTRAM_RESTORE(std_pHS); }
+    TWL_EXTRAM_RESTORE(std_g_pHS); }
     v2 = 0;
     v3 = v1;
     v4 = _strlen(a1);
@@ -276,9 +276,9 @@ char* stdString_WcharCopy(wchar_t *a1)
     char *i; // edx
 
     v1 = _wcslen(a1);
-    { TWL_EXTRAM_SUGGEST(std_pHS); // Added: filled via 16-bit RMW below
+    { TWL_EXTRAM_SUGGEST(std_g_pHS); // Added: filled via 16-bit RMW below
     v2 = (char *)STD_ALLOC(v1 + 1);
-    TWL_EXTRAM_RESTORE(std_pHS); }
+    TWL_EXTRAM_RESTORE(std_g_pHS); }
     v3 = _wcslen(a1);
     v4 = 0;
     v5 = a1;

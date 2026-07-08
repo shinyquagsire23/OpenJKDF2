@@ -556,8 +556,8 @@ char* jkDev_Decrypt(char *cheatStr)
 
 int jkDev_CmdVersion(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
-    _sprintf(std_genBuffer, "Jedi Knight v%d.%d%c %s %s\n", jkGuiTitle_verMajor, jkGuiTitle_verMinor, jkGuiTitle_verRevision, "Sep  8 1997", "16:17:30");
-    sithConsole_PrintString(std_genBuffer);
+    _sprintf(std_g_genBuffer, "Jedi Knight v%d.%d%c %s %s\n", jkGuiTitle_verMajor, jkGuiTitle_verMinor, jkGuiTitle_verRevision, "Sep  8 1997", "16:17:30");
+    sithConsole_PrintString(std_g_genBuffer);
     return 1;
 }
 

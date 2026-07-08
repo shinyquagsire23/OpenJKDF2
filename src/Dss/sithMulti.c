@@ -456,11 +456,11 @@ void sithMulti_ProcessScore()
         if ( score_limit_met )
         {
             wchar_t* v9 = sithStrTable_GetUniStringWithFallback("MULTI_SCORELIMIT");
-            stdString_WcharToChar(std_genBuffer, v9, 127);
-            std_genBuffer[127] = 0;
-            sithConsole_PrintString(std_genBuffer);
+            stdString_WcharToChar(std_g_genBuffer, v9, 127);
+            std_g_genBuffer[127] = 0;
+            sithConsole_PrintString(std_g_genBuffer);
             sithConsole_AlertSound();
-            uint32_t v10 = strlen(std_genBuffer) + 1;
+            uint32_t v10 = strlen(std_g_genBuffer) + 1;
             if ( v10 >= 0x80 )
                 v10 = 128;
 
@@ -469,7 +469,7 @@ void sithMulti_ProcessScore()
             NETMSG_PUSHS32(-1);
             NETMSG_PUSHS32(-1);
             NETMSG_PUSHS32(v10);
-            NETMSG_PUSHSTR(std_genBuffer, v10);
+            NETMSG_PUSHSTR(std_g_genBuffer, v10);
             NETMSG_END(DSS_CHAT);
 
             sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 1, 1);
@@ -655,8 +655,8 @@ int sithMulti_ProcessPong(sithCogMsg *msg)
                 if ( ++v1 >= jkPlayer_maxPlayers )
                     return 1;
             }
-            _sprintf(std_genBuffer, "Ping time to %S is %d msec", jkPlayer_playerInfos[v1].player_name, sithTime_g_msecGameTime - sithMulti_msecPingStartTime);
-            sithConsole_PrintString(std_genBuffer);
+            _sprintf(std_g_genBuffer, "Ping time to %S is %d msec", jkPlayer_playerInfos[v1].player_name, sithTime_g_msecGameTime - sithMulti_msecPingStartTime);
+            sithConsole_PrintString(std_g_genBuffer);
         }
     }
     return 1;
@@ -1289,11 +1289,11 @@ void sithMulti_Update(int deltaMs)
         }
         if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_TIMELIMIT) != 0 && sithTime_g_msecGameTime > sithNet_multiplayer_timelimit )
         {
-            stdString_WcharToChar(std_genBuffer, sithStrTable_GetUniStringWithFallback("MULTI_TIMELIMIT"), 127);
-            std_genBuffer[127] = 0;
-            sithConsole_PrintString(std_genBuffer);
+            stdString_WcharToChar(std_g_genBuffer, sithStrTable_GetUniStringWithFallback("MULTI_TIMELIMIT"), 127);
+            std_g_genBuffer[127] = 0;
+            sithConsole_PrintString(std_g_genBuffer);
             sithConsole_AlertSound();
-            v2 = strlen(std_genBuffer) + 1;
+            v2 = strlen(std_g_genBuffer) + 1;
             if ( v2 >= 0x80 )
                 v2 = 128;
 
@@ -1302,7 +1302,7 @@ void sithMulti_Update(int deltaMs)
             NETMSG_PUSHS32(-1);
             NETMSG_PUSHS32(-1);
             NETMSG_PUSHS32(v2);
-            NETMSG_PUSHSTR(std_genBuffer, v2);
+            NETMSG_PUSHSTR(std_g_genBuffer, v2);
             NETMSG_END(DSS_CHAT);
 
             sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 1, 1);

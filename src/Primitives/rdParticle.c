@@ -145,7 +145,7 @@ int rdParticle_LoadEntry(char *fpath, rdParticle *pParticle)
     if (!stdConffile_ReadLine())
         goto done_close;
         
-    if ( _sscanf(stdConffile_aLine, " section: %s", std_genBuffer) != 1 )
+    if ( _sscanf(stdConffile_aLine, " section: %s", std_g_genBuffer) != 1 )
         goto done_close;
     
     if (!stdConffile_ReadLine())
@@ -163,10 +163,10 @@ int rdParticle_LoadEntry(char *fpath, rdParticle *pParticle)
     if (!stdConffile_ReadLine())
         goto done_close;
 
-    if ( _sscanf(stdConffile_aLine, " material %s", std_genBuffer) != 1 )
+    if ( _sscanf(stdConffile_aLine, " material %s", std_g_genBuffer) != 1 )
         goto done_close;
         
-    v7 = rdMaterial_Load(std_genBuffer, 0, 0);
+    v7 = rdMaterial_Load(std_g_genBuffer, 0, 0);
     pParticle->material = v7;
     if (!v7)
         goto done_close;
@@ -181,7 +181,7 @@ int rdParticle_LoadEntry(char *fpath, rdParticle *pParticle)
     if (!stdConffile_ReadLine())
         goto done_close;
 
-    if ( _sscanf(stdConffile_aLine, " section: %s", std_genBuffer) != 1 )
+    if ( _sscanf(stdConffile_aLine, " section: %s", std_g_genBuffer) != 1 )
         goto done_close;
 
     if (!stdConffile_ReadLine() )

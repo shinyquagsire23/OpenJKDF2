@@ -725,12 +725,12 @@ int sithWorld_ReadGeoresourceText(sithWorld *pWorld, int a2)
             return 0;
         }
 
-        if ( _sscanf(stdConffile_aLine, " %d: %s", &v_idx, std_genBuffer) != 2 )
+        if ( _sscanf(stdConffile_aLine, " %d: %s", &v_idx, std_g_genBuffer) != 2 )
         {
             return 0;
         }
         
-        stdString_snprintf(colormap_fname, sizeof(colormap_fname), "%s%c%s", "misc\\cmp", '\\', std_genBuffer); // Added: sprintf -> snprintf
+        stdString_snprintf(colormap_fname, sizeof(colormap_fname), "%s%c%s", "misc\\cmp", '\\', std_g_genBuffer); // Added: sprintf -> snprintf
         if ( !rdColormap_LoadEntry(colormap_fname, &pWorld->colormaps[i]) )
         {
             return 0;

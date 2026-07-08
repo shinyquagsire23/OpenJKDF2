@@ -32,14 +32,14 @@ void stdMemory_Close()
 
     if ( stdMemory_info.nextNum || stdMemory_info.allocCur )
     {
-        std_pHS->errorPrint("File\tLine\tSize\tNumber\n\n", 0, 0, 0, 0);
+        std_g_pHS->errorPrint("File\tLine\tSize\tNumber\n\n", 0, 0, 0, 0);
         iter = stdMemory_info.allocTop.prev;
         if ( stdMemory_info.allocTop.prev )
         {
             do
             {
                 iterNext = iter->prev;
-                std_pHS->errorPrint("%s\t%d\t%d\t%d\n\n", iter->filePath, iter->lineNum, iter->size, iter->num);
+                std_g_pHS->errorPrint("%s\t%d\t%d\t%d\n\n", iter->filePath, iter->lineNum, iter->size, iter->num);
                 iter = iterNext;
             }
             while ( iterNext );

@@ -4,10 +4,10 @@
 
 int util_FileExists(const char *fpath)
 {
-    intptr_t f = std_pHS->fileOpen(fpath, "r");
+    intptr_t f = std_g_pHS->fileOpen(fpath, "r");
     if ( f )
     {
-        std_pHS->fileClose(f);
+        std_g_pHS->fileClose(f);
         return 1;
     }
 

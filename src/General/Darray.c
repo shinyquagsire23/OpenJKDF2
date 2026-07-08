@@ -18,8 +18,8 @@ int Darray_New(Darray *array, int entrySize, int num)
 
     array->alloc = STD_ALLOC(entrySize * num);
     if ( !array->alloc ) {
-        std_pHS->errorPrint("Ran out of memory initializing Darray.\n");
-        std_pHS->errorPrint("OpenJKDF2: entrySize=%x, num=%x\n", entrySize, num); // Added
+        std_g_pHS->errorPrint("Ran out of memory initializing Darray.\n");
+        std_g_pHS->errorPrint("OpenJKDF2: entrySize=%x, num=%x\n", entrySize, num); // Added
     }
     array->size = num;
     return (array->alloc != 0);
@@ -53,7 +53,7 @@ void* Darray_NewEntry(Darray *array)
         array->size = 0;
         array->total = 0;
         array->dword10 = 0;
-        std_pHS->errorPrint("Ran out of memory reallocating data for Darray.\n");
+        std_g_pHS->errorPrint("Ran out of memory reallocating data for Darray.\n");
         return NULL;
     }
     return result;

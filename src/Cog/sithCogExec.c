@@ -235,8 +235,8 @@ void sithCogExec_Execute(sithCog *cog_ctx)
                 if ( cog_ctx->flags & SITH_COG_DEBUG )
                 {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-                    _sprintf(std_genBuffer, "Cog %s: Returned from depth %d.\n", cog_ctx->cogscript_fpath, cog_ctx->calldepth);
-                    sithConsole_PrintString(std_genBuffer);
+                    _sprintf(std_g_genBuffer, "Cog %s: Returned from depth %d.\n", cog_ctx->cogscript_fpath, cog_ctx->calldepth);
+                    sithConsole_PrintString(std_g_genBuffer);
 #endif
                 }
                 sithCogExec_PopCallstack(cog_ctx);
@@ -306,8 +306,8 @@ void sithCogExec_ExecuteMessage(sithCog *ctx, int32_t trigIdx)
         if ( ctx->flags & SITH_COG_DEBUG )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_genBuffer, "Cog %s: execution started.\n", ctx->cogscript_fpath);
-            sithConsole_PrintString(std_genBuffer);
+            _sprintf(std_g_genBuffer, "Cog %s: execution started.\n", ctx->cogscript_fpath);
+            sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
         sithCogExec_Execute(ctx);

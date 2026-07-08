@@ -65,19 +65,19 @@ stdFont* stdFont_Load(char *fpath, int a2, int a3)
     stdFontHeader header; // [esp+2Ch] [ebp-28h] BYREF
     int fpatha; // [esp+58h] [ebp+4h]
 
-    fd = std_pHS->fileOpen(fpath, "rb");
+    fd = std_g_pHS->fileOpen(fpath, "rb");
 
     if (!fd) {
         return NULL;
     }
 
-    if ( std_pHS->fileRead(fd, &header, 0x28) != 40 )
+    if ( std_g_pHS->fileRead(fd, &header, 0x28) != 40 )
         goto LABEL_28;
     if ( _memcmp(&header, "SFNT", 4u) )
         return 0;
     if ( header.version != 10 )
         return 0;
-    if ( std_pHS->fileRead(fd, &extHeader, 4) != 4 )
+    if ( std_g_pHS->fileRead(fd, &extHeader, 4) != 4 )
         goto LABEL_28;
     charLast = extHeader.characterLast;
     charFirst = extHeader.characterFirst;
@@ -110,12 +110,12 @@ stdFont* stdFont_Load(char *fpath, int a2, int a3)
     pEntries = fontAlloc_->charsetHead.pEntries;
     charMin = fontAlloc_->charsetHead.charFirst;
     charMax = fontAlloc_->charsetHead.charLast;
-    if ( std_pHS->fileRead(fd, pEntries, sizeof(stdFontEntry) * (charMax - charMin + 1)) != sizeof(stdFontEntry) * (charMax - charMin + 1) )
+    if ( std_g_pHS->fileRead(fd, pEntries, sizeof(stdFontEntry) * (charMax - charMin + 1)) != sizeof(stdFontEntry) * (charMax - charMin + 1) )
         goto LABEL_28;
     fpatha = 1;
     if ( header.numCharsets > 1 )
     {
-        while ( std_pHS->fileRead(fd, &extHeader, 4) == 4 )
+        while ( std_g_pHS->fileRead(fd, &extHeader, 4) == 4 )
         {
             charLast_1 = extHeader.characterLast;
             charFirsta = extHeader.characterFirst;
@@ -134,11 +134,11 @@ stdFont* stdFont_Load(char *fpath, int a2, int a3)
             }
             if ( !charset )
             {
-                std_pHS->fileClose(fd);
+                std_g_pHS->fileClose(fd);
                 return 0;
             }
             entries_readsize = sizeof(stdFontEntry) * (charset->charLast - charset->charFirst + 1);
-            if ( std_pHS->fileRead(fd, charset->pEntries, entries_readsize) != entries_readsize )
+            if ( std_g_pHS->fileRead(fd, charset->pEntries, entries_readsize) != entries_readsize )
             {
                 break;
             }
@@ -146,7 +146,7 @@ stdFont* stdFont_Load(char *fpath, int a2, int a3)
                 goto LABEL_21;
         }
 LABEL_28:
-        std_pHS->fileClose(fd);
+        std_g_pHS->fileClose(fd);
         return 0;
     }
 LABEL_21:
@@ -157,7 +157,7 @@ LABEL_21:
 #ifndef OPTIMIZE_AWAY_UNUSED_FIELDS
         stdString_SafeStrCopy((char *)bitmap->fpath, "FONTSTRIP", 32);
 #endif
-        std_pHS->fileClose(fd);
+        std_g_pHS->fileClose(fd);
         result = fontAlloc_;
     }
     else
@@ -1371,14 +1371,14 @@ int stdFont_Write(const char *fpath, stdFont *font)
     }
     header.numCharsets = numCharsets;
 
-    int fhand = std_pHS->fileOpen(fpath, "wb");
+    int fhand = std_g_pHS->fileOpen(fpath, "wb");
     if ( !fhand )
         return 0;
 
-    int written = std_pHS->fileWrite(fhand, &header, sizeof(stdFontHeader));
+    int written = std_g_pHS->fileWrite(fhand, &header, sizeof(stdFontHeader));
     if ( written != sizeof(stdFontHeader) )
     {
-        std_pHS->fileClose(fhand);
+        std_g_pHS->fileClose(fhand);
         return 0;
     }
 
@@ -1388,17 +1388,17 @@ int stdFont_Write(const char *fpath, stdFont *font)
     {
         extHeader.characterFirst = charset->charFirst;
         extHeader.characterLast = charset->charLast;
-        written = std_pHS->fileWrite(fhand, &extHeader, sizeof(stdFontExtHeader));
+        written = std_g_pHS->fileWrite(fhand, &extHeader, sizeof(stdFontExtHeader));
         if ( written != sizeof(stdFontExtHeader) )
         {
-            std_pHS->fileClose(fhand);
+            std_g_pHS->fileClose(fhand);
             return 0;
         }
         uint32_t entryBytes = ((uint32_t)(charset->charLast - charset->charFirst)) * sizeof(stdFontEntry) + sizeof(stdFontEntry);
-        written = std_pHS->fileWrite(fhand, charset->pEntries, entryBytes);
+        written = std_g_pHS->fileWrite(fhand, charset->pEntries, entryBytes);
         if ( (uint32_t)written != entryBytes )
         {
-            std_pHS->fileClose(fhand);
+            std_g_pHS->fileClose(fhand);
             return 0;
         }
         charset = charset->previous;
@@ -1406,7 +1406,7 @@ int stdFont_Write(const char *fpath, stdFont *font)
     }
 
     stdBitmap_AppendToFile(fhand, font->pBitmap);
-    std_pHS->fileClose(fhand);
+    std_g_pHS->fileClose(fhand);
     return 1;
 }
 

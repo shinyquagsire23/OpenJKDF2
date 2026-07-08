@@ -1174,7 +1174,7 @@ void sithCog_SendMessage(sithCog *cog, int32_t msgid, int32_t senderType, int32_
     {
 #ifdef SITH_DEBUG_STRUCT_NAMES
         _sprintf(
-            std_genBuffer,
+            std_g_genBuffer,
             "Cog %s: Message %d delivered, senderType=%d, senderIndex=%d, sourceType=%d, sourceIndex=%d, linkId=%d.\n",
             cog->cogscript_fpath,
             msgid,
@@ -1183,7 +1183,7 @@ void sithCog_SendMessage(sithCog *cog, int32_t msgid, int32_t senderType, int32_
             sourceType,
             sourceIndex,
             linkId);
-        sithConsole_PrintString(std_genBuffer);
+        sithConsole_PrintString(std_g_genBuffer);
 #endif
     }
 
@@ -1192,8 +1192,8 @@ void sithCog_SendMessage(sithCog *cog, int32_t msgid, int32_t senderType, int32_
         if ( (cog->flags & SITH_COG_DEBUG) != 0 )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_genBuffer, "Cog %s: Disabled, message ignored.\n", cog->cogscript_fpath);
-            sithConsole_PrintString(std_genBuffer);
+            _sprintf(std_g_genBuffer, "Cog %s: Disabled, message ignored.\n", cog->cogscript_fpath);
+            sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
         return;
@@ -1210,8 +1210,8 @@ void sithCog_SendMessage(sithCog *cog, int32_t msgid, int32_t senderType, int32_
         if (cog->flags & SITH_COG_DEBUG)
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_genBuffer, "--Cog %s: Message %d received but ignored.  No handler.\n", cog->cogscript_fpath, msgid);
-            sithConsole_PrintString(std_genBuffer);
+            _sprintf(std_g_genBuffer, "--Cog %s: Message %d received but ignored.  No handler.\n", cog->cogscript_fpath, msgid);
+            sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
         return;
@@ -1222,8 +1222,8 @@ void sithCog_SendMessage(sithCog *cog, int32_t msgid, int32_t senderType, int32_
         if (cog->flags & SITH_COG_DEBUG)
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_genBuffer, "--Cog %s: Message %d received but COG is paused.\n", cog->cogscript_fpath, msgid);
-            sithConsole_PrintString(std_genBuffer);
+            _sprintf(std_g_genBuffer, "--Cog %s: Message %d received but COG is paused.\n", cog->cogscript_fpath, msgid);
+            sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
         return;
@@ -1272,8 +1272,8 @@ execute:
         if ( (cog->flags & SITH_COG_DEBUG) != 0 )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_genBuffer, "--Cog %s: Message %d received and accepted for execution.\n", cog->cogscript_fpath, msgid);
-            sithConsole_PrintString(std_genBuffer);
+            _sprintf(std_g_genBuffer, "--Cog %s: Message %d received and accepted for execution.\n", cog->cogscript_fpath, msgid);
+            sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
         sithCogExec_ExecuteMessage(cog, v10);
@@ -1300,7 +1300,7 @@ cog_flex_t sithCog_SendMessageEx(sithCog *cog, int32_t message, int32_t senderTy
     {
 #ifdef SITH_DEBUG_STRUCT_NAMES
         _sprintf(
-            std_genBuffer,
+            std_g_genBuffer,
             "Cog %s: MessageEx %d delivered, senderType=%d, senderIndex=%d, sourceType=%d, sourceIndex=%d, linkId=%d, param0=%g, param1=%g, param2=%g, param3=%g.\n",
             cog->cogscript_fpath,
             message,
@@ -1313,7 +1313,7 @@ cog_flex_t sithCog_SendMessageEx(sithCog *cog, int32_t message, int32_t senderTy
             param1,
             param2,
             param3);
-        sithConsole_PrintString(std_genBuffer);
+        sithConsole_PrintString(std_g_genBuffer);
 #endif
     }
     v13 = cog->flags;
@@ -1322,8 +1322,8 @@ cog_flex_t sithCog_SendMessageEx(sithCog *cog, int32_t message, int32_t senderTy
         if ( (v13 & 1) != 0 )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_genBuffer, "Cog %s: Disabled, MessageEx ignored.\n", cog->cogscript_fpath);
-            sithConsole_PrintString(std_genBuffer);
+            _sprintf(std_g_genBuffer, "Cog %s: Disabled, MessageEx ignored.\n", cog->cogscript_fpath);
+            sithConsole_PrintString(std_g_genBuffer);
 #endif
             return -9999.9873046875;
         }
@@ -1348,8 +1348,8 @@ cog_flex_t sithCog_SendMessageEx(sithCog *cog, int32_t message, int32_t senderTy
         if ( (v13 & 1) != 0 )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_genBuffer, "--Cog %s: MessageEx %d received but ignored.  No handler.\n", cog->cogscript_fpath, message);
-            sithConsole_PrintString(std_genBuffer);
+            _sprintf(std_g_genBuffer, "--Cog %s: MessageEx %d received but ignored.  No handler.\n", cog->cogscript_fpath, message);
+            sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
         return -9999.9873046875;
@@ -1359,8 +1359,8 @@ cog_flex_t sithCog_SendMessageEx(sithCog *cog, int32_t message, int32_t senderTy
         if ( (v13 & 1) != 0 )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_genBuffer, "--Cog %s: MessageEx %d received but COG is paused.\n", cog->cogscript_fpath, message);
-            sithConsole_PrintString(std_genBuffer);
+            _sprintf(std_g_genBuffer, "--Cog %s: MessageEx %d received but COG is paused.\n", cog->cogscript_fpath, message);
+            sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
         return -9999.9873046875;
@@ -1411,8 +1411,8 @@ execute:
         if ( (v13 & 1) != 0 )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_genBuffer, "--Cog %s: MessageEx %d received and accepted for execution.\n", cog->cogscript_fpath, message);
-            sithConsole_PrintString(std_genBuffer);
+            _sprintf(std_g_genBuffer, "--Cog %s: MessageEx %d received and accepted for execution.\n", cog->cogscript_fpath, message);
+            sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
         sithCogExec_ExecuteMessage(cog, trigIdx);
@@ -1704,8 +1704,8 @@ void sithCog_ProcessCog(sithCog *cog)
             if ((cog->flags & SITH_COG_DEBUG))
             {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-                _sprintf(std_genBuffer, "Cog %s: Waking up due to timer elapse.\n", cog->cogscript_fpath);
-                sithConsole_PrintString(std_genBuffer);
+                _sprintf(std_g_genBuffer, "Cog %s: Waking up due to timer elapse.\n", cog->cogscript_fpath);
+                sithConsole_PrintString(std_g_genBuffer);
 #endif
             }
 
@@ -1717,8 +1717,8 @@ void sithCog_ProcessCog(sithCog *cog)
             if ((cog->flags & SITH_COG_DEBUG))
             {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-                _sprintf(std_genBuffer, "Cog %s: Waking up due to movement completion.\n", cog->cogscript_fpath);
-                sithConsole_PrintString(std_genBuffer);
+                _sprintf(std_g_genBuffer, "Cog %s: Waking up due to movement completion.\n", cog->cogscript_fpath);
+                sithConsole_PrintString(std_g_genBuffer);
 #endif
             }
 
@@ -1770,8 +1770,8 @@ int sithCog_CogStatus(stdDebugConsoleCmd *cmd, const char *extra)
       && (v3 = &world->cogs[tmp], v3->cogscript)
       && v3->pSymbolTable )
     {
-        _sprintf(std_genBuffer, "Cog #%d: Name:%s  Script %s\n", tmp, v3->cogscript_fpath, v3->cogscript->cog_fpath);
-        sithConsole_PrintString(std_genBuffer);
+        _sprintf(std_g_genBuffer, "Cog #%d: Name:%s  Script %s\n", tmp, v3->cogscript_fpath, v3->cogscript->cog_fpath);
+        sithConsole_PrintString(std_g_genBuffer);
         v4 = v3->pSymbolTable;
         v5 = 0;
         v6 = v4->buckets;
@@ -1786,12 +1786,12 @@ int sithCog_CogStatus(stdDebugConsoleCmd *cmd, const char *extra)
 #endif
                 if ( !v7 )
                     v7 = "<null>";
-                _sprintf(std_genBuffer, "  Symbol %d: '%s' ", v6->symbol_id, v7);
+                _sprintf(std_g_genBuffer, "  Symbol %d: '%s' ", v6->symbol_id, v7);
                 if ( v6->val.type == 2 )
-                    _sprintf(&std_genBuffer[_strlen(std_genBuffer)], " = %f\n", v6->val.dataAsFloat[0]);
+                    _sprintf(&std_g_genBuffer[_strlen(std_g_genBuffer)], " = %f\n", v6->val.dataAsFloat[0]);
                 else
-                    _sprintf(&std_genBuffer[_strlen(std_genBuffer)], " = %d\n", v6->val.data[0]);
-                sithConsole_PrintString(std_genBuffer);
+                    _sprintf(&std_g_genBuffer[_strlen(std_g_genBuffer)], " = %d\n", v6->val.data[0]);
+                sithConsole_PrintString(std_g_genBuffer);
                 ++v5;
                 ++v6;
             }
