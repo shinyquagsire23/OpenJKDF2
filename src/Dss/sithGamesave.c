@@ -144,9 +144,9 @@ int sithGamesave_Restore(char *saveFname, int debugNextCheckpoint, int a3)
         sithGamesave_dword_835914 = a3;
         if (sithWorld_pCurrentWorld)
         {
-            sithGamesave_currentState = debugNextCheckpoint != 0 ? SITH_GS_LOAD_DEBUG_NEXTCHECKPOINT : SITH_GS_LOAD;
-            _strncpy(sithGamesave_fpath, fpath, 0x7Fu);
-            sithGamesave_fpath[127] = 0;
+            sithGamesave_state = debugNextCheckpoint != 0 ? SITH_GS_LOAD_DEBUG_NEXTCHECKPOINT : SITH_GS_LOAD;
+            _strncpy(sithGamesave_aCurFilename, fpath, 0x7Fu);
+            sithGamesave_aCurFilename[127] = 0;
             return 1;
         }
         else
@@ -283,7 +283,7 @@ LABEL_11:
         //stdConffile_Close();
         
         // TODO add message
-        //sithGamesave_currentState = SITH_GS_LOAD_DEBUG_NEXTCHECKPOINT;
+        //sithGamesave_state = SITH_GS_LOAD_DEBUG_NEXTCHECKPOINT;
         curMs = 0;
         sithCamera_ResetAllCameras();
         goto skip_free_things;
@@ -531,7 +531,7 @@ int sithGamesave_Save(char *saveFname, int a2, int a3, wchar_t *saveName)
     stdString_snprintf(
         PathName, 128, "player%c%s%c%s",
         LEC_PATH_SEPARATOR_CHR, tmp_playerName, LEC_PATH_SEPARATOR_CHR,
-        &sithGamesave_fpath[128]
+        &sithGamesave_aCurFilename[128]
     );
     stdFileUtil_MkDir(PathName);
     stdString_WcharToChar(tmp_playerName, jkPlayer_playerShortName, 31);
@@ -567,9 +567,9 @@ int sithGamesave_Save(char *saveFname, int a2, int a3, wchar_t *saveName)
             ++v8;
         }
         while ( (intptr_t)v7 < (intptr_t)sithGamesave_headerTmp.saveName );
-        sithGamesave_currentState = SITH_GS_SAVE;
-        _strncpy(sithGamesave_fpath, PathName, 0x7Fu);
-        sithGamesave_fpath[127] = 0;
+        sithGamesave_state = SITH_GS_SAVE;
+        _strncpy(sithGamesave_aCurFilename, PathName, 0x7Fu);
+        sithGamesave_aCurFilename[127] = 0;
         return 1;
     }
     else
@@ -581,34 +581,34 @@ int sithGamesave_Save(char *saveFname, int a2, int a3, wchar_t *saveName)
 
 int sithGamesave_Process()
 {
-    if ( sithGamesave_currentState == SITH_GS_LOAD )
+    if ( sithGamesave_state == SITH_GS_LOAD )
     {
-        if ( sithGamesave_RestoreFile(sithGamesave_fpath) )
+        if ( sithGamesave_RestoreFile(sithGamesave_aCurFilename) )
         {
-            sithGamesave_currentState = SITH_GS_NONE;
+            sithGamesave_state = SITH_GS_NONE;
             return 1;
         }
         // TODO inlined?
         sithMain_set_sithmode_5();
-        sithGamesave_currentState = SITH_GS_NONE;
+        sithGamesave_state = SITH_GS_NONE;
         return 1;
     }
-    if ( sithGamesave_currentState != SITH_GS_SAVE )
+    if ( sithGamesave_state != SITH_GS_SAVE )
     {
-        if ( sithGamesave_currentState != SITH_GS_LOAD_DEBUG_NEXTCHECKPOINT)
-            return sithGamesave_currentState - SITH_GS_LOAD_DEBUG_NEXTCHECKPOINT;
-        if ( sithGamesave_RestoreFile(sithGamesave_fpath) )
+        if ( sithGamesave_state != SITH_GS_LOAD_DEBUG_NEXTCHECKPOINT)
+            return sithGamesave_state - SITH_GS_LOAD_DEBUG_NEXTCHECKPOINT;
+        if ( sithGamesave_RestoreFile(sithGamesave_aCurFilename) )
         {
             sithPlayer_NewPlayer(sithPlayer_pLocalPlayerThing);
-            sithGamesave_currentState = SITH_GS_NONE;
+            sithGamesave_state = SITH_GS_NONE;
             return 1;
         }
         // TODO inlined?
         sithMain_set_sithmode_5();
-        sithGamesave_currentState = SITH_GS_NONE;
+        sithGamesave_state = SITH_GS_NONE;
         return 1;
     }
-    if ( (sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD) == 0 && stdConffile_OpenWriteBypass(sithGamesave_fpath) )
+    if ( (sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD) == 0 && stdConffile_OpenWriteBypass(sithGamesave_aCurFilename) )
     {
         int multiplayerFlagsSave = sithMessage_g_outputstream;
         sithMessage_g_outputstream = 4;
@@ -628,7 +628,7 @@ int sithGamesave_Process()
         
 #ifdef TARGET_DREAMCAST
         // The flat /ram autosave (redirected in _Write) is identified by its path.
-        int bRamAutosave = (_strncmp(sithGamesave_fpath, "/ram/", 5) == 0);
+        int bRamAutosave = (_strncmp(sithGamesave_aCurFilename, "/ram/", 5) == 0);
         // Added: a slim save serializes only the inventory bins, not the full
         // per-thing state -- the restart-with-inventory load consumes just
         // DSS_INVENTORY, and the tiny VMU can't hold the rest. Slim when there's
@@ -645,11 +645,11 @@ int sithGamesave_Process()
         if ( sithGamesave_func1 )
             sithGamesave_func1();
         stdConffile_CloseWrite();
-        _strncpy(sithGamesave_autosave_fname, stdFnames_FindMedName(sithGamesave_fpath), 0x7Fu);
+        _strncpy(sithGamesave_autosave_fname, stdFnames_FindMedName(sithGamesave_aCurFilename), 0x7Fu);
         sithGamesave_autosave_fname[127] = 0;
         if ( sithGamesave_dword_835914 )
         {
-            _strncpy(sithGamesave_saveName, stdFnames_FindMedName(sithGamesave_fpath), 0x7Fu);
+            _strncpy(sithGamesave_saveName, stdFnames_FindMedName(sithGamesave_aCurFilename), 0x7Fu);
             sithGamesave_saveName[127] = 0;
             _wcsncpy(sithGamesave_wsaveName, sithGamesave_headerTmp.saveName, 0xFFu);
             sithGamesave_wsaveName[255] = 0;
@@ -668,6 +668,6 @@ int sithGamesave_Process()
         }
 #endif
     }
-    sithGamesave_currentState = SITH_GS_NONE;
+    sithGamesave_state = SITH_GS_NONE;
     return 0;
 }
