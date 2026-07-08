@@ -1939,28 +1939,28 @@ sithThing_ShouldSync	.text	004CF660	00000026	00000000	00000004	R	.	.	.	.	.	T	.
 sithThing_netidk2	.text	004CF690	00000060	00000004	00000004	R	.	.	.	.	.	.	.
 sithWorld_Startup	.text	004CF6F0	000003B7	00000008	00000000	R	.	.	.	.	.	.	.
 sithWorld_Shutdown	.text	004CFAB0	00000048	00000004	00000000	R	.	.	.	.	.	T	.
-sithWorld_SetLoadPercentCallback	.text	004CFB00	0000000A	00000000	00000004	R	.	.	.	.	.	T	.
-sithWorld_UpdateLoadPercent	.text	004CFB10	00000014	00000000	00000004	R	.	.	.	.	.	T	.
+sithWorld_SetLoadProgressCallback	.text	004CFB00	0000000A	00000000	00000004	R	.	.	.	.	.	T	.
+sithWorld_UpdateLoadProgress	.text	004CFB10	00000014	00000000	00000004	R	.	.	.	.	.	T	.
 sithWorld_Load	.text	004CFB30	00000212	0000013C	00000008	R	.	.	.	.	.	T	.
-sithWorld_NewEntry	.text	004CFD50	000001C3	00000010	00000004	R	.	.	.	.	.	T	.
+sithWorld_LoadPostProcess	.text	004CFD50	000001C3	00000010	00000004	R	.	.	.	.	.	T	.
 sithWorld_Parse	.text	004CFF20	00000155	000000BC	0000000C	R	.	.	.	.	.	T	.
 sithWorld_Free	.text	004D0080	0000002C			R	.	.	.	.	.	.	.
-sithWorld_New	.text	004D00B0	00000027			R	.	.	.	.	.	T	.
+sithWorld_NewEntry	.text	004D00B0	00000027			R	.	.	.	.	.	T	.
 sithWorld_FreeEntry	.text	004D00E0	000001E9	00000010	00000004	R	.	.	.	.	.	T	.
-sithHeader_Load	.text	004D02D0	000001F9	00000004	00000008	R	.	.	.	.	.	T	.
-sithCopyright_Load	.text	004D04D0	00000067	0000000C	00000008	R	.	.	.	.	.	T	.
-sithWorld_GetMemorySize	.text	004D0540	000002DB	00000010	0000000C	R	.	.	.	.	.	T	.
-sithWorld_SetSectionParser	.text	004D0820	00000086	0000000C	00000008	R	.	.	.	.	.	T	.
+sithWorld_ReadHeaderText	.text	004D02D0	000001F9	00000004	00000008	R	.	.	.	.	.	T	.
+sithWorld_ReadCopyrightText	.text	004D04D0	00000067	0000000C	00000008	R	.	.	.	.	.	T	.
+sithWorld_GetMemoryUsage	.text	004D0540	000002DB	00000010	0000000C	R	.	.	.	.	.	T	.
+sithWorld_RegisterTextSectionParser	.text	004D0820	00000086	0000000C	00000008	R	.	.	.	.	.	T	.
 sithWorld_RemoveSectionParser	.text	004D08B0	0000007C	0000000C	00000004	R	.	.	.	.	.	.	.
 sithWorld_CalcFaceNormals	.text	004D0930	000000ED	00000018	00000004	R	.	.	.	.	.	T	.
-sithWorld_sub_4D0A20	.text	004D0A20	00000078	00000008	00000004	R	.	.	.	.	.	T	.
-sithWorld_ResetSectorRuntimeAlteredVars	.text	004D0AA0	0000005B	00000008	00000004	R	.	.	.	.	.	T	.
-sithWorld_Verify	.text	004D0B00	00000128	00000000	00000004	R	.	.	.	.	.	T	.
-sithWorld_CalcChecksum	.text	004D0C30	000000DB	0000000C	00000008	R	.	.	.	.	.	T	.
-sithWorld_Initialize	.text	004D0D10	00000038	00000004	00000000	R	.	.	.	.	.	.	.
+sithWorld_ResetRenderState	.text	004D0A20	00000078	00000008	00000004	R	.	.	.	.	.	T	.
+sithWorld_ResetGeoresource	.text	004D0AA0	0000005B	00000008	00000004	R	.	.	.	.	.	T	.
+sithWorld_ValidateWorld	.text	004D0B00	00000128	00000000	00000004	R	.	.	.	.	.	T	.
+sithWorld_CalcWorldChecksum	.text	004D0C30	000000DB	0000000C	00000008	R	.	.	.	.	.	T	.
+sithWorld_InitPlayers	.text	004D0D10	00000038	00000004	00000000	R	.	.	.	.	.	.	.
 sithWorld_TimeSectionParse	.text	004D0D50	000000C7	00000098	0000000C	R	.	.	.	.	.	.	.
-sithWorld_FindSectionParser	.text	004D0E20	00000046	0000000C	00000004	R	.	.	.	.	.	T	.
-sithWorld_LoadGeoresource	.text	004D0E70	000002B0	000000B0	00000008	R	.	.	.	.	.	T	.
+sithWorld_GetTextSectionParserIndex	.text	004D0E20	00000046	0000000C	00000004	R	.	.	.	.	.	T	.
+sithWorld_ReadGeoresourceText	.text	004D0E70	000002B0	000000B0	00000008	R	.	.	.	.	.	T	.
 sithInventory_NewEntry	.text	004D1120	00000057	00000004	00000018	R	.	.	.	.	.	T	.
 sithInventory_GetNumBinsWithFlag	.text	004D1180	000000A0	00000010	0000000C	R	.	.	.	.	.	T	.
 sithInventory_GetNumBinsWithFlagRev	.text	004D1220	0000009F	00000010	0000000C	R	.	.	.	.	.	T	.

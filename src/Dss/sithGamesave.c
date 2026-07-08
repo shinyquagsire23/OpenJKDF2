@@ -250,7 +250,7 @@ int sithGamesave_RestoreFile(char *fpath)
     {
         if ( !_strcmp(SrcStr, sithWorld_pCurrentWorld->map_jkl_fname) )
         {
-            sithWorld_ResetSectorRuntimeAlteredVars(sithWorld_pCurrentWorld);
+            sithWorld_ResetGeoresource(sithWorld_pCurrentWorld);
             goto LABEL_11;
         }
         sithClose();

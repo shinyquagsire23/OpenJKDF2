@@ -33,7 +33,7 @@ int jkGame_Startup()
 {
     stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
     
-    sithWorld_SetSectionParser("jk", jkGame_ParseSection);
+    sithWorld_RegisterTextSectionParser("jk", jkGame_ParseSection);
     jkGame_bInitted = 1;
     return 1;
 }

@@ -48,7 +48,7 @@ int sithModel_ReadStaticModelsListText(sithWorld *world, int a2)
     world->numModelsLoaded = 0;
     _memset(world->models, 0, sizeof(rdModel3) * world->numModels);
 
-    sithWorld_UpdateLoadPercent(60.0);
+    sithWorld_UpdateLoadProgress(60.0);
     loadStep = 10.0 / (flex_d_t)world->numModels;
     loadProgress = 60.0;
     while ( stdConffile_ReadArgs() )
@@ -57,9 +57,9 @@ int sithModel_ReadStaticModelsListText(sithWorld *world, int a2)
             break;
         sithModel_Load(stdConffile_entry.args[1].value, 0);
         loadProgress = loadProgress + loadStep;
-        sithWorld_UpdateLoadPercent(loadProgress);
+        sithWorld_UpdateLoadProgress(loadProgress);
     }
-    sithWorld_UpdateLoadPercent(70.0);
+    sithWorld_UpdateLoadProgress(70.0);
 
     return 1;
 }

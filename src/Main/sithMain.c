@@ -128,7 +128,7 @@ void sithShutdown()
 
 int sithOpenStatic(char *path)
 {
-    sithWorld_pStatic = sithWorld_New();
+    sithWorld_pStatic = sithWorld_NewEntry();
     sithWorld_pStatic->level_type_maybe |= 1;
     return sithWorld_Load(sithWorld_pStatic, path) != 0;
 }
@@ -145,13 +145,13 @@ void sithCloseStatic()
 
 int sithMain_Mode1Init(char *a1)
 {
-    sithWorld_pCurrentWorld = sithWorld_New();
+    sithWorld_pCurrentWorld = sithWorld_NewEntry();
 
     if ( !sithWorld_Load(sithWorld_pCurrentWorld, a1) )
         return 0;
 
     sithTime_Startup();
-    sithWorld_Initialize();
+    sithWorld_InitPlayers();
     sithOpen();
     sithTime_Startup();
     g_sithMode = 1;
@@ -160,12 +160,12 @@ int sithMain_Mode1Init(char *a1)
 
 int sithOpenNormal(char *path)
 {
-    sithWorld_pCurrentWorld = sithWorld_New();
+    sithWorld_pCurrentWorld = sithWorld_NewEntry();
 
     if ( !sithWorld_Load(sithWorld_pCurrentWorld, path) )
         return 0;
 
-    sithWorld_Initialize();
+    sithWorld_InitPlayers();
     sithOpen();
     g_sithMode = 1;
     return 1;
@@ -173,7 +173,7 @@ int sithOpenNormal(char *path)
 
 int sithOpenMulti(char *fpath)
 {
-    sithWorld_pCurrentWorld = sithWorld_New();
+    sithWorld_pCurrentWorld = sithWorld_NewEntry();
     if ( !sithWorld_Load(sithWorld_pCurrentWorld, fpath) )
         return 0;
     sithOpen();
@@ -187,7 +187,7 @@ int sithOpen()
 {
     jkPlayer_currentTickIdx = 0;
     sithRender_lastRenderTick = 1;
-    sithWorld_sub_4D0A20(sithWorld_pCurrentWorld);
+    sithWorld_ResetRenderState(sithWorld_pCurrentWorld);
     sithEvent_Open();
     sithSurface_Open();
     sithAI_Open();
@@ -488,7 +488,7 @@ void sithAdvanceRenderTick()
 {
     if ( !++sithRender_lastRenderTick )
     {
-        sithWorld_sub_4D0A20(sithWorld_pCurrentWorld);
+        sithWorld_ResetRenderState(sithWorld_pCurrentWorld);
         sithRender_lastRenderTick = 1;
     }
 }

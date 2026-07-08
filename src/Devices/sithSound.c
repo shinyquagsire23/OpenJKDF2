@@ -75,7 +75,7 @@ int sithSound_ReadSoundsListText(sithWorld *world, int a2)
     if ( a2 )
         return 0;
 
-    sithWorld_UpdateLoadPercent(0.0);
+    sithWorld_UpdateLoadProgress(0.0);
     if (!stdConffile_ReadArgs() 
         || _strcmp(stdConffile_entry.args[0].value, "world") 
         || _strcmp(stdConffile_entry.args[1].value, "sounds") )

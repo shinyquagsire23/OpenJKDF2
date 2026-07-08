@@ -2101,12 +2101,12 @@ void do_hooks()
     // sithWorld
     hook_function(sithWorld_Startup_ADDR, sithWorld_Startup);
     hook_function(sithWorld_Shutdown_ADDR, sithWorld_Shutdown);
-    hook_function(sithWorld_SetLoadPercentCallback_ADDR, sithWorld_SetLoadPercentCallback);
-    hook_function(sithWorld_UpdateLoadPercent_ADDR, sithWorld_UpdateLoadPercent);
-    hook_function(sithWorld_SetSectionParser_ADDR, sithWorld_SetSectionParser);
-    hook_function(sithWorld_FindSectionParser_ADDR, sithWorld_FindSectionParser);
-    hook_function(sithWorld_CalcChecksum_ADDR, sithWorld_CalcChecksum);
-    hook_function(sithWorld_ResetSectorRuntimeAlteredVars_ADDR, sithWorld_ResetSectorRuntimeAlteredVars);
+    hook_function(sithWorld_SetLoadProgressCallback_ADDR, sithWorld_SetLoadProgressCallback);
+    hook_function(sithWorld_UpdateLoadProgress_ADDR, sithWorld_UpdateLoadProgress);
+    hook_function(sithWorld_RegisterTextSectionParser_ADDR, sithWorld_RegisterTextSectionParser);
+    hook_function(sithWorld_GetTextSectionParserIndex_ADDR, sithWorld_GetTextSectionParserIndex);
+    hook_function(sithWorld_CalcWorldChecksum_ADDR, sithWorld_CalcWorldChecksum);
+    hook_function(sithWorld_ResetGeoresource_ADDR, sithWorld_ResetGeoresource);
 
     // sithInventory
     hook_function(sithInventory_NewEntry_ADDR, sithInventory_NewEntry);

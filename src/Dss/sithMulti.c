@@ -217,7 +217,7 @@ int sithMulti_Startup()
     // Remove all actor things from the world
     sithMulti_RemoveAllActorsFromWorld(sithWorld_pCurrentWorld);
 
-    sithNet_checksum = sithWorld_CalcChecksum(sithWorld_pCurrentWorld, 0/*jkGuiMultiplayer_checksumSeed*/); // Added: TODO fix the checksum seed
+    sithNet_checksum = sithWorld_CalcWorldChecksum(sithWorld_pCurrentWorld, 0/*jkGuiMultiplayer_checksumSeed*/); // Added: TODO fix the checksum seed
     sithNet_syncIdx = 0;
     sithSurface_numSurfaces_0 = 0;
     sithSector_numSync = 0;

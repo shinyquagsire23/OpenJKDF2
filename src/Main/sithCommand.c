@@ -417,7 +417,7 @@ int sithCommand_Memory(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         sithConsole_PrintString("No world.");
         return 0;
     }
-    sithWorld_GetMemorySize(pWorld, worldAllocatedAmt, worldQuantityAmt);
+    sithWorld_GetMemoryUsage(pWorld, worldAllocatedAmt, worldQuantityAmt);
     _sprintf(std_genBuffer, "%5d Materials        %8d bytes.", worldQuantityAmt[0], worldAllocatedAmt[0]);
     sithConsole_PrintString(std_genBuffer);
     _sprintf(std_genBuffer, "%5d Models           %8d bytes.", worldQuantityAmt[10], worldAllocatedAmt[10]);

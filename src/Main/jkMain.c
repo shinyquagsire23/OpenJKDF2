@@ -596,7 +596,7 @@ void jkMain_GameplayShow(int a1, int a2)
         }
 
         // MOTS added:
-        //sithWorld_GetMemorySize(sithWorld_pCurrentWorld,local_44,local_88);
+        //sithWorld_GetMemoryUsage(sithWorld_pCurrentWorld,local_44,local_88);
 
         if ( !sithNet_isMulti )
         {

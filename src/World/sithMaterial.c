@@ -80,7 +80,7 @@ int sithMaterial_ReadMaterialsListText(sithWorld *world, int a2)
     result = stdConffile_ReadLine();
     if ( result )
     {
-        sithWorld_UpdateLoadPercent(5.0);
+        sithWorld_UpdateLoadProgress(5.0);
         if ( _sscanf(stdConffile_aLine, " world materials %d", &a2) == 1 )
         {
             // Added: needed for JKE?
@@ -117,13 +117,13 @@ int sithMaterial_ReadMaterialsListText(sithWorld *world, int a2)
                     world->materials2[v2].x = v8;
                     world->materials2[v2++].y = _atof(v9);
                     a1a = (flex_d_t)(unsigned int)v2 * v12 - -5.0;
-                    sithWorld_UpdateLoadPercent(a1a);
+                    sithWorld_UpdateLoadProgress(a1a);
                     if ( !stdConffile_ReadArgs() )
                         break;
                 }
             }
             sithMaterial_numMaterials = v2;
-            sithWorld_UpdateLoadPercent(50.0);
+            sithWorld_UpdateLoadProgress(50.0);
             result = 1;
         }
         else

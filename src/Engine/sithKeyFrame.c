@@ -56,7 +56,7 @@ int sithKeyFrame_Load(sithWorld *world, int a2)
         load_percent = percent_delta + load_percent;
         if ( load_percent >= 95.0 )
             load_percent = 95.0;
-        sithWorld_UpdateLoadPercent(load_percent);
+        sithWorld_UpdateLoadProgress(load_percent);
     }
     return 1;
 }

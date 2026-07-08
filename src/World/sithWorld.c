@@ -80,24 +80,24 @@ static sithWorldProgressCallback_t sithWorld_LoadPercentCallback;
 int sithWorld_Startup()
 {
     sithWorld_numParsers = 0;
-    sithWorld_SetSectionParser("georesource", sithWorld_LoadGeoresource);
-    sithWorld_SetSectionParser("copyright", sithCopyright_Load);
-    sithWorld_SetSectionParser("header", sithHeader_Load);
-    sithWorld_SetSectionParser("sectors", sithSector_ReadSectorsListText);
-    sithWorld_SetSectionParser("models", sithModel_ReadStaticModelsListText);
-    sithWorld_SetSectionParser("sprites", sithSprite_ReadStaticSpritesListText);
-    sithWorld_SetSectionParser("things", sithThing_Load);
-    sithWorld_SetSectionParser("templates", sithTemplate_ReadThingTemplatesListText);
-    sithWorld_SetSectionParser("materials", sithMaterial_ReadMaterialsListText);
-    sithWorld_SetSectionParser("sounds", sithSound_ReadSoundsListText);
-    sithWorld_SetSectionParser("cogs", sithCog_Load);
-    sithWorld_SetSectionParser("cogscripts", sithCogScript_Load);
-    sithWorld_SetSectionParser("keyframes", sithKeyFrame_Load);
-    sithWorld_SetSectionParser("animclass", sithAnimClass_Load);
-    sithWorld_SetSectionParser("aiclass", sithAIClass_ReadStaticAIClassesListText);
-    sithWorld_SetSectionParser("soundclass", sithSoundClass_ReadSoundClassesListText);
+    sithWorld_RegisterTextSectionParser("georesource", sithWorld_ReadGeoresourceText);
+    sithWorld_RegisterTextSectionParser("copyright", sithWorld_ReadCopyrightText);
+    sithWorld_RegisterTextSectionParser("header", sithWorld_ReadHeaderText);
+    sithWorld_RegisterTextSectionParser("sectors", sithSector_ReadSectorsListText);
+    sithWorld_RegisterTextSectionParser("models", sithModel_ReadStaticModelsListText);
+    sithWorld_RegisterTextSectionParser("sprites", sithSprite_ReadStaticSpritesListText);
+    sithWorld_RegisterTextSectionParser("things", sithThing_Load);
+    sithWorld_RegisterTextSectionParser("templates", sithTemplate_ReadThingTemplatesListText);
+    sithWorld_RegisterTextSectionParser("materials", sithMaterial_ReadMaterialsListText);
+    sithWorld_RegisterTextSectionParser("sounds", sithSound_ReadSoundsListText);
+    sithWorld_RegisterTextSectionParser("cogs", sithCog_Load);
+    sithWorld_RegisterTextSectionParser("cogscripts", sithCogScript_Load);
+    sithWorld_RegisterTextSectionParser("keyframes", sithKeyFrame_Load);
+    sithWorld_RegisterTextSectionParser("animclass", sithAnimClass_Load);
+    sithWorld_RegisterTextSectionParser("aiclass", sithAIClass_ReadStaticAIClassesListText);
+    sithWorld_RegisterTextSectionParser("soundclass", sithSoundClass_ReadSoundClassesListText);
 #ifdef JKM_LIGHTING
-    sithWorld_SetSectionParser("archlighting", sithArchLighting_ParseSection); // MOTS added
+    sithWorld_RegisterTextSectionParser("archlighting", sithArchLighting_ParseSection); // MOTS added
 #endif
     sithWorld_bInitted = 1;
     return 1;
@@ -117,12 +117,12 @@ void sithWorld_Shutdown()
     sithWorld_bInitted = 0;
 }
 
-void sithWorld_SetLoadPercentCallback(sithWorldProgressCallback_t func)
+void sithWorld_SetLoadProgressCallback(sithWorldProgressCallback_t func)
 {
     sithWorld_LoadPercentCallback = func;
 }
 
-void sithWorld_UpdateLoadPercent(flex_t percent)
+void sithWorld_UpdateLoadProgress(flex_t percent)
 {
     if ( sithWorld_LoadPercentCallback )
         sithWorld_LoadPercentCallback(percent);
@@ -218,7 +218,7 @@ LABEL_19:
         stdConffile_Close();
     }
 
-    if ( sithWorld_NewEntry(pWorld) )
+    if ( sithWorld_LoadPostProcess(pWorld) )
     {
 #ifdef SDL2_RENDER
         std3D_UpdateSettings();
@@ -243,7 +243,7 @@ cleanup:
     return 0;
 }
 
-sithWorld* sithWorld_New()
+sithWorld* sithWorld_NewEntry()
 {
     sithWorld *result; // eax
 
@@ -254,7 +254,7 @@ sithWorld* sithWorld_New()
     return result;
 }
 
-int sithWorld_NewEntry(sithWorld *pWorld)
+int sithWorld_LoadPostProcess(sithWorld *pWorld)
 {
     sithAdjoin *v1; // ebp
     sithSector *v2; // ebx
@@ -340,7 +340,7 @@ int sithWorld_NewEntry(sithWorld *pWorld)
                     sithPhysics_FindFloor(v16, 1);
                 }
             }
-            if ( !sithWorld_Verify(pWorld) )
+            if ( !sithWorld_ValidateWorld(pWorld) )
                 return 0;
         }
         pWorld->level_type_maybe |= 2;
@@ -458,7 +458,7 @@ void sithWorld_FreeEntry(sithWorld *pWorld)
     SITH_FREE(pWorld);
 }
 
-int sithHeader_Load(sithWorld *pWorld, int junk)
+int sithWorld_ReadHeaderText(sithWorld *pWorld, int junk)
 {
     flex32_t tmp;
     flex32_t tmp2;
@@ -546,7 +546,7 @@ int sithHeader_Load(sithWorld *pWorld, int junk)
     return 1;
 }
 
-int sithCopyright_Load(sithWorld *lvl, int junk)
+int sithWorld_ReadCopyrightText(sithWorld *lvl, int junk)
 {
     char *iter;
 
@@ -576,9 +576,9 @@ int sithCopyright_Load(sithWorld *lvl, int junk)
     return 1;
 }
 
-int sithWorld_SetSectionParser(char *section_name, sithWorldSectionParser_t funcptr)
+int sithWorld_RegisterTextSectionParser(char *section_name, sithWorldSectionParser_t funcptr)
 {
-    int idx = sithWorld_FindSectionParser(section_name);
+    int idx = sithWorld_GetTextSectionParserIndex(section_name);
     if (idx == -1)
     {
         if ( sithWorld_numParsers >= 32 )
@@ -591,7 +591,7 @@ int sithWorld_SetSectionParser(char *section_name, sithWorldSectionParser_t func
     return 1;
 }
 
-int sithWorld_FindSectionParser(char *a1)
+int sithWorld_GetTextSectionParserIndex(char *a1)
 {
     if ( sithWorld_numParsers <= 0 )
         return -1;
@@ -608,7 +608,7 @@ int sithWorld_FindSectionParser(char *a1)
     return i;
 }
 
-int sithWorld_Verify(sithWorld *pWorld)
+int sithWorld_ValidateWorld(sithWorld *pWorld)
 {
     if ( !pWorld->things && pWorld->numThingsLoaded )
     {
@@ -637,7 +637,7 @@ int sithWorld_Verify(sithWorld *pWorld)
 }
 
 // MOTS altered
-uint32_t sithWorld_CalcChecksum(sithWorld *pWorld, uint32_t seed)
+uint32_t sithWorld_CalcWorldChecksum(sithWorld *pWorld, uint32_t seed)
 {
     // Starting hash seed
     uint32_t hash = seed;
@@ -673,7 +673,7 @@ uint32_t sithWorld_CalcChecksum(sithWorld *pWorld, uint32_t seed)
     return hash;
 }
 
-int sithWorld_Initialize()
+int sithWorld_InitPlayers()
 {
     for (int i = 1; i < jkPlayer_maxPlayers; i++)
     {
@@ -684,7 +684,7 @@ int sithWorld_Initialize()
     return 1;
 }
 
-int sithWorld_LoadGeoresource(sithWorld *pWorld, int a2)
+int sithWorld_ReadGeoresourceText(sithWorld *pWorld, int a2)
 {
     uint32_t numVertices;
     uint32_t textureVertices;
@@ -817,7 +817,7 @@ int sithWorld_LoadGeoresource(sithWorld *pWorld, int a2)
     return sithSurface_ReadSurfacesListText(pWorld) != 0;
 }
 
-void sithWorld_sub_4D0A20(sithWorld *pWorld)
+void sithWorld_ResetRenderState(sithWorld *pWorld)
 {
     _memset(pWorld->alloc_unk98, 0, sizeof(int) * pWorld->numVertices);
     _memset(pWorld->alloc_unk9c, 0, sizeof(int) * pWorld->numVertices);
@@ -845,7 +845,7 @@ void sithWorld_Free()
     }
 }
 
-void sithWorld_ResetSectorRuntimeAlteredVars(sithWorld *pWorld)
+void sithWorld_ResetGeoresource(sithWorld *pWorld)
 {
     for (int i = 0; i < pWorld->numMaterialsLoaded; i++)
     {
@@ -861,7 +861,7 @@ void sithWorld_ResetSectorRuntimeAlteredVars(sithWorld *pWorld)
 }
 
 // MOTS altered
-void sithWorld_GetMemorySize(sithWorld *pWorld, int *outAllocated, int *outQuantity)
+void sithWorld_GetMemoryUsage(sithWorld *pWorld, int *outAllocated, int *outQuantity)
 {
     _memset(outAllocated, 0, sizeof(int) * 0x11);
     _memset(outQuantity, 0, sizeof(int) * 0x11);

@@ -316,7 +316,7 @@ void jkGuiTitle_ShowLoadingStatic()
 
     jkGui_SetModeMenu(jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]->palette);
     jkGuiTitle_whichLoading = 1;
-    sithWorld_SetLoadPercentCallback(jkGuiTitle_WorldLoadCallback);
+    sithWorld_SetLoadProgressCallback(jkGuiTitle_WorldLoadCallback);
     verRevision = jkGuiTitle_verRevision;
     verMinor = jkGuiTitle_verMinor;
     verMajor = jkGuiTitle_verMajor;
@@ -345,7 +345,7 @@ void jkGuiTitle_ShowLoading(char *a1, wchar_t *a2)
     jkGui_SetModeMenu(jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]->palette);
     jkGuiTitle_whichLoading = 2;
     jkGuiRend_SetCursorVisible(0);
-    sithWorld_SetLoadPercentCallback(jkGuiTitle_WorldLoadCallback);
+    sithWorld_SetLoadProgressCallback(jkGuiTitle_WorldLoadCallback);
     jkGuiTitle_elementsLoad[1].selectedTextEntry = 0;
 
     v4 = jkGui_sub_412ED0();
@@ -401,6 +401,6 @@ void jkGuiTitle_LoadingFinalize()
     //std3D_PurgeTextureCache();
 #endif
     jkGui_SetModeGame();
-    sithWorld_SetLoadPercentCallback(0);
+    sithWorld_SetLoadProgressCallback(0);
     jkGuiRend_sub_50FDB0();
 }

@@ -46,7 +46,7 @@ int sithSprite_ReadStaticSpritesListText(sithWorld *world, int a2)
         return 0;
     }
     
-    sithWorld_UpdateLoadPercent(70.0);
+    sithWorld_UpdateLoadProgress(70.0);
     
     flex_t loadPercent = 70.0;
     if ( stdConffile_ReadArgs() )
@@ -71,12 +71,12 @@ int sithSprite_ReadStaticSpritesListText(sithWorld *world, int a2)
             }
             flex_t percentDelta = 10.0 / (flex_d_t)sprites_amt;
             loadPercent += percentDelta;
-            sithWorld_UpdateLoadPercent(loadPercent);
+            sithWorld_UpdateLoadProgress(loadPercent);
             if ( !stdConffile_ReadArgs() )
                 break;
         }
     }
-    sithWorld_UpdateLoadPercent(80.0);
+    sithWorld_UpdateLoadProgress(80.0);
     return 1;
 }
 
