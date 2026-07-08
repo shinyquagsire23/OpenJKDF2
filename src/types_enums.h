@@ -6,7 +6,7 @@
 
 // Constants
 typedef int32_t rdGeoMode_t;
-enum RD_GEOMODE
+typedef enum erdGeometryMode
 {
     RD_GEOMETRY_NONE = 0,
     RD_GEOMETRY_VERTEX = 1,
@@ -14,10 +14,10 @@ enum RD_GEOMODE
     RD_GEOMETRY_SOLID = 3,
     RD_GEOMETRY_FULL = 4,
     RD_GEOMODE_5_UNK = 5
-};
+} rdGeometryMode;
 
 typedef int32_t rdLightMode_t;
-enum RD_LIGHTMODE
+typedef enum erdLightMode
 {
     RD_LIGHTMODE_FULLYLIT = 0,
     RD_LIGHTMODE_NOTLIT = 1,
@@ -26,7 +26,7 @@ enum RD_LIGHTMODE
     RD_LIGHTMODE_4_UNK = 4,
     RD_LIGHTMODE_5_UNK = 5,
     RD_LIGHTMODE_6_UNK = 6
-};
+} rdLightMode;
 
 typedef int32_t rdTexMode_t;
 enum RD_TEXTUREMODE
@@ -167,14 +167,14 @@ enum SITH_GS_E
 };
 
 typedef uint32_t sithItemFlags_t;
-enum SITH_ITEMFLAG_E // could be jones specific
+typedef enum eSithItemFlag // could be jones specific
 {
     SITH_ITEM_RESPAWN_MP = 0x1,
     SITH_ITEM_RESPAWN_SP = 0x2,
     SITH_ITEM_BACKPACK = 0x4,
     SITH_ITEM_8 = 0x8,
     SITH_ITEM_10 = 0x10
-};
+} SithItemFlag;
 
 enum jkEpisodeLoadType
 {
@@ -384,7 +384,7 @@ typedef enum
 #define DEBUGFLAG_NOCLIP               (0x40000000)
 
 // type
-enum SITHCOLLISION
+typedef enum eSithCollisionType
 {
     SITHCOLLISION_NONE = 0x0,
     SITHCOLLISION_THING = 0x1,
@@ -395,7 +395,7 @@ enum SITHCOLLISION
 
     SITHCOLLISION_ADJOINCROSS = 0x20,
     SITHCOLLISION_ADJOINTOUCH = 0x40,
-};
+} SithCollisionType;
 
 typedef enum eSithCollideType
 {
@@ -436,7 +436,7 @@ typedef enum eSithParticleFlag
     SITHPARTICLE_FLAG_TIMEOUT_RATE = 0x40,
 } SithParticleFlag;
 
-enum RdAnimFlag
+typedef enum erdKeyframeFlags
 {
     RDKEYFRAME_PUPPET_CONTROLLED = 0x1,
     RDKEYFRAME_NOLOOP = 0x2,
@@ -445,19 +445,19 @@ enum RdAnimFlag
     RDKEYFRAME_DISABLE_FADEIN = 0x10,
     RDKEYFRAME_FADEOUT_NOLOOP = 0x20,
     RDKEYFRAME_FORCEMOVE = 0x40,
-};
+} rdKeyframeFlags;
 
 #define rdCameraProjectType_Ortho (0)
 #define rdCameraProjectType_Perspective       (1)
 #define rdCameraProjectType_PerspMVP (2)
 
-enum CLIP_OUTCODE
+typedef enum erdClipOutcode
 {
     RDCLIP_OUTCODE_LEFT = 0x1,
     RDCLIP_OUTCODE_RIGHT = 0x10,
     RDCLIP_OUTCODE_BOTTOM = 0x100,
     RDCLIP_OUTCODE_TOP = 0x1000
-};
+} rdClipOutcode;
 
 enum RdClipFaceStatus {
     CLIPSTAT_NEAR = 0x01,
@@ -476,7 +476,7 @@ enum RdSphereClipStatus {
     SPHERE_FULLY_OUTSIDE = 2,
 };
 
-enum RD_THINGTYPE
+typedef enum erdThingType
 {
     RD_THING_NONE   = 0,
     RD_THING_MODEL3  = 1,
@@ -485,7 +485,7 @@ enum RD_THINGTYPE
     RD_THING_SPRITE3  = 4,
     RD_THING_PARTICLE  = 5,
     RD_THING_POLYLINE  = 6
-};
+} rdThingType;
 
 enum SITH_ANIM
 {
@@ -1113,16 +1113,16 @@ typedef enum eSithInventoryItemStatus
 } SithInventoryItemStatus;
 
 
-typedef enum ATTACHFLAGS
+typedef enum SithAttachFlag
 {
   SITH_ATTACH_SURFACE = 0x1,
   SITH_ATTACH_THINGFACE = 0x2,
   SITH_ATTACH_THING = 0x4,
   SITH_ATTACH_NOMOVE = 0x8,
   SITH_ATTACH_FORCE_SERIALIZE = 0x10, // MOTS added: Jail Key
-} ATTACHFLAGS;
+} SithAttachFlag;
 
-typedef enum SITH_SECTOR_FLAG
+typedef enum SithSectorFlag
 {
   SITH_SECTOR_NOGRAVITY = 0x1,
   SITH_SECTOR_UNDERWATER = 0x2,
@@ -1140,7 +1140,7 @@ typedef enum SITH_SECTOR_FLAG
   SITH_SECTOR_2000 = 0x2000,
   SITH_SECTOR_SEEN = 0x4000,
   SITH_SECTOR_SYNC = 0x8000,
-} SITH_SECTOR_FLAG;
+} SithSectorFlag;
 
 
 typedef enum eSithThingMoveType
