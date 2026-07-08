@@ -70,11 +70,11 @@ int32_t sithCog_StartupEnhanced(); // Added
 void sithCog_Shutdown();
 int32_t sithCog_Open();
 void sithCog_Close();
-int sithCog_ReadCogsListText(SithWorld *world, int a2);
-sithCog* sithCog_Load(const char *fpath);
-int32_t sithCog_ParseSymbolRef(SithCogSymbol *cogSymbol, SithCogSymbolRef *cogIdk, char *val);
-int32_t sithCog_LinkCog(sithCog *cog, SithCogSymbolRef *idk, SithCogSymbol *symbol);
-void sithCog_UpdateThingTimer(SithThing *thing);
+int sithCog_ReadCogsListText(SithWorld *pWorld, int bSkip);
+sithCog* sithCog_Load(const char *pName);
+int32_t sithCog_ParseSymbolRef(SithCogSymbol *pSymbol, SithCogSymbolRef *pRef, char *pString);
+int32_t sithCog_LinkCog(sithCog *pCog, SithCogSymbolRef *pRef, SithCogSymbol *pSymbol);
+void sithCog_UpdateThingTimer(SithThing *pThing);
 
 void sithCogFunction_Startup(SithCogSymbolTable* a1);
 void sithCogThing_Startup(SithCogSymbolTable* a1);
@@ -82,24 +82,24 @@ void sithCogFunctionSound_Startup(SithCogSymbolTable* a1);
 void sithCogFunctionSector_Startup(SithCogSymbolTable* a1);
 void sithCogSurface_Startup(SithCogSymbolTable* a1);
 
-void sithCog_ThingSendMessage(SithThing *a1, SithThing *a2, int32_t msg);
-cog_flex_t sithCog_ThingSendMessageEx(SithThing *pMeshCollided, SithThing *pThingCollided, SITH_MESSAGE message, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3);
-void sithCog_SurfaceSendMessage(SithSurface *surface, SithThing *thing, int32_t msg);
-cog_flex_t sithCog_SurfaceSendMessageEx(SithSurface *pMeshCollided, SithThing *thing, SITH_MESSAGE msg, cog_flex_t a4, cog_flex_t a5, cog_flex_t a6, cog_flex_t a7);
-void sithCog_SectorSendMessage(SithSector *sector, SithThing *thing, int32_t message);
-cog_flex_t sithCog_SectorSendMessageEx(SithSector *a1, SithThing *sourceType, SITH_MESSAGE message, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3);
-void sithCog_BroadcastMessage(int32_t a1, int32_t a2, int32_t a3, int32_t a4, int32_t a5);
-void sithCog_BroadcastMessageEx(int32_t cmdid, int32_t senderType, int32_t senderIdx, int32_t sourceType, int32_t sourceIdx, cog_flex_t arg0, cog_flex_t arg1, cog_flex_t arg2, cog_flex_t arg3);
-void sithCog_SendMessage(sithCog *cog, int32_t msgid, int32_t senderType, int32_t senderIndex, int32_t sourceType, int32_t sourceIndex, int32_t linkId);
-cog_flex_t sithCog_SendMessageEx(sithCog *cog, int32_t message, int32_t senderType, int32_t senderIndex, int32_t sourceType, int32_t sourceIndex, int32_t linkId, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3);
-void sithCog_FreeWorldCogs(SithWorld *world);
-void sithCog_FreeEntry(sithCog *cog);
+void sithCog_ThingSendMessage(SithThing *pThing, SithThing *pSrcThing, int32_t msgType);
+cog_flex_t sithCog_ThingSendMessageEx(SithThing *pThing, SithThing *pSrcThing, SITH_MESSAGE messageType, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3);
+void sithCog_SurfaceSendMessage(SithSurface *pSurf, SithThing *pSrcThing, int32_t messageType);
+cog_flex_t sithCog_SurfaceSendMessageEx(SithSurface *pSurf, SithThing *pSrcThing, SITH_MESSAGE messageType, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3);
+void sithCog_SectorSendMessage(SithSector *pSector, SithThing *pThing, int32_t msgType);
+cog_flex_t sithCog_SectorSendMessageEx(SithSector *pSector, SithThing *pThing, SITH_MESSAGE messageType, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3);
+void sithCog_BroadcastMessage(int32_t msgType, int32_t senderType, int32_t senderIdx, int32_t srcType, int32_t srcIdx);
+void sithCog_BroadcastMessageEx(int32_t msgType, int32_t senderType, int32_t senderIdx, int32_t srcType, int32_t srcIdx, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3);
+void sithCog_SendMessage(sithCog *pCog, int32_t messageType, int32_t senderType, int32_t senderIdx, int32_t srcType, int32_t srcIdx, int32_t linkId);
+cog_flex_t sithCog_SendMessageEx(sithCog *pCog, int32_t messageType, int32_t senderType, int32_t senderIdx, int32_t srcType, int32_t srcIdx, int32_t linkId, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3);
+void sithCog_FreeWorldCogs(SithWorld *pWorld);
+void sithCog_FreeEntry(sithCog *pCog);
 void sithCog_FreeScriptEntry(SithCogScript *pScript);
-int sithCog_AllocWorldCogScripts(SithWorld *world, int num);
-int sithCog_AllocWorldCogs(SithWorld *world, int num);
-int sithCog_LinkCogToThing(sithCog *cog, SithThing *thing, int linkId, int mask);
-int sithCog_LinkCogToSurface(sithCog *cog, SithSurface *surface, int linkId, int mask);
-int sithCog_LinkCogToSector(sithCog *cog, SithSector *sector, int linkId, int mask);
+int sithCog_AllocWorldCogScripts(SithWorld *pWorld, int numCogScripts);
+int sithCog_AllocWorldCogs(SithWorld *pWorld, int sizeCogs);
+int sithCog_LinkCogToThing(sithCog *pCog, SithThing *pThing, int linkId, int mask);
+int sithCog_LinkCogToSurface(sithCog *pCog, SithSurface *pSurface, int linkId, int mask);
+int sithCog_LinkCogToSector(sithCog *pCog, SithSector *pSector, int linkId, int mask);
 
 //static int32_t (*_sithCog_Open)() = (void*)sithCog_Open_ADDR;
 //static double (*sithCog_SurfaceSendMessageEx)(SithSurface *a1, SithThing *a2, int32_t a3, cog_flex_t a4, cog_flex_t a5, cog_flex_t a6, cog_flex_t a7) = (void*)sithCog_SurfaceSendMessageEx_ADDR;
@@ -109,15 +109,15 @@ int sithCog_LinkCogToSector(sithCog *cog, SithSector *sector, int linkId, int ma
 //static void (*sithCog_FreeWorldCogs)(SithWorld* world) = (void*)sithCog_FreeWorldCogs_ADDR;
 //static void (*sithCog_ProcessCog)(sithCog* cog) = (void*)sithCog_ProcessCog_ADDR;
 
-int sithCog_ReadCogScriptsListText(SithWorld *lvl, int a2);
-SithCogScript* sithCog_LoadScript(const char *pFpath, int32_t unk);
-void sithCog_RegisterFunction(SithCogSymbolTable *a1, cogSymbolFunc_t a2, const char *a3);
-void sithCog_AddIntSymbol(SithCogSymbolTable *a1, int32_t a2, const char *a3);
-void sithCog_AddFloatSymbol(SithCogSymbolTable *a1, const char *a2, int32_t a3);
+int sithCog_ReadCogScriptsListText(SithWorld *pWorld, int bSkip);
+SithCogScript* sithCog_LoadScript(const char *pName, int32_t unk);
+void sithCog_RegisterFunction(SithCogSymbolTable *pTable, cogSymbolFunc_t pFunction, const char *pName);
+void sithCog_AddIntSymbol(SithCogSymbolTable *pTbl, int32_t val, const char *pName);
+void sithCog_AddFloatSymbol(SithCogSymbolTable *pTbl, const char *pName, int32_t value);
 void sithCog_ProcessCogs();
-void sithCog_ProcessCog(sithCog *cog);
-int sithCog_TimerEventTask(int32_t deltaMs, SithEventParams *info);
-int sithCog_CogStatus(stdDebugConsoleCmd *cmd, const char *extra);
+void sithCog_ProcessCog(sithCog *pCog);
+int sithCog_TimerEventTask(int32_t msecTime, SithEventParams *pParams);
+int sithCog_CogStatus(stdDebugConsoleCmd *pFunc, const char *pArg);
 sithCog* sithCog_GetCogByIndex(int32_t idx);
 
 

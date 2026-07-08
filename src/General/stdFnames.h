@@ -29,19 +29,19 @@ extern "C" {
 #endif
 
 
-char* stdFnames_FindMedName(char *path);
-char* stdFnames_FindExt(char *path);
+char* stdFnames_FindMedName(char *pFilePath);
+char* stdFnames_FindExt(char *pFilePath);
 int stdFnames_AddDefaultExt(char *str, const char *ext);
 char* stdFnames_StripExt(char *str);
-char* stdFnames_StripExtAndDot(char *str);
-int stdFnames_ChangeExt(char *str, char* ext);
+char* stdFnames_StripExtAndDot(char *pPath);
+int stdFnames_ChangeExt(char *pPath, char* pExt);
 int stdFnames_StripDirAndExt(char *str);
 int stdFnames_CopyExt(char *out, int out_size, char *path);
 int stdFnames_CopyMedName(char *out, int out_size, char *path);
 char* stdFnames_CopyDir(char *out, int out_size, char *path);
 char* stdFnames_CopyShortName(char *a1, int a2, char *a3);
-char* stdFnames_Concat(char *a1, char *a2, int a3);
-char* stdFnames_MakePath(char *a1, int a2, const char *pBasePath, const char *pAppendedPath);
+char* stdFnames_Concat(char *path1, char *path2, int size);
+char* stdFnames_MakePath(char *aOutPath, int size, const char *pBasePath, const char *pAppendedPath);
 char* stdFnames_MakePath3(char *a1, int a2, char *a3, char *a4, char *a5);
 
 #ifdef __cplusplus

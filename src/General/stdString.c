@@ -3,7 +3,7 @@
 #include "jk.h"
 #include "stdPlatform.h"
 
-char* stdString_FastCopy(const char *str)
+char* stdString_FastCopy(const char *pSource)
 {
     char *result; // eax
     char *v2; // edx
@@ -13,13 +13,13 @@ char* stdString_FastCopy(const char *str)
     const char *v6; // esi
 
     { TWL_EXTRAM_SUGGEST(std_g_pHS); // Added: strings are read-only after creation
-    result = (char *)STD_ALLOC(_strlen(str) + 1);
+    result = (char *)STD_ALLOC(_strlen(pSource) + 1);
     TWL_EXTRAM_RESTORE(std_g_pHS); }
     v2 = result;
     if ( result )
     {
         // Added: word-safe copy (destination may be word-addressable-only)
-        stdPlatform_Memcpy32(v2, str, _strlen(str) + 1);
+        stdPlatform_Memcpy32(v2, pSource, _strlen(pSource) + 1);
     }
     return result;
 }
@@ -37,19 +37,19 @@ wchar_t* stdString_FastWCopy(const wchar_t *str)
     return result;
 }
 
-int stdString_snprintf(char *out, int num, const char *fmt, ...)
+int stdString_snprintf(char *pStr, int size, const char *format, ...)
 {
     int result; // eax
     va_list va; // [esp+18h] [ebp+10h]
 
-    va_start(va, fmt);
-    result = __vsnprintf(out, num - 1, fmt, va);
+    va_start(va, format);
+    result = __vsnprintf(pStr, size - 1, format, va);
     va_end(va);
-    out[num - 1] = 0;
+    pStr[size - 1] = 0;
     return result;
 }
 
-char* stdString_CopyBetweenDelimiter(char *instr, char *outstr, int out_size, char *find_str)
+char* stdString_CopyBetweenDelimiter(char *pSource, char *pFirstToken, int maxTokenLenght, char *pSeparators)
 {
     char *out_; // edi
     const char *v5; // ebx
@@ -57,11 +57,11 @@ char* stdString_CopyBetweenDelimiter(char *instr, char *outstr, int out_size, ch
     char *retval; // ebp
     size_t idk_len; // esi
 
-    out_ = outstr;
-    if ( outstr )
-        *outstr = 0;
-    v5 = &instr[_strspn(instr, find_str)];
-    str_find = _strpbrk(v5, find_str);
+    out_ = pFirstToken;
+    if ( pFirstToken )
+        *pFirstToken = 0;
+    v5 = &pSource[_strspn(pSource, pSeparators)];
+    str_find = _strpbrk(v5, pSeparators);
     retval = (char*)str_find;
     if ( str_find )
     {
@@ -69,11 +69,11 @@ char* stdString_CopyBetweenDelimiter(char *instr, char *outstr, int out_size, ch
     }
     else
     {
-        out_ = outstr;
+        out_ = pFirstToken;
         idk_len = _strlen(v5);
     }
-    if ( idk_len >= out_size - 1 )
-        idk_len = out_size - 1;
+    if ( idk_len >= maxTokenLenght - 1 )
+        idk_len = maxTokenLenght - 1;
     if ( out_ )
     {
         _strncpy(out_, v5, idk_len);
@@ -82,28 +82,28 @@ char* stdString_CopyBetweenDelimiter(char *instr, char *outstr, int out_size, ch
     return retval;
 }
 
-char* stdString_GetQuotedStringContents(char *in, char *out, int out_size)
+char* stdString_GetQuotedStringContents(char *pSource, char *pDest, int destSize)
 {
     char *result; // eax
     char *v4; // esi
     unsigned int v5; // edx
 
-    if ( out )
-        *out = 0;
-    result = _strchr(in, '"');
+    if ( pDest )
+        *pDest = 0;
+    result = _strchr(pSource, '"');
     if ( result )
     {
         v4 = result + 1;
         result = _strchr(result + 1, '"');
         if ( result )
         {
-            if ( out )
+            if ( pDest )
             {
                 v5 = result - v4;
-                if ( result - v4 >= (unsigned int)(out_size - 1) )
-                    v5 = out_size - 1;
-                _memcpy(out, v4, v5);
-                out[v5] = 0;
+                if ( result - v4 >= (unsigned int)(destSize - 1) )
+                    v5 = destSize - 1;
+                _memcpy(pDest, v4, v5);
+                pDest[v5] = 0;
             }
             ++result;
         }
@@ -111,21 +111,21 @@ char* stdString_GetQuotedStringContents(char *in, char *out, int out_size)
     return result;
 }
 
-int stdString_CharToWchar(wchar_t *a1, const char *a2, int a3)
+int stdString_CharToWchar(wchar_t *pwString, const char *pString, int maxChars)
 {
     int result; // eax
     const char *v4; // esi
     wchar_t *v5; // edx
 
     result = 0;
-    if ( a3 <= 0 )
+    if ( maxChars <= 0 )
     {
-        v5 = a1;
+        v5 = pwString;
     }
     else
     {
-        v4 = a2;
-        v5 = a1;
+        v4 = pString;
+        v5 = pwString;
         do
         {
             if ( !*v4 )
@@ -135,28 +135,28 @@ int stdString_CharToWchar(wchar_t *a1, const char *a2, int a3)
             ++v4;
             ++result;
         }
-        while ( result < a3 );
+        while ( result < maxChars );
     }
-    if ( result < a3 )
+    if ( result < maxChars )
         *v5 = 0;
     return result;
 }
 
-int stdString_WcharToChar(char *a1, const wchar_t *a2, int a3)
+int stdString_WcharToChar(char *pString, const wchar_t *pwString, int maxChars)
 {
     int result; // eax
     const wchar_t *v4; // ecx
     char *v5; // esi
 
     result = 0;
-    if ( a3 <= 0 )
+    if ( maxChars <= 0 )
     {
-        v5 = a1;
+        v5 = pString;
     }
     else
     {
-        v4 = a2;
-        v5 = a1;
+        v4 = pwString;
+        v5 = pString;
         do
         {
             if ( !*v4 )
@@ -166,9 +166,9 @@ int stdString_WcharToChar(char *a1, const wchar_t *a2, int a3)
             ++v5;
             ++result;
         }
-        while ( result < a3 );
+        while ( result < maxChars );
     }
-    if ( result < a3 )
+    if ( result < maxChars )
         *v5 = 0;
     return result;
 }
@@ -238,7 +238,7 @@ int stdString_wstrncat(wchar_t *a1, int a2, int a3, wchar_t *a4)
     return result;
 }
 
-wchar_t* stdString_CstrCopy(const char *a1)
+wchar_t* stdString_CstrCopy(const char *pString)
 {
     wchar_t *v1; // ebp
     signed int v2; // eax
@@ -247,14 +247,14 @@ wchar_t* stdString_CstrCopy(const char *a1)
     uint8_t v5; // dl
 
     { TWL_EXTRAM_SUGGEST(std_g_pHS); // Added: fill loop below stores 16-bit wchars
-    v1 = (wchar_t *)STD_ALLOC(sizeof(wchar_t) * (_strlen(a1) + 1));
+    v1 = (wchar_t *)STD_ALLOC(sizeof(wchar_t) * (_strlen(pString) + 1));
     TWL_EXTRAM_RESTORE(std_g_pHS); }
     v2 = 0;
     v3 = v1;
-    v4 = _strlen(a1);
+    v4 = _strlen(pString);
     for (v2 = 0; v2 < v4; v2++)
     {
-        v5 = a1[v2];
+        v5 = pString[v2];
         if ( !v5 )
             break;
         *v3 = v5;
@@ -262,11 +262,11 @@ wchar_t* stdString_CstrCopy(const char *a1)
     }
     if ( v2 < v4 )
         *v3 = 0;
-    v1[_strlen(a1)] = 0;
+    v1[_strlen(pString)] = 0;
     return v1;
 }
 
-char* stdString_WcharCopy(wchar_t *a1)
+char* stdString_WcharCopy(wchar_t *pwString)
 {
     size_t v1; // eax
     char *v2; // esi
@@ -275,13 +275,13 @@ char* stdString_WcharCopy(wchar_t *a1)
     wchar_t *v5; // ecx
     char *i; // edx
 
-    v1 = _wcslen(a1);
+    v1 = _wcslen(pwString);
     { TWL_EXTRAM_SUGGEST(std_g_pHS); // Added: filled via 16-bit RMW below
     v2 = (char *)STD_ALLOC(v1 + 1);
     TWL_EXTRAM_RESTORE(std_g_pHS); }
-    v3 = _wcslen(a1);
+    v3 = _wcslen(pwString);
     v4 = 0;
-    v5 = a1;
+    v5 = pwString;
     for ( i = v2; v4 < v3; ++v4 )
     {
         if ( !*v5 )
@@ -292,17 +292,17 @@ char* stdString_WcharCopy(wchar_t *a1)
     }
     if ( v4 < v3 )
         stdPlatform_WriteByte16(i, 0); // Added: word-safe
-    stdPlatform_WriteByte16(&v2[_wcslen(a1)], 0); // Added: word-safe
+    stdPlatform_WriteByte16(&v2[_wcslen(pwString)], 0); // Added: word-safe
     return v2;
 }
 
-void stdString_CStrToLower(char *a1)
+void stdString_CStrToLower(char *pStr)
 {
     char *v1; // esi
     char result; // al
 
-    v1 = a1;
-    for (result = *a1; result; ++v1 )
+    v1 = pStr;
+    for (result = *pStr; result; ++v1 )
     {
         *v1 = __tolower(result);
         result = v1[1];

@@ -21,18 +21,18 @@ extern "C" {
 #define stdString_CStrToLower_ADDR (0x0042F4F0)
 
 
-char* stdString_FastCopy(const char *str);
+char* stdString_FastCopy(const char *pSource);
 wchar_t* stdString_FastWCopy(const wchar_t *str); // Added
-int stdString_snprintf(char *out, int num, const char *fmt, ...);
-char* stdString_CopyBetweenDelimiter(char *instr, char *outstr, int out_size, char *find_str);
-char* stdString_GetQuotedStringContents(char *in, char *out, int out_size);
-int stdString_CharToWchar(wchar_t *a1, const char *a2, int a3);
-int stdString_WcharToChar(char *a1, const wchar_t *a2, int a3);
+int stdString_snprintf(char *pStr, int size, const char *format, ...);
+char* stdString_CopyBetweenDelimiter(char *pSource, char *pFirstToken, int maxTokenLenght, char *pSeparators);
+char* stdString_GetQuotedStringContents(char *pSource, char *pDest, int destSize);
+int stdString_CharToWchar(wchar_t *pwString, const char *pString, int maxChars);
+int stdString_WcharToChar(char *pString, const wchar_t *pwString, int maxChars);
 int stdString_WstrRemoveCharsAt(wchar_t *pwaStr, int idx, int numChars);
 int stdString_wstrncat(wchar_t *a1, int a2, int a3, wchar_t *a4);
-wchar_t* stdString_CstrCopy(const char *a1);
-char* stdString_WcharCopy(wchar_t *a1);
-void stdString_CStrToLower(char *a1);
+wchar_t* stdString_CstrCopy(const char *pString);
+char* stdString_WcharCopy(wchar_t *pwString);
+void stdString_CStrToLower(char *pStr);
 
 // Added: These were macros or something
 char* stdString_SafeStrCopy(char* pDst, const char* pSrc, uint32_t lenDst);

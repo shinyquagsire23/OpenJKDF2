@@ -6,14 +6,14 @@
 #include "external/fcaseopen/fcaseopen.h"
 #endif
 
-char* stdFnames_FindMedName(char *path)
+char* stdFnames_FindMedName(char *pFilePath)
 {
     char *result; // eax
     char v2; // cl
 
-    result = _strrchr(path, LEC_PATH_SEPARATOR_CHR);
+    result = _strrchr(pFilePath, LEC_PATH_SEPARATOR_CHR);
     if (!result)
-        return path;
+        return pFilePath;
 
     if ( *result == LEC_PATH_SEPARATOR_CHR )
     {
@@ -22,11 +22,11 @@ char* stdFnames_FindMedName(char *path)
     return result;
 }
 
-char* stdFnames_FindExt(char *path)
+char* stdFnames_FindExt(char *pFilePath)
 {
     char *result;
 
-    result = _strrchr(stdFnames_FindMedName(path), '.');
+    result = _strrchr(stdFnames_FindMedName(pFilePath), '.');
     if (result)
         ++result;
     return result;
@@ -53,21 +53,21 @@ char* stdFnames_StripExt(char *str)
     return result;
 }
 
-char* stdFnames_StripExtAndDot(char *str)
+char* stdFnames_StripExtAndDot(char *pPath)
 {
     char* result;
 
-    result = stdFnames_FindExt(str);
+    result = stdFnames_FindExt(pPath);
     if (result)
         *(result-1) = 0;
 
     return result;
 }
 
-int stdFnames_ChangeExt(char *str, char* ext)
+int stdFnames_ChangeExt(char *pPath, char* pExt)
 {
-    stdFnames_StripExtAndDot(str);
-    return stdFnames_AddDefaultExt(str, ext);
+    stdFnames_StripExtAndDot(pPath);
+    return stdFnames_AddDefaultExt(pPath, pExt);
 }
 
 int stdFnames_StripDirAndExt(char *str)
@@ -197,56 +197,56 @@ char* stdFnames_CopyShortName(char *a1, int a2, char *a3)
   return result;
 }
 
-char* stdFnames_Concat(char *a1, char *a2, int a3)
+char* stdFnames_Concat(char *path1, char *path2, int size)
 {
   int v3; // ecx
   unsigned int v4; // kr04_4
 
-  v4 = _strlen(a1) + 1;
+  v4 = _strlen(path1) + 1;
   v3 = v4 - 1;
-  if ( a1[v4 - 2] != LEC_PATH_SEPARATOR_CHR && v3 < a3 - 1 && *a1 )
+  if ( path1[v4 - 2] != LEC_PATH_SEPARATOR_CHR && v3 < size - 1 && *path1 )
   {
-    a1[v3] = LEC_PATH_SEPARATOR_CHR;
+    path1[v3] = LEC_PATH_SEPARATOR_CHR;
     v3 = v4;
-    a1[v4] = 0;
+    path1[v4] = 0;
   }
-  _strncat(a1, a2, a3 - v3 - 1);
-  return a1;
+  _strncat(path1, path2, size - v3 - 1);
+  return path1;
 }
 
-char* stdFnames_MakePath(char *a1, int a2, const char *a3, const char *a4)
+char* stdFnames_MakePath(char *aOutPath, int size, const char *pPath1, const char *pPath2)
 {
     int v4; // ecx
     unsigned int v5; // kr04_4
 
-    _strncpy(a1, a3, a2 - 1);
-    a1[a2 - 1] = 0;
-    v5 = _strlen(a1) + 1;
+    _strncpy(aOutPath, pPath1, size - 1);
+    aOutPath[size - 1] = 0;
+    v5 = _strlen(aOutPath) + 1;
     v4 = v5 - 1;
-    if ( a1[v5 - 2] != LEC_PATH_SEPARATOR_CHR && v4 < a2 - 1 && *a1 )
+    if ( aOutPath[v5 - 2] != LEC_PATH_SEPARATOR_CHR && v4 < size - 1 && *aOutPath )
     {
-      a1[v4] = LEC_PATH_SEPARATOR_CHR;
+      aOutPath[v4] = LEC_PATH_SEPARATOR_CHR;
       v4 = v5;
-      a1[v5] = 0;
+      aOutPath[v5] = 0;
     }
 
 #ifdef FS_POSIX
-    char *r = (char*)malloc(strlen(a1) + 16);
-    if (casepath(a1, r))
+    char *r = (char*)malloc(strlen(aOutPath) + 16);
+    if (casepath(aOutPath, r))
     {
         if (r[0] == '.' && (r[1] == '/' || r[1] == '\\')) {
-            strcpy(a1, r+2);
+            strcpy(aOutPath, r+2);
         }
         else {
-            strcpy(a1, r);
+            strcpy(aOutPath, r);
         }
-        _strncat(a1, "/", a2-1); // Added?
+        _strncat(aOutPath, "/", size-1); // Added?
     }
     free(r);
 #endif
 
-    _strncat(a1, a4, a2 - v4 - 1);
-    return a1;
+    _strncat(aOutPath, pPath2, size - v4 - 1);
+    return aOutPath;
 }
 
 char* stdFnames_MakePath3(char *a1, int a2, char *a3, char *a4, char *a5)

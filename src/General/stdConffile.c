@@ -9,22 +9,22 @@ static struct HostServices* stdConffile_pHS = 0;
 static BOOL openFileIsBypass[20];
 static BOOL bOpenFileIsBypassed = 0;
 
-int stdConffile_Open(char *fpath)
+int stdConffile_Open(char *pFilename)
 {
-    return stdConffile_OpenMode(fpath, "r");
+    return stdConffile_OpenMode(pFilename, "r");
 }
 
-int stdConffile_OpenWrite(char *a1)
+int stdConffile_OpenWrite(char *pFilename)
 {
     if ( writeFile )
         return 0;
 
     // Added: std_g_pHS -> pLowLevelHS
     stdConffile_pHS = pLowLevelHS;
-    writeFile = stdConffile_pHS->fileOpen(a1, "wb");
+    writeFile = stdConffile_pHS->fileOpen(pFilename, "wb");
     if (writeFile)
     {
-        stdString_SafeStrCopy(stdConffile_aWriteFilename, a1, 128);
+        stdString_SafeStrCopy(stdConffile_aWriteFilename, pFilename, 128);
         return 1;
     }
     else
@@ -103,9 +103,9 @@ fail_open:
     return 0;
 }
 
-int stdConffile_OpenMode(char *fpath, const char* mode)
+int stdConffile_OpenMode(char *pFilename, const char* openMode)
 {
-    return stdConffile_OpenModeCommon(fpath, mode, 0);
+    return stdConffile_OpenModeCommon(pFilename, openMode, 0);
 }
 
 // Added
@@ -166,48 +166,48 @@ void stdConffile_CloseWrite()
     }
 }
 
-int stdConffile_WriteLine(const char *line)
+int stdConffile_WriteLine(const char *pLine)
 {
-    return stdConffile_Write(line, _strlen(line));
+    return stdConffile_Write(pLine, _strlen(pLine));
 }
 
-int stdConffile_Write(const char* line, int amt)
+int stdConffile_Write(const char* pData, int size)
 {
-    if ( !writeFile || !line )
+    if ( !writeFile || !pData )
         return 0;
 
     // Added: std_g_pHS -> stdConffile_pHS
-    return (amt) == stdConffile_pHS->fileWrite(writeFile, (void *)line, (amt));
+    return (size) == stdConffile_pHS->fileWrite(writeFile, (void *)pData, (size));
 }
 
-int stdConffile_Printf(char *fmt, ...)
+int stdConffile_Printf(char *pFormat, ...)
 {
     int len;
     va_list va;
 
-    va_start(va, fmt);
-    if ( !writeFile || !fmt ) {
+    va_start(va, pFormat);
+    if ( !writeFile || !pFormat ) {
         va_end(va);
         return 0;
     }
 
-    len = __vsnprintf(printfBuffer, STDCONF_LINEBUFFER_LEN, fmt, va);
+    len = __vsnprintf(printfBuffer, STDCONF_LINEBUFFER_LEN, pFormat, va);
     va_end(va);
 
     // Added: std_g_pHS -> stdConffile_pHS
     return stdConffile_pHS->fileWrite(writeFile, printfBuffer, len) == len;
 }
 
-int stdConffile_Read(void* out, int len)
+int stdConffile_Read(void* pData, int size)
 {
     // Added: std_g_pHS -> stdConffile_pHS
     if (stdConffile_bOpen && openFile)
-        return stdConffile_pHS->fileRead(openFile, out, len) == len;
+        return stdConffile_pHS->fileRead(openFile, pData, size) == size;
     else
         return 0;
 }
 
-int stdConffile_ReadArgsFromStr(char *str)
+int stdConffile_ReadArgsFromStr(char *pStr)
 {
   int i;
   char *iter;
@@ -215,7 +215,7 @@ int stdConffile_ReadArgsFromStr(char *str)
 
   i = 0;
   stdConffile_g_entry.numArgs = 0;
-  iter = _strtok(str, ", \t\n\r");
+  iter = _strtok(pStr, ", \t\n\r");
   if ( iter )
   {
     StdConffileArg* arg = &stdConffile_g_entry.aArgs[0];
