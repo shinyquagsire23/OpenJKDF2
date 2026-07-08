@@ -154,7 +154,7 @@ sithThing* sithTemplate_GetTemplate(const char *name)
         return 0;
     if ( v3[3] )
         sithTemplate_GetTemplate(v3[3]);
-    stdConffile_OpenRead("none");
+    stdConffile_Open("none");
 
     _strncpy(v6, v3[2], 0x3FFu);
     v6[0x3FF] = 0;

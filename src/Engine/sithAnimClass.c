@@ -137,7 +137,7 @@ int sithAnimClass_LoadPupEntry(sithAnimclass *animclass, char *fpath)
     char keyframe_fpath[128]; // [esp+10h] [ebp-80h] BYREF
 
     mode = 0;
-    if (!stdConffile_OpenRead(fpath))
+    if (!stdConffile_Open(fpath))
         return 0;
 
     stdPlatform_Memset32(animclass->bodypart_to_joint, 0xFFu, sizeof(animclass->bodypart_to_joint)); // Added: word-safe

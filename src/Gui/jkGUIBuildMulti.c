@@ -445,7 +445,7 @@ int jkGuiBuildMulti_ShowEditCharacter(BOOL bIdk)
     jkGuiRend_SetVisibleAndDraw(&jkGuiBuildMulti_buttons[5], &jkGuiBuildMulti_menu, 0);
     jkGuiBuildMulti_numSabers = 0;
     jkGuiBuildMulti_bEditShowing = 1;
-    if ( stdConffile_OpenRead("misc\\sabers.dat") )
+    if ( stdConffile_Open("misc\\sabers.dat") )
     {
         stdConffile_ReadLine();
         if ( _sscanf(stdConffile_aLine, "numsabers: %d", &jkGuiBuildMulti_numSabers) == 1 )
@@ -505,7 +505,7 @@ int jkGuiBuildMulti_ShowEditCharacter(BOOL bIdk)
 LABEL_16:
     jkGuiBuildMulti_numModels = 0;
     jkGuiBuildMulti_bSabersLoaded = 1;
-    if ( stdConffile_OpenRead("misc\\models.dat") )
+    if ( stdConffile_Open("misc\\models.dat") )
     {
         stdConffile_ReadLine();
         if ( _sscanf(stdConffile_aLine, "nummodels: %d", &jkGuiBuildMulti_numModels) == 1 )

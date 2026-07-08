@@ -2063,7 +2063,7 @@ uint32_t jkPlayer_ChecksumExtra(uint32_t hash)
     for (uVar2 = 0; uVar2 < 5; uVar2++) 
     {
         stdString_snprintf(local_80, 128, "misc\\per\\%s.per", jkPlayer_aClassNames[uVar2]); // Added: sprintf -> snprintf
-        if (stdConffile_OpenRead(local_80)) 
+        if (stdConffile_Open(local_80)) 
         {
             if ((stdConffile_ReadLine() && (iVar1 = _sscanf(stdConffile_aLine,"version %d",&local_84), iVar1 == 1)) && (local_84 == 2)) {
                 hash = hash + 2;
@@ -2121,7 +2121,7 @@ int jkPlayer_SetAmmoMaximums(int classIdx)
         classIdx = 0;
     }
     _sprintf(local_80,"misc\\per\\%s.per", jkPlayer_aClassNames[classIdx]);
-    iVar1 = stdConffile_OpenRead(local_80);
+    iVar1 = stdConffile_Open(local_80);
     if (iVar1 != 0) {
         iVar1 = stdConffile_ReadLine();
         if (((iVar1 != 0) && (iVar1 = _sscanf(stdConffile_aLine,"version %d",&local_84), iVar1 == 1)) && (local_84 == 2)) {

@@ -160,7 +160,7 @@ int sithWorld_Load(sithWorld *pWorld, char *map_jkl_fname)
         sithWorld_pLoading = pWorld;
         stdFnames_MakePath(v8, 128, "jkl", map_jkl_fname);
         sithWorld_some_integer_4 = 0;
-        if ( !stdConffile_OpenRead(v8) )
+        if ( !stdConffile_Open(v8) )
         {
             goto failed_open;
         }

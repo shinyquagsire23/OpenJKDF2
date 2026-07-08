@@ -116,7 +116,7 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
 
     //rdModel3_HelpDebug("OpenJKDF2: %s -> `%s`\n", __func__, model_fpath); // Added
 
-    if ( !stdConffile_OpenRead(model_fpath) ) {
+    if ( !stdConffile_Open(model_fpath) ) {
         rdModel3_HelpDebug("OpenJKDF2: %s: Failed to open file `%s`\n", __func__, model_fpath); // Added
         return 0;
     }

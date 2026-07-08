@@ -140,7 +140,7 @@ int rdParticle_LoadEntry(char *fpath, rdParticle *pParticle)
     stdString_SafeStrCopy(pParticle->name, stdFileFromPath(fpath), 0x20);
     v5 = 0;
     pParticle->hasVertices = 1;
-    if (!stdConffile_OpenRead(fpath))
+    if (!stdConffile_Open(fpath))
         goto done;
     if (!stdConffile_ReadLine())
         goto done_close;

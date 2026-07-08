@@ -84,7 +84,7 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
 #ifdef STDHASHTABLE_CRC32_KEYS
     keyframe->namecrc = stdCrc32(key_fname_only, strlen(key_fname_only));
 #endif
-    if (!stdConffile_OpenRead(key_fpath)) {
+    if (!stdConffile_Open(key_fpath)) {
         stdPrintf(pSithHS->errorPrint, ".\\Engine\\rdKeyframe.c", 0, "OpenJKDF2: Failed to open keyframe file `%s`\n", key_fpath);
         goto open_fail;
     }

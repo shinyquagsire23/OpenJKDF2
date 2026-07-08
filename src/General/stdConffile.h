@@ -5,7 +5,7 @@
 #include "types.h"
 #include "globals.h"
 
-#define stdConffile_OpenRead_ADDR (0x00430F50)
+#define stdConffile_Open_ADDR (0x00430F50)
 #define stdConffile_OpenWrite_ADDR (0x00431100)
 #define stdConffile_OpenMode_ADDR (0x00431160)
 #define stdConffile_Close_ADDR (0x00431310)
@@ -20,7 +20,7 @@
 #define stdConffile_GetFileHandle_ADDR (0x00431730)
 
 
-int stdConffile_OpenRead(char *jkl_fname);
+int stdConffile_Open(char *jkl_fname);
 int stdConffile_OpenReadBytes(char *fpath); // Added: Helper
 int stdConffile_OpenWrite(char *a1);
 int stdConffile_OpenMode(char *fpath, const char* mode);

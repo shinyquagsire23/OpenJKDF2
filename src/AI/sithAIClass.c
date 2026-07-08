@@ -160,7 +160,7 @@ int sithAIClass_LoadEntry(char *fpath, sithAIClass *aiclass)
     flex_t fpathb; // [esp+ACh] [ebp+8h]
 
     _sprintf(jkl_fname, "%s%1d", fpath, jkPlayer_setDiff);
-    if ( stdConffile_OpenRead(jkl_fname) || (result = stdConffile_OpenRead(fpath)) != 0 )
+    if ( stdConffile_Open(jkl_fname) || (result = stdConffile_Open(fpath)) != 0 )
     {
         aiclass->maxStep = 0.5;
         aiclass->sightDist = 20.0;

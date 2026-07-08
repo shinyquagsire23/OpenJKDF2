@@ -9,7 +9,7 @@ static struct HostServices* stdConffile_pHS = 0;
 static BOOL openFileIsBypass[20];
 static BOOL bOpenFileIsBypassed = 0;
 
-int stdConffile_OpenRead(char *fpath)
+int stdConffile_Open(char *fpath)
 {
     return stdConffile_OpenMode(fpath, "r");
 }

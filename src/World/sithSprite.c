@@ -112,7 +112,7 @@ rdSprite* sithSprite_Load(char *fpath)
         {
             sprite = &world->sprites[idx];
             _sprintf(spriteFpath, "%s%c%s", "misc\\spr", '\\', fpath);
-            if ( stdConffile_OpenRead(spriteFpath) )
+            if ( stdConffile_Open(spriteFpath) )
             {
                 if ( stdConffile_ReadArgs() && stdConffile_entry.numArgs >= 0xBu )
                 {

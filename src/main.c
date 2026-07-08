@@ -1303,7 +1303,7 @@ void do_hooks()
     hook_function(stdColor_Indexed8ToRGB16_ADDR, stdColor_Indexed8ToRGB16);
     
     // stdConffile
-    hook_function(stdConffile_OpenRead_ADDR, stdConffile_OpenRead);
+    hook_function(stdConffile_Open_ADDR, stdConffile_Open);
     hook_function(stdConffile_OpenWrite_ADDR, stdConffile_OpenWrite);
     hook_function(stdConffile_OpenMode_ADDR, stdConffile_OpenMode);
     hook_function(stdConffile_Close_ADDR, stdConffile_Close);

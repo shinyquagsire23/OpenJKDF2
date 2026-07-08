@@ -850,7 +850,7 @@ stdFnames_CopyShortName	.text	00430D70	0000007E	00000008	0000000C	R	.	.	.	.	.	T	
 stdFnames_Concat	.text	00430DF0	0000004A	00000008	0000000C	R	.	.	.	.	.	.	.
 stdFnames_MakePath	.text	00430E40	00000061	00000010	00000010	R	.	.	.	.	.	T	.
 stdFnames_MakePath3	.text	00430EB0	0000009A	00000010	00000014	R	.	.	.	.	.	.	.
-stdConffile_OpenRead	.text	00430F50	000001AB	00000010	00000004	R	.	.	.	.	.	T	.
+stdConffile_Open	.text	00430F50	000001AB	00000010	00000004	R	.	.	.	.	.	T	.
 stdConffile_OpenWrite	.text	00431100	00000058	00000004	00000004	R	.	.	.	.	.	T	.
 stdConffile_OpenMode	.text	00431160	000001AC	00000010	00000008	R	.	.	.	.	.	T	.
 stdConffile_Close	.text	00431310	000000CC	00000008	00000000	R	.	.	.	.	.	T	.

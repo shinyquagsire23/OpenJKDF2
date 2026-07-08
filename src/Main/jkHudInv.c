@@ -30,7 +30,7 @@ int jkHudInv_ItemDatLoad(char *fpath)
     flex_t min; // [esp+1Ch] [ebp-4h]
     int flags;
 
-    if (!stdConffile_OpenRead(fpath))
+    if (!stdConffile_Open(fpath))
         return 0;
 
     while ( stdConffile_ReadArgs() )

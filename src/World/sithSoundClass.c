@@ -288,7 +288,7 @@ int sithSoundClass_LoadEntry(sithSoundClass *soundClass, char *fpath)
     int v10; // edx
     sithSoundClassEntry *i; // eax
 
-    if (!stdConffile_OpenRead(fpath))
+    if (!stdConffile_Open(fpath))
         return 0;
 
     while ( stdConffile_ReadArgs() )

@@ -48,7 +48,7 @@ int sithCogParse_Load(char *cog_fpath, sithCogScript *cogscript, int unk)
     unsigned int v6; // ecx
     int v8; // edx
 
-    if (!stdConffile_OpenRead(cog_fpath))
+    if (!stdConffile_Open(cog_fpath))
         return 0;
 
     //printf("%s\n", cog_fpath);
