@@ -2211,7 +2211,7 @@ sithCogScript_RegisterGlobalMessage	.text	004E06C0	0000003B	00000010	0000000C	R	
 sithCogScript_RegisterVerb	.text	004E0700	0000003B	00000010	0000000C	R	.	.	.	.	.	T	.
 sithThing_Release	.text	004E0740	00000034	00000000	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionPlayer_Startup	.text	004E0780	00000312	00000004	00000004	R	.	.	.	.	.	T	.
-sithCogFunctionPlayer_SetInvActivate	.text	004E0AA0	00000066	0000000C	00000004	R	.	.	.	.	.	T	.
+sithCogFunctionPlayer_SetInvActivated	.text	004E0AA0	00000066	0000000C	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionPlayer_SetInvAvailable	.text	004E0B10	00000066	0000000C	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionPlayer_IsInvActivated	.text	004E0B80	00000060	00000008	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionPlayer_IsInvAvailable	.text	004E0BE0	00000060	00000008	00000004	R	.	.	.	.	.	T	.
@@ -2236,7 +2236,7 @@ sithCogFunctionPlayer_SetPlayerSuicides	.text	004E1170	00000045	00000008	0000000
 sithCogFunctionPlayer_PickupBackpack	.text	004E11C0	0000004E	00000008	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionPlayer_NthBackpackBin	.text	004E1210	00000044	00000008	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionPlayer_NthBackpackValue	.text	004E1260	0000004C	00000008	00000004	R	.	.	.	.	.	T	.
-sithCogFunctionPlayer_NumBackpackItems	.text	004E12B0	00000036	00000004	00000004	R	.	.	.	.	.	T	.
+sithCogFunctionPlayer_GetNumBackbackItems	.text	004E12B0	00000036	00000004	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionPlayer_CreateBackpack	.text	004E12F0	0000004B	00000004	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionPlayer_GetAutoSwitch	.text	004E1340	00000032	00000000	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionPlayer_SetAutoSwitch	.text	004E1380	00000023	00000000	00000004	R	.	.	.	.	.	T	.

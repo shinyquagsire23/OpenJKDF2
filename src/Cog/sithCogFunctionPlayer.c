@@ -7,7 +7,7 @@
 #include "World/sithActor.h"
 #include "Gameplay/sithInventory.h"
 
-void sithCogFunctionPlayer_SetInvActivate(sithCog *ctx)
+void sithCogFunctionPlayer_SetInvActivated(sithCog *ctx)
 {
     int bActivate = sithCogExec_PopInt(ctx);
     int binIdx = sithCogExec_PopInt(ctx);
@@ -367,7 +367,7 @@ void sithCogFunctionPlayer_NthBackpackValue(sithCog *ctx)
     }
 }
 
-void sithCogFunctionPlayer_NumBackpackItems(sithCog *ctx)
+void sithCogFunctionPlayer_GetNumBackbackItems(sithCog *ctx)
 {
     int ret;
 
@@ -579,7 +579,7 @@ void sithCogFunctionPlayer_KillPlayerQuietly(sithCog *ctx)
 
 void sithCogFunctionPlayer_Startup(sithCogSymboltable* ctx)
 {
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetInvActivate, "setinvactivated");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetInvActivated, "setinvactivated");
 
     // DW added: g_debugModeFlags & DEBUGFLAG_100 check
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetInvAvailable, "setinvavailable");
@@ -612,7 +612,7 @@ void sithCogFunctionPlayer_Startup(sithCogSymboltable* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_CreateBackpack, "createbackpack");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_NthBackpackBin, "nthbackpackbin");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_NthBackpackValue, "nthbackpackvalue");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_NumBackpackItems, "numbackpackitems");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetNumBackbackItems, "numbackpackitems");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetAutoSwitch, "getautoswitch");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetAutoSwitch, "setautoswitch");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetAutoPickup, "getautopickup");
