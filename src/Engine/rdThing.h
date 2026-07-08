@@ -5,7 +5,7 @@
 #include "globals.h"
 
 #include "Primitives/rdModel3.h"
-#include "Primitives/rdPolyLine.h"
+#include "Primitives/rdPolyline.h"
 #include "Primitives/rdParticle.h"
 #include "Primitives/rdSprite.h"
 #include "Engine/rdPuppet.h"
@@ -33,7 +33,7 @@ int rdThing_SetModel3(rdThing *thing, rdModel3 *model);
 int rdThing_SetCamera(rdThing *thing, rdCamera *camera);
 int rdThing_SetLight(rdThing *thing, rdLight *light);
 int rdThing_SetSprite3(rdThing *thing, rdSprite *sprite);
-int rdThing_SetPolyline(rdThing *thing, rdPolyLine *polyline);
+int rdThing_SetPolyline(rdThing *thing, rdPolyline *polyline);
 int rdThing_SetParticleCloud(rdThing *thing, rdParticle *particle);
 MATH_FUNC int rdThing_Draw(rdThing *thing, rdMatrix34 *m);
 MATH_FUNC FAST_FUNC void rdThing_AccumulateMatrices(rdThing *thing, rdHierarchyNode *node, rdMatrix34 *acc);

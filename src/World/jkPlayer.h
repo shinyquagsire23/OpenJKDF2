@@ -4,7 +4,7 @@
 #include "types.h"
 #include "globals.h"
 
-#include "Primitives/rdPolyLine.h"
+#include "Primitives/rdPolyline.h"
 #include "Engine/rdThing.h"
 #include "Gameplay/sithPlayer.h"
 

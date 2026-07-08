@@ -286,7 +286,7 @@ void jkPlayer_Shutdown()
 {
     for (int i = 0; i < jkPlayer_numThings; i++ )
     {
-        rdPolyLine_FreeEntry(&playerThings[i].polyline); // Added: prevent memleak
+        rdPolyline_FreeEntry(&playerThings[i].polyline); // Added: prevent memleak
 
         if (playerThings[i].polylineThing.model3)
         {
@@ -313,7 +313,7 @@ void jkPlayer_Shutdown()
 #ifdef JKM_DSS
     for (int i = 0; i < NUM_JKPLAYER_THINGS; i++)
     {
-        rdPolyLine_FreeEntry(&jkPlayer_aMotsInfos[i].polyline); // Added: prevent memleak
+        rdPolyline_FreeEntry(&jkPlayer_aMotsInfos[i].polyline); // Added: prevent memleak
 
         if (jkPlayer_aMotsInfos[i].polylineThing.model3)
         {

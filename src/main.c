@@ -101,7 +101,7 @@
 #include "World/sithSoundClass.h"
 #include "Engine/sithAnimClass.h"
 #include "Primitives/rdModel3.h"
-#include "Primitives/rdPolyLine.h"
+#include "Primitives/rdPolyline.h"
 #include "Primitives/rdParticle.h"
 #include "Primitives/rdSprite.h"
 #include "Primitives/rdMatrix.h"
@@ -1638,13 +1638,13 @@ void do_hooks()
     hook_function(rdMaterial_AddToTextureCache_ADDR, rdMaterial_AddToTextureCache);
     hook_function(rdMaterial_ResetCacheInfo_ADDR, rdMaterial_ResetCacheInfo);
     
-    // rdPolyLine
-    hook_function(rdPolyLine_New_ADDR, rdPolyLine_New);
-    hook_function(rdPolyLine_NewEntry_ADDR, rdPolyLine_NewEntry);
-    hook_function(rdPolyLine_Free_ADDR, rdPolyLine_Free);
-    hook_function(rdPolyLine_FreeEntry_ADDR, rdPolyLine_FreeEntry);
-    hook_function(rdPolyLine_Draw_ADDR, rdPolyLine_Draw);
-    hook_function(rdPolyLine_DrawFace_ADDR, rdPolyLine_DrawFace);
+    // rdPolyline
+    hook_function(rdPolyline_New_ADDR, rdPolyline_New);
+    hook_function(rdPolyline_NewEntry_ADDR, rdPolyline_NewEntry);
+    hook_function(rdPolyline_Free_ADDR, rdPolyline_Free);
+    hook_function(rdPolyline_FreeEntry_ADDR, rdPolyline_FreeEntry);
+    hook_function(rdPolyline_Draw_ADDR, rdPolyline_Draw);
+    hook_function(rdPolyline_DrawFace_ADDR, rdPolyline_DrawFace);
     
     // rdCache
     hook_function(rdCache_Startup_ADDR, rdCache_Startup);

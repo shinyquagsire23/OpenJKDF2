@@ -1,4 +1,4 @@
-#include "rdPolyLine.h"
+#include "rdPolyline.h"
 
 #include "stdPlatform.h" // Added: *_ALLOC/*_FREE macros
 
@@ -13,22 +13,22 @@
 #include <math.h>
 
 static rdVector3 polylineVerts[32]; // idk the size on this
-static rdVector3 rdPolyLine_FaceVerts[32];
+static rdVector3 rdPolyline_FaceVerts[32];
 
-rdPolyLine* rdPolyLine_New(char *polyline_fname, char *material_fname, char *material_fname2, flex_t length, flex_t base_rad, flex_t tip_rad, int lightmode, int texmode, int sortingmethod, flex_t extraLight)
+rdPolyline* rdPolyline_New(char *polyline_fname, char *material_fname, char *material_fname2, flex_t length, flex_t base_rad, flex_t tip_rad, int lightmode, int texmode, int sortingmethod, flex_t extraLight)
 {
-    rdPolyLine* polyline;
+    rdPolyline* polyline;
 
-    polyline = (rdPolyLine *)RDROID_ALLOC(sizeof(rdPolyLine));
+    polyline = (rdPolyline *)RDROID_ALLOC(sizeof(rdPolyline));
     if (polyline)
     {
         memset(polyline, 0, sizeof(*polyline)); // Added: clear struct
-        rdPolyLine_NewEntry(polyline, polyline_fname, material_fname, material_fname2, length, base_rad, tip_rad, lightmode, texmode, sortingmethod, extraLight);
+        rdPolyline_NewEntry(polyline, polyline_fname, material_fname, material_fname2, length, base_rad, tip_rad, lightmode, texmode, sortingmethod, extraLight);
     }
     return polyline;
 }
 
-int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *material_side_fname, char *material_tip_fname, flex_t length, flex_t base_rad, flex_t tip_rad, rdGeoMode_t edgeGeometryMode, rdLightMode_t edgeLightingMode, rdTexMode_t edgeTextureMode, flex_t extraLight)
+int rdPolyline_NewEntry(rdPolyline *polyline, char *polyline_fname, char *material_side_fname, char *material_tip_fname, flex_t length, flex_t base_rad, flex_t tip_rad, rdGeoMode_t edgeGeometryMode, rdLightMode_t edgeLightingMode, rdTexMode_t edgeTextureMode, flex_t extraLight)
 {
 
     rdMaterial *mat;
@@ -40,7 +40,7 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
     stdVBuffer *v22;
 
     // Added: memleak mitigation
-    rdPolyLine_FreeEntry(polyline);
+    rdPolyline_FreeEntry(polyline);
 
     if ( polyline_fname )
     {
@@ -151,16 +151,16 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
     return 1;
 }
 
-void rdPolyLine_Free(rdPolyLine *polyline)
+void rdPolyline_Free(rdPolyline *polyline)
 {
     if ( polyline )
     {
-        rdPolyLine_FreeEntry(polyline);
+        rdPolyline_FreeEntry(polyline);
         RDROID_FREE(polyline);
     }
 }
 
-void rdPolyLine_FreeEntry(rdPolyLine *polyline)
+void rdPolyline_FreeEntry(rdPolyline *polyline)
 {
     if ( polyline->extraUVFaceMaybe )
     {
@@ -194,9 +194,9 @@ void rdPolyLine_FreeEntry(rdPolyLine *polyline)
     }
 }
 
-int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
+int rdPolyline_Draw(rdThing *thing, rdMatrix34 *matrix)
 {
-    rdPolyLine *polyline;
+    rdPolyline *polyline;
     flex_t length;
     flex_d_t tip_left;
     flex_d_t tip_bottom;
@@ -245,7 +245,7 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
         polylineVerts[3].y = vertex_out.y - epislon;
         polylineVerts[3].z = tip_top;
         idxInfo.vertexUVs = polyline->extraUVFaceMaybe;
-        rdPolyLine_DrawFace(thing, &polyline->tipFace, polylineVerts, &idxInfo);
+        rdPolyline_DrawFace(thing, &polyline->tipFace, polylineVerts, &idxInfo);
     }
 
     // Base
@@ -263,7 +263,7 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
         polylineVerts[3].y = out.scale.y - epislon;
         polylineVerts[3].z = out.scale.z + polyline->baseRadius;
         idxInfo.vertexUVs = polyline->extraUVFaceMaybe;
-        rdPolyLine_DrawFace(thing, &polyline->tipFace, polylineVerts, &idxInfo);
+        rdPolyline_DrawFace(thing, &polyline->tipFace, polylineVerts, &idxInfo);
     }
     
 
@@ -304,12 +304,12 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
         polylineVerts[3].y = out.scale.y;
         polylineVerts[3].z = (polyline->baseRadius * angSin) + (flex_t)0.0 + out.scale.z;
         idxInfo.vertexUVs = polyline->extraUVTipMaybe;
-        rdPolyLine_DrawFace(thing, &polyline->edgeFace, polylineVerts, &idxInfo);
+        rdPolyline_DrawFace(thing, &polyline->edgeFace, polylineVerts, &idxInfo);
     }
     return 1;
 }
 
-void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdMeshinfo *idxInfo)
+void rdPolyline_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdMeshinfo *idxInfo)
 {
     rdProcEntry *procEntry;
     rdMeshinfo mesh_out;
@@ -319,7 +319,7 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdMesh
     if (!procEntry)
         return;
 
-    mesh_out.vertices = rdPolyLine_FaceVerts;
+    mesh_out.vertices = rdPolyline_FaceVerts;
     mesh_out.verticesOrig = procEntry->vertices;
     mesh_out.vertexUVs = procEntry->vertexUVs;
     mesh_out.paDynamicLight = procEntry->vertexIntensities;

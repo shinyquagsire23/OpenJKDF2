@@ -142,7 +142,7 @@ int rdThing_SetSprite3(rdThing *thing, rdSprite *sprite)
     return 1;
 }
 
-int rdThing_SetPolyline(rdThing *thing, rdPolyLine *polyline)
+int rdThing_SetPolyline(rdThing *thing, rdPolyline *polyline)
 {
     thing->type = RD_THINGTYPE_POLYLINE;
     thing->polyline = polyline;
@@ -175,7 +175,7 @@ int rdThing_Draw(rdThing *thing, rdMatrix34 *m)
         case RD_THINGTYPE_PARTICLECLOUD:
             return rdParticle_Draw(thing, m);
         case RD_THINGTYPE_POLYLINE:
-            return rdPolyLine_Draw(thing, m);
+            return rdPolyline_Draw(thing, m);
     }
     
     // aaaaaaaaaaaaaaaaaa original game returns undefined for other types, this is to replicate that

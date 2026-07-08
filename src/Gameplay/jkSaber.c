@@ -40,7 +40,7 @@ void jkSaber_InitializeSaberInfo(sithThing *thing, char *material_side_fname, ch
     {
         length = saberinfo->polyline.length;
         rdThing_FreeEntry(&saberinfo->polylineThing);
-        rdPolyLine_FreeEntry(&saberinfo->polyline);
+        rdPolyline_FreeEntry(&saberinfo->polyline);
         saberinfo->polylineThing.polyline = 0;
     }
 
@@ -54,8 +54,8 @@ void jkSaber_InitializeSaberInfo(sithThing *thing, char *material_side_fname, ch
     }
 #endif
 
-    rdPolyLine_FreeEntry(&saberinfo->polyline); // Added: fix memleak
-    rdPolyLine_NewEntry(&saberinfo->polyline, "Saber", material_side_fname, material_tip_fname, length, base_rad, tip_rad, RD_LIGHTMODE_4_UNK, 0, 0, 0.0);
+    rdPolyline_FreeEntry(&saberinfo->polyline); // Added: fix memleak
+    rdPolyline_NewEntry(&saberinfo->polyline, "Saber", material_side_fname, material_tip_fname, length, base_rad, tip_rad, RD_LIGHTMODE_4_UNK, 0, 0, 0.0);
     rdThing_NewEntry(&saberinfo->polylineThing, thing);
     rdThing_SetPolyline(&saberinfo->polylineThing, &saberinfo->polyline);
     saberinfo->wall_sparks = wall_sparks;
@@ -66,7 +66,7 @@ void jkSaber_InitializeSaberInfo(sithThing *thing, char *material_side_fname, ch
 
 void jkSaber_PolylineRand(rdThing *thing)
 {
-    rdPolyLine* line = thing->polyline;
+    rdPolyline* line = thing->polyline;
     if ( line )
     {
         if ( !(jkPlayer_currentTickIdx & 0xF) )

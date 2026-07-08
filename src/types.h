@@ -2409,7 +2409,7 @@ typedef struct sithMap
   int32_t teamColors[5];
 } sithMap;
 
-typedef struct rdPolyLine 
+typedef struct rdPolyline 
 {
 #ifdef SITH_DEBUG_STRUCT_NAMES
     char fname[32];
@@ -2425,7 +2425,7 @@ typedef struct rdPolyLine
     rdVector2* extraUVTipMaybe;
     rdVector2* extraUVFaceMaybe;
 }
-rdPolyLine;
+rdPolyline;
 
 typedef struct rdThing
 {
@@ -2437,7 +2437,7 @@ typedef struct rdThing
         rdLight* light;
         rdSprite* sprite3;
         rdParticle* particlecloud;
-        rdPolyLine* polyline;
+        rdPolyline* polyline;
 #ifdef GHIDRA_IMPORT
     } containedObj;
 #else
@@ -2543,7 +2543,7 @@ typedef struct jkPlayerInfo
     rdThing povModel;
     flex_t length;
     uint32_t field_98;
-    rdPolyLine polyline;
+    rdPolyline polyline;
     rdThing polylineThing;
     jkSaberCollide saberCollideInfo;
     uint32_t lastSparkSpawnMs;
@@ -3825,7 +3825,7 @@ typedef void (*sithCvarEnumerationFn_t)(tSithCvar*);
 #include "World/sithSoundClass.h"
 #include "Engine/sithAnimClass.h"
 #include "Primitives/rdModel3.h"
-#include "Primitives/rdPolyLine.h"
+#include "Primitives/rdPolyline.h"
 #include "Primitives/rdParticle.h"
 #include "Primitives/rdSprite.h"
 #include "Primitives/rdMatrix.h"
