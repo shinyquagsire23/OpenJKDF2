@@ -729,7 +729,7 @@ int32_t sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogReference *cogIdk, ch
             return 1;
         case COG_TYPE_SOUND:
             cogSymbol->val.type = COG_VARTYPE_INT;
-            v12 = sithSound_LoadEntry(val, 0);
+            v12 = sithSound_Load(val, 0);
             if ( !v12 )
             {
                 cogSymbol->val.data[0] = -1;

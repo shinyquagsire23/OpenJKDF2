@@ -160,7 +160,7 @@ int sithSector_Load(sithWorld *world, int tmp)
             if ( _sscanf(stdConffile_aLine, "sound %s %f", sound_fname, &tmpf1) == 2 )
             {
                 sectors->sectorSoundVol = tmpf1; // FLEXTODO
-                sectors->sectorSound = sithSound_LoadEntry(sound_fname, 0);
+                sectors->sectorSound = sithSound_Load(sound_fname, 0);
                 if ( !stdConffile_ReadLine() )
                     break;
             }

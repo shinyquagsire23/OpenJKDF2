@@ -276,7 +276,7 @@ void sithCogFunctionSound_LoadSound(sithCog *ctx)
     sithSound* pSound;
 
     char* path = sithCogExec_PopString(ctx);
-    if ( path && (pSound = sithSound_LoadEntry(path, 0)) != 0 )
+    if ( path && (pSound = sithSound_Load(path, 0)) != 0 )
         sithCogExec_PushInt(ctx, pSound->id);
     else
         sithCogExec_PushInt(ctx, -1);

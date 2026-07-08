@@ -308,7 +308,7 @@ int sithSoundClass_LoadEntry(sithSoundClass *soundClass, char *fpath)
             v5 = 0;
         }
         else {
-            v5 = sithSound_LoadEntry(stdConffile_entry.args[1].value, 0);
+            v5 = sithSound_Load(stdConffile_entry.args[1].value, 0);
             if (!v5)
                 continue;
         }

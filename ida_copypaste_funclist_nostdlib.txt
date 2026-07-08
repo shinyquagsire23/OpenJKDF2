@@ -2455,10 +2455,10 @@ sithCommand_CmdKick	.text	004EEDB0	000000BF	0000004C	00000008	R	.	.	.	.	.	T	.
 sithCommand_matlist_sort	.text	004EEE70	00000011	00000000	00000008	R	.	.	.	.	.	T	.
 sithSound_Startup	.text	004EEE90	0000002C			R	.	.	.	.	.	T	.
 sithSound_Shutdown	.text	004EEEC0	0000003D			R	.	.	.	.	.	.	.
-sithSound_Load	.text	004EEF00	000001B6	00000010	00000008	R	.	.	.	.	.	T	.
-sithSound_Free	.text	004EF0C0	000000A9	00000008	00000004	R	.	.	.	.	.	T	.
+sithSound_ReadSoundsListText	.text	004EEF00	000001B6	00000010	00000008	R	.	.	.	.	.	T	.
+sithSound_FreeWorldSounds	.text	004EF0C0	000000A9	00000008	00000004	R	.	.	.	.	.	T	.
 sithSound_New	.text	004EF170	0000005A	0000000C	00000008	R	.	.	.	.	.	T	.
-sithSound_LoadEntry	.text	004EF1D0	00000212	00000094	00000008	R	.	.	.	.	.	T	.
+sithSound_Load	.text	004EF1D0	00000212	00000094	00000008	R	.	.	.	.	.	T	.
 sithSound_GetFromIdx	.text	004EF3F0	00000037	00000000	00000004	R	.	.	.	.	.	T	.
 sithSound_LoadFileData	.text	004EF430	00000195	00000094	00000004	R	.	.	.	.	.	T	.
 sithSound_UnloadData	.text	004EF5D0	00000041	00000004	00000004	R	.	.	.	.	.	T	.

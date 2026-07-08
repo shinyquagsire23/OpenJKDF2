@@ -2504,10 +2504,10 @@ void do_hooks()
     // sithSound
     hook_function(sithSound_Startup_ADDR, sithSound_Startup);
     hook_function(sithSound_Shutdown_ADDR, sithSound_Shutdown);
-    hook_function(sithSound_Load_ADDR, sithSound_Load);
-    hook_function(sithSound_Free_ADDR, sithSound_Free);
+    hook_function(sithSound_ReadSoundsListText_ADDR, sithSound_ReadSoundsListText);
+    hook_function(sithSound_FreeWorldSounds_ADDR, sithSound_FreeWorldSounds);
     hook_function(sithSound_New_ADDR, sithSound_New);
-    hook_function(sithSound_LoadEntry_ADDR, sithSound_LoadEntry);
+    hook_function(sithSound_Load_ADDR, sithSound_Load);
     hook_function(sithSound_GetFromIdx_ADDR, sithSound_GetFromIdx);
     hook_function(sithSound_LoadFileData_ADDR, sithSound_LoadFileData);
     hook_function(sithSound_UnloadData_ADDR, sithSound_UnloadData);

@@ -68,7 +68,7 @@ int sithSound_Shutdown()
     return 1;
 }
 
-int sithSound_Load(sithWorld *world, int a2)
+int sithSound_ReadSoundsListText(sithWorld *world, int a2)
 {
     int numSounds; // eax
 
@@ -80,7 +80,7 @@ int sithSound_Load(sithWorld *world, int a2)
         || _strcmp(stdConffile_entry.args[0].value, "world") 
         || _strcmp(stdConffile_entry.args[1].value, "sounds") )
     {
-        sithSound_Free(world);
+        sithSound_FreeWorldSounds(world);
         return 0;
     }
     numSounds = _atoi(stdConffile_entry.args[2].value);
@@ -94,12 +94,12 @@ int sithSound_Load(sithWorld *world, int a2)
         if ( !_strcmp(stdConffile_entry.args[0].value, "end") )
             break;
         if ( sithSound_bInit )
-            sithSound_LoadEntry(stdConffile_entry.args[0].value, stdConffile_entry.numArgs > 1u);
+            sithSound_Load(stdConffile_entry.args[0].value, stdConffile_entry.numArgs > 1u);
     }
     return 1;
 }
 
-void sithSound_Free(sithWorld *world)
+void sithSound_FreeWorldSounds(sithWorld *world)
 {
     if (world->sounds)
     {
@@ -140,7 +140,7 @@ int sithSound_New(sithWorld *world, int num)
     return 0;
 }
 
-sithSound* sithSound_LoadEntry(char *sound_fname, int a2)
+sithSound* sithSound_Load(char *sound_fname, int a2)
 {
     int32_t sound_file; // ebp
     sithSound *sound; // esi
@@ -158,7 +158,7 @@ sithSound* sithSound_LoadEntry(char *sound_fname, int a2)
     if ( !_strcmp(sound_fname, "none") )
         return 0;
 
-    //printf("sithSound_LoadEntry %s\n", sound_fname);
+    //printf("sithSound_Load %s\n", sound_fname);
     sound = (sithSound *)stdHashTable_GetKeyVal(sithSound_hashtable, sound_fname);
     if ( sound )
     {
