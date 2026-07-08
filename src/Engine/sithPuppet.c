@@ -114,6 +114,7 @@ sithPuppet* sithPuppet_New(SithThing *pThing)
     SithSector *sector; // eax
     sithPuppet *result; // eax
 
+    SITH_ASSERTREL(pThing); // Added: ported from OpenJones3D sithPuppet_New
     v1 = (sithPuppet *)SITH_ALLOC(sizeof(sithPuppet));
     pThing->puppet = v1;
     if ( !v1 ) {
@@ -182,6 +183,7 @@ int sithPuppet_PlayMode(SithThing *pThing, signed int submode, rdPuppetTrackCall
     int highPri; // [esp+14h] [ebp+4h]
     int lowPri; // [esp+18h] [ebp+8h]
 
+    SITH_ASSERTREL(pThing); // Added: ported from OpenJones3D sithPuppet_PlayMode
     v4 = pThing->pPuppetClass;
     if ( !v4 )
         return -1;
@@ -223,6 +225,7 @@ int sithPuppet_PlayKey(rdPuppet *pPuppet, rdKeyframe *pTrack, int lowPriority, i
     int trackNum; // esi
     signed int result; // eax
 
+    SITH_ASSERTREL(pPuppet && pTrack); // Added: ported from OpenJones3D sithPuppet_PlayKey
     v6 = 1;
     if ( (flags & 8) != 0 )
     {
@@ -280,6 +283,7 @@ void sithPuppet_ResetTrack(SithThing *pThing)
     unsigned int trackNum; // esi
     sithPuppet *v2; // eax
 
+    SITH_ASSERTREL(pThing && pThing->renderData.puppet); // Added: ported from OpenJones3D
     for ( trackNum = 0; trackNum < 4; ++trackNum )
         rdPuppet_RemoveTrack(pThing->renderData.puppet, trackNum);
     v2 = pThing->puppet;
@@ -316,6 +320,7 @@ void sithPuppet_UpdatePuppet(SithThing *pThing, flex_t secDeltaTime)
     flex_t thinga; // [esp+1Ch] [ebp+4h]
     flex_t a2a; // [esp+20h] [ebp+8h]
 
+    SITH_ASSERTREL(pThing != NULL); // Added: ported from OpenJones3D sithPuppet_UpdatePuppet
     if ( pThing->pPuppetClass && pThing->puppet && pThing->renderData.puppet && (g_debugmodeFlags & DEBUGFLAG_NO_PUPPETS) == 0 )
     {
         if ( pThing->moveType == SITH_MT_PHYSICS )
@@ -387,6 +392,7 @@ flex_t sithPuppet_UpdateThingMove(SithThing *pThing)
     rdVector3 a1a; // [esp+14h] [ebp-Ch] BYREF
     flex_t thinga; // [esp+24h] [ebp+4h]
 
+    SITH_ASSERTREL(pThing); // Added: ported from OpenJones3D sithPuppet_UpdateThingMove
     v23 = 0.5;
     if ( !pThing->sector
       || rdVector_IsZero3(&pThing->physicsParams.vel) )
@@ -780,6 +786,7 @@ LABEL_50:
 
 int sithPuppet_StopKey(rdPuppet *pPuppet, int track, flex_t fadeTime)
 {
+    SITH_ASSERTREL(pPuppet); // Added: ported from OpenJones3D sithPuppet_StopKey
     if ( !pPuppet->aTracks[track].keyframe )
         return 0;
     if ( fadeTime <= 0.0 )
@@ -814,6 +821,8 @@ void sithPuppet_PlayFidgetMode(SithThing *pThing)
     SithPuppetClassSubmode *v9; // eax
     int v10; // eax
 
+    SITH_ASSERTREL(pThing); // Added: ported from OpenJones3D sithPuppet_PlayFidgetMode
+    SITH_ASSERTREL(pThing->puppet); // Added: ported from OpenJones3D sithPuppet_PlayFidgetMode
     puppet = pThing->puppet;
     if ( puppet->currentTrack < 0 && puppet->currentAnimation == 1 && (flex_d_t)(unsigned int)puppet->animStartedMs - -30000.0 < (flex_d_t)sithTime_g_msecGameTime )
     {

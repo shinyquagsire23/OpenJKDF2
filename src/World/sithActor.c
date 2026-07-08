@@ -83,6 +83,10 @@ flex_t sithActor_DamageActor(SithThing *pActor, SithThing *pThing, flex_t damage
     SithThing *v7; // eax
     flex_t fR; // [esp+0h] [ebp-1Ch]
 
+    // Added: J3D asserts
+    SITH_ASSERTREL(pActor && (damage > 0.0f));
+    SITH_ASSERTREL(pActor->type == SITH_THING_ACTOR || pActor->type == SITH_THING_PLAYER);
+
     if ( sithNet_isMulti && (pActor->flags & SITH_TF_INVULN) != 0 )
     {
         receiver_ = pThing;
@@ -325,6 +329,9 @@ void sithActor_SetHeadPYR(SithThing *pThing, const rdVector3 *headAngles)
     int v13; // ecx
     int v14; // ecx
 
+    // Added: J3D assert
+    SITH_ASSERTREL(pThing && headAngles && ((pThing->type == SITH_THING_ACTOR) || (pThing->type == SITH_THING_PLAYER) || (pThing->type == SITH_THING_CORPSE)));
+
     pThing->actorParams.flags &= ~SITH_AF_VIEWCENTRED;
     pThing->actorParams.headPYR = *headAngles;
     pAnimClass = pThing->pPuppetClass;
@@ -400,6 +407,8 @@ int sithActor_ActorCollisionHandler(SithThing *pSrcThing, SithThing *pThing, Sit
 
 void sithActor_UpdateAimJoints(SithThing* pThing)
 {
+    // Added: J3D assert
+    SITH_ASSERTREL(pThing && ((pThing->type == SITH_THING_ACTOR) || (pThing->type == SITH_THING_PLAYER) || (pThing->type == SITH_THING_CORPSE)));
     SithPuppetClass* pAnimClass = pThing->pPuppetClass;
     if (pAnimClass)
     {

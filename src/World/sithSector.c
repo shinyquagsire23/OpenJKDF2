@@ -230,6 +230,7 @@ void sithSector_HideSectorAdjoins(SithSector *pSector)
 {
     SithSurfaceAdjoin *i; // esi
 
+    SITH_ASSERTREL(pSector); // Added: J3D assert
     for ( i = pSector->adjoins; i; i = i->next )
         sithSurface_HideSectorAdjoin(i);
     pSector->flags |= SITH_SECTOR_ADJOINSOFF;
@@ -240,6 +241,7 @@ int sithSector_GetSectorThingCount(SithSector *pSector)
     int result; // eax
     SithThing *i; // ecx
 
+    SITH_ASSERTREL(pSector != NULL); // Added: J3D assert
     result = 0;
     for ( i = pSector->pFirstThingInSector; i; ++result )
         i = i->pNextThingInSector;
@@ -249,6 +251,7 @@ int sithSector_GetSectorThingCount(SithSector *pSector)
 int sithSector_AllocWorldSectors(SithWorld *pWorld, int numSectors)
 {
     SithSector *aSectors;
+    SITH_ASSERTREL(pWorld != NULL); // Added: J3D assert
     { TWL_EXTRAM_SUGGEST(pSithHS); // Added: word-width fields/writes (audited)
     aSectors = (SithSector *)SITH_ALLOC(numSectors * sizeof(SithSector));
     TWL_EXTRAM_RESTORE(pSithHS); }
@@ -277,6 +280,7 @@ void sithSector_NewEntry(SithSector *sector, int idx)
 
 void sithSector_FreeWorldSectors(SithWorld *pWorld)
 {
+    SITH_ASSERTREL(pWorld->aSectors); // Added: J3D assert
     for (uint32_t i = 0; i < pWorld->numSectors; i++)
     {
         if ( pWorld->aSectors[i].aVertIdxs )
@@ -292,6 +296,7 @@ int sithSector_GetSectorPlayerCount(SithSector *pSector)
     int result; // eax
     SithThing *i; // ecx
 
+    SITH_ASSERTREL(pSector != NULL); // Added: J3D assert
     result = 0;
     for ( i = pSector->pFirstThingInSector; i; i = i->pNextThingInSector )
     {
@@ -318,6 +323,7 @@ void sithSector_SyncSector(SithSector *pSector, int flags)
     uint32_t v4; // eax
     SithSector **v5; // ecx
 
+    SITH_ASSERTREL(pSector); // Added: J3D assert
     if ( flags )
     {
         pSector->flags |= SITH_SECTOR_SYNC;
@@ -363,6 +369,8 @@ SithSector* sithSector_FindSectorAtPos(SithWorld *pWorld, rdVector3 *pos)
     SithSector *v4; // esi
     int v7; // eax
 
+    SITH_ASSERTREL(pos != NULL); // Added: J3D assert
+    SITH_ASSERTREL(pWorld != NULL); // Added: J3D assert
     v2 = 0;
     v3 = pWorld->numSectors;
     v4 = pWorld->aSectors;

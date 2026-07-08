@@ -354,6 +354,8 @@ void sithWorld_FreeEntry(SithWorld *pWorld)
     unsigned int v1; // edi
     int v2; // ebx
 
+    SITH_ASSERTREL(pWorld); // Added: J3D assert
+
     if ( pWorld->colormaps )
     {
         v1 = 0;
@@ -819,6 +821,9 @@ int sithWorld_ReadGeoresourceText(SithWorld *pWorld, int bSkip)
 
 void sithWorld_ResetRenderState(SithWorld *pWorld)
 {
+    SITH_ASSERTREL((pWorld != NULL)); // Added: J3D assert
+    SITH_ASSERTREL((pWorld->aSectors != NULL)); // Added: J3D assert
+
     _memset(pWorld->alloc_unk98, 0, sizeof(int) * pWorld->numVertices);
     _memset(pWorld->alloc_unk9c, 0, sizeof(int) * pWorld->numVertices);
 
@@ -847,6 +852,8 @@ void sithWorld_Free()
 
 void sithWorld_ResetGeoresource(SithWorld *pWorld)
 {
+    SITH_ASSERTREL(pWorld); // Added: J3D assert
+
     for (int i = 0; i < pWorld->numMaterials; i++)
     {
         pWorld->aMaterials[i].curCelNum = 0;;
@@ -863,6 +870,9 @@ void sithWorld_ResetGeoresource(SithWorld *pWorld)
 // MOTS altered
 void sithWorld_GetMemoryUsage(SithWorld *pWorld, int *aMemUsed, int *aCount)
 {
+    SITH_ASSERTREL(aMemUsed && aCount); // Added: J3D assert
+    SITH_ASSERTREL(pWorld); // Added: J3D assert
+
     _memset(aMemUsed, 0, sizeof(int) * 0x11);
     _memset(aCount, 0, sizeof(int) * 0x11);
     aCount[0] = pWorld->numMaterials;
