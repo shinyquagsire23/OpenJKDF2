@@ -48,7 +48,7 @@ void sithCogFunctionThing_CreateThing(sithCog *ctx)
     {
         if ( COG_SHOULD_SYNC(ctx) )
         {
-            sithDSSThing_SendCreateThing(v2, v3, v1, 0, 0, 0, 255, 1);
+            sithDSSThing_CreateThing(v2, v3, v1, 0, 0, 0, 255, 1);
         }
         sithCogExec_PushInt(ctx, v3->thingIdx);
     }
@@ -71,7 +71,7 @@ void sithCogFunctionThing_CreateThingNr(sithCog *ctx)
     {
         if ( COG_SHOULD_SYNC(ctx) )
         {
-            sithDSSThing_SendCreateThing(v2, v3, v1, 0, 0, 0, 255, 1);
+            sithDSSThing_CreateThing(v2, v3, v1, 0, 0, 0, 255, 1);
         }
         sithCogExec_PushInt(ctx, v3->thingIdx);
     }
@@ -96,7 +96,7 @@ void sithCogFunctionThing_createThingUnused(sithCog *ctx)
     {
         if ( COG_SHOULD_SYNC(ctx) )
         {
-            sithDSSThing_SendCreateThing(v2, v3, v1, 0, 0, 0, 255, v6);
+            sithDSSThing_CreateThing(v2, v3, v1, 0, 0, 0, 255, v6);
         }
         sithCogExec_PushInt(ctx, v3->thingIdx);
     }
@@ -199,7 +199,7 @@ void sithCogFunctionThing_createThingAtPos_nr_Mots(sithCog *ctx, int idk, sithTh
                 sithCogExec_PushInt(ctx, v7->thingIdx);
                 return;
             }
-            sithDSSThing_SendCreateThing(popTemplate, v7, 0, popSector, &pos, &rot, 255, idk);
+            sithDSSThing_CreateThing(popTemplate, v7, 0, popSector, &pos, &rot, 255, idk);
         }
         sithCogExec_PushInt(ctx, v7->thingIdx);
     }
@@ -261,7 +261,7 @@ void sithCogFunctionThing_createThingAtPos_nr(sithCog *ctx, int idk)
     {
         if ( COG_SHOULD_SYNC(ctx) )
         {
-            sithDSSThing_SendCreateThing(popTemplate, v7, 0, popSector, &pos, &rot, 255, idk);
+            sithDSSThing_CreateThing(popTemplate, v7, 0, popSector, &pos, &rot, 255, idk);
         }
         sithCogExec_PushInt(ctx, v7->thingIdx);
     }
@@ -284,7 +284,7 @@ void sithCogFunctionThing_DamageThing(sithCog *ctx)
             pThing = pThing2;
         if ( COG_SHOULD_SYNC(ctx) )
         {
-            sithDSSThing_SendDamage(pThing2, pThing, a5, a4, -1, 1);
+            sithDSSThing_DamageThing(pThing2, pThing, a5, a4, -1, 1);
         }
         sithCogExec_PushFlex(ctx, sithThing_Damage(pThing2, pThing, a5, a4));
     }
@@ -334,7 +334,7 @@ void sithCogFunctionThing_DestroyThing(sithCog *ctx)
     //printf("destroy %x %s\n", pThing->thing_id, ctx->cogscript_fpath);
 
     if (COG_SHOULD_SYNC(ctx) )
-        sithDSSThing_SendDestroyThing(pThing->thing_id, -1);
+        sithDSSThing_DestroyThing(pThing->thing_id, -1);
 
     sithThing_Destroy(pThing);
 }
@@ -374,7 +374,7 @@ void sithCogFunctionThing_MoveToFrame(sithCog *ctx)
         sithTrackThing_MoveToFrame(pThing, frame, speed);
 
         if (COG_SHOULD_SYNC(ctx))
-            sithDSSThing_SendPathMove(pThing, frame, speed, 0, -1, 255);
+            sithDSSThing_PathMove(pThing, frame, speed, 0, -1, 255);
     }
 }
 
@@ -391,7 +391,7 @@ void sithCogFunctionThing_SkipToFrame(sithCog *ctx)
         sithTrackThing_SkipToFrame(pThing, frame, speed);
 
         if (COG_SHOULD_SYNC(ctx))
-            sithDSSThing_SendPathMove(pThing, frame, speed, 1, -1, 255);
+            sithDSSThing_PathMove(pThing, frame, speed, 1, -1, 255);
     }
 }
 
@@ -553,7 +553,7 @@ void sithCogFunctionThing_StopThing(sithCog *ctx)
     {
         sithTrackThing_Stop(pThing);
         if (COG_SHOULD_SYNC(ctx))
-            sithDSSThing_SendPathMove(pThing, 0, 0.0, 2, -1, 255);
+            sithDSSThing_PathMove(pThing, 0, 0.0, 2, -1, 255);
     }
     else if (pThing->moveType == SITH_MT_PHYSICS)
     {
@@ -698,7 +698,7 @@ void sithCogFunctionThing_SetThingPos(sithCog *ctx)
         rdVector_Copy3(&pThing->position, &poppedVec);
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithDSSThing_SendPos(pThing, -1, 1);
+            sithDSSThing_Pos(pThing, -1, 1);
         }
         sithCogExec_PushInt(ctx, 1);
     }
@@ -731,7 +731,7 @@ void sithCogFunctionThing_SetThingPosEx(sithCog *ctx)
 
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithDSSThing_SendPos(pThing, -1, 1);
+            sithDSSThing_Pos(pThing, -1, 1);
         }
         sithCogExec_PushInt(ctx, 1);
     }
@@ -968,7 +968,7 @@ void sithCogFunctionThing_DetachThing(sithCog *ctx)
         sithThing_DetachThing(pThing);
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithDSSThing_SendSyncThingAttachment(pThing, -1, 255, 1);
+            sithDSSThing_Attachment(pThing, -1, 255, 1);
         }
     }
 }
@@ -992,7 +992,7 @@ void sithCogFunctionThing_AttachThingToSurf(sithCog *ctx)
         sithThing_AttachToSurface(pThing, surface, 1);
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithDSSThing_SendSyncThingAttachment(pThing, -1, 255, 1);
+            sithDSSThing_Attachment(pThing, -1, 255, 1);
         }
     }
 }
@@ -1007,7 +1007,7 @@ void sithCogFunctionThing_AttachThingToThing(sithCog *ctx)
         sithThing_AttachThing(pThing, attached);
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithDSSThing_SendSyncThingAttachment(pThing, -1, 255, 1);
+            sithDSSThing_Attachment(pThing, -1, 255, 1);
         }
     }
 }
@@ -1025,7 +1025,7 @@ void sithCogFunctionThing_AttachThingToThingEx(sithCog *ctx)
 
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithDSSThing_SendSyncThingAttachment(pThing, -1, 255, 1);
+            sithDSSThing_Attachment(pThing, -1, 255, 1);
         }
     }
 }
@@ -1042,7 +1042,7 @@ void sithCogFunctionThing_PlayMode(sithCog *ctx)
             sithCogExec_PushInt(ctx, track);
             if (COG_SHOULD_SYNC(ctx))
             {
-                sithDSSThing_SendPlayKeyMode(pThing, mode, pThing->rdthing.puppet->tracks[track].field_130, -1, 255);
+                sithDSSThing_PlayKeyMode(pThing, mode, pThing->rdthing.puppet->tracks[track].field_130, -1, 255);
             }
         }
     }
@@ -1091,7 +1091,7 @@ void sithCogFunctionThing_PlayKey(sithCog *ctx)
         }
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithDSSThing_SendPlayKey(pThing, keyframe, trackNum, popInt, pThing->rdthing.puppet->tracks[track].field_130, -1, 255);
+            sithDSSThing_PlayKey(pThing, keyframe, trackNum, popInt, pThing->rdthing.puppet->tracks[track].field_130, -1, 255);
         }
         return;
     }
@@ -1119,7 +1119,7 @@ void sithCogFunctionThing_StopKey(sithCog *ctx)
         {
             if (COG_SHOULD_SYNC(ctx))
             {
-                sithDSSThing_SendStopKey(pThing, v6, poppedFlex, -1, 255);
+                sithDSSThing_StopKey(pThing, v6, poppedFlex, -1, 255);
             }
         }
     }
@@ -1147,7 +1147,7 @@ void sithCogFunctionThing_SetThingModel(sithCog *ctx)
 
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithDSSThing_SendSetThingModel(pThing, -1);
+            sithDSSThing_SetModel(pThing, -1);
         }
     }
     else
@@ -1177,7 +1177,7 @@ void sithCogFunctionThing_SetArmedMode(sithCog *ctx)
 
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithDSSThing_SendSyncThing(pThing, -1, 255);
+            sithDSSThing_UpdateState(pThing, -1, 255);
         }
     }
 }
@@ -1242,7 +1242,7 @@ void sithCogFunctionThing_TeleportThing(sithCog *ctx)
 
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithDSSThing_SendPos(pThing, -1, 1);
+            sithDSSThing_Pos(pThing, -1, 1);
         }
     }
 }
@@ -2044,7 +2044,7 @@ void sithCogFunctionThing_SetThingAttachFlags(sithCog *ctx)
 
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithDSSThing_SendSyncThingAttachment(pThing, -1, 255, 1);
+            sithDSSThing_Attachment(pThing, -1, 255, 1);
         }
     }
 }
@@ -2060,7 +2060,7 @@ void sithCogFunctionThing_ClearThingAttachFlags(sithCog *ctx)
 
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithDSSThing_SendSyncThingAttachment(pThing, -1, 255, 1);
+            sithDSSThing_Attachment(pThing, -1, 255, 1);
         }
     }
 }
@@ -2356,7 +2356,7 @@ void sithCogFunctionThing_SyncThingAttachment(sithCog *ctx)
     sithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing)
-        sithDSSThing_SendSyncThingAttachment(pThing, -1, 255, 0);
+        sithDSSThing_Attachment(pThing, -1, 255, 0);
 }
 
 void sithCogFunctionThing_SyncThingState(sithCog *ctx)

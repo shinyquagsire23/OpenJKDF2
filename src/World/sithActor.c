@@ -160,7 +160,7 @@ LABEL_32:
         return amount;
     }
     if ( sithComm_multiplayerFlags )
-        sithDSSThing_SendDeath(sender, receiver_, 0, -1, 255);
+        sithDSSThing_Death(sender, receiver_, 0, -1, 255);
     sithActor_KillActor(sender, receiver_, flags);
     return amount - sender->actorParams.health;
 }

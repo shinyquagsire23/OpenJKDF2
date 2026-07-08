@@ -602,7 +602,7 @@ int sithMulti_ProcessJoinLeave(sithCogMsg *msg)
                 sithCog_SendSimpleMessageToAll(SITH_MESSAGE_JOIN, 3, jkPlayer_playerInfos[v1].playerThing->thingIdx, 0, v1);
             if ( sithMulti_handlerIdk )
                 sithMulti_handlerIdk();
-            sithDSSThing_SendSyncThing(sithPlayer_pLocalPlayerThing, -1, 255);
+            sithDSSThing_UpdateState(sithPlayer_pLocalPlayerThing, -1, 255);
             if ( sithNet_isServer )
                 sithNet_bSyncScores = 1;
         }
@@ -732,7 +732,7 @@ int sithMulti_ServerLeft(int32_t a, sithEventInfo* b)
     wchar_t a1[128]; // [esp+10h] [ebp-100h] BYREF
 
     if ( sithWorld_pCurrentWorld && sithPlayer_pLocalPlayerThing && (g_submodeFlags & 8) == 0 )
-        sithDSSThing_SendPos(sithPlayer_pLocalPlayerThing, -1, 0);
+        sithDSSThing_Pos(sithPlayer_pLocalPlayerThing, -1, 0);
     if ( sithNet_isServer )
     {
         v0 = 1;
@@ -926,7 +926,7 @@ int sithMulti_ProcessLeaveJoin(sithCogMsg *msg)
                     sithCog_SendSimpleMessageToAll(SITH_MESSAGE_JOIN, 3, v6->playerThing->thingIdx, 0, v3);
                 if ( sithMulti_handlerIdk )
                     sithMulti_handlerIdk();
-                sithDSSThing_SendSyncThing(sithPlayer_pLocalPlayerThing, -1, 255);
+                sithDSSThing_UpdateState(sithPlayer_pLocalPlayerThing, -1, 255);
             }
             NETMSG_POPSTR(a2, 0x10);
 
@@ -1389,15 +1389,15 @@ void sithMulti_HandleTimeLimit(int deltaMs)
                                 if ( v14->type != SITH_THING_WEAPON && v14->type != SITH_THING_EXPLOSION )
                                 {
                                     if ( (v14->thing_id & 0xFFFF0000) != 0 )
-                                        sithDSSThing_SendFullDesc(v14, sithMulti_sendto_id, 1);
+                                        sithDSSThing_FullDescription(v14, sithMulti_sendto_id, 1);
                                     else
-                                        sithDSSThing_SendSyncThing(v14, sithMulti_sendto_id, 1);
+                                        sithDSSThing_UpdateState(v14, sithMulti_sendto_id, 1);
 
-                                    sithDSSThing_SendPos(v14, sithMulti_sendto_id, 0);
+                                    sithDSSThing_Pos(v14, sithMulti_sendto_id, 0);
 
                                     // Added: co-op
                                     if (v14->type == SITH_THING_CORPSE || ((v14->type == SITH_THING_ACTOR || v14->type == SITH_THING_PLAYER) && v14->thingflags & SITH_TF_DEAD)) {
-                                        //sithDSSThing_SendSyncThing(v14, sithMulti_sendto_id, 1);
+                                        //sithDSSThing_UpdateState(v14, sithMulti_sendto_id, 1);
                                         //sithDSS_SendSyncAI(v14->actor, sithMulti_sendto_id, 1);
                                         if (v14->rdthing.puppet)
                                             sithDSS_SendSyncPuppet(v14, sithMulti_sendto_id, 255);
@@ -1418,7 +1418,7 @@ void sithMulti_HandleTimeLimit(int deltaMs)
                         continue;
                     case 4:
                         if ( stdComm_dword_832208 >= sithMulti_dword_83265C
-                                || (sithDSSThing_SendDestroyThing(sithMulti_arr_832218[stdComm_dword_832208], sithMulti_sendto_id),
+                                || (sithDSSThing_DestroyThing(sithMulti_arr_832218[stdComm_dword_832208], sithMulti_sendto_id),
                                     ++stdComm_dword_832208,
                                     stdComm_dword_832208 >= sithMulti_dword_83265C) )
                         {
@@ -1584,7 +1584,7 @@ void sithMulti_ProcessJoin_unused(int playerIdx)
         sithMulti_handlerIdk();
     }
 
-    sithDSSThing_SendSyncThing(sithPlayer_pLocalPlayerThing, -1, 0xFF);
+    sithDSSThing_UpdateState(sithPlayer_pLocalPlayerThing, -1, 0xFF);
 }
 
 void sithMulti_Send36(int param1, int param2, int sendtoId)

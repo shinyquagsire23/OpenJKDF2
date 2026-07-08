@@ -1993,7 +1993,7 @@ void do_hooks()
     hook_function(sithSector_GetPtrFromIdx_ADDR, sithSector_GetPtrFromIdx);
 
     // sithDSSThing
-    hook_function(sithDSSThing_SendPos_ADDR, sithDSSThing_SendPos);
+    hook_function(sithDSSThing_Pos_ADDR, sithDSSThing_Pos);
     hook_function(sithDSSThing_ProcessPos_ADDR, sithDSSThing_ProcessPos);
 
 #if 0
@@ -2001,7 +2001,7 @@ void do_hooks()
     //hook_function(sithDSSThing_SendPlaySoundPos_ADDR, sithDSSThing_SendPlaySoundPos); // TODO: not yet decompiled
     //hook_function(sithDSSThing_ProcessSyncThingFull_ADDR, sithDSSThing_ProcessSyncThingFull); // TODO: not yet decompiled
     //hook_function(sithDSSThing_ProcessPlaySoundPos_ADDR, sithDSSThing_ProcessPlaySoundPos); // TODO: not yet decompiled
-    hook_function(sithDSSThing_SendSyncThingAttachment_ADDR, sithDSSThing_SendSyncThingAttachment);
+    hook_function(sithDSSThing_Attachment_ADDR, sithDSSThing_Attachment);
 #endif
 
 #if 0
@@ -3077,7 +3077,7 @@ void do_hooks()
     hook_function_inv(sithDSSThing_SendPlaySoundPos_ADDR, sithDSSThing_SendPlaySoundPos);
     hook_function_inv(sithDSSThing_ProcessSyncThingFull_ADDR, sithDSSThing_ProcessSyncThingFull);
     hook_function_inv(sithDSSThing_ProcessPlaySoundPos_ADDR, sithDSSThing_ProcessPlaySoundPos);
-    hook_function_inv(sithDSSThing_SendSyncThingAttachment_ADDR, sithDSSThing_SendSyncThingAttachment);
+    hook_function_inv(sithDSSThing_Attachment_ADDR, sithDSSThing_Attachment);
     
     hook_function_inv(sithPuppet_Startup_ADDR, sithPuppet_Startup);
     hook_function_inv(sithPuppet_NewEntry_ADDR, sithPuppet_NewEntry);

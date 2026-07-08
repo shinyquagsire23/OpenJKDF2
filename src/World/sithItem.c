@@ -41,7 +41,7 @@ void sithItem_SetItemTaken(sithThing *item, sithThing *actor, int a3)
 {
     if (sithNet_isMulti && !a3)
     {
-        sithDSSThing_SendTakeItem(item, actor, 255);
+        sithDSSThing_Take(item, actor, 255);
         if (Main_bMotsCompat) {
             if (item->collide == SITH_COLLIDE_SPHERE) {
                 item->collide = SITH_COLLIDE_NONE;
@@ -131,8 +131,8 @@ void sithItem_DestroyItem(sithThing *item)
 
     if ( sithComm_multiplayerFlags )
     {
-        sithDSSThing_SendSyncThing(item, -1, 255);
-        sithDSSThing_SendPos(item, -1, 1);
+        sithDSSThing_UpdateState(item, -1, 255);
+        sithDSSThing_Pos(item, -1, 1);
     }
 }
 

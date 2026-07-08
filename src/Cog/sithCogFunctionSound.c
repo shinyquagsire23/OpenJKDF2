@@ -82,7 +82,7 @@ void sithCogFunctionSound_PlaySoundThing(sithCog *ctx)
                 refid_ = playingSound->refid;
             else
                 refid_ = -1;
-            sithDSSThing_SendPlaySound(pThing, &pThing->position, pSound, minDist_act, maxDist_act_, flagsTmp, refid_, -1, 255);
+            sithDSSThing_PlaySound(pThing, &pThing->position, pSound, minDist_act, maxDist_act_, flagsTmp, refid_, -1, 255);
         }
     }
     else
@@ -95,7 +95,7 @@ void sithCogFunctionSound_PlaySoundThing(sithCog *ctx)
                 refid = playingSound->refid;
             else
                 refid = -1;
-            sithDSSThing_SendPlaySound(0, 0, pSound, volume, 0.0, flags, refid, -1, 255);
+            sithDSSThing_PlaySound(0, 0, pSound, volume, 0.0, flags, refid, -1, 255);
         }
     }
     if ( playingSound )
@@ -149,7 +149,7 @@ void sithCogFunctionSound_PlaySoundPos(sithCog *ctx)
         else
             refId = -1;
 
-        sithDSSThing_SendPlaySound(0, &pos, pSound, minDist_act, maxDist_act, flagsTmp, refId, -1, 255);
+        sithDSSThing_PlaySound(0, &pos, pSound, minDist_act, maxDist_act, flagsTmp, refId, -1, 255);
     }
 
     if ( playingSound )
@@ -237,7 +237,7 @@ void sithCogFunctionSound_PlaySoundGlobal(sithCog *ctx)
     {
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithDSSThing_SendPlaySound(0, 0, pSound, volume, pan, flagsTmp, playingSound->refid, -1, 255);
+            sithDSSThing_PlaySound(0, 0, pSound, volume, pan, flagsTmp, playingSound->refid, -1, 255);
         }
         sithCogExec_PushInt(ctx, playingSound->refid);
     }
@@ -257,7 +257,7 @@ void sithCogFunctionSound_StopSound(sithCog *ctx)
     {
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithDSSThing_SendStopSound(playingSound, fadeOut, -1, 255);
+            sithDSSThing_StopSound(playingSound, fadeOut, -1, 255);
         }
         if ( fadeOut > 0.0 )
         {
@@ -294,7 +294,7 @@ void sithCogFunctionSound_PlaySoundClass(sithCog *ctx)
         sithCogExec_PushInt(ctx, pPlayingSound->refid);
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithDSSThing_SendPlaySoundMode(pThing, soundClassId, pPlayingSound->refid, -1.0);
+            sithDSSThing_PlaySoundMode(pThing, soundClassId, pPlayingSound->refid, -1.0);
         }
     }
     else
@@ -551,7 +551,7 @@ void sithCogFunctionSound_PlaySoundThingAndWait(sithCog *ctx)
                 refid_ = playingSound->refid;
             else
                 refid_ = -1;
-            sithDSSThing_SendPlaySound(pThing, &pThing->position, pSound, minDist_act, maxDist_act_, flagsTmp, refid_, -1, 255);
+            sithDSSThing_PlaySound(pThing, &pThing->position, pSound, minDist_act, maxDist_act_, flagsTmp, refid_, -1, 255);
         }
     }
     else
@@ -564,7 +564,7 @@ void sithCogFunctionSound_PlaySoundThingAndWait(sithCog *ctx)
                 refid = playingSound->refid;
             else
                 refid = -1;
-            sithDSSThing_SendPlaySound(0, 0, pSound, volume, 0.0, flags, refid, -1, 255);
+            sithDSSThing_PlaySound(0, 0, pSound, volume, 0.0, flags, refid, -1, 255);
         }
     }
     if ( playingSound ) {

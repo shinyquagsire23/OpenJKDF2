@@ -484,7 +484,7 @@ sithThing* sithWeapon_FireMots(sithThing *weapon, sithThing *projectile, rdVecto
     spawned = sithWeapon_FireProjectile_0(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9, 0);
 
     if ( spawned && sithComm_multiplayerFlags )
-        sithDSSThing_SendFireProjectile(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9, spawned->thing_id, -1, 255, extra);
+        sithDSSThing_Fire(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9, spawned->thing_id, -1, 255, extra);
 
     return spawned;
 }
@@ -499,7 +499,7 @@ sithThing* sithWeapon_Fire(sithThing *weapon, sithThing *projectile, rdVector3 *
     spawned = sithWeapon_FireProjectile_0(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9, 0);
 
     if ( spawned && sithComm_multiplayerFlags )
-        sithDSSThing_SendFireProjectile(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9, spawned->thing_id, -1, 255, 0);
+        sithDSSThing_Fire(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9, spawned->thing_id, -1, 255, 0);
 
     return spawned;
 }
@@ -1404,7 +1404,7 @@ sithThing* sithWeapon_FireProjectile(sithThing *pSender, sithThing *pProjectileT
                 finalTimeOffset = catchupTimeOffset;
                 sithThing *pFired = sithWeapon_FireProjectile_0(pSender, pProjectileTemplate, &fireDir, pFireOffset, 0, mode, scale, scaleFlags, catchupTimeOffset, extra);
                 if ( pFired && sithComm_multiplayerFlags )
-                    sithDSSThing_SendFireProjectile(pSender, pProjectileTemplate, &fireDir, pFireOffset, 0, mode, scale, scaleFlags, catchupTimeOffset, pFired->thing_id, -1, 255, extra);
+                    sithDSSThing_Fire(pSender, pProjectileTemplate, &fireDir, pFireOffset, 0, mode, scale, scaleFlags, catchupTimeOffset, pFired->thing_id, -1, 255, extra);
             }
             while ( catchupFactor > 1.0 );
         }
@@ -1418,7 +1418,7 @@ sithThing* sithWeapon_FireProjectile(sithThing *pSender, sithThing *pProjectileT
     pResult = sithWeapon_FireProjectile_0(pSender, pProjectileTemplate, &fireDir, pFireOffset, pFireSound, mode, scale, scaleFlags, finalTimeOffset, extra);
     if ( pResult && sithComm_multiplayerFlags )
     {
-        sithDSSThing_SendFireProjectile(
+        sithDSSThing_Fire(
             pSender,
             pProjectileTemplate,
             &fireDir,

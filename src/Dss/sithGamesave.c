@@ -430,7 +430,7 @@ int sithGamesave_SaveCurrentWorld(int mpFlags)
         sithThing* v4 = &sithWorld_pCurrentWorld->things[i];
         if ( sithThing_ShouldSync(v4) )
         {
-            sithDSSThing_SendFullDesc(v4, 0, mpFlags);
+            sithDSSThing_FullDescription(v4, 0, mpFlags);
             if ( v4->rdthing.puppet )
                 sithDSS_SendSyncPuppet(v4, 0, mpFlags);
         }
@@ -445,9 +445,9 @@ int sithGamesave_SaveCurrentWorld(int mpFlags)
             {
                 // MOTS altered: Jail Key
                 if (!Main_bMotsCompat && (v7->attach_flags & SITH_ATTACH_NO_MOVE) != 0 || v7->moveType != SITH_MT_PHYSICS )
-                    sithDSSThing_SendSyncThingAttachment(v7, 0, mpFlags, 1);
+                    sithDSSThing_Attachment(v7, 0, mpFlags, 1);
                 else if (Main_bMotsCompat && v7->attach_flags && (v7->attach_flags & (SITH_ATTACH_NO_MOVE|SITH_ATTACH_FORCE_SERIALIZE)) != 0 || v7->moveType != SITH_MT_PHYSICS )
-                    sithDSSThing_SendSyncThingAttachment(v7, 0, mpFlags, 1);
+                    sithDSSThing_Attachment(v7, 0, mpFlags, 1);
             }
         }
     }

@@ -360,7 +360,7 @@ void sithPlayer_HandleSentDeathPkt(sithThing *thing)
     v1 = thing->actorParams.playerinfo;
 
     if ( thing == sithPlayer_pLocalPlayerThing)
-        sithDSSThing_SendDeath(thing, thing, 1, -1, 255);
+        sithDSSThing_Death(thing, thing, 1, -1, 255);
 
     if ( (thing->thingflags & SITH_TF_CAPTURED) == 0
       || (sithCog_SendMessageFromThing(thing, thing, SITH_MESSAGE_KILLED), (thing->thingflags & SITH_TF_WILLBEREMOVED) == 0) )
@@ -528,7 +528,7 @@ void sithPlayer_debug_ToNextCheckpoint(sithThing *player)
             sithWeapon_SyncPuppet(player);
             sithCog_SendSimpleMessageToAll(SITH_MESSAGE_NEWPLAYER, SENDERTYPE_THING, player->thingIdx, SENDERTYPE_THING, player->thingIdx);
             if ( sithComm_multiplayerFlags )
-                sithDSSThing_SendSyncThing(player, -1, 255);
+                sithDSSThing_UpdateState(player, -1, 255);
         }
     }
 }
