@@ -29,7 +29,7 @@ int stdDisplay_FindClosestDevice(void* a)
 
 int stdDisplay_Open(int a)
 {
-    stdDisplay_pCurDevice = &stdDisplay_aDevices[0];
+    stdDisplay_pCurDevice = &stdDisplay_aDisplayDevices[0];
     stdDisplay_bOpen = 1;
     return 1;
 }

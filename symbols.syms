@@ -367,7 +367,7 @@ wuRegistry_lpSubKey 0x00855EA8 LPCSTR
 
 WinIdk_aDplayGuid 0x008607F0 uint32_t[4]
 
-stdDisplay_aDevices 0x00868280 stdVideoDevice[16]
+stdDisplay_aDisplayDevices 0x00868280 stdVideoDevice[16]
 stdDisplay_gammaTableLen 0x055B410 int
 stdDisplay_paGammaTable 0x055B414 flex_d_t*
 stdDisplay_gammaPalette 0x0055ADB8 rdColor24[256]
