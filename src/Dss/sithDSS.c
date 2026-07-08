@@ -891,7 +891,7 @@ void sithDSS_SyncGameState(int sendto_id, int mpFlags)
     NETMSG_PUSHU32(sithRender_lightingIRMode);
     NETMSG_PUSHF32(sithRender_f_83198C);
     NETMSG_PUSHF32(sithRender_f_831990);
-    NETMSG_PUSHU32(sithRender_needsAspectReset);
+    NETMSG_PUSHU32(sithRender_bResetCameraAspect);
     NETMSG_PUSHU8(sithSoundMixer_bPlayingMci);
     NETMSG_PUSHF32(sithSoundMixer_musicVolume);
 
@@ -959,7 +959,7 @@ int sithDSS_ProcessSyncGameState(sithCogMsg *msg)
     sithRender_lightingIRMode = NETMSG_POPU32();
     sithRender_f_83198C = NETMSG_POPF32();
     sithRender_f_831990 = NETMSG_POPF32();
-    sithRender_needsAspectReset = NETMSG_POPU32();
+    sithRender_bResetCameraAspect = NETMSG_POPU32();
     sithSoundMixer_bPlayingMci = NETMSG_POPU8();
 
     sithSoundMixer_SetMusicVol(NETMSG_POPF32());

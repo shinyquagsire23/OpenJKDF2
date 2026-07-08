@@ -49,33 +49,33 @@ sithTime_msecPauseStartTime 0x00836C20 int32_t
 sithTime_g_bPaused 0x00836C24 int
 
 sithRender_texMode 0x008EC360 int
-sithRender_flag 0x008EC364 int
+sithRender_renderflags 0x008EC364 int
 sithRender_geoMode 0x008EC368 int
 sithRender_lightMode 0x008EC36C int
 sithRender_lightingIRMode 0x00831988 int
 sithRender_f_83198C 0x0083198C flex_t
 sithRender_f_831990 0x00831990 flex_t
-sithRender_needsAspectReset 0x00831994 int
-sithRender_numSectors 0x008318F0 int32_t
-sithRender_numClipFrustums 0x0082FEE8 int32_t
-sithRender_numLights 0x00831978 int32_t
-sithRender_numSectors2 0x0082F640 int32_t
-sithRender_82F4B4 0x0082F4B4 uint32_t
-sithRender_sectorsDrawn 0x0083197C int
-sithRender_numSurfaces 0x0082F4B8 int32_t
+sithRender_bResetCameraAspect 0x00831994 int
+sithRender_g_numVisibleSectors 0x008318F0 int32_t
+sithRender_numSecorFrustrums 0x0082FEE8 int32_t
+sithRender_numThingLights 0x00831978 int32_t
+sithRender_numThingSectors 0x0082F640 int32_t
+sithRender_numSpritesToDraw 0x0082F4B4 uint32_t
+sithRender_numRenderedSectors 0x0083197C int
+sithRender_numAlphaAdjoins 0x0082F4B8 int32_t
 sithRender_geoThingsDrawn 0x00831980 int
 sithRender_nongeoThingsDrawn 0x00831984 int
 sithRender_f_82F4B0 0x0082F4B0 flex_t = 0.0
-sithRender_idxInfo 0x0082F648 rdMeshinfo
+sithRender_faceView 0x0082F648 rdMeshinfo
 meshinfo_out 0x0082F490 rdMeshinfo
-sithRender_weaponRenderHandle 0x00831998 sithRender_weapRendFunc_t
-sithRender_aLights 0x0082F668 rdLight[32]
-sithRender_aSectors 0x0082F110 sithSector*[SITH_MAX_VISIBLE_SECTORS]
-sithRender_clipFrustums 0x0082FEF0 rdClipFrustum[SITH_MAX_VISIBLE_SECTORS]
-sithRender_aSectors2 0x0082FC68 sithSector*[SITH_MAX_VISIBLE_SECTORS_2+2]
-sithRender_aVerticesTmp 0x0082F310 rdVector3[32] NO_REINIT
-sithRender_aVerticesTmp_projected 0x0082F4C0 rdVector3[32] NO_REINIT
-sithRender_aSurfaces 0x008318F8 sithSurface*[SITH_MAX_VISIBLE_ALPHA_SURFACES]
+sithRender_pExtraThingRenderFunc 0x00831998 sithRender_weapRendFunc_t
+sithRender_aThingLights 0x0082F668 rdLight[32]
+sithRender_aVisibleSectors 0x0082F110 sithSector*[SITH_MAX_VISIBLE_SECTORS]
+sithRender_aSectorFrustrums 0x0082FEF0 rdClipFrustum[SITH_MAX_VISIBLE_SECTORS]
+sithRender_aThingSectors 0x0082FC68 sithSector*[SITH_MAX_VISIBLE_SECTORS_2+2]
+sithRender_aClipVertices 0x0082F310 rdVector3[32] NO_REINIT
+sithRender_aTransformedClipVertices 0x0082F4C0 rdVector3[32] NO_REINIT
+sithRender_aAlphaAdjoins 0x008318F8 sithSurface*[SITH_MAX_VISIBLE_ALPHA_SURFACES]
 sithRender_lastRenderTick 0x008EE678 int
 aSithSurfaces 0x00847E98 sithSurface*[SITH_MAX_VISIBLE_ALPHA_SURFACES]
 

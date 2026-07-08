@@ -114,7 +114,7 @@ int sithCommand_DebugMode(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             v3 = 1;
             goto LABEL_13;
         case 1u:
-            v2 = &sithRender_flag;
+            v2 = &sithRender_renderflags;
             v3 = 1;
             goto LABEL_13;
         case 2u:

@@ -236,7 +236,7 @@ int jkGame_Update()
                     "%02.3f (%02d%%)f %3ds %3da %3dz %4dp %3d curSector %3d fo",
                     Video_flt_55289C,
                     (unsigned int)(__int64)((flex_d_t)(unsigned int)jkGame_updateMsecsTotal / (flex_d_t)(int)v0 * 100.0),
-                    sithRender_sectorsDrawn,
+                    sithRender_numRenderedSectors,
                     sithRender_geoThingsDrawn,
                     sithRender_nongeoThingsDrawn,
                     rdCache_drawnFaces,
@@ -354,7 +354,7 @@ int jkGame_Update()
     int total_delta = now_ms - last_time_ms;
     last_time_ms = now_ms;
     extern int std3D_timeWastedWaitingAround;
-    extern int32_t sithRender_numSectors;
+    extern int32_t sithRender_g_numVisibleSectors;
 
     int healthNum = 0;
     int shieldsNum = 0;
@@ -404,7 +404,7 @@ int jkGame_Update()
     jkDev_PrintfLog();
     stdPlatform_Printf("\x1b[7;0H                                \r");
     stdPlatform_Printf(resetConsole);
-    stdPlatform_Printf("\x1b[10;0H                               \rdlt all=%d mn=%d %d wrld=%d\n                               \r pov=%d hud=%d drw=%d wst=%d %d \n                               \n                               \n", total_delta-std3D_timeWastedWaitingAround, sithMain_tickEndMs-sithMain_tickStartMs, jkGame_Delta_ClearScreen_AdvanceFrame, jkGame_Delta_AdvanceFrame_UpdateCamera, jkGame_Delta_UpdateCamera_DrawPov, jkGame_Delta_DrawPov_HudDrawn, jkGame_Delta_HudDrawn_End - std3D_timeWastedWaitingAround, std3D_timeWastedWaitingAround, sithRender_numSectors);
+    stdPlatform_Printf("\x1b[10;0H                               \rdlt all=%d mn=%d %d wrld=%d\n                               \r pov=%d hud=%d drw=%d wst=%d %d \n                               \n                               \n", total_delta-std3D_timeWastedWaitingAround, sithMain_tickEndMs-sithMain_tickStartMs, jkGame_Delta_ClearScreen_AdvanceFrame, jkGame_Delta_AdvanceFrame_UpdateCamera, jkGame_Delta_UpdateCamera_DrawPov, jkGame_Delta_DrawPov_HudDrawn, jkGame_Delta_HudDrawn_End - std3D_timeWastedWaitingAround, std3D_timeWastedWaitingAround, sithRender_g_numVisibleSectors);
     stdPlatform_Printf(resetConsole);
     stdPlatform_Printf("\x1b[13;0H                               \r");
     stdPlatform_PrintHeapStats();
