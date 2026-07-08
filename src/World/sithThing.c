@@ -373,7 +373,7 @@ void sithThing_Remove(sithThing* pThing)
             sithWeapon_Remove(pThing);
             break;
         case SITH_THING_ITEM:
-            sithItem_Remove(pThing);
+            sithItem_DestroyItem(pThing);
             break;
         case SITH_THING_CORPSE:
             sithActor_RemoveCorpse(pThing);
@@ -632,7 +632,7 @@ void sithThing_sub_4CD100(sithThing* pThing)
     switch ( pThing->type )
     {
         case SITH_THING_ITEM:
-            sithItem_New(pThing);
+            sithItem_Initialize(pThing);
             break;
         case SITH_THING_EXPLOSION:
             sithExplosion_CreateThing(pThing);
@@ -1594,7 +1594,7 @@ int sithThing_ParseArgs(stdConffileArg *arg, sithThing* pThing)
             v7 = sithWeapon_LoadParams(arg, pThing, paramIdx);
             goto LABEL_10;
         case SITH_THING_ITEM:
-            v7 = sithItem_LoadThingParams(arg, pThing, paramIdx);
+            v7 = sithItem_ParseArg(arg, pThing, paramIdx);
             goto LABEL_10;
         case SITH_THING_EXPLOSION:
             v7 = sithExplosion_LoadThingParams(arg, pThing, paramIdx);

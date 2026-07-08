@@ -2386,12 +2386,12 @@ void do_hooks()
     hook_function(sithActor_RemoveCorpse_ADDR, sithActor_RemoveCorpse);
     
     // sithItem
-    hook_function(sithItem_Collide_ADDR, sithItem_Collide);
-    hook_function(sithItem_New_ADDR, sithItem_New);
-    hook_function(sithItem_Take_ADDR, sithItem_Take);
-    hook_function(sithItem_Remove_ADDR, sithItem_Remove);
-    hook_function(sithItem_LoadThingParams_ADDR, sithItem_LoadThingParams);
-    hook_function(sithItem_LoadThingParams_ADDR, sithItem_LoadThingParams);
+    hook_function(sithItem_PlayerCollisionHandler_ADDR, sithItem_PlayerCollisionHandler);
+    hook_function(sithItem_Initialize_ADDR, sithItem_Initialize);
+    hook_function(sithItem_SetItemTaken_ADDR, sithItem_SetItemTaken);
+    hook_function(sithItem_DestroyItem_ADDR, sithItem_DestroyItem);
+    hook_function(sithItem_ParseArg_ADDR, sithItem_ParseArg);
+    hook_function(sithItem_ParseArg_ADDR, sithItem_ParseArg);
     
     // sithMap
     hook_function(sithMap_Startup_ADDR, sithMap_Startup);

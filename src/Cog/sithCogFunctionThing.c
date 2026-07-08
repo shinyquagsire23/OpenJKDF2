@@ -2215,7 +2215,7 @@ void sithCogFunctionThing_TakeItem(sithCog *ctx)
     sithThing* player = sithCogExec_PopThing(ctx);
     sithThing* itemThing = sithCogExec_PopThing(ctx);
     if ( itemThing && (Main_bMotsCompat || player) && itemThing->type == SITH_THING_ITEM )
-        sithItem_Take(itemThing, player, 0);
+        sithItem_SetItemTaken(itemThing, player, 0);
 }
 
 void sithCogFunctionThing_HasLos(sithCog *ctx)

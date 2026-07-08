@@ -40,7 +40,7 @@ int sithCollision_Startup()
     sithCollision_RegisterCollisionHandler(SITH_THING_WEAPON, SITH_THING_PLAYER, sithWeapon_Collide, 0);
     sithCollision_RegisterCollisionHandler(SITH_THING_WEAPON, SITH_THING_DEBRIS, sithWeapon_Collide, 0);
     sithCollision_RegisterCollisionHandler(SITH_THING_WEAPON, SITH_THING_COG, sithWeapon_Collide, 0);
-    sithCollision_RegisterCollisionHandler(SITH_THING_ITEM, SITH_THING_PLAYER, sithItem_Collide, 0);
+    sithCollision_RegisterCollisionHandler(SITH_THING_ITEM, SITH_THING_PLAYER, sithItem_PlayerCollisionHandler, 0);
 
     sithCollision_RegisterHitHandler(SITH_THING_ACTOR, sithActor_sub_4ED1D0);
     sithCollision_RegisterHitHandler(SITH_THING_WEAPON, sithWeapon_HitDebug);

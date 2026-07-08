@@ -11,7 +11,7 @@
 #include "Main/Main.h"
 #include "jk.h"
 
-int sithItem_Collide(sithThing *a1, sithThing *a2, sithCollisionSearchEntry *a4, int a5)
+int sithItem_PlayerCollisionHandler(sithThing *a1, sithThing *a2, sithCollisionSearchEntry *a4, int a5)
 {
     if ( !sithNet_isMulti || (!(a2->thingflags & SITH_TF_INVULN)) )
     {
@@ -28,7 +28,7 @@ int sithItem_Collide(sithThing *a1, sithThing *a2, sithCollisionSearchEntry *a4,
     return 0;
 }
 
-void sithItem_New(sithThing *out)
+void sithItem_Initialize(sithThing *out)
 {
 #ifdef JKM_PARAMS
     out->itemParams.respawnFactor = 0.9;
@@ -37,7 +37,7 @@ void sithItem_New(sithThing *out)
     out->itemParams.sector = out->sector;
 }
 
-void sithItem_Take(sithThing *item, sithThing *actor, int a3)
+void sithItem_SetItemTaken(sithThing *item, sithThing *actor, int a3)
 {
     if (sithNet_isMulti && !a3)
     {
@@ -93,7 +93,7 @@ void sithItem_Take(sithThing *item, sithThing *actor, int a3)
     }
 }
 
-void sithItem_Remove(sithThing *item)
+void sithItem_DestroyItem(sithThing *item)
 {
     if ( sithNet_isMulti && !sithNet_isServer )
     {
@@ -137,7 +137,7 @@ void sithItem_Remove(sithThing *item)
 }
 
 // MOTS altered
-int sithItem_LoadThingParams(stdConffileArg *arg, sithThing *thing, int paramIdx)
+int sithItem_ParseArg(stdConffileArg *arg, sithThing *thing, int paramIdx)
 {
     if ( paramIdx == THINGPARAM_TYPEFLAGS )
     {

@@ -2648,11 +2648,11 @@ sithExplosion_CreateThing	.text	004FB790	000000CA	00000018	00000004	R	.	.	.	.	.	
 sithExplosion_Tick	.text	004FB860	000000BD	00000018	00000004	R	.	.	.	.	.	T	.
 sithExplosion_UpdateForce	.text	004FB920	000002B0	00000060	00000004	R	.	.	.	.	.	T	.
 sithExplosion_LoadThingParams	.text	004FBBD0	000001E6	00000008	0000000C	R	.	.	.	.	.	T	.
-sithItem_Collide	.text	004FBE10	0000005D	00000008	00000008	R	.	.	.	.	.	T	.
-sithItem_New	.text	004FBE70	0000002C	00000004	00000004	R	.	.	.	.	.	T	.
-sithItem_Take	.text	004FBEA0	00000090	00000004	0000000C	R	.	.	.	.	.	T	.
-sithItem_Remove	.text	004FBF30	000000F5	00000004	00000004	R	.	.	.	.	.	T	.
-sithItem_LoadThingParams	.text	004FC030	00000067	00000000	0000000C	R	.	.	.	.	.	T	.
+sithItem_PlayerCollisionHandler	.text	004FBE10	0000005D	00000008	00000008	R	.	.	.	.	.	T	.
+sithItem_Initialize	.text	004FBE70	0000002C	00000004	00000004	R	.	.	.	.	.	T	.
+sithItem_SetItemTaken	.text	004FBEA0	00000090	00000004	0000000C	R	.	.	.	.	.	T	.
+sithItem_DestroyItem	.text	004FBF30	000000F5	00000004	00000004	R	.	.	.	.	.	T	.
+sithItem_ParseArg	.text	004FC030	00000067	00000000	0000000C	R	.	.	.	.	.	T	.
 sithPlayerActions_Activate	.text	004FC0A0	000001C6	00000058	00000004	R	.	.	.	.	.	T	.
 sithPlayerActions_JumpWithVel	.text	004FC270	000001DE	00000014	00000008	R	.	.	.	.	.	T	.
 sithPlayerActions_WarpToCheckpoint	.text	004FC450	000000CB	0000000C	00000008	R	.	.	.	.	.	T	.

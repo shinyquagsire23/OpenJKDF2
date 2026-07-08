@@ -1368,14 +1368,14 @@ void sithDSSThing_SendTakeItem(sithThing *pItemThing, sithThing *pActor, int mpF
     {
         if ( sithComm_netMsgTmp.netMsg.cogMsgId != DSS_TAKEITEM1 )
         {
-            sithItem_Take(pItemThing2, pActor2, 1);
+            sithItem_SetItemTaken(pItemThing2, pActor2, 1);
             return;
         }
         if ( pItemThing2->type == SITH_THING_ITEM && (pItemThing2->thingflags & (SITH_TF_DISABLED|SITH_TF_WILLBEREMOVED)) == 0 )
         {
             sithComm_netMsgTmp.netMsg.cogMsgId = DSS_TAKEITEM2;
             sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 1, 1);
-            sithItem_Take(pItemThing2, pActor2, 1);
+            sithItem_SetItemTaken(pItemThing2, pActor2, 1);
             return;
         }
     }
@@ -1413,7 +1413,7 @@ int sithDSSThing_ProcessTakeItem(sithCogMsg *msg)
             msg->netMsg.cogMsgId = DSS_TAKEITEM2;
             sithComm_SendMsgToPlayer(msg, -1, 1, 1);
         }
-        sithItem_Take(v2, v4, 1);
+        sithItem_SetItemTaken(v2, v4, 1);
         return 1;
     }
     return 0;
