@@ -2420,10 +2420,10 @@ void do_hooks()
     // sithSprite
     hook_function(sithSprite_Startup_ADDR, sithSprite_Startup);
     hook_function(sithSprite_Shutdown_ADDR, sithSprite_Shutdown);
+    hook_function(sithSprite_ReadStaticSpritesListText_ADDR, sithSprite_ReadStaticSpritesListText);
+    hook_function(sithSprite_FreeWorldSprites_ADDR, sithSprite_FreeWorldSprites);
     hook_function(sithSprite_Load_ADDR, sithSprite_Load);
-    hook_function(sithSprite_FreeEntry_ADDR, sithSprite_FreeEntry);
-    hook_function(sithSprite_LoadEntry_ADDR, sithSprite_LoadEntry);
-    hook_function(sithSprite_New_ADDR, sithSprite_New);
+    hook_function(sithSprite_AllocWorldSprites_ADDR, sithSprite_AllocWorldSprites);
     
     // sithMapView
     hook_function(sithOverlayMap_Startup_ADDR, sithOverlayMap_Startup);

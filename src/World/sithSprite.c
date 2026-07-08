@@ -26,7 +26,7 @@ void sithSprite_Shutdown()
     }
 }
 
-int sithSprite_Load(sithWorld *world, int a2)
+int sithSprite_ReadStaticSpritesListText(sithWorld *world, int a2)
 {
     int sprites_amt;
 
@@ -40,7 +40,7 @@ int sithSprite_Load(sithWorld *world, int a2)
     if ( !sprites_amt )
         return 1;
 
-    if ( !sithSprite_New(world, sprites_amt) )
+    if ( !sithSprite_AllocWorldSprites(world, sprites_amt) )
     {
         stdPrintf(pSithHS->errorPrint, ".\\World\\sithSprite.c", 163, "Memory error while reading sprites, line %d.\n", stdConffile_linenum, 0, 0, 0);
         return 0;
@@ -53,7 +53,7 @@ int sithSprite_Load(sithWorld *world, int a2)
     {
         while ( _memcmp(stdConffile_entry.args[0].value, "end", 4u) )
         {
-            if ( !sithSprite_LoadEntry(stdConffile_entry.args[1].value) )
+            if ( !sithSprite_Load(stdConffile_entry.args[1].value) )
             {
                 stdPrintf(
                     pSithHS->errorPrint,
@@ -80,7 +80,7 @@ int sithSprite_Load(sithWorld *world, int a2)
     return 1;
 }
 
-void sithSprite_FreeEntry(sithWorld *world)
+void sithSprite_FreeWorldSprites(sithWorld *world)
 {
     if (!world->numSprites)
         return;
@@ -96,7 +96,7 @@ void sithSprite_FreeEntry(sithWorld *world)
     world->numSprites = 0;
 }
 
-rdSprite* sithSprite_LoadEntry(char *fpath)
+rdSprite* sithSprite_Load(char *fpath)
 {
     sithWorld *world;
     rdSprite *result;
@@ -156,7 +156,7 @@ rdSprite* sithSprite_LoadEntry(char *fpath)
             }
             else if ( _memcmp(fpath, "default.spr", 0xCu) )
             {
-                return sithSprite_LoadEntry("default.spr");
+                return sithSprite_Load("default.spr");
             }
             else { // Added
                 jk_printf("OpenJKDF2: Failed to open sprite `%s`!\n", spriteFpath);
@@ -169,7 +169,7 @@ rdSprite* sithSprite_LoadEntry(char *fpath)
     return result;
 }
 
-int sithSprite_New(sithWorld *world, int num)
+int sithSprite_AllocWorldSprites(sithWorld *world, int num)
 {
     rdSprite *sprites; // edi
 

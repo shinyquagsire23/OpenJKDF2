@@ -85,7 +85,7 @@ int sithWorld_Startup()
     sithWorld_SetSectionParser("header", sithHeader_Load);
     sithWorld_SetSectionParser("sectors", sithSector_Load);
     sithWorld_SetSectionParser("models", sithModel_ReadStaticModelsListText);
-    sithWorld_SetSectionParser("sprites", sithSprite_Load);
+    sithWorld_SetSectionParser("sprites", sithSprite_ReadStaticSpritesListText);
     sithWorld_SetSectionParser("things", sithThing_Load);
     sithWorld_SetSectionParser("templates", sithTemplate_Load);
     sithWorld_SetSectionParser("materials", sithMaterial_Load);
@@ -379,7 +379,7 @@ void sithWorld_FreeEntry(sithWorld *pWorld)
     if ( pWorld->models )
         sithModel_FreeWorldModels(pWorld);
     if ( pWorld->sprites )
-        sithSprite_FreeEntry(pWorld);
+        sithSprite_FreeWorldSprites(pWorld);
     if ( pWorld->particles )
         sithParticle_FreeWorldParticles(pWorld);
     if ( pWorld->keyframes )

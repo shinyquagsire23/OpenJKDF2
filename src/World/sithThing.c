@@ -1776,7 +1776,7 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing* pThing, int param)
             break;
         case THINGPARAM_SPRITE:
             rdThing_FreeEntry(&pThing->rdthing);
-            pSprite = sithSprite_LoadEntry(arg->value);
+            pSprite = sithSprite_Load(arg->value);
             if ( pSprite )
             {
                 rdThing_SetSprite3(&pThing->rdthing, pSprite);
