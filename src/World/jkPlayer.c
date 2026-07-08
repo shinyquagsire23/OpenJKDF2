@@ -1326,7 +1326,7 @@ int jkPlayer_MPCParse(jkPlayerMpcInfo *info, SithPlayer* unk, wchar_t *fname, wc
       && stdConffile_ReadLine()
       && _sscanf(stdConffile_g_aLine, "model: %s", jkPlayer_model) == 1
       && stdConffile_ReadLine()
-      && _sscanf(stdConffile_g_aLine, "pSoundClass: %s", jkPlayer_soundClass) == 1
+      && _sscanf(stdConffile_g_aLine, "soundclass: %s", jkPlayer_soundClass) == 1
       && stdConffile_ReadLine()
       && _sscanf(stdConffile_g_aLine, "sidemat: %s", jkPlayer_sideMat) == 1
       && stdConffile_ReadLine()
@@ -1390,7 +1390,7 @@ int jkPlayer_MPCWrite(SithPlayer* unk, wchar_t *mpcName, wchar_t *playerName)
 
     stdConffile_Printf("version %d\n", 1);
     if ( stdConffile_Printf("model: %s\n", jkPlayer_model)
-      && stdConffile_Printf("pSoundClass: %s\n", jkPlayer_soundClass)
+      && stdConffile_Printf("soundclass: %s\n", jkPlayer_soundClass)
       && stdConffile_Printf("sidemat: %s\n", jkPlayer_sideMat)
       && stdConffile_Printf("tipmat: %s\n", jkPlayer_tipMat))
     {

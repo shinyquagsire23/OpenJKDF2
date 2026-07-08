@@ -203,11 +203,11 @@ int sithDSSThing_ProcessStateUpdate(SithMessage *msg)
 #if 0
     // Added: why is this needed???
     if (!pThing->controlType && pThing->type) {
-        jk_printf("OpenJKDF2 WARN: id %08x pThing->controlType 0, using pThing->type %u\n", id, pThing->type);
+        jk_printf("OpenJKDF2 WARN: id %08x parentSithThing->controlType 0, using parentSithThing->type %u\n", id, pThing->type);
         pThing->controlType = pThing->type;
     }
     if (pThing->controlType && !pThing->type) {
-        jk_printf("OpenJKDF2 WARN: id %08x pThing->type 0, using pThing->controlType %u\n", id, pThing->controlType);
+        jk_printf("OpenJKDF2 WARN: id %08x parentSithThing->type 0, using parentSithThing->controlType %u\n", id, pThing->controlType);
         pThing->type = pThing->controlType;
     }
 #endif

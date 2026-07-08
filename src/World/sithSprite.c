@@ -13,7 +13,7 @@ int sithSprite_Startup()
     sithSprite_pHashtable = stdHashtbl_New(128);
     if (sithSprite_pHashtable)
         return 1;
-    stdPrintf(pSithHS->errorPrint, ".\\World\\sithSprite.c", 63, "Failed to allocate memory for aSprites.\n", 0, 0, 0, 0);
+    stdPrintf(pSithHS->errorPrint, ".\\World\\sithSprite.c", 63, "Failed to allocate memory for sprites.\n", 0, 0, 0, 0);
     return 0;
 }
 
@@ -34,7 +34,7 @@ int sithSprite_ReadStaticSpritesListText(SithWorld *world, int a2)
         return 0;
 
     stdConffile_ReadArgs();
-    if ( _memcmp(stdConffile_g_entry.aArgs[0].value, "world", 6u) || _memcmp(stdConffile_g_entry.aArgs[1].value, "aSprites", 8u) )
+    if ( _memcmp(stdConffile_g_entry.aArgs[0].value, "world", 6u) || _memcmp(stdConffile_g_entry.aArgs[1].value, "sprites", 8u) )
         return 0;
     sprites_amt = _atoi(stdConffile_g_entry.aArgs[2].value);
     if ( !sprites_amt )
@@ -42,7 +42,7 @@ int sithSprite_ReadStaticSpritesListText(SithWorld *world, int a2)
 
     if ( !sithSprite_AllocWorldSprites(world, sprites_amt) )
     {
-        stdPrintf(pSithHS->errorPrint, ".\\World\\sithSprite.c", 163, "Memory error while reading aSprites, line %d.\n", stdConffile_linenum, 0, 0, 0);
+        stdPrintf(pSithHS->errorPrint, ".\\World\\sithSprite.c", 163, "Memory error while reading sprites, line %d.\n", stdConffile_linenum, 0, 0, 0);
         return 0;
     }
     
@@ -59,7 +59,7 @@ int sithSprite_ReadStaticSpritesListText(SithWorld *world, int a2)
                     pSithHS->errorPrint,
                     ".\\World\\sithSprite.c",
                     159,
-                    "Parse error while reading aSprites, line %d.\n",
+                    "Parse error while reading sprites, line %d.\n",
                     stdConffile_linenum);
                 stdPrintf(
                     pSithHS->errorPrint,
@@ -163,7 +163,7 @@ rdSprite* sithSprite_Load(char *fpath)
             }
         }
         else { // Added
-            jk_printf("OpenJKDF2: Failed allocate sprite `%s`! numSprites < sizeSprites -> %x < %x failed\n", fpath, world->numSprites, world->sizeSprites);
+            jk_printf("OpenJKDF2: Failed allocate sprite `%s`! numSpritesLoaded < numSprites -> %x < %x failed\n", fpath, world->numSprites, world->sizeSprites);
         }
     }
     return result;

@@ -51,7 +51,7 @@ int32_t sithCog_Startup()
     sithCog_g_pHashtable = stdHashtbl_New(256);
     if (!sithCog_g_pHashtable)
     {
-        stdPrintf(pSithHS->errorPrint, ".\\Cog\\sithCog.c", 124, "Could not allocate COG pHashtbl.");
+        stdPrintf(pSithHS->errorPrint, ".\\Cog\\sithCog.c", 124, "Could not allocate COG hashtable.");
         return 0;
     }
     sithCog_g_pSymbolTable->firstId = 0x100;
@@ -83,7 +83,7 @@ int32_t sithCog_Startup()
     sithCog_AddIntSymbol(sithCog_g_pSymbolTable, 20, "changed");
     sithCog_AddIntSymbol(sithCog_g_pSymbolTable, 21, "deactivated");
     sithCog_AddIntSymbol(sithCog_g_pSymbolTable, 22, "shutdown");
-    sithCog_AddIntSymbol(sithCog_g_pSymbolTable, 23, "secRespawnInterval");
+    sithCog_AddIntSymbol(sithCog_g_pSymbolTable, 23, "respawn");
     sithCog_AddIntSymbol(sithCog_g_pSymbolTable, 2, "removed");
     sithCog_AddIntSymbol(sithCog_g_pSymbolTable, 19, "autoselect");
     sithCog_AddIntSymbol(sithCog_g_pSymbolTable, 24, "aievent");
@@ -551,7 +551,7 @@ int sithCog_ReadCogsListText(SithWorld *world, int a2)
     if ( a2 )
         return 0;
     stdConffile_ReadArgs();
-    if ( _strcmp(stdConffile_g_entry.aArgs[0].value, "world") || _strcmp(stdConffile_g_entry.aArgs[1].value, "aCogs") )
+    if ( _strcmp(stdConffile_g_entry.aArgs[0].value, "world") || _strcmp(stdConffile_g_entry.aArgs[1].value, "cogs") )
         return 0;
     num_cogs = _atoi(stdConffile_g_entry.aArgs[2].value);
     if ( !num_cogs )
@@ -1222,7 +1222,7 @@ void sithCog_SendMessage(sithCog *cog, int32_t msgid, int32_t senderType, int32_
         if (cog->flags & SITH_COG_DEBUG)
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_g_genBuffer, "--Cog %s: Message %d received but COG is bPaused.\n", cog->aName, msgid);
+            _sprintf(std_g_genBuffer, "--Cog %s: Message %d received but COG is paused.\n", cog->aName, msgid);
             sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
@@ -1359,7 +1359,7 @@ cog_flex_t sithCog_SendMessageEx(sithCog *cog, int32_t message, int32_t senderTy
         if ( (v13 & 1) != 0 )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_g_genBuffer, "--Cog %s: MessageEx %d received but COG is bPaused.\n", cog->aName, message);
+            _sprintf(std_g_genBuffer, "--Cog %s: MessageEx %d received but COG is paused.\n", cog->aName, message);
             sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
@@ -1880,7 +1880,7 @@ int sithCog_AllocWorldCogs(SithWorld *world, int num)
     if ( !aCogs )
     {
         stdPrintf(pSithHS->errorPrint, ".\\Cog\\sithCog.c", 0x373,
-                  "Memory alloc failure initializing aCogs.");
+                  "Memory alloc failure initializing cogs.");
         return 0;
     }
     stdPlatform_Memzero32(aCogs, num * sizeof(sithCog)); // Added: word-safe

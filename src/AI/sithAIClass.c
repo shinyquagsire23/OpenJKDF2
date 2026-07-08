@@ -57,7 +57,7 @@ int sithAIClass_ReadStaticAIClassesListText(SithWorld *world, int a2)
         return 0;
     }
     stdConffile_ReadArgs();
-    if (_strcmp(stdConffile_g_entry.aArgs[0].value, "world") || _strcmp(stdConffile_g_entry.aArgs[1].value, "aAIClasses")) {
+    if (_strcmp(stdConffile_g_entry.aArgs[0].value, "world") || _strcmp(stdConffile_g_entry.aArgs[1].value, "aiclasses")) {
         return 0;
     }
     sizeAIClasses = _atoi(stdConffile_g_entry.aArgs[2].value);
@@ -72,7 +72,7 @@ int sithAIClass_ReadStaticAIClassesListText(SithWorld *world, int a2)
     {
         world->sizeAIClasses = 0;
         world->numAIClasses = 0;
-        stdPrintf(pSithHS->errorPrint, ".\\Ai\\sithAIClass.c", 176, "Memory error while reading aAIClasses, line %d.\n", stdConffile_linenum);
+        stdPrintf(pSithHS->errorPrint, ".\\Ai\\sithAIClass.c", 176, "Memory error while reading aiclasses, line %d.\n", stdConffile_linenum);
         return 0;
     }
     
@@ -85,7 +85,7 @@ int sithAIClass_ReadStaticAIClassesListText(SithWorld *world, int a2)
         {
             if ( !sithAIClass_Load(stdConffile_g_entry.aArgs[1].value) )
             {
-                stdPrintf(pSithHS->errorPrint, ".\\Ai\\sithAIClass.c", 172, "Parse error while reading aAIClasses, line %d.\n", stdConffile_linenum);
+                stdPrintf(pSithHS->errorPrint, ".\\Ai\\sithAIClass.c", 172, "Parse error while reading aiclasses, line %d.\n", stdConffile_linenum);
                 return 0;
             }
             if ( !stdConffile_ReadArgs() )

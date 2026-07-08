@@ -83,19 +83,19 @@ int sithWorld_Startup()
     sithWorld_RegisterTextSectionParser("georesource", sithWorld_ReadGeoresourceText);
     sithWorld_RegisterTextSectionParser("copyright", sithWorld_ReadCopyrightText);
     sithWorld_RegisterTextSectionParser("header", sithWorld_ReadHeaderText);
-    sithWorld_RegisterTextSectionParser("aSectors", sithSector_ReadSectorsListText);
-    sithWorld_RegisterTextSectionParser("aModels", sithModel_ReadStaticModelsListText);
-    sithWorld_RegisterTextSectionParser("aSprites", sithSprite_ReadStaticSpritesListText);
-    sithWorld_RegisterTextSectionParser("aThings", sithThing_ReadStaticThingsListText);
-    sithWorld_RegisterTextSectionParser("aThingTemplates", sithTemplate_ReadThingTemplatesListText);
-    sithWorld_RegisterTextSectionParser("aMaterials", sithMaterial_ReadMaterialsListText);
+    sithWorld_RegisterTextSectionParser("sectors", sithSector_ReadSectorsListText);
+    sithWorld_RegisterTextSectionParser("models", sithModel_ReadStaticModelsListText);
+    sithWorld_RegisterTextSectionParser("sprites", sithSprite_ReadStaticSpritesListText);
+    sithWorld_RegisterTextSectionParser("things", sithThing_ReadStaticThingsListText);
+    sithWorld_RegisterTextSectionParser("templates", sithTemplate_ReadThingTemplatesListText);
+    sithWorld_RegisterTextSectionParser("materials", sithMaterial_ReadMaterialsListText);
     sithWorld_RegisterTextSectionParser("sounds", sithSound_ReadSoundsListText);
-    sithWorld_RegisterTextSectionParser("aCogs", sithCog_ReadCogsListText);
+    sithWorld_RegisterTextSectionParser("cogs", sithCog_ReadCogsListText);
     sithWorld_RegisterTextSectionParser("cogscripts", sithCog_ReadCogScriptsListText);
-    sithWorld_RegisterTextSectionParser("aKeyframes", sithKeyFrame_Load);
-    sithWorld_RegisterTextSectionParser("pPuppetClass", sithAnimClass_Load);
+    sithWorld_RegisterTextSectionParser("keyframes", sithKeyFrame_Load);
+    sithWorld_RegisterTextSectionParser("animclass", sithAnimClass_Load);
     sithWorld_RegisterTextSectionParser("aiclass", sithAIClass_ReadStaticAIClassesListText);
-    sithWorld_RegisterTextSectionParser("pSoundClass", sithSoundClass_ReadSoundClassesListText);
+    sithWorld_RegisterTextSectionParser("soundclass", sithSoundClass_ReadSoundClassesListText);
 #ifdef JKM_LIGHTING
     sithWorld_RegisterTextSectionParser("archlighting", sithArchLighting_ParseSection); // MOTS added
 #endif
@@ -612,7 +612,7 @@ int sithWorld_ValidateWorld(SithWorld *pWorld)
 {
     if ( !pWorld->aThings && pWorld->numThingsLoaded )
     {
-        stdPrintf(pSithHS->errorPrint, ".\\World\\sithWorld.c", 1245, "Problem with aThings array, should not be NULL.\n", 0, 0, 0, 0);
+        stdPrintf(pSithHS->errorPrint, ".\\World\\sithWorld.c", 1245, "Problem with things array, should not be NULL.\n", 0, 0, 0, 0);
         return 0;
     }
     if ( !pWorld->aSprites && pWorld->numSprites )
@@ -622,7 +622,7 @@ int sithWorld_ValidateWorld(SithWorld *pWorld)
     }
     if ( !pWorld->aModels && pWorld->numModels )
     {
-        stdPrintf(pSithHS->errorPrint, ".\\World\\sithWorld.c", 1257, "Problem with aModels array, should not be NULL.\n", 0, 0, 0, 0);
+        stdPrintf(pSithHS->errorPrint, ".\\World\\sithWorld.c", 1257, "Problem with models array, should not be NULL.\n", 0, 0, 0, 0);
         return 0;
     }
     if ( !pWorld->aSectors || !pWorld->surfaces || !pWorld->aVertices )
@@ -742,7 +742,7 @@ int sithWorld_ReadGeoresourceText(SithWorld *pWorld, int a2)
         return 0;
     }
 
-    if (_sscanf(stdConffile_g_aLine, " world aVertices %d", &numVertices) != 1 )
+    if (_sscanf(stdConffile_g_aLine, " world vertices %d", &numVertices) != 1 )
     {
         return 0;
     }
@@ -785,7 +785,7 @@ int sithWorld_ReadGeoresourceText(SithWorld *pWorld, int a2)
         return 0;
     }
 
-    if (_sscanf(stdConffile_g_aLine, " world texture aVertices %d", &textureVertices) != 1)
+    if (_sscanf(stdConffile_g_aLine, " world texture vertices %d", &textureVertices) != 1)
     {
         return 0;
     }

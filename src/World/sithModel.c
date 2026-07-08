@@ -33,7 +33,7 @@ int sithModel_ReadStaticModelsListText(SithWorld *world, int a2)
     if ( a2 )
         return 0;
     stdConffile_ReadArgs();
-    if ( _memcmp(stdConffile_g_entry.aArgs[0].value, "world", 6u) || _memcmp(stdConffile_g_entry.aArgs[1].value, "aModels", 7u) )
+    if ( _memcmp(stdConffile_g_entry.aArgs[0].value, "world", 6u) || _memcmp(stdConffile_g_entry.aArgs[1].value, "models", 7u) )
         return 0;
     world->sizeModels = _atoi(stdConffile_g_entry.aArgs[2].value);
     if ( !world->sizeModels )
@@ -42,7 +42,7 @@ int sithModel_ReadStaticModelsListText(SithWorld *world, int a2)
     world->aModels = (rdModel3 *)SITH_ALLOC(sizeof(rdModel3) * world->sizeModels);
     if ( !world->aModels )
     {
-        stdPrintf(pSithHS->errorPrint, ".\\World\\sithModel.c", 164, "Memory error while reading aModels, line %d.\n", stdConffile_linenum, 0, 0, 0);
+        stdPrintf(pSithHS->errorPrint, ".\\World\\sithModel.c", 164, "Memory error while reading models, line %d.\n", stdConffile_linenum, 0, 0, 0);
         return 0;
     }
     world->numModels = 0;
@@ -92,7 +92,7 @@ rdModel3* sithModel_Load(const char *model_3do_fname, int unk)
     }
 
     if ( sithWorld_g_pLastLoadedWorld->numModels >= sithWorld_g_pLastLoadedWorld->sizeModels ) {
-        stdPlatform_Printf("OpenJKDF2: %s: Too many aModels already loaded!\n", __func__); // Added
+        stdPlatform_Printf("OpenJKDF2: %s: Too many models already loaded!\n", __func__); // Added
         return 0;
     }
     model = &sithWorld_g_pLastLoadedWorld->aModels[sithWorld_g_pLastLoadedWorld->numModels];

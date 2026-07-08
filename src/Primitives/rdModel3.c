@@ -142,9 +142,9 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
 
     if ( _sscanf(stdConffile_g_aLine, " section: %s", std_g_genBuffer) != 1
       || !stdConffile_ReadLine()
-      || _sscanf(stdConffile_g_aLine, " aMaterials %d", &model->sizeMaterials) != 1 ) {
+      || _sscanf(stdConffile_g_aLine, " materials %d", &model->sizeMaterials) != 1 ) {
 
-        rdModel3_HelpDebug("OpenJKDF2: %s: Failed to parse section or aMaterials\n", __func__); // Added
+        rdModel3_HelpDebug("OpenJKDF2: %s: Failed to parse section or materials\n", __func__); // Added
         return 0;
     }
 
@@ -152,7 +152,7 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
     {
         model->aMaterials = (rdMaterial **)RDROID_ALLOC(sizeof(rdMaterial*) * model->sizeMaterials);
         if (!model->aMaterials) {
-            rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate aMaterials\n", __func__); // Added
+            rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate materials\n", __func__); // Added
             return 0;
         }
     }
@@ -209,14 +209,14 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
         goto fail;
     }
 
-    if ( _sscanf(stdConffile_g_aLine, " aGeos %d", &model->numGeos) != 1 ) {
-        rdModel3_HelpDebug("OpenJKDF2: %s: Failed to parse aGeos %s\n", __func__, stdConffile_g_aLine); // Added
+    if ( _sscanf(stdConffile_g_aLine, " geosets %d", &model->numGeos) != 1 ) {
+        rdModel3_HelpDebug("OpenJKDF2: %s: Failed to parse geosets %s\n", __func__, stdConffile_g_aLine); // Added
         goto fail;
     }
     for (v78 = 0; v78 < model->numGeos; v78++)
     {
         if (!stdConffile_ReadLine()) {
-            rdModel3_HelpDebug("OpenJKDF2: %s: Failed to aGeos ln %s\n", __func__, stdConffile_g_aLine); // Added
+            rdModel3_HelpDebug("OpenJKDF2: %s: Failed to geosets ln %s\n", __func__, stdConffile_g_aLine); // Added
             goto fail;
         }
             
@@ -228,8 +228,8 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
         if ( !stdConffile_ReadLine() )
             goto fail;
             
-        if ( _sscanf(stdConffile_g_aLine, " aMeshes %d", &model->aGeos[v78].numMeshes) != 1 ) {
-            rdModel3_HelpDebug("OpenJKDF2: %s: Failed to parse aMeshes %s\n", __func__, stdConffile_g_aLine); // Added
+        if ( _sscanf(stdConffile_g_aLine, " meshes %d", &model->aGeos[v78].numMeshes) != 1 ) {
+            rdModel3_HelpDebug("OpenJKDF2: %s: Failed to parse meshes %s\n", __func__, stdConffile_g_aLine); // Added
             goto fail;
         }
 
@@ -265,10 +265,10 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
               || !stdConffile_ReadLine()
               || _sscanf(stdConffile_g_aLine, " texturemode %d", &mesh->textureMode) != 1
               || !stdConffile_ReadLine()
-              || _sscanf(stdConffile_g_aLine, " aVertices %d", &mesh->numVertices) != 1
+              || _sscanf(stdConffile_g_aLine, " vertices %d", &mesh->numVertices) != 1
               || mesh->numVertices > 0x200 )
             {
-                rdModel3_HelpDebug("OpenJKDF2: %s: Failed to parse radius, render modes, aVertices %s\n", __func__, stdConffile_g_aLine); // Added
+                rdModel3_HelpDebug("OpenJKDF2: %s: Failed to parse radius, render modes, vertices %s\n", __func__, stdConffile_g_aLine); // Added
                 goto fail;
             }
             mesh->radius = radius; // FLEXTODO
@@ -286,14 +286,14 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
                 mesh->aVertices = (rdVector3 *)RDROID_ALLOC(sizeof(rdVector3) * mesh->numVertices);
                 RDMODEL3_EXTRAM_RESTORE(); }
                 if ( !mesh->aVertices ){
-                    rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate aVertices\n", __func__); // Added
+                    rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate vertices\n", __func__); // Added
                     goto fail;
                 }
                 { RDMODEL3_EXTRAM_SUGGEST();
                 mesh->vertices_i = (flex_t *)RDROID_ALLOC(sizeof(flex_t) * mesh->numVertices);
                 RDMODEL3_EXTRAM_RESTORE(); }
                 if ( !mesh->vertices_i ) {
-                    rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate vertex aLights\n", __func__); // Added
+                    rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate vertex lights\n", __func__); // Added
                     goto fail;
                 }
                 { RDMODEL3_EXTRAM_SUGGEST();
@@ -327,10 +327,10 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
             }
 
             if ( !stdConffile_ReadLine()
-              || _sscanf(stdConffile_g_aLine, " texture aVertices %d", &mesh->numUVs) != 1
+              || _sscanf(stdConffile_g_aLine, " texture vertices %d", &mesh->numUVs) != 1
               || mesh->numUVs > 0x300 )
             {
-                rdModel3_HelpDebug("OpenJKDF2: %s: Failed to parse texture aVertices %s\n", __func__, stdConffile_g_aLine); // Added
+                rdModel3_HelpDebug("OpenJKDF2: %s: Failed to parse texture vertices %s\n", __func__, stdConffile_g_aLine); // Added
                 goto fail;
             }
             
@@ -590,12 +590,12 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
     if (!stdConffile_ReadLine())
         goto fail;
 
-    if ( _sscanf(stdConffile_g_aLine, " hierarchy aCurKfNodeEntryNums %d", &model->numHNodes) != 1 )
+    if ( _sscanf(stdConffile_g_aLine, " hierarchy nodes %d", &model->numHNodes) != 1 )
         goto fail;
 
     model->aHierarchyNodes = (rdHierarchyNode *)RDROID_ALLOC(sizeof(rdHierarchyNode) * model->numHNodes);
     if (!model->aHierarchyNodes) {
-        rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate aHierarchyNodes\n", __func__); // Added
+        rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate hierarchyNodes\n", __func__); // Added
         goto fail;
     }
 

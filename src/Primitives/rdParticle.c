@@ -204,7 +204,7 @@ int rdParticle_LoadEntry(char *fpath, rdParticle *pParticle)
         goto done_close;
 
     uint32_t numVertices;
-    if ( _sscanf(stdConffile_g_aLine, " aVertices %d", &numVertices) == 1
+    if ( _sscanf(stdConffile_g_aLine, " vertices %d", &numVertices) == 1
       && numVertices <= 0x100 )
     {
         pParticle->numVertices = numVertices;

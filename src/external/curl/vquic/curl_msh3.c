@@ -709,7 +709,7 @@ static void cf_msh3_close(struct Curl_cfilter *cf, struct Curl_easy *data)
        * closed it) and we just forget about it.
        */
       if(ctx->sock[SP_LOCAL] == cf->conn->sock[cf->sockindex]) {
-        DEBUGF(LOG_CF(data, cf, "cf_msh3_close(%d) bEnabled",
+        DEBUGF(LOG_CF(data, cf, "cf_msh3_close(%d) active",
                       (int)ctx->sock[SP_LOCAL]));
         cf->conn->sock[cf->sockindex] = CURL_SOCKET_BAD;
       }

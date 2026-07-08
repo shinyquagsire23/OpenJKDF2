@@ -519,7 +519,7 @@ int sithAI_AIList(stdDebugConsoleCmd* a, const char* b)
 #ifdef SITH_DEBUG_STRUCT_NAMES
     if ( sithAI_bOpened )
     {
-        sithConsole_PrintString("Active AI aThings:\n");
+        sithConsole_PrintString("Active AI things:\n");
         v1 = 0;
         for ( i = sithAI_actors; v1 <= sithAI_inittedActors; ++i )
         {
@@ -580,7 +580,7 @@ int sithAI_AIStatus(stdDebugConsoleCmd* a1, const char *idxStr)
                 v4->mood2,
                 v4->nextUpdate);
             sithConsole_PrintString(std_g_genBuffer);
-            sithConsole_PrintString("Current aInstinctStates:\n");
+            sithConsole_PrintString("Current instincts:\n");
             if ( v4->numInstincts )
             {
                 v7 = 0;
@@ -609,7 +609,7 @@ int sithAI_AIStatus(stdDebugConsoleCmd* a1, const char *idxStr)
         }
         else
         {
-            sithConsole_PrintString("That AI block is not currently bEnabled.\n");
+            sithConsole_PrintString("That AI block is not currently active.\n");
             result = 1;
         }
     }

@@ -53,7 +53,7 @@ int sithSector_ReadSectorsListText(SithWorld *world, int tmp)
 
     if ( tmp )
         return 0;
-    if ( !stdConffile_ReadLine() || _sscanf(stdConffile_g_aLine, " world aSectors %d", &sectors_amt) != 1 )
+    if ( !stdConffile_ReadLine() || _sscanf(stdConffile_g_aLine, " world sectors %d", &sectors_amt) != 1 )
         return 0;
 
 #ifdef STDPLATFORM_HEAP_SUGGESTIONS
@@ -176,7 +176,7 @@ int sithSector_ReadSectorsListText(SithWorld *world, int tmp)
             aSectors->radius = tmpf1; // FLEXTODO
             if ( !stdConffile_ReadLine() )
                 break;
-            if ( _sscanf(stdConffile_g_aLine, " aVertices %d", &num_vertices) != 1 )
+            if ( _sscanf(stdConffile_g_aLine, " vertices %d", &num_vertices) != 1 )
                 break;
             { TWL_EXTRAM_SUGGEST(pSithHS); // Added: word-width fields/writes (audited)
             aSectors->aVertIdxs = (int32_t *)SITH_ALLOC(sizeof(int32_t) * num_vertices);

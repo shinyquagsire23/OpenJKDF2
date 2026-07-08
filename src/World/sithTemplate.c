@@ -84,7 +84,7 @@ int sithTemplate_ReadThingTemplatesListText(SithWorld *world, int a2)
         return 0;
 
     stdConffile_ReadArgs();
-    if ( _memcmp(stdConffile_g_entry.aArgs[0].value, "world", 6u) || _memcmp(stdConffile_g_entry.aArgs[1].value, "aThingTemplates", 0xAu) )
+    if ( _memcmp(stdConffile_g_entry.aArgs[0].value, "world", 6u) || _memcmp(stdConffile_g_entry.aArgs[1].value, "templates", 0xAu) )
         return 0;
 
     sizeThingTemplates = _atoi(stdConffile_g_entry.aArgs[2].value);

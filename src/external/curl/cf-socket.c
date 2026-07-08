@@ -800,7 +800,7 @@ static void cf_socket_close(struct Curl_cfilter *cf, struct Curl_easy *data)
        * closed it) and we just forget about it.
        */
       if(ctx->sock == cf->conn->sock[cf->sockindex]) {
-        DEBUGF(LOG_CF(data, cf, "cf_socket_close(%d, bEnabled)",
+        DEBUGF(LOG_CF(data, cf, "cf_socket_close(%d, active)",
                      (int)ctx->sock));
         socket_close(data, cf->conn, !ctx->accepted, ctx->sock);
         cf->conn->sock[cf->sockindex] = CURL_SOCKET_BAD;
@@ -817,7 +817,7 @@ static void cf_socket_close(struct Curl_cfilter *cf, struct Curl_easy *data)
     }
     else {
       /* this is our local socket, we did never publish it */
-      DEBUGF(LOG_CF(data, cf, "cf_socket_close(%d, not bEnabled)",
+      DEBUGF(LOG_CF(data, cf, "cf_socket_close(%d, not active)",
                     (int)ctx->sock));
       sclose(ctx->sock);
       ctx->sock = CURL_SOCKET_BAD;

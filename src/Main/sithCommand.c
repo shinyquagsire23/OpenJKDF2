@@ -338,14 +338,14 @@ int sithCommand_CogList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     if ( sithWorld_g_pCurrentWorld )
     {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-        _sprintf(std_g_genBuffer, "World aCogs = %d.", sithWorld_g_pCurrentWorld->numCogs);
+        _sprintf(std_g_genBuffer, "World cogs = %d.", sithWorld_g_pCurrentWorld->numCogs);
         sithConsole_PrintString(std_g_genBuffer);
         v3 = 0;
         for ( i = sithWorld_g_pCurrentWorld->aCogs; v3 < sithWorld_g_pCurrentWorld->numCogs; ++i )
         {
             _sprintf(std_g_genBuffer, "%d: %-16s %-16s ", v3, i->aName, i->pScript->aName);
             if ( (i->flags & SITH_COG_DISABLED) != 0 )
-                _sprintf(&std_g_genBuffer[strlen(std_g_genBuffer)], "(bPaused) ");
+                _sprintf(&std_g_genBuffer[strlen(std_g_genBuffer)], "(paused) ");
             if ( (i->flags & SITH_COG_DEBUG) != 0 )
                 _sprintf(&std_g_genBuffer[strlen(std_g_genBuffer)], "(trace)  ");
             _sprintf(&std_g_genBuffer[strlen(std_g_genBuffer)], sithCommand_aIdk);
@@ -442,7 +442,7 @@ int sithCommand_Memory(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     sithConsole_PrintString(std_g_genBuffer);
     _sprintf(std_g_genBuffer, "Total Memory Used:   %8d bytes.", worldAllocatedAmt[4] + worldAllocatedAmt[5] + worldAllocatedAmt[3] + worldAllocatedAmt[2] + worldAllocatedAmt[1] + worldAllocatedAmt[11] + worldAllocatedAmt[10] + worldAllocatedAmt[0]);
     sithConsole_PrintString(std_g_genBuffer);
-    sithConsole_PrintString("(Total does not include sounds & aCogs)"); 
+    sithConsole_PrintString("(Total does not include sounds & cogs)"); 
     
     return 1;
 }
@@ -839,7 +839,7 @@ int sithCommand_CmdBind(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 
     char* pArgIter = _strtok(pArgStrMutable, ", \t\n\r");
     if ( !pArgIter || strlen(pArgIter) > 1) {
-        _sprintf(std_g_genBuffer, "Usage: %s <key> <command...aArgs>\n", pCmd->cmdStr);
+        _sprintf(std_g_genBuffer, "Usage: %s <key> <command...args>\n", pCmd->cmdStr);
         sithConsole_PrintString(std_g_genBuffer);
         free((void*)pArgStrMutable);
         return 1;
@@ -861,7 +861,7 @@ int sithCommand_CmdBind(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         sithCommand_AddBind(key, tmp);
     }
     else {
-        _sprintf(std_g_genBuffer, "Usage: %s <key> <command...aArgs>\n", pCmd->cmdStr);
+        _sprintf(std_g_genBuffer, "Usage: %s <key> <command...args>\n", pCmd->cmdStr);
         sithConsole_PrintString(std_g_genBuffer);
     }
     free((void*)pArgStrMutable);

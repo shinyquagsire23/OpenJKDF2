@@ -173,7 +173,7 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
     }
     
     
-    if (!stdConffile_ReadLine() || _sscanf(stdConffile_g_aLine, " aCurKfNodeEntryNums %d", &num_nodes) != 1)
+    if (!stdConffile_ReadLine() || _sscanf(stdConffile_g_aLine, " nodes %d", &num_nodes) != 1)
     {
       goto read_fail;
     }

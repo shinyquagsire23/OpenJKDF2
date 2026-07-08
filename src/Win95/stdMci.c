@@ -677,7 +677,7 @@ void stdMci_trackStart(int track)
     // GOG only reports real track IDs, and does not have any disk 2s
     if (cdNum > 1 && stdMci_bIsGOG) {
         stdMci_bIsGOG = 0;
-        stdPlatform_Printf("stdMci: Seeing CD number >1 (%u), assuming this is an OG disk install with offsetted aTracks...\n", cdNum);
+        stdPlatform_Printf("stdMci: Seeing CD number >1 (%u), assuming this is an OG disk install with offsetted tracks...\n", cdNum);
     }
 
     // If we're getting a >12 track number, it's definitely GOG

@@ -1827,7 +1827,7 @@ static ssize_t cf_h2_recv(struct Curl_cfilter *cf, struct Curl_easy *data,
       nread = 0;
       goto out;
     }
-    DEBUGF(LOG_CF(data, cf, "[h2sid=%u] is bPaused, pause h2sid: %u",
+    DEBUGF(LOG_CF(data, cf, "[h2sid=%u] is paused, pause h2sid: %u",
                   stream->stream_id, ctx->pause_stream_id));
     *err = CURLE_AGAIN;
     nread = -1;

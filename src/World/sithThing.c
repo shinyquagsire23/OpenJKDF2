@@ -78,7 +78,7 @@ const char* sithThing_aParams[NUM_THING_PARAMS] = {
     "timer",
     "light",
     "attach",
-    "pSoundClass",
+    "soundclass",
     "model3d",
     "sprite",
     "surfdrag",
@@ -112,7 +112,7 @@ const char* sithThing_aParams[NUM_THING_PARAMS] = {
     "flashrgb",
     "aiclass",
     "cog",
-    "secRespawnInterval",
+    "respawn",
 #ifdef JKM_PARAMS
     "respawnfactor", // MOTS added
 #endif
@@ -1158,12 +1158,12 @@ void sithThing_AttachThingToSurface(SithThing* pThing, SithSurface *surface, int
 
     // Added: Safety checking
     if (!pThing) {
-        stdPlatform_Printf("OpenJKDF2: NULL pThing in sithThing_AttachThingToSurface!\n");
+        stdPlatform_Printf("OpenJKDF2: NULL parentSithThing in sithThing_AttachThingToSurface!\n");
         return;
     }
     // Added: Safety checking
     if (pThing->moveType != SITH_MT_PHYSICS) {
-        stdPlatform_Printf("OpenJKDF2: Non-physics pThing in sithThing_AttachThingToSurface!\n");
+        stdPlatform_Printf("OpenJKDF2: Non-physics parentSithThing in sithThing_AttachThingToSurface!\n");
         return;
     }
 
@@ -1489,7 +1489,7 @@ int sithThing_ReadStaticThingsListText(SithWorld *pWorld, int a2)
     stdConffile_ReadArgs();
     if ( _strcmp(stdConffile_g_entry.aArgs[0].value, "world") )
         return 0;
-    if ( _strcmp(stdConffile_g_entry.aArgs[1].value, "aThings") )
+    if ( _strcmp(stdConffile_g_entry.aArgs[1].value, "things") )
         return 0;
     v10 = _atoi(stdConffile_g_entry.aArgs[2].value);
     { TWL_EXTRAM_SUGGEST(pSithHS); // Added: word-safe struct (audited); slow-but-loads on NDS

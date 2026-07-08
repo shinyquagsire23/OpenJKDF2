@@ -135,7 +135,7 @@ int sithSoundClass_Startup()
     }
     else
     {
-        stdPrintf(pSithHS->errorPrint, ".\\World\\sithSoundClass.c", 214, "Could not allocate pHashtbl for aSoundClasses.\n", 0, 0, 0, 0);
+        stdPrintf(pSithHS->errorPrint, ".\\World\\sithSoundClass.c", 214, "Could not allocate hashtable for soundclasses.\n", 0, 0, 0, 0);
         return 0;
     }
 }
@@ -169,7 +169,7 @@ int sithSoundClass_ReadSoundClassesListText(SithWorld *world, int a2)
         return 0;
 
     stdConffile_ReadArgs();
-    if ( _strcmp(stdConffile_g_entry.aArgs[0].value, "world") || _strcmp(stdConffile_g_entry.aArgs[1].value, "aSoundClasses") ) {
+    if ( _strcmp(stdConffile_g_entry.aArgs[0].value, "world") || _strcmp(stdConffile_g_entry.aArgs[1].value, "soundclasses") ) {
         jk_printf("OpenJKDF2: sithSoundClass_ReadSoundClassesListText failed first strcmp");
         return 0;
     }
@@ -178,7 +178,7 @@ int sithSoundClass_ReadSoundClassesListText(SithWorld *world, int a2)
 
     // Added
     if ( num_soundclasses <= 0 ) {
-        jk_printf("OpenJKDF2: num aSoundClasses <= 0");
+        jk_printf("OpenJKDF2: num soundclasses <= 0");
         return 1;
     }
     if ( sithNet_isMulti ) {
@@ -236,7 +236,7 @@ int sithSoundClass_ReadSoundClassesListText(SithWorld *world, int a2)
     return 1;
 
 failed:
-    stdPrintf(pSithHS->errorPrint, ".\\World\\sithSoundClass.c", 321, "Memory error while reading aSoundClasses, line %d.\n", stdConffile_linenum);
+    stdPrintf(pSithHS->errorPrint, ".\\World\\sithSoundClass.c", 321, "Memory error while reading soundclasses, line %d.\n", stdConffile_linenum);
     return 0;
 }
 

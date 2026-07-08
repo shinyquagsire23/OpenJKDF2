@@ -389,7 +389,7 @@ no_loading:
           goto LABEL_21;
         }
       }
-      stdPlatform_Printf("OpenJKDF2: Material `%s` pVBuffer could not be allocated!\n", mat_fpath); // Added
+      stdPlatform_Printf("OpenJKDF2: Material `%s` vbuffer could not be allocated!\n", mat_fpath); // Added
       mat_file_ = mat_file__;
       rdroid_g_pHS->fileClose(mat_file_);
 

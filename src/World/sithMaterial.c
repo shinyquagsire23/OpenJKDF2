@@ -81,7 +81,7 @@ int sithMaterial_ReadMaterialsListText(SithWorld *world, int a2)
     if ( result )
     {
         sithWorld_UpdateLoadProgress(5.0);
-        if ( _sscanf(stdConffile_g_aLine, " world aMaterials %d", &a2) == 1 )
+        if ( _sscanf(stdConffile_g_aLine, " world materials %d", &a2) == 1 )
         {
             // Added: needed for JKE?
             a2 *= 2;
