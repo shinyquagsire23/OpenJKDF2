@@ -1019,7 +1019,7 @@ int32_t stdMath_FloorDivMod(int32_t in1, int32_t in2, int32_t *out1, int32_t *ou
     return result;
 }
 
-flex_t stdMath_ClipPrecision(flex_t val)
+flex_t stdMath_ClipNearZero(flex_t val)
 {
 #ifndef EXPERIMENTAL_FIXED_POINT
     if (stdMath_Fabs(val) <= 0.00001)

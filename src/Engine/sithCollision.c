@@ -687,7 +687,7 @@ flex_t sithCollision_MoveThing(sithThing *pThing, rdVector3 *a2, flex_t a6, int 
         if ( (v10->attach_flags & SITH_ATTACH_THINGSURFACE) != 0 )
         {
             rdMatrix_TransformVector34(&out, &v10->attachedSufaceInfo->face.normal, &v5->lookOrientation);
-            v12 = stdMath_ClipPrecision(rdVector_Dot3(a2, &out));
+            v12 = stdMath_ClipNearZero(rdVector_Dot3(a2, &out));
             if ( v12 <= 0.0 ) {
                 continue;
             }
@@ -823,7 +823,7 @@ LABEL_78:
                 v64 = v19->distance + v64;
                 a6 = 0.0;
                 if (!rdVector_IsZero3(&v5->field_268))
-                    a6 = stdMath_ClipPrecision(rdVector_Normalize3(&direction, &v5->field_268));
+                    a6 = stdMath_ClipNearZero(rdVector_Normalize3(&direction, &v5->field_268));
                 ++v66;
             }
             else
@@ -850,7 +850,7 @@ LABEL_78:
     }
 LABEL_81:
     
-    v64 = stdMath_ClipPrecision(v64);
+    v64 = stdMath_ClipNearZero(v64);
     if ( v5->collide && v5->moveType == SITH_MT_PHYSICS && !sithIntersect_IsSphereInSector(&v5->position, 0.0, v5->sector) )
     {
         // Added: noclip
@@ -981,7 +981,7 @@ int sithCollision_ThingCollisionHandler(sithThing *thing1, sithThing *thing2, si
         if ( v5->moveType != SITH_MT_PHYSICS || v5->physicsParams.mass == 0.0 )
             return 1;
         v11 = rdVector_Dot3(&v4->field_268, &a2);
-        v11 = stdMath_ClipPrecision(v11);
+        v11 = stdMath_ClipNearZero(v11);
         if ( v11 < 0.0 )
         {
             sendera = -v11 * 1.0001;
@@ -1004,7 +1004,7 @@ int sithCollision_ThingCollisionHandler(sithThing *thing1, sithThing *thing2, si
     if ( v5->moveType == SITH_MT_PHYSICS && v5->physicsParams.mass != 0.0 )
     {
         v6 = rdVector_Dot3(&v5->physicsParams.vel, &a2) - rdVector_Dot3(&v4->physicsParams.vel, &a2);
-        v6 = stdMath_ClipPrecision(v6);
+        v6 = stdMath_ClipNearZero(v6);
         if ( v6 <= 0.0 )
             return 0;
 
@@ -1060,7 +1060,7 @@ int sithCollision_CollideHurt(sithThing *a1, rdVector3 *a2, flex_t a3, int a4)
     if ( a1->moveType != SITH_MT_PHYSICS )
         return 0;
     amount = -rdVector_Dot3(&a1->field_268, a2);
-    a1a = stdMath_ClipPrecision(amount);
+    a1a = stdMath_ClipNearZero(amount);
     if ( a1a <= 0.0 )
         return 0;
     v43 = 1.9;

@@ -1256,7 +1256,7 @@ LABEL_20:
                     v8 = deltaSecs * 180.0;
 #endif
                     player->actorParams.typeflags |= SITH_AF_CENTER_VIEW;
-                    v9 = stdMath_ClipPrecision(stdMath_ClampValue(-player->actorParams.eyePYR.x, v8));
+                    v9 = stdMath_ClipNearZero(stdMath_ClampValue(-player->actorParams.eyePYR.x, v8));
                     if ( v9 == 0.0 )
                     {
                         player->actorParams.typeflags &= ~SITH_AF_CENTER_VIEW;

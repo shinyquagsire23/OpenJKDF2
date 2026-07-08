@@ -228,7 +228,7 @@ void sithPhysics_SetThingLook(sithThing *pThing, const rdVector3 *look, flex_t a
     flex_d_t v4; // st7
     flex_d_t v20; // st7
 
-    v4 = stdMath_ClipPrecision(1.0 - rdVector_Dot3(&pThing->lookOrientation.uvec, look));
+    v4 = stdMath_ClipNearZero(1.0 - rdVector_Dot3(&pThing->lookOrientation.uvec, look));
     if ( v4 == 0.0 )
     {
         pThing->physicsParams.physflags |= SITH_PF_100;
@@ -1048,7 +1048,7 @@ void sithPhysics_UpdateAttachedThingPhysics(sithThing *pThing, flex_t deltaSecon
     {
         flex_t v109 = rdVector_Dot3(&attachedNormal, &pThing->physicsParams.vel);
 
-        if ( stdMath_ClipPrecision(v109) != 0.0 )
+        if ( stdMath_ClipNearZero(v109) != 0.0 )
         {
             // If deltaSeconds is < the canonical phys tickrate, we get these
             // crazy oscillations
@@ -1097,7 +1097,7 @@ void sithPhysics_UpdateAttachedThingPhysics(sithThing *pThing, flex_t deltaSecon
     }
 
     // Slide down slopes
-    v131 = stdMath_ClipPrecision(v131);
+    v131 = stdMath_ClipNearZero(v131);
     if ( v131 != 0.0 )
     {
         // Fix physics being tied to framerate?

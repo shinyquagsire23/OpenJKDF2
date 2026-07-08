@@ -76,7 +76,7 @@ MATH_FUNC flex_t stdMath_Floor(flex_t a);
 MATH_FUNC flex_t stdMath_Sqrt(flex_t a);
 
 // Added
-MATH_FUNC flex_t stdMath_ClipPrecision(flex_t val);
+MATH_FUNC flex_t stdMath_ClipNearZero(flex_t val);
 MATH_FUNC flex_t stdMath_Clamp(flex_t val, flex_t valMin, flex_t valMax);
 MATH_FUNC flex_t stdMath_ClampValue(flex_t val, flex_t valAbsMax);
 ALWAYS_INLINE static inline flex_t stdMath_Fabs(flex_t val)

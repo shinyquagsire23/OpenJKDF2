@@ -342,7 +342,7 @@ flex_t stdControl_ReadAxis(int axisNum)
                 return 0.0;
         }
     }
-    result = stdMath_ClipPrecision(stdControl_aJoysticks[v2].fRangeConversion * (flex_d_t)v9);
+    result = stdMath_ClipNearZero(stdControl_aJoysticks[v2].fRangeConversion * (flex_d_t)v9);
 #ifdef QOL_IMPROVEMENTS
     if ( result != 0.0 ) {
         sithControl_msIdle = 0;

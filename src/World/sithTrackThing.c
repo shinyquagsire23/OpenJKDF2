@@ -131,7 +131,7 @@ void sithTrackThing_Tick(sithThing *thing, flex_t deltaSeconds)
             rdVector_Sub3Acc(&a1a, &thing->position);
             if (!rdVector_IsZero3(&a1a))
             {
-                a6 = stdMath_ClipPrecision(rdVector_Normalize3Acc(&a1a));
+                a6 = stdMath_ClipNearZero(rdVector_Normalize3Acc(&a1a));
                 if ( a6 != 0.0 )
                 {
                     v18 = sithCollision_MoveThing(thing, &a1a, a6, RAYCAST_40 | RAYCAST_4);
@@ -166,7 +166,7 @@ void sithTrackThing_Tick(sithThing *thing, flex_t deltaSeconds)
         else
             v22 = deltaSeconds;
         v42 = v22;
-        deltaSecondsa = stdMath_ClipPrecision(thing->trackParams.lerpSpeed * v22);
+        deltaSecondsa = stdMath_ClipNearZero(thing->trackParams.lerpSpeed * v22);
         if ( deltaSecondsa != 0.0 )
         {
             v26 = sithCollision_MoveThing(thing, &thing->trackParams.vel, deltaSecondsa, RAYCAST_40 | RAYCAST_4);
@@ -177,7 +177,7 @@ void sithTrackThing_Tick(sithThing *thing, flex_t deltaSeconds)
             }
             else
             {
-                v30 = stdMath_ClipPrecision(a3a);
+                v30 = stdMath_ClipNearZero(a3a);
                 if ( v30 <= 0.0 )
                 {
                     v22 = 0.0;
@@ -192,7 +192,7 @@ void sithTrackThing_Tick(sithThing *thing, flex_t deltaSeconds)
         }
         v31 = thing->trackParams.field_1C - v22;
         thing->trackParams.field_1C = v31;
-        v31 = stdMath_ClipPrecision(v31);
+        v31 = stdMath_ClipNearZero(v31);
         if ( v31 == 0.0 )
         {
             thing->trackParams.flags &= ~1;

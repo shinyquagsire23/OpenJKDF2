@@ -71,7 +71,7 @@ int sithIntersect_IsSphereInSector(const rdVector3 *pos, flex_t radius, sithSect
             || (adjoin && adjoin->flags & SITHSURF_ADJOIN_ALLOW_MOVEMENT) )
         {
             v7 = sithWorld_pCurrentWorld->vertices;
-            v8 = stdMath_ClipPrecision(rdMath_DistancePointToPlane(pos, &surface->surfaceInfo.face.normal, &v7[*surface->surfaceInfo.face.vertexPosIdx]));
+            v8 = stdMath_ClipNearZero(rdMath_DistancePointToPlane(pos, &surface->surfaceInfo.face.normal, &v7[*surface->surfaceInfo.face.vertexPosIdx]));
             if ( v8 < radius )
                 return 0;
         }
@@ -453,7 +453,7 @@ int sithIntersect_TestSphereFaceHit(rdVector3 *a1, flex_t radius, rdFace *pFace,
             v14 = v28;
             a1a.x += *(&a4[v19[v23]].x + v13);
             a1a.y += *(&a4[v19[v23]].x + v28);
-            flex_t idk = v30 * a1a.y - v31 * a1a.x;//stdMath_ClipPrecision(); // Added at some point?
+            flex_t idk = v30 * a1a.y - v31 * a1a.x;//stdMath_ClipNearZero(); // Added at some point?
             if ( idk < 0.0 )
             {
                 if ( radius == 0.0 )
@@ -565,7 +565,7 @@ int sithIntersect_CheckSphereHit(const rdVector3 *pStartPos, const rdVector3 *pR
     flex_t v18; // [esp+18h] [ebp+18h]
 
     v8 = rdMath_DistancePointToPlane(pStartPos, surfaceNormal, a6);
-    v8 = stdMath_ClipPrecision(v8);
+    v8 = stdMath_ClipNearZero(v8);
     if ( v8 < 0.0 )
         return 0;
 
@@ -626,7 +626,7 @@ int sithIntersect_CheckSphereFaceIntersectionEx(const rdVector3 *pStartPos, cons
                 v36 = pFace->vertexPosIdx;
                 rdVector_Copy3(&v45, pStartPos);
                 v37 = rdMath_DistancePointToPlane(&v45, &pFace->normal, &aVertices[*v36]);
-                v37 = stdMath_ClipPrecision(v37);
+                v37 = stdMath_ClipNearZero(v37);
                 if ( v37 != 0.0 )
                 {
                     rdVector_ScaleAdd3Acc(&v45, &pFace->normal, -v37);
@@ -638,7 +638,7 @@ int sithIntersect_CheckSphereFaceIntersectionEx(const rdVector3 *pStartPos, cons
                 v18 = pFace->vertexPosIdx;
                 rdVector_Add3Acc(&v45, pStartPos);
                 v21 = rdMath_DistancePointToPlane(&v45, &pFace->normal, &aVertices[*v18]);
-                v21 = stdMath_ClipPrecision(v21);
+                v21 = stdMath_ClipNearZero(v21);
                 if ( v21 != 0.0 )
                 {
                     v25 = -v21;
