@@ -199,14 +199,14 @@ int jkGame_Update()
     if ( Video_modeStruct.b3DAccel )
 #endif
     {
-        sithMain_UpdateCamera();
+        sithDrawScene();
     }
 #if !defined(SDL2_RENDER) && !defined(TARGET_RETRO_HOMEBREW)
     else
     {
         stdDisplay_VBufferLock(Video_pMenuBuffer);
         stdDisplay_VBufferLock(Video_pVbufIdk);
-        sithMain_UpdateCamera();
+        sithDrawScene();
         stdDisplay_VBufferUnlock(Video_pVbufIdk);
         stdDisplay_VBufferUnlock(Video_pMenuBuffer);
     }

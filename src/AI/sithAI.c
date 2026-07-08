@@ -1329,7 +1329,7 @@ int sithAI_FirstThingInView(sithSector *sector, rdMatrix34 *out, flex_t autoaimF
     sithAI_pThing_84DE68 = thingList;
     stdMath_SinCos(90.0 - autoaimFov * 0.5, &autoaimFov, &sithAI_flt_84DE64);
     stdMath_SinCos(90.0 - autoaimMaxDist * 0.5, &autoaimFov, &sithAI_flt_84DE58);
-    sithMain_sub_4C4D80();
+    sithAdvanceRenderTick();
     sithAI_dword_84DE60 = 0;
     sithAI_dword_84DE5C = 0;
     sithAI_GetThingsInView(sector, out, 0.0);
@@ -1339,7 +1339,7 @@ int sithAI_FirstThingInView(sithSector *sector, rdMatrix34 *out, flex_t autoaimF
 int sithAI_sub_4EB860(int a1, flex_t a2)
 {
     if ( a2 > 0.0 )
-        sithMain_sub_4C4D80();
+        sithAdvanceRenderTick();
     return 0;
 }
 
@@ -1772,7 +1772,7 @@ int sithAI_FirstThingInCone(sithSector *sector, rdMatrix34 *out, flex_t autoaimF
     sithAI_pThing_84DE68 = thingList;
     stdMath_SinCos(90.0 - autoaimFov * 0.5, &autoaimFov, &sithAI_flt_84DE64);
     stdMath_SinCos(90.0 - autoaimMaxDist * 0.5, &autoaimFov, &sithAI_flt_84DE58);
-    sithMain_sub_4C4D80();
+    sithAdvanceRenderTick();
     sithAI_dword_84DE60 = 0;
     sithAI_dword_84DE5C = 0;
     sithAI_GetThingsInCone(sector, out, 0.0); // TODO: Did they actually change this?

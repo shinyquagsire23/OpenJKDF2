@@ -245,7 +245,7 @@ int Main_StartupDedicated(int bFullyDedicated)
     
     std3D_StartScene();
     std3D_EndScene();
-    sithMain_Load("static.jkl");
+    sithOpenStatic("static.jkl");
     jkHudInv_InitItems();
 
     if (!Main_bAutostartSp) {
@@ -513,7 +513,7 @@ void Main_Shutdown()
 #endif
     jkGuiRend_Shutdown();
     jkCog_Shutdown();
-    sithMain_Free();
+    sithCloseStatic();
     jkCredits_Shutdown();
     jkCutscene_Shutdown();
     jkDSS_Shutdown();
@@ -524,7 +524,7 @@ void Main_Shutdown()
     Video_Shutdown();
     jkGame_Shutdown();
     jkDev_Shutdown();
-    sithMain_Shutdown();
+    sithShutdown();
 #ifndef LINUX_TMP
     smack_Shutdown();
 #endif

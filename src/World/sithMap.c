@@ -45,7 +45,7 @@ void sithMap_DrawCircle(rdCamera *camera, rdMatrix34 *viewMat)
     flex_t a2a; // [esp+0h] [ebp-20h]
     rdVector3 vertex_out; // [esp+14h] [ebp-Ch] BYREF
 
-    sithMain_sub_4C4D80();
+    sithAdvanceRenderTick();
     rdSetGeometryMode(2);
     rdSetLightingMode(1);
     sithMap_pCurCamera = camera;

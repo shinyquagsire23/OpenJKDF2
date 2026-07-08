@@ -94,7 +94,7 @@ void jkMain_Startup()
 void jkMain_Shutdown()
 {
     jkPlayer_Shutdown();
-    sithMain_Close();
+    sithClose();
 
     // Added: memleak
     if ( jkEpisode_mLoad.paEntries )
@@ -230,7 +230,7 @@ void jkMain_GuiAdvance()
                 if (v1 > jkMain_lastTickMs + TICKRATE_MS)
                 {
                     jkMain_lastTickMs = v1;
-                    if (!sithMain_Tick()) return;
+                    if (!sithUpdate()) return;
                 }
                 
                 if ( g_sithMode == 5 )
@@ -355,7 +355,7 @@ void jkMain_EscapeMenuTick(int a2)
     if (v1 > jkMain_lastTickMs + TICKRATE_MS)
     {
         jkMain_lastTickMs = v1;
-        if (sithMain_Tick()) return;
+        if (sithUpdate()) return;
     }
     
     if ( g_sithMode == 5 )
@@ -419,7 +419,7 @@ void jkMain_EscapeMenuLeave(int a2, int a3)
         if ( a3 != JK_GAMEMODE_ESCAPE && jkMain_bInit )
         {
             jkPlayer_Shutdown();
-            sithMain_Close();
+            sithClose();
             jkMain_bInit = 0;
             thing_eight = 0;
         }
@@ -532,7 +532,7 @@ void jkMain_GameplayShow(int a1, int a2)
         jkPlayer_InitForceBins();
         jkMain_bInit = 1;
         jkPlayer_InitSaber();
-        sithMain_AutoSave();
+        sithOpenPostProcess();
     }
     else {
         // MOTS added
@@ -571,7 +571,7 @@ void jkMain_GameplayShow(int a1, int a2)
 #ifdef JKM_DSS
             jkPlayer_SetAmmoMaximums(jkPlayer_personality);
 #endif
-            v3 = sithMain_Mode1Init_3(jkMain_aLevelJklFname);
+            v3 = sithOpenMulti(jkMain_aLevelJklFname);
         }
 
         level_loaded = v3;
@@ -607,7 +607,7 @@ void jkMain_GameplayShow(int a1, int a2)
             {
                 sithCamera_ResetAllCameras();
                 jkPlayer_InitSaber();
-                sithMain_AutoSave();
+                sithOpenPostProcess();
             }
         }
         else if ( sithNet_isServer )
@@ -623,7 +623,7 @@ LABEL_28:
             {
                 sithCamera_ResetAllCameras();
                 jkPlayer_InitSaber();
-                sithMain_AutoSave();
+                sithOpenPostProcess();
             }
             if ( sithNet_isMulti )
             {
@@ -650,7 +650,7 @@ LABEL_28:
                 goto LABEL_28;
             }
 #endif
-            sithMain_Close();
+            sithClose();
             sithMulti_Shutdown();
             if ( jkGuiRend_thing_five )
                 jkGuiRend_thing_four = 1;
@@ -733,7 +733,7 @@ void jkMain_GameplayTick(int a2)
     if (v1 > jkMain_lastTickMs + TICKRATE_MS)
     {
         jkMain_lastTickMs = v1;
-        if (sithMain_Tick()) return;
+        if (sithUpdate()) return;
     }
     
     if ( g_sithMode == 5 )
@@ -794,7 +794,7 @@ void jkMain_GameplayLeave(int a2, int a3)
     if ( a3 != 6 && jkMain_bInit )
     {
         jkPlayer_Shutdown();
-        sithMain_Close();
+        sithClose();
         jkMain_bInit = 0;
         thing_eight = 0;
     }
@@ -830,7 +830,7 @@ void jkMain_GameplayLeave(int a2, int a3)
 void jkMain_TitleShow(int a1, int a2)
 {
     jkGuiTitle_ShowLoadingStatic();
-    sithMain_Load("static.jkl");
+    sithOpenStatic("static.jkl");
     jkHudInv_InitItems(); // MOTS inlined?
 }
 

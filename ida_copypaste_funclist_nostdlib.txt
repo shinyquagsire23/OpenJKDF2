@@ -1750,19 +1750,19 @@ rdAFRaster_sub_4C24D0	.text	004C24D0	00000B12	00000010	00000004	R	.	.	.	.	.	.	.
 rdAFRaster_sub_4C2FF0	.text	004C2FF0	00000B12	00000010	00000004	R	.	.	.	.	.	.	.
 rdAFRaster_sub_4C3B10	.text	004C3B10	00000B12	00000010	00000004	R	.	.	.	.	.	.	.
 sithMain_Startup	.text	004C4630	000000CB	00000008	00000004	R	.	.	.	.	.	T	.
-sithMain_Shutdown	.text	004C4700	00000074			R	.	.	.	.	.	.	.
-sithMain_Load	.text	004C4780	00000026	00000000	00000004	R	.	.	.	.	.	T	.
-sithMain_Free	.text	004C47B0	0000001D			R	.	.	.	.	.	.	.
+sithShutdown	.text	004C4700	00000074			R	.	.	.	.	.	.	.
+sithOpenStatic	.text	004C4780	00000026	00000000	00000004	R	.	.	.	.	.	T	.
+sithCloseStatic	.text	004C47B0	0000001D			R	.	.	.	.	.	.	.
 sithMain_Mode1Init	.text	004C47D0	000000AA	00000000	00000004	R	.	.	.	.	.	.	.
-sithMain_AutoSave	.text	004C4880	00000147	00000090	00000000	R	.	.	.	.	.	T	.
-sithMain_OpenNormal	.text	004C49D0	0000009C	00000000	00000004	R	.	.	.	.	.	T	.
-sithMain_Mode1Init_3	.text	004C4A70	00000098	00000000	00000004	R	.	.	.	.	.	T	.
-sithMain_Open	.text	004C4B10	00000064	00000000	00000000	R	.	.	.	.	.	.	.
-sithMain_Close	.text	004C4B80	00000064			R	.	.	.	.	.	.	.
+sithOpenPostProcess	.text	004C4880	00000147	00000090	00000000	R	.	.	.	.	.	T	.
+sithOpenNormal	.text	004C49D0	0000009C	00000000	00000004	R	.	.	.	.	.	T	.
+sithOpenMulti	.text	004C4A70	00000098	00000000	00000004	R	.	.	.	.	.	T	.
+sithOpen	.text	004C4B10	00000064	00000000	00000000	R	.	.	.	.	.	.	.
+sithClose	.text	004C4B80	00000064			R	.	.	.	.	.	.	.
 sithMain_SetEndLevel	.text	004C4BF0	0000000B	00000000	00000000	R	.	.	.	.	.	.	.
-sithMain_Tick	.text	004C4C00	00000121			R	.	.	.	.	.	T	.
-sithMain_UpdateCamera	.text	004C4D30	00000043	00000000	00000000	R	.	.	.	.	.	.	.
-sithMain_sub_4C4D80	.text	004C4D80	00000026			R	.	.	.	.	.	.	.
+sithUpdate	.text	004C4C00	00000121			R	.	.	.	.	.	T	.
+sithDrawScene	.text	004C4D30	00000043	00000000	00000000	R	.	.	.	.	.	.	.
+sithAdvanceRenderTick	.text	004C4D80	00000026			R	.	.	.	.	.	.	.
 sithMain_set_sithmode_5	.text	004C4DB0	0000000B			R	.	.	.	.	.	.	.
 sithMain_SetEpisodeName	.text	004C4DC0	0000001C	00000000	00000004	R	.	.	.	.	.	T	.
 sithCamera_Startup	.text	004C4DE0	00000101			R	.	.	.	.	.	.	.

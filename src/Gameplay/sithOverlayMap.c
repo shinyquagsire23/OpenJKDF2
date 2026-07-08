@@ -82,7 +82,7 @@ int sithOverlayMap_Draw(rdCanvas *canvas)
     if (!sithOverlayMap_bShowMap)
         return 0;
 
-    sithMain_sub_4C4D80();
+    sithAdvanceRenderTick();
     rdSetGeometryMode(2);
     rdSetLightingMode(1);
     sithOverlayMap_inst.world = sithWorld_pCurrentWorld;

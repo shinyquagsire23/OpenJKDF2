@@ -98,7 +98,7 @@ int sithMain_Startup(HostServices *commonFuncs)
     return 1;
 }
 
-void sithMain_Shutdown()
+void sithShutdown()
 {
     stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
     //sithWeapon
@@ -126,14 +126,14 @@ void sithMain_Shutdown()
     sithMain_bInitialized = 0;
 }
 
-int sithMain_Load(char *path)
+int sithOpenStatic(char *path)
 {
     sithWorld_pStatic = sithWorld_New();
     sithWorld_pStatic->level_type_maybe |= 1;
     return sithWorld_Load(sithWorld_pStatic, path) != 0;
 }
 
-void sithMain_Free()
+void sithCloseStatic()
 {
     stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
     if ( sithWorld_pStatic )
@@ -152,13 +152,13 @@ int sithMain_Mode1Init(char *a1)
 
     sithTime_Startup();
     sithWorld_Initialize();
-    sithMain_Open();
+    sithOpen();
     sithTime_Startup();
     g_sithMode = 1;
     return 1;
 }
 
-int sithMain_OpenNormal(char *path)
+int sithOpenNormal(char *path)
 {
     sithWorld_pCurrentWorld = sithWorld_New();
 
@@ -166,24 +166,24 @@ int sithMain_OpenNormal(char *path)
         return 0;
 
     sithWorld_Initialize();
-    sithMain_Open();
+    sithOpen();
     g_sithMode = 1;
     return 1;
 }
 
-int sithMain_Mode1Init_3(char *fpath)
+int sithOpenMulti(char *fpath)
 {
     sithWorld_pCurrentWorld = sithWorld_New();
     if ( !sithWorld_Load(sithWorld_pCurrentWorld, fpath) )
         return 0;
-    sithMain_Open();
+    sithOpen();
     sithTime_Startup();
     sithMulti_Startup();
     g_sithMode = 1;
     return 1;
 }
 
-int sithMain_Open()
+int sithOpen()
 {
     jkPlayer_currentTickIdx = 0;
     sithRender_lastRenderTick = 1;
@@ -201,7 +201,7 @@ int sithMain_Open()
     return 1;
 }
 
-void sithMain_Close()
+void sithClose()
 {
     if ( sithMain_bOpened )
     {
@@ -232,7 +232,7 @@ int sithMain_tickStartMs;
 int sithMain_tickEndMs;
 
 // MOTS altered
-int sithMain_Tick()
+int sithUpdate()
 {
 #if 0
     if (sithWorld_pCurrentWorld) {
@@ -304,7 +304,7 @@ int sithMain_Tick()
         //sithWorld_pCurrentWorld->playerThing->physicsParams.physflags &= ~SITH_PF_USEGRAVITY;
         
         ++jkPlayer_currentTickIdx;
-        sithMain_sub_4C4D80();
+        sithAdvanceRenderTick();
         sithSoundMixer_ResumeMusic(0);
         sithTime_Advance();
 
@@ -416,7 +416,7 @@ int sithMain_Tick()
     }
 }
 
-void sithMain_UpdateCamera()
+void sithDrawScene()
 {
 #if defined(TARGET_RETRO_HOMEBREW)
     jkPlayer_fov = 98; // 90deg vertical, 106deg horizontal stock
@@ -427,7 +427,7 @@ void sithMain_UpdateCamera()
 
     if ( (g_submodeFlags & 8) == 0 )
     {
-        sithMain_sub_4C4D80();
+        sithAdvanceRenderTick();
 
 #if defined(QOL_IMPROVEMENTS)
         if (sithCamera_currentCamera && sithCamera_currentCamera->rdCam.canvas)
@@ -484,7 +484,7 @@ void sithMain_UpdateCamera()
     }
 }
 
-void sithMain_sub_4C4D80()
+void sithAdvanceRenderTick()
 {
     if ( !++sithRender_lastRenderTick )
     {
@@ -505,7 +505,7 @@ void sithMain_SetEpisodeName(char *text)
 }
 
 // MOTS altered
-void sithMain_AutoSave()
+void sithOpenPostProcess()
 {
     sithThing *v3; // esi
     sithCog *v4; // eax

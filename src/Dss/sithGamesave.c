@@ -39,7 +39,7 @@
 #include "jk.h"
 
 #ifdef TARGET_DREAMCAST
-// Added: set while a load re-runs sithMain_AutoSave() so its re-save doesn't push
+// Added: set while a load re-runs sithOpenPostProcess() so its re-save doesn't push
 // a redundant write to the VMU -- the card already holds what we just loaded.
 static int sithGamesave_bSuppressVmuFlush = 0;
 // Added: forces a slim (inventory-only) save even when an SD card is present, so
@@ -253,9 +253,9 @@ int sithGamesave_RestoreFile(char *fpath)
             sithWorld_ResetSectorRuntimeAlteredVars(sithWorld_pCurrentWorld);
             goto LABEL_11;
         }
-        sithMain_Close();
+        sithClose();
     }
-    if ( !sithMain_OpenNormal(SrcStr) )
+    if ( !sithOpenNormal(SrcStr) )
     {
         goto load_fail;
     }
@@ -358,10 +358,10 @@ skip_free_things:
         // Added: this AutoSave just re-materialises what we loaded; let it rebuild
         // the RAM-disk save but skip the (slow, flash-wearing) VMU write.
         sithGamesave_bSuppressVmuFlush = 1;
-        sithMain_AutoSave();
+        sithOpenPostProcess();
         sithGamesave_bSuppressVmuFlush = 0;
 #else
-        sithMain_AutoSave();
+        sithOpenPostProcess();
 #endif
 
         // Added: bin-only is the intended VMU save format, not a version error --
@@ -394,7 +394,7 @@ skip_dss:
 load_fail:
     stdConffile_Close();
     sithThing_sub_4CCE60();
-    sithMain_Close();
+    sithClose();
     return 0;
 }
 
