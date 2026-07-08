@@ -74,10 +74,20 @@ lets fixes/insights flow between them.
        `state`, `thing`, `param1/2/3`, `nextUpdate`, `trigId`, `keyframe`, `func`,
        `linkid`, all `field_XX`, and other shared-in-N names (see process_members.py
        GENERIC list + shared-drop). ~39 dropped in batch 2 alone.
-     - **STILL TODO**: remaining structs — `rd*` (rdThing/Model3/Mesh/Material/
-       Camera/Light/Keyframe/Puppet/Sprite…), `std*` (tVBuffer/Gob/tHashTable/
-       stdFont…), and leftover sith (SithSoundClass, SithMap/MapView, collision
-       structs); and **enum-type field retyping** (`uint32_t type`→`SithThingType`,
+     - **rd* (render) structs ✅** — 42 member renames (rdCamera, rdCanvas,
+       rdClipFrustum, rdLight, rdThing, rdKeyframe, rdJoint, rdAnimEntry,
+       rdPuppetTrack, rdPuppet, rdMaterial, rdSprite, rdParticle, rdPolyline,
+       rdFace, rdMesh, rdGeoset, rdModel3, rdMeshinfo). All three platforms green.
+       Compile-driven loop caught: within-struct dupes (`numJoints2`/`cloudRadius`),
+       cross-batch `renderData`→`pThing` (collides with SithThing.renderData), and
+       maxmod `callback`→`pfCallback` in Platform/TWL/stdSound.c (mm_stream.callback —
+       TWL-only, like the earlier `timer` case). Added length guard (drop olds <4
+       chars: r/g/b/id/vel) + all-headers uniqueness scan to the processor.
+       rd *type*-name diffs (rdThing→rdThingData, rdFace→rdPrimit3, rdColor24→rdRGB,
+       rdMeshinfo→rdModel3Mesh) DEFERRED — fuzzy/3a-scope.
+     - **STILL TODO**: `std*` structs (tVBuffer/Gob/tHashTable/stdFont…) + leftover
+       sith (SithSoundClass, SithPlayingSound, SithMap/MapView, collision structs,
+       SithGamesave); and **enum-type field retyping** (`uint32_t type`→`SithThingType`,
        creating the enum typedefs) — retype targets captured in scratchpad
        `members_*_retype.json` (28 so far).
 4. **Style match (final)** — for each function, match OpenJones3D's *style* as
