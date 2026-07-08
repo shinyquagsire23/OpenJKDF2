@@ -19,9 +19,9 @@ static size_t sithTime_deltaUs_history_collected_entries = 0;
 flex_d_t sithTime_physicsRolloverFrames = 0.0;
 
 // MOTS altered
-void sithTime_Tick()
+void sithTime_Advance()
 {
-    sithTime_SetDelta(stdPlatform_GetTimeMsec() - sithTime_curMsAbsolute);
+    sithTime_SetFrameTime(stdPlatform_GetTimeMsec() - sithTime_curMsAbsolute);
 }
 
 void sithTime_Pause()
@@ -53,7 +53,7 @@ void sithTime_Resume()
 }
 
 // MOTS altered: min/max are variables
-void sithTime_SetDelta(int deltaMs)
+void sithTime_SetFrameTime(int deltaMs)
 {
     sithTime_deltaMs = deltaMs;
     sithTime_curMsAbsolute = stdPlatform_GetTimeMsec();
@@ -133,7 +133,7 @@ void sithTime_Startup()
     sithTime_physicsRolloverFrames = 0.0; // Added
 }
 
-void sithTime_SetMs(uint32_t curMs)
+void sithTime_SetGameTime(uint32_t curMs)
 {
 #ifdef MICROSECOND_TIME
     sithTime_curUsAbsolute = Linux_TimeUs();

@@ -2081,12 +2081,12 @@ void do_hooks()
 #endif
 
     // sithTime
-    hook_function(sithTime_Tick_ADDR, sithTime_Tick);
+    hook_function(sithTime_Advance_ADDR, sithTime_Advance);
     hook_function(sithTime_Pause_ADDR, sithTime_Pause);
     hook_function(sithTime_Resume_ADDR, sithTime_Resume);
-    hook_function(sithTime_SetDelta_ADDR, sithTime_SetDelta);
+    hook_function(sithTime_SetFrameTime_ADDR, sithTime_SetFrameTime);
     hook_function(sithTime_Startup_ADDR, sithTime_Startup);
-    hook_function(sithTime_SetMs_ADDR, sithTime_SetMs);
+    hook_function(sithTime_SetGameTime_ADDR, sithTime_SetGameTime);
     
     // sithModel
     hook_function(sithModel_Startup_ADDR, sithModel_Startup);

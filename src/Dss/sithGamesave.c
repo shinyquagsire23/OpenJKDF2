@@ -269,7 +269,7 @@ LABEL_11:
         sithGamesave_func2();
     if ( !stdConffile_Read(&curMs, sizeof(uint32_t)) )
         goto load_fail; // TODO: is this a memleak?
-    sithTime_SetMs(curMs);
+    sithTime_SetGameTime(curMs);
     
     // Added: split this apart, g_sithMode is a struct...
     stdConffile_Read((char*)&g_sithMode, sizeof(int32_t));
@@ -387,7 +387,7 @@ skip_free_things:
         sithGamesave_wsaveName[255] = 0;
     }
 skip_dss:
-    sithTime_SetMs(curMs);
+    sithTime_SetGameTime(curMs);
     sithCamera_SetCurrentCamera(sithCamera_currentCamera);
     return 1;
 

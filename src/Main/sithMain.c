@@ -250,7 +250,7 @@ int sithMain_Tick()
 
     if ( (g_submodeFlags & 8) != 0 )
     {
-        sithTime_Tick();
+        sithTime_Advance();
         sithComm_Sync();
 
 #ifdef TARGET_RETRO_HOMEBREW
@@ -306,7 +306,7 @@ int sithMain_Tick()
         ++jkPlayer_currentTickIdx;
         sithMain_sub_4C4D80();
         sithSoundMixer_ResumeMusic(0);
-        sithTime_Tick();
+        sithTime_Advance();
 
 #ifdef FIXED_TIMESTEP_PHYS
         if (NEEDS_STEPPED_PHYS) {

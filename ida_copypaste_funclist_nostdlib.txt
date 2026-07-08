@@ -2156,12 +2156,12 @@ sithSoundMixer_SyncSounds	.text	004DD360	00000052	00000004	00000000	R	.	.	.	.	.	
 sithSoundMixer_FreePlayingSound	.text	004DD3C0	0000002C	00000008	00000004	R	.	.	.	.	.	T	.
 sithSoundMixer_sub_4DD3F0	.text	004DD3F0	000001D8	00000008	00000004	R	.	.	.	.	.	T	.
 sithSoundMixer_sub_4DD5D0	.text	004DD5D0	0000006A	00000008	00000004	R	.	.	.	.	.	T	.
-sithTime_Tick	.text	004DD640	000000C4	00000010	00000000	R	.	.	.	.	B	T	.
+sithTime_Advance	.text	004DD640	000000C4	00000010	00000000	R	.	.	.	.	B	T	.
 sithTime_Pause	.text	004DD710	0000001E			R	.	.	.	.	.	T	.
 sithTime_Resume	.text	004DD730	0000002F			R	.	.	.	.	.	T	.
-sithTime_SetDelta	.text	004DD760	00000096	00000008	00000004	R	.	.	.	.	.	T	.
+sithTime_SetFrameTime	.text	004DD760	00000096	00000008	00000004	R	.	.	.	.	.	T	.
 sithTime_Startup	.text	004DD800	00000026			R	.	.	.	.	.	T	.
-sithTime_SetMs	.text	004DD830	00000046	00000008	00000004	R	.	.	.	.	.	T	.
+sithTime_SetGameTime	.text	004DD830	00000046	00000008	00000004	R	.	.	.	.	.	T	.
 sithTemplate_Startup	.text	004DD880	0000001C			R	.	.	.	.	.	.	.
 sithTemplate_Shutdown	.text	004DD8A0	0000001D			R	.	.	.	.	.	.	.
 sithTemplate_New	.text	004DD8C0	000000AC	00000010	00000008	R	.	.	.	.	.	T	.
