@@ -181,14 +181,14 @@ int sithThing_Shutdown()
     return 1;
 }
 
-void sithThing_SetHandler(sithThing_handler_t handler)
+void sithThing_RegisterUnknownFunc(sithThing_handler_t handler)
 {
     if ( handler )
         sithThing_handler = handler;
 }
 
 // MOTS altered?
-void sithThing_TickAll(flex_t deltaSeconds, int deltaMs)
+void sithThing_Update(flex_t deltaSeconds, int deltaMs)
 {
     sithThing* pThingIter; // esi
 
@@ -226,7 +226,7 @@ void sithThing_TickAll(flex_t deltaSeconds, int deltaMs)
                 }
                 else
                 {
-                    sithThing_Remove(pThingIter);
+                    sithThing_DestroyDyingThing(pThingIter);
                 }
             }
 
@@ -284,7 +284,7 @@ void sithThing_TickAll(flex_t deltaSeconds, int deltaMs)
 #ifdef TARGET_RETRO_HOMEBREW
             if (bCanAlwaysUpdatePhysics || pThingIter->lastRenderedTickIdx >= jkPlayer_currentTickIdx-3 || bCanUpdateOffscreen)
 #endif
-            sithThing_TickPhysics(pThingIter, deltaSeconds);
+            sithThing_UpdateMove(pThingIter, deltaSeconds);
 
             // CPU optimization testing
 #ifdef TARGET_RETRO_HOMEBREW
@@ -296,11 +296,11 @@ void sithThing_TickAll(flex_t deltaSeconds, int deltaMs)
             continue;
         }
 
-        sithThing_FreeEverythingNet(pThingIter); // Was inlined
+        sithThing_RemoveThing(pThingIter); // Was inlined
     }
 }
 
-void sithThing_TickPhysics(sithThing *pThing, flex_t deltaSecs)
+void sithThing_UpdateMove(sithThing *pThing, flex_t deltaSecs)
 {
     int32_t v2; // ebp
     sithSurface *v5; // eax
@@ -362,7 +362,7 @@ void sithThing_TickPhysics(sithThing *pThing, flex_t deltaSecs)
     }
 }
 
-void sithThing_Remove(sithThing* pThing)
+void sithThing_DestroyDyingThing(sithThing* pThing)
 {
     switch ( pThing->type )
     {
@@ -391,7 +391,7 @@ void sithThing_Remove(sithThing* pThing)
     }
 }
 
-sithThing* sithThing_GetParent(sithThing* pThing)
+sithThing* sithThing_GetThingParent(sithThing* pThing)
 {
     sithThing *result; // eax
     sithThing *i; // ecx
@@ -406,7 +406,7 @@ sithThing* sithThing_GetParent(sithThing* pThing)
     return result;
 }
 
-sithThing* sithThing_GetThingByIdx(int idx)
+sithThing* sithThing_GetThingByIndex(int idx)
 {
     sithThing *result; // eax
 
@@ -415,7 +415,7 @@ sithThing* sithThing_GetThingByIdx(int idx)
     return result;
 }
 
-sithThing* sithThing_GetById(int thing_id)
+sithThing* sithThing_GetGuidThing(int thing_id)
 {
     sithThing *result; // eax
 
@@ -442,14 +442,14 @@ sithThing* sithThing_GetById(int thing_id)
     return NULL;
 }
 
-void sithThing_Destroy(sithThing* pThing)
+void sithThing_DestroyThing(sithThing* pThing)
 {
     pThing->thingflags |= SITH_TF_WILLBEREMOVED;
     if ( (pThing->thingflags & SITH_TF_CAPTURED) != 0 && (pThing->thingflags & SITH_TF_INVULN) == 0 )
         sithCog_ThingSendMessage(pThing, 0, SITH_MESSAGE_REMOVED);
 }
 
-flex_t sithThing_Damage(sithThing *sender, sithThing *reciever, flex_t amount, int damageClass)
+flex_t sithThing_DamageThing(sithThing *sender, sithThing *reciever, flex_t amount, int damageClass)
 {
     flex_t param1; // [esp+0h] [ebp-20h]
 
@@ -486,7 +486,7 @@ flex_t sithThing_Damage(sithThing *sender, sithThing *reciever, flex_t amount, i
 
 //sithThing_Create_idk
 
-void sithThing_Free(sithWorld *pWorld)
+void sithThing_FreeWorldThings(sithWorld *pWorld)
 {
     // Added: !world check
     if (!pWorld || !pWorld->things)
@@ -494,7 +494,7 @@ void sithThing_Free(sithWorld *pWorld)
         return;
     }
 
-    sithThing_freestuff(pWorld);
+    sithThing_RemoveWorldThings(pWorld);
 
     SITH_FREE(pWorld->things);
     pWorld->things = 0;
@@ -502,7 +502,7 @@ void sithThing_Free(sithWorld *pWorld)
     pWorld->numThings = -1;
 }
 
-void sithThing_freestuff(sithWorld *pWorld)
+void sithThing_RemoveWorldThings(sithWorld *pWorld)
 {
     sithThing* pThingIter;
 
@@ -516,25 +516,25 @@ void sithThing_freestuff(sithWorld *pWorld)
         if (!pThingIter->type)
             continue;
 
-        sithThing_FreeEverythingNet(pThingIter);
+        sithThing_RemoveThing(pThingIter);
     }
 }
 
-void sithThing_idkjkl(void)
+void sithThing_InitializeWorldThings(void)
 {
     sithNet_thingsIdx = 0;
     for (int32_t idx = sithWorld_pCurrentWorld->numThingsLoaded - 1; idx >= 0; idx--)
     {
         sithThing* pThing = &sithWorld_pCurrentWorld->things[idx];
-        sithThing_DoesRdThingInit(pThing);
+        sithThing_Reset(pThing);
 
         pThing->thingIdx = idx;
         pThing->thing_id = -1;
-        sithThing_netidk2(idx);
+        sithThing_FreeThingIndex(idx);
     }
 }
 
-void sithThing_sub_4CCE60()
+void sithThing_LoadPostProcess()
 {
     int32_t v1; // edx
     int32_t *v2; // ebp
@@ -574,7 +574,7 @@ void sithThing_sub_4CCE60()
 }
 
 
-void sithThing_FreeEverythingNet(sithThing* pThing)
+void sithThing_RemoveThing(sithThing* pThing)
 {
     int32_t v2; // esi
     int32_t v3; // eax
@@ -583,7 +583,7 @@ void sithThing_FreeEverythingNet(sithThing* pThing)
     if ( sithNet_isMulti && sithNet_isServer && (pThing->thing_id & 0xFFFF0000) == 0 )
         sithMulti_RemoveStaticThing(pThing->thing_id);
 
-    sithThing_FreeEverything(pThing); // Inlined
+    sithThing_FreeThing(pThing); // Inlined
 
     v2 = pThing->thingIdx;
     if (sithWorld_pCurrentWorld && v2 == sithWorld_pCurrentWorld->numThings ) // Added: sithWorld_pCurrentWorld nullptr check
@@ -606,12 +606,12 @@ void sithThing_FreeEverythingNet(sithThing* pThing)
     sithNet_thingsIdx = v5 + 1;
 }
 
-void sithThing_FreeEverything(sithThing* pThing)
+void sithThing_FreeThing(sithThing* pThing)
 {
     if ( pThing->attach_flags )
         sithThing_DetachThing(pThing);
     if ( pThing->sector )
-        sithThing_LeaveSector(pThing);
+        sithThing_ExitSector(pThing);
     if ( pThing->moveType == SITH_MT_PATH && pThing->trackParams.aFrames )
         SITH_FREE(pThing->trackParams.aFrames);
     if ( pThing->controlType == SITH_CT_AI )
@@ -627,7 +627,7 @@ void sithThing_FreeEverything(sithThing* pThing)
     pThing->thing_id = -1;
 }
 
-void sithThing_sub_4CD100(sithThing* pThing)
+void sithThing_Initialize(sithThing* pThing)
 {
     switch ( pThing->type )
     {
@@ -657,7 +657,7 @@ void sithThing_sub_4CD100(sithThing* pThing)
 }
 
 // MOTS altered
-int sithThing_DoesRdThingInit(sithThing* pThing)
+int sithThing_Reset(sithThing* pThing)
 {
 
     int32_t idx = pThing->thingIdx;
@@ -679,7 +679,7 @@ int sithThing_DoesRdThingInit(sithThing* pThing)
     return out;
 }
 
-void sithThing_MoveToSector(sithThing* pThing, sithSector *sector, int a4)
+void sithThing_SetSector(sithThing* pThing, sithSector *sector, int a4)
 {
     sithSector *v3; // eax
 
@@ -688,12 +688,12 @@ void sithThing_MoveToSector(sithThing* pThing, sithSector *sector, int a4)
     {
         if ( v3 == sector )
             return;
-        sithThing_LeaveSector(pThing);
+        sithThing_ExitSector(pThing);
     }
     sithThing_EnterSector(pThing, sector, 0, a4);
 }
 
-void sithThing_LeaveSector(sithThing* pThing)
+void sithThing_ExitSector(sithThing* pThing)
 {
     sithSector *sector; // eax
     sithThing *prevThing; // ecx
@@ -905,7 +905,7 @@ void sithThing_ExitWater(sithThing* pThing, int a2)
 }
 
 // Unused or inlined
-sithThing* sithThing_CreateThingOfType(uint32_t thingType)
+sithThing* sithThing_Create(uint32_t thingType)
 {
     sithThingFrame *psVar1;
     sithWorld *pWorld;
@@ -937,7 +937,7 @@ sithThing* sithThing_CreateThingOfType(uint32_t thingType)
                         (((pThing->type == SITH_THING_DEBRIS || (pThing->type == SITH_THING_PARTICLE))
                           && (pThing->lifeLeftMs != 0))))
                 {
-                    sithThing_FreeEverythingNet(pThing); // was inlined
+                    sithThing_RemoveThing(pThing); // was inlined
                 }
                 iVar3 = sithNet_thingsIdx;
                 if (10 < i) break;
@@ -959,7 +959,7 @@ sithThing* sithThing_CreateThingOfType(uint32_t thingType)
         }
     }
     pThingRet = pWorld->things + iVar4;
-    sithThing_DoesRdThingInit(pThingRet);
+    sithThing_Reset(pThingRet);
     pThingRet->thingIdx = iVar4;
     if (sithThing_inittedThings == 0) {
         sithThing_inittedThings = 1; // TODO: this is a 32-bit write?
@@ -977,7 +977,7 @@ sithThing* sithThing_CreateThingOfType(uint32_t thingType)
     return pThingRet;
 }
 
-void sithThing_SetPosAndRot(sithThing *pThing, rdVector3 *pos, rdMatrix34 *rot)
+void sithThing_SetPositionAndOrient(sithThing *pThing, rdVector3 *pos, rdMatrix34 *rot)
 {
     rdVector_Copy3(&pThing->position, pos);
     rdMatrix_Copy34(&pThing->lookOrientation, rot);
@@ -985,7 +985,7 @@ void sithThing_SetPosAndRot(sithThing *pThing, rdVector3 *pos, rdMatrix34 *rot)
 }
 
 // MOTS altered
-int sithThing_SetNewModel(sithThing* pThing, rdModel3 *pModel)
+int sithThing_SetThingModel(sithThing* pThing, rdModel3 *pModel)
 {
     rdThing *v2; // edi
     rdPuppet *v4; // ebx
@@ -1007,7 +1007,7 @@ int sithThing_SetNewModel(sithThing* pThing, rdModel3 *pModel)
     return 1;
 }
 
-sithThing* sithThing_InstantiateFromTemplate(sithThing *pThing, sithThing *pTemplateThing)
+sithThing* sithThing_SetThingBasedOn(sithThing *pThing, sithThing *pTemplateThing)
 {
     sithThing *result; // eax
     int v10; // [esp+10h] [ebp-Ch]
@@ -1043,7 +1043,7 @@ sithThing* sithThing_InstantiateFromTemplate(sithThing *pThing, sithThing *pTemp
     }
     else
     {
-        sithThing_DoesRdThingInit(pThing);
+        sithThing_Reset(pThing);
     }
     pThing->thingIdx = thinga;
     result = v12;
@@ -1054,14 +1054,14 @@ sithThing* sithThing_InstantiateFromTemplate(sithThing *pThing, sithThing *pTemp
     return result;
 }
 
-sithThing* sithThing_Create(sithThing *pTemplateThing, const rdVector3 *position, const rdMatrix34 *lookOrientation, sithSector *sector, sithThing *prevThing)
+sithThing* sithThing_CreateThingAtPos(sithThing *pTemplateThing, const rdVector3 *position, const rdMatrix34 *lookOrientation, sithSector *sector, sithThing *prevThing)
 {
-    sithThing* pThingRet = sithThing_CreateThingOfType(pTemplateThing->type); // was inlined
+    sithThing* pThingRet = sithThing_Create(pTemplateThing->type); // was inlined
 
     if (!pThingRet)
         return 0;
 
-    sithThing_InstantiateFromTemplate(pThingRet, pTemplateThing);
+    sithThing_SetThingBasedOn(pThingRet, pTemplateThing);
     pThingRet->position = *position;
     stdPlatform_Memcpy32(&pThingRet->lookOrientation, lookOrientation, sizeof(pThingRet->lookOrientation)); // Added: word-safe (things may be in extram)
     rdVector_Zero3(&pThingRet->lookOrientation.scale);
@@ -1073,7 +1073,7 @@ sithThing* sithThing_Create(sithThing *pTemplateThing, const rdVector3 *position
         pThingRet->child_signature = prevThing->signature;
     }
 
-    sithThing_sub_4CD100(pThingRet); // was inlined
+    sithThing_Initialize(pThingRet); // was inlined
 
     if ( pThingRet->moveType == SITH_MT_PHYSICS && (pThingRet->physicsParams.physflags & SITH_PF_20000) == 0 )
         rdMatrix_TransformVector34Acc(&pThingRet->physicsParams.vel, &pThingRet->lookOrientation);
@@ -1081,7 +1081,7 @@ sithThing* sithThing_Create(sithThing *pTemplateThing, const rdVector3 *position
         sithCog_SendMessage(pThingRet->class_cog, SITH_MESSAGE_CREATED, 3, pThingRet->thingIdx, 0, 0, 0);
     if ( pThingRet->pTemplate )
     {
-        sithThing* v26 = sithThing_Create(pThingRet->pTemplate, position, lookOrientation, sector, prevThing);
+        sithThing* v26 = sithThing_CreateThingAtPos(pThingRet->pTemplate, position, lookOrientation, sector, prevThing);
         if ( v26 )
         {
             if ( (pThingRet->thingflags & SITH_TF_INVULN) != 0 )
@@ -1093,7 +1093,7 @@ sithThing* sithThing_Create(sithThing *pTemplateThing, const rdVector3 *position
     return pThingRet;
 }
 
-sithThing* sithThing_SpawnTemplate(sithThing *pTemplateThing, sithThing *spawnThing)
+sithThing* sithThing_CreateThing(sithThing *pTemplateThing, sithThing *spawnThing)
 {
     sithSector *v2; // eax
     sithThing *result; // eax
@@ -1130,7 +1130,7 @@ sithThing* sithThing_SpawnTemplate(sithThing *pTemplateThing, sithThing *spawnTh
     rdMatrix_TransformVector34(&dstVec, &diffVec, &spawnThing->lookOrientation);
     rdVector_Add3(&v7, &dstVec, &spawnThing->position);
     v2 = sithCollision_FindSectorInRadius(spawnThing->sector, &spawnThing->position, &v7, 0.0);
-    result = sithThing_Create(pTemplateThing, &v7, &spawnThing->lookOrientation, v2, 0);
+    result = sithThing_CreateThingAtPos(pTemplateThing, &v7, &spawnThing->lookOrientation, v2, 0);
     v4 = result;
     if ( result )
     {
@@ -1146,7 +1146,7 @@ sithThing* sithThing_SpawnTemplate(sithThing *pTemplateThing, sithThing *spawnTh
     return result;
 }
 
-void sithThing_AttachToSurface(sithThing* pThing, sithSurface *surface, int a3)
+void sithThing_AttachThingToSurface(sithThing* pThing, sithSurface *surface, int a3)
 {
     int v4; // ebp
     int *v6; // eax
@@ -1158,12 +1158,12 @@ void sithThing_AttachToSurface(sithThing* pThing, sithSurface *surface, int a3)
 
     // Added: Safety checking
     if (!pThing) {
-        stdPlatform_Printf("OpenJKDF2: NULL pThing in sithThing_AttachToSurface!\n");
+        stdPlatform_Printf("OpenJKDF2: NULL pThing in sithThing_AttachThingToSurface!\n");
         return;
     }
     // Added: Safety checking
     if (pThing->moveType != SITH_MT_PHYSICS) {
-        stdPlatform_Printf("OpenJKDF2: Non-physics pThing in sithThing_AttachToSurface!\n");
+        stdPlatform_Printf("OpenJKDF2: Non-physics pThing in sithThing_AttachThingToSurface!\n");
         return;
     }
 
@@ -1237,7 +1237,7 @@ void sithThing_AttachToSurface(sithThing* pThing, sithSurface *surface, int a3)
     }
 }
 
-void sithThing_LandThing(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3 *a4, int a5)
+void sithThing_AttachThingToThingFace(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3 *a4, int a5)
 {
     int *v7; // eax
     int v8; // eax
@@ -1310,7 +1310,7 @@ void sithThing_LandThing(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3 *a4
     }
 }
 
-void sithThing_AttachThing(sithThing *parent, sithThing *child)
+void sithThing_AttachThingToThing(sithThing *parent, sithThing *child)
 {
     int v2; // eax
     sithThing *v3; // eax
@@ -1415,7 +1415,7 @@ LABEL_8:
     return result;
 }
 
-void sithThing_detachallchildren(sithThing* pThing)
+void sithThing_DetachAttachedThings(sithThing* pThing)
 {
     sithThing *v1; // eax
     sithThing *v2; // esi
@@ -1437,7 +1437,7 @@ void sithThing_detachallchildren(sithThing* pThing)
 //sithThing_LotsOfFreeing
 
 // MOTS altered
-int sithThing_Load(sithWorld *pWorld, int a2)
+int sithThing_ReadStaticThingsListText(sithWorld *pWorld, int a2)
 {
     sithThing *v4; // esi
     int32_t v5; // esi
@@ -1467,7 +1467,7 @@ int sithThing_Load(sithWorld *pWorld, int a2)
             {
                 if ( sithNet_isMulti && sithNet_isServer && (v4->thing_id & 0xFFFF0000) == 0 )
                     sithMulti_RemoveStaticThing(v4->thing_id);
-                sithThing_FreeEverything(v4);
+                sithThing_FreeThing(v4);
                 v5 = v4->thingIdx;
                 if ( v5 == sithWorld_pCurrentWorld->numThings )
                 {
@@ -1500,7 +1500,7 @@ int sithThing_Load(sithWorld *pWorld, int a2)
     if ( !paThings )
         return 0;
     sithWorld_pCurrentWorld->numThingsLoaded = v10;
-    sithThing_idkjkl();
+    sithThing_InitializeWorldThings();
     sithNet_thingsIdx = 0;
     v20 = 0x1000 << jkPlayer_setDiff;
     if ( (g_submodeFlags & 1) != 0 )
@@ -1534,10 +1534,10 @@ int sithThing_Load(sithWorld *pWorld, int a2)
                     v21->archlightIdx = v23;
                     //printf("%p %p %x\n", , v21->archlightIdx);
                 }
-                sithThing_InstantiateFromTemplate(v21, v22);
-                sithThing_SetPosAndRot(v21, &pos, &a);
+                sithThing_SetThingBasedOn(v21, v22);
+                sithThing_SetPositionAndOrient(v21, &pos, &a);
                 sithThing_EnterSector(v21, v24, 1, 1);
-                sithThing_sub_4CD100(v21);
+                sithThing_Initialize(v21);
                 v21->signature = sithThing_bInitted2++;
                 v21->thing_id = v21->thingIdx;
                 v27 = 10;
@@ -1546,7 +1546,7 @@ int sithThing_Load(sithWorld *pWorld, int a2)
                     v28 = &stdConffile_entry.args[10];
                     do
                     {
-                        sithThing_ParseArgs(v28, v21);
+                        sithThing_ParseArg(v28, v21);
                         ++v27;
                         ++v28;
                     }
@@ -1554,7 +1554,7 @@ int sithThing_Load(sithWorld *pWorld, int a2)
                 }
                 if ( (v21->thingflags & v38) != 0 )
                 {
-                    sithThing_FreeEverything(v21);
+                    sithThing_FreeThing(v21);
                 }
                 else
                 {
@@ -1565,11 +1565,11 @@ int sithThing_Load(sithWorld *pWorld, int a2)
             }
         }
     }
-    sithThing_sub_4CCE60();
+    sithThing_LoadPostProcess();
     return 1;
 }
 
-int sithThing_ParseArgs(stdConffileArg *arg, sithThing* pThing)
+int sithThing_ParseArg(stdConffileArg *arg, sithThing* pThing)
 {
     int32_t v2; // ebp
     int32_t param; // eax
@@ -1582,7 +1582,7 @@ int sithThing_ParseArgs(stdConffileArg *arg, sithThing* pThing)
     paramIdx = param;
     if ( !param )
         return 0;
-    if ( sithThing_LoadThingParam(arg, pThing, param) )
+    if ( sithThing_ParseThingArg(arg, pThing, param) )
         return 1;
     switch ( pThing->type )
     {
@@ -1627,7 +1627,7 @@ LABEL_18:
 }
 
 // MOTS altered
-int sithThing_LoadThingParam(stdConffileArg *arg, sithThing* pThing, int param)
+int sithThing_ParseThingArg(stdConffileArg *arg, sithThing* pThing, int param)
 {
     int32_t v3; // ebp
     const char **v4; // edi
@@ -1880,7 +1880,7 @@ LABEL_59:
 
 //sithThing_TypeIdxFromStr
 
-int sithThing_GetIdxFromThing(sithThing* pThing)
+int sithThing_ValidateThingPointer(sithThing* pThing)
 {
     uint32_t v1; // ecx
     int result; // eax
@@ -1895,7 +1895,7 @@ int sithThing_GetIdxFromThing(sithThing* pThing)
     return result;
 }
 
-uint32_t sithThing_Checksum(sithThing* pThing, uint32_t last_hash)
+uint32_t sithThing_CalcThingChecksum(sithThing* pThing, uint32_t last_hash)
 {
     uint32_t hash;
 
@@ -1933,7 +1933,7 @@ uint32_t sithThing_Checksum(sithThing* pThing, uint32_t last_hash)
     return hash;
 }
 
-void sithThing_SetSyncFlags(sithThing *pThing, int flags)
+void sithThing_SyncThing(sithThing *pThing, int flags)
 {
     if (!sithComm_multiplayerFlags) return;
 
@@ -1953,7 +1953,7 @@ void sithThing_SetSyncFlags(sithThing *pThing, int flags)
     }
 }
 
-void sithThing_Sync()
+void sithThing_SyncThings()
 {
     for (uint32_t v0 = 0; v0 < sithNet_syncIdx; v0++)
     {
@@ -1997,7 +1997,7 @@ void sithThing_Sync()
     return;
 }
 
-int sithThing_ShouldSync(sithThing* pThing)
+int sithThing_CanSync(sithThing* pThing)
 {
     if ( pThing->type )
         return !pThing->lifeLeftMs || pThing->type != SITH_THING_DEBRIS && pThing->type != SITH_THING_PARTICLE;
@@ -2005,7 +2005,7 @@ int sithThing_ShouldSync(sithThing* pThing)
     return 0;
 }
 
-int sithThing_netidk2(int a1)
+int sithThing_FreeThingIndex(int a1)
 {
     int32_t v1; // eax
 

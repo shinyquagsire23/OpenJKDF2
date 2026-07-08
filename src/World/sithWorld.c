@@ -86,7 +86,7 @@ int sithWorld_Startup()
     sithWorld_RegisterTextSectionParser("sectors", sithSector_ReadSectorsListText);
     sithWorld_RegisterTextSectionParser("models", sithModel_ReadStaticModelsListText);
     sithWorld_RegisterTextSectionParser("sprites", sithSprite_ReadStaticSpritesListText);
-    sithWorld_RegisterTextSectionParser("things", sithThing_Load);
+    sithWorld_RegisterTextSectionParser("things", sithThing_ReadStaticThingsListText);
     sithWorld_RegisterTextSectionParser("templates", sithTemplate_ReadThingTemplatesListText);
     sithWorld_RegisterTextSectionParser("materials", sithMaterial_ReadMaterialsListText);
     sithWorld_RegisterTextSectionParser("sounds", sithSound_ReadSoundsListText);
@@ -373,7 +373,7 @@ void sithWorld_FreeEntry(sithWorld *pWorld)
         pWorld->numColormaps = 0;
     }
     if ( pWorld->things )
-        sithThing_Free(pWorld);
+        sithThing_FreeWorldThings(pWorld);
     if ( pWorld->sectors )
         sithSector_FreeWorldSectors(pWorld);
     if ( pWorld->models )
@@ -654,7 +654,7 @@ uint32_t sithWorld_CalcWorldChecksum(sithWorld *pWorld, uint32_t seed)
     // Hash all thing templates
     for (int i = 0; i < pWorld->numTemplatesLoaded; i++)
     {
-        hash = sithThing_Checksum(&pWorld->templates[i], hash);
+        hash = sithThing_CalcThingChecksum(&pWorld->templates[i], hash);
     }
     
     // Hash static COG __VM bytecode__ (*not* text)

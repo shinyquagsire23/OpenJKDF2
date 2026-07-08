@@ -43,7 +43,7 @@ int sithTemplate_AllocWorldTemplates(sithWorld *world, unsigned int numTemplates
     stdPlatform_Memzero32(world->templates, sizeof(sithThing) * numTemplates); // Added: word-safe
     for (int i = 0; i < numTemplates; i++)
     {
-        sithThing_DoesRdThingInit(&world->templates[i]);
+        sithThing_Reset(&world->templates[i]);
         if ( world->level_type_maybe & 1 )
         {
             world->templates[i].thingIdx = 0x8000 | i;
@@ -180,9 +180,9 @@ sithThing* sithTemplate_Parse(sithWorld *world)
     // Added: memset for consistent behavior
     memset(&tmp, 0, sizeof(tmp));
 
-    sithThing_DoesRdThingInit(&tmp);
+    sithThing_Reset(&tmp);
     result = (sithThing *)stdHashTable_GetKeyVal(sithTemplate_hashmap, (const char*)stdConffile_entry.args[1].value);
-    sithThing_InstantiateFromTemplate(&tmp, result);
+    sithThing_SetThingBasedOn(&tmp, result);
 
     template_name = stdConffile_entry.args[0].value;
 #ifdef SITH_DEBUG_STRUCT_NAMES
@@ -194,7 +194,7 @@ sithThing* sithTemplate_Parse(sithWorld *world)
 
     for (int i = 2; i < stdConffile_entry.numArgs; i++)
     {
-        sithThing_ParseArgs(&stdConffile_entry.args[i], &tmp);
+        sithThing_ParseArg(&stdConffile_entry.args[i], &tmp);
     }
 
     if (!tmp.type )

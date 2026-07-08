@@ -587,7 +587,7 @@ void sithCollision_FallHurt(sithThing *thing, flex_t vel)
     if ( v2 > 1.0 )
     {
         sithSoundClass_PlayModeRandom(thing, SITH_SC_HITDAMAGED);
-        sithThing_Damage(thing, thing, v2, SITH_DAMAGE_FALL);
+        sithThing_DamageThing(thing, thing, v2, SITH_DAMAGE_FALL);
     }
 }
 
@@ -695,7 +695,7 @@ flex_t sithCollision_MoveThing(sithThing *pThing, rdVector3 *a2, flex_t a6, int 
 
         if ( (v5->thingflags & SITH_TF_NOIMPACTDAMAGE) == 0 )
         {
-            sithThing_Damage(v10, v5, (a6 - v11) * 100.0, SITH_DAMAGE_IMPACT);
+            sithThing_DamageThing(v10, v5, (a6 - v11) * 100.0, SITH_DAMAGE_IMPACT);
         }
         a6 = v11;
     }
@@ -782,7 +782,7 @@ LABEL_78:
                     rdVector_Copy3(&v72, &v5->position);
                     if ( (v37->surfaceFlags & SITH_SURFACE_COG_LINKED) != 0 )
                         sithCog_SurfaceSendMessage(v37, v5, 8);
-                    sithThing_MoveToSector(v5, v19->surface->adjoin->sector, 0);
+                    sithThing_SetSector(v5, v19->surface->adjoin->sector, 0);
                     v36 = _memcmp(&v72, &v5->position, sizeof(rdVector3)) != 0;
                 }
                 else
@@ -858,9 +858,9 @@ LABEL_81:
         {
             rdVector_Copy3(&v5->position, &posCopy);
             rdVector_Copy3(&direction, &out);
-            sithThing_MoveToSector(v5, sectTmp, 0);
+            sithThing_SetSector(v5, sectTmp, 0);
             if ( v5->lifeLeftMs )
-                sithThing_Destroy(v5);
+                sithThing_DestroyThing(v5);
         }
         else {
             for (int i = 0; i < sithWorld_pCurrentWorld->numSectors; i++)
@@ -870,7 +870,7 @@ LABEL_81:
                 {
                     found = 1;
                     sithPlayer_bNoClippingRend = 0;
-                    sithThing_MoveToSector(v5, &sithWorld_pCurrentWorld->sectors[i], 0);
+                    sithThing_SetSector(v5, &sithWorld_pCurrentWorld->sectors[i], 0);
                     break;
                 }
 
@@ -888,7 +888,7 @@ LABEL_81:
         rdMatrix_TransformVector34(&i->position, &i->field_4C, &v5->lookOrientation);
         rdVector_Add3Acc(&i->position, &v5->position);
         if ( i->sector != v5->sector )
-            sithThing_MoveToSector(i, v5->sector, 0);
+            sithThing_SetSector(i, v5->sector, 0);
     }
     if ( v5->moveType == SITH_MT_PHYSICS )
     {
@@ -993,7 +993,7 @@ int sithCollision_ThingCollisionHandler(sithThing *thing1, sithThing *thing2, si
                 {
                     a1a = v15;
                     a3a = (sendera - a1a) * 100.0;
-                    sithThing_Damage(v5, v4, a3a, SITH_DAMAGE_IMPACT);
+                    sithThing_DamageThing(v5, v4, a3a, SITH_DAMAGE_IMPACT);
                 }
                 rdVector_Zero3(&v4->field_268);
             }
@@ -1117,7 +1117,7 @@ int sithCollision_CollideHurt(sithThing *a1, rdVector3 *a2, flex_t a3, int a4)
                 if ( v39 > 1.0 )
                 {
                     sithSoundClass_PlayModeRandom(a1, SITH_SC_HITDAMAGED);
-                    sithThing_Damage(a1, a1, v39, SITH_DAMAGE_FALL);
+                    sithThing_DamageThing(a1, a1, v39, SITH_DAMAGE_FALL);
                 }
             }
         }
@@ -1269,7 +1269,7 @@ int sithCollision_ParticleAndActorCollisionHandler(sithThing *thing, sithThing *
     {
         if ( tmp > 0.25 )
         {
-            sithThing_Damage(thing2, thing, mass * 0.3 * tmp, SITH_DAMAGE_IMPACT);
+            sithThing_DamageThing(thing2, thing, mass * 0.3 * tmp, SITH_DAMAGE_IMPACT);
         }
         return 1;
     }

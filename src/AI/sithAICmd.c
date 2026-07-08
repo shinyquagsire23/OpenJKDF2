@@ -476,7 +476,7 @@ int sithAICmd_LobFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorInst
 
             // Added: co-op
             if (sithNet_isMulti && sithNet_MultiModeFlags & MULTIMODEFLAG_COOP) {
-                sithThing_SetSyncFlags(actor->thing, THING_SYNC_PUPPET);
+                sithThing_SyncThing(actor->thing, THING_SYNC_PUPPET);
             }
 
             instinct->nextUpdate = sithTime_curMs + 1000;
@@ -510,7 +510,7 @@ int sithAICmd_LobFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorInst
 
         // Added: co-op
         if (sithNet_isMulti && sithNet_MultiModeFlags & MULTIMODEFLAG_COOP) {
-            sithThing_SetSyncFlags(actor->thing, THING_SYNC_PUPPET);
+            sithThing_SyncThing(actor->thing, THING_SYNC_PUPPET);
         }
     }
 
@@ -561,7 +561,7 @@ int sithAICmd_PrimaryFire(sithActor *actor, sithAIClassEntry *aiclass, sithActor
 
         // Added: co-op
         if (sithNet_isMulti && sithNet_MultiModeFlags & MULTIMODEFLAG_COOP) {
-            sithThing_SetSyncFlags(actor->thing, THING_SYNC_PUPPET);
+            sithThing_SyncThing(actor->thing, THING_SYNC_PUPPET);
         }
         return 0;
     }
@@ -617,7 +617,7 @@ int sithAICmd_PrimaryFire(sithActor *actor, sithAIClassEntry *aiclass, sithActor
 
         // Added: co-op
         if (sithNet_isMulti && sithNet_MultiModeFlags & MULTIMODEFLAG_COOP) {
-            sithThing_SetSyncFlags(actor->thing, THING_SYNC_PUPPET);
+            sithThing_SyncThing(actor->thing, THING_SYNC_PUPPET);
         }
     }
 
@@ -1298,7 +1298,7 @@ int sithAICmd_Dodge(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstin
             {
                 if ( v16->field_58[2] )
                 {
-                    if ( sithThing_GetParent(v16->field_58[2]) != actor->thing
+                    if ( sithThing_GetThingParent(v16->field_58[2]) != actor->thing
                       && v16->field_58[2]->type == SITH_THING_WEAPON
                       && v16->field_58[2]->moveType == SITH_MT_PHYSICS
                       && !sithAI_CheckSightThing(actor->thing, &actor->thing->position, v16->field_58[2], actor->pAIClass->fov, 1.0, 0.0, &a5, &tmp) )
@@ -1475,7 +1475,7 @@ int sithAICmd_SenseDanger(sithActor *actor, sithAIClassEntry *aiclass, sithActor
     }
     sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_SURPRISE);
     if ( extra )
-        actor->pFleeThing = sithThing_GetParent(extra);
+        actor->pFleeThing = sithThing_GetThingParent(extra);
     result = 1;
     actor->flags &= ~SITHAI_MODE_SEARCHING;
     actor->flags |= SITHAI_MODE_FLEEING;

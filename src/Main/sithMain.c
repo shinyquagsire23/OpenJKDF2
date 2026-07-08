@@ -282,7 +282,7 @@ int sithUpdate()
             for (int i = (int)framesToApply; i > 0; i--)
             {
                 sithSurface_Tick(sithTime_deltaSeconds);
-                sithThing_TickAll(sithTime_deltaSeconds, sithTime_deltaMs);
+                sithThing_Update(sithTime_deltaSeconds, sithTime_deltaMs);
             }
 
             sithTime_deltaSeconds = tmp;
@@ -292,7 +292,7 @@ int sithUpdate()
 #endif
         {
             sithSurface_Tick(sithTime_deltaSeconds);
-            sithThing_TickAll(sithTime_deltaSeconds, sithTime_deltaMs);
+            sithThing_Update(sithTime_deltaSeconds, sithTime_deltaMs);
         }
         sithConsole_Flush();
         return 1;
@@ -357,7 +357,7 @@ int sithUpdate()
                 //{
                 //    sithControl_Update(sithTime_deltaSeconds, sithTime_deltaMs);
                 //}
-                sithThing_TickAll(sithTime_deltaSeconds, sithTime_deltaMs);
+                sithThing_Update(sithTime_deltaSeconds, sithTime_deltaMs);
                 sithThing_MotsTick(0x1F, 0, 0);
 
                 sithCog_ProcessCogs();
@@ -398,7 +398,7 @@ int sithUpdate()
 #endif
             }
 
-            sithThing_TickAll(sithTime_deltaSeconds, sithTime_deltaMs);
+            sithThing_Update(sithTime_deltaSeconds, sithTime_deltaMs);
             sithThing_MotsTick(0x1F, 0, 0);
 
             sithCog_ProcessCogs();

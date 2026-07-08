@@ -165,7 +165,7 @@ void jkCog_SetFlags(sithCog *ctx)
         thing->jkFlags |= flags;
         if ( COG_SHOULD_SYNC(ctx) )
         {
-            sithThing_SetSyncFlags(thing, THING_SYNC_STATE);
+            sithThing_SyncThing(thing, THING_SYNC_STATE);
         }
     }
 }
@@ -184,7 +184,7 @@ void jkCog_ClearFlags(sithCog *ctx)
             v2->jkFlags &= ~v1;
             if ( COG_SHOULD_SYNC(ctx) )
             {
-                sithThing_SetSyncFlags(v2, THING_SYNC_STATE);
+                sithThing_SyncThing(v2, THING_SYNC_STATE);
             }
         }
     }
@@ -344,7 +344,7 @@ void jkCog_SetInvis(sithCog *pCog)
         v2->rdthing.curGeoMode = RD_GEOMODE_VERTICES;
     if ( COG_SHOULD_SYNC(pCog) )
     {
-        sithThing_SetSyncFlags(v2, THING_SYNC_STATE);
+        sithThing_SyncThing(v2, THING_SYNC_STATE);
     }
 }
 
@@ -366,7 +366,7 @@ void jkCog_SetInvulnerable(sithCog *pCog)
     v2->actorParams.typeflags = v4;
     if ( COG_SHOULD_SYNC(pCog) )
     {
-        sithThing_SetSyncFlags(v2, THING_SYNC_STATE);
+        sithThing_SyncThing(v2, THING_SYNC_STATE);
     }
 }
 

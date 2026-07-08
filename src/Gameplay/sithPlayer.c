@@ -39,7 +39,7 @@ void sithPlayer_Startup(int idx)
     {
         if ( sithWorld_pCurrentWorld )
         {
-            sithThing_SetNewModel(v2, v2->templateBase->rdthing.model3);
+            sithThing_SetThingModel(v2, v2->templateBase->rdthing.model3);
             jkPlayer_playerInfos[idx].playerThing->thingflags |= SITH_TF_DISABLED;
         }
     }
@@ -366,7 +366,7 @@ void sithPlayer_KillPlayer(sithThing *thing)
       || (sithCog_ThingSendMessage(thing, thing, SITH_MESSAGE_KILLED), (thing->thingflags & SITH_TF_WILLBEREMOVED) == 0) )
     {
         sithSoundClass_StopSound(thing, 0);
-        sithThing_detachallchildren(thing);
+        sithThing_DetachAttachedThings(thing);
         sithActor_SetHeadPYR(thing, &rdroid_zeroVector3);
         thing->physicsParams.physflags &= ~(SITH_PF_CROUCHING|SITH_PF_800|SITH_PF_100);
         thing->physicsParams.physflags |= (SITH_PF_SURFACEALIGN|SITH_PF_USEGRAVITY);
@@ -517,8 +517,8 @@ void sithPlayer_NewPlayer(sithThing *player)
         if ( !sithNet_isMulti || player == sithPlayer_pLocalPlayerThing )
         {
             v9 = sithMulti_GetSpawnIdx(player);
-            sithThing_LeaveSector(player);
-            sithThing_SetPosAndRot(
+            sithThing_ExitSector(player);
+            sithThing_SetPositionAndOrient(
                 player,
                 &jkPlayer_playerInfos[v9].spawnPosOrient.scale,
                 &jkPlayer_playerInfos[v9].spawnPosOrient);

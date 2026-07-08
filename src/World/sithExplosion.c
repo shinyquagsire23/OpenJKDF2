@@ -104,7 +104,7 @@ void sithExplosion_MakeBlast(sithThing *explosion)
                     }
                     if ( damage != 0.0 )
                     {
-                        sithThing_Damage(v4, explosion, a1a * damage, explosion->explosionParams.damageClass);
+                        sithThing_DamageThing(v4, explosion, a1a * damage, explosion->explosionParams.damageClass);
                     }
                 }
             }
@@ -121,7 +121,7 @@ void sithExplosion_MakeBlast(sithThing *explosion)
             a2.y = _frand() * 360.0;
             a2.z = _frand() * 360.0;
             rdMatrix_BuildRotate34(&a3, &a2);
-            sithThing_Create(*debrisTemplates, &explosion->position, &a3, explosion->sector, 0);
+            sithThing_CreateThingAtPos(*debrisTemplates, &explosion->position, &a3, explosion->sector, 0);
         }
         ++debrisTemplates;
     }

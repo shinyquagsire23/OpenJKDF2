@@ -122,7 +122,7 @@ void sithWeapon_HandleImpact(sithThing *weapon)
                 {
                     rdVector_Copy3(&tmp, &weapon->position);
                     rdVector_MultAcc3(&tmp, &weaponPos_, elementSize);
-                    sithThing_Create(weapon->weaponParams.trailThing, &tmp, &weapon->lookOrientation, sector, 0);
+                    sithThing_CreateThingAtPos(weapon->weaponParams.trailThing, &tmp, &weapon->lookOrientation, sector, 0);
                     elementSize += weapon->weaponParams.elementSize;
                 }
                 while ( elementSize < searchRes->distance );
@@ -142,7 +142,7 @@ void sithWeapon_HandleImpact(sithThing *weapon)
         }
         if (searchRes->hitType & SITHCOLLISION_THING)
         {
-            sithThing_Damage(searchRes->receiver, weapon, damage_, weapon->weaponParams.damageClass);
+            sithThing_DamageThing(searchRes->receiver, weapon, damage_, weapon->weaponParams.damageClass);
             if ( weapon->weaponParams.force != 0.0 )
             {
                 damageReceiver = searchRes->receiver;
@@ -161,7 +161,7 @@ void sithWeapon_HandleImpact(sithThing *weapon)
         {
             rdVector_Copy3(&tmp2, &weapon->position);
             rdVector_MultAcc3(&tmp2, &weaponPos_, searchRes->distance);
-            sithThing_Create(weapon->weaponParams.explodeTemplate, &tmp2, &rdroid_identMatrix34, sector, 0);
+            sithThing_CreateThingAtPos(weapon->weaponParams.explodeTemplate, &tmp2, &rdroid_identMatrix34, sector, 0);
         }
     }
 
@@ -176,12 +176,12 @@ LABEL_20:
         {
             rdVector_Copy3(&tmp, &weapon->position);
             rdVector_MultAcc3(&tmp, &weaponPos_, elementSize);
-            sithThing_Create(weapon->weaponParams.trailThing, &tmp, &weapon->lookOrientation, sector, 0);
+            sithThing_CreateThingAtPos(weapon->weaponParams.trailThing, &tmp, &weapon->lookOrientation, sector, 0);
             elementSize += weapon->weaponParams.elementSize;
         }
         while ( elementSize < weapon->weaponParams.range );
     }
-    sithThing_Destroy(weapon);
+    sithThing_DestroyThing(weapon);
 }
 
 void sithWeapon_sub_4D3920(sithThing *weapon)
@@ -305,7 +305,7 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
                         rdMatrix_BuildRotate34(&camera, &rot);
                     }
                     sectorLook = sithCollision_FindSectorInRadius(sector, &a3, &weaponPos, 0.0);
-                    sithThing_Create(weapon->weaponParams.trailThing, &weaponPos, &camera, sectorLook, 0);
+                    sithThing_CreateThingAtPos(weapon->weaponParams.trailThing, &weaponPos, &camera, sectorLook, 0);
                     rdMatrix_TransformPoint34(&vertex_out, &vertex, &camera);
                     rdVector_Add3Acc(&weaponPos, &vertex_out);
                 }
@@ -327,7 +327,7 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
         }
         if ( (searchRes->hitType & SITHCOLLISION_THING) != 0 )
         {
-            sithThing_Damage(searchRes->receiver, weapon, amount, weapon->weaponParams.damageClass);
+            sithThing_DamageThing(searchRes->receiver, weapon, amount, weapon->weaponParams.damageClass);
             if ( weapon->weaponParams.force != 0.0 )
             {
                 receiveThing = searchRes->receiver;
@@ -350,7 +350,7 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
             tmp2.x = searchRes->distance * lookOrient.x + weapon->position.x;
             tmp2.y = searchRes->distance * lookOrient.y + weapon->position.y;
             tmp2.z = searchRes->distance * lookOrient.z + weapon->position.z;
-            sithThing_Create(explodeTemplate, &tmp2, &rdroid_identMatrix34, sector, 0);
+            sithThing_CreateThingAtPos(explodeTemplate, &tmp2, &rdroid_identMatrix34, sector, 0);
         }
     }
 LABEL_25:
@@ -397,13 +397,13 @@ LABEL_25:
                 rdMatrix_BuildRotate34(&camera, &rot);
             }
             sectorLook_ = sithCollision_FindSectorInRadius(sector, &a3, &weaponPos, 0.0);
-            sithThing_Create(weapon->weaponParams.trailThing, &weaponPos, &camera, sectorLook_, 0);
+            sithThing_CreateThingAtPos(weapon->weaponParams.trailThing, &weaponPos, &camera, sectorLook_, 0);
             rdMatrix_TransformPoint34(&vertex_out, &vertex, &camera);
             rdVector_Add3Acc(&weaponPos, &vertex_out);
         }
         while ( v32 < (flex_d_t)weapon->weaponParams.range );
     }
-    sithThing_Destroy(weapon);
+    sithThing_DestroyThing(weapon);
 }
 
 int sithWeapon_ParseArg(stdConffileArg *arg, sithThing *thing, int param)
@@ -541,7 +541,7 @@ sithThing* sithWeapon_WeaponFireProjectile(sithThing *sender, sithThing *project
                 projectileTemplate->physicsParams.vel.z = 0;
             }
         }
-        v9 = sithThing_Create(projectileTemplate, &sender->position, &a3a, sender->sector, sender);
+        v9 = sithThing_CreateThingAtPos(projectileTemplate, &sender->position, &a3a, sender->sector, sender);
         if (Main_bMotsCompat) {
             projectileTemplate->physicsParams.vel.z = fVar3;
         }
@@ -695,7 +695,7 @@ int sithWeapon_ThingCollisionHandler(sithThing *physicsThing, sithThing *collide
         }
 
         if (physicsThing->weaponParams.damage != 0.0) {
-            sithThing_Damage(collidedThing, physicsThing, physicsThing->weaponParams.damage, physicsThing->weaponParams.damageClass);
+            sithThing_DamageThing(collidedThing, physicsThing, physicsThing->weaponParams.damage, physicsThing->weaponParams.damageClass);
         }
 
         if (physicsThing->weaponParams.typeflags & SITH_WF_EXPLODE_ON_SURFACE_HIT)
@@ -710,7 +710,7 @@ int sithWeapon_ThingCollisionHandler(sithThing *physicsThing, sithThing *collide
         sithSoundClass_StopMode(physicsThing, SITH_PF_USEGRAVITY);
         sithSoundClass_PlayModeFirst(physicsThing, SITH_SC_HITHARD);
         physicsThing->moveSize = 0.0;
-        sithThing_AttachThing(physicsThing, collidedThing);
+        sithThing_AttachThingToThing(physicsThing, collidedThing);
         sithPhysics_SetThingLook(physicsThing, &a4->hitNorm, 0.0);
         
         physicsThing->attach_flags |= SITH_ATTACH_NO_MOVE;
@@ -731,7 +731,7 @@ int sithWeapon_ThingCollisionHandler(sithThing *physicsThing, sithThing *collide
     if (sithCollision_ThingCollisionHandler(physicsThing, collidedThing, a4, a5))
     {
         if (physicsThing->weaponParams.damage != 0.0) {
-            sithThing_Damage(collidedThing, physicsThing, physicsThing->weaponParams.damage, physicsThing->weaponParams.damageClass);
+            sithThing_DamageThing(collidedThing, physicsThing, physicsThing->weaponParams.damage, physicsThing->weaponParams.damageClass);
         }
         if (physicsThing->weaponParams.typeflags & SITH_WF_EXPLODE_ON_THING_HIT)
         {
@@ -749,7 +749,7 @@ int sithWeapon_ThingCollisionHandler(sithThing *physicsThing, sithThing *collide
         if (!(physicsThing->weaponParams.typeflags & SITH_WF_ATTACH_TO_THING))
             return 1;
         sithPhysics_ResetThingMovement(physicsThing);
-        sithThing_AttachThing(physicsThing, collidedThing);
+        sithThing_AttachThingToThing(physicsThing, collidedThing);
 
         physicsThing->attach_flags |= SITH_ATTACH_NO_MOVE;
         physicsThing->physicsParams.physflags |= SITH_PF_USEGRAVITY;
@@ -784,7 +784,7 @@ int sithWeapon_SurfaceCollisionHandler(sithThing *thing, sithSurface *surface, s
     }
     v6 = surface->surfaceFlags;
     if (v6 & (SITH_SURFACE_CEILING_SKY|SITH_SURFACE_HORIZON_SKY)) {
-        sithThing_Destroy(thing);
+        sithThing_DestroyThing(thing);
         return 1;
     }
     typeFlags = thing->weaponParams.typeflags;
@@ -831,7 +831,7 @@ int sithWeapon_SurfaceCollisionHandler(sithThing *thing, sithSurface *surface, s
             sithPhysics_ResetThingMovement(thing);
             sithSoundClass_StopMode(thing, SITH_SC_CREATE);
             thing->moveSize = 0.0;
-            sithThing_AttachToSurface(thing, surface, 0);
+            sithThing_AttachThingToSurface(thing, surface, 0);
             sithPhysics_SetThingLook(thing, &surface->surfaceInfo.face.normal, 0.0);
             thing->physicsParams.physflags |= SITH_PF_NOTHRUST;
             result = 1;
@@ -849,7 +849,7 @@ void sithWeapon_DestroyWeapon(sithThing *weapon)
     }
     else
     {
-        sithThing_Destroy(weapon);
+        sithThing_DestroyThing(weapon);
     }
 }
 
@@ -857,8 +857,8 @@ void sithWeapon_CreateWeaponExplosion(sithThing *weapon, sithThing *explodeTempl
 {
     if (explodeTemplate)
     {
-        sithThing* player = sithThing_GetParent(weapon);
-        sithThing* spawned = sithThing_Create(explodeTemplate, &weapon->position, &rdroid_identMatrix34, weapon->sector, player);
+        sithThing* player = sithThing_GetThingParent(weapon);
+        sithThing* spawned = sithThing_CreateThingAtPos(explodeTemplate, &weapon->position, &rdroid_identMatrix34, weapon->sector, player);
         if (spawned)
         {
             // Added: second comparison, co-op
@@ -871,7 +871,7 @@ void sithWeapon_CreateWeaponExplosion(sithThing *weapon, sithThing *explodeTempl
             }
         }
     }
-    sithThing_Destroy(weapon);
+    sithThing_DestroyThing(weapon);
 }
 
 void sithWeapon_StartupEntry()

@@ -23,7 +23,7 @@ int jkEpisode_numBubbles = 0;
 // MOTS altered
 int jkEpisode_Startup()
 {
-    sithThing_SetHandler(jkEpisode_UpdateExtra);
+    sithThing_RegisterUnknownFunc(jkEpisode_UpdateExtra);
     jkEpisode_numBubbles = 0;
     return 1;
 }

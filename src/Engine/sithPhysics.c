@@ -108,7 +108,7 @@ LABEL_8:
                     if ( (i->hitType & SITHCOLLISION_WORLD) != 0 )
                     {
                         //printf("Attach to new surface? %x\n", i->surface->field_0);
-                        sithThing_AttachToSurface(pThing, i->surface, a3);
+                        sithThing_AttachThingToSurface(pThing, i->surface, a3);
                         sithCollision_DecreaseStackLevel();
                         return;
                     }
@@ -128,7 +128,7 @@ LABEL_8:
                             if ( (searchFlags & RAYCAST_10) == 0
                               || (rdMatrix_TransformVector34(&a1, &v12->normal, &v11->lookOrientation), rdVector_Dot3(&a1, &rdroid_zVector3) >= 0.6) )
                             {
-                                sithThing_LandThing(pThing, v11, i->face, i->sender->vertices, a3);
+                                sithThing_AttachThingToThingFace(pThing, v11, i->face, i->sender->vertices, a3);
                                 sithCollision_DecreaseStackLevel();
                                 return;
                             }

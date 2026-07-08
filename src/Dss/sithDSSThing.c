@@ -68,7 +68,7 @@ int sithDSSThing_ProcessPos(sithCogMsg *msg)
 
     int thing_id = NETMSG_POPS32();
 
-    sithThing* pThing = sithThing_GetById(thing_id);
+    sithThing* pThing = sithThing_GetGuidThing(thing_id);
     //printf("sithDSSThing_ProcessPos %x %x\n", thing_id, pThing->controlType);
     if ( !pThing || pThing->type == SITH_THING_FREE || !pThing->sector )
         return 0;
@@ -105,7 +105,7 @@ int sithDSSThing_ProcessPos(sithCogMsg *msg)
     else
     {
         pThing->position = pos;
-        sithThing_MoveToSector(pThing, pSector, 0);
+        sithThing_SetSector(pThing, pSector, 0);
     }
     if ( pThing->type == SITH_THING_PLAYER )
     {
@@ -133,12 +133,12 @@ void sithDSSThing_UpdateState(sithThing *pThing, int sendto_id, int mpFlags)
     if (!pThing->sector) {
         jk_printf("OpenJKDF2 WARN: Thing sector NULL, not synced.\n");
     }
-    if (!sithThing_GetIdxFromThing(pThing)) {
+    if (!sithThing_ValidateThingPointer(pThing)) {
         jk_printf("OpenJKDF2 WARN: Thing not syncable?\n");
     }
 #endif
 
-    if (!pThing || !pThing->type || !pThing->sector || !sithThing_GetIdxFromThing(pThing) || MOTS_ONLY_FLAG(pThing->physicsParams.physflags & SITH_PF_4000000))
+    if (!pThing || !pThing->type || !pThing->sector || !sithThing_ValidateThingPointer(pThing) || MOTS_ONLY_FLAG(pThing->physicsParams.physflags & SITH_PF_4000000))
         return;
 
     NETMSG_PUSHS32(pThing->thing_id);
@@ -195,7 +195,7 @@ int sithDSSThing_ProcessStateUpdate(sithCogMsg *msg)
     NETMSG_IN_START(msg);
 
     int id = NETMSG_POPS32();
-    sithThing* pThing = sithThing_GetById(id);
+    sithThing* pThing = sithThing_GetGuidThing(id);
     if ( !pThing )
         return 0;
 
@@ -223,7 +223,7 @@ int sithDSSThing_ProcessStateUpdate(sithCogMsg *msg)
         return 0;
     pThing->collide = NETMSG_POPS16();
     pThing->position = NETMSG_POPVEC3();
-    sithThing_MoveToSector(pThing, pSector, 0);
+    sithThing_SetSector(pThing, pSector, 0);
 
     uint32_t thingflags = NETMSG_POPS32();
     if ( pThing->type == SITH_THING_PLAYER && (pThing->thingflags & SITH_TF_DEAD) && !(thingflags & SITH_TF_DEAD) && MOTS_ONLY_COND(pThing != sithPlayer_pLocalPlayerThing))
@@ -347,7 +347,7 @@ int sithDSSThing_ProcessPlaySound(sithCogMsg *msg)
     }
     else
     {
-        sithThing* thing = sithThing_GetById(NETMSG_POPS32());
+        sithThing* thing = sithThing_GetGuidThing(NETMSG_POPS32());
         if ( !thing )
             return 0;
         out = sithSoundMixer_PlaySoundThing(sound, thing, 1.0, volume, a5, flags);
@@ -379,7 +379,7 @@ int sithDSSThing_ProcessPlaySoundMode(sithCogMsg *msg)
 
     NETMSG_IN_START(msg);
 
-    sithThing* pThing = sithThing_GetById(NETMSG_POPS32());
+    sithThing* pThing = sithThing_GetGuidThing(NETMSG_POPS32());
     if (!pThing)
         return 0;
     
@@ -415,7 +415,7 @@ int sithDSSThing_ProcessPlayKey(sithCogMsg *msg)
 {
     NETMSG_IN_START(msg);
 
-    sithThing* pThing = sithThing_GetById(NETMSG_POPS32());
+    sithThing* pThing = sithThing_GetGuidThing(NETMSG_POPS32());
     if ( pThing )
     {
         if ( pThing->rdthing.puppet )
@@ -463,7 +463,7 @@ int sithDSSThing_ProcessPlayKeyMode(sithCogMsg *msg)
 {
     NETMSG_IN_START(msg);
 
-    sithThing* pThing = sithThing_GetById(NETMSG_POPS32());
+    sithThing* pThing = sithThing_GetGuidThing(NETMSG_POPS32());
 
     if (!pThing )
         return 0;
@@ -502,14 +502,14 @@ int sithDSSThing_ProcessSetModel(sithCogMsg *msg)
 
     NETMSG_IN_START(msg);
 
-    sithThing* pThing = sithThing_GetById(NETMSG_POPS32());
+    sithThing* pThing = sithThing_GetGuidThing(NETMSG_POPS32());
     if ( pThing )
     {
         NETMSG_POPSTR(model_3do_fname, 0x20);
         rdModel3* pModel = sithModel_Load(model_3do_fname, 1);
         if ( pModel )
         {
-            sithThing_SetNewModel(pThing, pModel);
+            sithThing_SetThingModel(pThing, pModel);
             return 1;
         }
     }
@@ -533,7 +533,7 @@ int sithDSSThing_ProcessStopKey(sithCogMsg *msg)
 {
     NETMSG_IN_START(msg);
 
-    sithThing* pThing = sithThing_GetById(NETMSG_POPS32());
+    sithThing* pThing = sithThing_GetGuidThing(NETMSG_POPS32());
     if ( !pThing )
         return 0;
 
@@ -639,7 +639,7 @@ int sithDSSThing_ProcessFire(sithCogMsg *msg)
 
     // TODO: bug? if this fails, it might completely screw over save files?
 
-    sithThing* pThing = sithThing_GetById(idx);
+    sithThing* pThing = sithThing_GetGuidThing(idx);
     if ( pThing )
     {
         int16_t scaleFlags = NETMSG_POPS16();
@@ -678,7 +678,7 @@ int sithDSSThing_ProcessMOTSNew2(sithCogMsg *msg)
 {
     NETMSG_IN_START(msg);
 
-    sithThing* pThing = sithThing_GetById(NETMSG_POPS32());
+    sithThing* pThing = sithThing_GetGuidThing(NETMSG_POPS32());
     if ( pThing )
     {
         int16_t scaleFlags = NETMSG_POPS16();
@@ -734,10 +734,10 @@ int sithDSSThing_ProcessDeath(sithCogMsg *msg)
 {
     NETMSG_IN_START(msg);
 
-    sithThing* pSender = sithThing_GetById(NETMSG_POPS32());
+    sithThing* pSender = sithThing_GetGuidThing(NETMSG_POPS32());
     if ( pSender )
     {
-        sithThing* pReceiver = sithThing_GetById(NETMSG_POPS32());
+        sithThing* pReceiver = sithThing_GetGuidThing(NETMSG_POPS32());
         int cause = NETMSG_POPU8();
         int senderType = pSender->type;
         if ( senderType == SITH_THING_ACTOR)
@@ -784,16 +784,16 @@ int sithDSSThing_ProcessDamage(sithCogMsg *msg)
 
     NETMSG_IN_START(msg);
 
-    sithThing* pDamagedThing = sithThing_GetById(NETMSG_POPS32());
+    sithThing* pDamagedThing = sithThing_GetGuidThing(NETMSG_POPS32());
     if ( pDamagedThing )
     {
-        sithThing* pDamagedBy = sithThing_GetById(NETMSG_POPS32());
+        sithThing* pDamagedBy = sithThing_GetGuidThing(NETMSG_POPS32());
         if ( !pDamagedBy )
             pDamagedBy = pDamagedThing;
 
         flex32_t arg2 = NETMSG_POPF32();
         int16_t arg3 = NETMSG_POPS16();
-        sithThing_Damage(pDamagedThing, pDamagedBy, arg2, arg3);
+        sithThing_DamageThing(pDamagedThing, pDamagedBy, arg2, arg3);
         return 1;
     }
     return 0;
@@ -984,7 +984,7 @@ int sithDSSThing_ProcessFullDescription(sithCogMsg *msg)
         return 0;
 
     if ( sithWorld_pCurrentWorld->things[thingIdx].type )
-        sithThing_FreeEverythingNet(&sithWorld_pCurrentWorld->things[thingIdx]);
+        sithThing_RemoveThing(&sithWorld_pCurrentWorld->things[thingIdx]);
 
     // Only bump the high-water mark; do NOT clobber the destination slot.
     // The original game (JK.EXE @ 0x004F46F0) keeps these as two separate locals:
@@ -1004,13 +1004,13 @@ int sithDSSThing_ProcessFullDescription(sithCogMsg *msg)
         return 1;
 
     thing = &sithWorld_pCurrentWorld->things[thingIdx];
-    sithThing_DoesRdThingInit(thing);
+    sithThing_Reset(thing);
     v8 = NETMSG_POPS16();
 
     if ( v8 >= sithWorld_pCurrentWorld->numTemplatesLoaded )
         return 0;
 
-    sithThing_InstantiateFromTemplate(thing, &sithWorld_pCurrentWorld->templates[v8]);
+    sithThing_SetThingBasedOn(thing, &sithWorld_pCurrentWorld->templates[v8]);
 
     thing->signature = NETMSG_POPS32();
     thing->thing_id = NETMSG_POPS32();
@@ -1023,7 +1023,7 @@ int sithDSSThing_ProcessFullDescription(sithCogMsg *msg)
     int sectorIdx = NETMSG_POPS16();
     v11 = sithSector_GetPtrFromIdx(sectorIdx);
     if ( v11 )
-        sithThing_MoveToSector(thing, v11, 1);
+        sithThing_SetSector(thing, v11, 1);
 
     thing->thingflags = NETMSG_POPU32();
     thing->lifeLeftMs = NETMSG_POPS32();
@@ -1053,7 +1053,7 @@ int sithDSSThing_ProcessFullDescription(sithCogMsg *msg)
             NETMSG_POPSTR(tmp_model, 0x20);
             int unused = NETMSG_POPS16();
             rdModel3* pModel = sithModel_Load(tmp_model, 0);
-            sithThing_SetNewModel(thing, pModel);
+            sithThing_SetThingModel(thing, pModel);
 
             model = pModel;
         }
@@ -1170,7 +1170,7 @@ int sithDSSThing_ProcessFullDescription(sithCogMsg *msg)
             }
         }
     }
-    sithThing_sub_4CD100(thing);
+    sithThing_Initialize(thing);
     return 1;
 }
 
@@ -1205,7 +1205,7 @@ int sithDSSThing_ProcessPathMove(sithCogMsg *msg)
     NETMSG_IN_START(msg);
 
     int arg0 = NETMSG_POPS32();
-    sithThing* pThing = sithThing_GetById(NETMSG_POPS32());
+    sithThing* pThing = sithThing_GetGuidThing(NETMSG_POPS32());
     if ( !pThing || pThing->moveType != SITH_MT_PATH )
         return 0;
 
@@ -1218,7 +1218,7 @@ int sithDSSThing_ProcessPathMove(sithCogMsg *msg)
             return 0;
 
         pThing->position = NETMSG_POPVEC3();
-        sithThing_MoveToSector(pThing, pSector, 0);
+        sithThing_SetSector(pThing, pSector, 0);
         rdVector3 lookAngles = NETMSG_POPVEC3();
         
         rdMatrix_BuildRotate34(&pThing->lookOrientation, &lookAngles);
@@ -1280,7 +1280,7 @@ int sithDSSThing_ProcessAttachment(sithCogMsg *msg)
 {    
     NETMSG_IN_START(msg);
 
-    sithThing* v1 = sithThing_GetById(NETMSG_POPS32());
+    sithThing* v1 = sithThing_GetGuidThing(NETMSG_POPS32());
     if ( !v1 )
         return 0;
     int v3 = NETMSG_POPU16();
@@ -1289,7 +1289,7 @@ int sithDSSThing_ProcessAttachment(sithCogMsg *msg)
         sithSurface* v5 = sithSurface_sub_4E63B0(NETMSG_POPS16());
         if ( v5 )
         {
-            sithThing_AttachToSurface(v1, v5, 1);
+            sithThing_AttachThingToSurface(v1, v5, 1);
             v1->attach_flags = v3;
             return 1;
         }
@@ -1297,12 +1297,12 @@ int sithDSSThing_ProcessAttachment(sithCogMsg *msg)
     }
     if (v3 & (SITH_ATTACH_THING|SITH_ATTACH_THINGSURFACE))
     {
-        sithThing* v9 = sithThing_GetById(NETMSG_POPS32());
+        sithThing* v9 = sithThing_GetGuidThing(NETMSG_POPS32());
         if ( !v9 )
             return 0;
         if (v3 & SITH_ATTACH_THINGSURFACE)
         {
-            sithThing_LandThing(
+            sithThing_AttachThingToThingFace(
                 v1,
                 v9,
                 &v9->rdthing.model3->geosets[0].meshes->faces[NETMSG_POPS16()],
@@ -1313,7 +1313,7 @@ int sithDSSThing_ProcessAttachment(sithCogMsg *msg)
         }
         else
         {
-            sithThing_AttachThing(v1, v9);
+            sithThing_AttachThingToThing(v1, v9);
             v1->attach_flags = v3;
             v1->field_4C = NETMSG_POPVEC3();
             return 1;
@@ -1353,7 +1353,7 @@ void sithDSSThing_Take(sithThing *pItemThing, sithThing *pActor, int mpFlags)
         sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sithNet_serverNetId, mpFlags, 1);
         return;
     }
-    pItemThing2 = sithThing_GetById(itemThingId);
+    pItemThing2 = sithThing_GetGuidThing(itemThingId);
     if ( !pItemThing2 && sithNet_isServer )
     {
         sithComm_netMsgTmp.pktData[0] = itemThingId;
@@ -1363,7 +1363,7 @@ void sithDSSThing_Take(sithThing *pItemThing, sithThing *pActor, int mpFlags)
         sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sithComm_netMsgTmp.netMsg.thingIdx, 255, 1);
         return;
     }
-    pActor2 = sithThing_GetById(sithComm_netMsgTmp.pktData[1]);
+    pActor2 = sithThing_GetGuidThing(sithComm_netMsgTmp.pktData[1]);
     if ( pItemThing2 && pActor2 )
     {
         if ( sithComm_netMsgTmp.netMsg.cogMsgId != DSS_TAKEITEM1 )
@@ -1389,7 +1389,7 @@ int sithDSSThing_ProcessTake(sithCogMsg *msg)
     int v6; // [esp-Ch] [ebp-1Ch]
 
     v1 = msg->pktData[0];
-    v2 = sithThing_GetById(v1);
+    v2 = sithThing_GetGuidThing(v1);
     if ( !v2 && sithNet_isServer )
     {
         v6 = msg->netMsg.thingIdx;
@@ -1403,7 +1403,7 @@ int sithDSSThing_ProcessTake(sithCogMsg *msg)
     if (msg->pktData[1] == -1) // MOTS added
         v4 = NULL;
     else
-        v4 = sithThing_GetById(msg->pktData[1]);
+        v4 = sithThing_GetGuidThing(msg->pktData[1]);
     if ( v2 /*&& v4*/ ) // MOTS removed nullptr check
     {
         if ( msg->netMsg.cogMsgId == DSS_TAKEITEM1 )
@@ -1460,14 +1460,14 @@ int sithDSSThing_ProcessCreateThing(sithCogMsg *msg)
             rdVector3 pos = NETMSG_POPVEC3();
             rdVector3 rot = NETMSG_POPVEC3();
             rdMatrix_BuildRotate34(&lookOrient, &rot);
-            pCreated = sithThing_Create(pThing, &pos, &lookOrient, pSector, 0);
+            pCreated = sithThing_CreateThingAtPos(pThing, &pos, &lookOrient, pSector, 0);
         }
         else
         {
-            sithThing* pThing2 = sithThing_GetById(pThing2Id);
+            sithThing* pThing2 = sithThing_GetGuidThing(pThing2Id);
             if ( !pThing2 )
                 return 0;
-            pCreated = sithThing_SpawnTemplate(pThing, pThing2);
+            pCreated = sithThing_CreateThing(pThing, pThing2);
         }
 
         if ( pCreated )
@@ -1494,10 +1494,10 @@ int sithDSSThing_ProcessDestroyThing(sithCogMsg *msg)
 {
     NETMSG_IN_START(msg);
 
-    sithThing* pThing = sithThing_GetById(NETMSG_POPS32());
+    sithThing* pThing = sithThing_GetGuidThing(NETMSG_POPS32());
     if ( pThing )
     {
-        sithThing_Destroy(pThing);
+        sithThing_DestroyThing(pThing);
         return 1;
     }
     return 0;
@@ -1529,7 +1529,7 @@ void sithDSSThing_MoveToPos(sithThing *pThing, rdVector3 *pPos, sithSector *pSec
     if ( v5 == 0.0 || v5 >= 0.5 )
     {
         rdVector_Copy3(&pThing->position, pPos);
-        sithThing_MoveToSector(pThing, pSector, 0);
+        sithThing_SetSector(pThing, pSector, 0);
     }
     else
     {
@@ -1590,8 +1590,8 @@ int sithDSSThing_ProcessMOTSNew1(sithCogMsg *msg)
         rdMatrix_BuildRotate34(&local_30,&local_48);
 
         uVar3 = NETMSG_POPS32();
-        psVar2 = sithThing_GetById(NETMSG_POPS32());
-        psVar1 = sithThing_Create(psVar1,&local_3c,&local_30,sector,psVar2);
+        psVar2 = sithThing_GetGuidThing(NETMSG_POPS32());
+        psVar1 = sithThing_CreateThingAtPos(psVar1,&local_3c,&local_30,sector,psVar2);
         if (!rdVector_IsZero3(&local_54))
         {
             rdVector_Normalize3Acc(&local_54);
@@ -1600,12 +1600,12 @@ int sithDSSThing_ProcessMOTSNew1(sithCogMsg *msg)
     }
     else 
     {
-        psVar2 = sithThing_GetById(thing_id);
+        psVar2 = sithThing_GetGuidThing(thing_id);
         if (psVar2 == NULL)
         {
             return 0;
         }
-        psVar1 = sithThing_SpawnTemplate(psVar1,psVar2);
+        psVar1 = sithThing_CreateThing(psVar1,psVar2);
         uVar3 = puVar4;
     }
 

@@ -267,7 +267,7 @@ void  jkSaber_UpdateCollision2(sithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
             {
                 jkSaber_SpawnSparks(playerInfo, &local_54, pSectorIter, SPARKTYPE_BLOOD);
 
-                sithThing_Damage(searchResult->receiver, pPlayerThing, pCollideInfo->damage, SITH_DAMAGE_SABER);
+                sithThing_DamageThing(searchResult->receiver, pPlayerThing, pCollideInfo->damage, SITH_DAMAGE_SABER);
                 pCollideInfo->damagedThings[pCollideInfo->numDamagedThings++] = searchResult->receiver;
                 break;
             }
@@ -304,7 +304,7 @@ void  jkSaber_UpdateCollision2(sithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
 
             jkSaber_SpawnSparks(playerInfo, &local_54, pSectorIter, SPARKTYPE_BLOOD);
 
-            sithThing_Damage(resultThing, pPlayerThing, pCollideInfo->damage, SITH_DAMAGE_SABER);
+            sithThing_DamageThing(resultThing, pPlayerThing, pCollideInfo->damage, SITH_DAMAGE_SABER);
             pCollideInfo->damagedThings[pCollideInfo->numDamagedThings++] = searchResult->receiver;
             break;
         }
@@ -451,7 +451,7 @@ void jkSaber_SpawnSparks(jkPlayerInfo *pPlayerInfo, rdVector3 *pPos, sithSector 
     }
     if ( pTemplate )
     {
-        pSpawned = sithThing_Create(pTemplate, pPos, &rdroid_identMatrix34, psector, 0);
+        pSpawned = sithThing_CreateThingAtPos(pTemplate, pPos, &rdroid_identMatrix34, psector, 0);
         if ( pSpawned )
         {
             pSpawned->prev_thing = pPlayerInfo->actorThing;

@@ -577,8 +577,8 @@ int sithCommand_Warp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     else
     {
         sithThing_DetachThing(v3);
-        sithThing_LeaveSector(v3);
-        sithThing_SetPosAndRot(v3, &a1, &a);
+        sithThing_ExitSector(v3);
+        sithThing_SetPositionAndOrient(v3, &a1, &a);
         sithThing_EnterSector(v3, v6, 1, 0);
         result = 1;
     }
@@ -817,7 +817,7 @@ int sithCommand_CmdThingNpc(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             sithConsole_PrintString("No template by that name.");
         }
         else if (pTemplate && sithWorld_pCurrentWorld && sithPlayer_pLocalPlayerThing) {
-            //sithThing* pSpawned = sithThing_SpawnTemplate(pTemplate, sithPlayer_pLocalPlayerThing);
+            //sithThing* pSpawned = sithThing_CreateThing(pTemplate, sithPlayer_pLocalPlayerThing);
             sithThing* pSpawned = sithPlayerActions_SpawnThingAtLookAt(sithPlayer_pLocalPlayerThing, pTemplate);
         }
         else {

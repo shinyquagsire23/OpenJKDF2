@@ -154,7 +154,7 @@ void sithPlayerActions_JumpWithVel(sithThing *thing, flex_t vel)
             sithThing_DetachThing(thing);
         }
         if ( sithComm_multiplayerFlags )
-            sithThing_SetSyncFlags(thing, THING_SYNC_POS);
+            sithThing_SyncThing(thing, THING_SYNC_POS);
     }
 }
 
@@ -167,7 +167,7 @@ void sithPlayerActions_MoveToPlayerPosition(sithThing *thing, int idx)
             stdPlatform_Memcpy32(&thing->lookOrientation, &jkPlayer_playerInfos[idx].spawnPosOrient, sizeof(thing->lookOrientation)); // Added: word-safe (things may be in extram)
             thing->position = thing->lookOrientation.scale;
             rdVector_Zero3(&thing->lookOrientation.scale);
-            sithThing_MoveToSector(thing, jkPlayer_playerInfos[idx].pSpawnSector, 0);
+            sithThing_SetSector(thing, jkPlayer_playerInfos[idx].pSpawnSector, 0);
         }
         if ( thing->moveType == SITH_MT_PHYSICS )
         {
@@ -204,7 +204,7 @@ sithThing* sithPlayerActions_SpawnThingAtLookAt(sithThing *pPlayerThing, sithThi
         return sithWeapon_FireProjectile(pPlayerThing, pTemplate, NULL, -1, &tmp1, &tmp2, 1.0, 0, 90.0, 90.0, 0);
     }
 
-    sithThing* pSpawned = sithThing_SpawnTemplate(pTemplate, pPlayerThing);
+    sithThing* pSpawned = sithThing_CreateThing(pTemplate, pPlayerThing);
     if (!pSpawned) {
         return NULL;
     }
@@ -221,7 +221,7 @@ sithThing* sithPlayerActions_SpawnThingAtLookAt(sithThing *pPlayerThing, sithThi
                 if (searchResult && searchResult->surface && searchResult->surface->adjoin && searchResult->surface->adjoin->sector)
                 {
                     pSectorIter = searchResult->surface->adjoin->sector;
-                    sithThing_MoveToSector(pSpawned, pSectorIter, 0);
+                    sithThing_SetSector(pSpawned, pSectorIter, 0);
                 }
             }
             else if ( (searchResult->hitType & SITHCOLLISION_WORLD) != 0 )
@@ -229,7 +229,7 @@ sithThing* sithPlayerActions_SpawnThingAtLookAt(sithThing *pPlayerThing, sithThi
                 pSectorIter = searchResult->surface->parent_sector;
                 //sithCog_SurfaceSendMessage(searchResult->surface, pPlayerThing, SITH_MESSAGE_ACTIVATE);
                 if (pSectorIter)
-                    sithThing_MoveToSector(pSpawned, pSectorIter, 0);
+                    sithThing_SetSector(pSpawned, pSectorIter, 0);
 
                 rdVector3 tmp, tmp2;
                 rdVector_Copy3(&tmp, &thingPos);
@@ -248,7 +248,7 @@ sithThing* sithPlayerActions_SpawnThingAtLookAt(sithThing *pPlayerThing, sithThi
 
                 if ( v7->type != SITH_THING_ITEM && v7->type != SITH_THING_WEAPON && (v7->thingflags & SITH_TF_CAPTURED) != 0 )
                 {
-                    sithThing_MoveToSector(i, v5->sector, 0);
+                    sithThing_SetSector(i, v5->sector, 0);
 
                     //sithCog_ThingSendMessage(searchResult->receiver, pPlayerThing, SITH_MESSAGE_ACTIVATE);
                     sithCollision_DecreaseStackLevel();

@@ -896,7 +896,7 @@ sithThing* sithInventory_CreateBackpack(sithThing *player)
     if ( !templateThing )
         return 0;
 
-    backpack = sithThing_SpawnTemplate(templateThing, player);
+    backpack = sithThing_CreateThing(templateThing, player);
     if ( !backpack )
         return 0;
 

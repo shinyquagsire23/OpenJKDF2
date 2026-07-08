@@ -68,7 +68,7 @@ void sithActor_Update(sithThing *thing, int deltaMs)
             thing->actorParams.msUnderwater = v2;
             if ( v2 > 20000 )
             {
-                sithThing_Damage(thing, thing, 10.0, SITH_DAMAGE_DROWN);
+                sithThing_DamageThing(thing, thing, 10.0, SITH_DAMAGE_DROWN);
                 thing->actorParams.msUnderwater -= 2000;
             }
         }
@@ -113,7 +113,7 @@ flex_t sithActor_DamageActor(sithThing *sender, sithThing *receiver, flex_t amou
     {
         if ( receiver != sender && sender->controlType == SITH_CT_AI )
             sithAI_EmitEvent(sender->actor, SITHAI_MODE_MOVING, (intptr_t)receiver);
-        v7 = sithThing_GetParent(receiver);
+        v7 = sithThing_GetThingParent(receiver);
         receiver_ = v7;
 
         flex_t damageMult = 1.0;
@@ -277,8 +277,8 @@ void sithActor_KillActor(sithThing *thing, sithThing *a3, int a4)
             // MOTS added: quiet death
             if ((!Main_bMotsCompat || a4 != 12345678) && (old_typeflags & SITH_AF_EXPLODE_WHEN_KILLED) && thing->actorParams.templateExplode)
             {
-                sithThing_Create(thing->actorParams.templateExplode, &thing->position, &thing->lookOrientation, thing->sector, 0);
-                sithThing_Destroy(thing);
+                sithThing_CreateThingAtPos(thing->actorParams.templateExplode, &thing->position, &thing->lookOrientation, thing->sector, 0);
+                sithThing_DestroyThing(thing);
             }
             else
             {
@@ -469,7 +469,7 @@ int sithActor_thing_anim_blocked(sithThing *a1, sithThing *thing2, sithCollision
 void sithActor_DestroyActor(sithThing *thing)
 {
     thing->thingflags |= SITH_TF_DEAD;
-    sithThing_detachallchildren(thing);
+    sithThing_DetachAttachedThings(thing);
     thing->type = SITH_THING_CORPSE;
     thing->physicsParams.physflags &= ~(SITH_PF_FLY|SITH_PF_800|SITH_PF_100|SITH_PF_WALLSTICK);
     thing->physicsParams.physflags |= (SITH_PF_FLOORSTICK|SITH_PF_SURFACEALIGN|SITH_PF_USEGRAVITY);
@@ -484,7 +484,7 @@ void sithActor_DestroyCorpse(sithThing *corpse)
         corpse->lifeLeftMs = 3000;
     }
     else {
-        sithThing_Destroy(corpse);
+        sithThing_DestroyThing(corpse);
     }
 }
 

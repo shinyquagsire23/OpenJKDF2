@@ -1528,7 +1528,7 @@ void sithSurface_SyncFull(int mpFlags)
     for (int32_t i = 0; i <= sithSurface_numSurfaces; i++) // TODO: off by one?
     {
         int32_t flags = sithSurface_aSurfaces[i].flags;
-        if ( flags && ((flags & 0xC0000) == 0 || !sithSurface_aSurfaces[i].parent_thing || sithThing_ShouldSync(sithSurface_aSurfaces[i].parent_thing)) )
+        if ( flags && ((flags & 0xC0000) == 0 || !sithSurface_aSurfaces[i].parent_thing || sithThing_CanSync(sithSurface_aSurfaces[i].parent_thing)) )
             sithDSS_AnimStatus(&sithSurface_aSurfaces[i], 0, mpFlags);
     }
 }

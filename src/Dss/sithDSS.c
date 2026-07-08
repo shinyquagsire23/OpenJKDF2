@@ -359,7 +359,7 @@ int sithDSS_ProcessAIStatus(sithCogMsg *msg)
     
     NETMSG_IN_START(msg);
 
-    thing = sithThing_GetThingByIdx(NETMSG_POPS16());
+    thing = sithThing_GetThingByIndex(NETMSG_POPS16());
     if ( !thing )
         return 0;
     if ( thing->controlType != SITH_CT_AI )
@@ -376,14 +376,14 @@ int sithDSS_ProcessAIStatus(sithCogMsg *msg)
     actor->numAIClassEntries = sithWorld_pCurrentWorld->aiclasses[idx].numEntries;
     actor->flags = NETMSG_POPU32();
     actor->nextUpdate = NETMSG_POPU32();
-    actor->pMoveThing = sithThing_GetThingByIdx(NETMSG_POPS16());
+    actor->pMoveThing = sithThing_GetThingByIndex(NETMSG_POPS16());
     actor->field_224 = 0; // interesting?
     
     actor->movepos = NETMSG_POPVEC3();
     actor->field_23C = NETMSG_POPVEC3();
     actor->field_248 = NETMSG_POPU32();
 
-    actor->pDistractor = sithThing_GetThingByIdx(NETMSG_POPS16());
+    actor->pDistractor = sithThing_GetThingByIndex(NETMSG_POPS16());
     
     actor->field_1D4 = NETMSG_POPVEC3();
     actor->field_1E0 = 0; // interesting?
@@ -401,7 +401,7 @@ int sithDSS_ProcessAIStatus(sithCogMsg *msg)
     }
     if (actor->flags & SITHAI_MODE_FLEEING)
     {
-        actor->pFleeThing = sithThing_GetThingByIdx(NETMSG_POPS16());
+        actor->pFleeThing = sithThing_GetThingByIndex(NETMSG_POPS16());
     }
     actor->position = NETMSG_POPVEC3();
     actor->lookOrientation = NETMSG_POPVEC3();
@@ -580,7 +580,7 @@ int sithDSS_ProcessAnimStatus(sithCogMsg *msg)
     
     if (rdsurface->flags & 0xC0000)
     {
-        rdsurface->parent_thing = sithThing_GetThingByIdx(NETMSG_POPS32());
+        rdsurface->parent_thing = sithThing_GetThingByIndex(NETMSG_POPS32());
         if ( rdsurface->parent_thing && rdsurface->parent_thing->rdthing.type == RD_THINGTYPE_SPRITE3 )
             rdsurface->material = rdsurface->parent_thing->rdthing.sprite3->face.material;
         rdsurface->signature = NETMSG_POPU32();
@@ -811,10 +811,10 @@ int sithDSS_ProcessSyncCameras(sithCogMsg *msg)
         // Added: shifted around the -1 checks
         int primaryIdx = NETMSG_POPS32();
         int secondaryIdx = NETMSG_POPS32();
-        sithCamera_cameras[i].primaryFocus = sithThing_GetThingByIdx(primaryIdx);
+        sithCamera_cameras[i].primaryFocus = sithThing_GetThingByIndex(primaryIdx);
         if (!sithCamera_cameras[i].primaryFocus && primaryIdx != -1) return 0;
 
-        sithCamera_cameras[i].secondaryFocus = sithThing_GetThingByIdx(secondaryIdx);
+        sithCamera_cameras[i].secondaryFocus = sithThing_GetThingByIndex(secondaryIdx);
         if (!sithCamera_cameras[i].secondaryFocus && secondaryIdx != -1) return 0;
 
         sithCamera_cameras[i].fov = NETMSG_POPF32();
@@ -1025,7 +1025,7 @@ int sithDSS_ProcessPuppetStatus(sithCogMsg *msg)
 
     NETMSG_IN_START(msg);
 
-    thing = sithThing_GetThingByIdx(NETMSG_POPS32());
+    thing = sithThing_GetThingByIndex(NETMSG_POPS32());
 
     if ( !thing )
         return 0;

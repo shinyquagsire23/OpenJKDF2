@@ -351,7 +351,7 @@ void sithAI_Process()
                     sithAI_InstinctUpdate(actor);
 
                     if (sithNet_isMulti && sithNet_MultiModeFlags & MULTIMODEFLAG_COOP) {
-                        sithThing_SetSyncFlags(actor->thing, THING_SYNC_ALL); // Added
+                        sithThing_SyncThing(actor->thing, THING_SYNC_ALL); // Added
                     }
                 }
             }
@@ -366,7 +366,7 @@ void sithAI_Process()
                 sithAI_InstinctUpdate(actor);
 
                 if (sithNet_isMulti && sithNet_MultiModeFlags & MULTIMODEFLAG_COOP) {
-                    sithThing_SetSyncFlags(actor->thing, THING_SYNC_ALL); // Added
+                    sithThing_SyncThing(actor->thing, THING_SYNC_ALL); // Added
                 }
             }
         }
@@ -1455,7 +1455,7 @@ int sithAI_FireWeapon(sithActor *actor, flex_t minDistToFire, flex_t maxDistToFi
 
         // Added: co-op
         if (sithNet_isMulti && sithNet_MultiModeFlags & MULTIMODEFLAG_COOP) {
-            sithThing_SetSyncFlags(actor->thing, THING_SYNC_PUPPET);
+            sithThing_SyncThing(actor->thing, THING_SYNC_PUPPET);
         }
         return 1;
     }

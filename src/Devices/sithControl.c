@@ -1051,7 +1051,7 @@ debug_controls:
         if (pThing) {
             rdVector_Copy3(&player->position, &pThing->position);
             rdMatrix_Copy34(&player->lookOrientation, &pThing->lookOrientation);
-            sithThing_MoveToSector(player, pThing->sector, 0);
+            sithThing_SetSector(player, pThing->sector, 0);
             sithWorld_pCurrentWorld->cameraFocus = pThing;
             sithWorld_pCurrentWorld->playerThing = jkPlayer_playerInfos[0].playerThing;
             stdPalEffects_FlushAllAdds();

@@ -323,7 +323,7 @@ void sithParticle_DestroyParticle(sithThing *particle)
 
     if (!(particle->particleParams.typeFlags & SITHPARTICLE_FLAG_FADE_OUT_OVER_TIME))
     {
-        sithThing_Destroy(particle);
+        sithThing_DestroyThing(particle);
         return;
     }
 
@@ -341,7 +341,7 @@ void sithParticle_DestroyParticle(sithThing *particle)
     }
     else
     {
-        sithThing_Destroy(particle);
+        sithThing_DestroyThing(particle);
     }
 }
 

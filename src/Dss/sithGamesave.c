@@ -289,7 +289,7 @@ LABEL_11:
         goto skip_free_things;
     }
 
-    sithThing_freestuff(sithWorld_pCurrentWorld);
+    sithThing_RemoveWorldThings(sithWorld_pCurrentWorld);
 
 skip_free_things:
     // Apparently this works by interpreting a bunch of netMsg packets from the
@@ -372,7 +372,7 @@ skip_free_things:
         goto skip_dss;
     }
 
-    sithThing_sub_4CCE60();
+    sithThing_LoadPostProcess();
     sithPlayer_SetLocalPlayer(0);
     if ( sithGamesave_func3 )
         sithGamesave_func3();
@@ -393,7 +393,7 @@ skip_dss:
 
 load_fail:
     stdConffile_Close();
-    sithThing_sub_4CCE60();
+    sithThing_LoadPostProcess();
     sithClose();
     return 0;
 }
@@ -428,7 +428,7 @@ int sithGamesave_SaveCurrentWorld(int mpFlags)
     for (uint32_t i = 0; i < sithWorld_pCurrentWorld->numThingsLoaded; i++)
     {
         sithThing* v4 = &sithWorld_pCurrentWorld->things[i];
-        if ( sithThing_ShouldSync(v4) )
+        if ( sithThing_CanSync(v4) )
         {
             sithDSSThing_FullDescription(v4, 0, mpFlags);
             if ( v4->rdthing.puppet )
@@ -439,7 +439,7 @@ int sithGamesave_SaveCurrentWorld(int mpFlags)
     for (uint32_t i = 0; i < sithWorld_pCurrentWorld->numThingsLoaded; i++)
     {
         sithThing* v7 = &sithWorld_pCurrentWorld->things[i];
-        if (sithThing_ShouldSync(v7))
+        if (sithThing_CanSync(v7))
         {
             if ( v7->attach_flags )
             {

@@ -1891,7 +1891,7 @@ int sithCog_AllocWorldCogs(sithWorld *world, int num)
 
 int sithCog_LinkCogToThing(sithCog *cog, sithThing *thing, int linkId, int mask)
 {
-    int thingIdx = sithThing_GetIdxFromThing(thing);
+    int thingIdx = sithThing_ValidateThingPointer(thing);
     if ( !thingIdx || !thing->type )
         return 0;
     if ( linkId >= 0 )

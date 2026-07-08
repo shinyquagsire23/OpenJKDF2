@@ -192,7 +192,7 @@ void sithMulti_RemoveAllActorsFromWorld(sithWorld *pWorld)
         sithThing* pIter = &pWorld->things[i];
         if ( pIter->type == SITH_THING_ACTOR )
         {
-            sithThing_FreeEverythingNet(pIter);
+            sithThing_RemoveThing(pIter);
         }
         else if ( !sithNet_isServer )
         {
@@ -624,7 +624,7 @@ int sithMulti_ProcessWelcome(sithCogMsg *msg)
         while ( v4 );
     }
     g_submodeFlags &= ~8u;
-    sithThing_sub_4CCE60();
+    sithThing_LoadPostProcess();
     sithPlayer_ShowPlayer(v1, v2);
     sithPlayer_SetLocalPlayer(v1); // sets playerThingIdx and info
     sithPlayer_ResetPalEffects();
@@ -1264,7 +1264,7 @@ void sithMulti_Update(int deltaMs)
     if (!sithNet_isMulti)
         return;
 
-    sithThing_Sync();
+    sithThing_SyncThings();
     sithSurface_SyncSurfaces();
     sithSector_SyncSectors();
     if ( sithMulti_leaveJoinType && sithTime_curMs > sithMulti_leaveJoinWaitMs )
@@ -1384,7 +1384,7 @@ void sithMulti_Update(int deltaMs)
                         while (stdComm_dword_832208 <= sithWorld_pCurrentWorld->numThings)
                         {
                             v14 = &sithWorld_pCurrentWorld->things[stdComm_dword_832208++];
-                            if ( sithThing_ShouldSync(v14) )
+                            if ( sithThing_CanSync(v14) )
                             {
                                 if ( v14->type != SITH_THING_WEAPON && v14->type != SITH_THING_EXPLOSION )
                                 {
@@ -1527,7 +1527,7 @@ void sithMulti_CleanupThings(sithWorld *pWorld)
         sithThing *pThing = &pWorld->things[i];
         if ( pThing->type == SITH_THING_CORPSE ) // type 2
         {
-            sithThing_FreeEverythingNet(pThing);
+            sithThing_RemoveThing(pThing);
         }
         else if ( sithNet_isMulti == 0 )
         {

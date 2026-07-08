@@ -89,7 +89,7 @@ void sithItem_SetItemTaken(sithThing *item, sithThing *actor, int a3)
     }
     else
     {
-        sithThing_Destroy(item);
+        sithThing_DestroyThing(item);
     }
 }
 
@@ -109,14 +109,14 @@ void sithItem_DestroyItem(sithThing *item)
         if ( item->lastRenderedTickIdx + 1 == jkPlayer_currentTickIdx )
             item->lifeLeftMs = 3000;
         else
-            sithThing_Destroy(item);
+            sithThing_DestroyThing(item);
     }
     else
     {
         rdVector_Zero3(&item->physicsParams.vel);
-        sithThing_LeaveSector(item);
-        sithThing_SetPosAndRot(item, &item->itemParams.position, &item->lookOrientation);
-        sithThing_MoveToSector(item, item->itemParams.sector, 1);
+        sithThing_ExitSector(item);
+        sithThing_SetPositionAndOrient(item, &item->itemParams.position, &item->lookOrientation);
+        sithThing_SetSector(item, item->itemParams.sector, 1);
         item->lifeLeftMs = 0;
         item->thingflags = item->thingflags & ~SITH_TF_DISABLED;
         if (Main_bMotsCompat) {

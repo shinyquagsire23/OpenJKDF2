@@ -331,7 +331,7 @@ int jkDSS_ProcessSetSaberInfoMots(sithCogMsg *msg)
     if ( msg->netMsg.cogMsgId == DSS_SABERINFO1 && !sithNet_isServer )
         return 1;
 
-    sithThing* v2 = sithThing_GetById(NETMSG_POPS32());
+    sithThing* v2 = sithThing_GetGuidThing(NETMSG_POPS32());
     if ( !v2 )
         return 0;
     v11 = v2->actorParams.playerinfo;
@@ -372,7 +372,7 @@ int jkDSS_ProcessSetSaberInfoMots(sithCogMsg *msg)
         v5 = sithModel_Load(model_3do_fname, 1);
     }
     if (v5) // MOTS added
-        sithThing_SetNewModel(v2, v5);
+        sithThing_SetThingModel(v2, v5);
     sithSoundClass* v6 = sithSoundClass_Load(v14);
     if ( v6 )
         sithSoundClass_SetThingClass(v2, v6);
@@ -438,7 +438,7 @@ int jkDSS_ProcessSetSaberInfo(sithCogMsg *msg)
     if ( msg->netMsg.cogMsgId == DSS_SABERINFO1 && !sithNet_isServer )
         return 1;
 
-    sithThing* v2 = sithThing_GetById(NETMSG_POPS32());
+    sithThing* v2 = sithThing_GetGuidThing(NETMSG_POPS32());
     if ( !v2 )
         return 0;
     v11 = v2->actorParams.playerinfo;
@@ -462,7 +462,7 @@ int jkDSS_ProcessSetSaberInfo(sithCogMsg *msg)
     rdModel3* v5 = sithModel_Load(model_3do_fname, 1);
     if ( !v5 )
         return 1; // MOTS removed
-    sithThing_SetNewModel(v2, v5);
+    sithThing_SetThingModel(v2, v5);
     sithSoundClass* v6 = sithSoundClass_Load(v14);
     if ( v6 )
         sithSoundClass_SetThingClass(v2, v6);
@@ -501,7 +501,7 @@ int jkDSS_ProcessJKEnableSaber(sithCogMsg *msg)
 {
     NETMSG_IN_START(msg);
 
-    sithThing* pThing = sithThing_GetThingByIdx(NETMSG_POPS16());
+    sithThing* pThing = sithThing_GetThingByIndex(NETMSG_POPS16());
     if ( !pThing )
         return 0;
     if ( !pThing->playerInfo )
@@ -664,7 +664,7 @@ int jkDSS_ProcessSetSaberInfo2(sithCogMsg *msg)
     
 
     int idx = NETMSG_POPS32();
-    sithThing* thing = sithThing_GetById(idx);
+    sithThing* thing = sithThing_GetGuidThing(idx);
     if (!thing) {
         return Main_bMotsCompat ? 1 : 0; // MOTS altered
     }
@@ -735,7 +735,7 @@ int jkDSS_ProcessJKSetWeaponMesh(sithCogMsg *msg)
     int16_t arg2 = NETMSG_POPS16();
     int16_t arg3 = NETMSG_POPS16();
 
-    sithThing* pThing = sithThing_GetById(arg0);
+    sithThing* pThing = sithThing_GetGuidThing(arg0);
     if (!pThing)
         return 0;
 
@@ -789,7 +789,7 @@ int jkDSS_ProcessHudTarget(sithCogMsg *msg)
     NETMSG_IN_START(msg);
 
     jkHud_bHasTarget = NETMSG_POPS16();
-    jkHud_pTargetThing = sithThing_GetThingByIdx(NETMSG_POPS16());
+    jkHud_pTargetThing = sithThing_GetThingByIndex(NETMSG_POPS16());
     if ( !jkHud_pTargetThing )
         jkHud_bHasTarget = 0;
 
@@ -1002,7 +1002,7 @@ int jkDSS_Processx36_setwaggle(sithCogMsg *msg)
         int numBubble = NETMSG_POPS16();
 
         for (int i = 0; i < numBubble; i++) {
-            jkPlayer_aBubbleInfo[i].pThing = sithThing_GetById(NETMSG_POPS32());
+            jkPlayer_aBubbleInfo[i].pThing = sithThing_GetGuidThing(NETMSG_POPS32());
             if (!jkPlayer_aBubbleInfo[i].pThing) return 0;
 
             jkPlayer_aBubbleInfo[i].type = NETMSG_POPS32();
@@ -1169,7 +1169,7 @@ int jkDSS_ProcessSetTeam(sithCogMsg *pMsg)
             
             if ( v5 )
             {
-                sithThing_SetNewModel(jkPlayer_playerInfos[playerIdx].playerThing, v5);
+                sithThing_SetThingModel(jkPlayer_playerInfos[playerIdx].playerThing, v5);
                 jkDSS_SendSetSaberInfoMots(jkPlayer_playerInfos[playerIdx].playerThing, personality);
             }
         }
@@ -1177,7 +1177,7 @@ int jkDSS_ProcessSetTeam(sithCogMsg *pMsg)
             v5 = sithModel_Load(jkDSS_aKyTeamModels[teamNum], 1);
             if ( v5 )
             {
-                sithThing_SetNewModel(jkPlayer_playerInfos[playerIdx].playerThing, v5);
+                sithThing_SetThingModel(jkPlayer_playerInfos[playerIdx].playerThing, v5);
                 jkDSS_SendSetSaberInfo(jkPlayer_playerInfos[playerIdx].playerThing);
             }
         }
