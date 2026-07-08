@@ -13,16 +13,16 @@
 
 int sithMaterial_Startup()
 {
-    sithMaterial_hashmap = stdHashtbl_New(1024);
-    return sithMaterial_hashmap != 0;
+    sithMaterial_pHashtable = stdHashtbl_New(1024);
+    return sithMaterial_pHashtable != 0;
 }
 
 void sithMaterial_Shutdown()
 {
-    if ( sithMaterial_hashmap )
+    if ( sithMaterial_pHashtable )
     {
-        stdHashtbl_Free(sithMaterial_hashmap);
-        sithMaterial_hashmap = 0;
+        stdHashtbl_Free(sithMaterial_pHashtable);
+        sithMaterial_pHashtable = 0;
     }
 
     // Added
@@ -47,7 +47,7 @@ void sithMaterial_FreeWorldMaterials(sithWorld *world)
         v2 = 0;
         do
         {
-            stdHashtbl_Remove(sithMaterial_hashmap, world->materials[v2].mat_fpath);
+            stdHashtbl_Remove(sithMaterial_pHashtable, world->materials[v2].mat_fpath);
             rdMaterial_FreeEntry(&world->materials[v2]);
             ++v1;
             ++v2;
@@ -151,7 +151,7 @@ rdMaterial* sithMaterial_Load(const char *a1, int create_ddraw_surface, int gpu_
     while ( 1 )
     {
         v4 = sithWorld_g_pLastLoadedWorld;
-        result = (rdMaterial *)stdHashtbl_Find(sithMaterial_hashmap, a1);
+        result = (rdMaterial *)stdHashtbl_Find(sithMaterial_pHashtable, a1);
         if ( result )
             return result;
         v6 = v4->numMaterialsLoaded;
@@ -177,7 +177,7 @@ rdMaterial* sithMaterial_Load(const char *a1, int create_ddraw_surface, int gpu_
 LABEL_10:
         if ( v9 )
         {
-            stdHashtbl_Add(sithMaterial_hashmap, v8->mat_fpath, v8);
+            stdHashtbl_Add(sithMaterial_pHashtable, v8->mat_fpath, v8);
             v10 = v4->level_type_maybe;
             v11 = v4->numMaterialsLoaded;
             v8->id = v11;
@@ -246,10 +246,10 @@ rdVector2* sithMaterial_AllocWorldMaterials(sithWorld *world, int num)
         return 0;
 
     world->numMaterials = num;
-    if ( !sithMaterial_hashmap )
+    if ( !sithMaterial_pHashtable )
     {
-        sithMaterial_hashmap = stdHashtbl_New(1024);
-        if ( !sithMaterial_hashmap )
+        sithMaterial_pHashtable = stdHashtbl_New(1024);
+        if ( !sithMaterial_pHashtable )
         {
             SITH_FREE(world->materials);
             return 0;
