@@ -702,7 +702,7 @@ sithWeapon_bMultiAutoPickup 0x008BD08C int
 sithWeapon_bMultiplayerAutoSwitch 0x008BD090 int
 sithWeapon_bMultiAutoReload 0x008BD094 int
 sithWeapon_bAutoAim 0x008BD098 int
-sithWeapon_mountWait 0x008BD09C flex32_t
+sithWeapon_secMountWait 0x008BD09C flex32_t
 sithWeapon_8BD0A0 0x008BD0A0 flex_t[2]
 sithWeapon_fireWait 0x008BD0A8 flex32_t
 sithWeapon_fireRate 0x008BD0AC flex32_t

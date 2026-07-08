@@ -868,7 +868,7 @@ void sithDSS_SyncGameState(int sendto_id, int mpFlags)
     NETMSG_PUSHF32(sithWeapon_8BD060);
     NETMSG_PUSHF32(sithWeapon_LastFireTimeSecs);
     NETMSG_PUSHF32(sithWeapon_fireWait);
-    NETMSG_PUSHF32(sithWeapon_mountWait);
+    NETMSG_PUSHF32(sithWeapon_secMountWait);
     NETMSG_PUSHS32(sithWeapon_8BD05C);
     NETMSG_PUSHF32(sithWeapon_fireRate);
     NETMSG_PUSHU32(sithWeapon_CurWeaponMode);
@@ -936,7 +936,7 @@ int sithDSS_ProcessSyncGameState(sithCogMsg *msg)
     sithWeapon_8BD060 = NETMSG_POPF32();
     sithWeapon_LastFireTimeSecs = NETMSG_POPF32();
     sithWeapon_fireWait = NETMSG_POPF32();
-    sithWeapon_mountWait = NETMSG_POPF32();
+    sithWeapon_secMountWait = NETMSG_POPF32();
     sithWeapon_8BD05C = NETMSG_POPS32();
     sithWeapon_fireRate = NETMSG_POPF32();
     sithWeapon_CurWeaponMode = NETMSG_POPU32();
