@@ -68,11 +68,11 @@ int sithSound_Shutdown()
     return 1;
 }
 
-int sithSound_ReadSoundsListText(SithWorld *world, int a2)
+int sithSound_ReadSoundsListText(SithWorld *pWorld, int bSkip)
 {
     int numSounds; // eax
 
-    if ( a2 )
+    if ( bSkip )
         return 0;
 
     sithWorld_UpdateLoadProgress(0.0);
@@ -80,14 +80,14 @@ int sithSound_ReadSoundsListText(SithWorld *world, int a2)
         || _strcmp(stdConffile_g_entry.aArgs[0].value, "world") 
         || _strcmp(stdConffile_g_entry.aArgs[1].value, "sounds") )
     {
-        sithSound_FreeWorldSounds(world);
+        sithSound_FreeWorldSounds(pWorld);
         return 0;
     }
     numSounds = _atoi(stdConffile_g_entry.aArgs[2].value);
     if ( !numSounds )
         return 1;
 
-    sithSound_New(world, numSounds);
+    sithSound_New(pWorld, numSounds);
     
     while ( stdConffile_ReadArgs() )
     {
@@ -99,19 +99,19 @@ int sithSound_ReadSoundsListText(SithWorld *world, int a2)
     return 1;
 }
 
-void sithSound_FreeWorldSounds(SithWorld *world)
+void sithSound_FreeWorldSounds(SithWorld *pWorld)
 {
-    if (world->sounds)
+    if (pWorld->sounds)
     {
-        for (int i = 0; i < world->numSoundsLoaded; i++)
+        for (int i = 0; i < pWorld->numSoundsLoaded; i++)
         {
-            sithSound_UnloadData(&world->sounds[i]);
-            stdHashtbl_Remove(sithSound_hashtable, world->sounds[i].sound_fname);
+            sithSound_UnloadData(&pWorld->sounds[i]);
+            stdHashtbl_Remove(sithSound_hashtable, pWorld->sounds[i].sound_fname);
         }
-        SITH_FREE(world->sounds);
-        world->numSoundsLoaded = 0;
-        world->numSounds = 0;
-        world->sounds = 0;
+        SITH_FREE(pWorld->sounds);
+        pWorld->numSoundsLoaded = 0;
+        pWorld->numSounds = 0;
+        pWorld->sounds = 0;
     }
 }
 

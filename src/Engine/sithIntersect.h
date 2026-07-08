@@ -20,19 +20,19 @@
 MATH_FUNC int sithIntersect_IsSphereInSectorBox(const rdVector3 *pos, flex_t radius, SithSector *sector);
 
 // sithIntersect_sub_507EA0
-int sithIntersect_CheckFaceVerticesIntersection(rdVector3 *a1, flex_t a2, rdFace *a3, rdVector3 *a4, rdVector3 *pProjectedOut);
+int sithIntersect_CheckFaceVerticesIntersection(rdVector3 *startPos, flex_t radius, rdFace *pFace, rdVector3 *aVertices, rdVector3 *pHitPos);
 MATH_FUNC int sithIntersect_IsSphereInSector(const rdVector3 *pos, flex_t radius, SithSector *sector);
 // sithIntersect_CheckFaceVerticesIntersection
-MATH_FUNC int sithIntersect_CheckSphereThingIntersection(SithThing* thing, const rdVector3* a2, const rdVector3* a3, flex_t a4, flex_t a5, SithThing* a6, int raycastFlags, flex_t* a8, rdMesh** outMesh, rdFace** a10, rdVector3* a11);
+MATH_FUNC int sithIntersect_CheckSphereThingIntersection(SithThing* thing, const rdVector3* startPos, const rdVector3* moveNorm, flex_t moveDist, flex_t a5, SithThing* pCheck, int colflags, flex_t* pHitDistance, rdMesh** ppHitMesh, rdFace** ppHitFace, rdVector3* hitNorm);
 MATH_FUNC int sithIntersect_TreeIntersection(rdHierarchyNode *paNodes,rdVector3 *pPoseVec,rdVector3 *pDirVec,flex_t a4,flex_t range, SithThing *v11,flex_t *pOut,rdVector3 *pOutVec,int raycastFlags);
 // sithIntersect_sub_508370
-MATH_FUNC int sithIntersect_CheckSphereMeshIntersection(rdVector3 *a1, rdVector3 *a2, flex_t a3, flex_t a4, rdMesh *mesh, flex_t *a6, rdFace **faceOut, rdVector3 *a8);
+MATH_FUNC int sithIntersect_CheckSphereMeshIntersection(rdVector3 *a1, rdVector3 *a2, flex_t a3, flex_t a4, rdMesh *mesh, flex_t *a6, rdFace **ppHitFace, rdVector3 *a8);
 MATH_FUNC int sithIntersect_CheckSphereIntersection(const rdVector3 *a1, const rdVector3 *a2, flex_t a3, flex_t a4, rdVector3 *a5, flex_t a6, flex_t *a7, int a8, int a9);
-MATH_FUNC int sithIntersect_TestSphereFaceHit(rdVector3 *a1, flex_t a2, rdFace *a3, rdVector3 *a4, int *a5);
-MATH_FUNC int sithIntersect_CheckSphereFaceHitVerticesIntersection(rdVector3 *a1, flex_t a2, rdFace *a3, rdVector3 *a4, int a5, rdVector3 *a6);
-MATH_FUNC int sithIntersect_CheckSphereHit(const rdVector3* pStartPos, const rdVector3* pRayDirection, flex_t moveDistance, flex_t radius, rdVector3* surfaceNormal, rdVector3* a6, flex_t* pSphereHitDist, int flags);
-MATH_FUNC int sithIntersect_CheckSphereFaceIntersectionEx(const rdVector3 *a1, const rdVector3 *a2, flex_t a3, flex_t a4, rdFace *a5, rdVector3 *a6, flex_t *a7, rdVector3 *a8, int raycastFlags);
-MATH_FUNC int sithIntersect_CheckSphereFaceIntersection(const rdVector3* pStartPos, const rdVector3* pRayDirection, flex_t moveDistance, flex_t radius, sithSurfaceInfo* a5, rdVector3* a6, flex_t* pSphereHitDist, int flags);
+MATH_FUNC int sithIntersect_TestSphereFaceHit(rdVector3 *startPos, flex_t a2, rdFace *a3, rdVector3 *aVertices, int *pHitMask);
+MATH_FUNC int sithIntersect_CheckSphereFaceHitVerticesIntersection(rdVector3 *startPos, flex_t radius, rdFace *pFace, rdVector3 *aVertices, int vertHitMask, rdVector3 *a6);
+MATH_FUNC int sithIntersect_CheckSphereHit(const rdVector3* startPos, const rdVector3* moveNorm, flex_t moveDistance, flex_t radius, rdVector3* normal, rdVector3* point, flex_t* pSphereHitDist, int colflags);
+MATH_FUNC int sithIntersect_CheckSphereFaceIntersectionEx(const rdVector3 *a1, const rdVector3 *a2, flex_t a3, flex_t a4, rdFace *a5, rdVector3 *a6, flex_t *a7, rdVector3 *a8, int colflags);
+MATH_FUNC int sithIntersect_CheckSphereFaceIntersection(const rdVector3* startPos, const rdVector3* moveNorm, flex_t moveDistance, flex_t radius, sithSurfaceInfo* pFace, rdVector3* aVertices, flex_t* hitDist, int flags);
 
 
 #if 0

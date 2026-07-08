@@ -126,11 +126,11 @@ void sithShutdown()
     sith_bStartup = 0;
 }
 
-int sithOpenStatic(char *path)
+int sithOpenStatic(char *pFilename)
 {
     sithWorld_g_pStaticWorld = sithWorld_NewEntry();
     sithWorld_g_pStaticWorld->level_type_maybe |= 1;
-    return sithWorld_Load(sithWorld_g_pStaticWorld, path) != 0;
+    return sithWorld_Load(sithWorld_g_pStaticWorld, pFilename) != 0;
 }
 
 void sithCloseStatic()

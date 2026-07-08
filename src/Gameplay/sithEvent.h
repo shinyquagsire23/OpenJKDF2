@@ -25,7 +25,7 @@ void sithEvent_Close();
 void sithEvent_Reset();
 int sithEvent_CreateEvent(int taskId, SithEventParams *params, uint32_t when);
 void sithEvent_FreeEvent(SithEvent *pEvent);
-int sithEvent_RegisterTask(int idx, sithEventHandler_t handler, int rate, int startMode);
+int sithEvent_RegisterTask(int taskId, sithEventHandler_t pfProcess, int frequency, int startMode);
 void sithEvent_Process();
 
 //static void (*sithEvent_FreeEvent)(SithEvent *timer) = (void*)sithEvent_FreeEvent_ADDR;

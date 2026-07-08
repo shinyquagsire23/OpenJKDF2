@@ -25,7 +25,7 @@ extern flex_t sithMain_lastAspect;
 
 int sithMain_Startup(HostServices *commonFuncs);
 void sithShutdown();
-int sithOpenStatic(char *path);
+int sithOpenStatic(char *pFilename);
 void sithCloseStatic();
 int sithMain_Mode1Init(char *a1);
 int sithOpenNormal(char *path);

@@ -271,7 +271,7 @@ sithPlayingSound* sithSoundMixer_PlayingSoundFromSound(sithSound *sound, int fla
     return result;
 }
 
-sithPlayingSound* sithSoundMixer_PlaySound(sithSound *sound, flex_t volume, flex_t pan, int flags)
+sithPlayingSound* sithSoundMixer_PlaySound(sithSound *hSnd, flex_t volume, flex_t pan, int playflags)
 {
     sithPlayingSound *result; // eax
     sithPlayingSound *v6; // ebx
@@ -292,7 +292,7 @@ sithPlayingSound* sithSoundMixer_PlaySound(sithSound *sound, flex_t volume, flex
     jkGuiSound_numChannels = SITH_MIXER_NUMPLAYINGSOUNDS;
 #endif
 
-    v6 = sithSoundMixer_PlayingSoundFromSound(sound, flags);
+    v6 = sithSoundMixer_PlayingSoundFromSound(hSnd, playflags);
     
     if ( !v6 )
         return 0;
@@ -373,7 +373,7 @@ LABEL_46:
     return result;
 }
 
-sithPlayingSound* sithSoundMixer_PlaySoundPos(sithSound *a1, rdVector3 *a2, SithSector *a3, flex_t a4, flex_t a5, flex_t a6, int a7)
+sithPlayingSound* sithSoundMixer_PlaySoundPos(sithSound *hSnd, rdVector3 *pos, SithSector *pSector, flex_t volume, flex_t minRadius, flex_t maxRadius, int playflags)
 {
     int32_t v7; // ebx
     flex_d_t v10; // st7
@@ -386,38 +386,38 @@ sithPlayingSound* sithSoundMixer_PlaySoundPos(sithSound *a1, rdVector3 *a2, Sith
     if (!sithSoundMixer_bOpened)
         return NULL;
 
-    a4 = stdMath_Clamp(a4, 0.0, 1.5);
-    v7 = a7 & ~SITHSOUNDFLAG_PLAYING | SITHSOUNDFLAG_ABSOLUTE;
-    if ( a3 && (a3->flags & SITH_SECTOR_UNDERWATER) != 0 )
+    volume = stdMath_Clamp(volume, 0.0, 1.5);
+    v7 = playflags & ~SITHSOUNDFLAG_PLAYING | SITHSOUNDFLAG_ABSOLUTE;
+    if ( pSector && (pSector->flags & SITH_SECTOR_UNDERWATER) != 0 )
         v7 |= SITHSOUNDFLAG_UNDERWATER;
 
     if (!sithCamera_g_pCurCamera)
         return NULL;
     
-    rdVector_Sub3(&v16, a2, &sithCamera_g_pCurCamera->lookPos);
+    rdVector_Sub3(&v16, pos, &sithCamera_g_pCurCamera->lookPos);
     v10 = rdVector_Normalize3QuickAcc(&v16);
-    if ( (v7 & SITHSOUNDFLAG_LOOP) != 0 || v10 <= a6 )
+    if ( (v7 & SITHSOUNDFLAG_LOOP) != 0 || v10 <= maxRadius )
     {
-        v11 = sithSoundMixer_PlayingSoundFromSound(a1, v7);
+        v11 = sithSoundMixer_PlayingSoundFromSound(hSnd, v7);
         if ( v11 )
         {
-            v11->pos = *a2;
-            v11->vol_2 = a4;
-            v11->anonymous_5 = a5;
-            v11->maxPosition = a6;
+            v11->pos = *pos;
+            v11->vol_2 = volume;
+            v11->anonymous_5 = minRadius;
+            v11->maxPosition = maxRadius;
             v11->posRelative = v16;
             v11->distance = v10;
-            if ( a5 == a6 )
+            if ( minRadius == maxRadius )
                 v11->anonymous_7 = 0.0;
             else
-                v11->anonymous_7 = 1.0 / (a6 - a5);
+                v11->anonymous_7 = 1.0 / (maxRadius - minRadius);
             return v11;
         }
     }
     return NULL;
 }
 
-sithPlayingSound* sithSoundMixer_PlaySoundThing(sithSound *sound, SithThing *pThing, flex_t a3, flex_t a4, flex_t a5, int flags)
+sithPlayingSound* sithSoundMixer_PlaySoundThing(sithSound *hSnd, SithThing *pThing, flex_t volume, flex_t minRadius, flex_t maxRadius, int playflags)
 {
     sithPlayingSound *v11; // esi
     int v12; // eax
@@ -447,42 +447,42 @@ sithPlayingSound* sithSoundMixer_PlaySoundThing(sithSound *sound, SithThing *pTh
     if (!sithSoundMixer_bOpened)
         return NULL;
 
-    a3 = stdMath_Clamp(a3, 0.0, 1.5);
-    flags &= ~SITHSOUNDFLAG_PLAYING;
-    flags |= SITHSOUNDFLAG_FOLLOWSTHING;
+    volume = stdMath_Clamp(volume, 0.0, 1.5);
+    playflags &= ~SITHSOUNDFLAG_PLAYING;
+    playflags |= SITHSOUNDFLAG_FOLLOWSTHING;
 
     if (sithCamera_g_pCurCamera) {
         rdVector_Sub3(&a1, &pThing->position, &sithCamera_g_pCurCamera->lookPos);
         v34 = rdVector_Normalize3QuickAcc(&a1);
     }
-    if ( (flags & SITHSOUNDFLAG_LOOP) != 0 || (sithCamera_g_pCurCamera && (v34 <= a5)) )
+    if ( (playflags & SITHSOUNDFLAG_LOOP) != 0 || (sithCamera_g_pCurCamera && (v34 <= maxRadius)) )
     {
-        if ( (pThing->type == SITH_THING_ACTOR || pThing->type == SITH_THING_PLAYER) && (flags & SITHSOUNDFLAG_VOICE) != 0 && (flags & SITHSOUNDFLAG_HIGHEST_PRIO|SITHSOUNDFLAG_HIGHPRIO) == 0 )
+        if ( (pThing->type == SITH_THING_ACTOR || pThing->type == SITH_THING_PLAYER) && (playflags & SITHSOUNDFLAG_VOICE) != 0 && (playflags & SITHSOUNDFLAG_HIGHEST_PRIO|SITHSOUNDFLAG_HIGHPRIO) == 0 )
         {
             if ( pThing->actorParams.field_1BC > sithTime_g_msecGameTime )
                 return 0;
-            pThing->actorParams.field_1BC = sithTime_g_msecGameTime + sound->sound_len;
+            pThing->actorParams.field_1BC = sithTime_g_msecGameTime + hSnd->sound_len;
         }
         if ( pThing == sithPlayer_g_pLocalPlayerThing || pThing->moveType == SITH_MT_PATH || pThing->type == SITH_THING_PLAYER) // Added: third comparison, co-op
         {
-            sithAIAwareness_CreateTransmittingEvent(pThing->sector, &pThing->position, 0, a5 * 0.6, pThing);
+            sithAIAwareness_CreateTransmittingEvent(pThing->sector, &pThing->position, 0, maxRadius * 0.6, pThing);
         }
 
-        v11 = sithSoundMixer_PlayingSoundFromSound(sound, flags);
+        v11 = sithSoundMixer_PlayingSoundFromSound(hSnd, playflags);
 
         if ( v11 )
         {
             v11->thing = pThing;
-            v11->vol_2 = a3;
-            v11->anonymous_5 = a4;
-            v11->maxPosition = a5;
+            v11->vol_2 = volume;
+            v11->anonymous_5 = minRadius;
+            v11->maxPosition = maxRadius;
             rdVector_Copy3(&v11->pos, &pThing->position);
             v11->posRelative = a1;
             v11->distance = v34;
-            if ( a4 == a5 )
+            if ( minRadius == maxRadius )
                 v11->anonymous_7 = 0.0;
             else
-                v11->anonymous_7 = 1.0 / (a5 - a4);
+                v11->anonymous_7 = 1.0 / (maxRadius - minRadius);
             if ( pThing == sithSoundMixer_pFocusedThing )
             {
                 v16 = sithSound_LoadData(v11->sound);
@@ -542,7 +542,7 @@ LABEL_51:
                         sithSoundMixer_activeChannels++;
                         return v11;
                     }
-                    if ( (flags & SITHSOUNDFLAG_LOOP) != 0 )
+                    if ( (playflags & SITHSOUNDFLAG_LOOP) != 0 )
                         return v11;
                 }
                 
@@ -618,24 +618,24 @@ int sithSoundMixer_SetFrequency(sithPlayingSound *sound, flex_t pitch)
     return 1;
 }
 
-void sithSoundMixer_FadeVolume(sithPlayingSound *sound, flex_t vol_, flex_t fadeintime_)
+void sithSoundMixer_FadeVolume(sithPlayingSound *hChannel, flex_t volume, flex_t secFadeTime)
 {
     flex_d_t v3; // st7
     flex_d_t v7; // st6
     flex_t a2; // [esp+0h] [ebp-4h]
 
-    vol_ = stdMath_Clamp(vol_, 0.0, 1.5);
-    v3 = vol_ - sound->vol_2;
+    volume = stdMath_Clamp(volume, 0.0, 1.5);
+    v3 = volume - hChannel->vol_2;
     if ( v3 != 0.0 )
     {
-        sound->flags &= ~(SITHSOUNDFLAG_FADE_OUT|SITHSOUNDFLAG_FADE_IN|SITHSOUNDFLAG_FADING);
-        if (fadeintime_ == 0.0)
+        hChannel->flags &= ~(SITHSOUNDFLAG_FADE_OUT|SITHSOUNDFLAG_FADE_IN|SITHSOUNDFLAG_FADING);
+        if (secFadeTime == 0.0)
         {
-            sound->vol_2 = stdMath_Clamp(vol_, 0.0, 1.5);
-            if ( sound->pSoundBuf && ((sound->flags & SITHSOUNDFLAG_NO_3D) != 0 || (sound->flags & (SITHSOUNDFLAG_FOLLOWSTHING|SITHSOUNDFLAG_ABSOLUTE)) == 0) )
+            hChannel->vol_2 = stdMath_Clamp(volume, 0.0, 1.5);
+            if ( hChannel->pSoundBuf && ((hChannel->flags & SITHSOUNDFLAG_NO_3D) != 0 || (hChannel->flags & (SITHSOUNDFLAG_FOLLOWSTHING|SITHSOUNDFLAG_ABSOLUTE)) == 0) )
             {
-                a2 = sound->vol_2 * 0.75;
-                stdSound_BufferSetVolume(sound->pSoundBuf, a2);
+                a2 = hChannel->vol_2 * 0.75;
+                stdSound_BufferSetVolume(hChannel->pSoundBuf, a2);
             }
         }
         else
@@ -643,25 +643,25 @@ void sithSoundMixer_FadeVolume(sithPlayingSound *sound, flex_t vol_, flex_t fade
             v7 = v3;
             if (v7 < 0.0) // TODO verify? fadeintime_ < 0.0?
                 v7 = -v3;
-            sound->volumeVelocity = v7 / fadeintime_;
-            sound->volume = vol_;
+            hChannel->volumeVelocity = v7 / secFadeTime;
+            hChannel->volume = volume;
             if (v3 < 0.0) // TODO verify? sound->volumeVelocity < 0.0? fadeintime_ > 0.0?
-                sound->flags |= SITHSOUNDFLAG_FADE_OUT;
+                hChannel->flags |= SITHSOUNDFLAG_FADE_OUT;
             else
-                sound->flags |= SITHSOUNDFLAG_FADE_IN;
+                hChannel->flags |= SITHSOUNDFLAG_FADE_IN;
         }
     }
 }
 
-void sithSoundMixer_SetVolume(sithPlayingSound *sound, flex_t volume)
+void sithSoundMixer_SetVolume(sithPlayingSound *hChannel, flex_t volume)
 {
-    sound->vol_2 = stdMath_Clamp(volume, 0.0, 1.5);
-    if (!sound->pSoundBuf)
+    hChannel->vol_2 = stdMath_Clamp(volume, 0.0, 1.5);
+    if (!hChannel->pSoundBuf)
         return;
 
-    if ( (sound->flags & SITHSOUNDFLAG_NO_3D) != 0 || (sound->flags & (SITHSOUNDFLAG_FOLLOWSTHING|SITHSOUNDFLAG_ABSOLUTE)) == 0 )
+    if ( (hChannel->flags & SITHSOUNDFLAG_NO_3D) != 0 || (hChannel->flags & (SITHSOUNDFLAG_FOLLOWSTHING|SITHSOUNDFLAG_ABSOLUTE)) == 0 )
     {
-        stdSound_BufferSetVolume(sound->pSoundBuf, sound->vol_2 * 0.75);
+        stdSound_BufferSetVolume(hChannel->pSoundBuf, hChannel->vol_2 * 0.75);
     }
 }
 
@@ -1122,17 +1122,17 @@ void sithSoundMixer_FreeThing(SithThing *thing)
     }
 }
 
-sithPlayingSound* sithSoundMixer_GetChannelHandle(int refid)
+sithPlayingSound* sithSoundMixer_GetChannelHandle(int guid)
 {
     unsigned int playingsound_idx; // ecx
 
-    if ( !refid )
+    if ( !guid )
         return NULL;
 
     playingsound_idx = 0;
     for (int i = 0; i < SITH_MIXER_NUMPLAYINGSOUNDS; i++)
     {
-        if (sithSoundMixer_aPlayingSounds[i].sound && sithSoundMixer_aPlayingSounds[i].refid == refid)
+        if (sithSoundMixer_aPlayingSounds[i].sound && sithSoundMixer_aPlayingSounds[i].refid == guid)
             break;
         ++playingsound_idx;
     }
@@ -1186,11 +1186,11 @@ void sithSoundMixer_UpdatePlayingSoundPosition(sithPlayingSound *sound)
     }
 }
 
-void sithSoundMixer_SetSectorAmbientSound(SithSector *sector, sithSound *sound, flex_t vol)
+void sithSoundMixer_SetSectorAmbientSound(SithSector *pSector, sithSound *hSnd, flex_t volume)
 {
-    sector->hAmbientSound = sound;
-    sector->ambientSoundVolume = vol;
-    if ( sithSoundMixer_pCurSector == sector )
+    pSector->hAmbientSound = hSnd;
+    pSector->ambientSoundVolume = volume;
+    if ( sithSoundMixer_pCurSector == pSector )
         sithSoundMixer_pCurSector = 0;
 }
 
@@ -1294,26 +1294,26 @@ int32_t sithSoundMixer_GetThingSoundIdx(SithThing *thing, sithSound *sound)
     return -1;
 }
 
-void sithSoundMixer_StopSound(sithPlayingSound *pPlayingSound)
+void sithSoundMixer_StopSound(sithPlayingSound *hChannel)
 {
-    if (!pPlayingSound) return; // Added
+    if (!hChannel) return; // Added
 
-    if ( (pPlayingSound->flags & SITHSOUNDFLAG_PLAYING) != 0 )
+    if ( (hChannel->flags & SITHSOUNDFLAG_PLAYING) != 0 )
     {
-        sithSoundMixer_PlayingSoundReset(pPlayingSound);
+        sithSoundMixer_PlayingSoundReset(hChannel);
     }
-    if ( pPlayingSound->pSoundBuf )
+    if ( hChannel->pSoundBuf )
     {
-        stdSound_BufferRelease(pPlayingSound->pSoundBuf);
-        pPlayingSound->pSoundBuf = 0;
+        stdSound_BufferRelease(hChannel->pSoundBuf);
+        hChannel->pSoundBuf = 0;
     }
-    if ( pPlayingSound->p3DSoundObj )
+    if ( hChannel->p3DSoundObj )
     {
-        stdSound_3DBufferRelease(pPlayingSound->p3DSoundObj);
-        pPlayingSound->p3DSoundObj = 0;
+        stdSound_3DBufferRelease(hChannel->p3DSoundObj);
+        hChannel->p3DSoundObj = 0;
     }
 
-    sithSoundMixer_FreePlayingSound(pPlayingSound);
+    sithSoundMixer_FreePlayingSound(hChannel);
 }
 
 sithPlayingSound* sithSoundMixer_GetSoundFromIdx(int idx)

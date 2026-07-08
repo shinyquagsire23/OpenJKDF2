@@ -101,13 +101,13 @@ void sithEvent_FreeEvent(SithEvent *pEvent)
     sithEvent_numFreeEventBuffers++;
 }
 
-int sithEvent_RegisterTask(int idx, sithEventHandler_t handler, int rate, int startMode)
+int sithEvent_RegisterTask(int taskId, sithEventHandler_t pfProcess, int frequency, int startMode)
 {
-    sithEvent_aTasks[idx].pfProcess = handler;
-    sithEvent_aTasks[idx].msecLastIntervalTime = sithTime_g_msecGameTime;
-    sithEvent_aTasks[idx].field_10 = 0;
-    sithEvent_aTasks[idx].rate = rate;
-    sithEvent_aTasks[idx].startMode = startMode;
+    sithEvent_aTasks[taskId].pfProcess = pfProcess;
+    sithEvent_aTasks[taskId].msecLastIntervalTime = sithTime_g_msecGameTime;
+    sithEvent_aTasks[taskId].field_10 = 0;
+    sithEvent_aTasks[taskId].rate = frequency;
+    sithEvent_aTasks[taskId].startMode = startMode;
     return 1;
 }
 

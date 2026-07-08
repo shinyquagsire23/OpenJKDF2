@@ -22,14 +22,14 @@ int sithConsole_Startup(int maxCmds);
 void sithConsole_Shutdown();
 int sithConsole_Open(int maxLines);
 void sithConsole_Close();
-void sithConsole_PrintString(const char *str);
-void sithConsole_PrintWString(const wchar_t *a1);
-int sithConsole_ExeCommand(const char *cmd);
+void sithConsole_PrintString(const char *pString);
+void sithConsole_PrintWString(const wchar_t *pwString);
+int sithConsole_ExeCommand(const char *pLine);
 int sithConsole_sub_4DA100();
 void sithConsole_Flush();
-int sithConsole_RegisterCommand(DebugConsoleCmd_t fn, const char *cmd, int extra);
+int sithConsole_RegisterCommand(DebugConsoleCmd_t pfFunc, const char *pName, int flags);
 int sithConsole_RegisterPrintFunctions(DebugConsolePrintFunc_t a1, DebugConsolePrintUniStrFunc_t a2);
-int sithConsole_Help(stdDebugConsoleCmd* a, const char* b);
+int sithConsole_Help(stdDebugConsoleCmd* pFunc, const char* pArg);
 void sithConsole_AlertSound();
 
 #endif // _DEVICES_SITHCONSOLE_H

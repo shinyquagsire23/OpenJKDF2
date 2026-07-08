@@ -20,8 +20,8 @@
 
 int sithSound_Startup();
 int sithSound_Shutdown();
-int sithSound_ReadSoundsListText(SithWorld *world, int a2);
-void sithSound_FreeWorldSounds(SithWorld *world);
+int sithSound_ReadSoundsListText(SithWorld *pWorld, int bSkip);
+void sithSound_FreeWorldSounds(SithWorld *pWorld);
 int sithSound_New(SithWorld *world, int num);
 sithSound* sithSound_Load(char *sound_fname, int a2);
 sithSound* sithSound_GetFromIdx(int idx);
