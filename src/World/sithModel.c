@@ -24,7 +24,7 @@ void sithModel_Shutdown()
     }
 }
 
-int sithModel_Load(sithWorld *world, int a2)
+int sithModel_ReadStaticModelsListText(sithWorld *world, int a2)
 {
     int numModels;
     flex_t loadStep;
@@ -55,7 +55,7 @@ int sithModel_Load(sithWorld *world, int a2)
     {
         if ( !_memcmp(stdConffile_entry.args[0].value, "end", 4u) )
             break;
-        sithModel_LoadEntry(stdConffile_entry.args[1].value, 0);
+        sithModel_Load(stdConffile_entry.args[1].value, 0);
         loadProgress = loadProgress + loadStep;
         sithWorld_UpdateLoadPercent(loadProgress);
     }
@@ -64,7 +64,7 @@ int sithModel_Load(sithWorld *world, int a2)
     return 1;
 }
 
-void sithModel_Free(sithWorld *world)
+void sithModel_FreeWorldModels(sithWorld *world)
 {
     if (!world->numModels )
         return;
@@ -80,7 +80,7 @@ void sithModel_Free(sithWorld *world)
     world->numModels = 0;
 }
 
-rdModel3* sithModel_LoadEntry(const char *model_3do_fname, int unk)
+rdModel3* sithModel_Load(const char *model_3do_fname, int unk)
 {
     rdModel3 *model;
     char model_fpath[128];
@@ -102,7 +102,7 @@ rdModel3* sithModel_LoadEntry(const char *model_3do_fname, int unk)
     {
         if ( !unk ) {
             stdPlatform_Printf("OpenJKDF2: %s: rdModel3_Load failed for `%s`, loading dflt.3do!\n", __func__, model_3do_fname); // Added
-            return sithModel_LoadEntry("dflt.3do", 1);
+            return sithModel_Load("dflt.3do", 1);
         }
         return 0;
     }
@@ -117,7 +117,7 @@ rdModel3* sithModel_LoadEntry(const char *model_3do_fname, int unk)
     return model;
 }
 
-uint32_t sithModel_GetMemorySize(rdModel3 *model)
+uint32_t sithModel_GetModelMemUsage(rdModel3 *model)
 {
     unsigned int result; // eax
     rdGeoset *v2; // ebx
@@ -167,7 +167,7 @@ uint32_t sithModel_GetMemorySize(rdModel3 *model)
     return result;
 }
 
-int sithModel_New(sithWorld *world, int num)
+int sithModel_AllocWorldModels(sithWorld *world, int num)
 {
     world->models = (rdModel3 *)SITH_ALLOC(sizeof(rdModel3) * num);
     if ( !world->models )
@@ -180,7 +180,7 @@ int sithModel_New(sithWorld *world, int num)
     return 1;
 }
 
-rdModel3* sithModel_GetByIdx(int idx)
+rdModel3* sithModel_GetModelByIndex(int idx)
 {
     sithWorld *world;
     rdModel3 *result;

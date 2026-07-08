@@ -789,7 +789,7 @@ int32_t sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogReference *cogIdk, ch
 
         case COG_TYPE_MODEL:
             cogSymbol->val.type = COG_VARTYPE_INT;
-            v15 = sithModel_LoadEntry(val, 1);
+            v15 = sithModel_Load(val, 1);
             if ( !v15 )
             {
                 cogSymbol->val.data[0] = -1;

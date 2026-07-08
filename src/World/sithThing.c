@@ -1751,7 +1751,7 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing* pThing, int param)
             break;
         case THINGPARAM_MODEL3D:
             rdThing_FreeEntry(&pThing->rdthing);
-            pModel = sithModel_LoadEntry(arg->value, 0);
+            pModel = sithModel_Load(arg->value, 0);
             if ( pModel )
             {
                 rdThing_SetModel3(&pThing->rdthing, pModel);

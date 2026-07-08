@@ -84,7 +84,7 @@ int sithWorld_Startup()
     sithWorld_SetSectionParser("copyright", sithCopyright_Load);
     sithWorld_SetSectionParser("header", sithHeader_Load);
     sithWorld_SetSectionParser("sectors", sithSector_Load);
-    sithWorld_SetSectionParser("models", sithModel_Load);
+    sithWorld_SetSectionParser("models", sithModel_ReadStaticModelsListText);
     sithWorld_SetSectionParser("sprites", sithSprite_Load);
     sithWorld_SetSectionParser("things", sithThing_Load);
     sithWorld_SetSectionParser("templates", sithTemplate_Load);
@@ -377,7 +377,7 @@ void sithWorld_FreeEntry(sithWorld *pWorld)
     if ( pWorld->sectors )
         sithSector_Free(pWorld);
     if ( pWorld->models )
-        sithModel_Free(pWorld);
+        sithModel_FreeWorldModels(pWorld);
     if ( pWorld->sprites )
         sithSprite_FreeEntry(pWorld);
     if ( pWorld->particles )
@@ -904,7 +904,7 @@ void sithWorld_GetMemorySize(sithWorld *pWorld, int *outAllocated, int *outQuant
     outQuantity[10] = pWorld->numModelsLoaded;
     for (int i = 0; i < pWorld->numModelsLoaded; i++)
     {
-        outAllocated[10] += sithModel_GetMemorySize(&pWorld->models[i]);
+        outAllocated[10] += sithModel_GetModelMemUsage(&pWorld->models[i]);
     }
     outQuantity[11] = pWorld->numKeyframesLoaded;
     for (int i = 0; i < pWorld->numKeyframesLoaded; i++)

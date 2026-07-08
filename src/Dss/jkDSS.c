@@ -365,11 +365,11 @@ int jkDSS_ProcessSetSaberInfoMots(sithCogMsg *msg)
     else if (v2 == sithPlayer_pLocalPlayerThing) {
         jkDSS_005aec8c = 0;
     }
-    rdModel3* v5 = sithModel_LoadEntry(model_3do_fname, 1);
+    rdModel3* v5 = sithModel_Load(model_3do_fname, 1);
     if (!v5) {
         stdString_SafeStrCopy(model_3do_fname, "kk.3do", 0x20);
         stdString_SafeStrCopy(v14, "ky.snd", 0x20);
-        v5 = sithModel_LoadEntry(model_3do_fname, 1);
+        v5 = sithModel_Load(model_3do_fname, 1);
     }
     if (v5) // MOTS added
         sithThing_SetNewModel(v2, v5);
@@ -459,7 +459,7 @@ int jkDSS_ProcessSetSaberInfo(sithCogMsg *msg)
             stdString_SafeStrCopy(v14, "ky.snd", 32);
         }
     }
-    rdModel3* v5 = sithModel_LoadEntry(model_3do_fname, 1);
+    rdModel3* v5 = sithModel_Load(model_3do_fname, 1);
     if ( !v5 )
         return 1; // MOTS removed
     sithThing_SetNewModel(v2, v5);
@@ -672,7 +672,7 @@ int jkDSS_ProcessSetSaberInfo2(sithCogMsg *msg)
     int modelIdx = NETMSG_POPS32();
     thing->playerInfo = playerInfo;
     playerInfo->actorThing = thing;
-    rdModel3* model = sithModel_GetByIdx(modelIdx);
+    rdModel3* model = sithModel_GetModelByIndex(modelIdx);
     if (model)
     {
         rdThing_NewEntry(&playerInfo->rd_thing, 0);
@@ -751,7 +751,7 @@ int jkDSS_ProcessJKSetWeaponMesh(sithCogMsg *msg)
         }
     }
 
-    rdModel3* pModel = sithModel_GetByIdx(arg1);
+    rdModel3* pModel = sithModel_GetModelByIndex(arg1);
     if ( pModel )
     {
         rdThing_NewEntry(&pPlayerInfo->rd_thing, 0);
@@ -852,7 +852,7 @@ int jkDSS_Processx32(sithCogMsg *msg)
         return 0;
 
     jkPlayerInfo* playerInfo = &playerThings[v1];
-    rdModel3* model3 = sithModel_GetByIdx(NETMSG_POPS32());
+    rdModel3* model3 = sithModel_GetModelByIndex(NETMSG_POPS32());
     if (!model3)
         return 1;
 
@@ -1161,7 +1161,7 @@ int jkDSS_ProcessSetTeam(sithCogMsg *pMsg)
         // MOTS added: personality
         if (Main_bMotsCompat) {
             if (personality < 8) {
-                v5 = sithModel_LoadEntry(jkDSS_aMotsKyTeamModels[teamNum + (personality * 5)], 1);
+                v5 = sithModel_Load(jkDSS_aMotsKyTeamModels[teamNum + (personality * 5)], 1);
             }
             else {
                 v5 = NULL;
@@ -1174,7 +1174,7 @@ int jkDSS_ProcessSetTeam(sithCogMsg *pMsg)
             }
         }
         else {
-            v5 = sithModel_LoadEntry(jkDSS_aKyTeamModels[teamNum], 1);
+            v5 = sithModel_Load(jkDSS_aKyTeamModels[teamNum], 1);
             if ( v5 )
             {
                 sithThing_SetNewModel(jkPlayer_playerInfos[playerIdx].playerThing, v5);

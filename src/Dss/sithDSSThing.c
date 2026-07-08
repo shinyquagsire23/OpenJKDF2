@@ -506,7 +506,7 @@ int sithDSSThing_ProcessSetThingModel(sithCogMsg *msg)
     if ( pThing )
     {
         NETMSG_POPSTR(model_3do_fname, 0x20);
-        rdModel3* pModel = sithModel_LoadEntry(model_3do_fname, 1);
+        rdModel3* pModel = sithModel_Load(model_3do_fname, 1);
         if ( pModel )
         {
             sithThing_SetNewModel(pThing, pModel);
@@ -1052,7 +1052,7 @@ int sithDSSThing_ProcessFullDesc(sithCogMsg *msg)
             char tmp_model[32+1];
             NETMSG_POPSTR(tmp_model, 0x20);
             int unused = NETMSG_POPS16();
-            rdModel3* pModel = sithModel_LoadEntry(tmp_model, 0);
+            rdModel3* pModel = sithModel_Load(tmp_model, 0);
             sithThing_SetNewModel(thing, pModel);
 
             model = pModel;

@@ -305,7 +305,7 @@ void sithCogFunction_LoadModel(sithCog *ctx)
     rdModel3 *v2; // eax
 
     v1 = sithCogExec_PopString(ctx);
-    if ( v1 && (v2 = sithModel_LoadEntry(v1, 1)) != 0 )
+    if ( v1 && (v2 = sithModel_Load(v1, 1)) != 0 )
         sithCogExec_PushInt(ctx, v2->id);
     else
         sithCogExec_PushInt(ctx, -1);

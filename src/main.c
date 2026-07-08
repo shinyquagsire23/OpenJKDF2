@@ -2091,12 +2091,12 @@ void do_hooks()
     // sithModel
     hook_function(sithModel_Startup_ADDR, sithModel_Startup);
     hook_function(sithModel_Shutdown_ADDR, sithModel_Shutdown);
+    hook_function(sithModel_ReadStaticModelsListText_ADDR, sithModel_ReadStaticModelsListText);
+    hook_function(sithModel_FreeWorldModels_ADDR, sithModel_FreeWorldModels);
     hook_function(sithModel_Load_ADDR, sithModel_Load);
-    hook_function(sithModel_Free_ADDR, sithModel_Free);
-    hook_function(sithModel_LoadEntry_ADDR, sithModel_LoadEntry);
-    hook_function(sithModel_GetMemorySize_ADDR, sithModel_GetMemorySize);
-    hook_function(sithModel_New_ADDR, sithModel_New);
-    hook_function(sithModel_GetByIdx_ADDR, sithModel_GetByIdx);
+    hook_function(sithModel_GetModelMemUsage_ADDR, sithModel_GetModelMemUsage);
+    hook_function(sithModel_AllocWorldModels_ADDR, sithModel_AllocWorldModels);
+    hook_function(sithModel_GetModelByIndex_ADDR, sithModel_GetModelByIndex);
     
     // sithWorld
     hook_function(sithWorld_Startup_ADDR, sithWorld_Startup);
