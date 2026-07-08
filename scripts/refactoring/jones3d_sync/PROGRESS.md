@@ -21,6 +21,27 @@ the OpenJKDF2 function / struct / member / enum names to match the OpenJones3D
 names, one function at a time. This makes the two trees cross-referenceable and
 lets fixes/insights flow between them.
 
+## Phases (in order)
+
+1. **Functions** — rename function names. ✅ COMPLETE (91/91).
+2. **Globals** — rename file-scope globals via `symbols.syms`. ◐ IN PROGRESS.
+3. **Structs / members / typedefs / enums** — rename type names, struct members,
+   enum names+values (incl. deferred type renames like the `stdHashTable`/
+   `stdLinklist` structs). NOT STARTED.
+4. **Style match (final)** — for each function, match OpenJones3D's *style* as
+   closely as possible **without changing functionality**:
+   - **argument names** → adopt J3D's parameter names.
+   - **de-inlining** → where DF2 inlined code that J3D factored into a separate
+     (already-renamed) helper, call the helper instead — only when behavior is
+     identical.
+   - **debug prints & asserts** → add J3D's `SITHLOG_*` / `SITH_ASSERTREL` /
+     equivalent debug output and assertions.
+   - **enum usage** → replace magic-number literals with J3D's named enum
+     constants where they already exist in DF2.
+   - **HARD LIMIT:** do NOT import additional OpenJones3D *functionality* or new
+     code paths — only debug prints and asserts may be added. Everything else must
+     be behavior-preserving. NOT STARTED.
+
 ## Hard constraints
 
 - **Don't re-home files across directories** to mirror OpenJones3D's
@@ -58,6 +79,23 @@ lets fixes/insights flow between them.
   where behavior (not just a name) diverges from the decomp baseline. Pure
   identifier renames that preserve behavior don't need `// Added:`.
 - OpenJones3D is the **reference** and is never modified — we only read it.
+
+### Globals-pass naming policy (confirmed with user)
+
+OpenJones3D declares cross-module globals as `<module>_g_<name>` far-vars
+(`J3D_DECL_FAR_VAR` in the header; the `.c` body uses a short `g_<name>` alias —
+that's the "for g_ symbols the module can be omitted" convention). It also has
+many plain **bare file-static** vars with no prefix (`aControlFlags`,
+`horizonScale`, `numThingLinks`, `aEvents`).
+
+- For a J3D **far-var** (`<module>_g_<name>`): rename the DF2 global to the full
+  `<module>_g_<name>` form (matches J3D's DECL; no cross-module collisions).
+- For a J3D **bare file-static** (unprefixed): **SKIP** — DF2 keeps these as
+  address-mapped globals in `symbols.syms`, and an unprefixed `extern` would
+  pollute the global namespace / risk collisions. Keep the DF2 name.
+- Mechanism: globals live in `symbols.syms` (`name 0xADDR c_type`), which cog
+  regenerates into `extern`/`_ADDR`. Renaming the name column there + all uses is
+  enough — `make` re-runs cog (symbols.syms is a build DEPENDS).
 
 ## Method (per module)
 
