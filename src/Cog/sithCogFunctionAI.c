@@ -289,10 +289,10 @@ void sithCogFunctionAI_FirstThingInView(sithCog *ctx)
                                                                                                                                    rdMatrix_PreTranslate34(
                                                                                                                                        &v7,
                                                                                                                                        &v3->actorParams.eyeOffset)) : rdMatrix_PostTranslate34(&v7, &v3->position),
-          (sithCogFunctionAI_unk1 = sithAI_FirstThingInView(v3->sector, &v7, v6, v6, 32, sithCogFunctionAI_apViewThings, v5, a1), sithCogFunctionAI_viewThingIdx = 0, sithCogFunctionAI_unk1 > 0)
-       && sithCogFunctionAI_apViewThings[0]) )
+          (sithCogFunctionAI_numThingsInView = sithAI_FirstThingInView(v3->sector, &v7, v6, v6, 32, sithCogFunctionAI_aThingsInView, v5, a1), sithCogFunctionAI_curThingInView = 0, sithCogFunctionAI_numThingsInView > 0)
+       && sithCogFunctionAI_aThingsInView[0]) )
     {
-        sithCogExec_PushInt(ctx, sithCogFunctionAI_apViewThings[0]->thingIdx);
+        sithCogExec_PushInt(ctx, sithCogFunctionAI_aThingsInView[0]->thingIdx);
     }
     else
     {
@@ -305,8 +305,8 @@ void sithCogFunctionAI_NextThingInView(sithCog *ctx)
     int v1; // eax
     sithThing *v2; // eax
 
-    v1 = ++sithCogFunctionAI_viewThingIdx;
-    if ( sithCogFunctionAI_viewThingIdx < sithCogFunctionAI_unk1 && (v2 = sithCogFunctionAI_apViewThings[v1]) != 0 )
+    v1 = ++sithCogFunctionAI_curThingInView;
+    if ( sithCogFunctionAI_curThingInView < sithCogFunctionAI_numThingsInView && (v2 = sithCogFunctionAI_aThingsInView[v1]) != 0 )
         sithCogExec_PushInt(ctx, v2->thingIdx);
     else
         sithCogExec_PushInt(ctx, -1);
@@ -670,10 +670,10 @@ void sithCogFunctionAI_FirstThingInCone(sithCog *ctx)
                                                                                                                                    rdMatrix_PreTranslate34(
                                                                                                                                        &v7,
                                                                                                                                        &v3->actorParams.eyeOffset)) : rdMatrix_PostTranslate34(&v7, &v3->position),
-          (sithCogFunctionAI_unk1 = sithAI_FirstThingInCone(v3->sector, &v7, v6, v6, 32, sithCogFunctionAI_apViewThings, v5, a1), sithCogFunctionAI_viewThingIdx = 0, sithCogFunctionAI_unk1 > 0)
-       && sithCogFunctionAI_apViewThings[0]) )
+          (sithCogFunctionAI_numThingsInView = sithAI_FirstThingInCone(v3->sector, &v7, v6, v6, 32, sithCogFunctionAI_aThingsInView, v5, a1), sithCogFunctionAI_curThingInView = 0, sithCogFunctionAI_numThingsInView > 0)
+       && sithCogFunctionAI_aThingsInView[0]) )
     {
-        sithCogExec_PushInt(ctx, sithCogFunctionAI_apViewThings[0]->thingIdx);
+        sithCogExec_PushInt(ctx, sithCogFunctionAI_aThingsInView[0]->thingIdx);
     }
     else
     {
@@ -685,12 +685,12 @@ void sithCogFunctionAI_FirstThingInCone(sithCog *ctx)
 // MoTS added
 void sithCogFunctionAI_NextThingInCone(sithCog *ctx)
 {
-    sithCogFunctionAI_viewThingIdx++;
+    sithCogFunctionAI_curThingInView++;
 
-    if (sithCogFunctionAI_viewThingIdx < sithCogFunctionAI_unk1 
-        && sithCogFunctionAI_apViewThings[sithCogFunctionAI_viewThingIdx]) 
+    if (sithCogFunctionAI_curThingInView < sithCogFunctionAI_numThingsInView 
+        && sithCogFunctionAI_aThingsInView[sithCogFunctionAI_curThingInView]) 
     {
-        sithCogExec_PushInt(ctx,sithCogFunctionAI_apViewThings[sithCogFunctionAI_viewThingIdx]->thingIdx);
+        sithCogExec_PushInt(ctx,sithCogFunctionAI_aThingsInView[sithCogFunctionAI_curThingInView]->thingIdx);
         return;
     }
     sithCogExec_PushInt(ctx,-1);
