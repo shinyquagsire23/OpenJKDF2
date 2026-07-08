@@ -1921,11 +1921,11 @@ void do_hooks()
     
     // sithControl
     hook_function(sithControl_Open_ADDR, sithControl_Open);
-    hook_function(sithControl_Tick_ADDR, sithControl_Tick);
-    hook_function(sithControl_AddInputHandler_ADDR, sithControl_AddInputHandler);
+    hook_function(sithControl_Update_ADDR, sithControl_Update);
+    hook_function(sithControl_RegisterControlCallback_ADDR, sithControl_RegisterControlCallback);
     hook_function(sithControl_HandlePlayer_ADDR, sithControl_HandlePlayer);
-    hook_function(sithControl_SetFuncType_ADDR, sithControl_SetFuncType);
-    hook_function(sithControl_sub_4D7C30_ADDR, sithControl_ClearAllBindings);
+    hook_function(sithControl_RegisterAxisFunction_ADDR, sithControl_RegisterAxisFunction);
+    hook_function(sithControl_sub_4D7C30_ADDR, sithControl_Reset);
 
     // sithPlayerActions
     hook_function(sithPlayerActions_Activate_ADDR, sithPlayerActions_Activate);
@@ -2907,7 +2907,7 @@ void do_hooks()
     hook_function(Window_msg_main_handler_ADDR, Window_msg_main_handler);
     //hook_function(sithControl_GetAxis_ADDR, sithControl_GetAxis); // TODO: not yet decompiled
     //hook_function(sithControl_ReadAxisStuff_ADDR, sithControl_ReadAxisStuff); // TODO: not yet decompiled
-    hook_function(sithControl_ReadFunctionMap_ADDR, sithControl_ReadFunctionMap);
+    hook_function(sithControl_GetKey_ADDR, sithControl_GetKey);
 
     hook_function(stdControl_Open_ADDR, stdControl_Open);
     hook_function(stdControl_Close_ADDR, stdControl_Close);

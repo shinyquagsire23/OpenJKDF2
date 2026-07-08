@@ -321,7 +321,7 @@ int sithMain_Tick()
             sithControl_ReadControls();
             if ( g_sithMode != 2 )
             {
-                sithControl_Tick(sithTime_deltaSeconds, sithTime_deltaMs);
+                sithControl_Update(sithTime_deltaSeconds, sithTime_deltaMs);
             }
             sithControl_FinishRead();
 
@@ -355,7 +355,7 @@ int sithMain_Tick()
                 // TODO
                 //if (g_sithMode != 2 )
                 //{
-                //    sithControl_Tick(sithTime_deltaSeconds, sithTime_deltaMs);
+                //    sithControl_Update(sithTime_deltaSeconds, sithTime_deltaMs);
                 //}
                 sithThing_TickAll(sithTime_deltaSeconds, sithTime_deltaMs);
                 sithThing_MotsTick(0x1F, 0, 0);
@@ -392,7 +392,7 @@ int sithMain_Tick()
 #ifdef FIXED_TIMESTEP_PHYS
                 sithControl_ReadControls();
 #endif
-                sithControl_Tick(sithTime_deltaSeconds, sithTime_deltaMs);
+                sithControl_Update(sithTime_deltaSeconds, sithTime_deltaMs);
 #ifdef FIXED_TIMESTEP_PHYS
                 sithControl_FinishRead();
 #endif

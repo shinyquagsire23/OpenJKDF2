@@ -115,7 +115,7 @@ int jkGuiKeyboard_RemoveControlClicked(jkGuiElement *pClickedElement, jkGuiMenu 
             v3 = pEntry->dxKeyNum;
             if ( v3 != -1 )
             {
-                sithControl_ShiftFuncKeyinfo(pEntry->inputFuncIdx, v3);
+                sithControl_UnbindFunctionIndex(pEntry->inputFuncIdx, v3);
                 jkGuiKeyboard_sub_411F40(&jkGuiKeyboard_aElements[12], &jkGuiKeyboard_darrEntries);
                 jkGuiRend_UpdateAndDrawClickable(&jkGuiKeyboard_aElements[12], &jkGuiKeyboard_menu, 1);
                 return 0;
@@ -402,7 +402,7 @@ void jkGuiKeyboard_sub_4123C0(jkGuiMenu *pMenu)
             {
                 v4 = v11;
 LABEL_23:
-                if ( sithControl_MapFunc(jkGuiKeyboard_funcIdx, v4, jkGuiKeyboard_flags) )
+                if ( sithControl_BindControl(jkGuiKeyboard_funcIdx, v4, jkGuiKeyboard_flags) )
                 {
                     jkGuiKeyboard_sub_411F40(&jkGuiKeyboard_aElements[12], &jkGuiKeyboard_darrEntries);
                 }
@@ -507,7 +507,7 @@ int jkGuiKeyboard_RestoreDefaultsClicked(jkGuiElement *pElement, jkGuiMenu *pMen
     v3 = jkStrings_GetUniStringWithFallback("GUI_RESTORE_DEFAULTS");
     if ( jkGuiDialog_YesNoDialog(v3, v4) )
     {
-        sithControl_KeyboardInputInitDefaults();
+        sithControl_RebindKeyboard();
         jkHudInv_InputInit();
     }
     jkGuiKeyboard_sub_411F40(&jkGuiKeyboard_aElements[12], &jkGuiKeyboard_darrEntries);

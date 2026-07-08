@@ -483,9 +483,9 @@ void jkGuiJoystick_BindControl(int a1, int a2)
             v13 = v8->binaryAxisVal;
             v2 = v8->flags & INPUT_MAPPING_FLAG_AXIS_REVERSED;
         }
-        sithControl_ShiftFuncKeyinfo(v5, jkGuiJoystick_aEntries[v3].dxKeyNum);
+        sithControl_UnbindFunctionIndex(v5, jkGuiJoystick_aEntries[v3].dxKeyNum);
     }
-    v9 = sithControl_MapAxisFunc(v7, v6, v2);
+    v9 = sithControl_BindAxis(v7, v6, v2);
     if ( v9 )
     {
         v9->binaryAxisVal = v13;
@@ -717,8 +717,8 @@ int jkGuiJoystick_ClickList3(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t m
         v15 = jkGuiJoystick_aEntries[v12].dikNum;
         v16 = v13 & INPUT_MAPPING_FLAG_AXIS_REVERSED;
         if ( v14 != -1 )
-            sithControl_ShiftFuncKeyinfo(v14, jkGuiJoystick_aEntries[v12].dxKeyNum);
-        if ( sithControl_MapFunc(v11, v15, v16) )
+            sithControl_UnbindFunctionIndex(v14, jkGuiJoystick_aEntries[v12].dxKeyNum);
+        if ( sithControl_BindControl(v11, v15, v16) )
         {
             jkGuiJoystick_sub_41B390();
         }
@@ -755,7 +755,7 @@ int jkGuiJoystick_RemoveClick(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t 
     v5 = jkGuiRend_GetId(&jkGuiJoystick_darray2, jkGuiJoystick_aElements[JKGUIJOYSTICK_IDX_CONTROLS_LIST].selectedTextEntry);
     if ( !jkGuiJoystick_bIsCapturingInputs )
     {
-        sithControl_ShiftFuncKeyinfo(jkGuiJoystick_aEntries[v5].inputFunc, jkGuiJoystick_aEntries[v5].dxKeyNum);
+        sithControl_UnbindFunctionIndex(jkGuiJoystick_aEntries[v5].inputFunc, jkGuiJoystick_aEntries[v5].dxKeyNum);
         jkGuiRend_PlayWav(pMenu->soundClick);
         jkGuiJoystick_sub_41B390();
         jkGuiJoystick_dword_536B9C = -1;
@@ -807,8 +807,8 @@ int jkGuiJoystick_OkCancelClick(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_
                 v13 = jkGuiJoystick_aEntries[v10].dikNum;
                 v14 = v11 & INPUT_MAPPING_FLAG_AXIS_REVERSED;
                 if ( v12 != -1 )
-                    sithControl_ShiftFuncKeyinfo(v12, jkGuiJoystick_aEntries[v10].dxKeyNum);
-                if ( sithControl_MapFunc(v9, v13, v14) )
+                    sithControl_UnbindFunctionIndex(v12, jkGuiJoystick_aEntries[v10].dxKeyNum);
+                if ( sithControl_BindControl(v9, v13, v14) )
                 {
                     jkGuiJoystick_sub_41B390();
                 }
@@ -844,7 +844,7 @@ int jkGuiJoystick_RestoreDefaultsClick(jkGuiElement *pElement, jkGuiMenu *pMenu,
     v7 = jkStrings_GetUniStringWithFallback("GUI_RESTORE_DEFAULTS_Q");
     v6 = jkStrings_GetUniStringWithFallback("GUI_RESTORE_DEFAULTS");
     if ( jkGuiDialog_YesNoDialog(v6, v7) )
-        sithControl_JoyInputInit();
+        sithControl_RebindJoystick();
     jkGuiJoystick_sub_41B390();
     jkGuiJoystick_dword_536B9C = -1;
     jkGuiJoystick_dword_536B98 = -1;

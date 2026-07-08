@@ -323,9 +323,9 @@ void jkGuiMouse_sub_417100(int a1, int a2)
             v13 = pSubEnt->field_8;
             mapFlags = pSubEnt->bitflag & 4;
         }
-        sithControl_ShiftFuncKeyinfo(v5, jkGuiMouse_aEntries[v3].bindIdx);
+        sithControl_UnbindFunctionIndex(v5, jkGuiMouse_aEntries[v3].bindIdx);
     }
-    v8 = sithControl_MapAxisFunc(inputFuncIdx, dxKeyNum, mapFlags);
+    v8 = sithControl_BindAxis(inputFuncIdx, dxKeyNum, mapFlags);
     if ( v8 )
     {
         v9 = jkGuiMouse_aEntries[v3].flags;
@@ -537,8 +537,8 @@ int jkGuiMouse_ListClicked3(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mo
         v12 = (v8 >> 29) & 4;
         v13 = v8 & 0x7FFFFFFF;
         if ( v10 != -1 )
-            sithControl_ShiftFuncKeyinfo(v10, jkGuiMouse_aEntries[v9].bindIdx);
-        if ( sithControl_MapFunc(v13, v11, v12) )
+            sithControl_UnbindFunctionIndex(v10, jkGuiMouse_aEntries[v9].bindIdx);
+        if ( sithControl_BindControl(v13, v11, v12) )
         {
             jkGuiMouse_sub_417210();
         }
@@ -569,7 +569,7 @@ int jkGuiMouse_RemoveClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, in
     int32_t v5; // eax
 
     v5 = jkGuiRend_GetId(&jkGuiMouse_Darray_5566B8, jkGuiMouse_aElements[11].selectedTextEntry);
-    sithControl_ShiftFuncKeyinfo(jkGuiMouse_aEntries[v5].inputFuncIdx, jkGuiMouse_aEntries[v5].bindIdx);
+    sithControl_UnbindFunctionIndex(jkGuiMouse_aEntries[v5].inputFuncIdx, jkGuiMouse_aEntries[v5].bindIdx);
     jkGuiRend_PlayWav(pMenu->soundClick);
     jkGuiMouse_sub_417210();
     jkGuiMouse_dword_53032C = -1;
@@ -607,8 +607,8 @@ int jkGuiMouse_CancelOkClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, 
             v11 = (v7 >> 29) & 4;
             v12 = v7 & ~0x80000000;
             if ( v9 != -1 )
-                sithControl_ShiftFuncKeyinfo(v9, jkGuiMouse_aEntries[v8].bindIdx);
-            if ( sithControl_MapFunc(v12, v10, v11) )
+                sithControl_UnbindFunctionIndex(v9, jkGuiMouse_aEntries[v8].bindIdx);
+            if ( sithControl_BindControl(v12, v10, v11) )
             {
                 jkGuiMouse_sub_417210();
             }
@@ -640,7 +640,7 @@ int jkGuiMouse_RestoreDefaultsClicked(jkGuiElement *pClickedElement, jkGuiMenu *
     v7 = jkStrings_GetUniStringWithFallback("GUI_RESTORE_DEFAULTS_Q");
     v5 = jkStrings_GetUniStringWithFallback("GUI_RESTORE_DEFAULTS");
     if ( jkGuiDialog_YesNoDialog(v5, v7) )
-        sithControl_MouseInputInitDefaults();
+        sithControl_RebindMouse();
     jkGuiMouse_sub_417210();
     jkGuiMouse_dword_53032C = -1;
     jkGuiMouse_dword_530328 = -1;

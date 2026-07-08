@@ -1144,7 +1144,7 @@ int sithWeapon_HandleWeaponKeys(sithThing *player, flex_t a2)
         inputFunc = INPUT_FUNC_SELECT1;
         while ( 1 )
         {
-            sithControl_ReadFunctionMap(inputFunc, &readInput);
+            sithControl_GetKey(inputFunc, &readInput);
             if ( readInput && sithThing_MotsTick(7,0,inputFunc))
             {
                 if (!Main_bMotsCompat) {
@@ -1192,7 +1192,7 @@ int sithWeapon_HandleWeaponKeys(sithThing *player, flex_t a2)
             if ( ++inputFunc <= INPUT_FUNC_SELECT0 )
                 continue;
 
-            sithControl_ReadFunctionMap(INPUT_FUNC_NEXTWEAPON, &readInput);
+            sithControl_GetKey(INPUT_FUNC_NEXTWEAPON, &readInput);
             while (readInput--)
             {
                 if (sithThing_MotsTick(7,1,1.0)) {
@@ -1200,7 +1200,7 @@ int sithWeapon_HandleWeaponKeys(sithThing *player, flex_t a2)
                 }
             }
 
-            sithControl_ReadFunctionMap(INPUT_FUNC_PREVWEAPON, &readInput);
+            sithControl_GetKey(INPUT_FUNC_PREVWEAPON, &readInput);
             while (readInput--)
             {
                 if (sithThing_MotsTick(7,1,-1.0)) {
@@ -1220,7 +1220,7 @@ int sithWeapon_HandleWeaponKeys(sithThing *player, flex_t a2)
             while ( 1 )
             {
                 v22 = v20 - 10;
-                if ( sithControl_ReadFunctionMap(v20, &readInput) )
+                if ( sithControl_GetKey(v20, &readInput) )
                 {
                     if (sithThing_MotsTick(3, 0, (flex_t)v22) && !sithWeapon_a8BD030[v25]) // MOTS added // FLEXTODO
                     {

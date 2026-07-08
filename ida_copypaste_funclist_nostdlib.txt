@@ -2062,28 +2062,28 @@ sithControl_Open	.text	004D68B0	0000001F			R	.	.	.	.	.	.	.
 sithControl_Close	.text	004D68D0	00000026			R	.	.	.	.	.	T	.
 sithControl_IsOpen	.text	004D6900	00000006			R	.	.	.	.	.	.	.
 sithControl_sub_4D6910	.text	004D6910	00000012	00000000	00000008	R	.	.	.	.	.	.	.
-sithControl_sub_4D6930	.text	004D6930	00000010	00000000	00000004	R	.	.	.	.	.	T	.
-sithControl_MapFunc	.text	004D6940	000000EC	00000010	0000000C	R	.	.	.	.	.	T	.
-sithControl_MapAxisFunc	.text	004D6A30	0000012F	00000010	0000000C	R	.	.	.	.	.	T	.
-sithControl_ShiftFuncKeyinfo	.text	004D6B60	00000058	00000004	00000008	R	.	.	.	.	.	T	.
-sithControl_MapFuncToDxKey	.text	004D6BC0	00000090	00000010	00000008	R	.	.	.	.	.	T	.
-sithControl_AddInputHandler	.text	004D6C50	0000001C	00000000	00000004	R	.	.	.	.	.	T	.
-sithControl_Tick	.text	004D6C70	000000FE	0000000C	00000008	R	.	.	.	.	.	T	.
+sithControl_RegisterKeyFunction	.text	004D6930	00000010	00000000	00000004	R	.	.	.	.	.	T	.
+sithControl_BindControl	.text	004D6940	000000EC	00000010	0000000C	R	.	.	.	.	.	T	.
+sithControl_BindAxis	.text	004D6A30	0000012F	00000010	0000000C	R	.	.	.	.	.	T	.
+sithControl_UnbindFunctionIndex	.text	004D6B60	00000058	00000004	00000008	R	.	.	.	.	.	T	.
+sithControl_UnbindControl	.text	004D6BC0	00000090	00000010	00000008	R	.	.	.	.	.	T	.
+sithControl_RegisterControlCallback	.text	004D6C50	0000001C	00000000	00000004	R	.	.	.	.	.	T	.
+sithControl_Update	.text	004D6C70	000000FE	0000000C	00000008	R	.	.	.	.	.	T	.
 sithControl_GetAxis2	.text	004D6D70	00000137	00000014	00000004	R	.	.	.	.	.	T	.
 sithControl_ReadAxisStuff	.text	004D6EB0	000000C3	0000000C	00000004	R	.	.	.	.	.	T	.
 sithControl_GetAxis	.text	004D6F80	0000008F	00000008	00000004	R	.	.	.	.	.	T	.
-sithControl_ReadFunctionMap	.text	004D7010	00000082	00000014	00000008	R	.	.	.	.	.	T	.
+sithControl_GetKey	.text	004D7010	00000082	00000014	00000008	R	.	.	.	.	.	T	.
 sithControl_ReadControls	.text	004D70A0	00000005	00000000	00000000	R	.	.	.	.	.	.	.
 sithControl_FinishRead	.text	004D70B0	00000005	00000000	00000000	R	.	.	.	.	.	.	.
-sithControl_InputInit	.text	004D70C0	00000287	0000000C	00000000	R	.	.	.	.	.	T	.
-sithControl_KeyboardInputInitDefaults	.text	004D7350	0000008A	00000014	00000000	R	.	.	.	.	.	.	.
-sithControl_JoyInputInit	.text	004D73E0	00000290	00000014	00000000	R	.	.	.	.	.	.	.
-sithControl_MouseInputInitDefaults	.text	004D7670	0000026B	00000014	00000000	R	.	.	.	.	.	T	.
+sithControl_DefaultInit	.text	004D70C0	00000287	0000000C	00000000	R	.	.	.	.	.	T	.
+sithControl_RebindKeyboard	.text	004D7350	0000008A	00000014	00000000	R	.	.	.	.	.	.	.
+sithControl_RebindJoystick	.text	004D73E0	00000290	00000014	00000000	R	.	.	.	.	.	.	.
+sithControl_RebindMouse	.text	004D7670	0000026B	00000014	00000000	R	.	.	.	.	.	T	.
 sithControl_WriteConf	.text	004D78E0	000000B2	00000018	00000000	R	.	.	.	.	.	.	.
 sithControl_ReadConf	.text	004D79A0	0000028A	00000020	00000000	R	.	.	.	.	.	.	.
 sithControl_sub_4D7C30	.text	004D7C30	00000016	00000004	00000000	R	.	.	.	.	.	.	.
-sithControl_InitFuncToControlType	.text	004D7C50	000000EF			R	.	.	.	.	.	T	.
-sithControl_MapDefaults	.text	004D7D40	00000574	0000000C	00000000	R	.	.	.	.	.	.	.
+sithControl_RegisterControlFunctions	.text	004D7C50	000000EF			R	.	.	.	.	.	T	.
+sithControl_RegisterKeyboardBindings	.text	004D7D40	00000574	0000000C	00000000	R	.	.	.	.	.	.	.
 sithControl_EnumBindings	.text	004D82C0	00000254	0000002C	00000014	R	.	.	.	.	.	T	.
 sithControl_HandlePlayer	.text	004D8520	000004DB	00000048	00000008	R	.	.	.	.	.	T	.
 sithControl_PlayerMovement	.text	004D8A00	0000028C	0000000C	00000004	R	.	.	.	.	.	T	.

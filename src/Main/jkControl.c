@@ -27,10 +27,10 @@ int jkControl_Startup()
     stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
     
     sithControl_Startup();
-    sithControl_AddInputHandler(sithControl_HandlePlayer);
-    sithControl_AddInputHandler(sithWeapon_HandleWeaponKeys);
-    sithControl_AddInputHandler(sithInventory_HandleInvSkillKeys);
-    sithControl_AddInputHandler(jkControl_HandleHudKeys);
+    sithControl_RegisterControlCallback(sithControl_HandlePlayer);
+    sithControl_RegisterControlCallback(sithWeapon_HandleWeaponKeys);
+    sithControl_RegisterControlCallback(sithInventory_HandleInvSkillKeys);
+    sithControl_RegisterControlCallback(jkControl_HandleHudKeys);
     Window_AddMsgHandler(stdControl_MessageHandler);
 
     jkControl_bInit = 1;
@@ -64,14 +64,14 @@ int jkControl_HandleHudKeys(sithThing *player, flex_t b)
     {
         if ( !jkHud_bChatOpen )
         {
-            sithControl_ReadFunctionMap(INPUT_FUNC_TALK, &v15);
+            sithControl_GetKey(INPUT_FUNC_TALK, &v15);
             if (v15 && sithThing_MotsTick(0xe,0,1.0))
                 jkHud_Chat();
         }
 
         if ( (g_submodeFlags & 1) == 0 )
         {
-            sithControl_ReadFunctionMap(INPUT_FUNC_GAMESAVE, &v15);
+            sithControl_GetKey(INPUT_FUNC_GAMESAVE, &v15);
             if (v15 && sithThing_MotsTick(0xe,0,2.0))
             {
                 v2 = jkGuiTitle_quicksave_related_func1(&jkCog_strings, sithWorld_pCurrentWorld->map_jkl_fname);
@@ -82,7 +82,7 @@ int jkControl_HandleHudKeys(sithThing *player, flex_t b)
             }
         }
 
-        sithControl_ReadFunctionMap(INPUT_FUNC_CAMERAMODE, &v15);
+        sithControl_GetKey(INPUT_FUNC_CAMERAMODE, &v15);
         for (int i = v15-- == 0; !i; --v15 )
         {
             if ( (player->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 && sithThing_MotsTick(0xe,0,0.0)) // MOTS altered
@@ -100,7 +100,7 @@ int jkControl_HandleHudKeys(sithThing *player, flex_t b)
 
         if ( !sithOverlayMap_bShowMap )
         {
-            sithControl_ReadFunctionMap(INPUT_FUNC_INCREASE, &v15);
+            sithControl_GetKey(INPUT_FUNC_INCREASE, &v15);
             for (int i = v15-- == 0; !i; --v15 )
             {
                 if (sithThing_MotsTick(0xe,1,3.0)) { // MOTS altered
@@ -110,7 +110,7 @@ int jkControl_HandleHudKeys(sithThing *player, flex_t b)
                 }
                 i = v15 == 0;
             }
-            sithControl_ReadFunctionMap(INPUT_FUNC_DECREASE, &v15);
+            sithControl_GetKey(INPUT_FUNC_DECREASE, &v15);
             for (int i = v15-- == 0; !i; --v15 )
             {
                 if (sithThing_MotsTick(0xe,-1,3.0)) { // MOTS altered
@@ -122,7 +122,7 @@ int jkControl_HandleHudKeys(sithThing *player, flex_t b)
             }
         }
 
-        sithControl_ReadFunctionMap(INPUT_FUNC_GAMMA, &v15);
+        sithControl_GetKey(INPUT_FUNC_GAMMA, &v15);
         for (int i = v15-- == 0; !i; --v15 )
         {
             if (sithThing_MotsTick(0xe,0,4.0)) { // MOTS altered
@@ -133,14 +133,14 @@ int jkControl_HandleHudKeys(sithThing *player, flex_t b)
             i = v15 == 0;
         }
 
-        sithControl_ReadFunctionMap(INPUT_FUNC_SCREENSHOT, &v15);
+        sithControl_GetKey(INPUT_FUNC_SCREENSHOT, &v15);
         if (v15 && sithThing_MotsTick(0xe,0,6.0))
         {
             jkGame_Screenshot();
             jkDev_PrintUniString(jkStrings_GetUniStringWithFallback("GAME_SCREENSHOT"));
         }
 
-        sithControl_ReadFunctionMap(INPUT_FUNC_TALLY, &v15);
+        sithControl_GetKey(INPUT_FUNC_TALLY, &v15);
         if (v15 && sithThing_MotsTick(0xe,0,5.0))
             jkHud_Tally();
     }

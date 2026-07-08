@@ -751,31 +751,31 @@ void stdControl_ReadGamepad(int idx) {
     //SDL_GameControllerGetButton
 
     /*
-    sithControl_MapAxisFunc(INPUT_FUNC_FORWARD, AXIS_JOY1_Y, 4u);
+    sithControl_BindAxis(INPUT_FUNC_FORWARD, AXIS_JOY1_Y, 4u);
     if (Main_bMotsCompat) {
-        sithControl_MapAxisFunc(INPUT_FUNC_SLIDE, AXIS_JOY1_X, 4u);
+        sithControl_BindAxis(INPUT_FUNC_SLIDE, AXIS_JOY1_X, 4u);
     }
     else {
-        sithControl_MapAxisFunc(INPUT_FUNC_SLIDE, AXIS_JOY1_X, 0u);
+        sithControl_BindAxis(INPUT_FUNC_SLIDE, AXIS_JOY1_X, 0u);
     }
-    sithControl_MapAxisFunc(INPUT_FUNC_PITCH, AXIS_JOY1_R, 4u);
-    sithControl_MapAxisFunc(INPUT_FUNC_TURN, AXIS_JOY1_Z, 4u);
+    sithControl_BindAxis(INPUT_FUNC_PITCH, AXIS_JOY1_R, 4u);
+    sithControl_BindAxis(INPUT_FUNC_TURN, AXIS_JOY1_Z, 4u);
 
     sithControl_DefaultHelper(INPUT_FUNC_USELASTSELECTED, KEY_JOY1_B1, 2); // a
     sithControl_DefaultHelper(INPUT_FUNC_DUCK, KEY_JOY1_B2, 2); // b
     sithControl_DefaultHelper(INPUT_FUNC_ACTIVATE, KEY_JOY1_B3, 2); // x
-    sithControl_MapFunc(INPUT_FUNC_JUMP, KEY_JOY1_B4, 0); // y
+    sithControl_BindControl(INPUT_FUNC_JUMP, KEY_JOY1_B4, 0); // y
 
     sithControl_DefaultHelper(INPUT_FUNC_USEINV, KEY_JOY1_B8, 2); // lstick click
     sithControl_DefaultHelper(INPUT_FUNC_USESKILL, KEY_JOY1_B9, 2); // rstick click
 
-    sithControl_MapFunc(INPUT_FUNC_NEXTINV, KEY_JOY1_HUP, 0);
-    sithControl_MapFunc(INPUT_FUNC_PREVINV, KEY_JOY1_HDOWN, 0);
-    sithControl_MapFunc(INPUT_FUNC_PREVSKILL, KEY_JOY1_HLEFT, 0);
-    sithControl_MapFunc(INPUT_FUNC_NEXTSKILL, KEY_JOY1_HRIGHT, 0);
+    sithControl_BindControl(INPUT_FUNC_NEXTINV, KEY_JOY1_HUP, 0);
+    sithControl_BindControl(INPUT_FUNC_PREVINV, KEY_JOY1_HDOWN, 0);
+    sithControl_BindControl(INPUT_FUNC_PREVSKILL, KEY_JOY1_HLEFT, 0);
+    sithControl_BindControl(INPUT_FUNC_NEXTSKILL, KEY_JOY1_HRIGHT, 0);
 
-    sithControl_MapFunc(INPUT_FUNC_PREVWEAPON, KEY_JOY1_B10, 0); // lbump
-    sithControl_MapFunc(INPUT_FUNC_NEXTWEAPON, KEY_JOY1_B11, 0); // rbump
+    sithControl_BindControl(INPUT_FUNC_PREVWEAPON, KEY_JOY1_B10, 0); // lbump
+    sithControl_BindControl(INPUT_FUNC_NEXTWEAPON, KEY_JOY1_B11, 0); // rbump
 
     sithControl_DefaultHelper(INPUT_FUNC_FIRE2, KEY_JOY1_B16, 2); // ltrig
     sithControl_DefaultHelper(INPUT_FUNC_FIRE1, KEY_JOY1_B17, 2); // rtrig

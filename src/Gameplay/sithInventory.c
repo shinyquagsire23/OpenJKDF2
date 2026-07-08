@@ -1112,9 +1112,9 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, flex_t deltaSecs)
     }
     else
     {
-        if ( sithControl_ReadFunctionMap(INPUT_FUNC_USEINV, &keyRead) 
+        if ( sithControl_GetKey(INPUT_FUNC_USEINV, &keyRead) 
 #ifdef QOL_IMPROVEMENTS
-            || sithControl_ReadFunctionMap(INPUT_FUNC_USELASTSELECTED, &keyRead) && sithControl_GetLastSelected() == LAST_SELECTED_ITEM
+            || sithControl_GetKey(INPUT_FUNC_USELASTSELECTED, &keyRead) && sithControl_GetLastSelected() == LAST_SELECTED_ITEM
 #endif // QOL_IMPROVEMENTS
             )
         {
@@ -1163,9 +1163,9 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, flex_t deltaSecs)
             }
         }
 
-        if ( sithControl_ReadFunctionMap(INPUT_FUNC_USESKILL, &keyRead) 
+        if ( sithControl_GetKey(INPUT_FUNC_USESKILL, &keyRead) 
 #ifdef QOL_IMPROVEMENTS
-            || sithControl_ReadFunctionMap(INPUT_FUNC_USELASTSELECTED, &keyRead) && sithControl_GetLastSelected() == LAST_SELECTED_SKILL
+            || sithControl_GetKey(INPUT_FUNC_USELASTSELECTED, &keyRead) && sithControl_GetLastSelected() == LAST_SELECTED_SKILL
 #endif // QOL_IMPROVEMENTS
             )
         {
@@ -1220,7 +1220,7 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, flex_t deltaSecs)
         {
             if ( v20->enabled == 1 )
             {
-                int v21 = sithControl_ReadFunctionMap(v40 + INPUT_FUNC_ACTIVATE0, &keyRead) == 0;
+                int v21 = sithControl_GetKey(v40 + INPUT_FUNC_ACTIVATE0, &keyRead) == 0;
                 v22 = v20->idk;
                 if ( v21 )
                 {
@@ -1320,7 +1320,7 @@ skip_cog:
         }
         while ( (intptr_t)v20 < (intptr_t)&sithInventory_powerKeybinds[20].idk );
 
-        sithControl_ReadFunctionMap(INPUT_FUNC_NEXTINV, &keyRead);
+        sithControl_GetKey(INPUT_FUNC_NEXTINV, &keyRead);
         while (keyRead--)
         {
 #ifdef QOL_IMPROVEMENTS
@@ -1338,7 +1338,7 @@ skip_cog:
             }
         }
 
-        sithControl_ReadFunctionMap(INPUT_FUNC_PREVINV, &keyRead);
+        sithControl_GetKey(INPUT_FUNC_PREVINV, &keyRead);
         while (keyRead--)
         {
 #ifdef QOL_IMPROVEMENTS
@@ -1384,7 +1384,7 @@ LABEL_108:
             sithInventory_bRendIsHidden = 1;
         }
 
-        sithControl_ReadFunctionMap(INPUT_FUNC_NEXTSKILL, &keyRead);
+        sithControl_GetKey(INPUT_FUNC_NEXTSKILL, &keyRead);
         while (keyRead--)
         {
 #ifdef QOL_IMPROVEMENTS
@@ -1399,7 +1399,7 @@ LABEL_108:
             }
         }
 
-        sithControl_ReadFunctionMap(INPUT_FUNC_PREVSKILL, &keyRead);
+        sithControl_GetKey(INPUT_FUNC_PREVSKILL, &keyRead);
         while (keyRead--)
         {
 #ifdef QOL_IMPROVEMENTS
@@ -1469,7 +1469,7 @@ int sithInventory_KeybindInit()
     {
         if ( (sithInventory_aDescriptors[i].flags & 0x100) != 0 )
         {
-            sithControl_sub_4D6930(v0 + 42);
+            sithControl_RegisterKeyFunction(v0 + 42);
             sithInventory_powerKeybinds[v0].enabled = 1;
             sithInventory_powerKeybinds[v0].binding = i;
             sithInventory_powerKeybinds[v0].idk = 0;

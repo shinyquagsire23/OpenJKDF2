@@ -479,7 +479,7 @@ void jkPlayer_CreateConf(wchar_t *name)
     stdFileUtil_MkDir("player");
     stdFnames_MakePath(pathName, 128, "player", a1);
     stdFileUtil_MkDir(pathName);
-    sithControl_InputInit();
+    sithControl_DefaultInit();
     jkHudInv_InputInit();
     jkPlayer_SetRank(0);
     sithPlayer_SetBinAmt(SITHBIN_CHOICE, 0.0);
@@ -733,7 +733,7 @@ int jkPlayer_ReadConf(wchar_t *name)
 
         // HACK
 #ifdef TARGET_RETRO_HOMEBREW
-        sithControl_InputInit();
+        sithControl_DefaultInit();
 #endif
         if ( stdConffile_ReadArgs() )
         {
@@ -821,7 +821,7 @@ int jkPlayer_ReadConf(wchar_t *name)
     {
         stdConffile_Close();
         jkPlayer_setDiff = 1;
-        sithControl_InputInit();
+        sithControl_DefaultInit();
         return 0;
     }
     return 0;
