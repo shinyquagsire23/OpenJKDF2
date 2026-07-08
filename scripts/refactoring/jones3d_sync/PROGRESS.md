@@ -517,7 +517,12 @@ already matched / arg-count mismatch); **batch12** sithPlayer/Inventory/OverlayM
 rdMatrix/rdVector (sithControl already matched; rdVector_Cross3 chained swap
 v1→dest/v2→v1/v3→v2 handled swap-safe by single-pass apply); **batch13** rdMath/Polyline/
 Sprite/Primit2/Primit3/Face (rdPrimit2_DrawClippedCircle chained a4→radius/radius→step);
-**batch14** sithEvent/Sound/Console/Intersect/SoundMixer/Main. = **78 modules.**
+**batch14** sithEvent/Sound/Console/Intersect/SoundMixer/Main; **batch15** rdCache/rdroid.
+= **80 modules. ARG-NAME PASS COMPLETE** — every shared module with a J3D counterpart and
+unambiguous positional param correspondence has been synced. What's NOT arg-name-synced is
+intentional: no-J3D-counterpart modules (jk\* game layer, stdControl/Bmp/Font, rdColormap/
+rdActive, sithConsole platform bits), arg-count-mismatch functions, and platform-divergent
+added code (wuRegistry). All 15 batches byte-identical on NDS + clean on macOS/TWL/DC.
 Tool: scratchpad `apply_argnames.py` + per-module subagent maps. **jk\* game layer has NO
 J3D counterpart** (JK-specific; Indy has its own game code) — do NOT attempt. Remaining
 candidates remaining (thin): rdCache, rdroid (Engine), wuRegistry (platform-specific,
