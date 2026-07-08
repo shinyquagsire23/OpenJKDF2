@@ -50,7 +50,7 @@ int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *materi
         sprite->face.vertexPosIdx = (int *)RDROID_ALLOC(sizeof(int) * sprite->face.numVertices);
         if ( sprite->face.vertexPosIdx )
         {
-            if ( sprite->face.geometryMode <= RD_GEOMODE_SOLIDCOLOR)
+            if ( sprite->face.geometryMode <= RD_GEOMETRY_SOLID)
             {
                 for (int i = 0; i < sprite->face.numVertices; i++)
                 {

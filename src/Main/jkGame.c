@@ -157,7 +157,7 @@ int jkGame_Update()
             if (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_SCOPEHUD) {
                 sithCamera_g_aCameras[0].rdCam.pClipFrustum->zNear = SITHCAMERA_ZNEAR;
             }
-            if ((playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_80000000) != 0) {
+            if ((playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_ARACHNID) != 0) {
                 sithCamera_g_aCameras[0].rdCam.pClipFrustum->zNear = SITHCAMERA_ZNEAR;
             }
         }
@@ -280,7 +280,7 @@ int jkGame_Update()
 
     // MOTS added: scope/security cam overlays
     if (!Main_bMotsCompat) {
-        if ( (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_NOHUD) == 0 ) {
+        if ( (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_NOIDLECAMERA) == 0 ) {
             jkHud_Draw();
         }
     }
@@ -288,8 +288,8 @@ int jkGame_Update()
         if (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_SCOPEHUD) {
             jkHudScope_Draw();
         }
-        if ((playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_80000000) == 0) {
-            if ((playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_NOHUD) == 0) {
+        if ((playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_ARACHNID) == 0) {
+            if ((playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_NOIDLECAMERA) == 0) {
                 jkHud_Draw();
             }
         }

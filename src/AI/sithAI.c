@@ -278,12 +278,12 @@ void sithAI_Create(SithThing *thing)
         }
         else
         {
-            thing->controlType = SITH_CT_NONE;
+            thing->controlType = SITH_CT_PLOT;
         }
     }
     else
     {
-        thing->controlType = SITH_CT_NONE;
+        thing->controlType = SITH_CT_PLOT;
     }
 }
 
@@ -340,11 +340,11 @@ void sithAI_Process()
         if (Main_bMotsCompat)
         {
             if ( actor->pAIClass
-                  && (actor->thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0
+                  && (actor->thing->thingflags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) == 0
                   && actor->thing->actorParams.health > 0.0
                   && (actor->flags & (SITHAI_MODE_DISABLED|SITHAI_MODE_SLEEPING)) == 0 )
             {
-                if (actor->thing && actor->pInterest && (actor->pInterest->type == SITH_THING_FREE || actor->pInterest->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED))) {
+                if (actor->thing && actor->pInterest && (actor->pInterest->type == SITH_THING_FREE || actor->pInterest->thingflags & (SITH_TF_DEAD|SITH_TF_DESTROYED))) {
                     sithCog_ThingSendMessageEx(actor->thing,NULL,SITH_MESSAGE_AIEVENT,65536.0,0.0,0.0,0.0);
                 }
                 if (actor->nextUpdate <= sithTime_g_msecGameTime) {
@@ -358,7 +358,7 @@ void sithAI_Process()
         }
         else {
             if ( actor->pAIClass
-                  && (actor->thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0
+                  && (actor->thing->thingflags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) == 0
                   && actor->thing->actorParams.health > 0.0
                   && (actor->flags & (SITHAI_MODE_DISABLED|SITHAI_MODE_SLEEPING)) == 0
                   && actor->nextUpdate <= sithTime_g_msecGameTime )
@@ -430,7 +430,7 @@ void sithAI_EmitEvent(SithAIControlBlock *actor, int a2, intptr_t actorFlags)
     {
         if ( !actor->thing )
             break;
-        if (actor->thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED))
+        if (actor->thing->thingflags & (SITH_TF_DEAD|SITH_TF_DESTROYED))
             break;
         if ( (g_debugmodeFlags & DEBUGFLAG_NO_AIEVENTS) != 0 )
             break;
@@ -814,12 +814,12 @@ void sithAI_idk_msgarrived_target(SithAIControlBlock *actor, flex_t deltaSeconds
             tmp.z = 0.0;
         rdVector_Add3Acc(&tmp, &v3->physicsParams.vel);
         rdVector_Copy3(&v3->physicsParams.vel, &tmp);
-        if ( (actor->flags & SITHAI_MODE_NO_CHECK_FOR_CLIFF) == 0 && v3->attach_flags )
+        if ( (actor->flags & SITHAI_MODE_NOCHECKFORCLIFF) == 0 && v3->attach_flags )
         {
             if ( (v3->physicsParams.physflags & SITH_PF_FLY) != 0 )
             {
 LABEL_15:
-                if ( (v3->actorParams.typeflags & SITH_AF_BREATH_UNDER_WATER) == 0 )
+                if ( (v3->actorParams.typeflags & SITH_AF_BREATHEUNDERWATER) == 0 )
                 {
                     if ( (v3->thingflags & SITH_TF_WATER) != 0 )
                     {
@@ -854,7 +854,7 @@ LABEL_22:
                 if ( !sithAI_CanWalk(actor, &a4, 0) )
                 {
                     rdVector_Zero3(&v3->physicsParams.vel);
-                    sithAI_EmitEvent(actor, SITHAI_MODE_TARGET_VISIBLE, 0);
+                    sithAI_EmitEvent(actor, SITHAI_MODE_TARGETVISIBLE, 0);
                     return;
                 }
                 goto LABEL_22;
@@ -876,7 +876,7 @@ void sithAI_SetLookFrame(SithAIControlBlock *actor, rdVector3 *lookPos)
     v5 = &actor->thing->actorParams;
     if ( rdVector_Normalize3Acc(&actor->lookVector) != 0.0 )
     {
-        if ( (v5->typeflags & SITH_AF_CAN_ROTATE_HEAD) != 0 )
+        if ( (v5->typeflags & SITH_AF_CANROTATEHEAD) != 0 )
         {
             v6 = stdMath_ArcSin3(actor->lookVector.z);
             if ( v6 < v5->minHeadPitch )
@@ -1062,7 +1062,7 @@ int sithAI_CheckSightThing(SithThing *thing, rdVector3 *targetPosition, SithThin
     {
         if ( targetThing->moveType != SITH_MT_PHYSICS )
             return 3;
-        if ( (targetThing->physicsParams.physflags & SITH_PF_WATERSURFACE) == 0 )
+        if ( (targetThing->physicsParams.physflags & SITH_PF_ONWATERSURFACE) == 0 )
             return 3;
     }
     if ( (thing->thingflags & SITH_TF_WATER) && !(targetThing->thingflags & SITH_TF_WATER))
@@ -1203,7 +1203,7 @@ int sithAI_CanWalk(SithAIControlBlock *actor, rdVector3 *targetPosition, int *ou
                 v12 = 1;
                 if ( out )
                 {
-                    if ((actorThing->attach_flags & SITH_ATTACH_THINGSURFACE) && actorThing->attachedThing == searchThing )
+                    if ((actorThing->attach_flags & SITH_ATTACH_THINGFACE) && actorThing->attachedThing == searchThing )
                     {
                         *out = 0;
                         sithCollision_DecreaseStackLevel();
@@ -1229,7 +1229,7 @@ LABEL_8:
     v12 = 2 - ((searchSurface->surfaceFlags & SITH_SURFACE_FLOOR) != 0);
     if ( !out )
         goto LABEL_20;
-    if ( (actorThing->attach_flags & SITH_ATTACH_WORLDSURFACE) && actorThing->attachedSurface == searchSurface )
+    if ( (actorThing->attach_flags & SITH_ATTACH_SURFACE) && actorThing->attachedSurface == searchSurface )
     {
         *out = 0;
         sithCollision_DecreaseStackLevel();
@@ -1275,7 +1275,7 @@ int sithAI_CanWalk_ExplicitSector(SithAIControlBlock *actor, rdVector3 *targetPo
                 retval = 2 - ((searchSurface->surfaceFlags & SITH_SURFACE_FLOOR) != 0);
                 if ( !out )
                     goto LABEL_19;
-                if ( (actorThing->attach_flags & SITH_ATTACH_WORLDSURFACE) != 0 && actorThing->attachedSurface == searchSurface )
+                if ( (actorThing->attach_flags & SITH_ATTACH_SURFACE) != 0 && actorThing->attachedSurface == searchSurface )
                 {
                     *out = 0;
                     sithCollision_DecreaseStackLevel();
@@ -1305,7 +1305,7 @@ LABEL_13:
         retval = 1;
         if ( out )
         {
-            if ( (actorThing->attach_flags & SITH_ATTACH_THINGSURFACE) != 0 && actorThing->attachedThing == searchThing )
+            if ( (actorThing->attach_flags & SITH_ATTACH_THINGFACE) != 0 && actorThing->attachedThing == searchThing )
             {
                 *out = 0;
                 sithCollision_DecreaseStackLevel();
@@ -1399,13 +1399,13 @@ int sithAI_FireWeapon(SithAIControlBlock *actor, flex_t minDistToFire, flex_t ma
     if (g_debugmodeFlags & DEBUGFLAG_NO_AI) {
         return 0;
     }
-    if (v9->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) {
+    if (v9->thingflags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) {
         return 0;
     }
     // Bail when underwater and unable to shoot underwater
     if (v9->sector // Added: thing->sector null check
         && (v9->sector->flags & SITH_SECTOR_UNDERWATER)
-        && (v9->actorParams.typeflags & SITH_AF_CANTSHOOTUNDERWATER))
+        && (v9->actorParams.typeflags & SITH_AF_NOUNDERWATERFIRE))
     {
         return 0;
     }
@@ -1536,7 +1536,7 @@ void sithAI_GetThingsInView(SithSector *a1, rdMatrix34 *a2, flex_t a3)
         {
             if ( v6 >= sithAI_dword_84DE6C )
                 break;
-            if ( ((1 << v4->type) & sithAI_dword_84DE74) != 0 && (v4->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
+            if ( ((1 << v4->type) & sithAI_dword_84DE74) != 0 && (v4->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_DESTROYED)) == 0 )
             {
                 rdVector_Sub3(&v13, &v4->position, &a2->scale);
                 rdVector_Normalize3Acc(&v13);
@@ -1618,11 +1618,11 @@ int sithAI_CanDetectSightThing(SithAIControlBlock *actor, SithThing *targetThing
     {
         if (!(actor->flags & SITHAI_MODE_ACTIVE))
             awareness = 0.5;
-        if (!(targetThing->actorParams.typeflags & SITH_AF_FIELDLIGHT) && (targetThing->jkFlags & 1) == 0 )
+        if (!(targetThing->actorParams.typeflags & SITH_AF_HEADLIGHT) && (targetThing->jkFlags & 1) == 0 )
         {
             clampedDistance = stdMath_Clamp((distance - 2.0) * 0.1, 0.0, 0.6);
             awareness = (1.0 - clampedDistance) * awareness;
-            if (!(actorThing->actorParams.typeflags & SITH_AF_CAN_SEE_IN_DARK))
+            if (!(actorThing->actorParams.typeflags & SITH_AF_SEEINDARK))
             {
                 targetSector = targetThing->sector;
                 if ( targetSector->ambientLight < 0.5 )
@@ -1638,7 +1638,7 @@ int sithAI_CanDetectSightThing(SithAIControlBlock *actor, SithThing *targetThing
         }
     }
     if (targetThing->actorParams.typeflags & SITH_AF_INVISIBLE
-        && !(actorThing->actorParams.typeflags & SITH_AF_CAN_SEE_INVISIBLE)) {
+        && !(actorThing->actorParams.typeflags & SITH_AF_SEEINVISIBLE)) {
         awareness = awareness * 0.05;
     }
     if (actorThing->actorParams.typeflags & SITH_AF_COMBO_BLIND) {
@@ -1712,7 +1712,7 @@ void sithAI_GetThingsInCone(SithSector *a1, rdMatrix34 *a2, flex_t a3)
         v4 = &sithWorld_g_pCurrentWorld->things[iterIdx];
         if ( sithAI_dword_84DE60 >= (unsigned int)sithAI_dword_84DE6C )
             break;
-        if ( ((1 << v4->type) & sithAI_dword_84DE74) != 0 && (v4->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
+        if ( ((1 << v4->type) & sithAI_dword_84DE74) != 0 && (v4->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_DESTROYED)) == 0 )
         {
             rdVector_Sub3(&v13, &v4->position, &a2->scale);
             flex_t dist = rdVector_Normalize3Acc(&v13);
@@ -1798,13 +1798,13 @@ int sithAI_Charge(SithAIControlBlock *pActor,flex_t param_2,flex_t param_3,flex_
     if (g_debugmodeFlags & DEBUGFLAG_NO_AI) {
         return 0;
     }
-    if (thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) {
+    if (thing->thingflags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) {
         return 0;
     }
     // Bail when underwater and unable to shoot underwater
     if (thing->sector // Added: thing->sector null check
         && (thing->sector->flags & SITH_SECTOR_UNDERWATER)
-        && (thing->actorParams.typeflags & SITH_AF_CANTSHOOTUNDERWATER))
+        && (thing->actorParams.typeflags & SITH_AF_NOUNDERWATERFIRE))
     {
         return 0;
     }
@@ -1887,13 +1887,13 @@ int sithAI_Leap(SithAIControlBlock *pActor,flex_t minDist,flex_t maxDist,flex_t 
     if (g_debugmodeFlags & DEBUGFLAG_NO_AI) {
         return 0;
     }
-    if (thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) {
+    if (thing->thingflags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) {
         return 0;
     }
     // Bail when underwater and unable to shoot underwater
     if (thing->sector // Added: thing->sector null check
         && (thing->sector->flags & SITH_SECTOR_UNDERWATER)
-        && (thing->actorParams.typeflags & SITH_AF_CANTSHOOTUNDERWATER))
+        && (thing->actorParams.typeflags & SITH_AF_NOUNDERWATERFIRE))
     {
         return 0;
     }
@@ -1996,7 +1996,7 @@ SithThing* sithAI_FUN_00539a60(SithAIControlBlock *pThing)
             {
                 arg8 = &sithWorld_g_pCurrentWorld->things[iVar5];
                 if (((sithAI_dword_84DE74 & 1 << (arg8->type & 0x1f)) != 0) &&
-                ((arg8->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0))
+                ((arg8->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_DESTROYED)) == 0))
                 {
                     if (arg8->controlType == SITH_CT_AI) 
                     {

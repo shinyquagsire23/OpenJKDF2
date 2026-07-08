@@ -99,16 +99,16 @@ void sithPlayerActions_JumpWithVel(SithThing *thing, flex_t vel)
         final_vel = thing->actorParams.jumpSpeed * vel;
         if ( (thing->physicsParams.physflags & SITH_PF_CROUCHING) != 0 )
             final_vel = final_vel * 0.7;
-        if ( (thing->physicsParams.physflags & SITH_PF_WATERSURFACE) != 0 )
+        if ( (thing->physicsParams.physflags & SITH_PF_ONWATERSURFACE) != 0 )
         {
             rdVector_ScaleAdd3Acc(&thing->physicsParams.vel, &rdroid_zVector3, final_vel);
-            thing->physicsParams.physflags &= ~SITH_PF_WATERSURFACE;
+            thing->physicsParams.physflags &= ~SITH_PF_ONWATERSURFACE;
         }
         else
         {
             if ( !thing->attach_flags )
                 return;
-            isAttachedAndIsSurface = (thing->attach_flags & (SITH_ATTACH_THING|SITH_ATTACH_THINGSURFACE)) == 0;
+            isAttachedAndIsSurface = (thing->attach_flags & (SITH_ATTACH_THING|SITH_ATTACH_THINGFACE)) == 0;
             
             rdVector_ScaleAdd3Acc(&thing->physicsParams.vel, &rdroid_zVector3, final_vel);
             if ( isAttachedAndIsSurface )
@@ -154,7 +154,7 @@ void sithPlayerActions_JumpWithVel(SithThing *thing, flex_t vel)
             sithThing_DetachThing(thing);
         }
         if ( sithMessage_g_outputstream )
-            sithThing_SyncThing(thing, THING_SYNC_POS);
+            sithThing_SyncThing(thing, SITHTHING_SYNC_POS);
     }
 }
 

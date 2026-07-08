@@ -53,14 +53,14 @@ void sithPhysics_FindFloor(SithThing *pThing, int a3)
                     goto LABEL_8;
             }
             pThing->field_48 = v5->distance;
-            pThing->physicsParams.physflags |= SITH_PF_WATERSURFACE;
+            pThing->physicsParams.physflags |= SITH_PF_ONWATERSURFACE;
             sithCollision_DecreaseStackLevel();
         }
         else
         {
 LABEL_8:
             sithCollision_DecreaseStackLevel();
-            pThing->physicsParams.physflags &= ~SITH_PF_WATERSURFACE;
+            pThing->physicsParams.physflags &= ~SITH_PF_ONWATERSURFACE;
         }
     }
     else if (!(pThing->sector->flags & SITH_SECTOR_UNDERWATER))
@@ -82,7 +82,7 @@ LABEL_8:
             v9 = pThing->physicsParams.height;
             if ( v9 == 0.0 )
             {
-                if ( pThing->rdthing.type == RD_THINGTYPE_MODEL )
+                if ( pThing->rdthing.type == RD_THING_MODEL3 )
                     v9 = pThing->rdthing.model3->insertOffset.z;
                 thinga = pThing->moveSize - -0.005;
                 if ( v9 <= thinga )
@@ -168,7 +168,7 @@ void sithPhysics_UpdateThing(SithThing *pThing, flex_t deltaSecs)
         rdVector_Zero3(&pThing->physicsParams.acceleration);
     }
 
-    if (pThing->attach_flags & (SITH_ATTACH_THINGSURFACE | SITH_ATTACH_WORLDSURFACE))
+    if (pThing->attach_flags & (SITH_ATTACH_THINGFACE | SITH_ATTACH_SURFACE))
     {
         sithPhysics_UpdateAttachedThingPhysics(pThing, deltaSecs);
     }
@@ -332,7 +332,7 @@ int sithPhysics_ParseArg(StdConffileArg *arg, SithThing *pThing, int param)
                 return 0;
             pThing->physicsParams.physflags = tmpInt;
             return 1;
-        case THINGPARAM_MAXROTVEL:
+        case SITHTHING_ARG_MAXROTVEL:
             tmp = _atof(arg->value);
             if ( tmp < 0.0 || pThing->moveType != SITH_MT_PHYSICS )
                 return 0;
@@ -397,7 +397,7 @@ flex_t sithPhysics_GetThingHeight(SithThing *pThing)
     result = pThing->physicsParams.height;
     if ( result == 0.0 )
     {
-        if ( pThing->rdthing.type == RD_THINGTYPE_MODEL )
+        if ( pThing->rdthing.type == RD_THING_MODEL3 )
             result = pThing->rdthing.model3->insertOffset.z;
         v2 = pThing->moveSize - -0.005;
         if ( result <= v2 )
@@ -418,7 +418,7 @@ void sithPhysics_UpdateThingPhysics(SithThing *pThing, flex_t deltaSeconds)
     rdVector_Zero3(&pThing->physicsParams.addedVelocity);
     rdVector_Zero3(&a1a);
 
-    if (pThing->physicsParams.physflags & SITH_PF_ANGTHRUST)
+    if (pThing->physicsParams.physflags & SITH_PF_USEANGULARTHRUST)
     {
         if (!rdVector_IsZero3(&pThing->physicsParams.angVel))
         {
@@ -503,7 +503,7 @@ void sithPhysics_UpdateThingPhysics(SithThing *pThing, flex_t deltaSeconds)
     if ( pThing->physicsParams.airDrag != 0.0 )
         sithPhysics_ApplyDrag(&pThing->physicsParams.vel, pThing->physicsParams.airDrag, 0.0, deltaSeconds);
 
-    if (pThing->physicsParams.physflags & SITH_PF_USESTHRUST)
+    if (pThing->physicsParams.physflags & SITH_PF_USETHRUST)
     {
         if (!(pThing->physicsParams.physflags & SITH_PF_FLY))
         {
@@ -514,7 +514,7 @@ void sithPhysics_UpdateThingPhysics(SithThing *pThing, flex_t deltaSeconds)
     }
 
     if (pThing->physicsParams.mass != 0.0 
-        && (pThing->sector->flags & SITH_SECTOR_HASTHRUST) 
+        && (pThing->sector->flags & SITH_SECTOR_USETHRUST) 
         && !(pThing->physicsParams.physflags & SITH_PF_NOTHRUST))
     {
         rdVector_ScaleAdd3Acc(&a1a, &pThing->sector->thrust, deltaSeconds);
@@ -555,7 +555,7 @@ void sithPhysics_UpdatePlayerPhysics(SithThing *player, flex_t deltaSeconds)
     flex_t zOverride = 0.0;
 
     rdVector_Zero3(&player->physicsParams.addedVelocity);
-    if (player->physicsParams.physflags & SITH_PF_ANGTHRUST)
+    if (player->physicsParams.physflags & SITH_PF_USEANGULARTHRUST)
     {
         if (!rdVector_IsZero3(&player->physicsParams.angVel))
         {
@@ -649,7 +649,7 @@ void sithPhysics_UpdatePlayerPhysics(SithThing *player, flex_t deltaSeconds)
             sithPhysics_ApplyDrag(&player->physicsParams.vel, player->physicsParams.airDrag, 0.0, OLDSTEP_DELTA_50FPS);
         }
 
-        if (player->physicsParams.physflags & SITH_PF_USESTHRUST)
+        if (player->physicsParams.physflags & SITH_PF_USETHRUST)
         {
             rdVector_Scale3(&a1a, &player->physicsParams.acceleration, OLDSTEP_DELTA_50FPS);
             rdMatrix_TransformVector34Acc(&a1a, &player->lookOrientation);
@@ -657,7 +657,7 @@ void sithPhysics_UpdatePlayerPhysics(SithThing *player, flex_t deltaSeconds)
 
         if ( player->physicsParams.mass != 0.0 )
         {
-            if ((player->sector->flags & SITH_SECTOR_HASTHRUST)
+            if ((player->sector->flags & SITH_SECTOR_USETHRUST)
                 && !(player->physicsParams.physflags & SITH_PF_NOTHRUST))
             {
                 rdVector_ScaleAdd3Acc(&a1a, &player->sector->thrust, OLDSTEP_DELTA_50FPS);
@@ -690,7 +690,7 @@ void sithPhysics_UpdateUnderwaterThingPhysics(SithThing *pThing, flex_t deltaSec
 
     rdVector_Zero3(&a1a);
     rdVector_Zero3(&pThing->physicsParams.addedVelocity);
-    if ( (pThing->physicsParams.physflags & SITH_PF_ANGTHRUST) != 0 )
+    if ( (pThing->physicsParams.physflags & SITH_PF_USEANGULARTHRUST) != 0 )
     {
         if ( !rdVector_IsZero3(&pThing->physicsParams.angVel) )
         {
@@ -720,18 +720,18 @@ void sithPhysics_UpdateUnderwaterThingPhysics(SithThing *pThing, flex_t deltaSec
     {
         sithPhysics_ApplyDrag(&pThing->physicsParams.vel, pThing->physicsParams.airDrag * 4.0, 0.0, deltaSeconds);
     }
-    if ( (pThing->physicsParams.physflags & SITH_PF_USESTHRUST) != 0 )
+    if ( (pThing->physicsParams.physflags & SITH_PF_USETHRUST) != 0 )
     {
         rdVector_Scale3Acc(&pThing->physicsParams.acceleration, 0.6);
         rdVector_Scale3(&a1a, &pThing->physicsParams.acceleration, deltaSeconds);
         rdMatrix_TransformVector34Acc(&a1a, &pThing->lookOrientation);
     }
-    if ( pThing->physicsParams.mass != 0.0 && pThing->sector && (pThing->sector->flags & SITH_SECTOR_HASTHRUST) && !(pThing->physicsParams.physflags & SITH_PF_NOTHRUST) )
+    if ( pThing->physicsParams.mass != 0.0 && pThing->sector && (pThing->sector->flags & SITH_SECTOR_USETHRUST) && !(pThing->physicsParams.physflags & SITH_PF_NOTHRUST) )
     {
         rdVector_ScaleAdd3Acc(&a1a, &pThing->sector->thrust, deltaSeconds);
     }
 
-    if ( ((pThing->physicsParams.physflags & SITH_PF_WATERSURFACE) == 0 || (pThing->thingflags & SITH_TF_DEAD) != 0) && (pThing->physicsParams.physflags & SITH_PF_USEGRAVITY) != 0 )
+    if ( ((pThing->physicsParams.physflags & SITH_PF_ONWATERSURFACE) == 0 || (pThing->thingflags & SITH_TF_DEAD) != 0) && (pThing->physicsParams.physflags & SITH_PF_USEGRAVITY) != 0 )
     {
         v35 = sithWorld_g_pCurrentWorld->worldGravity * deltaSeconds * pThing->physicsParams.buoyancy;
         a1a.z -= v35;
@@ -744,7 +744,7 @@ void sithPhysics_UpdateUnderwaterThingPhysics(SithThing *pThing, flex_t deltaSec
     {
         rdVector_Scale3(&pThing->physicsParams.velocityMaybe, &pThing->physicsParams.vel, deltaSeconds);
     }
-    if ( (pThing->physicsParams.physflags & SITH_PF_WATERSURFACE) != 0 && pThing->physicsParams.acceleration.z >= 0.0 )
+    if ( (pThing->physicsParams.physflags & SITH_PF_ONWATERSURFACE) != 0 && pThing->physicsParams.acceleration.z >= 0.0 )
     {
         v51 = pThing->field_48 - 0.01;
         if ( pThing->physicsParams.velocityMaybe.z > 0.0 && pThing->physicsParams.velocityMaybe.z < (flex_d_t)deltaSeconds * 0.2 ) // verify first
@@ -784,7 +784,7 @@ void sithPhysics_UpdateAttachedThingPhysics(SithThing *pThing, flex_t deltaSecon
     rdVector_Zero3(&vel_change);
     v158 = 1.0;
     pThing->physicsParams.physflags &= ~SITH_PF_200000;
-    if ( (pThing->attach_flags & SITH_ATTACH_WORLDSURFACE) != 0 )
+    if ( (pThing->attach_flags & SITH_ATTACH_SURFACE) != 0 )
     {
         attachedNormal = pThing->attachedSufaceInfo->face.normal;
         possibly_undef_1 = rdMath_DistancePointToPlane(&pThing->position, &attachedNormal, &pThing->field_38);
@@ -800,7 +800,7 @@ void sithPhysics_UpdateAttachedThingPhysics(SithThing *pThing, flex_t deltaSecon
             possibly_undef_2 = 1.0;
         }
     }
-    else if ( (pThing->attach_flags & SITH_ATTACH_THINGSURFACE) != 0 )
+    else if ( (pThing->attach_flags & SITH_ATTACH_THINGFACE) != 0 )
     {
         rdMatrix_TransformVector34(&attachedNormal, &pThing->attachedSufaceInfo->face.normal, &pThing->attachedThing->lookOrientation);
         rdMatrix_TransformVector34(&a3, &pThing->field_38, &pThing->attachedThing->lookOrientation);
@@ -818,7 +818,7 @@ void sithPhysics_UpdateAttachedThingPhysics(SithThing *pThing, flex_t deltaSecon
 
     if (!(pThing->physicsParams.physflags & SITH_PF_100))
     {
-        if ( (pThing->physicsParams.physflags & SITH_PF_SURFACEALIGN) != 0 )
+        if ( (pThing->physicsParams.physflags & SITH_PF_ALIGNSURFACE) != 0 )
         {
             sithPhysics_SetThingLook(pThing, &attachedNormal, pThing->physicsParams.orientSpeed * deltaSeconds);
         }
@@ -832,7 +832,7 @@ void sithPhysics_UpdateAttachedThingPhysics(SithThing *pThing, flex_t deltaSecon
         }
     }
 
-    if (pThing->physicsParams.physflags & SITH_PF_ANGTHRUST)
+    if (pThing->physicsParams.physflags & SITH_PF_USEANGULARTHRUST)
     {
         if (!rdVector_IsZero3(&pThing->physicsParams.angVel))
         {
@@ -924,7 +924,7 @@ void sithPhysics_UpdateAttachedThingPhysics(SithThing *pThing, flex_t deltaSecon
         if ( (pThing->physicsParams.physflags & SITH_PF_8000) == 0 )
         {
             if ( rdVector_IsZero3(&pThing->physicsParams.acceleration)
-              && !(pThing->sector->flags & SITH_SECTOR_HASTHRUST)
+              && !(pThing->sector->flags & SITH_SECTOR_USETHRUST)
               && possibly_undef_2 > 0.8 )
             {
                 a2a = pThing->physicsParams.surfaceDrag * possibly_undef_2;
@@ -943,7 +943,7 @@ void sithPhysics_UpdateAttachedThingPhysics(SithThing *pThing, flex_t deltaSecon
         }
     }
 
-    if ( (pThing->physicsParams.physflags & SITH_PF_USESTHRUST) != 0
+    if ( (pThing->physicsParams.physflags & SITH_PF_USETHRUST) != 0
       && !rdVector_IsZero3(&pThing->physicsParams.acceleration) )
     {
         flex_t v44 = possibly_undef_2 * deltaSeconds;
@@ -959,14 +959,14 @@ void sithPhysics_UpdateAttachedThingPhysics(SithThing *pThing, flex_t deltaSecon
             rdMatrix_TransformVector34Acc(&vel_change, &pThing->lookOrientation);
     }
 
-    if (pThing->physicsParams.mass != 0.0 && (pThing->sector->flags & SITH_SECTOR_HASTHRUST) && !(pThing->physicsParams.physflags & SITH_PF_NOTHRUST))
+    if (pThing->physicsParams.mass != 0.0 && (pThing->sector->flags & SITH_SECTOR_USETHRUST) && !(pThing->physicsParams.physflags & SITH_PF_NOTHRUST))
     {
         if ( pThing->sector->thrust.z > sithWorld_g_pCurrentWorld->worldGravity * pThing->physicsParams.mass )
         {
             sithThing_DetachThing(pThing);
             rdVector_Zero3(&pThing->physicsParams.addedVelocity);
             rdVector_Zero3(&out);
-            if ( (pThing->physicsParams.physflags & SITH_PF_ANGTHRUST) != 0 )
+            if ( (pThing->physicsParams.physflags & SITH_PF_USEANGULARTHRUST) != 0 )
             {
                 if ( !rdVector_IsZero3(&pThing->physicsParams.angVel) )
                 {
@@ -998,7 +998,7 @@ void sithPhysics_UpdateAttachedThingPhysics(SithThing *pThing, flex_t deltaSecon
             if ( pThing->physicsParams.airDrag != 0.0 )
                 sithPhysics_ApplyDrag(&pThing->physicsParams.vel, pThing->physicsParams.airDrag, 0.0, deltaSeconds);
 
-            if (pThing->physicsParams.physflags & SITH_PF_USESTHRUST)
+            if (pThing->physicsParams.physflags & SITH_PF_USETHRUST)
             {
                 if (!(pThing->physicsParams.physflags & SITH_PF_FLY))
                 {
@@ -1008,7 +1008,7 @@ void sithPhysics_UpdateAttachedThingPhysics(SithThing *pThing, flex_t deltaSecon
             }
 
             if ( pThing->physicsParams.mass != 0.0
-              && (pThing->sector->flags & SITH_SECTOR_HASTHRUST)
+              && (pThing->sector->flags & SITH_SECTOR_USETHRUST)
               && !(pThing->physicsParams.physflags & SITH_PF_NOTHRUST))
             {
                 rdVector_ScaleAdd3Acc(&out, &pThing->sector->thrust, deltaSeconds);
@@ -1087,7 +1087,7 @@ void sithPhysics_UpdateAttachedThingPhysics(SithThing *pThing, flex_t deltaSecon
         flex_t v132 = pThing->physicsParams.height;
         if ( v132 == 0.0 )
         {
-            if ( pThing->rdthing.type == RD_THINGTYPE_MODEL )
+            if ( pThing->rdthing.type == RD_THING_MODEL3 )
                 v132 = pThing->rdthing.model3->insertOffset.z;
             new_ya = pThing->moveSize - -0.005;
             if ( v132 <= new_ya )

@@ -383,8 +383,8 @@ void sithCogFunctionSurface_SetFaceGeoMode(sithCog *ctx)
         if ( v2->surfaceInfo.face.material )
         {
             // MoTS added
-            if (!v2->surfaceInfo.face.vertexUVIdx && geoMode == RD_GEOMODE_TEXTURED) {
-                geoMode = RD_GEOMODE_SOLIDCOLOR;
+            if (!v2->surfaceInfo.face.vertexUVIdx && geoMode == RD_GEOMETRY_FULL) {
+                geoMode = RD_GEOMETRY_SOLID;
             }
 
             v2->surfaceInfo.face.geometryMode = geoMode;
@@ -396,7 +396,7 @@ void sithCogFunctionSurface_SetFaceGeoMode(sithCog *ctx)
         }
         else
         {
-            v2->surfaceInfo.face.geometryMode = RD_GEOMODE_NOTRENDERED;
+            v2->surfaceInfo.face.geometryMode = RD_GEOMETRY_NONE;
             if ( COG_SHOULD_SYNC(ctx) )
             {
                 sithSurface_SyncSurface(v2);

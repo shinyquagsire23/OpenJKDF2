@@ -642,7 +642,7 @@ int jkGuiBuildMulti_DisplayModel()
     rdColormap_LoadEntry("misc\\cmp\\UIColormap.cmp", &jkGuiBuildMulti_colormap);
     rdColormap_SetCurrent(&jkGuiBuildMulti_colormap);
     rdSetRenderOptions(jkGuiBuildMulti_renderOptions);
-    rdSetGeometryMode(RD_GEOMODE_TEXTURED);
+    rdSetGeometryMode(RD_GEOMETRY_FULL);
     rdSetLightingMode(RD_LIGHTMODE_GOURAUD);
     rdSetTextureMode(RD_TEXTUREMODE_PERSPECTIVE);
     rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);

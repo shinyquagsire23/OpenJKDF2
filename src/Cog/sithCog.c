@@ -687,13 +687,13 @@ int32_t sithCog_ParseSymbolRef(SithCogSymbol *cogSymbol, SithCogSymbolRef *cogId
 
     switch ( cogIdk->type )
     {
-        case COG_TYPE_FLEX:
-            cogSymbol->val.type = COG_VARTYPE_FLEX;
+        case SITHCOG_SYM_REF_FLEX:
+            cogSymbol->val.type = SITHCOG_VALUE_FLOAT;
             cogSymbol->val.dataAsFloat[0] = _atof(val); // FLEXTODO
             return 1;
 
-        case COG_TYPE_TEMPLATE:
-            cogSymbol->val.type = COG_VARTYPE_INT;
+        case SITHCOG_SYM_REF_TEMPLATE:
+            cogSymbol->val.type = SITHCOG_VALUE_INT;
             v14 = sithTemplate_GetTemplate(val);
             if ( !v14 )
             {
@@ -703,8 +703,8 @@ int32_t sithCog_ParseSymbolRef(SithCogSymbol *cogSymbol, SithCogSymbolRef *cogId
             cogSymbol->val.data[0] = v14->thingIdx;
             return 1;
 
-        case COG_TYPE_KEYFRAME:
-            cogSymbol->val.type = COG_VARTYPE_INT;
+        case SITHCOG_SYM_REF_KEYFRAME:
+            cogSymbol->val.type = SITHCOG_VALUE_INT;
             v17 = sithKeyFrame_LoadEntry(val);
             
             if ( !v17 )
@@ -727,8 +727,8 @@ int32_t sithCog_ParseSymbolRef(SithCogSymbol *cogSymbol, SithCogSymbolRef *cogId
 
             cogSymbol->val.data[0] = v17->id;
             return 1;
-        case COG_TYPE_SOUND:
-            cogSymbol->val.type = COG_VARTYPE_INT;
+        case SITHCOG_SYM_REF_SOUND:
+            cogSymbol->val.type = SITHCOG_VALUE_INT;
             v12 = sithSound_Load(val, 0);
             if ( !v12 )
             {
@@ -737,8 +737,8 @@ int32_t sithCog_ParseSymbolRef(SithCogSymbol *cogSymbol, SithCogSymbolRef *cogId
             }
             cogSymbol->val.data[0] = v12->id;
             return 1;
-        case COG_TYPE_MATERIAL:
-            cogSymbol->val.type = COG_VARTYPE_INT;
+        case SITHCOG_SYM_REF_MATERIAL:
+            cogSymbol->val.type = SITHCOG_VALUE_INT;
             v10 = sithMaterial_Load(val, 0, 0);
             if ( !v10 )
             {
@@ -747,8 +747,8 @@ int32_t sithCog_ParseSymbolRef(SithCogSymbol *cogSymbol, SithCogSymbolRef *cogId
             }
             cogSymbol->val.data[0] = v10->id;
             return 1;
-        case COG_TYPE_VECTOR:
-            cogSymbol->val.type = COG_VARTYPE_VECTOR;
+        case SITHCOG_SYM_REF_VECTOR:
+            cogSymbol->val.type = SITHCOG_VALUE_VECTOR;
 #ifndef COG_COMPRESS_VAR_SIZE
             if (_sscanf(val, "(%f/%f/%f)", &cogSymbol->val.dataAsFloat[0], &cogSymbol->val.dataAsFloat[1], &cogSymbol->val.dataAsFloat[2]) == 3 )
             {
@@ -787,8 +787,8 @@ int32_t sithCog_ParseSymbolRef(SithCogSymbol *cogSymbol, SithCogSymbolRef *cogId
 #endif
             break;
 
-        case COG_TYPE_MODEL:
-            cogSymbol->val.type = COG_VARTYPE_INT;
+        case SITHCOG_SYM_REF_MODEL:
+            cogSymbol->val.type = SITHCOG_VALUE_INT;
             v15 = sithModel_Load(val, 1);
             if ( !v15 )
             {
@@ -798,8 +798,8 @@ int32_t sithCog_ParseSymbolRef(SithCogSymbol *cogSymbol, SithCogSymbolRef *cogId
             cogSymbol->val.data[0] = v15->id;
             return 1;
 
-        case COG_TYPE_AICLASS:
-            cogSymbol->val.type = COG_VARTYPE_INT;
+        case SITHCOG_SYM_REF_AICLASS:
+            cogSymbol->val.type = SITHCOG_VALUE_INT;
             v19 = sithAIClass_Load(val);
             if ( v19 )
             {
@@ -814,7 +814,7 @@ int32_t sithCog_ParseSymbolRef(SithCogSymbol *cogSymbol, SithCogSymbolRef *cogId
             break;
 
         default:
-            cogSymbol->val.type = COG_VARTYPE_INT;
+            cogSymbol->val.type = SITHCOG_VALUE_INT;
             cogSymbol->val.data[0] = _atoi(val);
             return 1;
     }
@@ -1526,14 +1526,14 @@ void sithCog_FreeWorldCogs(SithWorld *world)
 
 void sithCog_UpdateThingTimer(SithThing *thing)
 {
-    if ( (thing->thingflags & SITH_TF_PULSE) != 0 && thing->pulse_end_ms <= sithTime_g_msecGameTime )
+    if ( (thing->thingflags & SITH_TF_PULSESET) != 0 && thing->pulse_end_ms <= sithTime_g_msecGameTime )
     {
         thing->pulse_end_ms = sithTime_g_msecGameTime + thing->pulse_ms;
         sithCog_ThingSendMessageEx(thing, 0, SITH_MESSAGE_PULSE, 0.0, 0.0, 0.0, 0.0);
     }
-    if ( (thing->thingflags & SITH_TF_TIMER) != 0 && thing->timer <= sithTime_g_msecGameTime )
+    if ( (thing->thingflags & SITH_TF_TIMERSET) != 0 && thing->timer <= sithTime_g_msecGameTime )
     {
-        thing->thingflags &= ~SITH_TF_TIMER;
+        thing->thingflags &= ~SITH_TF_TIMERSET;
         sithCog_ThingSendMessageEx(thing, 0, SITH_MESSAGE_TIMER, 0.0, 0.0, 0.0, 0.0);
     }
 }
@@ -1655,7 +1655,7 @@ void sithCog_AddFloatSymbol(SithCogSymbolTable *a1, const char *a2, int32_t a3)
     SithCogSymbol* v3 = sithCogParse_AddSymbol(a1, a2);
     if ( v3 )
     {
-        a2a.type = COG_TYPE_FLEX;
+        a2a.type = SITHCOG_SYM_REF_FLEX;
         a2a.data[0] = a3;
         sithCogParse_SetSymbolValue(v3, &a2a);
     }

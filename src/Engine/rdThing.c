@@ -27,10 +27,10 @@ int rdThing_NewEntry(rdThing *thing, SithThing *parent)
     thing->geosetSelect = -1;
     thing->wallCel = -1;
     thing->hierarchyNodeMatrices = 0;
-    thing->desiredGeoMode = RD_GEOMODE_TEXTURED;
+    thing->desiredGeoMode = RD_GEOMETRY_FULL;
     thing->desiredLightMode = RD_LIGHTMODE_GOURAUD;
     thing->desiredTexMode = RD_TEXTUREMODE_2_UNK;
-    thing->curGeoMode = RD_GEOMODE_TEXTURED;
+    thing->curGeoMode = RD_GEOMETRY_FULL;
     thing->curLightMode = RD_LIGHTMODE_GOURAUD;
     thing->curTexMode = RD_TEXTUREMODE_2_UNK;
     thing->parentSithThing = parent;
@@ -48,7 +48,7 @@ void rdThing_Free(rdThing *thing)
 
 void rdThing_FreeEntry(rdThing *thing)
 {
-    if (thing->type == RD_THINGTYPE_MODEL)
+    if (thing->type == RD_THING_MODEL3)
     {
         if ( thing->hierarchyNodeMatrices )
         {
@@ -75,7 +75,7 @@ void rdThing_FreeEntry(rdThing *thing)
 
 int rdThing_SetModel3(rdThing *thing, rdModel3 *model)
 {
-    thing->type = RD_THINGTYPE_MODEL;
+    thing->type = RD_THING_MODEL3;
     thing->model3 = model;
     thing->geosetSelect = -1;
 
@@ -136,7 +136,7 @@ int rdThing_SetLight(rdThing *thing, rdLight *light)
 
 int rdThing_SetSprite3(rdThing *thing, rdSprite *sprite)
 {
-    thing->type = RD_THINGTYPE_SPRITE3;
+    thing->type = RD_THING_SPRITE3;
     thing->sprite3 = sprite;
     thing->wallCel = -1;
     return 1;
@@ -144,7 +144,7 @@ int rdThing_SetSprite3(rdThing *thing, rdSprite *sprite)
 
 int rdThing_SetPolyline(rdThing *thing, rdPolyline *polyline)
 {
-    thing->type = RD_THINGTYPE_POLYLINE;
+    thing->type = RD_THING_POLYLINE;
     thing->polyline = polyline;
     thing->wallCel = -1;
     return 1;
@@ -152,7 +152,7 @@ int rdThing_SetPolyline(rdThing *thing, rdPolyline *polyline)
 
 int rdThing_SetParticleCloud(rdThing *thing, rdParticle *particle)
 {
-    thing->type = RD_THINGTYPE_PARTICLECLOUD;
+    thing->type = RD_THING_PARTICLE;
     thing->particlecloud = particle;
     return 1;
 }
@@ -164,17 +164,17 @@ int rdThing_Draw(rdThing *thing, rdMatrix34 *m)
 
     switch ( thing->type )
     {
-        case RD_THINGTYPE_0:
+        case RD_THING_NONE:
         case RD_THINGTYPE_CAMERA:
         case RD_THINGTYPE_LIGHT:
             return 0;
-        case RD_THINGTYPE_MODEL:
+        case RD_THING_MODEL3:
             return rdModel3_Draw(thing, m);
-        case RD_THINGTYPE_SPRITE3:
+        case RD_THING_SPRITE3:
             return rdSprite_Draw(thing, m);
-        case RD_THINGTYPE_PARTICLECLOUD:
+        case RD_THING_PARTICLE:
             return rdParticle_Draw(thing, m);
-        case RD_THINGTYPE_POLYLINE:
+        case RD_THING_POLYLINE:
             return rdPolyline_Draw(thing, m);
     }
     

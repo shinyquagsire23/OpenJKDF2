@@ -149,10 +149,10 @@ void sithOverlayMap_DrawSectors(SithSector *sector)
     SithSurfaceAdjoin *i; // esi
 
     if ( sector->renderTick != sithRender_lastRenderTick
-        && (sector->flags & SITH_SECTOR_AUTOMAPVISIBLE || g_mapModeFlags & MAPMODE_02))
+        && (sector->flags & SITH_SECTOR_SEEN || g_mapModeFlags & SITHMAPMODE_SHOWALLSECTORS))
     {
         sector->renderTick = sithRender_lastRenderTick;
-        if ( (sector->flags & SITH_SECTOR_AUTOMAPHIDE) != 0 )
+        if ( (sector->flags & SITH_SECTOR_HIDEONMAP) != 0 )
             v2 = 1;
         else
             v2 = sithOverlayMap_DrawSector(sector);
@@ -338,17 +338,17 @@ LABEL_30:
         }
     }
 
-    if ( (g_mapModeFlags & (MAPMODE_40 | MAPMODE_08 | MAPMODE_04)) != 0 )
+    if ( (g_mapModeFlags & (SITHMAPMODE_SHOWALLTHINGS | SITHMAPMODE_SHOWACTORS | SITHMAPMODE_SHOWPLAYERS)) != 0 )
     {
         for ( i = v2->thingsList; i; i = i->nextThing )
         {
-            if ( i != sithWorld_g_pCurrentWorld->cameraFocus && (i->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)) == 0 )
+            if ( i != sithWorld_g_pCurrentWorld->cameraFocus && (i->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_DESTROYED)) == 0 )
             {
-                v27 = (g_mapModeFlags & MAPMODE_40) != 0;
+                v27 = (g_mapModeFlags & SITHMAPMODE_SHOWALLTHINGS) != 0;
                 v28 = i->type;
                 if ( v28 == SITH_THING_PLAYER )
                 {
-                    if (g_mapModeFlags & (MAPMODE_08 | MAPMODE_04))
+                    if (g_mapModeFlags & (SITHMAPMODE_SHOWACTORS | SITHMAPMODE_SHOWPLAYERS))
                         v27 = 1;
                     if ( sithNet_isMulti && (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 )
                     {
@@ -363,7 +363,7 @@ LABEL_30:
                 }
                 else if ( v28 == SITH_THING_ACTOR )
                 {
-                    if (g_mapModeFlags & MAPMODE_08)
+                    if (g_mapModeFlags & SITHMAPMODE_SHOWACTORS)
                         v27 = 1;
                     circleColor = sithOverlayMap_inst.config.actorColor & 0xFFFF;
                     a6_ = sithOverlayMap_inst.config.actorLineColor;
@@ -372,13 +372,13 @@ LABEL_30:
                 {
                     if ( v28 == SITH_THING_ITEM )
                     {
-                        if (g_mapModeFlags & MAPMODE_10)
+                        if (g_mapModeFlags & SITHMAPMODE_SHOWITEMS)
                             v27 = 1;
                         v29 = sithOverlayMap_inst.config.itemColor;
                     }
                     else if ( v28 == SITH_THING_WEAPON )
                     {
-                        if (g_mapModeFlags & MAPMODE_20)
+                        if (g_mapModeFlags & SITHMAPMODE_SHOWWEAPONS)
                             v27 = 1;
                         v29 = sithOverlayMap_inst.config.weaponColor;
                     }

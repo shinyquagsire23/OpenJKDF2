@@ -1025,7 +1025,7 @@ void jkPlayer_renderSaberWeaponMesh(SithThing *thing)
 
     if (thing->jkFlags & JKFLAG_PERSUASION)
     {
-        if ( sithPlayer_g_pLocalPlayer->iteminfo[SITHBIN_F_SEEING].state & ITEMSTATE_ACTIVATE )
+        if ( sithPlayer_g_pLocalPlayer->iteminfo[SITHBIN_F_SEEING].state & SITHINVENTORY_ITEM_ACTIVATED )
         {
             rdGeoMode_t oldGeoMode = thing->rdthing.curGeoMode;
 #ifdef TARGET_TWL
@@ -1060,7 +1060,7 @@ void jkPlayer_renderSaberWeaponMesh(SithThing *thing)
             jkPlayer_renderSaberTwinkle(thing);
         }
     }
-    else if ( thing->rdthing.curGeoMode > RD_GEOMODE_NOTRENDERED)
+    else if ( thing->rdthing.curGeoMode > RD_GEOMETRY_NONE)
     {
         if (playerInfo->rd_thing.model3)
             rdThing_Draw(&playerInfo->rd_thing, primaryMat);
@@ -1459,13 +1459,13 @@ void jkPlayer_InitForceBins()
     {
         if ( i != SITHBIN_JEDI_RANK )
         {
-            if ( sithPlayer_GetInvItemAmount(i) > 0.0 && jkPlayer_playerInfos[playerThingIdx].iteminfo[i].state & ITEMSTATE_CARRIES)
+            if ( sithPlayer_GetInvItemAmount(i) > 0.0 && jkPlayer_playerInfos[playerThingIdx].iteminfo[i].state & SITHINVENTORY_ITEM_FOUND)
             {
-                jkPlayer_playerInfos[playerThingIdx].iteminfo[i].state |= ITEMSTATE_AVAILABLE;
+                jkPlayer_playerInfos[playerThingIdx].iteminfo[i].state |= SITHINVENTORY_ITEM_AVAILABLE;
             }
             else
             {
-                jkPlayer_playerInfos[playerThingIdx].iteminfo[i].state &= ~ITEMSTATE_AVAILABLE;
+                jkPlayer_playerInfos[playerThingIdx].iteminfo[i].state &= ~SITHINVENTORY_ITEM_AVAILABLE;
             }
         }
     }
@@ -1529,7 +1529,7 @@ void jkPlayer_SetAccessiblePowers(int rank)
         for (int i = SITHBIN_FP_START; i <= SITHBIN_FP_END; ++i )
         {
             if ( i != SITHBIN_JEDI_RANK )
-                jkPlayer_playerInfos[playerThingIdx].iteminfo[i].state |= ITEMSTATE_CARRIES;
+                jkPlayer_playerInfos[playerThingIdx].iteminfo[i].state |= SITHINVENTORY_ITEM_FOUND;
         }
 #endif
         return;
@@ -1538,7 +1538,7 @@ void jkPlayer_SetAccessiblePowers(int rank)
     for (int i = SITHBIN_FP_START; i <= SITHBIN_FP_END; ++i )
     {
         if ( i != SITHBIN_JEDI_RANK )
-            jkPlayer_playerInfos[playerThingIdx].iteminfo[i].state &= ~ITEMSTATE_CARRIES;
+            jkPlayer_playerInfos[playerThingIdx].iteminfo[i].state &= ~SITHINVENTORY_ITEM_FOUND;
     }
 
     if ( rank )
@@ -1546,27 +1546,27 @@ void jkPlayer_SetAccessiblePowers(int rank)
         for (int j = SITHBIN_FP_START; j <= SITHBIN_F_PULL; ++j )
         {
             if ( j != SITHBIN_JEDI_RANK )
-                jkPlayer_playerInfos[playerThingIdx].iteminfo[j].state |= ITEMSTATE_CARRIES;
+                jkPlayer_playerInfos[playerThingIdx].iteminfo[j].state |= SITHINVENTORY_ITEM_FOUND;
         }
 
         if ( rank > 3 )
         {
-            jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_HEALING].state |= ITEMSTATE_CARRIES;
-            jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_THROW].state |= ITEMSTATE_CARRIES;
+            jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_HEALING].state |= SITHINVENTORY_ITEM_FOUND;
+            jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_THROW].state |= SITHINVENTORY_ITEM_FOUND;
             
             if ( rank > 4 )
             {
-                jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_PERSUASION].state |= ITEMSTATE_CARRIES;
-                jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_GRIP].state |= ITEMSTATE_CARRIES;
+                jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_PERSUASION].state |= SITHINVENTORY_ITEM_FOUND;
+                jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_GRIP].state |= SITHINVENTORY_ITEM_FOUND;
                 
                 if ( rank > 5 )
                 {
-                    jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_BLINDING].state |= ITEMSTATE_CARRIES;
-                    jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_LIGHTNING].state |= ITEMSTATE_CARRIES;
+                    jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_BLINDING].state |= SITHINVENTORY_ITEM_FOUND;
+                    jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_LIGHTNING].state |= SITHINVENTORY_ITEM_FOUND;
                     if ( rank > 6 )
                     {
-                        jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_ABSORB].state |= ITEMSTATE_CARRIES;
-                        jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_DESTRUCTION].state |= ITEMSTATE_CARRIES;
+                        jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_ABSORB].state |= SITHINVENTORY_ITEM_FOUND;
+                        jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_DESTRUCTION].state |= SITHINVENTORY_ITEM_FOUND;
                     }
                 }
             }
@@ -2349,7 +2349,7 @@ LAB_004074a0:
     for (iVar5 = SITHBIN_FP_START; iVar5 <= SITHBIN_FP_END; iVar5++)
     {
         if (iVar5 != SITHBIN_JEDI_RANK) {
-            jkPlayer_playerInfos[playerThingIdx].iteminfo[iVar5].state &= ~ITEMSTATE_CARRIES;
+            jkPlayer_playerInfos[playerThingIdx].iteminfo[iVar5].state &= ~SITHINVENTORY_ITEM_FOUND;
         }
     }
 
@@ -2357,7 +2357,7 @@ LAB_004074a0:
        (fVar9 = sithPlayer_GetInvItemAmount(SITHBIN_F_DEFENSE), 
        0.0 < fVar9)) 
     {
-        jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_DEFENSE].state |= ITEMSTATE_CARRIES;
+        jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_DEFENSE].state |= SITHINVENTORY_ITEM_FOUND;
     }
     local_4 = 3;
     local_c = jkPlayer_aMotsFpBins + 0x18;
@@ -2387,7 +2387,7 @@ LAB_004074a0:
             piVar2 = local_c;
             do {
                 if (*piVar2 != 0) {
-                    jkPlayer_playerInfos[playerThingIdx].iteminfo[*piVar2].state |= ITEMSTATE_CARRIES;
+                    jkPlayer_playerInfos[playerThingIdx].iteminfo[*piVar2].state |= SITHINVENTORY_ITEM_FOUND;
                 }
                 piVar2 = piVar2 + 1;
                 iVar3 = iVar3 + -1;
@@ -2413,7 +2413,7 @@ LAB_004074a0:
                 iVar5 = *piVar2;
                 if ((iVar5 != 0) &&
                    (fVar9 = sithPlayer_GetInvItemAmount(iVar5), 0.0 < fVar9)) {
-                    jkPlayer_playerInfos[playerThingIdx].iteminfo[iVar5].state |= ITEMSTATE_CARRIES;
+                    jkPlayer_playerInfos[playerThingIdx].iteminfo[iVar5].state |= SITHINVENTORY_ITEM_FOUND;
                 }
                 piVar2 = piVar2 + 1;
                 iVar3 = iVar3 + -1;

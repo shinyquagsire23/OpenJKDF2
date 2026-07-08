@@ -423,11 +423,11 @@ flex_t sithPuppet_UpdateThingMove(SithThing *thing)
         }
     }
 
-    // MOTS also routes actors with the SITH_AF_40000000 typeflag through the submerged
+    // MOTS also routes actors with the SITH_AF_ELECTRICWHIP typeflag through the submerged
     // animation set (majorMode = field_0 + 3) even when not underwater. Without this, such MOTS
     // actors play the wrong animation set. Gated on MoTS so JK behavior is unchanged.
     if ( (thing->sector && (thing->sector->flags & SITH_SECTOR_UNDERWATER) != 0)
-      || (Main_bMotsCompat && (thing->actorParams.typeflags & SITH_AF_40000000) != 0) )
+      || (Main_bMotsCompat && (thing->actorParams.typeflags & SITH_AF_ELECTRICWHIP) != 0) )
     {
         v11 = thing->animclass;
         if ( v11 )
@@ -654,7 +654,7 @@ void sithPuppet_DefaultCallback(SithThing *thing, int32_t track, uint32_t a3)
             soundToPlay_base = a3 - 1;
             if ( a3 - 1 > 1 )
                 soundToPlay_base = a3 - 6;
-            if ( !(thing->attach_flags & SITH_ATTACH_THINGSURFACE) )
+            if ( !(thing->attach_flags & SITH_ATTACH_THINGFACE) )
             {
                 v10 = thing->attachedSurface->surfaceFlags;
                 if ( (v10 & (SITH_SURFACE_VERYDEEPWATER|SITH_SURFACE_EARTH|SITH_SURFACE_PUDDLE|SITH_SURFACE_WATER|SITH_SURFACE_METAL)) != 0 )
@@ -707,7 +707,7 @@ LABEL_14:
         case 6u:
             if ( thing->rdthing.puppet->tracks[track].playSpeed >= 0.5 && thing->soundclass )
             {
-                if ( (thing->physicsParams.physflags & SITH_PF_WATERSURFACE) != 0 )
+                if ( (thing->physicsParams.physflags & SITH_PF_ONWATERSURFACE) != 0 )
                     sithSoundClass_PlayModeRandom(thing, SITH_SC_LSWIMSURFACE);
                 else
                     sithSoundClass_PlayModeRandom(thing, SITH_SC_LSWIMUNDER);
@@ -716,7 +716,7 @@ LABEL_14:
         case 7u:
             if ( thing->rdthing.puppet->tracks[track].playSpeed >= 0.5 && thing->soundclass )
             {
-                if ( (thing->physicsParams.physflags & SITH_PF_WATERSURFACE) != 0 )
+                if ( (thing->physicsParams.physflags & SITH_PF_ONWATERSURFACE) != 0 )
                     sithSoundClass_PlayModeRandom(thing, SITH_SC_TREADSURFACE);
                 else
                     sithSoundClass_PlayModeRandom(thing, SITH_SC_TREADUNDER);
@@ -747,7 +747,7 @@ LABEL_50:
         case 0xDu:
             if ( thing->rdthing.puppet->tracks[track].playSpeed >= 0.5 && thing->soundclass )
             {
-                if ( (thing->physicsParams.physflags & SITH_PF_WATERSURFACE) != 0 )
+                if ( (thing->physicsParams.physflags & SITH_PF_ONWATERSURFACE) != 0 )
                     sithSoundClass_PlayModeRandom(thing, SITH_SC_RSWIMSURFACE);
                 else
                     sithSoundClass_PlayModeRandom(thing, SITH_SC_RSWIMUNDER);

@@ -1453,7 +1453,7 @@ void rdModel3_DrawHNode(rdHierarchyNode *pNode)
         // Added: HACK: Force enemy weapons to not have textures
         int geoMode = curGeometryMode;
         if (!strcmp(pNode->name, "weapon")) {
-            curGeometryMode = RD_GEOMODE_SOLIDCOLOR;
+            curGeometryMode = RD_GEOMETRY_SOLID;
         }
 #endif
         rdModel3_DrawMesh(&rdModel3_pCurGeoset->meshes[pNode->meshIdx], &pCurThing->hierarchyNodeMatrices[pNode->idx]);
@@ -1706,8 +1706,8 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
     }
 
     // Added: safeguard
-    if (!face->vertexUVIdx && geometryMode == RD_GEOMODE_TEXTURED) {
-        geometryMode = RD_GEOMODE_SOLIDCOLOR;
+    if (!face->vertexUVIdx && geometryMode == RD_GEOMETRY_FULL) {
+        geometryMode = RD_GEOMETRY_SOLID;
     }
 
     procEntry->geometryMode = geometryMode;

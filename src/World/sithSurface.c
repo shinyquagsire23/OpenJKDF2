@@ -226,13 +226,13 @@ int sithSurface_ReadSurfacesListText(SithWorld *world)
         {
             if ( (face->material->tex_type & 2) == 0 )
             {
-                face->geometryMode = RD_GEOMODE_SOLIDCOLOR;
+                face->geometryMode = RD_GEOMETRY_SOLID;
                 surfaceIter->surfaceFlags &= ~(SITH_SURFACE_CEILING_SKY | SITH_SURFACE_HORIZON_SKY);
             }
         }
         else
         {
-            face->geometryMode = RD_GEOMODE_NOTRENDERED;
+            face->geometryMode = RD_GEOMETRY_NONE;
         }
         face->lightingMode = (rdLightMode_t)_atoi(stdConffile_g_entry.args[5].value);
         
@@ -1468,7 +1468,7 @@ rdSurface* sithSurface_SetThingLight(SithThing *thing, flex_t a2, flex_t a3, int
         result->parent_thing = thing;
         result->signature = v9;
         result->flags = a4 & 1 | SITH_SURFACE_400000|SITH_SURFACE_PUDDLE;
-        thing->thingflags |= SITH_TF_LIGHT;
+        thing->thingflags |= SITH_TF_EMITLIGHT;
         a1a = v5;
         result->field_44 = a1a / a3;
         v11 = thing->light;

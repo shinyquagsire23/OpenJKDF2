@@ -268,7 +268,7 @@ int jkHud_ClearRects(int unk)
     }
     if ( !jkHud_bViewScores && jkHud_tallyWhich )
         --jkHud_tallyWhich;
-    if ( (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_NOHUD) == 0 )
+    if ( (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_NOIDLECAMERA) == 0 )
     {
         result = 0;
 LABEL_29:

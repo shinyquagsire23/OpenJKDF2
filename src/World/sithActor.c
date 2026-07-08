@@ -43,9 +43,9 @@ void sithActor_Update(SithThing *thing, int deltaMs)
     // Added
     if (!thing) return;
 
-    if ( (thing->actorParams.typeflags & SITH_AF_BREATH_UNDER_WATER) == 0 && (thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
+    if ( (thing->actorParams.typeflags & SITH_AF_BREATHEUNDERWATER) == 0 && (thing->thingflags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) == 0 )
     {
-        if ( (thing->physicsParams.physflags & SITH_PF_WATERSURFACE) != 0 || (thing->sector && thing->sector->flags & SITH_SECTOR_UNDERWATER) == 0 ) // Added: Sector check
+        if ( (thing->physicsParams.physflags & SITH_PF_ONWATERSURFACE) != 0 || (thing->sector && thing->sector->flags & SITH_SECTOR_UNDERWATER) == 0 ) // Added: Sector check
         {
             v3 = thing->actorParams.msUnderwater;
             if ( v3 )
@@ -121,7 +121,7 @@ flex_t sithActor_DamageActor(SithThing *sender, SithThing *receiver, flex_t amou
           && flags != 0x20
           && flags != 0x40
           && v7->type == SITH_THING_ACTOR
-          && (v7->actorParams.typeflags & SITH_AF_FULL_ACTOR_DAMAGE) == 0
+          && (v7->actorParams.typeflags & SITH_AF_FULLDAMAGE) == 0
           && sender->type == SITH_THING_ACTOR )
         {
             damageMult = 0.1;
@@ -215,7 +215,7 @@ void sithActor_KillActor(SithThing *thing, SithThing *a3, int a4)
 
 
     thing->actorParams.health = 0.0;
-    if ( (thing->thingflags & SITH_TF_CAPTURED) == 0 || (sithCog_ThingSendMessage(thing, a3, SITH_MESSAGE_KILLED), (thing->thingflags & SITH_TF_WILLBEREMOVED) == 0) )
+    if ( (thing->thingflags & SITH_TF_CAPTURED) == 0 || (sithCog_ThingSendMessage(thing, a3, SITH_MESSAGE_KILLED), (thing->thingflags & SITH_TF_DESTROYED) == 0) )
     {
         sithSoundClass_StopSound(thing, 0);
 
@@ -282,7 +282,7 @@ void sithActor_KillActor(SithThing *thing, SithThing *a3, int a4)
             }
             else
             {
-                if (old_typeflags & SITH_AF_BREATH_UNDER_WATER) {
+                if (old_typeflags & SITH_AF_BREATHEUNDERWATER) {
                     thing->physicsParams.buoyancy = 0.3;
                 }
                 else if (Main_bMotsCompat) {
@@ -325,10 +325,10 @@ void sithActor_SetHeadPYR(SithThing *actor, const rdVector3 *eyePYR)
     int v13; // ecx
     int v14; // ecx
 
-    actor->actorParams.typeflags &= ~SITH_AF_HEAD_IS_CENTERED;
+    actor->actorParams.typeflags &= ~SITH_AF_VIEWCENTRED;
     actor->actorParams.eyePYR = *eyePYR;
     pAnimClass = actor->animclass;
-    if (!pAnimClass || actor->rdthing.type != RD_THINGTYPE_MODEL) return;
+    if (!pAnimClass || actor->rdthing.type != RD_THING_MODEL3) return;
 
 
     v4 = actor->rdthing.hierarchyNodes2;
@@ -459,7 +459,7 @@ int sithActor_thing_anim_blocked(SithThing *a1, SithThing *thing2, SithCollision
         sithPuppet_PlayMode(thing2, SITH_ANIM_BLOCK2, 0);
     else
         sithPuppet_PlayMode(thing2, SITH_ANIM_BLOCK, 0);
-    a1->actorParams.typeflags &= ~SITH_AF_CAN_ROTATE_HEAD;
+    a1->actorParams.typeflags &= ~SITH_AF_CANROTATEHEAD;
     a1->prev_thing = thing2;
     a1->child_signature = thing2->signature;
     sithCog_ThingSendMessage(thing2, 0, SITH_MESSAGE_BLOCKED);
@@ -472,7 +472,7 @@ void sithActor_DestroyActor(SithThing *thing)
     sithThing_DetachAttachedThings(thing);
     thing->type = SITH_THING_CORPSE;
     thing->physicsParams.physflags &= ~(SITH_PF_FLY|SITH_PF_800|SITH_PF_100|SITH_PF_WALLSTICK);
-    thing->physicsParams.physflags |= (SITH_PF_FLOORSTICK|SITH_PF_SURFACEALIGN|SITH_PF_USEGRAVITY);
+    thing->physicsParams.physflags |= (SITH_PF_FLOORSTICK|SITH_PF_ALIGNSURFACE|SITH_PF_USEGRAVITY);
     thing->lifeLeftMs = jkPlayer_bKeepCorpses ? -1 : 20000; // Added
     sithPhysics_FindFloor(thing, 0);
 }
@@ -604,14 +604,14 @@ int sithActor_ParseArg(StdConffileArg *arg, SithThing *thing, unsigned int param
             thing->actorParams.lightOffset.x = vx;
             thing->actorParams.lightOffset.y = vy;
             thing->actorParams.lightOffset.z = vz;
-            thing->thingflags |= SITH_TF_LIGHT;
+            thing->thingflags |= SITH_TF_EMITLIGHT;
             result = 1;
             break;
         case THINGPARAM_LIGHTINTENSITY:
             if ( _sscanf(arg->value, "%f", &tmp) != 1 )
                 return 0;
             thing->actorParams.lightIntensity = tmp;
-            thing->thingflags |= SITH_TF_LIGHT;
+            thing->thingflags |= SITH_TF_EMITLIGHT;
             return 1;
         case THINGPARAM_ERROR:
             v19 = _atof(arg->value);

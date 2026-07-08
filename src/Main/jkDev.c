@@ -1035,7 +1035,7 @@ int jkDev_CmdAllMap(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
     {
-        g_mapModeFlags ^= (MAPMODE_40 | MAPMODE_02);
+        g_mapModeFlags ^= (SITHMAPMODE_SHOWALLTHINGS | SITHMAPMODE_SHOWALLSECTORS);
         sithConsole_PrintWString(jkStrings_GetUniStringWithFallback("GAME_ALLMAP"));
     }
     return 1;

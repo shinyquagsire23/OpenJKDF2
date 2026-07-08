@@ -147,11 +147,11 @@ int sithDSSCog_SyncCogState(sithCog *cog, int sendto_id, int mpFlags)
         for (int i = 0; i < v13->entry_cnt; i++)
         {
             SithCogSymbol* sym = &v13->buckets[i];
-            if (sym->val.type == COG_VARTYPE_FLEX)
+            if (sym->val.type == SITHCOG_VALUE_FLOAT)
             {
                 NETMSG_PUSHS32((uint32_t)sym->val.data[0]);
             }
-            else if ( sym->val.type == COG_VARTYPE_VECTOR )
+            else if ( sym->val.type == SITHCOG_VALUE_VECTOR )
             {
 #ifndef COG_COMPRESS_VAR_SIZE
                 NETMSG_PUSHF32(sym->val.dataAsFloat[0]);
@@ -171,7 +171,7 @@ int sithDSSCog_SyncCogState(sithCog *cog, int sendto_id, int mpFlags)
                 }
 #endif
             }
-            else if (Main_bMotsCompat && sym->val.type == COG_VARTYPE_STR)
+            else if (Main_bMotsCompat && sym->val.type == SITHCOG_VALUE_STRING)
             {
 
             }
@@ -233,11 +233,11 @@ int sithDSSCog_ProcessCogState(SithMessage *msg)
         for (int i = 0; i < v13->entry_cnt; i++)
         {
             SithCogSymbol* sym = &v13->buckets[i];
-            if (sym->val.type == COG_VARTYPE_FLEX)
+            if (sym->val.type == SITHCOG_VALUE_FLOAT)
             {
                 sym->val.data[0] = NETMSG_POPS32();
             }
-            else if ( sym->val.type == COG_VARTYPE_VECTOR )
+            else if ( sym->val.type == SITHCOG_VALUE_VECTOR )
             {
 #ifndef COG_COMPRESS_VAR_SIZE
                 sym->val.dataAsFloat[0] = NETMSG_POPF32();
@@ -257,12 +257,12 @@ int sithDSSCog_ProcessCogState(SithMessage *msg)
                 }
 #endif
             }
-            else if (Main_bMotsCompat && sym->val.type == COG_VARTYPE_STR)
+            else if (Main_bMotsCompat && sym->val.type == SITHCOG_VALUE_STRING)
             {
                 
             }
 #ifdef QOL_IMPROVEMENTS
-            else if (!Main_bMotsCompat && sym->val.type == COG_VARTYPE_STR)
+            else if (!Main_bMotsCompat && sym->val.type == SITHCOG_VALUE_STRING)
             {
                 
             }

@@ -165,7 +165,7 @@ void jkCog_SetFlags(sithCog *ctx)
         thing->jkFlags |= flags;
         if ( COG_SHOULD_SYNC(ctx) )
         {
-            sithThing_SyncThing(thing, THING_SYNC_STATE);
+            sithThing_SyncThing(thing, SITHTHING_SYNC_STATE);
         }
     }
 }
@@ -184,7 +184,7 @@ void jkCog_ClearFlags(sithCog *ctx)
             v2->jkFlags &= ~v1;
             if ( COG_SHOULD_SYNC(ctx) )
             {
-                sithThing_SyncThing(v2, THING_SYNC_STATE);
+                sithThing_SyncThing(v2, SITHTHING_SYNC_STATE);
             }
         }
     }
@@ -341,10 +341,10 @@ void jkCog_SetInvis(sithCog *pCog)
     if ( v1 <= 0 )
         v2->rdthing.curGeoMode = v2->rdthing.desiredGeoMode;
     else
-        v2->rdthing.curGeoMode = RD_GEOMODE_VERTICES;
+        v2->rdthing.curGeoMode = RD_GEOMETRY_VERTEX;
     if ( COG_SHOULD_SYNC(pCog) )
     {
-        sithThing_SyncThing(v2, THING_SYNC_STATE);
+        sithThing_SyncThing(v2, SITHTHING_SYNC_STATE);
     }
 }
 
@@ -366,7 +366,7 @@ void jkCog_SetInvulnerable(sithCog *pCog)
     v2->actorParams.typeflags = v4;
     if ( COG_SHOULD_SYNC(pCog) )
     {
-        sithThing_SyncThing(v2, THING_SYNC_STATE);
+        sithThing_SyncThing(v2, SITHTHING_SYNC_STATE);
     }
 }
 
@@ -861,7 +861,7 @@ LABEL_8:
         }
         if ( sithMessage_g_outputstream )
         {
-            if ( (ctx->flags & SITH_COG_NO_SYNC) == 0 )
+            if ( (ctx->flags & SITHCOG_NOSYNC) == 0 )
             {
                 v4 = ctx->trigId;
                 if ( v4 != SITH_MESSAGE_STARTUP && v4 != SITH_MESSAGE_SHUTDOWN && v2 < jkPlayer_maxPlayers && (jkPlayer_playerInfos[v2].flags & 1) != 0 )
@@ -880,7 +880,7 @@ LABEL_8:
         jkDev_PrintUniString(jkCog_jkstring);
         if ( sithMessage_g_outputstream )
         {
-            if ( (ctx->flags & SITH_COG_NO_SYNC) == 0 )
+            if ( (ctx->flags & SITHCOG_NOSYNC) == 0 )
             {
                 v3 = ctx->trigId;
                 if ( v3 != SITH_MESSAGE_STARTUP && v3 != SITH_MESSAGE_SHUTDOWN )
@@ -895,7 +895,7 @@ void jkCog_BeginCutscene(sithCog *ctx)
 {
     jkGuiMultiplayer_mpcInfo.pCutsceneCog = ctx;
     if (sithPlayer_g_pLocalPlayerThing) {
-        sithPlayer_g_pLocalPlayerThing->actorParams.typeflags |= SITH_AF_NOHUD;
+        sithPlayer_g_pLocalPlayerThing->actorParams.typeflags |= SITH_AF_NOIDLECAMERA;
     }
 }
 
@@ -904,7 +904,7 @@ void jkCog_EndCutscene(sithCog *ctx)
 {
     jkGuiMultiplayer_mpcInfo.pCutsceneCog = NULL;
     if (sithPlayer_g_pLocalPlayerThing) {
-        sithPlayer_g_pLocalPlayerThing->actorParams.typeflags &= ~SITH_AF_NOHUD;
+        sithPlayer_g_pLocalPlayerThing->actorParams.typeflags &= ~SITH_AF_NOIDLECAMERA;
     }
 }
 
@@ -1197,7 +1197,7 @@ void jkCogExt_GetThingAttachSurface(sithCog* ctx)
     SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
     {
-        if (pThing->attach_flags == SITH_ATTACH_WORLDSURFACE) {
+        if (pThing->attach_flags == SITH_ATTACH_SURFACE) {
             SithSurface* pAttached = pThing->attachedSurface;
             if (pAttached) {
                 retval = pAttached->index;
@@ -1213,7 +1213,7 @@ void jkCogExt_GetThingAttachThing(sithCog* ctx)
     SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
     {
-        if (pThing->attach_flags == SITH_ATTACH_THINGSURFACE) {
+        if (pThing->attach_flags == SITH_ATTACH_THINGFACE) {
             SithThing* pAttached = pThing->attachedThing;
             if (pAttached) {
                 retval = pAttached->thingIdx;

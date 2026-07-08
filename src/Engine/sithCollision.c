@@ -245,7 +245,7 @@ flex_t sithCollision_SearchForThingCollisions(SithSector *pSector, SithThing *se
             if ( (!v10 || (v7->thingflags & SITH_TF_80))
               && ((flags & RAYCAST_10) == 0 || (v7->thingflags & SITH_TF_STANDABLE) != 0)
               && v7->collide
-              && (v7->thingflags & (SITH_TF_DISABLED|SITH_TF_WILLBEREMOVED)) == 0
+              && (v7->thingflags & (SITH_TF_DISABLED|SITH_TF_DESTROYED)) == 0
               && ((flags & RAYCAST_2000) == 0 || v7->type == SITH_THING_COG) )
             {
                 if ( !v8 )
@@ -257,17 +257,17 @@ flex_t sithCollision_SearchForThingCollisions(SithSector *pSector, SithThing *se
                         if ( (v8->thingflags & SITH_TF_DEAD) == 0
                           && (v7->thingflags & SITH_TF_DEAD) == 0
                           && (v8->type != SITH_THING_WEAPON
-                           || (v8->actorParams.typeflags & SITH_AF_CAN_ROTATE_HEAD) == 0
+                           || (v8->actorParams.typeflags & SITH_AF_CANROTATEHEAD) == 0
                            || ((v13 = v8->prev_thing) == 0 || (v14 = v7->prev_thing) == 0 || v13 != v14 || v8->child_signature != v7->child_signature)
                            && (v13 != v7 || v8->child_signature != v7->signature))
                           && (v7->type != SITH_THING_WEAPON
-                           || (v7->actorParams.typeflags & SITH_AF_CAN_ROTATE_HEAD) == 0
+                           || (v7->actorParams.typeflags & SITH_AF_CANROTATEHEAD) == 0
                            || ((v15 = v7->prev_thing) == 0 || (v16 = v8->prev_thing) == 0 || v15 != v16 || v7->child_signature != v8->child_signature)
                            && (v15 != v8 || v7->child_signature != v8->signature)) )
                         {
-                            if ( (v8->attach_flags & (SITH_ATTACH_THINGSURFACE | SITH_ATTACH_THING)) == 0 || v8->attachedThing != v7 || (v8->attach_flags & SITH_ATTACH_NO_MOVE) == 0 && (flags & RAYCAST_40) == 0 )
+                            if ( (v8->attach_flags & (SITH_ATTACH_THINGFACE | SITH_ATTACH_THING)) == 0 || v8->attachedThing != v7 || (v8->attach_flags & SITH_ATTACH_NOMOVE) == 0 && (flags & RAYCAST_40) == 0 )
                             {
-                                if ( (v7->attach_flags & (SITH_ATTACH_THINGSURFACE | SITH_ATTACH_THING)) == 0 || v7->attachedThing != v8 || (v7->attach_flags & SITH_ATTACH_NO_MOVE) == 0 && (flags & RAYCAST_40) == 0 )
+                                if ( (v7->attach_flags & (SITH_ATTACH_THINGFACE | SITH_ATTACH_THING)) == 0 || v7->attachedThing != v8 || (v7->attach_flags & SITH_ATTACH_NOMOVE) == 0 && (flags & RAYCAST_40) == 0 )
                                 {
 LABEL_41:
                                     v19 = sithIntersect_CheckSphereThingIntersection(v8, a2, a3, a4, range, v7, flags, &v23, &senderMesh, &a10, &a11);
@@ -603,7 +603,7 @@ void sithCollision_RotateThing(SithThing *thing, rdMatrix34 *orient)
         rdVector_Sub3(&tmp, &i->position, &thing->position);
         rdVector_Copy3(&i->lookOrientation.scale, &tmp);
         sithCollision_RotateThing(i, orient);
-        if ( (i->attach_flags & SITH_ATTACH_NO_MOVE) == 0 )
+        if ( (i->attach_flags & SITH_ATTACH_NOMOVE) == 0 )
         {
             rdVector_Sub3(&a1a, &i->lookOrientation.scale, &tmp);
             if ( !rdVector_IsZero3(&a1a) )
@@ -678,13 +678,13 @@ flex_t sithCollision_MoveThing(SithThing *pThing, rdVector3 *a2, flex_t a6, int 
     v10 = pThing->attachedParentMaybe;
     for ( direction = *a2; v10; v10 = v10->childThing )
     {
-        if (v10->attach_flags & SITH_ATTACH_NO_MOVE)
+        if (v10->attach_flags & SITH_ATTACH_NOMOVE)
             continue;
 
         v11 = sithCollision_MoveThing(v10, a2, a6, RAYCAST_40);
         if ( v11 >= a6 ) continue;
         
-        if ( (v10->attach_flags & SITH_ATTACH_THINGSURFACE) != 0 )
+        if ( (v10->attach_flags & SITH_ATTACH_THINGFACE) != 0 )
         {
             rdMatrix_TransformVector34(&out, &v10->attachedSufaceInfo->face.normal, &v5->lookOrientation);
             v12 = stdMath_ClipNearZero(rdVector_Dot3(a2, &out));
@@ -884,7 +884,7 @@ LABEL_81:
 
     for ( i = v5->attachedParentMaybe; i; i = i->childThing )
     {
-        if (!(i->attach_flags & SITH_ATTACH_NO_MOVE)) continue;
+        if (!(i->attach_flags & SITH_ATTACH_NOMOVE)) continue;
         rdMatrix_TransformVector34(&i->position, &i->field_4C, &v5->lookOrientation);
         rdVector_Add3Acc(&i->position, &v5->position);
         if ( i->sector != v5->sector )
@@ -898,7 +898,7 @@ LABEL_81:
         {
             // A floor-sticking thing only re-finds/attaches to the floor when it's
             // descending slowly, i.e. vel.z in [-2.0, 0.2].
-            if ( (v5->attach_flags) != 0 && !(v5->attach_flags & SITH_ATTACH_NO_MOVE)
+            if ( (v5->attach_flags) != 0 && !(v5->attach_flags & SITH_ATTACH_NOMOVE)
               || (v5->physicsParams.physflags & SITH_PF_FLOORSTICK) != 0
               && (v5->physicsParams.vel.z >= -2.0 && v5->physicsParams.vel.z <= 0.2) )
             {

@@ -146,22 +146,22 @@ int rdClip_Line2(rdCanvas *canvas, signed int *pX1, signed int *pY1, signed int 
         if ( !clipOutcodeX1Y1 )
             clipCode = clipOutcodeX2Y2;
 
-        if (clipCode & CLIP_TOP)
+        if (clipCode & RDCLIP_OUTCODE_TOP)
         {
             x_clipped = (fY2 == fY1) ? fX1 : (fX2 - fX1) / (fY2 - fY1) * ((flex_d_t)canvas->yStart - fY1) + fX1;
             y_clipped = (flex_d_t)canvas->yStart;
         }
-        else if (clipCode & CLIP_BOTTOM)
+        else if (clipCode & RDCLIP_OUTCODE_BOTTOM)
         {
             x_clipped = (fY2 == fY1) ? fX1 : (fX2 - fX1) / (fY2 - fY1) * ((flex_d_t)canvas->heightMinusOne - fY1) + fX1;
             y_clipped = (flex_d_t)canvas->heightMinusOne;
         }
-        else if (clipCode & CLIP_RIGHT)
+        else if (clipCode & RDCLIP_OUTCODE_RIGHT)
         {
             x_clipped = (flex_d_t)canvas->widthMinusOne;
             y_clipped = (fX2 == fX1) ? fY1 : (fY2 - fY1) / (fX2 - fX1) * ((flex_d_t)canvas->widthMinusOne - fX1) + fY1;
         }
-        else if (clipCode & CLIP_LEFT)
+        else if (clipCode & RDCLIP_OUTCODE_LEFT)
         {
             x_clipped = (flex_d_t)canvas->xStart;
             y_clipped = (fX2 == fX1) ? fY1 : (flex_t)((fY2 - fY1) / (fX2 - fX1) * ((flex_d_t)canvas->xStart - fX1) + fY1);
@@ -194,14 +194,14 @@ int rdClip_CalcOutcode2(rdCanvas *canvas, int x, int y)
     int result = 0;
 
     if (x > canvas->widthMinusOne)
-        result |= CLIP_RIGHT;
+        result |= RDCLIP_OUTCODE_RIGHT;
     else if (x < canvas->xStart)
-        result |= CLIP_LEFT;
+        result |= RDCLIP_OUTCODE_LEFT;
 
     if (y < canvas->yStart)
-        result |= CLIP_TOP;
+        result |= RDCLIP_OUTCODE_TOP;
     else if (y > canvas->heightMinusOne)
-        result |= CLIP_BOTTOM;
+        result |= RDCLIP_OUTCODE_BOTTOM;
 
     return result;
 }

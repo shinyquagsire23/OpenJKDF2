@@ -73,7 +73,7 @@ int rdPolyline_NewEntry(rdPolyline *polyline, char *polyline_fname, char *materi
     numVertices = polyline->edgeFace.numVertices;
     for (int i = 0; i < numVertices; ++vertexPosIdx )
         *vertexPosIdx = i++;
-    if ( polyline->edgeFace.geometryMode >= RD_GEOMODE_TEXTURED)
+    if ( polyline->edgeFace.geometryMode >= RD_GEOMETRY_FULL)
     {
         vertexUVIdx = (int *)RDROID_ALLOC(4 * numVertices);
         polyline->edgeFace.vertexUVIdx = vertexUVIdx;
@@ -120,7 +120,7 @@ int rdPolyline_NewEntry(rdPolyline *polyline, char *polyline_fname, char *materi
         return 0;
     for (int k = 0; k < polyline->tipFace.numVertices; ++vertexPosIdx )
         *vertexPosIdx = k++;
-    if ( polyline->tipFace.geometryMode >= RD_GEOMODE_TEXTURED)
+    if ( polyline->tipFace.geometryMode >= RD_GEOMETRY_FULL)
     {
         vertexUVIdx = (int *)RDROID_ALLOC(sizeof(int) * polyline->tipFace.numVertices);
         polyline->tipFace.vertexUVIdx = vertexUVIdx;

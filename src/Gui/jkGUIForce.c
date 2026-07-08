@@ -243,7 +243,7 @@ void jkGuiForce_ChoiceRemoveStar(jkGuiMenu *menu, int fpIdx, int amount)
     for (int i = EIDX_START_FP; i < EIDX_END_FP; i++)
     {
         int id = jkGuiForce_pElements[i].hoverId;
-        jkGuiForce_pElements[i].bIsVisible = !!(jkPlayer_playerInfos[playerThingIdx].iteminfo[id].state & ITEMSTATE_CARRIES);
+        jkGuiForce_pElements[i].bIsVisible = !!(jkPlayer_playerInfos[playerThingIdx].iteminfo[id].state & SITHINVENTORY_ITEM_FOUND);
     }
 
     jkGuiRend_Paint(menu);
@@ -288,7 +288,7 @@ void jkGuiForce_ChoiceRemoveStars(jkGuiMenu *menu)
         for (int i = EIDX_START_FP; i < EIDX_END_FP; i++)
         {
             int id = jkGuiForce_pElements[i].hoverId;
-            jkGuiForce_pElements[i].bIsVisible = !!(jkPlayer_playerInfos[playerThingIdx].iteminfo[id].state & ITEMSTATE_CARRIES);
+            jkGuiForce_pElements[i].bIsVisible = !!(jkPlayer_playerInfos[playerThingIdx].iteminfo[id].state & SITHINVENTORY_ITEM_FOUND);
         }
         jkGuiRend_Paint(menu);
     }
@@ -589,7 +589,7 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *p
 
             jkGuiForce_pElements[i].oldForcePoints = (int)sithPlayer_GetInvItemAmount(id);
 
-            jkGuiForce_pElements[i].bIsVisible = !!(jkPlayer_playerInfos[playerThingIdx].iteminfo[id].state & ITEMSTATE_CARRIES);
+            jkGuiForce_pElements[i].bIsVisible = !!(jkPlayer_playerInfos[playerThingIdx].iteminfo[id].state & SITHINVENTORY_ITEM_FOUND);
         }
 
         if ( a4 != 0 )
@@ -750,7 +750,7 @@ void jkGuiForce_UpdateViewForRankMots(void)
     for (int i = EIDX_START_FP; i < EIDX_END_FP; i++)
     {
         int id = jkGuiForce_pElements[i].hoverId;
-        jkGuiForce_pElements[i].bIsVisible = !!(jkPlayer_playerInfos[playerThingIdx].iteminfo[id].state & ITEMSTATE_CARRIES);
+        jkGuiForce_pElements[i].bIsVisible = !!(jkPlayer_playerInfos[playerThingIdx].iteminfo[id].state & SITHINVENTORY_ITEM_FOUND);
     }
 
     pwVar5 = jkGuiForce_waTmp;
@@ -760,7 +760,7 @@ void jkGuiForce_UpdateViewForRankMots(void)
         for(int fpIdx = 0; fpIdx < 8; fpIdx++) 
         {
             int amt = jkPlayer_aMotsFpBins[(categoryIdx*8) + fpIdx];
-            if (amt && !!(jkPlayer_playerInfos[playerThingIdx].iteminfo[amt].state & ITEMSTATE_CARRIES)) {
+            if (amt && !!(jkPlayer_playerInfos[playerThingIdx].iteminfo[amt].state & SITHINVENTORY_ITEM_FOUND)) {
                 jediRank_ = jediRank_ + 1;
             }
         }
@@ -816,7 +816,7 @@ void jkGuiForce_UpdateViewForRank()
     for (int i = EIDX_START_FP; i < EIDX_END_FP; i++)
     {
         int id = jkGuiForce_pElements[i].hoverId;
-        jkGuiForce_pElements[i].bIsVisible = !!(jkPlayer_playerInfos[playerThingIdx].iteminfo[id].state & ITEMSTATE_CARRIES);
+        jkGuiForce_pElements[i].bIsVisible = !!(jkPlayer_playerInfos[playerThingIdx].iteminfo[id].state & SITHINVENTORY_ITEM_FOUND);
     }
 }
 

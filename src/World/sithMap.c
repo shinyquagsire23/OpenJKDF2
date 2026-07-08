@@ -64,7 +64,7 @@ LABEL_10:
         goto LABEL_11;
     }
 
-    if ( (v3->flags & SITH_SECTOR_AUTOMAPVISIBLE) != 0 || (g_mapModeFlags & MAPMODE_02))
+    if ( (v3->flags & SITH_SECTOR_SEEN) != 0 || (g_mapModeFlags & SITHMAPMODE_SHOWALLSECTORS))
     {
         v3->renderTick = sithRender_lastRenderTick;
         if ( (v3->flags & 0x10) != 0 )
@@ -100,10 +100,10 @@ LABEL_11:
         return;
     }
 
-    if ( (sector->flags & SITH_SECTOR_AUTOMAPVISIBLE) || (g_mapModeFlags & MAPMODE_02))
+    if ( (sector->flags & SITH_SECTOR_SEEN) || (g_mapModeFlags & SITHMAPMODE_SHOWALLSECTORS))
     {
         sector->renderTick = sithRender_lastRenderTick;
-        if (sector->flags & SITH_SECTOR_AUTOMAPHIDE)
+        if (sector->flags & SITH_SECTOR_HIDEONMAP)
             v2 = 1;
         else
             v2 = sithMap_Draw(sector);
@@ -280,17 +280,17 @@ LABEL_22:
         }
         while ( v57 < v34 );
     }
-    if (g_mapModeFlags & (MAPMODE_40 | MAPMODE_08 | MAPMODE_04))
+    if (g_mapModeFlags & (SITHMAPMODE_SHOWALLTHINGS | SITHMAPMODE_SHOWACTORS | SITHMAPMODE_SHOWPLAYERS))
     {
         for ( i = v1->thingsList; i; i = i->nextThing )
         {
-            if ( i != sithWorld_g_pCurrentWorld->cameraFocus && (i->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)) == 0 )
+            if ( i != sithWorld_g_pCurrentWorld->cameraFocus && (i->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_DESTROYED)) == 0 )
             {
-                int v37 = (g_mapModeFlags & MAPMODE_40) != 0;
+                int v37 = (g_mapModeFlags & SITHMAPMODE_SHOWALLTHINGS) != 0;
                 switch ( i->type )
                 {
                     case SITH_THING_PLAYER:
-                        if (g_mapModeFlags & (MAPMODE_08 | MAPMODE_04))
+                        if (g_mapModeFlags & (SITHMAPMODE_SHOWACTORS | SITHMAPMODE_SHOWPLAYERS))
                             v37 = 1;
                         if ( sithNet_isMulti && (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 )
                             circleColor = sithMap_ctx.teamColors[i->actorParams.playerinfo->teamNum];
@@ -298,17 +298,17 @@ LABEL_22:
                             circleColor = sithMap_ctx.playerColor & 0xFF;
                         break;
                     case SITH_THING_ACTOR:
-                        if (g_mapModeFlags & MAPMODE_08)
+                        if (g_mapModeFlags & SITHMAPMODE_SHOWACTORS)
                             v37 = 1;
                         circleColor = sithMap_ctx.actorColor & 0xFF;
                         break;
                     case SITH_THING_ITEM:
-                        if (g_mapModeFlags & MAPMODE_10)
+                        if (g_mapModeFlags & SITHMAPMODE_SHOWITEMS)
                             v37 = 1;
                         circleColor = sithMap_ctx.itemColor & 0xFF;
                         break;
                     case SITH_THING_WEAPON:
-                        if (g_mapModeFlags & MAPMODE_20)
+                        if (g_mapModeFlags & SITHMAPMODE_SHOWWEAPONS)
                             v37 = 1;
                         circleColor = sithMap_ctx.weaponColor & 0xFF;
                         break;

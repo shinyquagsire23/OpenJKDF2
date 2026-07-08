@@ -267,8 +267,8 @@ void sithControl_Update(flex_t deltaSecs, int deltaMs)
 
     // MOTS altered
     if ( !sithPlayer_g_pLocalPlayerThing
-      || (sithPlayer_g_pLocalPlayerThing->actorParams.typeflags & (Main_bMotsCompat ? (SITH_AF_NOHUD|SITH_AF_SCOPEHUD|SITH_AF_80000000) : SITH_AF_NOHUD))
-      || (sithPlayer_g_pLocalPlayerThing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0
+      || (sithPlayer_g_pLocalPlayerThing->actorParams.typeflags & (Main_bMotsCompat ? (SITH_AF_NOIDLECAMERA|SITH_AF_SCOPEHUD|SITH_AF_ARACHNID) : SITH_AF_NOIDLECAMERA))
+      || (sithPlayer_g_pLocalPlayerThing->thingflags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) != 0
       || (sithCamera_g_stateFlags & 1) != 0 )
     {
         if ( sithCamera_g_pCurCamera == &sithCamera_g_aCameras[4] )
@@ -952,7 +952,7 @@ int sithControl_HandlePlayer(SithThing *player, flex_t deltaSecs)
     {
         if (player->thingflags & SITH_TF_DEAD)
         {
-            if (!(player->actorParams.typeflags & SITH_AF_FALLING_TO_DEATH))
+            if (!(player->actorParams.typeflags & SITH_AF_FALLKILLED))
             {
                 if ( !sithControl_death_msgtimer )
                     goto LABEL_39;
@@ -1009,7 +1009,7 @@ LABEL_39:
                 sithControl_008d7f44 = 1.0;
                 sithControl_PlayerLook(player, deltaSecs);
             }
-            if ( player->type != SITH_THING_PLAYER || (player->actorParams.typeflags & SITH_AF_DISABLED) == 0 )
+            if ( player->type != SITH_THING_PLAYER || (player->actorParams.typeflags & SITH_AF_CONTROLSDISABLED) == 0 )
             {
                 // MOTS added
                 if (Main_bMotsCompat) {
@@ -1199,7 +1199,7 @@ void sithControl_PlayerLook(SithThing *player, flex_t deltaSecs)
     v3 = 0;
     if ( (player->type == SITH_THING_ACTOR || player->type == SITH_THING_PLAYER) && deltaSecs != 0.0 )
     {
-        if ( (player->actorParams.typeflags & SITH_AF_CAN_ROTATE_HEAD) != 0 )
+        if ( (player->actorParams.typeflags & SITH_AF_CANROTATEHEAD) != 0 )
         {
             if ( (sithWeapon_controlOptions & 4) == 0 && !sithControl_GetKey(INPUT_FUNC_MLOOK, 0) )
                 goto LABEL_20;
@@ -1242,12 +1242,12 @@ void sithControl_PlayerLook(SithThing *player, flex_t deltaSecs)
                 if (!sithThing_MotsTick(8, (int)(local_10 * 100.0), a2.x)) return;
 
                 sithActor_SetHeadPYR(player, &a2);
-                player->actorParams.typeflags &= ~SITH_AF_CENTER_VIEW;
+                player->actorParams.typeflags &= ~SITH_AF_VIEWCENTRING;
             }
             else
             {
 LABEL_20:
-                if ( sithControl_GetKey(INPUT_FUNC_CENTER, 0) || (player->actorParams.typeflags & SITH_AF_CENTER_VIEW) != 0 )
+                if ( sithControl_GetKey(INPUT_FUNC_CENTER, 0) || (player->actorParams.typeflags & SITH_AF_VIEWCENTRING) != 0 )
                 {
 #ifdef QOL_IMPROVEMENTS
                     // Scale appropriately to high framerates
@@ -1255,12 +1255,12 @@ LABEL_20:
 #else
                     v8 = deltaSecs * 180.0;
 #endif
-                    player->actorParams.typeflags |= SITH_AF_CENTER_VIEW;
+                    player->actorParams.typeflags |= SITH_AF_VIEWCENTRING;
                     v9 = stdMath_ClipNearZero(stdMath_ClampValue(-player->actorParams.eyePYR.x, v8));
                     if ( v9 == 0.0 )
                     {
-                        player->actorParams.typeflags &= ~SITH_AF_CENTER_VIEW;
-                        player->actorParams.typeflags |= SITH_AF_HEAD_IS_CENTERED;
+                        player->actorParams.typeflags &= ~SITH_AF_VIEWCENTRING;
+                        player->actorParams.typeflags |= SITH_AF_VIEWCENTRED;
                     }
                     else
                     {
@@ -1324,7 +1324,7 @@ void sithControl_PlayerMovementMots(SithThing *player)
     if ((thing->physicsParams.physflags & SITH_PF_200000) != 0) {
         move_multiplier = 0.5;
     }
-    if (((thing->attach_flags & SITH_ATTACH_WORLDSURFACE) != 0) &&
+    if (((thing->attach_flags & SITH_ATTACH_SURFACE) != 0) &&
        (player->attachedSurface->surfaceFlags & (SITH_SURFACE_VERYDEEPWATER|SITH_SURFACE_WATER))) {
         move_multiplier *= 0.5;
     }
@@ -1453,8 +1453,8 @@ LAB_00527d1c:
         sithControl_008d7f4c = 1;
     }
     if (((0.2 < local_8) && ((sithWeapon_controlOptions & 0x10) != 0)) &&
-       (uVar1 = thing->actorParams.typeflags, (uVar1 & SITH_AF_HEAD_IS_CENTERED) == 0)) {
-        thing->actorParams.typeflags = uVar1 | SITH_AF_CENTER_VIEW;
+       (uVar1 = thing->actorParams.typeflags, (uVar1 & SITH_AF_VIEWCENTRED) == 0)) {
+        thing->actorParams.typeflags = uVar1 | SITH_AF_VIEWCENTRING;
     }
     thing->physicsParams.acceleration.z = 0.0;
     if (move_multiplier != 1.0) {
@@ -1518,7 +1518,7 @@ void sithControl_PlayerMovement(SithThing *player)
         move_multiplier = 0.5;
     }
 
-    if ( (player->attach_flags & SITH_ATTACH_WORLDSURFACE)
+    if ( (player->attach_flags & SITH_ATTACH_SURFACE)
          && (player->attachedSurface->surfaceFlags & (SITH_SURFACE_VERYDEEPWATER|SITH_SURFACE_WATER)) )
     {
         move_multiplier *= 0.5;
@@ -1577,9 +1577,9 @@ void sithControl_PlayerMovement(SithThing *player)
         player->physicsParams.acceleration.y = y_vel;
         if ( v11 > 0.2 && (sithWeapon_controlOptions & 0x10) != 0 )
         {
-            if ( (player->actorParams.typeflags & SITH_AF_HEAD_IS_CENTERED) == 0 )
+            if ( (player->actorParams.typeflags & SITH_AF_VIEWCENTRED) == 0 )
             {
-                player->actorParams.typeflags |= SITH_AF_CENTER_VIEW;
+                player->actorParams.typeflags |= SITH_AF_VIEWCENTRING;
             }
         }
         player->physicsParams.acceleration.z = 0;
@@ -1633,7 +1633,7 @@ void sithControl_FreeCam(SithThing *player)
         if ( (v1->physicsParams.acceleration.x != 0.0 || v1->physicsParams.acceleration.y != 0.0) // TODO verified first comparison?
           && (v1->actorParams.eyePYR.x != 0.0 || v1->actorParams.eyePYR.y != 0.0 || v1->actorParams.eyePYR.z != 0.0)
           && v2
-          && (v1->physicsParams.physflags & SITH_PF_WATERSURFACE) == 0 )
+          && (v1->physicsParams.physflags & SITH_PF_ONWATERSURFACE) == 0 )
         {
             rdMatrix_BuildRotate34(&a, &v1->actorParams.eyePYR);
             rdMatrix_TransformVector34Acc(&v1->physicsParams.acceleration, &a);
@@ -1733,7 +1733,7 @@ void sithControl_FreeCam(SithThing *player)
                 if ((g_debugmodeFlags & DEBUGFLAG_NOCLIP)) {
 
                 }
-                else if ( (v1->physicsParams.physflags & SITH_PF_WATERSURFACE) != 0 )
+                else if ( (v1->physicsParams.physflags & SITH_PF_ONWATERSURFACE) != 0 )
                 {
                     if ( tmp )
                         sithPlayerActions_JumpWithVel(v1, 1.0);

@@ -194,7 +194,7 @@ int sithRender_Startup()
 // MOTS altered
 int sithRender_Open()
 {
-    sithRender_geoMode = RD_GEOMODE_TEXTURED;
+    sithRender_geoMode = RD_GEOMETRY_FULL;
     sithRender_lightMode = RD_LIGHTMODE_GOURAUD;
     sithRender_texMode = RD_TEXTUREMODE_PERSPECTIVE;
 
@@ -310,7 +310,7 @@ void sithRender_Draw()
     //lightDebugNum = 0; // Added
 
 #ifdef TARGET_TWL
-    //sithRender_geoMode = RD_GEOMODE_SOLIDCOLOR;
+    //sithRender_geoMode = RD_GEOMETRY_SOLID;
     //sithRender_lightMode = RD_LIGHTMODE_DIFFUSE;
     //sithRender_texMode = RD_TEXTUREMODE_PERSPECTIVE;
     //rdroid_curVertexColorMode = 0;
@@ -668,9 +668,9 @@ void sithRender_BuildVisibleSectorList(SithSector *sector, rdClipFrustum *frustu
         }
 
         sithRender_aVisibleSectors[sithRender_g_numVisibleSectors++] = sector;
-        if (!(sector->flags & SITH_SECTOR_AUTOMAPVISIBLE) && !(g_debugmodeFlags & DEBUGFLAG_NOCLIP)) // Added: don't send sighted stuff in noclip, otherwise the whole map reveals
+        if (!(sector->flags & SITH_SECTOR_SEEN) && !(g_debugmodeFlags & DEBUGFLAG_NOCLIP)) // Added: don't send sighted stuff in noclip, otherwise the whole map reveals
         {
-            sector->flags |= SITH_SECTOR_AUTOMAPVISIBLE;
+            sector->flags |= SITH_SECTOR_SEEN;
             if ( (sector->flags & SITH_SECTOR_COGLINKED) != 0 )
                 sithCog_SectorSendMessage(sector, 0, SITH_MESSAGE_SIGHTED);
         }
@@ -703,8 +703,8 @@ void sithRender_BuildVisibleSectorList(SithSector *sector, rdClipFrustum *frustu
             }
 #endif
 
-            if ((thing->thingflags & SITH_TF_LIGHT)
-                 && !(thing->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)))
+            if ((thing->thingflags & SITH_TF_EMITLIGHT)
+                 && !(thing->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_DESTROYED)))
             {
                 if ( thing->light > 0.0 )
                 {
@@ -715,7 +715,7 @@ void sithRender_BuildVisibleSectorList(SithSector *sector, rdClipFrustum *frustu
 
                 if ( (thing->type == SITH_THING_ACTOR || thing->type == SITH_THING_PLAYER) && lightIdx < 0x20 )
                 {
-                    if ( (thing->actorParams.typeflags & SITH_AF_FIELDLIGHT) != 0 && thing->actorParams.lightIntensity > 0.0 )
+                    if ( (thing->actorParams.typeflags & SITH_AF_HEADLIGHT) != 0 && thing->actorParams.lightIntensity > 0.0 )
                     {
                         rdMatrix_TransformPoint34(&vertex_out, &thing->actorParams.lightOffset, &thing->lookOrientation);
                         rdVector_Add3Acc(&vertex_out, &thing->position);
@@ -828,7 +828,7 @@ void sithRender_BuildVisibleSectorList(SithSector *sector, rdClipFrustum *frustu
             }
 
             int bMirrorAdjoinIsTransparent = (((!adjoinMirrorSurface->surfaceInfo.face.material ||
-                        (adjoinMirrorSurface->surfaceInfo.face.geometryMode == RD_GEOMODE_NOTRENDERED)) ||
+                        (adjoinMirrorSurface->surfaceInfo.face.geometryMode == RD_GEOMETRY_NONE)) ||
                        ((adjoinMirrorSurface->surfaceInfo.face.type & 2))) ||
                       (adjoinMirrorTexinfo && (adjoinMirrorTexinfo->header.texture_type & 8) && (adjoinMirrorTexinfo->texture_ptr && adjoinMirrorTexinfo->texture_ptr->alpha_en & 1))
                       );
@@ -861,7 +861,7 @@ void sithRender_BuildVisibleSectorList(SithSector *sector, rdClipFrustum *frustu
             meshinfo_out.vertices = sithRender_aClipVertices;
             sithRender_faceView.vertexUVIdx = adjoinSurface->surfaceInfo.face.vertexUVIdx;
 
-            rdPrimit3_ClipFace(frustumArg, RD_GEOMODE_WIREFRAME, RD_LIGHTMODE_NOTLIT, RD_TEXTUREMODE_AFFINE, &sithRender_faceView, &meshinfo_out, &adjoinSurface->surfaceInfo.face.clipIdk);
+            rdPrimit3_ClipFace(frustumArg, RD_GEOMETRY_WIREFRAME, RD_LIGHTMODE_NOTLIT, RD_TEXTUREMODE_AFFINE, &sithRender_faceView, &meshinfo_out, &adjoinSurface->surfaceInfo.face.clipIdk);
 
             if ((((unsigned int)meshinfo_out.numVertices >= 3u) || (rdClip_g_faceStatus & CLIPSTAT_NONE_VISIBLE)) 
                 && ((rdClip_g_faceStatus & (CLIPSTAT_NEAR|CLIPSTAT_NONE_VISIBLE)) || ((adjoinIter->flags & 1) && bAdjoinIsTransparent))) 
@@ -1015,9 +1015,9 @@ void sithRender_NoClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t pre
         }
 
         sithRender_aVisibleSectors[sithRender_g_numVisibleSectors++] = sector;
-        if (!(sector->flags & SITH_SECTOR_AUTOMAPVISIBLE) && !(g_debugmodeFlags & DEBUGFLAG_NOCLIP)) // Added: don't send sighted stuff in noclip, otherwise the whole map reveals
+        if (!(sector->flags & SITH_SECTOR_SEEN) && !(g_debugmodeFlags & DEBUGFLAG_NOCLIP)) // Added: don't send sighted stuff in noclip, otherwise the whole map reveals
         {
-            sector->flags |= SITH_SECTOR_AUTOMAPVISIBLE;
+            sector->flags |= SITH_SECTOR_SEEN;
             if ( (sector->flags & SITH_SECTOR_COGLINKED) != 0 )
                 sithCog_SectorSendMessage(sector, 0, SITH_MESSAGE_SIGHTED);
         }
@@ -1051,8 +1051,8 @@ void sithRender_NoClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t pre
             }
 #endif
 
-            if ((thing->thingflags & SITH_TF_LIGHT)
-                 && !(thing->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)))
+            if ((thing->thingflags & SITH_TF_EMITLIGHT)
+                 && !(thing->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_DESTROYED)))
             {
                 if ( thing->light > 0.0 )
                 {
@@ -1063,7 +1063,7 @@ void sithRender_NoClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t pre
 
                 if ( (thing->type == SITH_THING_ACTOR || thing->type == SITH_THING_PLAYER) && lightIdx < 0x20 )
                 {
-                    if ( (thing->actorParams.typeflags & SITH_AF_FIELDLIGHT) != 0 && thing->actorParams.lightIntensity > 0.0 )
+                    if ( (thing->actorParams.typeflags & SITH_AF_HEADLIGHT) != 0 && thing->actorParams.lightIntensity > 0.0 )
                     {
                         rdMatrix_TransformPoint34(&vertex_out, &thing->actorParams.lightOffset, &thing->lookOrientation);
                         rdVector_Add3Acc(&vertex_out, &thing->position);
@@ -1172,7 +1172,7 @@ void sithRender_NoClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t pre
             }
 
             int bMirrorAdjoinIsTransparent = (((!adjoinMirrorSurface->surfaceInfo.face.material ||
-                        (adjoinMirrorSurface->surfaceInfo.face.geometryMode == RD_GEOMODE_NOTRENDERED)) ||
+                        (adjoinMirrorSurface->surfaceInfo.face.geometryMode == RD_GEOMETRY_NONE)) ||
                        ((adjoinMirrorSurface->surfaceInfo.face.type & 2))) ||
                       (adjoinMirrorTexinfo && (adjoinMirrorTexinfo->header.texture_type & 8) && (adjoinMirrorTexinfo->texture_ptr && adjoinMirrorTexinfo->texture_ptr->alpha_en & 1))
                       );
@@ -1251,9 +1251,9 @@ void sithRender_KindaClipAssignFrustum(SithSector *sector, rdClipFrustum *frustu
     }
 
     sithRender_aVisibleSectors[sithRender_g_numVisibleSectors++] = sector;
-    if (!(sector->flags & SITH_SECTOR_AUTOMAPVISIBLE) && !(g_debugmodeFlags & DEBUGFLAG_NOCLIP)) // Added: don't send sighted stuff in noclip, otherwise the whole map reveals
+    if (!(sector->flags & SITH_SECTOR_SEEN) && !(g_debugmodeFlags & DEBUGFLAG_NOCLIP)) // Added: don't send sighted stuff in noclip, otherwise the whole map reveals
     {
-        sector->flags |= SITH_SECTOR_AUTOMAPVISIBLE;
+        sector->flags |= SITH_SECTOR_SEEN;
         if ( (sector->flags & SITH_SECTOR_COGLINKED) != 0 )
             sithCog_SectorSendMessage(sector, 0, SITH_MESSAGE_SIGHTED);
     }
@@ -1275,8 +1275,8 @@ void sithRender_KindaClipAssignFrustum(SithSector *sector, rdClipFrustum *frustu
         if (++safeguard >= SITH_MAX_THINGS)
             break;
 
-        if ((thing->thingflags & SITH_TF_LIGHT)
-             && !(thing->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)))
+        if ((thing->thingflags & SITH_TF_EMITLIGHT)
+             && !(thing->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_DESTROYED)))
         {
             if ( thing->light > 0.0 )
             {
@@ -1287,7 +1287,7 @@ void sithRender_KindaClipAssignFrustum(SithSector *sector, rdClipFrustum *frustu
 
             if ( (thing->type == SITH_THING_ACTOR || thing->type == SITH_THING_PLAYER) && lightIdx < 0x20 )
             {
-                if ( (thing->actorParams.typeflags & SITH_AF_FIELDLIGHT) != 0 && thing->actorParams.lightIntensity > 0.0 )
+                if ( (thing->actorParams.typeflags & SITH_AF_HEADLIGHT) != 0 && thing->actorParams.lightIntensity > 0.0 )
                 {
                     rdMatrix_TransformPoint34(&vertex_out, &thing->actorParams.lightOffset, &thing->lookOrientation);
                     rdVector_Add3Acc(&vertex_out, &thing->position);
@@ -1417,7 +1417,7 @@ void sithRender_KindaClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t 
             }
 
             int bMirrorAdjoinIsTransparent = (((!adjoinMirrorSurface->surfaceInfo.face.material ||
-                        (adjoinMirrorSurface->surfaceInfo.face.geometryMode == RD_GEOMODE_NOTRENDERED)) ||
+                        (adjoinMirrorSurface->surfaceInfo.face.geometryMode == RD_GEOMETRY_NONE)) ||
                        ((adjoinMirrorSurface->surfaceInfo.face.type & 2))) ||
                       (adjoinMirrorTexinfo && (adjoinMirrorTexinfo->header.texture_type & 8) && (adjoinMirrorTexinfo->texture_ptr && adjoinMirrorTexinfo->texture_ptr->alpha_en & 1))
                       );
@@ -1894,8 +1894,8 @@ void sithRender_RenderSectors()
                 if (UNLIKELY(bIsSkySurface))
                 {
                     geoMode = sithRender_geoMode;
-                    if ( sithRender_geoMode > RD_GEOMODE_SOLIDCOLOR)
-                        geoMode = RD_GEOMODE_SOLIDCOLOR;
+                    if ( sithRender_geoMode > RD_GEOMETRY_SOLID)
+                        geoMode = RD_GEOMETRY_SOLID;
                 }
                 else
                 {
@@ -2181,7 +2181,7 @@ void sithRender_RenderSectors()
                     v78[0] = v65->surfaceInfo.face.vertexPosIdx[v19];
                     v78[1] = v65->surfaceInfo.face.vertexPosIdx[v71];
                     v78[2] = v65->surfaceInfo.face.vertexPosIdx[v18];
-                    if ( v20->geometryMode >= RD_GEOMODE_TEXTURED)
+                    if ( v20->geometryMode >= RD_GEOMETRY_FULL)
                     {
                         v79[0] = v65->surfaceInfo.face.vertexUVIdx[v19];
                         v79[1] = v65->surfaceInfo.face.vertexUVIdx[v71];
@@ -2409,7 +2409,7 @@ LABEL_150:
                 continue;
             }
 
-            if (i->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)) {
+            if (i->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_DESTROYED)) {
                 continue;
             }
 
@@ -2417,7 +2417,7 @@ LABEL_150:
                 continue;
             }
 
-            if (i->rdthing.type != RD_THINGTYPE_MODEL) {
+            if (i->rdthing.type != RD_THING_MODEL3) {
                 continue;
             }
 
@@ -2445,7 +2445,7 @@ LABEL_150:
 
             // MOTS added
 #ifdef JKM_LIGHTING
-            if ((i->archlightIdx != -1) && ((i->rdthing).type == RD_THINGTYPE_MODEL)) {
+            if ((i->archlightIdx != -1) && ((i->rdthing).type == RD_THING_MODEL3)) {
                 rdModel3* iVar22 = i->rdthing.model3;
                 for (int k = 0; k < 4; k++) {
                     for (int j = 0; j < iVar22->geosets[k].numMeshes; j++) 
@@ -2480,7 +2480,7 @@ LABEL_150:
 
             // MOTS added
 #ifdef JKM_LIGHTING
-            if (((i->archlightIdx != -1) && (i->rdthing.type == RD_THINGTYPE_MODEL)) && (rdGetVertexColorMode() == 0)) {
+            if (((i->archlightIdx != -1) && (i->rdthing.type == RD_THING_MODEL3)) && (rdGetVertexColorMode() == 0)) {
                 rdModel3* iVar14 = i->rdthing.model3;
                 for (int k = 0; k < 4; k++) {
                     for (int j = 0; j < iVar14->geosets[k].numMeshes; j++) 
@@ -2554,8 +2554,8 @@ void sithRender_BuildSectorThingList(SithSector *sector, flex_t prev, flex_t dis
             if ( sithRender_numThingLights >= 0x20 )
                 break;
 
-            if ((i->thingflags & SITH_TF_LIGHT) 
-                && !(i->thingflags & (SITH_TF_DISABLED|SITH_TF_WILLBEREMOVED)))
+            if ((i->thingflags & SITH_TF_EMITLIGHT) 
+                && !(i->thingflags & (SITH_TF_DISABLED|SITH_TF_DESTROYED)))
             {
                 if ( i->light > 0.0 )
                 {
@@ -2567,7 +2567,7 @@ void sithRender_BuildSectorThingList(SithSector *sector, flex_t prev, flex_t dis
                 if ( (i->type == SITH_THING_ACTOR || i->type == SITH_THING_PLAYER) && sithRender_numThingLights < 0x20 )
                 {
                     // Actors all have a small amount of light
-                    if ( (i->actorParams.typeflags & SITH_AF_FIELDLIGHT) && i->actorParams.lightIntensity > 0.0 )
+                    if ( (i->actorParams.typeflags & SITH_AF_HEADLIGHT) && i->actorParams.lightIntensity > 0.0 )
                     {
                         rdMatrix_TransformPoint34(&vertex_out, &i->actorParams.lightOffset, &i->lookOrientation);
                         rdVector_Add3Acc(&vertex_out, &i->position);
@@ -2730,7 +2730,7 @@ void sithRender_RenderThings()
                 break;
             }
 
-            if ( (thingIter->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)) == 0
+            if ( (thingIter->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_DESTROYED)) == 0
               && (thingIter->thingflags & SITH_TF_LEVELGEO) == 0
               && ((sithCamera_g_pCurCamera->cameraPerspective & 0xFC) != 0 || thingIter != sithCamera_g_pCurCamera->primaryFocus) )
             {
@@ -2738,11 +2738,11 @@ void sithRender_RenderThings()
                 
                 //printf("%f %f %f ; %f %f %f\n", thingIter->screenPos.x, thingIter->screenPos.y, thingIter->screenPos.z, thingIter->position.x, thingIter->position.y, thingIter->position.z);
                 
-                if ( rdroid_curAcceleration > 0 || thingIter->rdthing.type != RD_THINGTYPE_SPRITE3 || sithRender_numSpritesToDraw < 8 )
+                if ( rdroid_curAcceleration > 0 || thingIter->rdthing.type != RD_THING_SPRITE3 || sithRender_numSpritesToDraw < 8 )
                 {
                     // Allow things to peek their light around corners w/o screwing with frustums
 #ifdef QOL_IMPROVEMENTS
-                    if ( (thingIter->thingflags & SITH_TF_LIGHT) != 0
+                    if ( (thingIter->thingflags & SITH_TF_EMITLIGHT) != 0
                       && thingIter->light > 0.0
                       && a2 <= stdMath_Clamp(thingIter->light, 0.0, 1.0) )
                     {
@@ -2765,24 +2765,24 @@ void sithRender_RenderThings()
                     clipRadius = 0.0f;
                     switch ( thingIter->rdthing.type )
                     {
-                        case RD_THINGTYPE_MODEL:
+                        case RD_THING_MODEL3:
                             radius = thingIter->rdthing.model3->radius;
                             clipRadius = radius;
                             clippingVal = rdClip_SphereInFrustrum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
                             break;
 
-                        case RD_THINGTYPE_SPRITE3:
+                        case RD_THING_SPRITE3:
                             clipRadius = thingIter->rdthing.sprite3->radius;
                             ++sithRender_numSpritesToDraw;
                             clippingVal = rdClip_SphereInFrustrum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
                             break;
 
-                        case RD_THINGTYPE_PARTICLECLOUD:
+                        case RD_THING_PARTICLE:
                             clipRadius = thingIter->rdthing.particlecloud->cloudRadius;
                             clippingVal = rdClip_SphereInFrustrum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
                             break;
 
-                        case RD_THINGTYPE_POLYLINE:
+                        case RD_THING_POLYLINE:
                             radius = thingIter->rdthing.polyline->length;
                             clipRadius = radius;
                             clippingVal = rdClip_SphereInFrustrum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
@@ -2812,7 +2812,7 @@ void sithRender_RenderThings()
                     }
 #endif
 
-                    if ( thingIter->rdthing.type == RD_THINGTYPE_MODEL )
+                    if ( thingIter->rdthing.type == RD_THING_MODEL3 )
                     {
                         model3 = thingIter->rdthing.model3;
 
@@ -2894,7 +2894,7 @@ void sithRender_RenderThings()
 
                     // Moved this before culling
 #ifndef QOL_IMPROVEMENTS
-                    if ( (thingIter->thingflags & SITH_TF_LIGHT) != 0
+                    if ( (thingIter->thingflags & SITH_TF_EMITLIGHT) != 0
                       && thingIter->light > 0.0
                       && a2 <= stdMath_Clamp(thingIter->light, 0.0, 1.0) )
                     {
@@ -2991,7 +2991,7 @@ int sithRender_RenderThing(SithThing *pThing)
 
 #ifdef TARGET_TWL
     int skip_this_thing = 0;
-    flex_t realDepth = pThing->screenPos.y - (pThing->rdthing.type == RD_THINGTYPE_MODEL ? pThing->rdthing.model3->radius : (flex_t)0.0);
+    flex_t realDepth = pThing->screenPos.y - (pThing->rdthing.type == RD_THING_MODEL3 ? pThing->rdthing.model3->radius : (flex_t)0.0);
     if (realDepth > 3.0) {
         skip_this_thing = 1;
     }
@@ -3169,8 +3169,8 @@ void sithRender_RenderAlphaAdjoins()
         meshinfo_out.vertices = sithRender_aClipVertices;
 
         // Added: Just in case
-        if (!sithRender_faceView.vertexUVIdx && v9->geometryMode > RD_GEOMODE_SOLIDCOLOR) {
-            v9->geometryMode = RD_GEOMODE_SOLIDCOLOR;
+        if (!sithRender_faceView.vertexUVIdx && v9->geometryMode > RD_GEOMETRY_SOLID) {
+            v9->geometryMode = RD_GEOMETRY_SOLID;
         }
 
 #ifdef SITHRENDER_SPHERE_TEST_SURFACES
@@ -3278,7 +3278,7 @@ void sithRender_RenderAlphaAdjoins()
 #endif
 
         v23 = 1;
-        if ( v9->geometryMode >= RD_GEOMODE_TEXTURED)
+        if ( v9->geometryMode >= RD_GEOMETRY_FULL)
             v23 = 3;
         if ( v9->lightingMode >= RD_LIGHTMODE_GOURAUD)
             v23 |= 4u;

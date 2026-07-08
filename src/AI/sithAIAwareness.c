@@ -99,7 +99,7 @@ int sithAIAwareness_Update(int32_t a, SithEventParams* b)
         {
             if ( i->thing )
             {
-                if ( (i->thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
+                if ( (i->thing->thingflags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) == 0 )
                 {
                     SithSector* v6 = i->thing->sector;
                     if ( v6 )

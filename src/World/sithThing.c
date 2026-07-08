@@ -215,7 +215,7 @@ void sithThing_Update(flex_t deltaSeconds, int deltaMs)
         int bCanAlwaysUpdatePhysics = pThingIter->type == SITH_THING_PLAYER || pThingIter->type == SITH_THING_PARTICLE || pThingIter->type == SITH_THING_WEAPON || pThingIter->type == SITH_THING_DEBRIS || pThingIter->type == SITH_THING_COG;
 #endif
 
-        if (!(pThingIter->thingflags & SITH_TF_WILLBEREMOVED))
+        if (!(pThingIter->thingflags & SITH_TF_DESTROYED))
         {
 
             if ( pThingIter->lifeLeftMs )
@@ -233,7 +233,7 @@ void sithThing_Update(flex_t deltaSeconds, int deltaMs)
             if ( (pThingIter->thingflags & SITH_TF_DISABLED) != 0 )
                 continue;
 
-            if ( (pThingIter->thingflags & (SITH_TF_TIMER|SITH_TF_PULSE)) != 0 )
+            if ( (pThingIter->thingflags & (SITH_TF_TIMERSET|SITH_TF_PULSESET)) != 0 )
                 sithCog_UpdateThingTimer(pThingIter);
 
             switch ( pThingIter->controlType )
@@ -309,7 +309,7 @@ void sithThing_UpdateMove(SithThing *pThing, flex_t deltaSecs)
     flex_t arg4a; // [esp+2Ch] [ebp+8h]
 
     v2 = 0;
-    if ((pThing->attach_flags & SITH_ATTACH_NO_MOVE))
+    if ((pThing->attach_flags & SITH_ATTACH_NOMOVE))
         return;
 
     if ( pThing->moveType == SITH_MT_PHYSICS )
@@ -322,7 +322,7 @@ void sithThing_UpdateMove(SithThing *pThing, flex_t deltaSecs)
         rdVector_Zero3(&pThing->field_268);
     }
 
-    if (pThing->attach_flags && pThing->attach_flags & SITH_ATTACH_WORLDSURFACE)
+    if (pThing->attach_flags && pThing->attach_flags & SITH_ATTACH_SURFACE)
     {
         v5 = pThing->attachedSurface;
         if ( (v5->surfaceFlags & SITH_SURFACE_SCROLLING) != 0 )
@@ -334,7 +334,7 @@ void sithThing_UpdateMove(SithThing *pThing, flex_t deltaSecs)
     
     if (rdVector_IsZero3(&pThing->field_268))
     {
-        if ( pThing->moveType == SITH_MT_PHYSICS && (pThing->attach_flags & (SITH_ATTACH_THINGSURFACE|SITH_ATTACH_THING)) != 0 && pThing->attachedThing->moveType == SITH_MT_PATH )
+        if ( pThing->moveType == SITH_MT_PHYSICS && (pThing->attach_flags & (SITH_ATTACH_THINGFACE|SITH_ATTACH_THING)) != 0 && pThing->attachedThing->moveType == SITH_MT_PATH )
             sithPhysics_FindFloor(pThing, 0);
     }
     else
@@ -384,7 +384,7 @@ void sithThing_DestroyDyingThing(SithThing* pThing)
             sithParticle_DestroyParticle(pThing);
             break;
         default:
-            pThing->thingflags |= SITH_TF_WILLBEREMOVED;
+            pThing->thingflags |= SITH_TF_DESTROYED;
             if (pThing->thingflags & SITH_TF_CAPTURED && !(pThing->thingflags & SITH_TF_INVULN))
                 sithCog_ThingSendMessage(pThing, 0, SITH_MESSAGE_REMOVED);
             break;
@@ -444,7 +444,7 @@ SithThing* sithThing_GetGuidThing(int thing_id)
 
 void sithThing_DestroyThing(SithThing* pThing)
 {
-    pThing->thingflags |= SITH_TF_WILLBEREMOVED;
+    pThing->thingflags |= SITH_TF_DESTROYED;
     if ( (pThing->thingflags & SITH_TF_CAPTURED) != 0 && (pThing->thingflags & SITH_TF_INVULN) == 0 )
         sithCog_ThingSendMessage(pThing, 0, SITH_MESSAGE_REMOVED);
 }
@@ -460,7 +460,7 @@ flex_t sithThing_DamageThing(SithThing *sender, SithThing *reciever, flex_t amou
 
     if ( amount <= 0.0 )
         return 0.0;
-    if ( (sender->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0 )
+    if ( (sender->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_DESTROYED)) != 0 )
         return 0.0;
     if ( (sender->thingflags & SITH_TF_CAPTURED) != 0 && (sender->thingflags & SITH_TF_INVULN) == 0 )
     {
@@ -777,7 +777,7 @@ void sithThing_EnterSector(SithThing* pThing, SithSector *sector, int a3, int a4
 
     if (sector->flags & SITH_SECTOR_UNDERWATER)
     {
-        if ( pThing->attach_flags && !(pThing->attach_flags & SITH_ATTACH_NO_MOVE) && pThing->moveType == SITH_MT_PHYSICS )
+        if ( pThing->attach_flags && !(pThing->attach_flags & SITH_ATTACH_NOMOVE) && pThing->moveType == SITH_MT_PHYSICS )
             sithThing_DetachThing(pThing);
 
         if (!(pThing->thingflags & SITH_TF_WATER))
@@ -806,7 +806,7 @@ void sithThing_EnterWater(SithThing* pThing, int a2)
         sithPuppet_SetMoveMode(pThing, 1);
     if ( (pThing->thingflags & SITH_TF_DROWNS) != 0 )
     {
-        pThing->thingflags |= SITH_TF_WILLBEREMOVED;
+        pThing->thingflags |= SITH_TF_DESTROYED;
         if ( (pThing->thingflags & SITH_TF_CAPTURED) != 0 && (pThing->thingflags & SITH_TF_INVULN) == 0 )
             sithCog_ThingSendMessage(pThing, 0, SITH_MESSAGE_REMOVED);
     }
@@ -880,7 +880,7 @@ void sithThing_ExitWater(SithThing* pThing, int a2)
 
     if ( (pThing->thingflags & SITH_TF_WATERCREATURE) != 0 )
     {
-        pThing->thingflags |= SITH_TF_WILLBEREMOVED;
+        pThing->thingflags |= SITH_TF_DESTROYED;
         if ( (pThing->thingflags & SITH_TF_CAPTURED) != 0 && (pThing->thingflags & SITH_TF_INVULN) == 0 )
             sithCog_ThingSendMessage(pThing, 0, SITH_MESSAGE_REMOVED);
     }
@@ -933,7 +933,7 @@ SithThing* sithThing_Create(uint32_t thingType)
             int i = 0;
             for (uint32_t uVar5 = 0; uVar5 < pWorld->numThingsLoaded; uVar5++) {
                 SithThing* pThing = &pWorld->things[uVar5];
-                if (((pThing->thingflags & SITH_TF_WILLBEREMOVED) != 0) ||
+                if (((pThing->thingflags & SITH_TF_DESTROYED) != 0) ||
                         (((pThing->type == SITH_THING_DEBRIS || (pThing->type == SITH_THING_PARTICLE))
                           && (pThing->lifeLeftMs != 0))))
                 {
@@ -991,7 +991,7 @@ int sithThing_SetThingModel(SithThing* pThing, rdModel3 *pModel)
     rdPuppet *v4; // ebx
 
     v2 = &pThing->rdthing;
-    if ( pThing->rdthing.type == RD_THINGTYPE_MODEL && pThing->rdthing.model3 == pModel )
+    if ( pThing->rdthing.type == RD_THING_MODEL3 && pThing->rdthing.model3 == pModel )
         return 0;
     v4 = pThing->rdthing.puppet;
     pThing->rdthing.puppet = 0;
@@ -1022,11 +1022,11 @@ SithThing* sithThing_SetThingBasedOn(SithThing *pThing, SithThing *pTemplateThin
     if ( pTemplateThing )
     {
         stdPlatform_Memcpy32(pThing, pTemplateThing, sizeof(SithThing)); // Added: word-safe (things/templates may be word-addressable-only)
-        if ( pThing->rdthing.type == RD_THINGTYPE_MODEL )
+        if ( pThing->rdthing.type == RD_THING_MODEL3 )
         {
             rdThing_SetModel3(&pThing->rdthing, pThing->rdthing.model3);
         }
-        else if ( pThing->rdthing.type == RD_THINGTYPE_PARTICLECLOUD )
+        else if ( pThing->rdthing.type == RD_THING_PARTICLE )
         {
             rdThing_SetParticleCloud(&pThing->rdthing, pThing->rdthing.particlecloud);
         }
@@ -1102,11 +1102,11 @@ SithThing* sithThing_CreateThing(SithThing *pTemplateThing, SithThing *spawnThin
     rdVector3 v7; // [esp+18h] [ebp-18h] BYREF
     rdVector3 dstVec; // [esp+24h] [ebp-Ch] BYREF
 
-    if ( pTemplateThing->rdthing.type == RD_THINGTYPE_MODEL )
+    if ( pTemplateThing->rdthing.type == RD_THING_MODEL3 )
     {
         diffVec = pTemplateThing->rdthing.model3->insertOffset;
     }
-    else if ( pTemplateThing->rdthing.type == RD_THINGTYPE_SPRITE3 )
+    else if ( pTemplateThing->rdthing.type == RD_THING_SPRITE3 )
     {
         diffVec = pTemplateThing->rdthing.sprite3->offset;
     }
@@ -1114,11 +1114,11 @@ SithThing* sithThing_CreateThing(SithThing *pTemplateThing, SithThing *spawnThin
     {
         rdVector_Zero3(&diffVec);
     }
-    if ( spawnThing->rdthing.type == RD_THINGTYPE_MODEL )
+    if ( spawnThing->rdthing.type == RD_THING_MODEL3 )
     {
         v7 = spawnThing->rdthing.model3->insertOffset;
     }
-    else if ( spawnThing->rdthing.type == RD_THINGTYPE_SPRITE3 )
+    else if ( spawnThing->rdthing.type == RD_THING_SPRITE3 )
     {
         v7 = spawnThing->rdthing.sprite3->offset;
     }
@@ -1252,13 +1252,13 @@ void sithThing_AttachThingToThingFace(SithThing *a1, SithThing *a2, rdFace *a3, 
     v18 = 1;
     if ( a1->attach_flags )
     {
-        if ( (a1->attach_flags & SITH_ATTACH_THINGSURFACE) != 0 && a1->attachedThing == a2 && (rdFace *)a1->attachedSufaceInfo == a3 )
+        if ( (a1->attach_flags & SITH_ATTACH_THINGFACE) != 0 && a1->attachedThing == a2 && (rdFace *)a1->attachedSufaceInfo == a3 )
             return;
         v18 = 0;
         sithThing_DetachThing(a1);
     }
     v7 = a3->vertexPosIdx;
-    a1->attach_flags = SITH_ATTACH_THINGSURFACE;
+    a1->attach_flags = SITH_ATTACH_THINGFACE;
     a1->attachedSufaceInfo = (sithSurfaceInfo *)a3;
     v8 = *v7;
     a1->attachedThing = a2;
@@ -1350,9 +1350,9 @@ int sithThing_DetachThing(SithThing* pThing)
     rdVector3 a2; // [esp+Ch] [ebp-Ch] BYREF
 
     v2 = &pThing->attach_flags;
-    if ( (pThing->attach_flags & (SITH_ATTACH_THING|SITH_ATTACH_THINGSURFACE)) == 0 )
+    if ( (pThing->attach_flags & (SITH_ATTACH_THING|SITH_ATTACH_THINGFACE)) == 0 )
     {
-        if ( (pThing->attach_flags & SITH_ATTACH_WORLDSURFACE) != 0 )
+        if ( (pThing->attach_flags & SITH_ATTACH_SURFACE) != 0 )
         {
             attached = pThing->attachedSurface;
             if ( (attached->surfaceFlags & SITH_SURFACE_SCROLLING) != 0 && pThing->moveType == SITH_MT_PHYSICS )
@@ -1653,7 +1653,7 @@ int sithThing_ParseThingArg(StdConffileArg *arg, SithThing* pThing, int param)
 
     switch ( param )
     {
-        case THINGPARAM_TYPE:
+        case SITHTHING_ARG_TYPE:
             v3 = SITH_THING_FREE;
             for (int i = 0; i < NUM_THING_TYPES; i++)
             {
@@ -1742,7 +1742,7 @@ int sithThing_ParseThingArg(StdConffileArg *arg, SithThing* pThing, int param)
                 goto LABEL_56;
             pThing->light = light;
             pThing->lightMin = light;
-            pThing->thingflags |= SITH_TF_LIGHT;
+            pThing->thingflags |= SITH_TF_EMITLIGHT;
             result = 1;
             break;
         case THINGPARAM_SOUNDCLASS:
@@ -1965,7 +1965,7 @@ void sithThing_SyncThings()
         }
         printf("%u Syncing explicitly: 0x%08x type %x, flags %x\n", playerThingIdx, sithNet_aSyncThings[v0]->thing_id, sithNet_aSyncThings[v0]->type, sithNet_aSyncFlags[v0]);
 #endif
-        if (sithNet_aSyncFlags[v0] & THING_SYNC_FULL)
+        if (sithNet_aSyncFlags[v0] & SITHTHING_SYNC_FULL)
         {
             // Added: this used to be outside the loop?
             sithDSSThing_FullDescription(sithNet_aSyncThings[v0], -1, 255);
@@ -1973,10 +1973,10 @@ void sithThing_SyncThings()
         }
         else
         {
-            if (sithNet_aSyncFlags[v0] & THING_SYNC_STATE)
+            if (sithNet_aSyncFlags[v0] & SITHTHING_SYNC_STATE)
                 sithDSSThing_UpdateState(sithNet_aSyncThings[v0], -1, 255);
 
-            if (sithNet_aSyncFlags[v0] & THING_SYNC_POS)
+            if (sithNet_aSyncFlags[v0] & SITHTHING_SYNC_POS)
                 sithDSSThing_Pos(sithNet_aSyncThings[v0], -1, 0);
         }
 

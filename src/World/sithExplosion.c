@@ -17,7 +17,7 @@ void sithExplosion_CreateThing(SithThing *explosion)
     rdVector3 rot; // [esp+Ch] [ebp-Ch] BYREF
 
     explosion->explosionParams.lifeLeftMs = explosion->lifeLeftMs;
-    if ( (explosion->explosionParams.typeflags & SITHEXPLOSION_FLAG_ANIMATED_SPRITE) != 0 && explosion->rdthing.type == RD_THINGTYPE_SPRITE3 )
+    if ( (explosion->explosionParams.typeflags & SITHEXPLOSION_FLAG_ANIMATED_SPRITE) != 0 && explosion->rdthing.type == RD_THING_SPRITE3 )
     {
         v3 = explosion->rdthing.sprite3->face.material;
         if ( v3 && (v4 = v3->num_texinfo, v4 > 1) )
@@ -50,7 +50,7 @@ void sithExplosion_Update(SithThing *explosion)
         explosion->explosionParams.typeflags &= ~SITHEXPLOSION_FLAG_HAS_BLAST_PHASE;
     }
     if ((explosion->explosionParams.typeflags & SITHEXPLOSION_FLAG_VARIABLE_LIGHT) 
-        && (explosion->thingflags & SITH_TF_LIGHT))
+        && (explosion->thingflags & SITH_TF_EMITLIGHT))
     {
         if (explosion->lifeLeftMs <= explosion->explosionParams.blastTime)
         {
@@ -97,7 +97,7 @@ void sithExplosion_MakeBlast(SithThing *explosion)
                    || v4->signature != explosion->child_signature)
                   && sithCollision_HasLOS(explosion, v4, 1) )
                 {
-                    if ( force != 0.0 && v4->moveType == SITH_MT_PHYSICS && (v4->physicsParams.physflags & SITH_PF_FEELBLASTFORCE) != 0 )
+                    if ( force != 0.0 && v4->moveType == SITH_MT_PHYSICS && (v4->physicsParams.physflags & SITH_PF_USEBLASTFORCE) != 0 )
                     {
                         rdVector_Scale3(&a2, &i->hitNorm, -(a1a * force));
                         sithPhysics_ApplyForce(v4, &a2);

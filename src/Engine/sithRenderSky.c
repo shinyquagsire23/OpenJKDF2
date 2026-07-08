@@ -41,7 +41,7 @@ void sithRenderSky_HorizonFaceToPlane(rdProcEntry *pProcEntry, sithSurfaceInfo *
     flex_d_t tmp1;
     flex_d_t tmp2;
 
-    pProcEntry->geometryMode = sithRender_geoMode > RD_GEOMODE_TEXTURED ? RD_GEOMODE_TEXTURED : sithRender_geoMode;
+    pProcEntry->geometryMode = sithRender_geoMode > RD_GEOMETRY_FULL ? RD_GEOMETRY_FULL : sithRender_geoMode;
     pProcEntry->lightingMode = sithRender_lightMode > RD_LIGHTMODE_FULLYLIT ? RD_LIGHTMODE_FULLYLIT : sithRender_lightMode;
     pProcEntry->textureMode = sithRender_texMode > RD_TEXTUREMODE_AFFINE ? RD_TEXTUREMODE_AFFINE : sithRender_texMode;
     
@@ -88,7 +88,7 @@ void sithRenderSky_CeilingFaceToPlane(rdProcEntry *pProcEntry, sithSurfaceInfo *
     rdVector3 a2a;
     rdVector3 vertex_out;
 
-    pProcEntry->geometryMode = sithRender_geoMode > RD_GEOMODE_TEXTURED ? RD_GEOMODE_TEXTURED : sithRender_geoMode;
+    pProcEntry->geometryMode = sithRender_geoMode > RD_GEOMETRY_FULL ? RD_GEOMETRY_FULL : sithRender_geoMode;
     pProcEntry->lightingMode = sithRender_lightMode > RD_LIGHTMODE_FULLYLIT ? RD_LIGHTMODE_FULLYLIT : sithRender_lightMode;
     // Weird, no texture mode, though idk if the affine mode even worked
 #ifdef TARGET_TWL
@@ -154,7 +154,7 @@ void sithRenderSky_CeilingFaceToPlane(rdProcEntry *pProcEntry, sithSurfaceInfo *
 
 #ifdef QOL_IMPROVEMENTS
     /*if (bHitTestFailed) {
-        pProcEntry->geometryMode = RD_GEOMODE_SOLIDCOLOR;
+        pProcEntry->geometryMode = RD_GEOMETRY_SOLID;
     }*/
 #endif
 }

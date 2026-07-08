@@ -34,7 +34,7 @@ SithThing* sithAICmd_NearestPlayer(SithAIControlBlock *actor)
         SithThing* playerThing = playerInfo->playerThing;
         if (!playerThing) continue;
 
-        if ((playerThing->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) || playerThing->type != SITH_THING_PLAYER)
+        if ((playerThing->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_DESTROYED)) || playerThing->type != SITH_THING_PLAYER)
             continue;
 
         flex_t dist = rdVector_Dist3(&playerThing->position, &actor->thing->position);
@@ -83,7 +83,7 @@ void sithAICmd_Startup()
     sithAI_RegisterInstinct("follow", (sithAICommandFunc_t)sithAICmd_Follow,
         SITHAI_MODE_ATTACKING,   // allowed flags
         SITHAI_MODE_FLEEING,            // disallowed flags
-        SITHAI_MODE_FLEEING|SITHAI_MODE_TARGET_VISIBLE|SITHAI_MODE_ACTIVE);
+        SITHAI_MODE_FLEEING|SITHAI_MODE_TARGETVISIBLE|SITHAI_MODE_ACTIVE);
     sithAI_RegisterInstinct("turretfire", (sithAICommandFunc_t)sithAICmd_TurretFire, 
         SITHAI_MODE_ATTACKING,   // allowed flags
         SITHAI_MODE_FLEEING,            // disallowed flags
@@ -95,7 +95,7 @@ void sithAICmd_Startup()
     sithAI_RegisterInstinct("jump", (sithAICommandFunc_t)sithAICmd_Jump, 
         0,                      // allowed flags
         0,                      // disallowed flags
-        SITHAI_MODE_TARGET_VISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_SEARCHING);
+        SITHAI_MODE_TARGETVISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_SEARCHING);
     sithAI_RegisterInstinct("randomturn", (sithAICommandFunc_t)sithAICmd_RandomTurn, 
         SITHAI_MODE_SEARCHING,  // allowed flags
         0,                      // disallowed flags
@@ -107,13 +107,13 @@ void sithAICmd_Startup()
     sithAI_RegisterInstinct("flee", (sithAICommandFunc_t)sithAICmd_Flee,
         SITHAI_MODE_FLEEING,    // allowed flags
         0,                      // disallowed flags
-        SITHAI_MODE_FLEEING|SITHAI_MODE_TARGET_VISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_UNK100|SITHAI_MODE_SEARCHING|SITHAI_MODE_MOVING);
+        SITHAI_MODE_FLEEING|SITHAI_MODE_TARGETVISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_UNK100|SITHAI_MODE_SEARCHING|SITHAI_MODE_MOVING);
     sithAI_RegisterInstinct("sensedanger", (sithAICommandFunc_t)sithAICmd_SenseDanger,
         SITHAI_MODE_SEARCHING, // SenseDanger allowed flags
         SITHAI_MODE_FLEEING,   // SenseDanger disallowed flags
         SITHAI_MODE_SEARCHING|SITHAI_MODE_ATTACKING|SITHAI_MODE_MOVING); // SenseDanger idk?
     sithAI_RegisterInstinct("hitandrun", (sithAICommandFunc_t)sithAICmd_HitAndRun, 
-        SITHAI_MODE_FLEEING|SITHAI_MODE_TARGET_VISIBLE, // HitAndRun allowed flags
+        SITHAI_MODE_FLEEING|SITHAI_MODE_TARGETVISIBLE, // HitAndRun allowed flags
         0,                            // HitAndRun disallowed flags
         0);                           // HitAndRun idk?
     sithAI_RegisterInstinct("retreat", (sithAICommandFunc_t)sithAICmd_Retreat, 
@@ -126,7 +126,7 @@ void sithAICmd_Startup()
         0);
     sithAI_RegisterInstinct("blindfire", (sithAICommandFunc_t)sithAICmd_BlindFire, 
         SITHAI_MODE_ATTACKING, // allowed flags
-        SITHAI_MODE_FLEEING|SITHAI_MODE_TARGET_VISIBLE, // disallowed flags
+        SITHAI_MODE_FLEEING|SITHAI_MODE_TARGETVISIBLE, // disallowed flags
         0);
     sithAI_RegisterInstinct("returnhome", (sithAICommandFunc_t)sithAICmd_ReturnHome, 
         0, // allowed flags
@@ -147,7 +147,7 @@ void sithAICmd_Startup()
     sithAI_RegisterInstinct("withdraw", (sithAICommandFunc_t)sithAICmd_Withdraw,
         SITHAI_MODE_FLEEING, // allowed flags
         0, // disallowed flags
-        SITHAI_MODE_FLEEING|SITHAI_MODE_TARGET_VISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_UNK100|SITHAI_MODE_SEARCHING|SITHAI_MODE_MOVING);
+        SITHAI_MODE_FLEEING|SITHAI_MODE_TARGETVISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_UNK100|SITHAI_MODE_SEARCHING|SITHAI_MODE_MOVING);
     sithAI_RegisterInstinct("dodge", (sithAICommandFunc_t)sithAICmd_Dodge, 
         0, // allowed flags
         0, // disallowed flags
@@ -180,7 +180,7 @@ int sithAICmd_Follow(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAII
 
     if ( flags > SITHAI_MODE_ACTIVE )
     {
-        if ( flags != SITHAI_MODE_TARGET_VISIBLE )
+        if ( flags != SITHAI_MODE_TARGETVISIBLE )
         {
             if ( flags != SITHAI_MODE_FLEEING || (actor->flags & SITHAI_MODE_ACTIVE) == 0 || instinct->param0 == 0.0 )
                 return 0;
@@ -375,7 +375,7 @@ int sithAICmd_Crouch(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAII
     instinct->nextUpdate = sithTime_g_msecGameTime + aiclass->argsAsInt[0];
     if (!(actor->flags & SITHAI_MODE_MOVING) 
         && (actor->flags & SITHAI_MODE_ATTACKING)
-        && (actor->flags & SITHAI_MODE_TARGET_VISIBLE))
+        && (actor->flags & SITHAI_MODE_TARGETVISIBLE))
     {
         actor->thing->physicsParams.physflags |= SITH_PF_CROUCHING;
         return 0;
@@ -486,24 +486,24 @@ int sithAICmd_LobFire(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAI
     }
     if ( !v7 )
         return 0;
-    if ( (v7->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
+    if ( (v7->thingflags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) == 0 )
     {
         if ( aiclass->argsAsFloat[5] > _frand() )
             v5 = 1;
         if ( sithAI_FireWeapon(actor, aiclass->argsAsFloat[2], aiclass->argsAsFloat[3], aiclass->argsAsFloat[1], aiclass->argsAsFloat[4], v5, 2) )
         {
-            actor->flags |= SITHAI_MODE_TARGET_VISIBLE;
+            actor->flags |= SITHAI_MODE_TARGETVISIBLE;
             v11 = sithTime_g_msecGameTime + aiclass->argsAsInt[0];
             instinct->nextUpdate = v11;
             actor->field_288 = v11;
             return 0;
         }
         sithAI_SetLookFrame(actor, &v7->position);
-        actor->flags |= SITHAI_MODE_TARGET_VISIBLE;
+        actor->flags |= SITHAI_MODE_TARGETVISIBLE;
         instinct->nextUpdate = sithTime_g_msecGameTime + 500;
         return 0;
     }
-    if ( (actor->flags & SITHAI_MODE_TARGET_VISIBLE) != 0 )
+    if ( (actor->flags & SITHAI_MODE_TARGETVISIBLE) != 0 )
     {
         sithSoundClass_PlayModeRandom(v6, SITH_SC_VICTORY);
         sithPuppet_PlayMode(actor->thing, SITH_ANIM_VICTORY, 0);
@@ -514,7 +514,7 @@ int sithAICmd_LobFire(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAI
         }
     }
 
-    actor->flags &= ~(SITHAI_MODE_TARGET_VISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_ATTACKING);
+    actor->flags &= ~(SITHAI_MODE_TARGETVISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_ATTACKING);
     actor->flags |= SITHAI_MODE_SEARCHING;
     return 1;
 }
@@ -567,7 +567,7 @@ int sithAICmd_PrimaryFire(SithAIControlBlock *actor, SithAIInstinct *aiclass, Si
     }
     if ( !actor->pDistractor )
         return 0;
-    if ( (actor->pDistractor->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
+    if ( (actor->pDistractor->thingflags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) == 0 )
     {
         if ( aiclass->argsAsFloat[6] != 0.0 && aiclass->argsAsFloat[6] >= _frand() )
             v5 = 1;
@@ -576,7 +576,7 @@ int sithAICmd_PrimaryFire(SithAIControlBlock *actor, SithAIInstinct *aiclass, Si
 
         if ( sithAI_FireWeapon(actor, aiclass->argsAsFloat[4], aiclass->argsAsFloat[2], aiclass->argsAsFloat[1], aiclass->argsAsFloat[3], v6, v5) )
         {
-            actor->flags |= SITHAI_MODE_TARGET_VISIBLE;
+            actor->flags |= SITHAI_MODE_TARGETVISIBLE;
             if ( instinct->param0 == 0.0 )
             {
                 instinct->param0 = aiclass->argsAsFloat[8];
@@ -605,12 +605,12 @@ int sithAICmd_PrimaryFire(SithAIControlBlock *actor, SithAIInstinct *aiclass, Si
         }
         if ( actor->field_1F4 == 3 )
         {
-            actor->flags &= ~SITHAI_MODE_TARGET_VISIBLE;
+            actor->flags &= ~SITHAI_MODE_TARGETVISIBLE;
         }
         instinct->nextUpdate = sithTime_g_msecGameTime + 250;
         return 0;
     }
-    if ( (actor->flags & SITHAI_MODE_TARGET_VISIBLE) != 0 )
+    if ( (actor->flags & SITHAI_MODE_TARGETVISIBLE) != 0 )
     {
         sithSoundClass_PlayModeRandom(v7, SITH_SC_VICTORY);
         sithPuppet_PlayMode(actor->thing, SITH_ANIM_VICTORY, 0);
@@ -622,7 +622,7 @@ int sithAICmd_PrimaryFire(SithAIControlBlock *actor, SithAIInstinct *aiclass, Si
     }
 
     instinct->param0 = aiclass->argsAsFloat[8];
-    actor->flags &= ~(SITHAI_MODE_TARGET_VISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_ATTACKING);
+    actor->flags &= ~(SITHAI_MODE_TARGETVISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_ATTACKING);
     actor->flags |= SITHAI_MODE_SEARCHING;
     return 1;
 }
@@ -673,7 +673,7 @@ int sithAICmd_TurretFire(SithAIControlBlock *actor, SithAIInstinct *aiclass, Sit
         actor->flags &= ~SITHAI_MODE_ATTACKING;
         return 1;
     }
-    if ( (v7->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0 )
+    if ( (v7->thingflags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) != 0 )
     {
         actor->flags &= ~(SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_ATTACKING);
         actor->flags |= SITHAI_MODE_SEARCHING;
@@ -958,7 +958,7 @@ int sithAICmd_LookForTarget(SithAIControlBlock *actor, SithAIInstinct *aiclass, 
     {
         if ( aiclass->argsAsInt[1] && aiclass->argsAsInt[1] + actor->field_204 < sithTime_g_msecGameTime )
         {
-            actor->flags &= ~(SITHAI_MODE_TARGET_VISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_ATTACKING);
+            actor->flags &= ~(SITHAI_MODE_TARGETVISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_ATTACKING);
             actor->flags |= SITHAI_MODE_SEARCHING;
             sithActor_SetHeadPYR(actor->thing, &rdroid_zeroVector3);
             return 1;
@@ -993,7 +993,7 @@ int sithAICmd_LookForTarget(SithAIControlBlock *actor, SithAIInstinct *aiclass, 
                 psVar3 = sithAICmd_NearestPlayer(actor);
             }
             actor->pDistractor = psVar3;
-            if ((psVar3->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0)
+            if ((psVar3->thingflags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) == 0)
             {
                 sithAI_sub_4EAD60(actor);
                 if (actor->field_1F4 == 0) 
@@ -1014,7 +1014,7 @@ int sithAICmd_LookForTarget(SithAIControlBlock *actor, SithAIInstinct *aiclass, 
         else {
             actor->pDistractor = sithAICmd_NearestPlayer(actor);
             instinct->nextUpdate = sithTime_g_msecGameTime +  aiclass->argsAsInt[0];
-            if (!(actor->pDistractor->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)))
+            if (!(actor->pDistractor->thingflags & (SITH_TF_DEAD|SITH_TF_DESTROYED)))
             {
                 sithAI_sub_4EAD60(actor);
                 if ( !actor->field_1F4 )
@@ -1075,7 +1075,7 @@ int sithAICmd_Jump(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIIns
     instinct->param0 = aiclass->argsAsFloat[0] + (flex_d_t)sithTime_g_msecGameTime;
     if ( flags != SITHAI_MODE_SEARCHING && flags != SITHAI_MODE_ACTIVE )
     {
-        if ( flags != SITHAI_MODE_TARGET_VISIBLE )
+        if ( flags != SITHAI_MODE_TARGETVISIBLE )
             return 0;
 
         rdVector_Copy3(&pos, &actorThing->position);
@@ -1433,7 +1433,7 @@ int sithAICmd_SenseDanger(SithAIControlBlock *actor, SithAIInstinct *aiclass, Si
                 actor->pDistractor = sithAICmd_NearestPlayer(actor);
             }
             
-            if ( (actor->pDistractor->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0 )
+            if ( (actor->pDistractor->thingflags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) != 0 )
                 return 0;
             sithAI_sub_4EAD60(actor);
             if ( !actor->field_1F4 )
@@ -1499,7 +1499,7 @@ int sithAICmd_HitAndRun(SithAIControlBlock *actor, SithAIInstinct *aiclass, Sith
         actor->flags &= ~SITHAI_MODE_FLEEING;
         return 1;
     }
-    if ( (actor->flags & SITHAI_MODE_TARGET_VISIBLE) == 0 )
+    if ( (actor->flags & SITHAI_MODE_TARGETVISIBLE) == 0 )
     {
         instinct->param0 = 0.0;
         instinct->nextUpdate = sithTime_g_msecGameTime + 1000;
@@ -1613,7 +1613,7 @@ int sithAICmd_Talk(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIIns
         return 0;
     }
 
-    if (actor->flags & SITHAI_MODE_TARGET_VISIBLE)
+    if (actor->flags & SITHAI_MODE_TARGETVISIBLE)
     {
         if ( healthPercent < 0.25 )
         {
@@ -1666,7 +1666,7 @@ int sithAICmd_LookForOpposingTarget(SithAIControlBlock *pActor, SithAIInstinct *
             psVar3 = sithAI_FUN_00539a60(pActor);
         }
         pActor->pDistractor = psVar3;
-        if ((psVar3 != (SithThing *)0x0) && ((psVar3->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0))
+        if ((psVar3 != (SithThing *)0x0) && ((psVar3->thingflags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) == 0))
         {
             sithAI_sub_4EAD60(pActor);
             if (pActor->field_1F4 == 0) {
@@ -1687,7 +1687,7 @@ int sithAICmd_LookForOpposingTarget(SithAIControlBlock *pActor, SithAIInstinct *
     else if ((pAiclass->argsAsInt[1] != 0) &&
              ((uint32_t)(pActor->field_204 + pAiclass->argsAsInt[1]) < sithTime_g_msecGameTime))
     {
-        pActor->flags &= ~(SITHAI_MODE_TARGET_VISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_ATTACKING); 
+        pActor->flags &= ~(SITHAI_MODE_TARGETVISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_ATTACKING); 
         pActor->flags |= SITHAI_MODE_SEARCHING;
         sithActor_SetHeadPYR(pActor->thing, &rdroid_zeroVector3);
         return 1;
@@ -1740,7 +1740,7 @@ int sithAICmd_Leap(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIIns
     iVar2 = sithAI_Leap(actor, aiclass->argsAsFloat[3], aiclass->argsAsFloat[2], aiclass->argsAsFloat[1], 1, aiclass->argsAsFloat[5], 0);
     if (iVar2 != 0) 
     {
-        actor->flags = actor->flags | SITHAI_MODE_TARGET_VISIBLE;
+        actor->flags = actor->flags | SITHAI_MODE_TARGETVISIBLE;
         lVar3 = (int64_t)(((_frand() * 0.4 - 0.2) -
                         -1.0) * aiclass->argsAsFloat[0]);
         instinct->nextUpdate = (int)lVar3 + sithTime_g_msecGameTime;
@@ -1762,7 +1762,7 @@ int sithAICmd_Leap(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIIns
     sithAI_SetLookFrame(actor, lookPos);
 LAB_0055c4da:
     if (actor->field_1F4 == 3) {
-        actor->flags = actor->flags & ~SITHAI_MODE_TARGET_VISIBLE;
+        actor->flags = actor->flags & ~SITHAI_MODE_TARGETVISIBLE;
     }
     instinct->nextUpdate = sithTime_g_msecGameTime + 250;
 
@@ -1809,7 +1809,7 @@ int sithAICmd_Charge(SithAIControlBlock *pActor, SithAIInstinct *pAiclass, SithA
     }
     iVar2 = sithAI_Charge(pActor, pAiclass->argsAsFloat[3], pAiclass->argsAsFloat[2], pAiclass->argsAsFloat[1], 1, pAiclass->argsAsFloat[5], 0);
     if (iVar2 != 0) {
-        pActor->flags = pActor->flags | SITHAI_MODE_TARGET_VISIBLE;
+        pActor->flags = pActor->flags | SITHAI_MODE_TARGETVISIBLE;
         lVar3 = (int64_t)(((_frand() * 0.4 - 0.2) -
                         -1.0) * pAiclass->argsAsFloat[0]);
         pInstinct->nextUpdate = (int)lVar3 + sithTime_g_msecGameTime;
@@ -1829,7 +1829,7 @@ int sithAICmd_Charge(SithAIControlBlock *pActor, SithAIInstinct *pAiclass, SithA
     sithAI_SetLookFrame(pActor, lookPos);
 LAB_0055c33d:
     if (pActor->field_1F4 == 3) {
-        pActor->flags = pActor->flags & ~SITHAI_MODE_TARGET_VISIBLE;
+        pActor->flags = pActor->flags & ~SITHAI_MODE_TARGETVISIBLE;
     }
     pInstinct->nextUpdate = sithTime_g_msecGameTime + 250;
 

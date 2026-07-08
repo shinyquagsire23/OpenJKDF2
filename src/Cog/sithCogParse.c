@@ -519,7 +519,7 @@ void sithCogParse_FreeSymbolTable(SithCogSymbolTable *table)
 #endif
 
 #ifdef COG_COMPRESS_VAR_SIZE
-                    if (v1[v3].val.type == COG_VARTYPE_VECTOR)
+                    if (v1[v3].val.type == SITHCOG_VALUE_VECTOR)
                     {
                         if (v1[v3].val.dataAsPtrs[0]) {
                             SITH_FREE((void*)v1[v3].val.dataAsPtrs[0]);
@@ -528,7 +528,7 @@ void sithCogParse_FreeSymbolTable(SithCogSymbolTable *table)
                     }
 #endif
                     v1 = table->buckets;
-                    if (table->buckets[v3].val.type == COG_VARTYPE_STR)
+                    if (table->buckets[v3].val.type == SITHCOG_VALUE_STRING)
                     {
                         SITH_FREE(v1[v3].val.dataAsName);
                         v1 = table->buckets;
@@ -735,7 +735,7 @@ void sithCogParse_LexerSetString(const char *symName)
     
     if ( symbol )
     {
-        symbol->val.type = COG_VARTYPE_STR;
+        symbol->val.type = SITHCOG_VALUE_STRING;
         symbol->val.dataAsName = (char *)SITH_ALLOC(_strlen(symName) - 1);
         _strncpy(symbol->val.dataAsName, symName + 1, _strlen(symName) - 2);
         symbol->val.dataAsName[_strlen(symName) - 2] = 0;
@@ -855,7 +855,7 @@ int sithCogParse_ParseSymbolRef(SithCogScript *cogScript, int a2, int unk)
         return 0;
 
     // Added: remove undef stuff
-    symbol->val.type = COG_VARTYPE_INT;
+    symbol->val.type = SITHCOG_VALUE_INT;
     symbol->val.dataAsPtrs[0] = 0;
 #ifndef COG_COMPRESS_VAR_SIZE
     symbol->val.dataAsPtrs[1] = 0;
@@ -924,7 +924,7 @@ int sithCogParse_ParseFlex(SithCogScript *cogScript, int a2)
         return 0;
 
     // Added: remove undef stuff
-    symbol->val.type = COG_VARTYPE_FLEX;
+    symbol->val.type = SITHCOG_VALUE_FLOAT;
     symbol->val.dataAsPtrs[0] = 0;
 #ifndef COG_COMPRESS_VAR_SIZE
     symbol->val.dataAsPtrs[1] = 0;
@@ -953,7 +953,7 @@ int sithCogParse_ParseFlex(SithCogScript *cogScript, int a2)
 
     SithCogSymbolRef* cogIdk = &cogScript->aIdk[cogScript->numIdk];
     _memset(cogIdk, 0, sizeof(SithCogSymbolRef)); // added
-    cogIdk->type = COG_TYPE_FLEX; // hmm
+    cogIdk->type = SITHCOG_SYM_REF_FLEX; // hmm
     cogIdk->linkid = -1;
     cogIdk->hash = symbol->symbol_id;
     cogIdk->desc = v20;
@@ -975,7 +975,7 @@ int sithCogParse_ParseInt(SithCogScript *cogScript, int a2)
         return 0;
 
     // Added: remove undef stuff
-    symbol->val.type = COG_VARTYPE_INT;
+    symbol->val.type = SITHCOG_VALUE_INT;
     symbol->val.dataAsPtrs[0] = 0;
 #ifndef COG_COMPRESS_VAR_SIZE
     symbol->val.dataAsPtrs[1] = 0;
@@ -1026,7 +1026,7 @@ int sithCogParse_ParseVector(SithCogScript *cogScript, int a2)
         return 0;
 
     // Added: remove undef stuff
-    symbol->val.type = COG_VARTYPE_VECTOR;
+    symbol->val.type = SITHCOG_VALUE_VECTOR;
     symbol->val.dataAsPtrs[0] = 0;
 #ifndef COG_COMPRESS_VAR_SIZE
     symbol->val.dataAsPtrs[1] = 0;
@@ -1055,7 +1055,7 @@ int sithCogParse_ParseVector(SithCogScript *cogScript, int a2)
     
     SithCogSymbolRef* cogIdk = &cogScript->aIdk[cogScript->numIdk];
     _memset(cogIdk, 0, sizeof(SithCogSymbolRef)); // added
-    cogIdk->type = COG_TYPE_VECTOR; // TODO hmmmm
+    cogIdk->type = SITHCOG_SYM_REF_VECTOR; // TODO hmmmm
     cogIdk->linkid = -1;
     cogIdk->hash = symbol->symbol_id;
     cogIdk->desc = v20;

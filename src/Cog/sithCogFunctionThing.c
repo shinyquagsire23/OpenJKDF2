@@ -165,11 +165,11 @@ void sithCogFunctionThing_createThingAtPos_nr_Mots(sithCog *ctx, int idk, SithTh
         sithCogExec_PushInt(ctx, -1);
         return;
     }
-    if (popTemplate->rdthing.type == RD_THINGTYPE_MODEL)
+    if (popTemplate->rdthing.type == RD_THING_MODEL3)
     {
         a1 = popTemplate->rdthing.model3->insertOffset;
     }
-    else if (popTemplate->rdthing.type == RD_THINGTYPE_SPRITE3)
+    else if (popTemplate->rdthing.type == RD_THING_SPRITE3)
     {
         a1 = popTemplate->rdthing.sprite3->offset;
     }
@@ -240,11 +240,11 @@ void sithCogFunctionThing_createThingAtPos_nr(sithCog *ctx, int idk)
         sithCogExec_PushInt(ctx, -1);
         return;
     }
-    if (popTemplate->rdthing.type == RD_THINGTYPE_MODEL)
+    if (popTemplate->rdthing.type == RD_THING_MODEL3)
     {
         a1 = popTemplate->rdthing.model3->insertOffset;
     }
-    else if (popTemplate->rdthing.type == RD_THINGTYPE_SPRITE3)
+    else if (popTemplate->rdthing.type == RD_THING_SPRITE3)
     {
         a1 = popTemplate->rdthing.sprite3->offset;
     }
@@ -459,7 +459,7 @@ void sithCogFunctionThing_ThingLight(sithCog *ctx)
             pThing->light = light;
             if ( light != 0.0 )
             {
-                pThing->thingflags |= SITH_TF_LIGHT;
+                pThing->thingflags |= SITH_TF_EMITLIGHT;
             }
         }
         else
@@ -597,12 +597,12 @@ void sithCogFunctionThing_SetThingPulse(sithCog *ctx)
     if ( pulseSecs == 0.0 )
     {
         pThing->pulse_end_ms = 0;
-        pThing->thingflags &= ~SITH_TF_PULSE;
+        pThing->thingflags &= ~SITH_TF_PULSESET;
         pThing->pulse_ms = 0;
     }
     else
     {
-        pThing->thingflags |= SITH_TF_PULSE;
+        pThing->thingflags |= SITH_TF_PULSESET;
         pThing->pulse_ms = (int)(pulseSecs * 1000.0);
         pThing->pulse_end_ms = pThing->pulse_ms + sithTime_g_msecGameTime;
     }
@@ -618,11 +618,11 @@ void sithCogFunctionThing_SetThingTimer(sithCog *ctx)
     if ( timerSecs == 0.0 )
     {
         pThing->timer = 0;
-        pThing->thingflags &= ~SITH_TF_TIMER;
+        pThing->thingflags &= ~SITH_TF_TIMERSET;
     }
     else
     {
-        pThing->thingflags |= SITH_TF_TIMER;
+        pThing->thingflags |= SITH_TF_TIMERSET;
         pThing->timer = sithTime_g_msecGameTime + (uint32_t)(timerSecs * 1000.0);
     }
 }
@@ -870,7 +870,7 @@ void sithCogFunctionThing_SetThingVel(sithCog *ctx)
         rdVector_Copy3(&pThing->physicsParams.vel, &poppedVec);
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithThing_SyncThing(pThing, THING_SYNC_POS);
+            sithThing_SyncThing(pThing, SITHTHING_SYNC_POS);
         }
     }
 }
@@ -886,7 +886,7 @@ void sithCogFunctionThing_ApplyForce(sithCog *ctx)
         sithPhysics_ApplyForce(pThing, &poppedVec);
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithThing_SyncThing(pThing, THING_SYNC_POS);
+            sithThing_SyncThing(pThing, SITHTHING_SYNC_POS);
         }
     }
 }
@@ -902,7 +902,7 @@ void sithCogFunctionThing_AddThingVel(sithCog *ctx)
         rdVector_Add3Acc(&pThing->physicsParams.vel, &poppedVec);
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithThing_SyncThing(pThing, THING_SYNC_POS);
+            sithThing_SyncThing(pThing, SITHTHING_SYNC_POS);
         }
     }
 }
@@ -1161,7 +1161,7 @@ void sithCogFunctionThing_GetThingModel(sithCog *ctx)
     rdModel3 *model;
 
     SithThing* pThing = sithCogExec_PopThing(ctx);
-    if ( pThing && pThing->rdthing.type == RD_THINGTYPE_MODEL && (model = pThing->rdthing.model3) != 0 )
+    if ( pThing && pThing->rdthing.type == RD_THING_MODEL3 && (model = pThing->rdthing.model3) != 0 )
         sithCogExec_PushInt(ctx, model->id);
     else
         sithCogExec_PushInt(ctx, -1);
@@ -1201,7 +1201,7 @@ void sithCogFunctionThing_SetThingFlags(sithCog *ctx)
 
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithThing_SyncThing(pThing, THING_SYNC_STATE);
+            sithThing_SyncThing(pThing, SITHTHING_SYNC_STATE);
         }
     }
 }
@@ -1216,7 +1216,7 @@ void sithCogFunctionThing_ClearThingFlags(sithCog *ctx)
 
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithThing_SyncThing(pThing, THING_SYNC_STATE);
+            sithThing_SyncThing(pThing, SITHTHING_SYNC_STATE);
         }
     }
 }
@@ -1277,7 +1277,7 @@ void sithCogFunctionThing_SetCollideType(sithCog *ctx)
 
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithThing_SyncThing(pThing, THING_SYNC_STATE);
+            sithThing_SyncThing(pThing, SITHTHING_SYNC_STATE);
         }
     }
 }
@@ -1558,7 +1558,7 @@ void sithCogFunctionThing_SetThingCurGeoMode(sithCog *ctx)
         pThing->rdthing.curGeoMode = mode;
         if (COG_SHOULD_SYNC(ctx))
         {
-                sithThing_SyncThing(pThing, THING_SYNC_STATE);
+                sithThing_SyncThing(pThing, SITHTHING_SYNC_STATE);
         }
     }
 }
@@ -1630,7 +1630,7 @@ void sithCogFunctionThing_SetLifeleft(sithCog *ctx)
         pThing->lifeLeftMs = (int)(lifeLeftSecs * 1000.0);
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithThing_SyncThing(pThing, THING_SYNC_STATE);
+            sithThing_SyncThing(pThing, SITHTHING_SYNC_STATE);
         }
     }
 }
@@ -1804,7 +1804,7 @@ void sithCogFunctionThing_SetPhysicsFlags(sithCog *ctx)
         pThing->physicsParams.physflags |= flags;
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithThing_SyncThing(pThing, THING_SYNC_STATE);
+            sithThing_SyncThing(pThing, SITHTHING_SYNC_STATE);
         }
     }
 }
@@ -1899,7 +1899,7 @@ void sithCogFunctionThing_SetThingRotVel(sithCog *ctx)
         rdVector_Copy3(&pThing->physicsParams.angVel, &popped_vector3);
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithThing_SyncThing(pThing, THING_SYNC_POS);
+            sithThing_SyncThing(pThing, SITHTHING_SYNC_POS);
         }
     }
 }
@@ -1927,7 +1927,7 @@ void sithCogFunctionThing_SetThingLook(sithCog *ctx)
 
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithThing_SyncThing(pThing, THING_SYNC_POS);
+            sithThing_SyncThing(pThing, SITHTHING_SYNC_POS);
         }
     }
 }
@@ -2176,7 +2176,7 @@ void sithCogFunctionThing_SetTypeFlags(sithCog *ctx)
 
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithThing_SyncThing(pThing, THING_SYNC_STATE);
+            sithThing_SyncThing(pThing, SITHTHING_SYNC_STATE);
         }
     }
 }
@@ -2204,7 +2204,7 @@ void sithCogFunctionThing_ClearTypeFlags(sithCog *ctx)
 
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithThing_SyncThing(pThing, THING_SYNC_STATE);
+            sithThing_SyncThing(pThing, SITHTHING_SYNC_STATE);
         }
     }
 }
@@ -2338,7 +2338,7 @@ void sithCogFunctionThing_SetThingMass(sithCog *ctx)
         pThing->physicsParams.mass = mass;
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithThing_SyncThing(pThing, THING_SYNC_STATE);
+            sithThing_SyncThing(pThing, SITHTHING_SYNC_STATE);
         }
     }
 }
@@ -2348,7 +2348,7 @@ void sithCogFunctionThing_SyncThingPos(sithCog *ctx)
     SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing)
-        sithThing_SyncThing(pThing, THING_SYNC_POS);
+        sithThing_SyncThing(pThing, SITHTHING_SYNC_POS);
 }
 
 void sithCogFunctionThing_SyncThingAttachment(sithCog *ctx)
@@ -2364,7 +2364,7 @@ void sithCogFunctionThing_SyncThingState(sithCog *ctx)
     SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing)
-        sithThing_SyncThing(pThing, THING_SYNC_STATE);
+        sithThing_SyncThing(pThing, SITHTHING_SYNC_STATE);
 }
 
 void sithCogFunctionThing_GetMajorMode(sithCog *ctx)
@@ -2535,7 +2535,7 @@ void sithCogFunctionThing_SetJointAngle(sithCog *ctx)
     arg1 = sithCogExec_PopInt(ctx);
     pThing = sithCogExec_PopThing(ctx);
     if (((pThing && pThing->animclass) 
-      && (pThing->rdthing.type == RD_THINGTYPE_MODEL)) 
+      && (pThing->rdthing.type == RD_THING_MODEL3)) 
       && ((prVar1 = pThing->rdthing.hierarchyNodes2, prVar1 != NULL &&
       (arg1 = pThing->animclass->bodypart_to_joint[arg1],
       arg1 > -1 && arg1 <= (int)(pThing->rdthing.model3->numHierarchyNodes - 1))))) 
@@ -2554,7 +2554,7 @@ void sithCogFunctionThing_GetJointAngle(sithCog *ctx)
     SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
     {
-        if (((pThing->animclass && pThing->rdthing.type == RD_THINGTYPE_MODEL) &&
+        if (((pThing->animclass && pThing->rdthing.type == RD_THING_MODEL3) &&
             (prVar1 = (pThing->rdthing).hierarchyNodes2, prVar1 != NULL)) &&
            (arg1 = pThing->animclass->bodypart_to_joint[arg1],
            arg1 > -1 && arg1 <= (int)(pThing->rdthing.model3->numHierarchyNodes - 1))) 
@@ -2593,7 +2593,7 @@ void sithCogFunctionThing_GetThingInsertOffset(sithCog *ctx)
     rdModel3 *prVar1;
     SithThing* pThing = sithCogExec_PopThing(ctx);
     if (((pThing != (SithThing *)0x0) 
-        && ((pThing->rdthing).type == RD_THINGTYPE_MODEL)) 
+        && ((pThing->rdthing).type == RD_THING_MODEL3)) 
         && (prVar1 = (pThing->rdthing).model3, prVar1 != (rdModel3 *)0x0))
     {
         sithCogExec_PushVector(ctx,&prVar1->insertOffset);

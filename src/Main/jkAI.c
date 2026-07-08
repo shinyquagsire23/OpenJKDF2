@@ -72,7 +72,7 @@ int jkAI_SaberFighting(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithA
     v9 = actor->pDistractor;
     if ( !v9 )
         return 0;
-    if ( (v9->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
+    if ( (v9->thingflags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) == 0 )
     {
         // MoTS Added: SITH_AF_FREEZE_MOVEMENT
         if ( (v7->actorParams.typeflags & SITH_AF_COMBO_FREEZE) == 0 )
@@ -120,7 +120,7 @@ LABEL_27:
                 while ( v5 < 4 );
                 if ( !v5 )
                 {
-                    actor->flags &= ~SITHAI_MODE_TARGET_VISIBLE;
+                    actor->flags &= ~SITHAI_MODE_TARGETVISIBLE;
                     goto LABEL_27;
                 }
                 v17_lo = (int)(_frand() * (flex_d_t)v5);
@@ -164,7 +164,7 @@ LABEL_27:
                 {
                     v21->actorParams.typeflags &= ~SITHAI_MODE_DISABLED;
                 }
-                actor->flags |= SITHAI_MODE_TARGET_VISIBLE;
+                actor->flags |= SITHAI_MODE_TARGETVISIBLE;
                 sithSoundClass_PlayModeFirst(v21, v17_lo + SITH_SC_FIRE1);
                 sithPuppet_PlayMode(actor->thing, v20, 0);
                 jkSaber_Enable(actor->thing, a2a, a3a, 0.0);
@@ -175,13 +175,13 @@ LABEL_27:
         }
         return 0;
     }
-    if ( (actor->flags & SITHAI_MODE_TARGET_VISIBLE) != 0 )
+    if ( (actor->flags & SITHAI_MODE_TARGETVISIBLE) != 0 )
     {
         sithSoundClass_PlayModeRandom(v7, SITH_SC_VICTORY);
         sithPuppet_PlayMode(actor->thing, SITH_ANIM_VICTORY, 0);
     }
     result = 1;
-    actor->flags = actor->flags & ~(SITHAI_MODE_TARGET_VISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_ATTACKING) | SITHAI_MODE_SEARCHING;
+    actor->flags = actor->flags & ~(SITHAI_MODE_TARGETVISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_ATTACKING) | SITHAI_MODE_SEARCHING;
     return result;
 }
 

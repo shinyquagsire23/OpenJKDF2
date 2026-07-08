@@ -778,7 +778,7 @@ int jkHudInv_InitItems()
     jkHudInv_numItems = 0;
     for (int i = 0; i < SITHBIN_NUMBINS; i++)
     {
-        if ( (v2->flags & ITEMINFO_POWER) != 0 )
+        if ( (v2->flags & SITHINVENTORY_TYPE_AUTOAIM) != 0 )
             ++v1;
         ++v2;
     }
@@ -797,7 +797,7 @@ int jkHudInv_InitItems()
         v5 = sithInventory_g_aTypes;
         for (int i = 0; i < SITHBIN_NUMBINS; i++)
         {
-            if ( (v5->flags & ITEMINFO_POWER) != 0 )
+            if ( (v5->flags & SITHINVENTORY_TYPE_AUTOAIM) != 0 )
                 *v3++ = v4;
             ++v5;
             ++v4;
@@ -884,7 +884,7 @@ void jkHudInv_LoadItemRes()
 #endif
         for (int j = 0; j < SITHBIN_NUMBINS; j++)
         {
-            if ( (sithInventory_g_aTypes[j].flags & (ITEMINFO_POWER|ITEMINFO_ITEM)) != 0 )
+            if ( (sithInventory_g_aTypes[j].flags & (SITHINVENTORY_TYPE_AUTOAIM|ITEMINFO_ITEM)) != 0 )
             {
                 if ( sithInventory_g_aTypes[j].hudBitmap )
                     stdBitmap_Free(sithInventory_g_aTypes[j].hudBitmap);

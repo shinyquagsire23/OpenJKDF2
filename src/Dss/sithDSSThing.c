@@ -479,7 +479,7 @@ int sithDSSThing_ProcessPlayKeyMode(SithMessage *msg)
 
 void sithDSSThing_SetModel(SithThing *pThing, int sendtoId)
 {
-    if (!pThing || pThing->rdthing.type != RD_THINGTYPE_MODEL )
+    if (!pThing || pThing->rdthing.type != RD_THING_MODEL3 )
         return;
 
     const char *pFname = pThing->rdthing.model3->filename;
@@ -849,7 +849,7 @@ void sithDSSThing_FullDescription(SithThing *thing, int sendto_id, int mpFlags)
         }
 
         // MOTS added
-        if (sithComm_version == 0x7D6 && thing->rdthing.type == RD_THINGTYPE_MODEL) {
+        if (sithComm_version == 0x7D6 && thing->rdthing.type == RD_THING_MODEL3) {
             rdModel3* model = thing->rdthing.model3;
             if (thing->unk && model) 
             {
@@ -1044,7 +1044,7 @@ int sithDSSThing_ProcessFullDescription(SithMessage *msg)
     }
 
     // MOTS added
-    if (sithComm_version == 0x7D6 && thing->rdthing.type == RD_THINGTYPE_MODEL) {
+    if (sithComm_version == 0x7D6 && thing->rdthing.type == RD_THING_MODEL3) {
         thing->unk = NETMSG_POPS16();
 
         rdModel3* model = thing->rdthing.model3;
@@ -1253,15 +1253,15 @@ void sithDSSThing_Attachment(SithThing *thing, int sendto_id, int mpFlags, int a
     NETMSG_PUSHS32(thing->thing_id);
     NETMSG_PUSHU16(thing->attach_flags);
 
-    if (thing->attach_flags & SITH_ATTACH_WORLDSURFACE)
+    if (thing->attach_flags & SITH_ATTACH_SURFACE)
     {
         NETMSG_PUSHU16(thing->attachedSurface->index);
     }
-    else if (thing->attach_flags & (SITH_ATTACH_THING|SITH_ATTACH_THINGSURFACE))
+    else if (thing->attach_flags & (SITH_ATTACH_THING|SITH_ATTACH_THINGFACE))
     {
         SithThing* v7 = (SithThing *)thing->attachedThing;
         NETMSG_PUSHS32(v7->thing_id)
-        if ( (thing->attach_flags & SITH_ATTACH_THINGSURFACE) != 0 )
+        if ( (thing->attach_flags & SITH_ATTACH_THINGFACE) != 0 )
         {
             NETMSG_PUSHS16(((intptr_t)thing->attachedSufaceInfo - (intptr_t)v7->rdthing.model3->geosets[0].meshes->faces) / sizeof(sithSurfaceInfo));
         }
@@ -1284,7 +1284,7 @@ int sithDSSThing_ProcessAttachment(SithMessage *msg)
     if ( !v1 )
         return 0;
     int v3 = NETMSG_POPU16();
-    if (v3 & SITH_ATTACH_WORLDSURFACE)
+    if (v3 & SITH_ATTACH_SURFACE)
     {
         SithSurface* v5 = sithSurface_sub_4E63B0(NETMSG_POPS16());
         if ( v5 )
@@ -1295,12 +1295,12 @@ int sithDSSThing_ProcessAttachment(SithMessage *msg)
         }
         return 0;
     }
-    if (v3 & (SITH_ATTACH_THING|SITH_ATTACH_THINGSURFACE))
+    if (v3 & (SITH_ATTACH_THING|SITH_ATTACH_THINGFACE))
     {
         SithThing* v9 = sithThing_GetGuidThing(NETMSG_POPS32());
         if ( !v9 )
             return 0;
-        if (v3 & SITH_ATTACH_THINGSURFACE)
+        if (v3 & SITH_ATTACH_THINGFACE)
         {
             sithThing_AttachThingToThingFace(
                 v1,
@@ -1371,7 +1371,7 @@ void sithDSSThing_Take(SithThing *pItemThing, SithThing *pActor, int mpFlags)
             sithItem_SetItemTaken(pItemThing2, pActor2, 1);
             return;
         }
-        if ( pItemThing2->type == SITH_THING_ITEM && (pItemThing2->thingflags & (SITH_TF_DISABLED|SITH_TF_WILLBEREMOVED)) == 0 )
+        if ( pItemThing2->type == SITH_THING_ITEM && (pItemThing2->thingflags & (SITH_TF_DISABLED|SITH_TF_DESTROYED)) == 0 )
         {
             sithComm_netMsgTmp.netMsg.cogMsgId = DSS_TAKEITEM2;
             sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 1, 1);
@@ -1408,7 +1408,7 @@ int sithDSSThing_ProcessTake(SithMessage *msg)
     {
         if ( msg->netMsg.cogMsgId == DSS_TAKEITEM1 )
         {
-            if ( v2->type != SITH_THING_ITEM || (v2->thingflags & (SITH_TF_DISABLED|SITH_TF_WILLBEREMOVED)) != 0 )
+            if ( v2->type != SITH_THING_ITEM || (v2->thingflags & (SITH_TF_DISABLED|SITH_TF_DESTROYED)) != 0 )
                 return 1;
             msg->netMsg.cogMsgId = DSS_TAKEITEM2;
             sithComm_SendMsgToPlayer(msg, -1, 1, 1);

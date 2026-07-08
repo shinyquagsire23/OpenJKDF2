@@ -53,7 +53,7 @@
 #define sithCog_AddFloatSymbol_ADDR (0x004E06C0)
 #define sithCog_RegisterFunction_ADDR (0x004E0700)
 
-#define COG_SHOULD_SYNC(ctx) (sithMessage_g_outputstream && !(ctx->flags & SITH_COG_NO_SYNC) && ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
+#define COG_SHOULD_SYNC(ctx) (sithMessage_g_outputstream && !(ctx->flags & SITHCOG_NOSYNC) && ctx->trigId != SITH_MESSAGE_STARTUP && ctx->trigId != SITH_MESSAGE_SHUTDOWN)
 
 
 //static int32_t (*_sithCog_Load)(SithWorld *world, int32_t a2) = (void*)sithCog_ReadCogsListText_ADDR;

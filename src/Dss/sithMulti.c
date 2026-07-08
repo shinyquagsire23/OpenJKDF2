@@ -329,7 +329,7 @@ int sithMulti_GetSpawnIdx(SithThing *pPlayerThing)
             if ( (i->hitType & SITHCOLLISION_THING) != 0 )
             {
                 v10 = i->receiver;
-                if ( v10->type == SITH_THING_PLAYER && (v10->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
+                if ( v10->type == SITH_THING_PLAYER && (v10->thingflags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) == 0 )
                     break;
             }
         }
@@ -1345,7 +1345,7 @@ void sithMulti_Update(int deltaMs)
                                 sithDSS_SectorStatus(v11, sithMulti_newPlayerId, 1);
                                 break;
                             }
-                            else if (v11->flags & SITH_SECTOR_ADJOINS_SET)
+                            else if (v11->flags & SITH_SECTOR_ADJOINSOFF)
                             {
                                 sithDSS_SectorFlags(v11, sithMulti_newPlayerId, 1);
                                 break;

@@ -153,7 +153,7 @@ int sithSector_ReadSectorsListText(SithWorld *world, int tmp)
                 sectors->collidebox_othercorner.x = tmpf4; // FLEXTODO
                 sectors->collidebox_othercorner.y = tmpf5; // FLEXTODO
                 sectors->collidebox_othercorner.z = tmpf6; // FLEXTODO
-                sectors->flags |= SITH_SECTOR_HAS_COLLIDE_BOX;
+                sectors->flags |= SITH_SECTOR_HASCOLLIDEBOX;
                 if ( !stdConffile_ReadLine() )
                     break;
             }
@@ -223,7 +223,7 @@ void sithSector_ShowSectorAdjoins(SithSector *sector)
 
     for ( i = sector->adjoins; i; i = i->next )
         sithSurface_ShowSectorAdjoin(i);
-    sector->flags &= ~SITH_SECTOR_ADJOINS_SET;
+    sector->flags &= ~SITH_SECTOR_ADJOINSOFF;
 }
 
 void sithSector_HideSectorAdjoins(SithSector *sector)
@@ -232,7 +232,7 @@ void sithSector_HideSectorAdjoins(SithSector *sector)
 
     for ( i = sector->adjoins; i; i = i->next )
         sithSurface_HideSectorAdjoin(i);
-    sector->flags |= SITH_SECTOR_ADJOINS_SET;
+    sector->flags |= SITH_SECTOR_ADJOINSOFF;
 }
 
 int sithSector_GetSectorThingCount(SithSector *sector)

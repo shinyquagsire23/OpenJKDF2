@@ -27,7 +27,7 @@ int sithIntersect_IsSphereInSectorBox(const rdVector3 *pos, flex_t radius, SithS
     if (!sector)
         return 0;
 
-    if ( (sector->flags & SITH_SECTOR_HAS_COLLIDE_BOX) != 0
+    if ( (sector->flags & SITH_SECTOR_HASCOLLIDEBOX) != 0
       && pos->z - radius > sector->collidebox_onecorner.z
       && pos->y - radius > sector->collidebox_onecorner.y
       && pos->x - radius > sector->collidebox_onecorner.x
@@ -52,7 +52,7 @@ int sithIntersect_IsSphereInSector(const rdVector3 *pos, flex_t radius, SithSect
     if (!sector)
         return 0;
 
-    if ( (sector->flags & SITH_SECTOR_HAS_COLLIDE_BOX) != 0
+    if ( (sector->flags & SITH_SECTOR_HASCOLLIDEBOX) != 0
       && pos->z - radius > sector->collidebox_onecorner.z
       && pos->y - radius > sector->collidebox_onecorner.y
       && pos->x - radius > sector->collidebox_onecorner.x

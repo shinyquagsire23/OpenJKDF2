@@ -171,7 +171,7 @@ void sithDSS_SectorStatus(SithSector *sector, int sendto_id, int mpFlags)
     NETMSG_PUSHF32(sector->ambientLight);
     NETMSG_PUSHF32(sector->extraLight);
     
-    if (sector->flags & SITH_SECTOR_HASTHRUST)
+    if (sector->flags & SITH_SECTOR_USETHRUST)
     {
         NETMSG_PUSHVEC3(sector->thrust);
     }
@@ -206,16 +206,16 @@ int sithDSS_ProcessSectorStatus(SithMessage *msg)
     sector->flags = NETMSG_POPU32();
 
     // TODO: untangle this
-    if (!(sector->flags & SITH_SECTOR_ADJOINS_SET))
+    if (!(sector->flags & SITH_SECTOR_ADJOINSOFF))
     {
-        if ( (oldSectorFlags & SITH_SECTOR_ADJOINS_SET) == 0 )
+        if ( (oldSectorFlags & SITH_SECTOR_ADJOINSOFF) == 0 )
             goto LABEL_11;
 LABEL_9:
-        if ( (sector->flags & SITH_SECTOR_ADJOINS_SET) == 0 )
+        if ( (sector->flags & SITH_SECTOR_ADJOINSOFF) == 0 )
             sithSector_ShowSectorAdjoins(sector);
     }
     else {
-        if (oldSectorFlags & SITH_SECTOR_ADJOINS_SET)
+        if (oldSectorFlags & SITH_SECTOR_ADJOINSOFF)
             goto LABEL_9;
         sithSector_HideSectorAdjoins(sector);
     }
@@ -224,7 +224,7 @@ LABEL_11:
     sector->ambientLight = NETMSG_POPF32();
     sector->extraLight = NETMSG_POPF32();
 
-    if (sector->flags & SITH_SECTOR_HASTHRUST)
+    if (sector->flags & SITH_SECTOR_USETHRUST)
     {
         sector->thrust = NETMSG_POPVEC3();
     }
@@ -246,7 +246,7 @@ void sithDSS_SectorFlags(SithSector *pSector, int sendto_id, int mpFlags)
     NETMSG_PUSHU32(pSector->flags);
     NETMSG_END(DSS_SECTORFLAGS);
 
-    if (!(pSector->flags & SITH_SECTOR_ADJOINS_SET))
+    if (!(pSector->flags & SITH_SECTOR_ADJOINSOFF))
         sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendto_id, mpFlags, 1);
     else
         sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendto_id, mpFlags, 0);
@@ -263,20 +263,20 @@ int sithDSS_ProcessSectorFlags(SithMessage *msg)
     {
         int oldFlags = pSector->flags;
         pSector->flags = NETMSG_POPU32();
-        if (pSector->flags & SITH_SECTOR_ADJOINS_SET)
+        if (pSector->flags & SITH_SECTOR_ADJOINSOFF)
         {
-            if (!(oldFlags & SITH_SECTOR_ADJOINS_SET))
+            if (!(oldFlags & SITH_SECTOR_ADJOINSOFF))
             {
                 sithSector_HideSectorAdjoins(pSector);
                 return 1;
             }
         }
-        else if (!(oldFlags & SITH_SECTOR_ADJOINS_SET))
+        else if (!(oldFlags & SITH_SECTOR_ADJOINSOFF))
         {
             return 1;
         }
 
-        if (!(pSector->flags & SITH_SECTOR_ADJOINS_SET))
+        if (!(pSector->flags & SITH_SECTOR_ADJOINSOFF))
             sithSector_ShowSectorAdjoins(pSector);
 
         return 1;
@@ -505,7 +505,7 @@ int sithDSS_ProcessInventory(SithMessage *msg)
     //printf("%x %f\n", binIdx, iteminfo->ammoAmt);
 
     // Added: idk if this is necessary
-    sithInventory_g_aTypes[binIdx].flags |= ITEMINFO_VALID;
+    sithInventory_g_aTypes[binIdx].flags |= SITHINVENTORY_TYPE_REGISTERED;
 
     return 1;
 }
@@ -581,7 +581,7 @@ int sithDSS_ProcessAnimStatus(SithMessage *msg)
     if (rdsurface->flags & 0xC0000)
     {
         rdsurface->parent_thing = sithThing_GetThingByIndex(NETMSG_POPS32());
-        if ( rdsurface->parent_thing && rdsurface->parent_thing->rdthing.type == RD_THINGTYPE_SPRITE3 )
+        if ( rdsurface->parent_thing && rdsurface->parent_thing->rdthing.type == RD_THING_SPRITE3 )
             rdsurface->material = rdsurface->parent_thing->rdthing.sprite3->face.material;
         rdsurface->signature = NETMSG_POPU32();
     }

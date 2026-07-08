@@ -125,7 +125,7 @@ void rdPrimit3_ClipFace(const rdClipFrustum* NO_ALIAS clipFrustum, rdGeoMode_t g
 
     switch ( geoMode )
     {
-        case RD_GEOMODE_NOTRENDERED:
+        case RD_GEOMETRY_NONE:
             v15 = idxInfo;
             v16 = mesh_out;
             v17 = idxInfo->numVertices;
@@ -156,8 +156,8 @@ LABEL_26:
 LABEL_27:
                 v16->numVertices = rdClip_Face3SOrtho(clipFrustum, v16->vertices, v86);
             break;
-        case RD_GEOMODE_VERTICES:
-        case RD_GEOMODE_WIREFRAME:
+        case RD_GEOMETRY_VERTEX:
+        case RD_GEOMETRY_WIREFRAME:
             v7 = idxInfo;
             v8 = mesh_out;
             v9 = idxInfo->numVertices;
@@ -185,7 +185,7 @@ LABEL_27:
             else
                 v8->numVertices = rdClip_Face3WOrtho(clipFrustum, v8->vertices, v9);
             break;
-        case RD_GEOMODE_SOLIDCOLOR:
+        case RD_GEOMETRY_SOLID:
             switch ( lightMode )
             {
                 case RD_LIGHTMODE_FULLYLIT:
@@ -334,7 +334,7 @@ LABEL_25:
                     return;
             }
             break;
-        case RD_GEOMODE_TEXTURED:
+        case RD_GEOMETRY_FULL:
             if ( lightMode >= RD_LIGHTMODE_FULLYLIT)
             {
                 if ( lightMode <= RD_LIGHTMODE_DIFFUSE)
@@ -571,7 +571,7 @@ void rdPrimit3_NoClipFace(rdGeoMode_t geoMode, signed int lightMode, int texMode
 
     switch ( geoMode )
     {
-        case RD_GEOMODE_NOTRENDERED:
+        case RD_GEOMETRY_NONE:
             v13 = _vertexSrc;
             v7 = _vertexSrc->numVertices;
             vertexSrcb = _vertexSrc->numVertices;
@@ -592,8 +592,8 @@ void rdPrimit3_NoClipFace(rdGeoMode_t geoMode, signed int lightMode, int texMode
             while ( v7 );
             _vertexDst->numVertices = vertexSrcb;
             return;
-        case RD_GEOMODE_VERTICES:
-        case RD_GEOMODE_WIREFRAME:
+        case RD_GEOMETRY_VERTEX:
+        case RD_GEOMETRY_WIREFRAME:
             v6 = _vertexSrc;
             v7 = _vertexSrc->numVertices;
             vertexSrca = _vertexSrc->numVertices;
@@ -620,7 +620,7 @@ LABEL_19:
                 _vertexDst->numVertices = v7;
             }
             return;
-        case RD_GEOMODE_SOLIDCOLOR:
+        case RD_GEOMETRY_SOLID:
             switch ( lightMode )
             {
                 case RD_LIGHTMODE_FULLYLIT:
@@ -745,7 +745,7 @@ LABEL_19:
                 default:
                     return;
             }
-        case RD_GEOMODE_TEXTURED:
+        case RD_GEOMETRY_FULL:
             if ( lightMode < RD_LIGHTMODE_FULLYLIT)
                 return;
             if ( lightMode > RD_LIGHTMODE_DIFFUSE)

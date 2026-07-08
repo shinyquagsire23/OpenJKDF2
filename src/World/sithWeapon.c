@@ -78,7 +78,7 @@ void sithWeapon_Update(SithThing* weapon, flex_t deltaSeconds)
                 v3 = weapon->weaponParams.mindDamage;
             weapon->weaponParams.damage = v3;
         }
-        if ( (typeFlags & SITH_WF_TRIGGER_AI_AWARENESS) != 0 && (((uint8_t)jkPlayer_currentTickIdx + (weapon->thingIdx & 0xFF)) & 7) == 0 )
+        if ( (typeFlags & SITH_WF_DECAYEMITSOUNDAWARENESSEVENT) != 0 && (((uint8_t)jkPlayer_currentTickIdx + (weapon->thingIdx & 0xFF)) & 7) == 0 )
             sithAIAwareness_CreateTransmittingEvent(weapon->sector, &weapon->position, 2, 2.0, weapon);
     }
 }
@@ -422,7 +422,7 @@ int sithWeapon_ParseArg(StdConffileArg *arg, SithThing *thing, int param)
             thing->weaponParams.damage = _atof(arg->value);
             return 1;
 
-        case THINGPARAM_MINDDAMAGE:
+        case SITHTHING_ARG_MINDAMAGE:
             thing->weaponParams.mindDamage = _atof(arg->value);
             return 1;
 
@@ -583,7 +583,7 @@ SithThing* sithWeapon_WeaponFireProjectile(SithThing *sender, SithThing *project
         }
 
         // TODO Co-op
-        if ( !sithNet_isMulti && jkPlayer_setDiff && sender == sithPlayer_g_pLocalPlayerThing && (v9->weaponParams.typeflags & SITH_WF_TRIGGER_AIEVENT) != 0 )
+        if ( !sithNet_isMulti && jkPlayer_setDiff && sender == sithPlayer_g_pLocalPlayerThing && (v9->weaponParams.typeflags & SITH_WF_EMITAITARGETEDEVENT) != 0 )
         {
             v18 = rdVector_Normalize3(&a5a, &v9->physicsParams.vel) * 3.0;
             a6 = v18 >= 5.0 ? (flex_t)5.0 : (flex_t)v18; // FLEXTODO
@@ -620,7 +620,7 @@ void sithWeapon_DamageWeapon(SithThing *weapon, SithThing* a2, flex_t timeLeft)
     
     // TODO: ??? why is timeLeft unused
 
-    if ( (weapon->weaponParams.typeflags & SITH_WF_EXPLODE_WHEN_DAMAGED) != 0 && timeLeft > 1.0 )
+    if ( (weapon->weaponParams.typeflags & SITH_WF_DAMAGEDESTROY) != 0 && timeLeft > 1.0 )
     {
         if ( !weapon->lifeLeftMs || weapon->lifeLeftMs > 250 )
             weapon->lifeLeftMs = 250;
@@ -652,16 +652,16 @@ int sithWeapon_ThingCollisionHandler(SithThing *physicsThing, SithThing *collide
             return 0;
         }
         physicsThing->weaponParams.typeflags &= ~SITH_WF_PROXIMITY;
-        physicsThing->weaponParams.typeflags |= SITH_WF_EXPLODE_AT_TIMER_TIMEOUT;
+        physicsThing->weaponParams.typeflags |= SITH_WF_EXPLODE;
         physicsThing->collideSize = 0.0;
         physicsThing->lifeLeftMs = 550;
         sithSoundClass_PlayModeFirst(physicsThing, SITH_SC_ACTIVATE);
         return 0;
     }
 
-    int bFlagsHadWfImpactSoundFxEarlier = physicsThing->weaponParams.typeflags & SITH_WF_IMPACT_SOUND_FX;
-    if ( physicsThing->weaponParams.typeflags & SITH_WF_IMPACT_SOUND_FX && collidedThing->thingflags & SITH_TF_4
-      || collidedThing->type == SITH_THING_COG && physicsThing->weaponParams.typeflags & SITH_WF_RICOCHET_OFF_SURFACE && physicsThing->weaponParams.numDeflectionBounces < 2 )
+    int bFlagsHadWfImpactSoundFxEarlier = physicsThing->weaponParams.typeflags & SITH_WF_IMPACTSOUND;
+    if ( physicsThing->weaponParams.typeflags & SITH_WF_IMPACTSOUND && collidedThing->thingflags & SITH_TF_4
+      || collidedThing->type == SITH_THING_COG && physicsThing->weaponParams.typeflags & SITH_WF_SURFACERICOCHET && physicsThing->weaponParams.numDeflectionBounces < 2 )
     {
         if ( physicsThing->weaponParams.numDeflectionBounces++ < MAX_DEFLECTION_BOUNCES )
         {
@@ -681,7 +681,7 @@ int sithWeapon_ThingCollisionHandler(SithThing *physicsThing, SithThing *collide
                 rdMatrix_BuildFromLook34(&physicsThing->lookOrientation, &tmp);
 
                 sithSoundClass_PlayModeRandom(physicsThing, SITH_SC_DEFLECTED);
-                physicsThing->weaponParams.typeflags &= ~SITH_WF_NO_DAMAGE_TO_SHOOTER;
+                physicsThing->weaponParams.typeflags &= ~SITH_WF_NOSHOOTERDAMAGE;
                 result = 1;
             }
             return result;
@@ -698,12 +698,12 @@ int sithWeapon_ThingCollisionHandler(SithThing *physicsThing, SithThing *collide
             sithThing_DamageThing(collidedThing, physicsThing, physicsThing->weaponParams.damage, physicsThing->weaponParams.damageClass);
         }
 
-        if (physicsThing->weaponParams.typeflags & SITH_WF_EXPLODE_ON_SURFACE_HIT)
+        if (physicsThing->weaponParams.typeflags & SITH_WF_FACEHITEXPLODE)
         {
             sithWeapon_CreateWeaponExplosion(physicsThing, physicsThing->weaponParams.explodeTemplate);
             return 1;
         }
-        if (!(physicsThing->weaponParams.typeflags & SITH_WF_ATTACH_TO_WALL)) {
+        if (!(physicsThing->weaponParams.typeflags & SITH_WF_ATTACHFACE)) {
             return sithCollision_ThingCollisionHandler(physicsThing, collidedThing, a4, a5);
         }
         sithPhysics_ResetThingMovement(physicsThing);
@@ -713,19 +713,19 @@ int sithWeapon_ThingCollisionHandler(SithThing *physicsThing, SithThing *collide
         sithThing_AttachThingToThing(physicsThing, collidedThing);
         sithPhysics_SetThingLook(physicsThing, &a4->hitNorm, 0.0);
         
-        physicsThing->attach_flags |= SITH_ATTACH_NO_MOVE;
+        physicsThing->attach_flags |= SITH_ATTACH_NOMOVE;
         physicsThing->physicsParams.physflags |= SITH_PF_USEGRAVITY;
         return 1;
     }
     if (collidedThing->weaponParams.typeflags & SITH_WF_INSTANT_IMPACT
       && bFlagsHadWfImpactSoundFxEarlier
-      && !(collidedThing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED))
+      && !(collidedThing->thingflags & (SITH_TF_DEAD|SITH_TF_DESTROYED))
       && (collidedThing != sithPlayer_g_pLocalPlayerThing || sithTime_g_secGameTime >= (flex_d_t)sithWeapon_fireWait)
       && sithActor_thing_anim_blocked(physicsThing, collidedThing, a4) )
     {
         return 1;
     }
-    if ( physicsThing->weaponParams.damage == 0.0 && !(physicsThing->weaponParams.typeflags & (SITH_WF_ATTACH_TO_THING | SITH_WF_EXPLODE_ON_THING_HIT)))
+    if ( physicsThing->weaponParams.damage == 0.0 && !(physicsThing->weaponParams.typeflags & (SITH_WF_ATTACHTHING | SITH_WF_THINGHITEXPLODE)))
         return 0;
 
     if (sithCollision_ThingCollisionHandler(physicsThing, collidedThing, a4, a5))
@@ -733,10 +733,10 @@ int sithWeapon_ThingCollisionHandler(SithThing *physicsThing, SithThing *collide
         if (physicsThing->weaponParams.damage != 0.0) {
             sithThing_DamageThing(collidedThing, physicsThing, physicsThing->weaponParams.damage, physicsThing->weaponParams.damageClass);
         }
-        if (physicsThing->weaponParams.typeflags & SITH_WF_EXPLODE_ON_THING_HIT)
+        if (physicsThing->weaponParams.typeflags & SITH_WF_THINGHITEXPLODE)
         {
             // Proximity mines did the Beep Beep Beep, time to explode
-            if (collidedThing->weaponParams.typeflags & SITH_WF_EXPLODE_AT_TIMER_TIMEOUT)
+            if (collidedThing->weaponParams.typeflags & SITH_WF_EXPLODE)
             {
                 sithWeapon_CreateWeaponExplosion(physicsThing, physicsThing->weaponParams.explodeTemplate);
                 return 1;
@@ -746,12 +746,12 @@ int sithWeapon_ThingCollisionHandler(SithThing *physicsThing, SithThing *collide
             sithWeapon_CreateWeaponExplosion(physicsThing, physicsThing->weaponParams.fleshHitTemplate);
             return 1;
         }
-        if (!(physicsThing->weaponParams.typeflags & SITH_WF_ATTACH_TO_THING))
+        if (!(physicsThing->weaponParams.typeflags & SITH_WF_ATTACHTHING))
             return 1;
         sithPhysics_ResetThingMovement(physicsThing);
         sithThing_AttachThingToThing(physicsThing, collidedThing);
 
-        physicsThing->attach_flags |= SITH_ATTACH_NO_MOVE;
+        physicsThing->attach_flags |= SITH_ATTACH_NOMOVE;
         physicsThing->physicsParams.physflags |= SITH_PF_USEGRAVITY;
         return 1;
     }
@@ -788,7 +788,7 @@ int sithWeapon_SurfaceCollisionHandler(SithThing *thing, SithSurface *surface, S
         return 1;
     }
     typeFlags = thing->weaponParams.typeflags;
-    if ( ((typeFlags & SITH_WF_IMPACT_SOUND_FX) != 0 && (v6 & SITH_SURFACE_MAGSEALED) != 0 || (typeFlags & SITH_WF_RICOCHET_OFF_SURFACE) != 0 && thing->weaponParams.numDeflectionBounces < 2u)
+    if ( ((typeFlags & SITH_WF_IMPACTSOUND) != 0 && (v6 & SITH_SURFACE_MAGSEALED) != 0 || (typeFlags & SITH_WF_SURFACERICOCHET) != 0 && thing->weaponParams.numDeflectionBounces < 2u)
       && (++thing->weaponParams.numDeflectionBounces < MAX_DEFLECTION_BOUNCES) )
     {
         thing->physicsParams.physflags |= SITH_PF_SURFACEBOUNCE;
@@ -805,7 +805,7 @@ int sithWeapon_SurfaceCollisionHandler(SithThing *thing, SithSurface *surface, S
         thing->lookOrientation.uvec.x = (thing->lookOrientation.rvec.y * thing->lookOrientation.lvec.z) - (thing->lookOrientation.rvec.z * thing->lookOrientation.lvec.y);
         thing->lookOrientation.uvec.y = (thing->lookOrientation.rvec.z * thing->lookOrientation.lvec.x) - (thing->lookOrientation.lvec.z * thing->lookOrientation.rvec.x);
         thing->lookOrientation.uvec.z = (thing->lookOrientation.lvec.y * thing->lookOrientation.rvec.x) - (thing->lookOrientation.rvec.y * thing->lookOrientation.lvec.x);
-        thing->weaponParams.typeflags &= ~SITH_WF_NO_DAMAGE_TO_SHOOTER;
+        thing->weaponParams.typeflags &= ~SITH_WF_NOSHOOTERDAMAGE;
         
         sithSoundClass_PlayModeRandom(thing, SITH_SC_DEFLECTED);
         result = 1;
@@ -816,12 +816,12 @@ int sithWeapon_SurfaceCollisionHandler(SithThing *thing, SithSurface *surface, S
             sithSurface_HandleThingImpact(surface, thing, thing->weaponParams.damage, thing->weaponParams.damageClass);
 
         // MOTS added: floor explode?
-        if (thing->weaponParams.typeflags & SITH_WF_EXPLODE_ON_SURFACE_HIT || MOTS_ONLY_FLAG(thing->weaponParams.typeflags & SITH_WF_EXPLODES_ON_WORLD_FLOOR_HIT && surface->surfaceFlags & SITH_SURFACE_FLOOR))
+        if (thing->weaponParams.typeflags & SITH_WF_FACEHITEXPLODE || MOTS_ONLY_FLAG(thing->weaponParams.typeflags & SITH_WF_ACTORKILLDESTROY && surface->surfaceFlags & SITH_SURFACE_FLOOR))
         {
             sithWeapon_CreateWeaponExplosion(thing, thing->weaponParams.explodeTemplate);
             return 1;
         }
-        if ( (thing->weaponParams.typeflags & SITH_WF_ATTACH_TO_WALL) == 0 )
+        if ( (thing->weaponParams.typeflags & SITH_WF_ATTACHFACE) == 0 )
         {
             result = sithCollision_HandleThingHitSurface(thing, surface, a3);
         }
@@ -843,7 +843,7 @@ int sithWeapon_SurfaceCollisionHandler(SithThing *thing, SithSurface *surface, S
 void sithWeapon_DestroyWeapon(SithThing *weapon)
 {
     // This gets called for thermal detonators and prox mines when they run out of lifetime
-    if (weapon->weaponParams.typeflags & SITH_WF_EXPLODE_AT_TIMER_TIMEOUT)
+    if (weapon->weaponParams.typeflags & SITH_WF_EXPLODE)
     {
         sithWeapon_CreateWeaponExplosion(weapon, weapon->weaponParams.explodeTemplate);
     }
@@ -1136,7 +1136,7 @@ int sithWeapon_ProcessWeaponControls(SithThing *player, flex_t a2)
     if ( player->type != SITH_THING_PLAYER || (player->thingflags & SITH_TF_DEAD) != 0 )
         return 0;
 
-    if ( (player->weaponParams.typeflags & SITH_WF_TRIGGER_AIEVENT) == 0 )
+    if ( (player->weaponParams.typeflags & SITH_WF_EMITAITARGETEDEVENT) == 0 )
     {
         if ( sithTime_g_secGameTime < sithWeapon_secMountWait )
             return 0;

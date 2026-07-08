@@ -408,7 +408,7 @@ int sithGamesave_SerializeInventoryOnly(int mpFlags)
         return 0;
     for (int v19 = 0; v19 < SITHBIN_NUMBINS; v19++)
     {
-        if ( (sithInventory_g_aTypes[v19].flags & ITEMINFO_VALID) != 0 )
+        if ( (sithInventory_g_aTypes[v19].flags & SITHINVENTORY_TYPE_REGISTERED) != 0 )
             sithDSS_Inventory(sithPlayer_g_pLocalPlayerThing, v19, 0, mpFlags);
     }
     return 1;
@@ -444,9 +444,9 @@ int sithGamesave_SaveCurrentWorld(int mpFlags)
             if ( v7->attach_flags )
             {
                 // MOTS altered: Jail Key
-                if (!Main_bMotsCompat && (v7->attach_flags & SITH_ATTACH_NO_MOVE) != 0 || v7->moveType != SITH_MT_PHYSICS )
+                if (!Main_bMotsCompat && (v7->attach_flags & SITH_ATTACH_NOMOVE) != 0 || v7->moveType != SITH_MT_PHYSICS )
                     sithDSSThing_Attachment(v7, 0, mpFlags, 1);
-                else if (Main_bMotsCompat && v7->attach_flags && (v7->attach_flags & (SITH_ATTACH_NO_MOVE|SITH_ATTACH_FORCE_SERIALIZE)) != 0 || v7->moveType != SITH_MT_PHYSICS )
+                else if (Main_bMotsCompat && v7->attach_flags && (v7->attach_flags & (SITH_ATTACH_NOMOVE|SITH_ATTACH_FORCE_SERIALIZE)) != 0 || v7->moveType != SITH_MT_PHYSICS )
                     sithDSSThing_Attachment(v7, 0, mpFlags, 1);
             }
         }
@@ -484,7 +484,7 @@ int sithGamesave_SaveCurrentWorld(int mpFlags)
 
     for (v19 = 0; v19 < SITHBIN_NUMBINS; v19++) // TODO define this maximum
     {
-        if ( (sithInventory_g_aTypes[v19].flags & ITEMINFO_VALID) != 0 )
+        if ( (sithInventory_g_aTypes[v19].flags & SITHINVENTORY_TYPE_REGISTERED) != 0 )
             sithDSS_Inventory(sithPlayer_g_pLocalPlayerThing, v19, 0, mpFlags);
     }
 

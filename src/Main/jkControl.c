@@ -85,7 +85,7 @@ int jkControl_HandleHudKeys(SithThing *player, flex_t b)
         sithControl_GetKey(INPUT_FUNC_CAMERAMODE, &v15);
         for (int i = v15-- == 0; !i; --v15 )
         {
-            if ( (player->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 && sithThing_MotsTick(0xe,0,0.0)) // MOTS altered
+            if ( (player->thingflags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) == 0 && sithThing_MotsTick(0xe,0,0.0)) // MOTS altered
             {
                 sithCamera_CycleCamera();
                 //DAT_005b9254 = 2; // MOTS TODO
