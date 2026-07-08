@@ -501,3 +501,13 @@ named-enum-usage only where behavior is provably unchanged.
 Pilot done: `sithTime` (deltaMs→frameTime, curMs→msecTime), byte-identical.
 Remaining: arg-name pass over the other ~90 shared modules (per-module J3D-vs-DF2
 signature diff → function-scoped rename → byte-verify).
+
+### Phase 4 progress (arg-name pass)
+Done (byte-identical NDS each batch): sithTime; **batch1** sithCamera/Collision/Sector/
+Model/SoundClass/Material; **batch2** sithSurface/Sprite/KeyFrame/Template/Weapon/Item;
+**batch3** sithPhysics/Actor/Explosion/Particle/Control/Puppet; **batch4** rdCamera/
+Material/Model3/Light/Keyframe (rdColormap has no J3D counterpart); **batch5** sithWorld/
+Render/Map/CogExec/CogParse (sithNav absent in both). = **30 modules, ~340 functions.**
+Tool: scratchpad `apply_argnames.py` + per-module subagent maps. Remaining ~61 modules
+(sithThing, sithCog + CogFunction*/CogUtil/CogVm, sithAI family [note sithAICmd ↔ J3D
+sithAIInstinct/sithAIMove/sithAIUtil split], std* utilities, jk* game layer, etc.).
