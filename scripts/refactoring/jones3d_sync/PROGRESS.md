@@ -24,7 +24,7 @@ lets fixes/insights flow between them.
 ## Phases (in order)
 
 1. **Functions** — rename function names. ✅ COMPLETE (91/91).
-2. **Globals** — rename file-scope globals via `symbols.syms`. ◐ IN PROGRESS.
+2. **Globals** â rename file-scope globals via `symbols.syms`. ✅ COMPLETE (37 modules renamed; 8 had only bare-static/DF2-only globals). Build green.
 3. **Structs / members / typedefs / enums** — rename type names, struct members,
    enum names+values (incl. deferred type renames like the `stdHashTable`/
    `stdLinklist` structs). NOT STARTED.
