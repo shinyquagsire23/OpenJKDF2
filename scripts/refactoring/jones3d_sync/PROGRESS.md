@@ -25,9 +25,18 @@ lets fixes/insights flow between them.
 
 1. **Functions** — rename function names. ✅ COMPLETE (91/91).
 2. **Globals** — rename file-scope globals via `symbols.syms`. ✅ COMPLETE (37 modules renamed; 8 had only bare-static/DF2-only globals). Build green.
-3. **Structs / members / typedefs / enums** — rename type names, struct members,
-   enum names+values (incl. deferred type renames like the `stdHashTable`/
-   `stdLinklist` structs). NOT STARTED.
+3. **Structs / members / typedefs / enums** ◐ IN PROGRESS. Order names → enums →
+   members. Enum adoption width-safe only; member renames name-only +
+   layout-preserving (DF2 structs are JK.EXE-hooked — do NOT adopt J3D structural
+   reorganizations like union↔sub-struct).
+   - **3a struct type NAMES ✅** — sith (43: `sithThing`→`SithThing`, …) + std
+     (11: `stdVBuffer`→`tVBuffer`, `stdHashTable`→`tHashTable`, `stdGob`→`Gob`, …);
+     `rd*` names already matched. Build green. HAZARD: many type names double as
+     module/file names → the apply must not rewrite `.h`/`.c` refs in `#include`s
+     (scratchpad `apply_types.py` has a `(?!\.[ch])` lookahead + covers `.cpp`).
+     Skipped `stdFileSearch`→`FindFileData` (would shadow a local WIN32_FIND_DATA).
+   - **3b enum types + constants** — NOT STARTED.
+   - **3c struct members** — NOT STARTED (name-only, layout-preserving; largest blast radius).
 4. **Style match (final)** — for each function, match OpenJones3D's *style* as
    closely as possible **without changing functionality**:
    - **argument names** → adopt J3D's parameter names.
