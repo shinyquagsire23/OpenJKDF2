@@ -11,16 +11,16 @@
 
 int sithAIClass_Startup()
 {
-    sithAIClass_hashmap = stdHashtbl_New(64);
-    return sithAIClass_hashmap != 0;
+    sithAIClass_g_pHashtable = stdHashtbl_New(64);
+    return sithAIClass_g_pHashtable != 0;
 }
 
 void sithAIClass_Shutdown()
 {
-    if (sithAIClass_hashmap)
+    if (sithAIClass_g_pHashtable)
     {
-        stdHashtbl_Free(sithAIClass_hashmap);
-        sithAIClass_hashmap = 0;
+        stdHashtbl_Free(sithAIClass_g_pHashtable);
+        sithAIClass_g_pHashtable = 0;
     }
 }
 
@@ -107,7 +107,7 @@ sithAIClass* sithAIClass_Load(char *fpath)
     if ( !sithWorld_g_pLastLoadedWorld->aiclasses )
         return 0;
 
-    result = (sithAIClass *)stdHashtbl_Find(sithAIClass_hashmap, fpath);
+    result = (sithAIClass *)stdHashtbl_Find(sithAIClass_g_pHashtable, fpath);
     if ( result )
         return result;
 
@@ -132,9 +132,9 @@ sithAIClass* sithAIClass_Load(char *fpath)
     {
 #ifdef SITH_DEBUG_STRUCT_NAMES
             // The copies of names are load-bearing, SetKeyVal stores a reference
-        stdHashtbl_Add(sithAIClass_hashmap, aiclass->fpath, aiclass);
+        stdHashtbl_Add(sithAIClass_g_pHashtable, aiclass->fpath, aiclass);
 #else
-        stdHashtbl_Add(sithAIClass_hashmap, fpath, aiclass);
+        stdHashtbl_Add(sithAIClass_g_pHashtable, fpath, aiclass);
 #endif
         aiclass->index = world->numAIClassesLoaded++;
         
@@ -258,9 +258,9 @@ void sithAIClass_FreeWorldAIClasses(sithWorld *world)
         for (uint32_t i = 0; i < world->numAIClassesLoaded; i++)
         {
 #ifdef STDHASHTABLE_CRC32_KEYS
-            stdHashtbl_FreeKeyCrc32(sithAIClass_hashmap, world->aiclasses[i].fpathcrc);
+            stdHashtbl_FreeKeyCrc32(sithAIClass_g_pHashtable, world->aiclasses[i].fpathcrc);
 #else
-            stdHashtbl_Remove(sithAIClass_hashmap, world->aiclasses[i].fpath);
+            stdHashtbl_Remove(sithAIClass_g_pHashtable, world->aiclasses[i].fpath);
 #endif
         }
         SITH_FREE(world->aiclasses);

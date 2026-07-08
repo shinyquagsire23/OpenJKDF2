@@ -1,4 +1,4 @@
-sithAIClass_hashmap 0x00852F88 stdHashTable*
+sithAIClass_g_pHashtable 0x00852F88 stdHashTable*
 
 std_g_genBuffer 0x866880 char[1024]
 std_g_pHS 0x866C80 struct HostServices*
