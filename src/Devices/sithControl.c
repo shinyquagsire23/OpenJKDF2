@@ -269,9 +269,9 @@ void sithControl_Update(flex_t deltaSecs, int deltaMs)
     if ( !sithPlayer_pLocalPlayerThing
       || (sithPlayer_pLocalPlayerThing->actorParams.typeflags & (Main_bMotsCompat ? (SITH_AF_NOHUD|SITH_AF_SCOPEHUD|SITH_AF_80000000) : SITH_AF_NOHUD))
       || (sithPlayer_pLocalPlayerThing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0
-      || (sithCamera_state & 1) != 0 )
+      || (sithCamera_g_stateFlags & 1) != 0 )
     {
-        if ( sithCamera_currentCamera == &sithCamera_cameras[4] )
+        if ( sithCamera_g_pCurCamera == &sithCamera_g_aCameras[4] )
         {
             sithCamera_SetCurrentToCycleCamera();
         }
@@ -281,10 +281,10 @@ void sithControl_Update(flex_t deltaSecs, int deltaMs)
         if ( stdControl_bControlsIdle )
         {
             sithControl_msIdle += deltaMs;
-            if ( sithControl_msIdle > 30000 && sithCamera_currentCamera != &sithCamera_cameras[4] )
-                sithCamera_SetCurrentCamera(&sithCamera_cameras[4]);
+            if ( sithControl_msIdle > 30000 && sithCamera_g_pCurCamera != &sithCamera_g_aCameras[4] )
+                sithCamera_SetCurrentCamera(&sithCamera_g_aCameras[4]);
 #ifdef QOL_IMPROVEMENTS
-            else if (sithControl_msIdle < 30000 && sithCamera_currentCamera == &sithCamera_cameras[4] ) {
+            else if (sithControl_msIdle < 30000 && sithCamera_g_pCurCamera == &sithCamera_g_aCameras[4] ) {
                 sithCamera_SetCurrentToCycleCamera();
             }
 #endif
@@ -292,7 +292,7 @@ void sithControl_Update(flex_t deltaSecs, int deltaMs)
         }
         else {
             sithControl_msIdle = 0;
-            if ( sithCamera_currentCamera == &sithCamera_cameras[4] ) {
+            if ( sithCamera_g_pCurCamera == &sithCamera_g_aCameras[4] ) {
                 sithCamera_SetCurrentToCycleCamera();
             }
         }
@@ -1013,7 +1013,7 @@ LABEL_39:
             {
                 // MOTS added
                 if (Main_bMotsCompat) {
-                    sithControl_008d7f44 = sithCamera_cameras[sithCamera_currentCamera - sithCamera_cameras].rdCam.fov * 0.01111111;
+                    sithControl_008d7f44 = sithCamera_g_aCameras[sithCamera_g_pCurCamera - sithCamera_g_aCameras].rdCam.fov * 0.01111111;
                     sithControl_PlayerLook(player, deltaSecs);
                 }
 
@@ -1112,10 +1112,10 @@ debug_controls:
         sithControl_GetKey(INPUT_FUNC_ACTIVATE, &input_read);
         if ( input_read )
         {
-            if ( sithCamera_currentCamera->cameraPerspective == 128 )
+            if ( sithCamera_g_pCurCamera->cameraPerspective == 128 )
                 sithCamera_SetCurrentToCycleCamera();
             else
-                sithCamera_SetCurrentCamera(&sithCamera_cameras[6]);
+                sithCamera_SetCurrentCamera(&sithCamera_g_aCameras[6]);
         }
 #ifdef QOL_IMPROVEMENTS
         // Scale appropriately to high framerates
@@ -1153,29 +1153,29 @@ debug_controls:
         }
         
         v10 = -sithControl_vec3_54A570.x;
-        sithCamera_viewMat.lvec.x = v10;
+        sithCamera_g_orbCamOrient.lvec.x = v10;
         v11 = -sithControl_vec3_54A570.y;
-        sithCamera_viewMat.lvec.y = v11;
+        sithCamera_g_orbCamOrient.lvec.y = v11;
         v12 = -sithControl_vec3_54A570.z;
-        sithCamera_viewMat.lvec.z = v12;
+        sithCamera_g_orbCamOrient.lvec.z = v12;
         v13 = v11 * 1.0 - v12 * 0.0;
-        sithCamera_viewMat.rvec.x = v13;
-        v14 = sithCamera_viewMat.lvec.z * 0.0 - v10 * 1.0;
-        sithCamera_viewMat.rvec.y = v14;
-        v15 = v14 * sithCamera_viewMat.lvec.z;
-        v16 = sithCamera_viewMat.lvec.x * 0.0 - sithCamera_viewMat.lvec.y * 0.0;
-        sithCamera_viewMat.rvec.z = v16;
-        sithCamera_viewMat.uvec.x = v15 - v16 * sithCamera_viewMat.lvec.y;
-        sithCamera_viewMat.uvec.y = sithCamera_viewMat.rvec.z * sithCamera_viewMat.lvec.x - v13 * sithCamera_viewMat.lvec.z;
-        sithCamera_viewMat.uvec.z = sithCamera_viewMat.rvec.x * sithCamera_viewMat.lvec.y - sithCamera_viewMat.rvec.y * sithCamera_viewMat.lvec.x;
-        rdMatrix_Normalize34(&sithCamera_viewMat);
-        sithCamera_viewMat.scale.x = sithControl_flt_54A57C * sithControl_vec3_54A570.x;
-        sithCamera_viewMat.scale.y = sithControl_flt_54A57C * sithControl_vec3_54A570.y;
-        sithCamera_viewMat.scale.z = sithControl_flt_54A57C * sithControl_vec3_54A570.z;
+        sithCamera_g_orbCamOrient.rvec.x = v13;
+        v14 = sithCamera_g_orbCamOrient.lvec.z * 0.0 - v10 * 1.0;
+        sithCamera_g_orbCamOrient.rvec.y = v14;
+        v15 = v14 * sithCamera_g_orbCamOrient.lvec.z;
+        v16 = sithCamera_g_orbCamOrient.lvec.x * 0.0 - sithCamera_g_orbCamOrient.lvec.y * 0.0;
+        sithCamera_g_orbCamOrient.rvec.z = v16;
+        sithCamera_g_orbCamOrient.uvec.x = v15 - v16 * sithCamera_g_orbCamOrient.lvec.y;
+        sithCamera_g_orbCamOrient.uvec.y = sithCamera_g_orbCamOrient.rvec.z * sithCamera_g_orbCamOrient.lvec.x - v13 * sithCamera_g_orbCamOrient.lvec.z;
+        sithCamera_g_orbCamOrient.uvec.z = sithCamera_g_orbCamOrient.rvec.x * sithCamera_g_orbCamOrient.lvec.y - sithCamera_g_orbCamOrient.rvec.y * sithCamera_g_orbCamOrient.lvec.x;
+        rdMatrix_Normalize34(&sithCamera_g_orbCamOrient);
+        sithCamera_g_orbCamOrient.scale.x = sithControl_flt_54A57C * sithControl_vec3_54A570.x;
+        sithCamera_g_orbCamOrient.scale.y = sithControl_flt_54A57C * sithControl_vec3_54A570.y;
+        sithCamera_g_orbCamOrient.scale.z = sithControl_flt_54A57C * sithControl_vec3_54A570.z;
         sithControl_GetKey(INPUT_FUNC_MAP, &input_read);
         if ( input_read )
             g_mapModeFlags ^= 0x42u;
-        sithCamera_currentCamera->cameraPerspective = 128;
+        sithCamera_g_pCurCamera->cameraPerspective = 128;
         if (!(sithNet_isServer && jkGuiNetHost_bIsDedicated)) // Added
             result = 1;
         else

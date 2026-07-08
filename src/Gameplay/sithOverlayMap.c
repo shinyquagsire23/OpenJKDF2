@@ -94,7 +94,7 @@ int sithOverlayMap_Draw(rdCanvas *canvas)
     sithOverlayMap_x1 = v12;
     v12 = (int)canvas->half_screen_height;
     a3.x = 0.0;
-    a3.y = -sithCamera_currentCamera->viewPYR.y;
+    a3.y = -sithCamera_g_pCurCamera->viewPYR.y;
     sithOverlayMap_y1 = v12;
     a3.z = 0.0;
     rdMatrix_BuildRotate34(&sithOverlayMap_matrix, &a3);

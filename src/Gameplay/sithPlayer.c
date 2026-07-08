@@ -247,8 +247,8 @@ void sithPlayer_Update(sithPlayerInfo *playerInfo, flex_t a2)
                     {
                         v3->thingflags |= SITH_TF_DEAD;
                         v3->actorParams.typeflags |= SITH_AF_FALLING_TO_DEATH;
-                        sithCamera_SetCameraFocus(&sithCamera_cameras[1], v3, 0);
-                        sithCamera_SetCurrentCamera(&sithCamera_cameras[1]);
+                        sithCamera_SetCameraFocus(&sithCamera_g_aCameras[1], v3, 0);
+                        sithCamera_SetCurrentCamera(&sithCamera_g_aCameras[1]);
                     }
                 }
             }
@@ -504,8 +504,8 @@ void sithPlayer_NewPlayer(sithThing *player)
         sithActor_SetHeadPYR(player, &rdroid_zeroVector3);
         if ( player == sithPlayer_pLocalPlayerThing )
         {
-            sithCamera_SetCameraFocus(sithCamera_cameras, player, 0);
-            sithCamera_SetCameraFocus(&sithCamera_cameras[1], player, 0);
+            sithCamera_SetCameraFocus(sithCamera_g_aCameras, player, 0);
+            sithCamera_SetCameraFocus(&sithCamera_g_aCameras[1], player, 0);
             sithCamera_SetCurrentToCycleCamera();
             v6 = stdPalEffects_GetEffectPointer(sithPlayer_pLocalPlayer->palEffectsIdx1);
             stdPalEffects_ResetEffect(v6);
@@ -523,7 +523,7 @@ void sithPlayer_NewPlayer(sithThing *player)
                 &jkPlayer_playerInfos[v9].spawnPosOrient.scale,
                 &jkPlayer_playerInfos[v9].spawnPosOrient);
             sithThing_EnterSector(player, jkPlayer_playerInfos[v9].pSpawnSector, 1, 0);
-            sithCamera_Update(sithCamera_currentCamera);
+            sithCamera_Update(sithCamera_g_pCurCamera);
             sithPhysics_ResetThingMovement(player);
             sithWeapon_SyncPuppet(player);
             sithCog_BroadcastMessage(SITH_MESSAGE_NEWPLAYER, SENDERTYPE_THING, player->thingIdx, SENDERTYPE_THING, player->thingIdx);

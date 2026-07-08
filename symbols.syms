@@ -79,18 +79,18 @@ sithRender_aSurfaces 0x008318F8 sithSurface*[SITH_MAX_VISIBLE_ALPHA_SURFACES]
 sithRender_lastRenderTick 0x008EE678 int
 aSithSurfaces 0x00847E98 sithSurface*[SITH_MAX_VISIBLE_ALPHA_SURFACES]
 
-sithCamera_cameras 0x008EC380 sithCamera[SITHCAMERA_NUMCAMERAS]
-sithCamera_dword_8EE5A0 0x008EE5A0 int
-sithCamera_state 0x008EE5A4 int
-sithCamera_curCameraIdx 0x008EE5A8 int
-sithCamera_povShakeVector1 0x008EE5AC rdVector3
-sithCamera_povShakeVector2 0x008EE5B8 rdVector3
-sithCamera_povShakeF1 0x008EE5C4 flex_t
-sithCamera_povShakeF2 0x008EE5C8 flex_t
-sithCamera_currentCamera 0x0082F104 sithCamera*
-sithCamera_bInitted 0x0082F108 int
-sithCamera_viewMat 0x008EE5E0 rdMatrix34
-sithCamera_focusMat 0x0082F0B8 rdMatrix34
+sithCamera_g_aCameras 0x008EC380 sithCamera[SITHCAMERA_NUMCAMERAS]
+sithCamera_g_bCurCameraSet 0x008EE5A0 int
+sithCamera_g_stateFlags 0x008EE5A4 int
+sithCamera_g_curCycleCamNum 0x008EE5A8 int
+sithCamera_g_vecCameraPosOffset 0x008EE5AC rdVector3
+sithCamera_g_vecCameraAngleOffset 0x008EE5B8 rdVector3
+sithCamera_g_cameraPosDelta 0x008EE5C4 flex_t
+sithCamera_g_cameraAngleDelta 0x008EE5C8 flex_t
+sithCamera_g_pCurCamera 0x0082F104 sithCamera*
+sithCamera_bStartup 0x0082F108 int
+sithCamera_g_orbCamOrient 0x008EE5E0 rdMatrix34
+sithCamera_idleCamOrient 0x0082F0B8 rdMatrix34
 sithCamera_bOpen 0x0082F10C int
 //sithCamera_camIdxToGlobalIdx 0x00549088 int[2]
 

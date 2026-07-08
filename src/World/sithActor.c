@@ -254,7 +254,7 @@ void sithActor_KillActor(sithThing *thing, sithThing *a3, int a4)
         // MOTS added: quiet death
         if (!Main_bMotsCompat || a4 != 12345678) {
             if ( thing == sithWorld_pCurrentWorld->cameraFocus )
-                sithCamera_SetCurrentCamera(&sithCamera_cameras[5]);
+                sithCamera_SetCurrentCamera(&sithCamera_g_aCameras[5]);
 
             // MOTS added: quiet death
             if (!Main_bMotsCompat || a4 != 12345678) {

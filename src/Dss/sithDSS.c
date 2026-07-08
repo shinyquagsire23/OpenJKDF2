@@ -741,25 +741,25 @@ void sithDSS_SyncCameras(int sendto_id, int mpFlags)
 {
     NETMSG_START;
 
-    NETMSG_PUSHS16(sithCamera_currentCamera - sithCamera_cameras);
-    NETMSG_PUSHU32(sithCamera_dword_8EE5A0);
-    NETMSG_PUSHU32(sithCamera_curCameraIdx);
-    NETMSG_PUSHVEC3(sithCamera_povShakeVector1);
-    NETMSG_PUSHVEC3(sithCamera_povShakeVector2);
-    NETMSG_PUSHF32(sithCamera_povShakeF1);
-    NETMSG_PUSHF32(sithCamera_povShakeF2);
+    NETMSG_PUSHS16(sithCamera_g_pCurCamera - sithCamera_g_aCameras);
+    NETMSG_PUSHU32(sithCamera_g_bCurCameraSet);
+    NETMSG_PUSHU32(sithCamera_g_curCycleCamNum);
+    NETMSG_PUSHVEC3(sithCamera_g_vecCameraPosOffset);
+    NETMSG_PUSHVEC3(sithCamera_g_vecCameraAngleOffset);
+    NETMSG_PUSHF32(sithCamera_g_cameraPosDelta);
+    NETMSG_PUSHF32(sithCamera_g_cameraAngleDelta);
 
     for (int i = 0; i < 7; i++) // TODO define this maximum
     {
-        if ( sithCamera_cameras[i].primaryFocus ) {
-            NETMSG_PUSHS32(sithCamera_cameras[i].primaryFocus->thingIdx);
+        if ( sithCamera_g_aCameras[i].primaryFocus ) {
+            NETMSG_PUSHS32(sithCamera_g_aCameras[i].primaryFocus->thingIdx);
         }
         else {
             NETMSG_PUSHS32(-1);
         }
 
-        if ( sithCamera_cameras[i].secondaryFocus ) {
-            NETMSG_PUSHS32(sithCamera_cameras[i].secondaryFocus->thingIdx);
+        if ( sithCamera_g_aCameras[i].secondaryFocus ) {
+            NETMSG_PUSHS32(sithCamera_g_aCameras[i].secondaryFocus->thingIdx);
         }
         else {
             NETMSG_PUSHS32(-1);
@@ -767,20 +767,20 @@ void sithDSS_SyncCameras(int sendto_id, int mpFlags)
 
         if (Main_bMotsCompat) {
 #ifndef QOL_IMPROVEMENTS
-            if (!sithCamera_cameras[i].rdCam.canvas || !sithCamera_cameras[i].bZoomed) {
-                NETMSG_PUSHF32(sithCamera_cameras[i].rdCam.fov); //fVar1 = (ADJ(ppsVar5)->rdCam).fov;
+            if (!sithCamera_g_aCameras[i].rdCam.canvas || !sithCamera_g_aCameras[i].bZoomed) {
+                NETMSG_PUSHF32(sithCamera_g_aCameras[i].rdCam.fov); //fVar1 = (ADJ(ppsVar5)->rdCam).fov;
             }
             else {
-                NETMSG_PUSHF32(sithCamera_cameras[i].zoomFov);
+                NETMSG_PUSHF32(sithCamera_g_aCameras[i].zoomFov);
                 //fVar1 = ADJ(ppsVar5)->zoomFov;
             }
 #else
-            NETMSG_PUSHF32(sithCamera_cameras[i].fov);
+            NETMSG_PUSHF32(sithCamera_g_aCameras[i].fov);
 #endif
             
         }
         else {
-            NETMSG_PUSHF32(sithCamera_cameras[i].fov);
+            NETMSG_PUSHF32(sithCamera_g_aCameras[i].fov);
         }
         
     }
@@ -798,47 +798,47 @@ int sithDSS_ProcessSyncCameras(sithCogMsg *msg)
 {
     NETMSG_IN_START(msg);
     
-    sithCamera_currentCamera = &sithCamera_cameras[NETMSG_POPS16()];
-    sithCamera_dword_8EE5A0 = NETMSG_POPU32();
-    sithCamera_curCameraIdx = NETMSG_POPU32();
-    sithCamera_povShakeVector1 = NETMSG_POPVEC3();
-    sithCamera_povShakeVector2 = NETMSG_POPVEC3();
-    sithCamera_povShakeF1 = NETMSG_POPF32();
-    sithCamera_povShakeF2 = NETMSG_POPF32();
+    sithCamera_g_pCurCamera = &sithCamera_g_aCameras[NETMSG_POPS16()];
+    sithCamera_g_bCurCameraSet = NETMSG_POPU32();
+    sithCamera_g_curCycleCamNum = NETMSG_POPU32();
+    sithCamera_g_vecCameraPosOffset = NETMSG_POPVEC3();
+    sithCamera_g_vecCameraAngleOffset = NETMSG_POPVEC3();
+    sithCamera_g_cameraPosDelta = NETMSG_POPF32();
+    sithCamera_g_cameraAngleDelta = NETMSG_POPF32();
 
     for (int i = 0; i < 7; i++) // TODO define this maximum
     {
         // Added: shifted around the -1 checks
         int primaryIdx = NETMSG_POPS32();
         int secondaryIdx = NETMSG_POPS32();
-        sithCamera_cameras[i].primaryFocus = sithThing_GetThingByIndex(primaryIdx);
-        if (!sithCamera_cameras[i].primaryFocus && primaryIdx != -1) return 0;
+        sithCamera_g_aCameras[i].primaryFocus = sithThing_GetThingByIndex(primaryIdx);
+        if (!sithCamera_g_aCameras[i].primaryFocus && primaryIdx != -1) return 0;
 
-        sithCamera_cameras[i].secondaryFocus = sithThing_GetThingByIndex(secondaryIdx);
-        if (!sithCamera_cameras[i].secondaryFocus && secondaryIdx != -1) return 0;
+        sithCamera_g_aCameras[i].secondaryFocus = sithThing_GetThingByIndex(secondaryIdx);
+        if (!sithCamera_g_aCameras[i].secondaryFocus && secondaryIdx != -1) return 0;
 
-        sithCamera_cameras[i].fov = NETMSG_POPF32();
+        sithCamera_g_aCameras[i].fov = NETMSG_POPF32();
 
         // MOTS added
         if (Main_bMotsCompat) {
 #ifndef QOL_IMPROVEMENTS
-            if ((sithCamera_cameras[i].fov < 5.0) || (179.0 < sithCamera_cameras[i].fov)) {
-                sithCamera_cameras[i].fov = 90.0;
+            if ((sithCamera_g_aCameras[i].fov < 5.0) || (179.0 < sithCamera_g_aCameras[i].fov)) {
+                sithCamera_g_aCameras[i].fov = 90.0;
             }
 #else
-            if ((sithCamera_cameras[i].fov < 5.0) || (179.0 < sithCamera_cameras[i].fov)) {
-                sithCamera_cameras[i].fov = jkPlayer_fov;
+            if ((sithCamera_g_aCameras[i].fov < 5.0) || (179.0 < sithCamera_g_aCameras[i].fov)) {
+                sithCamera_g_aCameras[i].fov = jkPlayer_fov;
             }
 #endif
 
-            rdCamera_SetFOV(&sithCamera_cameras[i].rdCam, sithCamera_cameras[i].fov);
-            sithCamera_cameras[i].bZoomed = 0;
-            sithCamera_cameras[i].zoomFov = sithCamera_cameras[i].fov;
+            rdCamera_SetFOV(&sithCamera_g_aCameras[i].rdCam, sithCamera_g_aCameras[i].fov);
+            sithCamera_g_aCameras[i].bZoomed = 0;
+            sithCamera_g_aCameras[i].zoomFov = sithCamera_g_aCameras[i].fov;
 #ifdef QOL_IMPROVEMENTS
-            sithCamera_cameras[i].zoomFov = 1.0;
-            sithCamera_cameras[i].zoomScale = 1.0;
-            sithCamera_cameras[i].invZoomScale = 1.0;
-            sithCamera_cameras[i].zoomScaleOrig = 1.0;
+            sithCamera_g_aCameras[i].zoomFov = 1.0;
+            sithCamera_g_aCameras[i].zoomScale = 1.0;
+            sithCamera_g_aCameras[i].invZoomScale = 1.0;
+            sithCamera_g_aCameras[i].zoomScaleOrig = 1.0;
 #endif
         }
     }

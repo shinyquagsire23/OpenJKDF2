@@ -1301,7 +1301,7 @@ void sithWeapon_GetAimOrient(rdMatrix34 *out, sithThing *sender, rdMatrix34 *in,
         autoaimMaxDist = autoaimMaxDist * g_flt_8BD050;
     }
 
-    if ( sithCamera_currentCamera - sithCamera_cameras == 1 )
+    if ( sithCamera_g_pCurCamera - sithCamera_g_aCameras == 1 )
     {
         autoaimFov = autoaimFov * g_flt_8BD058;
         autoaimMaxDist = autoaimMaxDist * g_flt_8BD058;

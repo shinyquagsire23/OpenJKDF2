@@ -388,7 +388,7 @@ skip_free_things:
     }
 skip_dss:
     sithTime_SetGameTime(curMs);
-    sithCamera_SetCurrentCamera(sithCamera_currentCamera);
+    sithCamera_SetCurrentCamera(sithCamera_g_pCurCamera);
     return 1;
 
 load_fail:

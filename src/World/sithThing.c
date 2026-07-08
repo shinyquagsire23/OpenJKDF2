@@ -205,9 +205,9 @@ void sithThing_Update(flex_t deltaSeconds, int deltaMs)
         // cutscene rigs (boss-intro fly-bys: PlayKey/RotatePivot on an invisible
         // camera thing) never render, so the rendered-recently gates below would
         // throttle their animation to the 1/64 offscreen rate and freeze the shot.
-        int bIsCameraFocus = sithCamera_currentCamera
-            && (sithCamera_currentCamera->primaryFocus == pThingIter
-             || sithCamera_currentCamera->secondaryFocus == pThingIter);
+        int bIsCameraFocus = sithCamera_g_pCurCamera
+            && (sithCamera_g_pCurCamera->primaryFocus == pThingIter
+             || sithCamera_g_pCurCamera->secondaryFocus == pThingIter);
         int bCanUpdateOffscreen = bIsCameraFocus ||
             (((uint8_t)jkPlayer_currentTickIdx + (pThingIter->thingIdx & 0xFF)) & 0x3F) == 0;
         int bActorCanUpdateEveryOther = pThingIter->type == SITH_THING_ACTOR && (((uint8_t)jkPlayer_currentTickIdx + (pThingIter->thingIdx & 0xFF)) & 1) == 0;

@@ -21,22 +21,22 @@ static int sithCamera_camIdxToGlobalIdx[2] = {0,1};
 
 int sithCamera_Startup()
 {
-    sithCamera_NewEntry(&sithCamera_cameras[0], 0, 0x1, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
-    sithCamera_NewEntry(&sithCamera_cameras[1], 0, 0x4, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
-    sithCamera_cameras[1].collisionOffset.x = 0.0;
-    sithCamera_cameras[1].collisionOffset.y = -0.2;
-    sithCamera_cameras[1].collisionOffset.z = 0.06;
-    sithCamera_NewEntry(&sithCamera_cameras[2], 0, 0x8, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
-    sithCamera_NewEntry(&sithCamera_cameras[4], 0, 0x20, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
-    sithCamera_NewEntry(&sithCamera_cameras[5], 0, 0x40, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
-    sithCamera_NewEntry(&sithCamera_cameras[6], 0, 0x80, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
+    sithCamera_NewEntry(&sithCamera_g_aCameras[0], 0, 0x1, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
+    sithCamera_NewEntry(&sithCamera_g_aCameras[1], 0, 0x4, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
+    sithCamera_g_aCameras[1].collisionOffset.x = 0.0;
+    sithCamera_g_aCameras[1].collisionOffset.y = -0.2;
+    sithCamera_g_aCameras[1].collisionOffset.z = 0.06;
+    sithCamera_NewEntry(&sithCamera_g_aCameras[2], 0, 0x8, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
+    sithCamera_NewEntry(&sithCamera_g_aCameras[4], 0, 0x20, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
+    sithCamera_NewEntry(&sithCamera_g_aCameras[5], 0, 0x40, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
+    sithCamera_NewEntry(&sithCamera_g_aCameras[6], 0, 0x80, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
 #ifdef DW_CAMERA
     if (Main_bDwCompat) {
-        sithCamera_NewEntry(&sithCamera_cameras[7], 0, 0x100, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
+        sithCamera_NewEntry(&sithCamera_g_aCameras[7], 0, 0x100, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
     }
 #endif
-    sithCamera_curCameraIdx = 0;
-    sithCamera_bInitted = 1;
+    sithCamera_g_curCycleCamNum = 0;
+    sithCamera_bStartup = 1;
 
     return 1;
 }
@@ -47,12 +47,12 @@ void sithCamera_Shutdown()
 
     // Added: Clean reset
 #ifdef DW_CAMERA
-    memset(sithCamera_cameras, 0, sizeof(sithCamera) * 8);
+    memset(sithCamera_g_aCameras, 0, sizeof(sithCamera) * 8);
 #else
-    memset(sithCamera_cameras, 0, sizeof(sithCamera) * 7);
+    memset(sithCamera_g_aCameras, 0, sizeof(sithCamera) * 7);
 #endif
 
-    sithCamera_bInitted = 0;
+    sithCamera_bStartup = 0;
 }
 
 int sithCamera_Open(rdCanvas *canvas, flex_t aspect)
@@ -60,39 +60,39 @@ int sithCamera_Open(rdCanvas *canvas, flex_t aspect)
     if ( sithCamera_bOpen )
         return 0;
 
-    sithCamera_cameras[0].aspectRatio = aspect;
-    rdCamera_NewEntry(&sithCamera_cameras[0].rdCam, sithCamera_cameras[0].rdCam.fov, 0, SITHCAMERA_ZNEAR_FIRSTPERSON, SITHCAMERA_ZFAR, aspect);
-    rdCamera_SetAttenuation(&sithCamera_cameras[0].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
-    rdCamera_SetCanvas(&sithCamera_cameras[0].rdCam, canvas);
-    sithCamera_cameras[1].aspectRatio = aspect;
-    rdCamera_NewEntry(&sithCamera_cameras[1].rdCam, sithCamera_cameras[1].rdCam.fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
-    rdCamera_SetAttenuation(&sithCamera_cameras[1].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
-    rdCamera_SetCanvas(&sithCamera_cameras[1].rdCam, canvas);
-    sithCamera_cameras[2].aspectRatio = aspect;
-    rdCamera_NewEntry(&sithCamera_cameras[2].rdCam, sithCamera_cameras[2].rdCam.fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
-    rdCamera_SetAttenuation(&sithCamera_cameras[2].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
-    rdCamera_SetCanvas(&sithCamera_cameras[2].rdCam, canvas);
-    sithCamera_cameras[4].aspectRatio = aspect;
-    rdCamera_NewEntry(&sithCamera_cameras[4].rdCam, sithCamera_cameras[4].rdCam.fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
-    rdCamera_SetAttenuation(&sithCamera_cameras[4].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
-    rdCamera_SetCanvas(&sithCamera_cameras[4].rdCam, canvas);
-    sithCamera_cameras[5].aspectRatio = aspect;
-    rdCamera_NewEntry(&sithCamera_cameras[5].rdCam, sithCamera_cameras[5].rdCam.fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
-    rdCamera_SetAttenuation(&sithCamera_cameras[5].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
-    rdCamera_SetCanvas(&sithCamera_cameras[5].rdCam, canvas);
-    sithCamera_cameras[6].aspectRatio = aspect;
-    rdCamera_NewEntry(&sithCamera_cameras[6].rdCam, sithCamera_cameras[6].rdCam.fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
-    rdCamera_SetAttenuation(&sithCamera_cameras[6].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
-    rdCamera_SetCanvas(&sithCamera_cameras[6].rdCam, canvas);
+    sithCamera_g_aCameras[0].aspectRatio = aspect;
+    rdCamera_NewEntry(&sithCamera_g_aCameras[0].rdCam, sithCamera_g_aCameras[0].rdCam.fov, 0, SITHCAMERA_ZNEAR_FIRSTPERSON, SITHCAMERA_ZFAR, aspect);
+    rdCamera_SetAttenuation(&sithCamera_g_aCameras[0].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
+    rdCamera_SetCanvas(&sithCamera_g_aCameras[0].rdCam, canvas);
+    sithCamera_g_aCameras[1].aspectRatio = aspect;
+    rdCamera_NewEntry(&sithCamera_g_aCameras[1].rdCam, sithCamera_g_aCameras[1].rdCam.fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
+    rdCamera_SetAttenuation(&sithCamera_g_aCameras[1].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
+    rdCamera_SetCanvas(&sithCamera_g_aCameras[1].rdCam, canvas);
+    sithCamera_g_aCameras[2].aspectRatio = aspect;
+    rdCamera_NewEntry(&sithCamera_g_aCameras[2].rdCam, sithCamera_g_aCameras[2].rdCam.fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
+    rdCamera_SetAttenuation(&sithCamera_g_aCameras[2].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
+    rdCamera_SetCanvas(&sithCamera_g_aCameras[2].rdCam, canvas);
+    sithCamera_g_aCameras[4].aspectRatio = aspect;
+    rdCamera_NewEntry(&sithCamera_g_aCameras[4].rdCam, sithCamera_g_aCameras[4].rdCam.fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
+    rdCamera_SetAttenuation(&sithCamera_g_aCameras[4].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
+    rdCamera_SetCanvas(&sithCamera_g_aCameras[4].rdCam, canvas);
+    sithCamera_g_aCameras[5].aspectRatio = aspect;
+    rdCamera_NewEntry(&sithCamera_g_aCameras[5].rdCam, sithCamera_g_aCameras[5].rdCam.fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
+    rdCamera_SetAttenuation(&sithCamera_g_aCameras[5].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
+    rdCamera_SetCanvas(&sithCamera_g_aCameras[5].rdCam, canvas);
+    sithCamera_g_aCameras[6].aspectRatio = aspect;
+    rdCamera_NewEntry(&sithCamera_g_aCameras[6].rdCam, sithCamera_g_aCameras[6].rdCam.fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
+    rdCamera_SetAttenuation(&sithCamera_g_aCameras[6].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
+    rdCamera_SetCanvas(&sithCamera_g_aCameras[6].rdCam, canvas);
 #ifdef DW_CAMERA
     if (Main_bDwCompat) {
-        sithCamera_cameras[7].aspectRatio = aspect;
-        rdCamera_NewEntry(&sithCamera_cameras[7].rdCam, sithCamera_cameras[7].rdCam.fov, 0.0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
-        rdCamera_SetAttenuation(&sithCamera_cameras[7].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
-        rdCamera_SetCanvas(&sithCamera_cameras[7].rdCam, canvas);
+        sithCamera_g_aCameras[7].aspectRatio = aspect;
+        rdCamera_NewEntry(&sithCamera_g_aCameras[7].rdCam, sithCamera_g_aCameras[7].rdCam.fov, 0.0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
+        rdCamera_SetAttenuation(&sithCamera_g_aCameras[7].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
+        rdCamera_SetCanvas(&sithCamera_g_aCameras[7].rdCam, canvas);
     }
 #endif // DW_CAMERA
-    sithCamera_Update(sithCamera_currentCamera);
+    sithCamera_Update(sithCamera_g_pCurCamera);
     sithCamera_bOpen = 1;
     return 1;
 }
@@ -103,24 +103,24 @@ void sithCamera_Close()
         sithCamera_bOpen = 0;
 
         // Added: Prevent UAF
-        rdCamera_SetCanvas(&sithCamera_cameras[0].rdCam, NULL);
-        rdCamera_SetCanvas(&sithCamera_cameras[1].rdCam, NULL);
-        rdCamera_SetCanvas(&sithCamera_cameras[2].rdCam, NULL);
-        rdCamera_SetCanvas(&sithCamera_cameras[4].rdCam, NULL);
-        rdCamera_SetCanvas(&sithCamera_cameras[5].rdCam, NULL);
-        rdCamera_SetCanvas(&sithCamera_cameras[6].rdCam, NULL);
+        rdCamera_SetCanvas(&sithCamera_g_aCameras[0].rdCam, NULL);
+        rdCamera_SetCanvas(&sithCamera_g_aCameras[1].rdCam, NULL);
+        rdCamera_SetCanvas(&sithCamera_g_aCameras[2].rdCam, NULL);
+        rdCamera_SetCanvas(&sithCamera_g_aCameras[4].rdCam, NULL);
+        rdCamera_SetCanvas(&sithCamera_g_aCameras[5].rdCam, NULL);
+        rdCamera_SetCanvas(&sithCamera_g_aCameras[6].rdCam, NULL);
 #ifdef DW_CAMERA
-        rdCamera_SetCanvas(&sithCamera_cameras[7].rdCam, NULL);
+        rdCamera_SetCanvas(&sithCamera_g_aCameras[7].rdCam, NULL);
 #endif
 
         // Added: Prevent memleak
         for (int i = 0; i < 7; i++)
         {
-            rdCamera_FreeEntry(&sithCamera_cameras[i].rdCam);
+            rdCamera_FreeEntry(&sithCamera_g_aCameras[i].rdCam);
         }
 #ifdef DW_CAMERA
         if (Main_bDwCompat) {
-            rdCamera_FreeEntry(&sithCamera_cameras[7].rdCam);
+            rdCamera_FreeEntry(&sithCamera_g_aCameras[7].rdCam);
         }
 #endif
     }
@@ -132,36 +132,36 @@ void sithCamera_ResetAllCameras()
     rdVector3 rot; // [esp+Ch] [ebp-Ch] BYREF
 
     v0 = sithWorld_pCurrentWorld->cameraFocus;
-    sithCamera_state &= ~1u;
-    sithCamera_cameras[0].primaryFocus = v0;
-    sithCamera_cameras[1].primaryFocus = v0;
-    sithCamera_cameras[2].primaryFocus = v0;
-    sithCamera_cameras[2].secondaryFocus = v0;
-    sithCamera_cameras[4].primaryFocus = v0;
-    sithCamera_cameras[4].secondaryFocus = v0;
-    sithCamera_cameras[5].primaryFocus = v0;
-    sithCamera_cameras[5].secondaryFocus = v0;
-    sithCamera_cameras[6].primaryFocus = v0;
-    sithCamera_cameras[6].secondaryFocus = v0;
-    sithCamera_dword_8EE5A0 = 0;
-    sithCamera_cameras[0].secondaryFocus = 0;
-    sithCamera_cameras[1].secondaryFocus = 0;
-    if ( !sithCamera_currentCamera || sithCamera_cameras[0].dword4 >= sithCamera_currentCamera->dword4 )
+    sithCamera_g_stateFlags &= ~1u;
+    sithCamera_g_aCameras[0].primaryFocus = v0;
+    sithCamera_g_aCameras[1].primaryFocus = v0;
+    sithCamera_g_aCameras[2].primaryFocus = v0;
+    sithCamera_g_aCameras[2].secondaryFocus = v0;
+    sithCamera_g_aCameras[4].primaryFocus = v0;
+    sithCamera_g_aCameras[4].secondaryFocus = v0;
+    sithCamera_g_aCameras[5].primaryFocus = v0;
+    sithCamera_g_aCameras[5].secondaryFocus = v0;
+    sithCamera_g_aCameras[6].primaryFocus = v0;
+    sithCamera_g_aCameras[6].secondaryFocus = v0;
+    sithCamera_g_bCurCameraSet = 0;
+    sithCamera_g_aCameras[0].secondaryFocus = 0;
+    sithCamera_g_aCameras[1].secondaryFocus = 0;
+    if ( !sithCamera_g_pCurCamera || sithCamera_g_aCameras[0].dword4 >= sithCamera_g_pCurCamera->dword4 )
     {
-        sithCamera_currentCamera = sithCamera_cameras;
-        sithCamera_dword_8EE5A0 = 1;
-        rdCamera_SetCurrent(&sithCamera_cameras[0].rdCam);
-        if ( sithCamera_cameras[0].cameraPerspective == 32 )
+        sithCamera_g_pCurCamera = sithCamera_g_aCameras;
+        sithCamera_g_bCurCameraSet = 1;
+        rdCamera_SetCurrent(&sithCamera_g_aCameras[0].rdCam);
+        if ( sithCamera_g_aCameras[0].cameraPerspective == 32 )
         {
-            rdMatrix_Copy34(&sithCamera_focusMat, &sithCamera_currentCamera->primaryFocus->lookOrientation);
+            rdMatrix_Copy34(&sithCamera_idleCamOrient, &sithCamera_g_pCurCamera->primaryFocus->lookOrientation);
             rot.x = 0.0;
             rot.z = 0.0;
             rot.y = -45.0;
-            rdMatrix_PostRotate34(&sithCamera_focusMat, &rot);
+            rdMatrix_PostRotate34(&sithCamera_idleCamOrient, &rot);
         }
-        sithCamera_Update(sithCamera_currentCamera);
+        sithCamera_Update(sithCamera_g_pCurCamera);
     }
-    sithCamera_curCameraIdx = 0;
+    sithCamera_g_curCycleCamNum = 0;
 }
 
 // MOTS altered
@@ -215,8 +215,8 @@ void sithCamera_Update(sithCamera *cam)
     rdMatrix34 out; // [esp+5Ch] [ebp-30h] BYREF
 
     sithThing* focusThing = cam->primaryFocus;
-    flex_t v77 = sithCamera_povShakeF2 * sithTime_g_frameTimeFlex;
-    flex_t v78 = sithCamera_povShakeF1 * sithTime_g_frameTimeFlex;
+    flex_t v77 = sithCamera_g_cameraAngleDelta * sithTime_g_frameTimeFlex;
+    flex_t v78 = sithCamera_g_cameraPosDelta * sithTime_g_frameTimeFlex;
     switch ( cam->cameraPerspective )
     {
         case 1:
@@ -256,7 +256,7 @@ void sithCamera_Update(sithCamera *cam)
                 // MOTS added: hmm??
                 if (Main_bMotsCompat || focusThing == sithPlayer_pLocalPlayerThing )
                 {
-                    rdVector_Add3Acc(&v76, &sithCamera_povShakeVector2);
+                    rdVector_Add3Acc(&v76, &sithCamera_g_vecCameraAngleOffset);
                 }
 
                 rdMatrix_PreRotate34(&cam->viewMat, &v76);
@@ -267,7 +267,7 @@ void sithCamera_Update(sithCamera *cam)
                     
                     // MOTS added: hmm??
                     if (Main_bMotsCompat || focusThing == sithPlayer_pLocalPlayerThing )
-                        rdMatrix_PreTranslate34(&cam->viewMat, &sithCamera_povShakeVector1);
+                        rdMatrix_PreTranslate34(&cam->viewMat, &sithCamera_g_vecCameraPosOffset);
                 }
                 rdMatrix_Normalize34(&cam->viewMat);
             }
@@ -288,7 +288,7 @@ void sithCamera_Update(sithCamera *cam)
             // MOTS added: hmm??
             if (Main_bMotsCompat)
             {
-                rdVector_Add3Acc(&v76, &sithCamera_povShakeVector2);
+                rdVector_Add3Acc(&v76, &sithCamera_g_vecCameraAngleOffset);
             }
 
             rdMatrix_Copy34(&out, &focusThing->lookOrientation);
@@ -302,7 +302,7 @@ void sithCamera_Update(sithCamera *cam)
 
             // MOTS added: hmm?
             if (Main_bMotsCompat) {
-                rdMatrix_PreTranslate34(&cam->viewMat,&sithCamera_povShakeVector1);
+                rdMatrix_PreTranslate34(&cam->viewMat,&sithCamera_g_vecCameraPosOffset);
             }
 
             rdMatrix_PreTranslate34(&out, &sithCamera_trans);
@@ -311,7 +311,7 @@ void sithCamera_Update(sithCamera *cam)
             cam->sector = sithCamera_SearchSectorInRadius(0, cam->sector, &v84, &cam->viewMat.scale, 0.02, RAYCAST_2000 | RAYCAST_200);
             break;
         case 32:
-            rdMatrix_TransformVector34(&a1, &sithCamera_trans2, &sithCamera_focusMat);
+            rdMatrix_TransformVector34(&a1, &sithCamera_trans2, &sithCamera_idleCamOrient);
             v2 = (rdVector3){0.0, 0.0, 0.05};
             rdVector_Sub3(&v2, &focusThing->position, &v2);
             rdVector_Add3Acc(&a1, &v2);
@@ -320,8 +320,8 @@ void sithCamera_Update(sithCamera *cam)
             rot.x = 0.0;
             rot.y = sithTime_g_frameTimeFlex * 8.0;
             rot.z = 0.0;
-            rdMatrix_PostRotate34(&sithCamera_focusMat, &rot);
-            rdMatrix_Normalize34(&sithCamera_focusMat);
+            rdMatrix_PostRotate34(&sithCamera_idleCamOrient, &rot);
+            rdMatrix_Normalize34(&sithCamera_idleCamOrient);
             break;
         case 64:
             rdVector_Normalize3Acc(&sithCamera_trans3);
@@ -345,7 +345,7 @@ void sithCamera_Update(sithCamera *cam)
             cam->sector = sithCamera_SearchSectorInRadius(0, focusThing->sector, &focusThing->position, &cam->viewMat.scale, 0.02, RAYCAST_2000 | RAYCAST_200);
             break;
         case 128:
-            rdMatrix_Copy34(&cam->viewMat, &sithCamera_viewMat);
+            rdMatrix_Copy34(&cam->viewMat, &sithCamera_g_orbCamOrient);
             rdMatrix_PostTranslate34(&cam->viewMat, &focusThing->position);
             cam->sector = sithCollision_FindSectorInRadius(focusThing->sector, &focusThing->position, &cam->viewMat.scale, 0.02);
             break;
@@ -356,162 +356,162 @@ void sithCamera_Update(sithCamera *cam)
     rdMatrix_ExtractAngles34(&cam->viewMat, &cam->viewPYR);
 
     // TODO what inlined func is this
-    if ( sithCamera_povShakeVector1.x <= 0.0 )
+    if ( sithCamera_g_vecCameraPosOffset.x <= 0.0 )
     {
-        if ( sithCamera_povShakeVector1.x < 0.0 )
+        if ( sithCamera_g_vecCameraPosOffset.x < 0.0 )
         {
-            flex_t v42 = v78 + sithCamera_povShakeVector1.x;
+            flex_t v42 = v78 + sithCamera_g_vecCameraPosOffset.x;
             if ( v42 < 0.0 )
             {
-                sithCamera_povShakeVector1.x = v42;
+                sithCamera_g_vecCameraPosOffset.x = v42;
             }
             else {
-                sithCamera_povShakeVector1.x = 0.0;
+                sithCamera_g_vecCameraPosOffset.x = 0.0;
             }
         }
         
     }
     else
     {
-        flex_t v41 = sithCamera_povShakeVector1.x - v78;
+        flex_t v41 = sithCamera_g_vecCameraPosOffset.x - v78;
         if ( v41 > 0.0 )
         {
-            sithCamera_povShakeVector1.x = v41;
+            sithCamera_g_vecCameraPosOffset.x = v41;
         }
         else {
-            sithCamera_povShakeVector1.x = 0.0;
+            sithCamera_g_vecCameraPosOffset.x = 0.0;
         }
     }
 
-    if ( sithCamera_povShakeVector1.y <= 0.0 )
+    if ( sithCamera_g_vecCameraPosOffset.y <= 0.0 )
     {
-        if ( sithCamera_povShakeVector1.y < 0.0 )
+        if ( sithCamera_g_vecCameraPosOffset.y < 0.0 )
         {
-            flex_t v48 = v78 + sithCamera_povShakeVector1.y;
+            flex_t v48 = v78 + sithCamera_g_vecCameraPosOffset.y;
             if ( v48 < 0.0 )
             {
-                sithCamera_povShakeVector1.y = v48;
+                sithCamera_g_vecCameraPosOffset.y = v48;
             }
             else {
-                sithCamera_povShakeVector1.y = 0.0;
+                sithCamera_g_vecCameraPosOffset.y = 0.0;
             }
         }
     }
     else
     {
-        flex_t v47 = sithCamera_povShakeVector1.y - v78;
+        flex_t v47 = sithCamera_g_vecCameraPosOffset.y - v78;
         if ( v47 > 0.0 )
         {
-            sithCamera_povShakeVector1.y = v47;
+            sithCamera_g_vecCameraPosOffset.y = v47;
         }
         else {
-            sithCamera_povShakeVector1.y = 0.0;
+            sithCamera_g_vecCameraPosOffset.y = 0.0;
         }
     }
 
-    if ( sithCamera_povShakeVector1.z <= 0.0 )
+    if ( sithCamera_g_vecCameraPosOffset.z <= 0.0 )
     {
-        if ( sithCamera_povShakeVector1.z < 0.0 )
+        if ( sithCamera_g_vecCameraPosOffset.z < 0.0 )
         {
-            flex_t v54 = v78 + sithCamera_povShakeVector1.z;
+            flex_t v54 = v78 + sithCamera_g_vecCameraPosOffset.z;
             if ( v54 < 0.0 )
             {
-                sithCamera_povShakeVector1.z = v54;
+                sithCamera_g_vecCameraPosOffset.z = v54;
             }
             else {
-                sithCamera_povShakeVector1.z = 0.0;
+                sithCamera_g_vecCameraPosOffset.z = 0.0;
             }
         }
     }
     else
     {
-        flex_t v53 = sithCamera_povShakeVector1.z - v78;
+        flex_t v53 = sithCamera_g_vecCameraPosOffset.z - v78;
         if ( v53 > 0.0 )
         {
-            sithCamera_povShakeVector1.z = v53;
+            sithCamera_g_vecCameraPosOffset.z = v53;
         }
         else {
-            sithCamera_povShakeVector1.z = 0.0;
+            sithCamera_g_vecCameraPosOffset.z = 0.0;
         }
     }
     
-    if ( sithCamera_povShakeVector2.x <= 0.0 )
+    if ( sithCamera_g_vecCameraAngleOffset.x <= 0.0 )
     {
-        if ( sithCamera_povShakeVector2.x < 0.0 )
+        if ( sithCamera_g_vecCameraAngleOffset.x < 0.0 )
         {
-            flex_t v60 = v77 + sithCamera_povShakeVector2.x;
+            flex_t v60 = v77 + sithCamera_g_vecCameraAngleOffset.x;
             if ( v60 < 0.0 )
             {
-                sithCamera_povShakeVector2.x = v60;
+                sithCamera_g_vecCameraAngleOffset.x = v60;
             }
             else {
-                sithCamera_povShakeVector2.x = 0.0;
+                sithCamera_g_vecCameraAngleOffset.x = 0.0;
             }
         }
     }
     else
     {
-        flex_t v59 = sithCamera_povShakeVector2.x - v77;
+        flex_t v59 = sithCamera_g_vecCameraAngleOffset.x - v77;
         if ( v59 > 0.0 )
         {
-            sithCamera_povShakeVector2.x = v59;
+            sithCamera_g_vecCameraAngleOffset.x = v59;
         }
         else {
-            sithCamera_povShakeVector2.x = 0.0;
+            sithCamera_g_vecCameraAngleOffset.x = 0.0;
         }
     }
 
-    if ( sithCamera_povShakeVector2.y <= 0.0 )
+    if ( sithCamera_g_vecCameraAngleOffset.y <= 0.0 )
     {
-        if ( sithCamera_povShakeVector2.y < 0.0 )
+        if ( sithCamera_g_vecCameraAngleOffset.y < 0.0 )
         {
-            flex_t v66 = v77 + sithCamera_povShakeVector2.y;
+            flex_t v66 = v77 + sithCamera_g_vecCameraAngleOffset.y;
             if ( v66 < 0.0 )
             {
-                sithCamera_povShakeVector2.y = v66;
+                sithCamera_g_vecCameraAngleOffset.y = v66;
             }
             else {
-                sithCamera_povShakeVector2.y = 0.0;
+                sithCamera_g_vecCameraAngleOffset.y = 0.0;
             }
         }
         
     }
     else
     {
-        flex_t v65 = sithCamera_povShakeVector2.y - v77;
+        flex_t v65 = sithCamera_g_vecCameraAngleOffset.y - v77;
         if ( v65 > 0.0 )
         {
-            sithCamera_povShakeVector2.y = v65;
+            sithCamera_g_vecCameraAngleOffset.y = v65;
         }
         else {
-            sithCamera_povShakeVector2.y = 0.0;
+            sithCamera_g_vecCameraAngleOffset.y = 0.0;
         }
     }
     
-    if ( sithCamera_povShakeVector2.z <= 0.0 )
+    if ( sithCamera_g_vecCameraAngleOffset.z <= 0.0 )
     {
-        if ( sithCamera_povShakeVector2.z < 0.0 )
+        if ( sithCamera_g_vecCameraAngleOffset.z < 0.0 )
         {
-            flex_t v72 = v77 + sithCamera_povShakeVector2.z;
+            flex_t v72 = v77 + sithCamera_g_vecCameraAngleOffset.z;
             if ( v72 < 0.0 )
             {
-                sithCamera_povShakeVector2.z = v72;
+                sithCamera_g_vecCameraAngleOffset.z = v72;
             }
             else {
-                sithCamera_povShakeVector2.z = 0.0;
+                sithCamera_g_vecCameraAngleOffset.z = 0.0;
             }
         }
         
     }
     else
     {
-        flex_t v71 = sithCamera_povShakeVector2.z - v77;
+        flex_t v71 = sithCamera_g_vecCameraAngleOffset.z - v77;
         if ( v71 > 0.0 )
         {
-            sithCamera_povShakeVector2.z = v71;
+            sithCamera_g_vecCameraAngleOffset.z = v71;
         }
         else {
-            sithCamera_povShakeVector2.z = 0.0;
+            sithCamera_g_vecCameraAngleOffset.z = 0.0;
         }
     }
     
@@ -519,10 +519,10 @@ void sithCamera_Update(sithCamera *cam)
 
 void sithCamera_RenderScene()
 {
-    if ( sithCamera_currentCamera )
+    if ( sithCamera_g_pCurCamera )
     {
-        rdCamera_SetCurrent(&sithCamera_currentCamera->rdCam);
-        rdCamera_Update(&sithCamera_currentCamera->viewMat);
+        rdCamera_SetCurrent(&sithCamera_g_pCurCamera->rdCam);
+        rdCamera_Update(&sithCamera_g_pCurCamera->viewMat);
         sithRender_Draw();
     }
 }
@@ -531,7 +531,7 @@ void sithCamera_SetCurrentToCycleCamera()
 {
     sithCamera *v0; // esi
 
-    v0 = &sithCamera_cameras[sithCamera_camIdxToGlobalIdx[sithCamera_curCameraIdx]];
+    v0 = &sithCamera_g_aCameras[sithCamera_camIdxToGlobalIdx[sithCamera_g_curCycleCamNum]];
     sithCamera_SetCurrentCamera(v0);
 }
 
@@ -539,20 +539,20 @@ int sithCamera_SetCurrentCamera(sithCamera *camera)
 {
     rdVector3 rot; // [esp+8h] [ebp-Ch] BYREF
 
-    if ( sithCamera_currentCamera && camera->dword4 < sithCamera_currentCamera->dword4 )
+    if ( sithCamera_g_pCurCamera && camera->dword4 < sithCamera_g_pCurCamera->dword4 )
         return 0;
-    sithCamera_currentCamera = camera;
-    sithCamera_dword_8EE5A0 = 1;
+    sithCamera_g_pCurCamera = camera;
+    sithCamera_g_bCurCameraSet = 1;
     rdCamera_SetCurrent(&camera->rdCam);
     if ( camera->cameraPerspective == 32 )
     {
-        rdMatrix_Copy34(&sithCamera_focusMat, &sithCamera_currentCamera->primaryFocus->lookOrientation);
+        rdMatrix_Copy34(&sithCamera_idleCamOrient, &sithCamera_g_pCurCamera->primaryFocus->lookOrientation);
         rot.x = 0.0;
         rot.y = -45.0;
         rot.z = 0.0;
-        rdMatrix_PostRotate34(&sithCamera_focusMat, &rot);
+        rdMatrix_PostRotate34(&sithCamera_idleCamOrient, &rot);
     }
-    sithCamera_Update(sithCamera_currentCamera);
+    sithCamera_Update(sithCamera_g_pCurCamera);
     return 1;
 }
 
@@ -594,10 +594,10 @@ sithSector* sithCamera_SearchSectorInRadius(sithThing *a3, sithSector *a2, rdVec
 
 void sithCamera_SetPOVShake(rdVector3 *a1, rdVector3 *a2, flex_t a3, flex_t a4)
 {
-    rdVector_Copy3(&sithCamera_povShakeVector1, a1);
-    rdVector_Copy3(&sithCamera_povShakeVector2, a2);
-    sithCamera_povShakeF1 = a3;
-    sithCamera_povShakeF2 = a4;
+    rdVector_Copy3(&sithCamera_g_vecCameraPosOffset, a1);
+    rdVector_Copy3(&sithCamera_g_vecCameraAngleOffset, a2);
+    sithCamera_g_cameraPosDelta = a3;
+    sithCamera_g_cameraAngleDelta = a4;
 }
 
 sithThing* sithCamera_GetPrimaryFocus(sithCamera *pCamera)
@@ -615,13 +615,13 @@ int sithCamera_SetCameraStateFlags(int a1)
     int result; // eax
 
     result = a1;
-    sithCamera_state = a1;
+    sithCamera_g_stateFlags = a1;
     return result;
 }
 
 int sithCamera_GetCameraStateFlags()
 {
-    return sithCamera_state;
+    return sithCamera_g_stateFlags;
 }
 
 void sithCamera_CycleCamera()
@@ -630,14 +630,14 @@ void sithCamera_CycleCamera()
     sithCamera *v1; // esi
     rdVector3 rot; // [esp+8h] [ebp-Ch] BYREF
 
-    cam_id = ++sithCamera_curCameraIdx;
-    if ( (unsigned int)sithCamera_curCameraIdx >= 2 )
+    cam_id = ++sithCamera_g_curCycleCamNum;
+    if ( (unsigned int)sithCamera_g_curCycleCamNum >= 2 )
     {
         cam_id = 0;
-        sithCamera_curCameraIdx = 0;
+        sithCamera_g_curCycleCamNum = 0;
     }
 
-    v1 = &sithCamera_cameras[sithCamera_camIdxToGlobalIdx[cam_id]];
+    v1 = &sithCamera_g_aCameras[sithCamera_camIdxToGlobalIdx[cam_id]];
     sithCamera_SetCurrentCamera(v1);
 }
 
@@ -718,7 +718,7 @@ void sithCamera_UpdateZoom(sithCamera *pCamera)
 
     if (!pCamera->bZoomed) {
         if (Main_bMotsCompat) {
-            rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, jkPlayer_fov / pCamera->zoomScale); 
+            rdCamera_SetFOV(&sithCamera_g_pCurCamera->rdCam, jkPlayer_fov / pCamera->zoomScale); 
         }
         //printf("Zoom: en=%x scale=%f, fov=%f, speed=%f, invScale=%f; %x %x %f\n", pCamera->bZoomed, pCamera->zoomScale, pCamera->zoomFov, pCamera->zoomSpeed, pCamera->invZoomScale, 999, 999, jkPlayer_fov / pCamera->zoomScale);
         return;
@@ -804,7 +804,7 @@ void sithCamera_UpdateZoom(sithCamera *pCamera)
 
         // Added
         if (Main_bMotsCompat) {
-            rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, jkPlayer_fov / pCamera->zoomScale); 
+            rdCamera_SetFOV(&sithCamera_g_pCurCamera->rdCam, jkPlayer_fov / pCamera->zoomScale); 
         }
         return;
     }

@@ -863,7 +863,7 @@ void jkPlayer_DrawPov()
         rdPuppet_UpdateTracks(playerThings[playerThingIdx].povModel.puppet, sithTime_g_frameTimeFlex);
     }
 
-    if ( !(sithCamera_currentCamera->cameraPerspective & 0xFC) && sithCamera_currentCamera->primaryFocus == sithWorld_pCurrentWorld->cameraFocus )
+    if ( !(sithCamera_g_pCurCamera->cameraPerspective & 0xFC) && sithCamera_g_pCurCamera->primaryFocus == sithWorld_pCurrentWorld->cameraFocus )
     {
         sithThing* player = playerThings[playerThingIdx].actorThing;
 
@@ -912,18 +912,18 @@ void jkPlayer_DrawPov()
         rdSetOcclusionMethod(0);
 #endif
 
-        flex_t ambLight = stdMath_Clamp(sithCamera_currentCamera->sector->extraLight + sithCamera_currentCamera->sector->ambientLight, 0.0, 1.0);
+        flex_t ambLight = stdMath_Clamp(sithCamera_g_pCurCamera->sector->extraLight + sithCamera_g_pCurCamera->sector->ambientLight, 0.0, 1.0);
 
-        rdCamera_SetAmbientLight(&sithCamera_currentCamera->rdCam, ambLight);
-        rdColormap_SetCurrent(sithCamera_currentCamera->sector->colormap);
+        rdCamera_SetAmbientLight(&sithCamera_g_pCurCamera->rdCam, ambLight);
+        rdColormap_SetCurrent(sithCamera_g_pCurCamera->sector->colormap);
 
-        rdMatrix_Copy34(&viewMat, &sithCamera_currentCamera->viewMat);
+        rdMatrix_Copy34(&viewMat, &sithCamera_g_pCurCamera->viewMat);
         rdVector_Copy3(&trans, &playerThings[playerThingIdx].actorThing->actorParams.eyeOffset);
         //printf("%f %f %f\n", (flex32_t)playerThings[playerThingIdx].actorThing->actorParams.eyeOffset.x, (flex32_t)playerThings[playerThingIdx].actorThing->actorParams.eyeOffset.y, (flex32_t)playerThings[playerThingIdx].actorThing->actorParams.eyeOffset.z);
 #ifdef QOL_IMPROVEMENTS
         // Shift gun down slightly at higher aspect ratios
         // TODO just make a cvar-alike for this
-        //trans.z += 0.007 * (1.0 / sithCamera_currentCamera->rdCam.screenAspectRatio);
+        //trans.z += 0.007 * (1.0 / sithCamera_g_pCurCamera->rdCam.screenAspectRatio);
 #endif
         //printf("%f %f %f\n", (flex32_t)viewMat.scale.x, (flex32_t)viewMat.scale.y, (flex32_t)viewMat.scale.z);
 

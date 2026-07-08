@@ -1228,7 +1228,7 @@ void jkCogExt_GetCameraFov(sithCog* ctx)
     int camIdx = sithCogExec_PopInt(ctx);
 
     // TODO verify
-    sithCogExec_PushFlex(ctx, sithCamera_cameras[camIdx].rdCam.fov);
+    sithCogExec_PushFlex(ctx, sithCamera_g_aCameras[camIdx].rdCam.fov);
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
 
@@ -1248,7 +1248,7 @@ void jkCogExt_SetCameraFov(sithCog* ctx)
     int camIdx = sithCogExec_PopInt(ctx);
 
     // TODO
-    sithCamera_cameras[camIdx].rdCam.fov = fov;
+    sithCamera_g_aCameras[camIdx].rdCam.fov = fov;
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
 

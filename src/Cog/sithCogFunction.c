@@ -824,7 +824,7 @@ void sithCogFunction_SetCameraFocus(sithCog *ctx)
     if ( camIdx > -1 && camIdx < 7 )
     {
         if ( focusThing )
-            sithCamera_SetCameraFocus(&sithCamera_cameras[camIdx], focusThing, 0);
+            sithCamera_SetCameraFocus(&sithCamera_g_aCameras[camIdx], focusThing, 0);
     }
 }
 
@@ -841,7 +841,7 @@ void sithCogFunction_GetPrimaryFocus(sithCog *ctx)
         camIdx = 0;
 #endif
 
-    if ( camIdx > -1 && camIdx < 7 && (v2 = sithCamera_GetPrimaryFocus(&sithCamera_cameras[camIdx])) != 0 )
+    if ( camIdx > -1 && camIdx < 7 && (v2 = sithCamera_GetPrimaryFocus(&sithCamera_g_aCameras[camIdx])) != 0 )
         sithCogExec_PushInt(ctx, v2->thingIdx);
     else
         sithCogExec_PushInt(ctx, -1);
@@ -860,7 +860,7 @@ void sithCogFunction_GetSecondaryFocus(sithCog *ctx)
         camIdx = 0;
 #endif
     
-    if ( camIdx > -1 && camIdx < 7 && (v2 = sithCamera_GetSecondaryFocus(&sithCamera_cameras[camIdx])) != 0 )
+    if ( camIdx > -1 && camIdx < 7 && (v2 = sithCamera_GetSecondaryFocus(&sithCamera_g_aCameras[camIdx])) != 0 )
         sithCogExec_PushInt(ctx, v2->thingIdx);
     else
         sithCogExec_PushInt(ctx, -1);
@@ -877,21 +877,21 @@ void sithCogFunction_SetCameraMode(sithCog *ctx)
     if (camIdx == 7)
     {
         camIdx = 0;
-        sithCamera_SetCameraFocus(&sithCamera_cameras[camIdx], sithPlayer_pLocalPlayerThing, 0);
+        sithCamera_SetCameraFocus(&sithCamera_g_aCameras[camIdx], sithPlayer_pLocalPlayerThing, 0);
     }
 #endif
 
-    //printf("%u -> %u\n", sithCamera_currentCamera - sithCamera_cameras, camIdx);
+    //printf("%u -> %u\n", sithCamera_g_pCurCamera - sithCamera_g_aCameras, camIdx);
     
     if ( camIdx > -1 && camIdx < 7 )
-        sithCamera_SetCurrentCamera(&sithCamera_cameras[camIdx]);
+        sithCamera_SetCurrentCamera(&sithCamera_g_aCameras[camIdx]);
 }
 
 void sithCogFunction_GetCameraMode(sithCog *ctx)
 {
     int camIdx; // edx
 
-    if ( sithCamera_currentCamera && (camIdx = sithCamera_currentCamera - sithCamera_cameras, camIdx < 7) )
+    if ( sithCamera_g_pCurCamera && (camIdx = sithCamera_g_pCurCamera - sithCamera_g_aCameras, camIdx < 7) )
         sithCogExec_PushInt(ctx, camIdx);
     else
         sithCogExec_PushInt(ctx, -1);
@@ -910,7 +910,7 @@ void sithCogFunction_SetCameraZoom(sithCog *ctx)
     int camIdx = sithCogExec_PopInt(ctx);
 
     if ((-1 < camIdx) && (camIdx < 7)) {
-        sithCamera_SetZoom(sithCamera_cameras + camIdx, zoomScale, zoomSpeed);
+        sithCamera_SetZoom(sithCamera_g_aCameras + camIdx, zoomScale, zoomSpeed);
     }
 }
 
@@ -1553,7 +1553,7 @@ void sithCogFunction_SetCameraFocii(sithCog *ctx)
     if ( camIdx > -1 && camIdx < 7 ) // TODO macro this 7?
     {
         if ( focusThing )
-            sithCamera_SetCameraFocus(&sithCamera_cameras[camIdx], focusThing, focusThing2);
+            sithCamera_SetCameraFocus(&sithCamera_g_aCameras[camIdx], focusThing, focusThing2);
     }
 }
 
