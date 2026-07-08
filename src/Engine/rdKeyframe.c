@@ -8,43 +8,43 @@
 #include "Win95/std.h"
 #include "jk.h"
 
-keyframeLoader_t rdKeyframe_RegisterLoader(keyframeLoader_t loader)
+keyframeLoader_t rdKeyframe_RegisterLoader(keyframeLoader_t pFunc)
 {
     keyframeLoader_t result = pKeyframeLoader;
-    pKeyframeLoader = loader;
+    pKeyframeLoader = pFunc;
     return result;
 }
 
-keyframeUnloader_t rdKeyframe_RegisterUnloader(keyframeUnloader_t loader)
+keyframeUnloader_t rdKeyframe_RegisterUnloader(keyframeUnloader_t pFunc)
 {
     keyframeUnloader_t result = pKeyframeUnloader;
-    pKeyframeUnloader = loader;
+    pKeyframeUnloader = pFunc;
     return result;
 }
 
-void rdKeyframe_NewEntry(rdKeyframe *keyframe)
+void rdKeyframe_NewEntry(rdKeyframe *pKeyframe)
 {
-    stdPlatform_Memzero32(keyframe, sizeof(rdKeyframe)); // Added: word-safe (array may be in extram)
+    stdPlatform_Memzero32(pKeyframe, sizeof(rdKeyframe)); // Added: word-safe (array may be in extram)
 #ifdef SITH_DEBUG_STRUCT_NAMES
-    stdString_SafeStrCopy(keyframe->name, "UNKNOWN", 32);
+    stdString_SafeStrCopy(pKeyframe->name, "UNKNOWN", 32);
 #endif
 #ifdef STDHASHTABLE_CRC32_KEYS
-    keyframe->namecrc = stdCrc32("UNKNOWN", strlen("UNKNOWN"));
+    pKeyframe->namecrc = stdCrc32("UNKNOWN", strlen("UNKNOWN"));
 #endif
 }
 
-rdKeyframe* rdKeyframe_Load(char *fname)
+rdKeyframe* rdKeyframe_Load(char *pFilename)
 {
     rdKeyframe *keyframe;
 
     if (pKeyframeLoader)
-        return (rdKeyframe*)pKeyframeLoader(fname);
+        return (rdKeyframe*)pKeyframeLoader(pFilename);
 
     keyframe = (rdKeyframe*)RDROID_ALLOC(sizeof(rdKeyframe));
     if (!keyframe)
         return NULL;
 
-    if (rdKeyframe_LoadEntry(fname, keyframe))
+    if (rdKeyframe_LoadEntry(pFilename, keyframe))
       return keyframe;
 
     // This was inlined
@@ -53,7 +53,7 @@ rdKeyframe* rdKeyframe_Load(char *fname)
     return NULL;
 }
 
-int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
+int rdKeyframe_LoadEntry(char *pFilename, rdKeyframe *pKeyframe)
 {
     char *key_fname_only;
     rdJoint *aNodes;
@@ -76,16 +76,16 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
     unsigned int nodes_read;
     flex32_t ftmp;
 
-    rdKeyframe_NewEntry(keyframe);
-    key_fname_only = stdFileFromPath(key_fpath);
+    rdKeyframe_NewEntry(pKeyframe);
+    key_fname_only = stdFileFromPath(pFilename);
 #ifdef SITH_DEBUG_STRUCT_NAMES
-    stdString_SafeStrCopy(keyframe->name, key_fname_only, 32);
+    stdString_SafeStrCopy(pKeyframe->name, key_fname_only, 32);
 #endif
 #ifdef STDHASHTABLE_CRC32_KEYS
-    keyframe->namecrc = stdCrc32(key_fname_only, strlen(key_fname_only));
+    pKeyframe->namecrc = stdCrc32(key_fname_only, strlen(key_fname_only));
 #endif
-    if (!stdConffile_Open(key_fpath)) {
-        stdPrintf(pSithHS->errorPrint, ".\\Engine\\rdKeyframe.c", 0, "OpenJKDF2: Failed to open keyframe file `%s`\n", key_fpath);
+    if (!stdConffile_Open(pFilename)) {
+        stdPrintf(pSithHS->errorPrint, ".\\Engine\\rdKeyframe.c", 0, "OpenJKDF2: Failed to open keyframe file `%s`\n", pFilename);
         goto open_fail;
     }
 
@@ -98,19 +98,19 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
     if (!stdConffile_ReadLine())
       goto read_fail;
 
-    if (_sscanf(stdConffile_g_aLine, " flags %d", &keyframe->flags) != 1)
+    if (_sscanf(stdConffile_g_aLine, " flags %d", &pKeyframe->flags) != 1)
       goto read_fail;
 
     if (!stdConffile_ReadLine())
       goto read_fail;
 
-    if (_sscanf(stdConffile_g_aLine, " type %x", &keyframe->type) != 1)
+    if (_sscanf(stdConffile_g_aLine, " type %x", &pKeyframe->type) != 1)
       goto read_fail;
 
     if (!stdConffile_ReadLine())
       goto read_fail;
 
-    if (_sscanf(stdConffile_g_aLine, " frames %d", &keyframe->numFrames) != 1)
+    if (_sscanf(stdConffile_g_aLine, " frames %d", &pKeyframe->numFrames) != 1)
       goto read_fail;
 
     if (!stdConffile_ReadLine())
@@ -118,23 +118,23 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
 
     if (_sscanf(stdConffile_g_aLine, " fps %f", &ftmp) != 1)
       goto read_fail;
-    keyframe->fps = ftmp; // FLEXTODO
+    pKeyframe->fps = ftmp; // FLEXTODO
 
     if (!stdConffile_ReadLine())
       goto read_fail;
 
-    if (_sscanf(stdConffile_g_aLine, " joints %d", &keyframe->numJoints) != 1)
+    if (_sscanf(stdConffile_g_aLine, " joints %d", &pKeyframe->numJoints) != 1)
       goto read_fail;
 
     { TWL_EXTRAM_SUGGEST(rdroid_g_pHS); // Added: joints are word-width on RETRO
-    aNodes = (rdJoint *)RDROID_ALLOC(sizeof(rdJoint) * (keyframe->numJoints+1)); // Added: try and contain rdPuppet crashes...
+    aNodes = (rdJoint *)RDROID_ALLOC(sizeof(rdJoint) * (pKeyframe->numJoints+1)); // Added: try and contain rdPuppet crashes...
     TWL_EXTRAM_RESTORE(rdroid_g_pHS); }
-    keyframe->aNodes = aNodes;
+    pKeyframe->aNodes = aNodes;
     if (!aNodes)
       goto read_fail;
 
-    stdPlatform_Memzero32(aNodes, sizeof(rdJoint) * (keyframe->numJoints+1)); // Added: word-safe
-    keyframe->numJoints2 = keyframe->numJoints;
+    stdPlatform_Memzero32(aNodes, sizeof(rdJoint) * (pKeyframe->numJoints+1)); // Added: word-safe
+    pKeyframe->numJoints2 = pKeyframe->numJoints;
 
     if (!stdConffile_ReadLine() || _sscanf(stdConffile_g_aLine, " section: %s", std_g_genBuffer) != 1)
       goto read_fail;
@@ -150,10 +150,10 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
       if (num_markers > 8)
         goto read_fail;
 
-      keyframe->numMarkers = num_markers;
+      pKeyframe->numMarkers = num_markers;
       for (num_markers_read = 0; num_markers_read < num_markers; num_markers_read++)
       {
-        markers = &keyframe->markers;
+        markers = &pKeyframe->markers;
         if (!stdConffile_ReadLine())
             break;
         
@@ -188,7 +188,7 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
             goto read_fail;
         if (_sscanf(stdConffile_g_aLine, " mesh name %s", aMeshName) != 1)
             goto read_fail;
-        joint = &keyframe->aNodes[node_idx];
+        joint = &pKeyframe->aNodes[node_idx];
         
 #ifdef SITH_DEBUG_STRUCT_NAMES
         stdString_SafeStrCopy(joint->aMeshName, aMeshName, 32);
@@ -367,33 +367,33 @@ int rdKeyframe_Write(char *out_fpath, rdKeyframe *keyframe, char *creation_metho
     return 1;
 }
 
-void rdKeyframe_Free(rdKeyframe *keyframe)
+void rdKeyframe_Free(rdKeyframe *pKeyframe)
 {
-    if (!keyframe)
+    if (!pKeyframe)
         return;
 
     if (pKeyframeUnloader)
     {
-        pKeyframeUnloader(keyframe);
+        pKeyframeUnloader(pKeyframe);
         return;
     }
     
     // This was inlined
-    rdKeyframe_FreeEntry(keyframe);
+    rdKeyframe_FreeEntry(pKeyframe);
     
-    RDROID_FREE(keyframe);
+    RDROID_FREE(pKeyframe);
 }
 
-void rdKeyframe_FreeEntry(rdKeyframe *keyframe)
+void rdKeyframe_FreeEntry(rdKeyframe *pKeyframe)
 {
     unsigned int i;
     rdJoint* joint_iter;
     
-    if (!keyframe->aNodes)
+    if (!pKeyframe->aNodes)
         return;
 
-    joint_iter = keyframe->aNodes;
-    for (i = 0; i < keyframe->numJoints2; i++)
+    joint_iter = pKeyframe->aNodes;
+    for (i = 0; i < pKeyframe->numJoints2; i++)
     {
         if (joint_iter->aEntries)
         {
@@ -402,6 +402,6 @@ void rdKeyframe_FreeEntry(rdKeyframe *keyframe)
         }
         joint_iter++;
     }
-    RDROID_FREE(keyframe->aNodes);
-    keyframe->aNodes = NULL;
+    RDROID_FREE(pKeyframe->aNodes);
+    pKeyframe->aNodes = NULL;
 }

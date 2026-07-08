@@ -13,13 +13,13 @@
 #define rdKeyframe_Free_ADDR (0x0044B570)
 #define rdKeyframe_FreeEntry_ADDR (0x0044B5F0)
 
-keyframeLoader_t rdKeyframe_RegisterLoader(keyframeLoader_t loader);
-keyframeUnloader_t rdKeyframe_RegisterUnloader(keyframeUnloader_t loader);
-void rdKeyframe_NewEntry(rdKeyframe *keyframe);
-rdKeyframe* rdKeyframe_Load(char *fname);
-int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe);
+keyframeLoader_t rdKeyframe_RegisterLoader(keyframeLoader_t pFunc);
+keyframeUnloader_t rdKeyframe_RegisterUnloader(keyframeUnloader_t pFunc);
+void rdKeyframe_NewEntry(rdKeyframe *pKeyframe);
+rdKeyframe* rdKeyframe_Load(char *pFilename);
+int rdKeyframe_LoadEntry(char *pFilename, rdKeyframe *pKeyframe);
 int rdKeyframe_Write(char *out_fpath, rdKeyframe *keyframe, char *creation_method);
-void rdKeyframe_Free(rdKeyframe *keyframe);
-void rdKeyframe_FreeEntry(rdKeyframe *keyframe);
+void rdKeyframe_Free(rdKeyframe *pKeyframe);
+void rdKeyframe_FreeEntry(rdKeyframe *pKeyframe);
 
 #endif // _RDKEYFRAME_H

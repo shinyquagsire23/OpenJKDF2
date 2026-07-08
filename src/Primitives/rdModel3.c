@@ -27,17 +27,17 @@
 #include "Primitives/rdPrimit3.h"
 #include "Primitives/rdDebug.h"
 
-model3Loader_t rdModel3_RegisterLoader(model3Loader_t loader)
+model3Loader_t rdModel3_RegisterLoader(model3Loader_t pfFunc)
 {
     model3Loader_t result = pModel3Loader;
-    pModel3Loader = loader;
+    pModel3Loader = pfFunc;
     return result;
 }
 
-model3Unloader_t rdModel3_RegisterUnloader(model3Unloader_t unloader)
+model3Unloader_t rdModel3_RegisterUnloader(model3Unloader_t pfFunc)
 {
     model3Unloader_t result = pModel3Unloader;
-    pModel3Unloader = unloader;
+    pModel3Unloader = pfFunc;
     return result;
 }
 
@@ -46,24 +46,24 @@ void rdModel3_ClearFrameCounters()
     rdModel3_numDrawnModels = 0;
 }
 
-int rdModel3_NewEntry(rdModel3 *model)
+int rdModel3_NewEntry(rdModel3 *pModel3)
 {
-    stdPlatform_Memzero32(model, sizeof(rdModel3)); // Added: word-safe (aModels array may be in extram)
-    stdString_SafeStrCopy(model->filename, "UNKNOWN", 32);
-    model->geosetSelect = 0;
+    stdPlatform_Memzero32(pModel3, sizeof(rdModel3)); // Added: word-safe (aModels array may be in extram)
+    stdString_SafeStrCopy(pModel3->filename, "UNKNOWN", 32);
+    pModel3->geosetSelect = 0;
     return 0;
 }
 
-rdModel3* rdModel3_Load(char *path)
+rdModel3* rdModel3_Load(char *pName)
 {
     rdModel3 *model;
 
     if ( pModel3Loader )
-        return (rdModel3 *)pModel3Loader(path, 0);
+        return (rdModel3 *)pModel3Loader(pName, 0);
     model = (rdModel3 *)RDROID_ALLOC(sizeof(rdModel3));
     if ( model )
     {
-        if ( rdModel3_LoadEntry(path, model) )
+        if ( rdModel3_LoadEntry(pName, model) )
             return model;
         rdModel3_Free(model);
     }
@@ -73,7 +73,7 @@ rdModel3* rdModel3_Load(char *path)
 #define rdModel3_HelpDebug(s, ...) (s)
 
 // MOTS altered (RGB aLights?)
-int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
+int rdModel3_LoadEntry(char *pFilename, rdModel3 *pModel3)
 {
     rdMesh *mesh; // ebx
     int vertex_num; // edi
@@ -111,13 +111,13 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
     int version_major; // [esp+90h] [ebp-4h]
     int geoset_num;
 
-    rdModel3_NewEntry(model);
-    stdString_SafeStrCopy(model->filename, stdFileFromPath(model_fpath), 32);
+    rdModel3_NewEntry(pModel3);
+    stdString_SafeStrCopy(pModel3->filename, stdFileFromPath(pFilename), 32);
 
     //rdModel3_HelpDebug("OpenJKDF2: %s -> `%s`\n", __func__, model_fpath); // Added
 
-    if ( !stdConffile_Open(model_fpath) ) {
-        rdModel3_HelpDebug("OpenJKDF2: %s: Failed to open file `%s`\n", __func__, model_fpath); // Added
+    if ( !stdConffile_Open(pFilename) ) {
+        rdModel3_HelpDebug("OpenJKDF2: %s: Failed to open file `%s`\n", __func__, pFilename); // Added
         return 0;
     }
 
@@ -142,21 +142,21 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
 
     if ( _sscanf(stdConffile_g_aLine, " section: %s", std_g_genBuffer) != 1
       || !stdConffile_ReadLine()
-      || _sscanf(stdConffile_g_aLine, " materials %d", &model->sizeMaterials) != 1 ) {
+      || _sscanf(stdConffile_g_aLine, " materials %d", &pModel3->sizeMaterials) != 1 ) {
 
         rdModel3_HelpDebug("OpenJKDF2: %s: Failed to parse section or materials\n", __func__); // Added
         return 0;
     }
 
-    if ( model->sizeMaterials)
+    if ( pModel3->sizeMaterials)
     {
-        model->aMaterials = (rdMaterial **)RDROID_ALLOC(sizeof(rdMaterial*) * model->sizeMaterials);
-        if (!model->aMaterials) {
+        pModel3->aMaterials = (rdMaterial **)RDROID_ALLOC(sizeof(rdMaterial*) * pModel3->sizeMaterials);
+        if (!pModel3->aMaterials) {
             rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate materials\n", __func__); // Added
             return 0;
         }
     }
-    for (int i = 0; i < model->sizeMaterials; i++)
+    for (int i = 0; i < pModel3->sizeMaterials; i++)
     {
         if (!stdConffile_ReadLine())
             goto fail;
@@ -164,9 +164,9 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
         if ( _sscanf(stdConffile_g_aLine, " %d: %s", &geoset_num, std_g_genBuffer) != 2 )
             goto fail;
 
-        model->aMaterials[i] = rdMaterial_Load(std_g_genBuffer, 0, 0);
+        pModel3->aMaterials[i] = rdMaterial_Load(std_g_genBuffer, 0, 0);
 
-        if ( !model->aMaterials[i] ) {
+        if ( !pModel3->aMaterials[i] ) {
             rdModel3_HelpDebug("OpenJKDF2: %s: Failed to load material %s\n", __func__, std_g_genBuffer); // Added
             goto fail;
         }
@@ -190,7 +190,7 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
         goto fail;
     }
 
-    model->radius = radius; // FLEXTODO
+    pModel3->radius = radius; // FLEXTODO
     if (!stdConffile_ReadLine()) {
         rdModel3_HelpDebug("OpenJKDF2: %s: Failed to parse radius ln %s\n", __func__, stdConffile_g_aLine); // Added
         goto fail;
@@ -201,19 +201,19 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
         goto fail;
     }
 
-    model->insertOffset.x = v_x; // FLEXTODO
-    model->insertOffset.y = v_y; // FLEXTODO
-    model->insertOffset.z = v_z; // FLEXTODO
+    pModel3->insertOffset.x = v_x; // FLEXTODO
+    pModel3->insertOffset.y = v_y; // FLEXTODO
+    pModel3->insertOffset.z = v_z; // FLEXTODO
     if (!stdConffile_ReadLine()) {
         rdModel3_HelpDebug("OpenJKDF2: %s: Failed to parse insertOffset ln %s\n", __func__, stdConffile_g_aLine); // Added
         goto fail;
     }
 
-    if ( _sscanf(stdConffile_g_aLine, " geosets %d", &model->numGeos) != 1 ) {
+    if ( _sscanf(stdConffile_g_aLine, " geosets %d", &pModel3->numGeos) != 1 ) {
         rdModel3_HelpDebug("OpenJKDF2: %s: Failed to parse geosets %s\n", __func__, stdConffile_g_aLine); // Added
         goto fail;
     }
-    for (v78 = 0; v78 < model->numGeos; v78++)
+    for (v78 = 0; v78 < pModel3->numGeos; v78++)
     {
         if (!stdConffile_ReadLine()) {
             rdModel3_HelpDebug("OpenJKDF2: %s: Failed to geosets ln %s\n", __func__, stdConffile_g_aLine); // Added
@@ -228,18 +228,18 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
         if ( !stdConffile_ReadLine() )
             goto fail;
             
-        if ( _sscanf(stdConffile_g_aLine, " meshes %d", &model->aGeos[v78].numMeshes) != 1 ) {
+        if ( _sscanf(stdConffile_g_aLine, " meshes %d", &pModel3->aGeos[v78].numMeshes) != 1 ) {
             rdModel3_HelpDebug("OpenJKDF2: %s: Failed to parse meshes %s\n", __func__, stdConffile_g_aLine); // Added
             goto fail;
         }
 
-        model->aGeos[v78].aMeshes = (rdMesh *)RDROID_ALLOC(sizeof(rdMesh) * model->aGeos[v78].numMeshes);
-        if ( !model->aGeos[v78].aMeshes )
+        pModel3->aGeos[v78].aMeshes = (rdMesh *)RDROID_ALLOC(sizeof(rdMesh) * pModel3->aGeos[v78].numMeshes);
+        if ( !pModel3->aGeos[v78].aMeshes )
             goto fail;
         
-        for (int i = 0; i < model->aGeos[v78].numMeshes; i++)
+        for (int i = 0; i < pModel3->aGeos[v78].numMeshes; i++)
         {
-            mesh = &model->aGeos[v78].aMeshes[i];
+            mesh = &pModel3->aGeos[v78].aMeshes[i];
             mesh->mesh_num = i;
             if ( !stdConffile_ReadLine() )
                 goto fail;
@@ -427,13 +427,13 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
                 v36 = _atoi(tmpTxt);
                 face->num = j;
                 // Added: model->sizeMaterials bounds
-                if (v36 > model->sizeMaterials) {
-                    v36 = model->sizeMaterials-1;
+                if (v36 > pModel3->sizeMaterials) {
+                    v36 = pModel3->sizeMaterials-1;
                 }
                 else if (v36 < 0 && v36 != -1) {
                     v36 = 0;
                 }
-                face->material = (v36 == -1 || !model->sizeMaterials) ? 0 : model->aMaterials[v36]; // Added: model->sizeMaterials check
+                face->material = (v36 == -1 || !pModel3->sizeMaterials) ? 0 : pModel3->aMaterials[v36]; // Added: model->sizeMaterials check
                 rdMaterial_EnsureMetadata(face->material); // Added: we don't need VBuffers yet
                 tmpTxt = _strtok(0, " \t");
                 if ( _sscanf(tmpTxt, "%x", &face->type) != 1 )
@@ -590,18 +590,18 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
     if (!stdConffile_ReadLine())
         goto fail;
 
-    if ( _sscanf(stdConffile_g_aLine, " hierarchy nodes %d", &model->numHNodes) != 1 )
+    if ( _sscanf(stdConffile_g_aLine, " hierarchy nodes %d", &pModel3->numHNodes) != 1 )
         goto fail;
 
-    model->aHierarchyNodes = (rdHierarchyNode *)RDROID_ALLOC(sizeof(rdHierarchyNode) * model->numHNodes);
-    if (!model->aHierarchyNodes) {
+    pModel3->aHierarchyNodes = (rdHierarchyNode *)RDROID_ALLOC(sizeof(rdHierarchyNode) * pModel3->numHNodes);
+    if (!pModel3->aHierarchyNodes) {
         rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate hierarchyNodes\n", __func__); // Added
         goto fail;
     }
 
-    for (idx = 0; idx < model->numHNodes; idx++)
+    for (idx = 0; idx < pModel3->numHNodes; idx++)
     {
-        node = &model->aHierarchyNodes[idx];
+        node = &pModel3->aHierarchyNodes[idx];
         node->idx = idx;
         if ( !stdConffile_ReadLine()
           || _sscanf(
@@ -635,18 +635,18 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
         }
         else
         {
-            node->parent = &model->aHierarchyNodes[parent];
+            node->parent = &pModel3->aHierarchyNodes[parent];
         }
 
         if ( child == -1 )
             node->child = 0;
         else
-            node->child = &model->aHierarchyNodes[child];
+            node->child = &pModel3->aHierarchyNodes[child];
 
         if ( sibling == -1 )
             node->nextSibling = 0;
         else
-            node->nextSibling = &model->aHierarchyNodes[sibling];
+            node->nextSibling = &pModel3->aHierarchyNodes[sibling];
 
         node->pos.x = v_x; // FLEXTODO
         node->pos.y = v_y; // FLEXTODO
@@ -659,7 +659,7 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
         node->pivot.z = pivot_z; // FLEXTODO
     }
 
-    rdModel3_CalcNumParents(model); // MOTS added
+    rdModel3_CalcNumParents(pModel3); // MOTS added
 
     stdConffile_Close();
     return 1;
@@ -673,12 +673,12 @@ fail:
 }
 
 // from editor?
-void rdModel3_LoadPostProcess(rdModel3 *model)
+void rdModel3_LoadPostProcess(rdModel3 *pModel3)
 {
-    rdModel3_CalcRadii(model);
-    rdModel3_CalcFaceNormals(model);
-    rdModel3_CalcVertexNormals(model);
-    rdModel3_CalcNumParents(model); // MOTS added
+    rdModel3_CalcRadii(pModel3);
+    rdModel3_CalcFaceNormals(pModel3);
+    rdModel3_CalcVertexNormals(pModel3);
+    rdModel3_CalcNumParents(pModel3); // MOTS added
 }
 
 // MOTS added
@@ -702,7 +702,7 @@ void rdModel3_CalcNumParents(rdModel3* pModel)
 }
 
 // from editors?
-int rdModel3_Write(char *fout, rdModel3 *model, char *createdfrom)
+int rdModel3_Write(char *pFilename, rdModel3 *pModel, char *pCratedName)
 {
     rdGeoset* geoset;
     int siblingIdx;
@@ -710,34 +710,34 @@ int rdModel3_Write(char *fout, rdModel3 *model, char *createdfrom)
     int childIdx;
     int fd;
 
-    fd = rdroid_g_pHS->fileOpen(fout, "wt+");
+    fd = rdroid_g_pHS->fileOpen(pFilename, "wt+");
     if (!fd)
         return 0;
 
-    rdroid_g_pHS->filePrintf(fd, "# MODEL '%s' created from '%s'\n\n", model->filename, createdfrom);
+    rdroid_g_pHS->filePrintf(fd, "# MODEL '%s' created from '%s'\n\n", pModel->filename, pCratedName);
     rdroid_g_pHS->filePrintf(fd, "###############\n");
     rdroid_g_pHS->filePrintf(fd, "SECTION: HEADER\n\n");
     rdroid_g_pHS->filePrintf(fd, "3DO %d.%d\n\n", 2, 1);
     rdroid_g_pHS->filePrintf(fd, "###############\n");
     rdroid_g_pHS->filePrintf(fd, "SECTION: MODELRESOURCE\n\n");
     rdroid_g_pHS->filePrintf(fd, "# Materials list\n");
-    rdroid_g_pHS->filePrintf(fd, "MATERIALS %d\n\n", model->sizeMaterials);
-    for (int i = 0; i < model->sizeMaterials; i++)
+    rdroid_g_pHS->filePrintf(fd, "MATERIALS %d\n\n", pModel->sizeMaterials);
+    for (int i = 0; i < pModel->sizeMaterials; i++)
     {
-            rdroid_g_pHS->filePrintf(fd, "%10d:%15s\n", i, model->aMaterials[i]->mat_fpath);
+            rdroid_g_pHS->filePrintf(fd, "%10d:%15s\n", i, pModel->aMaterials[i]->mat_fpath);
     }
     rdroid_g_pHS->filePrintf(fd, "\n\n");
     rdroid_g_pHS->filePrintf(fd, "###############\n");
     rdroid_g_pHS->filePrintf(fd, "SECTION: GEOMETRYDEF\n\n");
     rdroid_g_pHS->filePrintf(fd, "# Object radius\n");
-    rdroid_g_pHS->filePrintf(fd, "RADIUS %10.6f\n\n", model->radius);
+    rdroid_g_pHS->filePrintf(fd, "RADIUS %10.6f\n\n", pModel->radius);
     rdroid_g_pHS->filePrintf(fd, "# Insertion offset\n");
-    rdroid_g_pHS->filePrintf(fd, "INSERT OFFSET %10.6f %10.6f %10.6f\n\n", model->insertOffset.x, model->insertOffset.y, model->insertOffset.z);
+    rdroid_g_pHS->filePrintf(fd, "INSERT OFFSET %10.6f %10.6f %10.6f\n\n", pModel->insertOffset.x, pModel->insertOffset.y, pModel->insertOffset.z);
     rdroid_g_pHS->filePrintf(fd, "# Number of Geometry Sets\n");
-    rdroid_g_pHS->filePrintf(fd, "GEOSETS %d\n\n", model->numGeos);
+    rdroid_g_pHS->filePrintf(fd, "GEOSETS %d\n\n", pModel->numGeos);
 
-    geoset = model->aGeos;
-    for (int geosetNum = 0; geosetNum < model->numGeos; geosetNum++)
+    geoset = pModel->aGeos;
+    for (int geosetNum = 0; geosetNum < pModel->numGeos; geosetNum++)
     {
         rdroid_g_pHS->filePrintf(fd, "# Geometry Set definition\n");
         rdroid_g_pHS->filePrintf(fd, "GEOSET %d\n\n", geosetNum);
@@ -796,12 +796,12 @@ int rdModel3_Write(char *fout, rdModel3 *model, char *createdfrom)
             for (int faceNum = 0; faceNum < geoset->aMeshes[meshNum].numFaces; faceNum++)
             {
                 int materialIdx = -1;
-                for (int j = 0; j < model->sizeMaterials; j++)
+                for (int j = 0; j < pModel->sizeMaterials; j++)
                 {
                     if (!face->material)
                         break;
 
-                    if ( face->material == model->aMaterials[j] )
+                    if ( face->material == pModel->aMaterials[j] )
                         materialIdx = j;
                 }
 
@@ -852,14 +852,14 @@ int rdModel3_Write(char *fout, rdModel3 *model, char *createdfrom)
     rdroid_g_pHS->filePrintf(fd, "###############\n");
     rdroid_g_pHS->filePrintf(fd, "SECTION: HIERARCHYDEF\n\n");
     rdroid_g_pHS->filePrintf(fd, "# Hierarchy node list\n");
-    rdroid_g_pHS->filePrintf(fd, "HIERARCHY NODES %d\n\n", model->numHNodes);
+    rdroid_g_pHS->filePrintf(fd, "HIERARCHY NODES %d\n\n", pModel->numHNodes);
     rdroid_g_pHS->filePrintf(fd, 
         "#  num:   flags:   type:    mesh:  parent:  child:  sibling:  numChildren:        x:         y:         z:     pitch:       yaw:      roll:    pivot"
         "x:    pivoty:    pivotz:  hnodename:\n");
 
-    for (int nodeNum = 0; nodeNum < model->numHNodes; nodeNum++ )
+    for (int nodeNum = 0; nodeNum < pModel->numHNodes; nodeNum++ )
     {
-        rdHierarchyNode* node = &model->aHierarchyNodes[nodeNum];
+        rdHierarchyNode* node = &pModel->aHierarchyNodes[nodeNum];
 
         if ( node->parent )
             parentIdx = node->parent->idx;
@@ -902,29 +902,29 @@ int rdModel3_Write(char *fout, rdModel3 *model, char *createdfrom)
     return 1;
 }
 
-void rdModel3_Free(rdModel3 *model)
+void rdModel3_Free(rdModel3 *pModel3)
 {
-    if ( model )
+    if ( pModel3 )
     {
         if ( pModel3Unloader )
         {
-            pModel3Unloader(model);
+            pModel3Unloader(pModel3);
         }
         else
         {
-            rdModel3_FreeEntry(model);
-            RDROID_FREE(model);
+            rdModel3_FreeEntry(pModel3);
+            RDROID_FREE(pModel3);
         }
     }
 }
 
-void rdModel3_FreeEntry(rdModel3 *model)
+void rdModel3_FreeEntry(rdModel3 *pModel3)
 {
-    if (!model)
+    if (!pModel3)
         return;
 
-    rdGeoset* geoset = model->aGeos;
-    for (int geosetNum = 0; geosetNum < model->numGeos; geosetNum++ )
+    rdGeoset* geoset = pModel3->aGeos;
+    for (int geosetNum = 0; geosetNum < pModel3->numGeos; geosetNum++ )
     {
         for (int meshNum = 0; meshNum < geoset->numMeshes; meshNum++)
         {
@@ -966,27 +966,27 @@ void rdModel3_FreeEntry(rdModel3 *model)
         ++geoset;
     }
 
-    if ( model->aHierarchyNodes )
-        RDROID_FREE(model->aHierarchyNodes);
+    if ( pModel3->aHierarchyNodes )
+        RDROID_FREE(pModel3->aHierarchyNodes);
 
-    if ( model->sizeMaterials )
+    if ( pModel3->sizeMaterials )
     {
-        for (int i = 0; i < model->sizeMaterials; i++)
+        for (int i = 0; i < pModel3->sizeMaterials; i++)
         {
-            rdMaterial_Free(model->aMaterials[i]);
+            rdMaterial_Free(pModel3->aMaterials[i]);
         }
     }
-    if (model->aMaterials )
-        RDROID_FREE(model->aMaterials);
+    if (pModel3->aMaterials )
+        RDROID_FREE(pModel3->aMaterials);
 }
 
-void rdModel3_FreeEntryGeometryOnly(rdModel3 *model)
+void rdModel3_FreeEntryGeometryOnly(rdModel3 *pModel3)
 {
-    if (!model)
+    if (!pModel3)
         return;
 
-    rdGeoset* geoset = model->aGeos;
-    for (int geosetNum = 0; geosetNum < model->numGeos; geosetNum++ )
+    rdGeoset* geoset = pModel3->aGeos;
+    for (int geosetNum = 0; geosetNum < pModel3->numGeos; geosetNum++ )
     {
         for (int meshNum = 0; meshNum < geoset->numMeshes; meshNum++)
         {
@@ -1028,15 +1028,15 @@ void rdModel3_FreeEntryGeometryOnly(rdModel3 *model)
         ++geoset;
     }
 
-    if ( model->aHierarchyNodes )
-        RDROID_FREE(model->aHierarchyNodes);
+    if ( pModel3->aHierarchyNodes )
+        RDROID_FREE(pModel3->aHierarchyNodes);
 
-    if (model->aMaterials )
-        RDROID_FREE(model->aMaterials);
+    if (pModel3->aMaterials )
+        RDROID_FREE(pModel3->aMaterials);
 }
 
 #if 0
-int __cdecl rdModel3_Validate(rdModel3 *model)
+int __cdecl rdModel3_Validate(rdModel3 *pModel3)
 {
     int result; // eax
     unsigned int v2; // edx
@@ -1051,10 +1051,10 @@ int __cdecl rdModel3_Validate(rdModel3 *model)
     unsigned int v11; // [esp+14h] [ebp-4h]
     rdGeoset *modela; // [esp+1Ch] [ebp+4h]
 
-    result = (int)model;
-    v2 = model->numGeos;
-    v3 = model->aGeos;
-    modela = model->aGeos;
+    result = (int)pModel3;
+    v2 = pModel3->numGeos;
+    v3 = pModel3->aGeos;
+    modela = pModel3->aGeos;
     v10 = 0;
     v11 = v2;
     if ( v2 )
@@ -1112,13 +1112,13 @@ rdModel3* rdModel3_Validate(rdModel3 *model)
     return model;
 }
 
-void rdModel3_CalcRadii(rdModel3 *model)
+void rdModel3_CalcRadii(rdModel3 *pModel3)
 {
     flex_t maxDist;
 
-    for (int i = 0; i < model->aGeos[0].numMeshes; i++)
+    for (int i = 0; i < pModel3->aGeos[0].numMeshes; i++)
     {
-        rdMesh* mesh = &model->aGeos[0].aMeshes[i];
+        rdMesh* mesh = &pModel3->aGeos[0].aMeshes[i];
         maxDist = 0.0;
         for (int j = 0; j < mesh->numVertices; j++)
         {
@@ -1132,11 +1132,11 @@ void rdModel3_CalcRadii(rdModel3 *model)
         mesh->field_64 = (maxDist * 0.1) + maxDist;
     }
     rdModel3_fRadius = 0.0;
-    rdModel3_BuildExpandedRadius(model, model->aHierarchyNodes, &rdroid_identMatrix34);
-    model->radius = rdModel3_fRadius * 0.1 + rdModel3_fRadius;
+    rdModel3_BuildExpandedRadius(pModel3, pModel3->aHierarchyNodes, &rdroid_identMatrix34);
+    pModel3->radius = rdModel3_fRadius * 0.1 + rdModel3_fRadius;
 }
 
-void rdModel3_BuildExpandedRadius(rdModel3 *model, rdHierarchyNode *node, const rdMatrix34 *matrix)
+void rdModel3_BuildExpandedRadius(rdModel3 *pModel, rdHierarchyNode *pNode, const rdMatrix34 *orient)
 {
     rdVector3 vertex_out;
     rdVector3 vecTmp;
@@ -1144,21 +1144,21 @@ void rdModel3_BuildExpandedRadius(rdModel3 *model, rdHierarchyNode *node, const 
     rdMatrix34 out;
     rdMatrix34 matTmp;
 
-    rdMatrix_Build34(&matTmp, &node->rot, &node->pos);
-    rdMatrix_BuildTranslate34(&matPivotTranslate, &node->pivot);
+    rdMatrix_Build34(&matTmp, &pNode->rot, &pNode->pos);
+    rdMatrix_BuildTranslate34(&matPivotTranslate, &pNode->pivot);
     rdMatrix_PostMultiply34(&matPivotTranslate, &matTmp);
     
-    if (node->parent)
+    if (pNode->parent)
     {
-        rdVector_Neg3(&vecTmp, &node->parent->pivot);
+        rdVector_Neg3(&vecTmp, &pNode->parent->pivot);
         rdMatrix_PostTranslate34(&matPivotTranslate, &vecTmp);
     }
     
-    rdMatrix_Multiply34(&out, matrix, &matPivotTranslate);
+    rdMatrix_Multiply34(&out, orient, &matPivotTranslate);
     
-    if ( node->meshIdx != -1 )
+    if ( pNode->meshIdx != -1 )
     {
-        rdMesh* mesh = &model->aGeos[0].aMeshes[node->meshIdx];
+        rdMesh* mesh = &pModel->aGeos[0].aMeshes[pNode->meshIdx];
         for (int i = 0; i < mesh->numVertices; i++)
         {
             rdVector3* vtx = &mesh->aVertices[i];
@@ -1169,23 +1169,23 @@ void rdModel3_BuildExpandedRadius(rdModel3 *model, rdHierarchyNode *node, const 
         }
     }
     
-    if (node->numChildren)
+    if (pNode->numChildren)
     {
-        rdHierarchyNode* childIter = node->child;
-        for (int i = 0; i < node->numChildren; i++)
+        rdHierarchyNode* childIter = pNode->child;
+        for (int i = 0; i < pNode->numChildren; i++)
         {
-            rdModel3_BuildExpandedRadius(model, childIter, &out);
+            rdModel3_BuildExpandedRadius(pModel, childIter, &out);
             childIter = childIter->nextSibling;
         }
     }
 }
 
 // from editors?
-void rdModel3_CalcFaceNormals(rdModel3 *model)
+void rdModel3_CalcFaceNormals(rdModel3 *pModel3)
 {
-    for (int geosetIdx = 0; geosetIdx < model->numGeos; geosetIdx++)
+    for (int geosetIdx = 0; geosetIdx < pModel3->numGeos; geosetIdx++)
     {
-        rdGeoset* geoset = &model->aGeos[geosetIdx];
+        rdGeoset* geoset = &pModel3->aGeos[geosetIdx];
 
         for (int meshIdx = 0; meshIdx < geoset->numMeshes; meshIdx++)
         {
@@ -1217,7 +1217,7 @@ void rdModel3_CalcFaceNormals(rdModel3 *model)
     } 
 }
 
-void rdModel3_CalcVertexNormals(rdModel3 *model)
+void rdModel3_CalcVertexNormals(rdModel3 *pModel)
 {
     flex_d_t v10; // st7
     flex_d_t v11; // st6
@@ -1227,9 +1227,9 @@ void rdModel3_CalcVertexNormals(rdModel3 *model)
     rdVector3 *v19; // ecx
     int v22; // edx
 
-    for (int geosetNum = 0; geosetNum < model->numGeos; geosetNum++)
+    for (int geosetNum = 0; geosetNum < pModel->numGeos; geosetNum++)
     {
-        rdGeoset* geoset = &model->aGeos[geosetNum];
+        rdGeoset* geoset = &pModel->aGeos[geosetNum];
         for (int meshNum = 0; meshNum < geoset->numMeshes; meshNum++)
         {
             rdMesh* mesh = &geoset->aMeshes[meshNum];
@@ -1291,44 +1291,44 @@ void rdModel3_CalcVertexNormals(rdModel3 *model)
 
 //vertexnormals, technically unused, from editors?
 
-rdHierarchyNode* rdModel3_FindNamedNode(char *name, rdModel3 *model)
+rdHierarchyNode* rdModel3_FindNamedNode(char *pName, rdModel3 *pModel3)
 {
     uint32_t i = 0;
-    rdHierarchyNode* nodeIter = model->aHierarchyNodes;
+    rdHierarchyNode* nodeIter = pModel3->aHierarchyNodes;
 
-    if ( !model->numHNodes )
+    if ( !pModel3->numHNodes )
         return 0;
 
-    while (_strcmp(nodeIter->name, name))
+    while (_strcmp(nodeIter->name, pName))
     {
         ++nodeIter;
-        if ( ++i >= model->numHNodes )
+        if ( ++i >= pModel3->numHNodes )
             return 0;
     }
 
     return nodeIter;
 }
 
-int rdModel3_GetMeshMatrix(rdThing *thing, rdMatrix34 *matrix, uint32_t nodeNum, rdMatrix34 *out)
+int rdModel3_GetMeshMatrix(rdThing *pThing, rdMatrix34 *orient, uint32_t nodeNum, rdMatrix34 *meshOrient)
 {
-    if ( nodeNum >= thing->model3->numHNodes )
+    if ( nodeNum >= pThing->model3->numHNodes )
         return 0;
 
-    if ( thing->rdFrameNum != rdroid_frameTrue )
-        rdPuppet_BuildJointMatrices(thing, matrix);
+    if ( pThing->rdFrameNum != rdroid_frameTrue )
+        rdPuppet_BuildJointMatrices(pThing, orient);
 
-    _memcpy(out, &thing->paJointMatrices[nodeNum], sizeof(rdMatrix34));
+    _memcpy(meshOrient, &pThing->paJointMatrices[nodeNum], sizeof(rdMatrix34));
     return 1;
 }
 
-int rdModel3_ReplaceMesh(rdModel3 *model, int geosetIdx, int meshIdx, rdMesh *in)
+int rdModel3_ReplaceMesh(rdModel3 *pModel, int geosetNum, int meshNum, rdMesh *pSrcMesh)
 {
-    _memcpy(&model->aGeos[geosetIdx].aMeshes[meshIdx], in, sizeof(model->aGeos[geosetIdx].aMeshes[meshIdx]));
+    _memcpy(&pModel->aGeos[geosetNum].aMeshes[meshNum], pSrcMesh, sizeof(pModel->aGeos[geosetNum].aMeshes[meshNum]));
     return 1;
 }
 
 // MOTS altered (RGB aLights)
-int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
+int rdModel3_Draw(rdThing *pThing, rdMatrix34 *pPlacement)
 {
     int frustumCull;
     int geosetNum;
@@ -1339,15 +1339,15 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     int meshIdx;
     rdHierarchyNode *node;
     
-    pCurThing = thing;
-    pCurModel3 = thing->model3;
+    pCurThing = pThing;
+    pCurModel3 = pThing->model3;
     
     if (rdroid_curCullFlags & 2) {
         rdVector3 vertex_out;
         rdClipFrustum* pThingFrustum = rdCamera_g_pCurCamera->pClipFrustum;
 
         // Moved this in here, it's not used elsewhere
-        rdMatrix_TransformPoint34(&vertex_out, &matrix_4_3->scale, &rdCamera_g_pCurCamera->orient);
+        rdMatrix_TransformPoint34(&vertex_out, &pPlacement->scale, &rdCamera_g_pCurCamera->orient);
         frustumCull = rdClip_SphereInFrustrum(pThingFrustum, &vertex_out, pCurModel3->radius);
 #ifdef SITHRENDER_SPHERE_TEST_SURFACES
         extern rdClipFrustum sithRender_absoluteMaxFrustum;
@@ -1358,7 +1358,7 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
 #endif
     }
     else {
-        frustumCull = thing->clippingIdk;
+        frustumCull = pThing->clippingIdk;
     }
     thingFrustumCull = frustumCull;
     if (frustumCull == SPHERE_FULLY_OUTSIDE) {
@@ -1370,7 +1370,7 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     thingFrustumCull = SPHERE_CLIPPING_EDGE;
 #endif
 
-    if ( thing->geosetSelect == -1 )
+    if ( pThing->geosetSelect == -1 )
     {
         geosetNum = pCurModel3->geosetSelect;
     }
@@ -1382,7 +1382,7 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     rdModel3_pCurGeoset = geoset;
     if ( pCurThing->rdFrameNum != rdroid_frameTrue )
     {
-        rdPuppet_BuildJointMatrices(pCurThing, matrix_4_3);
+        rdPuppet_BuildJointMatrices(pCurThing, pPlacement);
     }
 
     curGeometryMode = pCurThing->curGeoMode;
@@ -1413,7 +1413,7 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
             rdVector3* lightPos = &rdCamera_g_pCurCamera->aLightPositions[lNum];
             rdLight* lightIter = rdCamera_g_pCurCamera->aLights[lNum];
 
-            if ( lightIter->minRadius + pCurModel3->radius > rdVector_Dist3(lightPos, &matrix_4_3->scale))
+            if ( lightIter->minRadius + pCurModel3->radius > rdVector_Dist3(lightPos, &pPlacement->scale))
             {
                 *pGeoLight = lightIter;
                 ++pGeoLight;
@@ -1425,7 +1425,7 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     // JKDF2 inlined
     rdModel3_DrawHNode(pCurModel3->aHierarchyNodes);
 #if 0
-    rdDebug_DrawBoundingBox(matrix_4_3, pCurModel3->radius, 0xFF0000FF);
+    rdDebug_DrawBoundingBox(pPlacement, pCurModel3->radius, 0xFF0000FF);
 #endif
     ++rdModel3_numDrawnModels;
     return 1;
@@ -1473,15 +1473,15 @@ void rdModel3_DrawHNode(rdHierarchyNode *pNode)
 }
 
 // MOTS altered (RGB aLights)
-void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
+void rdModel3_DrawMesh(rdMesh *pMesh, rdMatrix34 *orient)
 {
     rdLight **pGeoLight;
     rdVector3 vertex;
     rdMatrix34 matInv;
     rdMatrix34 out;
 
-    pCurMesh = meshIn;
-    if ( !meshIn->geometryMode )
+    pCurMesh = pMesh;
+    if ( !pMesh->geometryMode )
         return;
     
     if (thingFrustumCull != SPHERE_FULLY_INSIDE) {
@@ -1489,7 +1489,7 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
         rdClipFrustum* pMeshFrustum = rdCamera_g_pCurCamera->pClipFrustum;
 
         // Moved this in here, it's not used elsewhere
-        rdMatrix_TransformPoint34(&vertex_out, &mat->scale, &rdCamera_g_pCurCamera->orient);
+        rdMatrix_TransformPoint34(&vertex_out, &orient->scale, &rdCamera_g_pCurCamera->orient);
         meshFrustumCull = (rdroid_curCullFlags & 1) ? rdClip_SphereInFrustrum(pMeshFrustum, &vertex_out, pCurMesh->radius) : SPHERE_CLIPPING_EDGE;
 #ifdef SITHRENDER_SPHERE_TEST_SURFACES
         extern rdClipFrustum sithRender_absoluteMaxFrustum;
@@ -1507,9 +1507,9 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
         return;
     }
 
-    rdMatrix_Multiply34(&out, &rdCamera_g_pCurCamera->orient, mat);
+    rdMatrix_Multiply34(&out, &rdCamera_g_pCurCamera->orient, orient);
     rdMatrix_TransformPointList34(&out, pCurMesh->aVertices, aView, pCurMesh->numVertices);
-    rdMatrix_InvertOrtho34(&matInv, mat);
+    rdMatrix_InvertOrtho34(&matInv, orient);
     
     rdModel3_geometryMode = pCurMesh->geometryMode;
     if ( rdModel3_geometryMode >= curGeometryMode )
@@ -1558,20 +1558,20 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
 
             // Added: dist -> dist squared
             flex_t dist = (*pGeoLight)->minRadius + pCurMesh->radius;
-            if ( dist*dist > rdVector_DistSquared3(&rdCamera_g_pCurCamera->aLightPositions[lightIdx], &mat->scale) )
+            if ( dist*dist > rdVector_DistSquared3(&rdCamera_g_pCurCamera->aLightPositions[lightIdx], &orient->scale) )
             {
                 apMeshLights[rdModel3_numMeshLights] = *pGeoLight;
                 rdMatrix_TransformPoint34(&rdModel3_aLocalLightPos[rdModel3_numMeshLights], &rdCamera_g_pCurCamera->aLightPositions[lightIdx], &matInv);
                 
                 // MOTS added
                 if ((*pGeoLight)->type == 3) {
-                    flex_t tmpZ = mat->scale.z;
-                    rdVector_Zero3(&mat->scale);
+                    flex_t tmpZ = orient->scale.z;
+                    rdVector_Zero3(&orient->scale);
 
                     rdVector3 tmpDir;
                     rdVector_Neg3(&tmpDir, &(*pGeoLight)->direction);
                     rdMatrix_TransformPoint34(&rdModel3_aLocalLightDir[rdModel3_numMeshLights], &tmpDir, &matInv);
-                    mat->scale.z = tmpZ;
+                    orient->scale.z = tmpZ;
                 }
 
                 ++rdModel3_numMeshLights;
@@ -1589,20 +1589,20 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
 
             // Added: dist -> dist squared
             flex_t dist = (*pGeoLight)->minRadius + pCurMesh->radius;
-            if ( dist*dist > rdVector_DistSquared3(&rdCamera_g_pCurCamera->aLightPositions[lightIdx], &mat->scale) )
+            if ( dist*dist > rdVector_DistSquared3(&rdCamera_g_pCurCamera->aLightPositions[lightIdx], &orient->scale) )
             {
                 apMeshLights[rdModel3_numMeshLights] = *pGeoLight;
                 rdMatrix_TransformPoint34(&rdModel3_aLocalLightPos[rdModel3_numMeshLights], &rdCamera_g_pCurCamera->aLightPositions[lightIdx], &matInv);
                 
                 // MOTS added
                 if ((*pGeoLight)->type == 3) {
-                    flex_t tmpZ = mat->scale.z;
-                    rdVector_Zero3(&mat->scale);
+                    flex_t tmpZ = orient->scale.z;
+                    rdVector_Zero3(&orient->scale);
 
                     rdVector3 tmpDir;
                     rdVector_Neg3(&tmpDir, &(*pGeoLight)->direction);
                     rdMatrix_TransformPoint34(&rdModel3_aLocalLightDir[rdModel3_numMeshLights], &tmpDir, &matInv);
-                    mat->scale.z = tmpZ;
+                    orient->scale.z = tmpZ;
                 }
 
                 ++rdModel3_numMeshLights;
@@ -1611,7 +1611,7 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
         }
 
         // MOTS added assignment
-        meshIn->extraLight = rdLight_CalcVertexIntensities(
+        pMesh->extraLight = rdLight_CalcVertexIntensities(
             apMeshLights,
             rdModel3_aLocalLightPos,
 #ifdef JKM_LIGHTING
@@ -1627,24 +1627,24 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
     }
     else if (rdModel3_lightingMode == RD_LIGHTMODE_6_UNK) // MOTS added
     {
-        for (int i = 0; i < meshIn->numFaces; i++)
+        for (int i = 0; i < pMesh->numFaces; i++)
         {
-            rdFace* face = &meshIn->faces[i];
-            face->extraLight = meshIn->extraLight;
+            rdFace* face = &pMesh->faces[i];
+            face->extraLight = pMesh->extraLight;
         }
     }
 
     // This is about 1/2 of the render time for E-11, 1/4 for saber
     // Before this is about 1/2 the render time for saber
     rdMatrix_TransformPoint34(&localCamera, &rdCamera_g_camMatrix.scale, &matInv);
-    rdFace* face = &meshIn->faces[0];
+    rdFace* face = &pMesh->faces[0];
 
     // Be extra sure we're setting backface culling
 #ifdef TARGET_TWL
     rdroid_g_curRenderOptions |= 1;
 #endif
 
-    for (int i = 0; i < meshIn->numFaces; i++)
+    for (int i = 0; i < pMesh->numFaces; i++)
     {
         int flags = 0;
         flex_t normalCheck = (localCamera.y - pCurMesh->aVertices[*face->vertexPosIdx].y) * face->normal.y
@@ -1670,7 +1670,7 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
 }
 
 // MOTS altered (RGB aLights)
-int rdModel3_DrawFace(rdFace *face, int lightFlags)
+int rdModel3_DrawFace(rdFace *pFace, int lightFlags)
 {
     rdProcEntry *procEntry;
     rdGeoMode_t geometryMode;
@@ -1689,24 +1689,24 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 #endif
 
     geometryMode = rdModel3_geometryMode;
-    if ( rdModel3_geometryMode >= face->geometryMode )
-        geometryMode = face->geometryMode;
+    if ( rdModel3_geometryMode >= pFace->geometryMode )
+        geometryMode = pFace->geometryMode;
 
     lightingMode = rdModel3_lightingMode;
-    if ( rdModel3_lightingMode >= face->lightingMode )
-        lightingMode = face->lightingMode;
+    if ( rdModel3_lightingMode >= pFace->lightingMode )
+        lightingMode = pFace->lightingMode;
 
     textureMode = rdModel3_textureMode;
-    if ( rdModel3_textureMode >= face->textureMode )
-        textureMode = face->textureMode;
+    if ( rdModel3_textureMode >= pFace->textureMode )
+        textureMode = pFace->textureMode;
 
     // MOTS added
-    if ((face->type & 0x10) != 0) {
+    if ((pFace->type & 0x10) != 0) {
         lightingMode = RD_LIGHTMODE_NOTLIT;
     }
 
     // Added: safeguard
-    if (!face->vertexUVIdx && geometryMode == RD_GEOMETRY_FULL) {
+    if (!pFace->vertexUVIdx && geometryMode == RD_GEOMETRY_FULL) {
         geometryMode = RD_GEOMETRY_SOLID;
     }
 
@@ -1716,16 +1716,16 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
     vertexDst.verticesOrig = procEntry->aVertices;
     vertexDst.aTexVerticies = procEntry->aTexVerticies;
     vertexDst.paDynamicLight = procEntry->vertexIntensities;
-    vertexSrc.numVertices = face->numVertices;
-    vertexSrc.vertexPosIdx = face->vertexPosIdx;
-    vertexSrc.vertexUVIdx = face->vertexUVIdx;
+    vertexSrc.numVertices = pFace->numVertices;
+    vertexSrc.vertexPosIdx = pFace->vertexPosIdx;
+    vertexSrc.vertexUVIdx = pFace->vertexUVIdx;
 
     // MOTS added: RGB
     if ((rdGetVertexColorMode() == 0) || (procEntry->lightingMode == RD_LIGHTMODE_DIFFUSE)) {
         if (meshFrustumCull != SPHERE_FULLY_INSIDE)
-            rdPrimit3_ClipFace(rdCamera_g_pCurCamera->pClipFrustum, geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &face->texVertOffset);
+            rdPrimit3_ClipFace(rdCamera_g_pCurCamera->pClipFrustum, geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &pFace->texVertOffset);
         else
-            rdPrimit3_NoClipFace(geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &face->texVertOffset);
+            rdPrimit3_NoClipFace(geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &pFace->texVertOffset);
     }
     else {
         vertexSrc.paRedIntensities = pCurMesh->paRedIntensities;
@@ -1736,9 +1736,9 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
         vertexDst.paBlueIntensities = procEntry->paBlueIntensities;
         //printf("%p %p %p, %p %p %p\n", vertexSrc.paRedIntensities, vertexSrc.paGreenIntensities, vertexSrc.paBlueIntensities, vertexDst.paRedIntensities, vertexDst.paGreenIntensities, vertexDst.paBlueIntensities);
         if (meshFrustumCull != SPHERE_FULLY_INSIDE)
-            rdPrimit3_ClipFaceRGB(rdCamera_g_pCurCamera->pClipFrustum, geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &face->texVertOffset);
+            rdPrimit3_ClipFaceRGB(rdCamera_g_pCurCamera->pClipFrustum, geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &pFace->texVertOffset);
         else
-            rdPrimit3_NoClipFaceRGB(geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &face->texVertOffset);
+            rdPrimit3_NoClipFaceRGB(geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &pFace->texVertOffset);
     }
 
     if ( vertexDst.numVertices < 3u )
@@ -1748,12 +1748,12 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
     {
         if ( lightFlags )
         {
-            rdVector_Neg3(&faceNormal, &face->normal);
+            rdVector_Neg3(&faceNormal, &pFace->normal);
             procEntry->light_level_static = rdLight_CalcFaceIntensity(
                       apMeshLights,
                       rdModel3_aLocalLightPos,
                       rdModel3_numMeshLights,
-                      face,
+                      pFace,
                       &faceNormal,
                       pCurMesh->aVertices,
                       rdCamera_g_pCurCamera->attenuationMin);
@@ -1764,8 +1764,8 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
                       apMeshLights,
                       rdModel3_aLocalLightPos,
                       rdModel3_numMeshLights,
-                      face,
-                      &face->normal,
+                      pFace,
+                      &pFace->normal,
                       pCurMesh->aVertices,
                       rdCamera_g_pCurCamera->attenuationMin);
         }
@@ -1777,7 +1777,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
         procEntry->ambientLight = 0.0;
 
     int isIdentityMap = (rdColormap_pCurMap == rdColormap_pIdentityMap);
-    procEntry->wallCel = face->wallCel;
+    procEntry->wallCel = pFace->wallCel;
 
     
 #if defined(TARGET_TWL)
@@ -1852,9 +1852,9 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
         flags |= 4u;
 
     procEntry->light_flags = lightFlags;
-    procEntry->type = face->type;
-    procEntry->extralight = face->extraLight;
-    procEntry->material = face->material;
+    procEntry->type = pFace->type;
+    procEntry->extralight = pFace->extraLight;
+    procEntry->material = pFace->material;
     rdCache_AddProcFace(0, vertexDst.numVertices, flags);
     return 1;
 }

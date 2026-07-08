@@ -188,30 +188,30 @@ typedef struct rdMesh
 } rdMesh;
 #endif
 
-model3Loader_t rdModel3_RegisterLoader(model3Loader_t loader);
-model3Unloader_t rdModel3_RegisterUnloader(model3Unloader_t unloader);
+model3Loader_t rdModel3_RegisterLoader(model3Loader_t pfFunc);
+model3Unloader_t rdModel3_RegisterUnloader(model3Unloader_t pfFunc);
 void rdModel3_ClearFrameCounters();
-int rdModel3_NewEntry(rdModel3 *model);
-rdModel3* rdModel3_Load(char *path);
-int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model);
-void rdModel3_LoadPostProcess(rdModel3 *model);
-int rdModel3_Write(char *fout, rdModel3 *model, char *createdfrom);
-void rdModel3_Free(rdModel3 *model);
-void rdModel3_FreeEntry(rdModel3 *model);
-void rdModel3_FreeEntryGeometryOnly(rdModel3 *model);
-rdModel3* rdModel3_Validate(rdModel3 *model);
-MATH_FUNC void rdModel3_CalcRadii(rdModel3 *model);
-MATH_FUNC void rdModel3_BuildExpandedRadius(rdModel3 *model, rdHierarchyNode *node, const rdMatrix34 *matrix);
-MATH_FUNC void rdModel3_CalcFaceNormals(rdModel3 *model);
-MATH_FUNC void rdModel3_CalcVertexNormals(rdModel3 *model);
+int rdModel3_NewEntry(rdModel3 *pModel3);
+rdModel3* rdModel3_Load(char *pName);
+int rdModel3_LoadEntry(char *pFilename, rdModel3 *pModel3);
+void rdModel3_LoadPostProcess(rdModel3 *pModel3);
+int rdModel3_Write(char *pFilename, rdModel3 *pModel, char *pCratedName);
+void rdModel3_Free(rdModel3 *pModel3);
+void rdModel3_FreeEntry(rdModel3 *pModel3);
+void rdModel3_FreeEntryGeometryOnly(rdModel3 *pModel3);
+rdModel3* rdModel3_Validate(rdModel3 *pModel3);
+MATH_FUNC void rdModel3_CalcRadii(rdModel3 *pModel3);
+MATH_FUNC void rdModel3_BuildExpandedRadius(rdModel3 *pModel, rdHierarchyNode *pNode, const rdMatrix34 *orient);
+MATH_FUNC void rdModel3_CalcFaceNormals(rdModel3 *pModel3);
+MATH_FUNC void rdModel3_CalcVertexNormals(rdModel3 *pModel);
 MATH_FUNC void rdModel3_CalcNumParents(rdModel3* pModel); // MOTS added
-rdHierarchyNode* rdModel3_FindNamedNode(char *name, rdModel3 *model);
-MATH_FUNC int rdModel3_GetMeshMatrix(rdThing *thing, rdMatrix34 *matrix, uint32_t nodeNum, rdMatrix34 *out);
-MATH_FUNC int rdModel3_ReplaceMesh(rdModel3 *model, int geosetIdx, int meshIdx, rdMesh *in);
-MATH_FUNC int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3);
+rdHierarchyNode* rdModel3_FindNamedNode(char *pName, rdModel3 *pModel3);
+MATH_FUNC int rdModel3_GetMeshMatrix(rdThing *pThing, rdMatrix34 *orient, uint32_t nodeNum, rdMatrix34 *meshOrient);
+MATH_FUNC int rdModel3_ReplaceMesh(rdModel3 *pModel, int geosetNum, int meshNum, rdMesh *pSrcMesh);
+MATH_FUNC int rdModel3_Draw(rdThing *pThing, rdMatrix34 *pPlacement);
 MATH_FUNC void rdModel3_DrawHNode(rdHierarchyNode *pNode);
-MATH_FUNC void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat);
-MATH_FUNC FAST_FUNC int rdModel3_DrawFace(rdFace *face, int lightFlags);
+MATH_FUNC void rdModel3_DrawMesh(rdMesh *pMesh, rdMatrix34 *orient);
+MATH_FUNC FAST_FUNC int rdModel3_DrawFace(rdFace *pFace, int lightFlags);
 
 // Added: Data preloading
 void rdModel3_EnsureMaterialData(rdThing *pRdThing);

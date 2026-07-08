@@ -21,34 +21,34 @@ rdLight *rdLight_New()
     return light;
 }
 
-int rdLight_NewEntry(rdLight *light)
+int rdLight_NewEntry(rdLight *pLight)
 {
-    light->type = 2;
-    light->bEnabled = 1;
-    light->direction.x = 0.0;
-    light->direction.y = 0.0;
-    light->direction.z = 0.0;
-    light->intensity = 1.0;
-    light->color = 0xFFFFFF;
+    pLight->type = 2;
+    pLight->bEnabled = 1;
+    pLight->direction.x = 0.0;
+    pLight->direction.y = 0.0;
+    pLight->direction.z = 0.0;
+    pLight->intensity = 1.0;
+    pLight->color = 0xFFFFFF;
 #ifdef JKM_LIGHTING
-    light->angleX = 0.0;
-    light->cosAngleX = 0.0;
-    light->angleY = 0.0;
-    light->cosAngleY = 0.0;
+    pLight->angleX = 0.0;
+    pLight->cosAngleX = 0.0;
+    pLight->angleY = 0.0;
+    pLight->cosAngleY = 0.0;
 #else
-    light->dword20 = 0;
-    light->dword24 = 0;
+    pLight->dword20 = 0;
+    pLight->dword24 = 0;
 #endif
     return 1;
 }
 
-void rdLight_Free(rdLight *light)
+void rdLight_Free(rdLight *pLight)
 {
-    if (light)
-        RDROID_FREE(light);
+    if (pLight)
+        RDROID_FREE(pLight);
 }
 
-void rdLight_FreeEntry(rdLight *light)
+void rdLight_FreeEntry(rdLight *pLight)
 {
 }
 
@@ -73,11 +73,11 @@ void rdLight_SetAngles(rdLight *pLight, flex_t angleX, flex_t angleY)
 }
 #endif
 
-flex_t rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLightPoses, 
+flex_t rdLight_CalcVertexIntensities(rdLight **apLights, rdVector3 *aLightPos, 
 #ifdef JKM_LIGHTING
     rdVector3 *localLightDirs, 
 #endif
-    int numLights, rdVector3 *verticesEnd, rdVector3 *aVertices, flex_t *vertices_i_end, flex_t *vertices_i, int numVertices, flex_t scalar)
+    int numLights, rdVector3 *aVertexNormal, rdVector3 *aVertices, flex_t *aVertexColors, flex_t *aColors, int numVertices, flex_t scalar)
 {
 #ifndef JKM_LIGHTING
     int vertexLightsSize;
@@ -96,17 +96,17 @@ flex_t rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
         return 0.0;
 
     // TODO: this was inlined from another (uncalled) function
-    vertexNormals = verticesEnd;
-    idkIter = vertices_i_end;
-    outLights = vertices_i;
+    vertexNormals = aVertexNormal;
+    idkIter = aVertexColors;
+    outLights = aColors;
     vertexIter = aVertices;
     for (j = 0; j < numVertices; j++)
     {
         *outLights = *idkIter;
-        meshLightIter = meshLights;
+        meshLightIter = apLights;
         for (i = 0; i < numLights; i++)
         {
-            rdVector_Sub3(&diff, &localLightPoses[i], vertexIter);
+            rdVector_Sub3(&diff, &aLightPos[i], vertexIter);
             light = *meshLightIter;
             len = rdVector_Len3(&diff);
             if ( len < (*meshLightIter)->minRadius )
@@ -147,17 +147,17 @@ flex_t rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
             return 0.0;
 
         // TODO: this was inlined from another (uncalled) function
-        vertexNormals = verticesEnd;
-        idkIter = vertices_i_end;
-        outLights = vertices_i;
+        vertexNormals = aVertexNormal;
+        idkIter = aVertexColors;
+        outLights = aColors;
         vertexIter = aVertices;
         for (j = 0; j < numVertices; j++)
         {
             *outLights = *idkIter;
-            meshLightIter = meshLights;
+            meshLightIter = apLights;
             for (i = 0; i < numLights; i++)
             {
-                rdVector_Sub3(&diff, &localLightPoses[i], vertexIter);
+                rdVector_Sub3(&diff, &aLightPos[i], vertexIter);
                 light = *meshLightIter;
                 len = rdVector_Len3(&diff);
                 if ( len < (*meshLightIter)->minRadius )
@@ -195,20 +195,20 @@ flex_t rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
     local_28 = 0.0;
     if (numVertices == 0) return 0.0;
     
-    outLights = vertices_i;
+    outLights = aColors;
     vertexIter = aVertices;
-    vertexNormals = verticesEnd;
+    vertexNormals = aVertexNormal;
     for (int vertIdx = 0; vertIdx < numVertices; vertIdx++)
     {
-        *outLights = *vertices_i_end;
+        *outLights = *aVertexColors;
 
-        meshLightIter = meshLights;
-        verticesEnd = localLightPoses;
+        meshLightIter = apLights;
+        aVertexNormal = aLightPos;
         lightDirIter = localLightDirs;
         
         for (int i = 0; i < numLights; i++)
         {
-            rdVector_Sub3(&diff, verticesEnd, vertexIter);
+            rdVector_Sub3(&diff, aVertexNormal, vertexIter);
             light = *meshLightIter;
             if ((light->minRadius * light->minRadius) > rdVector_Dot3(&diff, &diff))
             {
@@ -241,7 +241,7 @@ flex_t rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
             }
             if (*outLights == 1.0) break;
             meshLightIter++;
-            verticesEnd++;
+            aVertexNormal++;
             lightDirIter++;
         }
     
@@ -254,7 +254,7 @@ flex_t rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
 #endif
 }
 
-flex_t rdLight_CalcFaceIntensity(rdLight **meshLights, rdVector3 *localLightPoses, int numLights, rdFace *face, rdVector3 *faceNormal, rdVector3 *aVertices, flex_t a7)
+flex_t rdLight_CalcFaceIntensity(rdLight **apLights, rdVector3 *apLightPos, int numLights, rdFace *pFace, rdVector3 *pNormal, rdVector3 *apVertices, flex_t attenuation)
 {
   rdVector3 *lightPosIter; // esi
   rdLight *meshLight; // ebx
@@ -268,23 +268,23 @@ flex_t rdLight_CalcFaceIntensity(rdLight **meshLights, rdVector3 *localLightPose
   rdLight **meshLightIter; // [esp+2Ch] [ebp+8h]
 
   intensity = 0.0;
-  lightPosIter = localLightPoses;
-  meshLightIter = meshLights;
+  lightPosIter = apLightPos;
+  meshLightIter = apLights;
   for (v15 = 0; v15 < numLights; v15++)
   {
       meshLight = *meshLightIter;
       if ( (*meshLightIter)->bEnabled )
       {
-        v9 = face->vertexPosIdx;
-        rdVector_Sub3(&diff, lightPosIter, &aVertices[*v9]);
-        v10 = rdMath_DistancePointToPlane(lightPosIter, faceNormal, &aVertices[*v9]);
+        v9 = pFace->vertexPosIdx;
+        rdVector_Sub3(&diff, lightPosIter, &apVertices[*v9]);
+        v10 = rdMath_DistancePointToPlane(lightPosIter, pNormal, &apVertices[*v9]);
         meshLightsa = v10;
         if ( v10 < meshLight->minRadius )
         {
           rdVector_Normalize3Acc(&diff);
-          v11 = rdVector_Dot3(faceNormal, &diff);
+          v11 = rdVector_Dot3(pNormal, &diff);
           if ( v11 > 0.0 )
-            intensity += (meshLight->intensity - meshLightsa * a7) * v11;
+            intensity += (meshLight->intensity - meshLightsa * attenuation) * v11;
         }
       }
       if ( intensity >= 1.0 )

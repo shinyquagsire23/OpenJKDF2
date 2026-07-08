@@ -19,12 +19,12 @@ extern "C" {
 #define rdMaterial_AddToTextureCache_ADDR (0x0044AA70)
 #define rdMaterial_ResetCacheInfo_ADDR (0x0044AB20)
 
-rdMaterialLoader_t rdMaterial_RegisterLoader(rdMaterialLoader_t load);
-rdMaterialUnloader_t rdMaterial_RegisterUnloader(rdMaterialUnloader_t unload);
-rdMaterial* rdMaterial_Load(char *material_fname, int create_ddraw_surface, int gpu_memory);
-int rdMaterial_LoadEntry(char *mat_fpath, rdMaterial *material, int create_ddraw_surface, int gpu_mem);
-void rdMaterial_Free(rdMaterial *material);
-void rdMaterial_FreeEntry(rdMaterial* material);
+rdMaterialLoader_t rdMaterial_RegisterLoader(rdMaterialLoader_t pFunc);
+rdMaterialUnloader_t rdMaterial_RegisterUnloader(rdMaterialUnloader_t pFunc);
+rdMaterial* rdMaterial_Load(char *pFilename, int create_ddraw_surface, int gpu_memory);
+int rdMaterial_LoadEntry(char *pFilename, rdMaterial *pMat, int create_ddraw_surface, int gpu_mem);
+void rdMaterial_Free(rdMaterial *pMaterial);
+void rdMaterial_FreeEntry(rdMaterial* pMaterial);
 int rdMaterial_EnsureData(rdMaterial* material);
 int rdMaterial_EnsureDataForced(rdMaterial* pMaterial);
 int rdMaterial_EnsureMetadata(rdMaterial* pMaterial);

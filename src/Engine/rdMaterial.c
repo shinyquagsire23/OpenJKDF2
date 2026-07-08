@@ -36,21 +36,21 @@ int rdMaterial_numCachedMaterials = 0;
 
 #endif
 
-rdMaterialLoader_t rdMaterial_RegisterLoader(rdMaterialLoader_t load)
+rdMaterialLoader_t rdMaterial_RegisterLoader(rdMaterialLoader_t pFunc)
 {
     rdMaterialLoader_t result = pMaterialsLoader;
-    pMaterialsLoader = load;
+    pMaterialsLoader = pFunc;
     return result;
 }
 
-rdMaterialUnloader_t rdMaterial_RegisterUnloader(rdMaterialUnloader_t unload)
+rdMaterialUnloader_t rdMaterial_RegisterUnloader(rdMaterialUnloader_t pFunc)
 {
     rdMaterialUnloader_t result = pMaterialsUnloader;
-    pMaterialsUnloader = unload;
+    pMaterialsUnloader = pFunc;
     return result;
 }
 
-rdMaterial* rdMaterial_Load(char *material_fname, int create_ddraw_surface, int gpu_memory)
+rdMaterial* rdMaterial_Load(char *pFilename, int create_ddraw_surface, int gpu_memory)
 {
     rdMaterial *material;
     unsigned int v5;
@@ -63,7 +63,7 @@ rdMaterial* rdMaterial_Load(char *material_fname, int create_ddraw_surface, int 
 #if 0 // sithMaterial already does this more or less, via rdMaterial_RegisterLoader
     rdMaterial* pIter = rdMaterial_pFirstMatCache;
     while (pIter) {
-        if (!strcmp(material_fname, pIter->mat_full_fpath)) {
+        if (!strcmp(pFilename, pIter->mat_full_fpath)) {
             pIter->refcnt++;
             return pIter;
         }
@@ -72,10 +72,10 @@ rdMaterial* rdMaterial_Load(char *material_fname, int create_ddraw_surface, int 
 #endif
 
     if (pMaterialsLoader)
-        return (rdMaterial*)pMaterialsLoader(material_fname, create_ddraw_surface, gpu_memory);
+        return (rdMaterial*)pMaterialsLoader(pFilename, create_ddraw_surface, gpu_memory);
 
     material = (rdMaterial*)RDROID_ALLOC(sizeof(rdMaterial));
-    if (material && rdMaterial_LoadEntry(material_fname, material, create_ddraw_surface, gpu_memory))
+    if (material && rdMaterial_LoadEntry(pFilename, material, create_ddraw_surface, gpu_memory))
         return material;
 
     rdMaterial_Free(material);
@@ -499,22 +499,22 @@ LABEL_22:
     return mat_file;
 }
 
-int rdMaterial_LoadEntry(char *mat_fpath, rdMaterial *material, int create_ddraw_surface, int gpu_mem)
+int rdMaterial_LoadEntry(char *pFilename, rdMaterial *pMat, int create_ddraw_surface, int gpu_mem)
 {
     // Added: No nullptr derefs
-    if (!material) {
+    if (!pMat) {
         return 0;
     }
 
     // TODO: refcounting
     // Added: juuuust in case
-    int prevId = material->id;
-    _memset(material, 0, sizeof(rdMaterial));
-    material->id = prevId;
+    int prevId = pMat->id;
+    _memset(pMat, 0, sizeof(rdMaterial));
+    pMat->id = prevId;
 #if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
-    return rdMaterial_LoadEntry_Common(mat_fpath, material, create_ddraw_surface, gpu_mem, /*!openjkdf2_bIsExtraLowMemoryPlatform*/0);
+    return rdMaterial_LoadEntry_Common(pFilename, pMat, create_ddraw_surface, gpu_mem, /*!openjkdf2_bIsExtraLowMemoryPlatform*/0);
 #else
-    return rdMaterial_LoadEntry_Common(mat_fpath, material, create_ddraw_surface, gpu_mem, 1);
+    return rdMaterial_LoadEntry_Common(pFilename, pMat, create_ddraw_surface, gpu_mem, 1);
 #endif
 }
 
@@ -582,42 +582,42 @@ int rdMaterial_LoadEntry_Deferred(rdMaterial *material, int create_ddraw_surface
     return res;
 }
 
-void rdMaterial_Free(rdMaterial *material)
+void rdMaterial_Free(rdMaterial *pMaterial)
 {
-    if (!material)
+    if (!pMaterial)
         return;
 
 #if 0
-    material->refcnt--;
-    if (material->refcnt) {
+    pMaterial->refcnt--;
+    if (pMaterial->refcnt) {
         return;
     }
 #endif
 
     if (pMaterialsUnloader)
     {
-        pMaterialsUnloader(material);
+        pMaterialsUnloader(pMaterial);
         return;
     }
 
-    rdMaterial_FreeEntry(material);
+    rdMaterial_FreeEntry(pMaterial);
 
-    RDROID_FREE(material);
+    RDROID_FREE(pMaterial);
 }
 
-void rdMaterial_FreeEntry(rdMaterial* material)
+void rdMaterial_FreeEntry(rdMaterial* pMaterial)
 {
-    if (!material) {
+    if (!pMaterial) {
         return;
     }
     //stdPlatform_Printf("OpenJKDF2: rdMaterial_FreeEntry %s\n", material->mat_fpath);
 
     // Added
-    rdMaterial_ResetCacheInfo(material);
+    rdMaterial_ResetCacheInfo(pMaterial);
 
-    for (size_t i = 0; i < material->num_texinfo; i++)
+    for (size_t i = 0; i < pMaterial->num_texinfo; i++)
     {
-        rdTexinfo* texinfo = material->texinfos[i];
+        rdTexinfo* texinfo = pMaterial->texinfos[i];
 
         // Added: nullptr check
         if (texinfo) {
@@ -632,7 +632,7 @@ void rdMaterial_FreeEntry(rdMaterial* material)
 
 #if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
                     if (surface->texture_loaded) {
-                        stdPlatform_Printf("OpenJKDF2: rdMaterial_FreeEntry %s %x\n", material->mat_fpath, surface->texture_id);
+                        stdPlatform_Printf("OpenJKDF2: rdMaterial_FreeEntry %s %x\n", pMaterial->mat_fpath, surface->texture_id);
                         std3D_PurgeSurfaceRefs(&pTex->alphaMats[j]);
                         std3D_PurgeSurfaceRefs(&pTex->opaqueMats[j]);
                         pTex->alphaMats[j].texture_id = 0;
@@ -659,14 +659,14 @@ void rdMaterial_FreeEntry(rdMaterial* material)
         }
 
         // Added:
-        material->texinfos[i] = NULL;
+        pMaterial->texinfos[i] = NULL;
     }
 
-    for (size_t i = 0; i < material->num_textures; i++)
+    for (size_t i = 0; i < pMaterial->num_textures; i++)
     {
-        if (!material->textures) break;
+        if (!pMaterial->textures) break;
 
-        rdTexture* pTex = &material->textures[i];
+        rdTexture* pTex = &pMaterial->textures[i];
 
         for (size_t j = 0; j < pTex->num_mipmaps; j++)
         {
@@ -674,7 +674,7 @@ void rdMaterial_FreeEntry(rdMaterial* material)
 
 #if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
             if (surface->texture_loaded) {
-                stdPlatform_Printf("OpenJKDF2: rdMaterial_FreeEntry %s %x\n", material->mat_fpath, surface->texture_id);
+                stdPlatform_Printf("OpenJKDF2: rdMaterial_FreeEntry %s %x\n", pMaterial->mat_fpath, surface->texture_id);
                 std3D_PurgeSurfaceRefs(&pTex->alphaMats[j]);
                 std3D_PurgeSurfaceRefs(&pTex->opaqueMats[j]);
                 pTex->alphaMats[j].texture_id = 0;
@@ -696,25 +696,25 @@ void rdMaterial_FreeEntry(rdMaterial* material)
         }
     }
 
-    if (material->textures) {
-        RDROID_FREE(material->textures);
+    if (pMaterial->textures) {
+        RDROID_FREE(pMaterial->textures);
 
         // Added
-        material->textures = NULL;
+        pMaterial->textures = NULL;
     }
 
     // Added: nullptr check, removed type check
-    if (/*(material->tex_type & 1) &&*/ material->palette_alloc) {
-        RDROID_FREE(material->palette_alloc);
+    if (/*(material->tex_type & 1) &&*/ pMaterial->palette_alloc) {
+        RDROID_FREE(pMaterial->palette_alloc);
 
         // Added
-        material->palette_alloc = NULL;
+        pMaterial->palette_alloc = NULL;
     }
 
 #if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
-    rdMaterial_RemoveMaterialFromCacheList(material);
-    material->bDataLoaded = 0;
-    material->bMetadataLoaded = 0;
+    rdMaterial_RemoveMaterialFromCacheList(pMaterial);
+    pMaterial->bDataLoaded = 0;
+    pMaterial->bMetadataLoaded = 0;
 #endif
 }
 

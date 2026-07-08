@@ -20,19 +20,19 @@ extern "C" {
 #define rdLight_CalcDistFaceIntensity_ADDR (0x0044BAA0) // inlined/unused
 
 rdLight *rdLight_New();
-int rdLight_NewEntry(rdLight *light);
-void rdLight_Free(rdLight *light);
-void rdLight_FreeEntry(rdLight *light);
+int rdLight_NewEntry(rdLight *pLight);
+void rdLight_Free(rdLight *pLight);
+void rdLight_FreeEntry(rdLight *pLight);
 #ifdef JKM_LIGHTING
 MATH_FUNC void rdLight_SetAngles(rdLight *pLight, flex_t angleX, flex_t angleY);
 #endif
 
-MATH_FUNC flex_t rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLightPoses, 
+MATH_FUNC flex_t rdLight_CalcVertexIntensities(rdLight **apLights, rdVector3 *aLightPos, 
 #ifdef JKM_LIGHTING
     rdVector3 *localLightDirs, 
 #endif
-    int numLights, rdVector3 *verticesEnd, rdVector3 *aVertices, flex_t *vertices_i_end, flex_t *vertices_i, int numVertices, flex_t scalar);
-MATH_FUNC flex_t rdLight_CalcFaceIntensity(rdLight **meshLights, rdVector3 *localLightPoses, int numLights, rdFace *face, rdVector3 *faceNormal, rdVector3 *aVertices, flex_t a7);
+    int numLights, rdVector3 *aVertexNormal, rdVector3 *aVertices, flex_t *aVertexColors, flex_t *aColors, int numVertices, flex_t scalar);
+MATH_FUNC flex_t rdLight_CalcFaceIntensity(rdLight **apLights, rdVector3 *apLightPos, int numLights, rdFace *pFace, rdVector3 *pNormal, rdVector3 *apVertices, flex_t attenuation);
 
 MATH_FUNC void rdLight_CalcDistVertexIntensities();
 MATH_FUNC void rdLight_CalcDistFaceIntensity();
