@@ -7,7 +7,7 @@
 #include "stdPlatform.h"
 #include "jk.h"
 
-static stdHashTable* sithModel_hashtable;
+static tHashTable* sithModel_hashtable;
 
 int sithModel_Startup()
 {

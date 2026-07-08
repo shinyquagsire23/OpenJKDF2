@@ -2873,7 +2873,7 @@ int std3D_ClearZBuffer()
     return 1;
 }
 
-int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha)
+int std3D_AddToTextureCache(tVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha)
 {
     if (Main_bHeadless) return 1;
     if (!vbuf || !texture) return 1;
@@ -3082,7 +3082,7 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
     if (mipIdx >= texture->numMips) return 1;
     if (!texture->abLoadedToGPU || texture->abLoadedToGPU[mipIdx]) return 1;
 
-    stdVBuffer *vbuf = texture->mipSurfaces[mipIdx];
+    tVBuffer *vbuf = texture->mipSurfaces[mipIdx];
      if (!vbuf) return 1;
 
     int cacheIdx = std3D_GetBitmapCacheIdx();

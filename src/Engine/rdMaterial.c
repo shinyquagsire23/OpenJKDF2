@@ -57,7 +57,7 @@ rdMaterial* rdMaterial_Load(char *material_fname, int create_ddraw_surface, int 
     void **v6;
     int *v7;
     unsigned int v8;
-    stdVBuffer **v9;
+    tVBuffer **v9;
     unsigned int gpu_mem;
 
 #if 0 // sithMaterial already does this more or less, via rdMaterial_RegisterLoader
@@ -95,7 +95,7 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
     rdTexture *textures; // eax
     rdTexture *texture; // esi
     unsigned int mipmap_num; // ebx
-    stdVBuffer **texture_struct; // edi
+    tVBuffer **texture_struct; // edi
     int v21; // cf
     unsigned int v22; // edi
     int *v23; // esi
@@ -108,10 +108,10 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
     rdTextureHeader tex_header_1; // [esp+20h] [ebp-118h]
     rdTexinfoHeader texinfo_header; // [esp+38h] [ebp-100h]
     rdTexinfoExtHeader tex_ext; // [esp+50h] [ebp-E8h]
-    stdVBufferTexFmt format; // [esp+60h] [ebp-D8h]
+    tRasterInfo format; // [esp+60h] [ebp-D8h]
     rdMaterialHeader mat_header; // [esp+ACh] [ebp-8Ch]
     int textures_idk[RDMATERIAL_MAX_TEXINFOS]; // [esp+F8h] [ebp-40h]
-    stdVBuffer *created_tex; // eax
+    tVBuffer *created_tex; // eax
 
     // Added: No nullptr derefs
     if (!material) {
@@ -286,7 +286,7 @@ LABEL_21:
         if ( !v21 )
           goto LABEL_22;
       }
-      texture_struct = (stdVBuffer **)texture->texture_struct;
+      texture_struct = (tVBuffer **)texture->texture_struct;
       while ( 1 )
       {
         texture->alphaMats[mipmap_num].texture_loaded = 0;
@@ -467,7 +467,7 @@ LABEL_22:
         rdTexture *texture = &material->textures[i];
         texture->has_jkgm_override = 0;
         for (int j = 0; j < texture->num_mipmaps; j++) {
-            stdVBuffer* mipmap = texture->texture_struct[j];
+            tVBuffer* mipmap = texture->texture_struct[j];
             rdDDrawSurface* surface = &texture->alphaMats[j];
             
             surface->emissive_texture_id = 0;
@@ -817,7 +817,7 @@ int rdMaterial_AddToTextureCache(rdMaterial *pMaterial, rdTexture *texture, int 
         rdMaterial_UpdateFrameCount(pMaterial);
     //}
 #endif
-    stdVBuffer* mipmap = texture->texture_struct[mipmap_level];
+    tVBuffer* mipmap = texture->texture_struct[mipmap_level];
 
 #ifdef SDL2_RENDER
     if (mipmap) {

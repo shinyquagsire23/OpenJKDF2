@@ -37,7 +37,7 @@ int rdPolyline_NewEntry(rdPolyline *polyline, char *polyline_fname, char *materi
     rdVector2 *extraUVTipMaybe;
     int *vertexUVIdx;
     rdVector2 *extraUVFaceMaybe;
-    stdVBuffer *v22;
+    tVBuffer *v22;
 
     // Added: memleak mitigation
     rdPolyline_FreeEntry(polyline);

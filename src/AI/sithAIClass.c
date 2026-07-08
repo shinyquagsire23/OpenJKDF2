@@ -171,7 +171,7 @@ int sithAIClass_LoadEntry(char *fpath, SithAIClass *aiclass)
         {
             for (int v19 = 0; v19 < stdConffile_g_entry.numArgs; v19++)
             {
-                stdConffileArg* arg = &stdConffile_g_entry.args[v19];
+                StdConffileArg* arg = &stdConffile_g_entry.args[v19];
                 if ( !_strcmp(arg->key, "alignment") )
                 {
                     aiclass->alignment = _atof(arg->value);

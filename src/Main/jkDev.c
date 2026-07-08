@@ -120,7 +120,7 @@ void jkDev_Shutdown()
 
 int jkDev_Open()
 {
-    stdVBufferTexFmt a1; // [esp+0h] [ebp-4Ch] BYREF
+    tRasterInfo a1; // [esp+0h] [ebp-4Ch] BYREF
 
     if ( jkDev_bOpened )
         return 0;
@@ -167,7 +167,7 @@ void jkDev_Close()
 
 void jkDev_DrawLog()
 {
-    stdVBuffer *v0; // ecx
+    tVBuffer *v0; // ecx
     signed int v2; // edi
     jkDevLogEnt* v4; // esi
     int v5; // edx

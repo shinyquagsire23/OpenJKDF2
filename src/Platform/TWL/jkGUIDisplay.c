@@ -3,7 +3,7 @@
 #include "General/stdBitmap.h"
 #include "General/stdFont.h"
 #include "General/stdString.h"
-#include "Engine/rdMaterial.h" // TODO move stdVBuffer
+#include "Engine/rdMaterial.h" // TODO move tVBuffer
 #include "stdPlatform.h"
 #include "jk.h"
 #include "Gui/jkGUIRend.h"
@@ -28,8 +28,8 @@ enum jkGuiDecisionButton_t
 
 static int32_t slider_images[2] = {JKGUI_BM_SLIDER_BACK, JKGUI_BM_SLIDER_THUMB};
 
-void jkGuiDisplay_FovDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
-void jkGuiDisplay_FramelimitDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
+void jkGuiDisplay_FovDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, int redraw);
+void jkGuiDisplay_FramelimitDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, int redraw);
 
 static jkGuiElement jkGuiDisplay_aElements[13] = { 
     { ELEMENT_TEXT,        0,            0, NULL,                   3, {0, 410, 640, 20},   1, 0, NULL,                        0, 0, 0, {0}, 0},

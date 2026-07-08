@@ -398,7 +398,7 @@ int std3D_ClearZBuffer()
 static inline uint8_t std3D_Expand5(uint8_t v5) { return (uint8_t)((v5 * 527 + 23) >> 6); }
 static inline uint8_t std3D_Expand6(uint8_t v6) { return (uint8_t)((v6 * 259 + 33) >> 6); }
 
-int std3D_AddToTextureCache(stdVBuffer* vbuf, rdDDrawSurface* texture, int is_alpha_tex, int no_alpha)
+int std3D_AddToTextureCache(tVBuffer* vbuf, rdDDrawSurface* texture, int is_alpha_tex, int no_alpha)
 {
     if (Main_bHeadless) return 1;
     if (!vbuf || !texture) return 1;
@@ -890,7 +890,7 @@ int std3D_AddBitmapToTextureCache(stdBitmap* texture, int mipIdx, int is_alpha_t
     if (mipIdx >= texture->numMips) return 1;
     if (!texture->abLoadedToGPU || texture->abLoadedToGPU[mipIdx]) return 1;
 
-    stdVBuffer* vbuf = texture->mipSurfaces[mipIdx];
+    tVBuffer* vbuf = texture->mipSurfaces[mipIdx];
     if (!vbuf || !vbuf->sdlSurface) return 1;
 
     uint32_t width  = vbuf->format.width;

@@ -127,9 +127,9 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
     int palFmt; // ebp
     int numMips_; // edx
     unsigned int vbufAllocSize; // esi
-    stdVBuffer **vbufAlloc; // edi
+    tVBuffer **vbufAlloc; // edi
     int v12; // eax
-    stdVBuffer *surface; // esi
+    tVBuffer *surface; // esi
     char *lockAlloc; // ebp
     size_t v15; // edi
     unsigned int i; // ebx
@@ -139,7 +139,7 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
     int numMips; // [esp+14h] [ebp-D8h]
     unsigned int v21[2]; // [esp+18h] [ebp-D4h] BYREF
     bitmapHeader bmp_header; // [esp+20h] [ebp-CCh] BYREF
-    stdVBufferTexFmt vbufTexFmt; // [esp+A0h] [ebp-4Ch] BYREF
+    tRasterInfo vbufTexFmt; // [esp+A0h] [ebp-4Ch] BYREF
 
 #ifndef STDBITMAP_PARTIAL_LOAD
     bPartial = 0;
@@ -164,9 +164,9 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
     v18 = bmp_header.field_8;
     numMips_ = bmp_header.numMips;
 
-    vbufAllocSize = sizeof(stdVBuffer*) * numMips_;
+    vbufAllocSize = sizeof(tVBuffer*) * numMips_;
     numMips = numMips_;
-    vbufAlloc = (stdVBuffer **)STD_ALLOC(sizeof(stdVBuffer*) * numMips_);
+    vbufAlloc = (tVBuffer **)STD_ALLOC(sizeof(tVBuffer*) * numMips_);
     out->mipSurfaces = vbufAlloc;
     if ( vbufAlloc )
     {
@@ -302,7 +302,7 @@ void stdBitmap_ConvertColorFormat(rdTexFormat *formatTo, stdBitmap *bitmap)
 {
     rdTexFormat *formatFrom_; // eax
     int v4; // esi
-    stdVBuffer *v5; // eax
+    tVBuffer *v5; // eax
     rdTexFormat *formatFrom; // [esp+18h] [ebp+8h]
 
     formatFrom_ = &bitmap->format;
@@ -422,7 +422,7 @@ int stdBitmap_AppendToFile(stdFile_t fhand, stdBitmap *pBitmap)
 
     for (uint32_t i = 0; i < (uint32_t)pBitmap->numMips; i++)
     {
-        stdVBuffer *vbuf = pBitmap->mipSurfaces[i];
+        tVBuffer *vbuf = pBitmap->mipSurfaces[i];
         int dims[2];
         dims[0] = vbuf->format.width;
         dims[1] = vbuf->format.height;
@@ -484,7 +484,7 @@ int stdBitmap_Write(const char *fpath, stdBitmap *pBitmap)
     return 1;
 }
 
-void stdBitmap_MemUsage(stdBitmap *pBitmap, int mipIdx, stdVBuffer *vbuf)
+void stdBitmap_MemUsage(stdBitmap *pBitmap, int mipIdx, tVBuffer *vbuf)
 {
     pBitmap->mipSurfaces[mipIdx] = vbuf;
 }
@@ -500,7 +500,7 @@ stdBitmap* stdBitmap_New(uint32_t numMips, int palFmt, int field_20, int field_6
     }
     _memset(bitmap, 0, sizeof(stdBitmap));
 
-    stdVBuffer **surfaces = (stdVBuffer **)STD_ALLOC(numMips * sizeof(stdVBuffer *));
+    tVBuffer **surfaces = (tVBuffer **)STD_ALLOC(numMips * sizeof(tVBuffer *));
     bitmap->mipSurfaces = surfaces;
     if ( !surfaces )
     {
@@ -509,7 +509,7 @@ stdBitmap* stdBitmap_New(uint32_t numMips, int palFmt, int field_20, int field_6
         STD_FREE(bitmap);
         return NULL;
     }
-    _memset(surfaces, 0, numMips * sizeof(stdVBuffer *));
+    _memset(surfaces, 0, numMips * sizeof(tVBuffer *));
 
     bitmap->field_68 = field_68;
     bitmap->field_20 = field_20;
@@ -523,7 +523,7 @@ int stdBitmap_NewEntry(stdBitmap *bitmap, uint32_t numMips, int palFmt, int fiel
 {
     _memset(bitmap, 0, sizeof(stdBitmap));
 
-    stdVBuffer **surfaces = (stdVBuffer **)STD_ALLOC(numMips * sizeof(stdVBuffer *));
+    tVBuffer **surfaces = (tVBuffer **)STD_ALLOC(numMips * sizeof(tVBuffer *));
     bitmap->mipSurfaces = surfaces;
     if ( !surfaces )
     {
@@ -531,7 +531,7 @@ int stdBitmap_NewEntry(stdBitmap *bitmap, uint32_t numMips, int palFmt, int fiel
                   "Ran out of memory trying allocating bitmap.");
         return 0;
     }
-    _memset(surfaces, 0, numMips * sizeof(stdVBuffer *));
+    _memset(surfaces, 0, numMips * sizeof(tVBuffer *));
 
     bitmap->field_68 = field_68;
     bitmap->numMips = numMips;

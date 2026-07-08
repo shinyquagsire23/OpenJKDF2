@@ -5,7 +5,7 @@
 #include "General/stdFont.h"
 #include "General/stdStrTable.h"
 #include "General/stdFileUtil.h"
-#include "Engine/rdMaterial.h" // TODO move stdVBuffer
+#include "Engine/rdMaterial.h" // TODO move tVBuffer
 #include "stdPlatform.h"
 #include "jk.h"
 #include "Gui/jkGUIRend.h"
@@ -97,11 +97,11 @@ void jkGuiSingleTally_Shutdown()
     }
 }
 
-void jkGuiSingleTally_ForceStarsRender(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int d)
+void jkGuiSingleTally_ForceStarsRender(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, int d)
 {
     int v3; // ebx
     int v4; // esi
-    stdVBuffer *v5; // ebp
+    tVBuffer *v5; // ebp
 
     v3 = (__int64)sithPlayer_GetInvItemAmount(SITHBIN_NEW_STARS);
     if ( v3 > 0 )

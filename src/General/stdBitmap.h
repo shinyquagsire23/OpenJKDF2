@@ -22,7 +22,7 @@ typedef struct stdBitmap
     int xPos;
     int yPos;
     uint32_t colorkey;
-    stdVBuffer **mipSurfaces;
+    tVBuffer **mipSurfaces;
 #ifdef SDL2_RENDER
     int is_16bit;
     int* abLoadedToGPU;
@@ -80,7 +80,7 @@ void stdBitmap_Free(stdBitmap *bitmap);
 
 int stdBitmap_AppendToFile(stdFile_t fhand, stdBitmap *pBitmap);
 int stdBitmap_Write(const char *fpath, stdBitmap *pBitmap);
-void stdBitmap_MemUsage(stdBitmap *pBitmap, int mipIdx, stdVBuffer *vbuf);
+void stdBitmap_MemUsage(stdBitmap *pBitmap, int mipIdx, tVBuffer *vbuf);
 stdBitmap* stdBitmap_New(uint32_t numMips, int palFmt, int field_20, int field_68, rdTexFormat *pFormat);
 int stdBitmap_NewEntry(stdBitmap *bitmap, uint32_t numMips, int palFmt, int field_20, int field_68, rdTexFormat *pFormat);
 

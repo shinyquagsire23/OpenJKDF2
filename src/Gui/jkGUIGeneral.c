@@ -2,7 +2,7 @@
 
 #include "General/stdBitmap.h"
 #include "General/stdFont.h"
-#include "Engine/rdMaterial.h" // TODO move stdVBuffer
+#include "Engine/rdMaterial.h" // TODO move tVBuffer
 #include "stdPlatform.h"
 #include "jk.h"
 #include "Gui/jkGUIRend.h"
@@ -25,7 +25,7 @@ enum jkGuiDecisionButton_t
 
 static wchar_t slider_val_text[5] = {0};
 static int32_t slider_images[2] = {JKGUI_BM_SLIDER_BACK, JKGUI_BM_SLIDER_THUMB};
-void jkGuiGeneral_FovDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
+void jkGuiGeneral_FovDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, int redraw);
 
 static jkGuiElement jkGuiGeneral_aElements[23] = { 
     { ELEMENT_TEXT,        0,            0, NULL,                   3, {0, 410, 640, 20},   1, 0, NULL,                        0, 0, 0, {0}, 0},
@@ -107,7 +107,7 @@ void jkGuiGeneral_Shutdown()
 }
 
 #if defined(QOL_IMPROVEMENTS) && !defined(SDL2_RENDER)
-void jkGuiGeneral_FovDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)
+void jkGuiGeneral_FovDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, int redraw)
 {
     jkPlayer_fov = FOV_MIN + jkGuiGeneral_aElements[13].selectedTextEntry;
     

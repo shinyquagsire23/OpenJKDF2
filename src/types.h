@@ -324,11 +324,11 @@ typedef struct SithPuppetClass SithPuppetClass;
 
 typedef struct stdBitmap stdBitmap;
 typedef struct stdStrTable stdStrTable;
-typedef struct stdConffileArg stdConffileArg;
-typedef struct stdHashTable stdHashTable;
-typedef struct stdVBuffer stdVBuffer;
-typedef struct stdGob stdGob;
-typedef struct stdGobFile stdGobFile;
+typedef struct StdConffileArg StdConffileArg;
+typedef struct tHashTable tHashTable;
+typedef struct tVBuffer tVBuffer;
+typedef struct Gob Gob;
+typedef struct GobFileHandle GobFileHandle;
 typedef struct stdPalEffect stdPalEffect;
 typedef struct stdPalEffectRequest stdPalEffectRequest;
 typedef struct stdFont stdFont;
@@ -571,10 +571,10 @@ typedef struct rdCamera
 typedef struct rdCanvas
 {
     uint32_t bIdk;
-    stdVBuffer* vbuffer;
+    tVBuffer* vbuffer;
     flex_t half_screen_width;
     flex_t half_screen_height;
-    stdVBuffer* d3d_vbuf;
+    tVBuffer* d3d_vbuf;
     uint32_t field_14;
     int32_t xStart;
     int32_t yStart;
@@ -1081,7 +1081,7 @@ typedef struct rdTexFormatMin
 } rdTexFormatMin;
 #endif // RDMATERIAL_MINIMIZE_STRUCTS
 
-typedef struct stdVBufferTexFmt
+typedef struct tRasterInfo
 {
     int32_t width;
     int32_t height;
@@ -1093,7 +1093,7 @@ typedef struct stdVBufferTexFmt
 #else
     rdTexFormat format;
 #endif
-} stdVBufferTexFmt;
+} tRasterInfo;
 
 
 typedef struct stdFontEntry
@@ -1149,14 +1149,14 @@ typedef struct stdFontExtHeader
 typedef struct SDL_Surface SDL_Surface;
 #endif
 
-typedef struct stdVBuffer
+typedef struct tVBuffer
 {
     uint32_t bSurfaceLocked;
 #ifndef OPTIMIZE_AWAY_UNUSED_FIELDS
     uint32_t lock_cnt;
     uint32_t gap8;
 #endif
-    stdVBufferTexFmt format;
+    tRasterInfo format;
     void* palette;
     void* surface_lock_alloc;
     uint32_t transparent_color;
@@ -1171,7 +1171,7 @@ typedef struct stdVBuffer
 #ifndef OPTIMIZE_AWAY_UNUSED_FIELDS
     uint8_t desc[0x6c];
 #endif
-} stdVBuffer;
+} tVBuffer;
 
 typedef struct rdColor24
 {
@@ -1226,7 +1226,7 @@ typedef struct rdTexture
     uint32_t width_minus_1;
     uint32_t height_minus_1;
     uint32_t num_mipmaps;
-    stdVBuffer *texture_struct[4];
+    tVBuffer *texture_struct[4];
     rdDDrawSurface alphaMats[4];
     rdDDrawSurface opaqueMats[4];
 #ifdef SDL2_RENDER
@@ -1671,24 +1671,24 @@ typedef struct video_device
   int32_t dwVidMemFree;
 } video_device;
 
-typedef struct stdVideoMode
+typedef struct StdVideoMode
 {
   int32_t field_0;
   flex_t widthMaybe;
-  stdVBufferTexFmt format;
-} stdVideoMode;
+  tRasterInfo format;
+} StdVideoMode;
 
-typedef struct stdVideoDevice
+typedef struct StdDisplayInfo
 {
   char driverDesc[128];
   char driverName[128];
   video_device video_device[14];
   GUID guid;
   int32_t max_modes;
-  stdVideoMode *stdVideoMode;
+  StdVideoMode *StdVideoMode;
   uint32_t gap2A0;
   int32_t field_2A4;
-} stdVideoDevice;
+} StdDisplayInfo;
 
 typedef struct render_8bpp
 {
@@ -2077,7 +2077,7 @@ typedef struct jkResGobDirectory
 {
   char name[128];
   int32_t numGobs;
-  stdGob *gobs[STDGOB_MAX_GOBS];
+  Gob *gobs[STDGOB_MAX_GOBS];
 } jkResGobDirectory;
 
 typedef struct jkRes
@@ -2091,7 +2091,7 @@ typedef struct jkResFile
   char fpath[128];
   int32_t useLowLevel;
   stdFile_t fsHandle;
-  stdGobFile *gobHandle;
+  GobFileHandle *gobHandle;
 } jkResFile;
 
 // end jkRes
@@ -2141,7 +2141,7 @@ typedef struct SithCogSymbol
 typedef struct SithCogSymbolTable
 {
     SithCogSymbol* buckets;
-    stdHashTable* hashtable;
+    tHashTable* hashtable;
     uint32_t entry_cnt;
     uint32_t max_entries;
     uint32_t bucket_idx;
@@ -3110,7 +3110,7 @@ typedef struct Darray
   int32_t bInitialized;
 } Darray;
 
-typedef void (*jkGuiDrawFunc_t)(jkGuiElement*, jkGuiMenu*, stdVBuffer*, BOOL);
+typedef void (*jkGuiDrawFunc_t)(jkGuiElement*, jkGuiMenu*, tVBuffer*, BOOL);
 typedef int (*jkGuiEventHandlerFunc_t)(jkGuiElement*, jkGuiMenu*, int32_t, int32_t);
 typedef int (*jkGuiClickHandlerFunc_t)(jkGuiElement*, jkGuiMenu*, int32_t mouseX, int32_t mouseY, BOOL);
 
@@ -3251,11 +3251,11 @@ typedef struct jkGuiMenu
   int32_t fillColor;
   int32_t checkboxBitmapIdx;
 #ifndef STDBITMAP_PARTIAL_LOAD
-  stdVBuffer *texture;
+  tVBuffer *texture;
   uint8_t* palette;
 #else
   stdBitmap* pBgBitmap;
-  stdVBuffer* pTextureOverride;
+  tVBuffer* pTextureOverride;
 #endif
   stdBitmap **ui_structs;
   stdFont** fonts;
@@ -3300,21 +3300,21 @@ typedef struct stdPalEffectRequest
   stdPalEffect effect;
 } stdPalEffectRequest;
 
-typedef struct stdConffileArg
+typedef struct StdConffileArg
 {
     char* key;
     char* value;
-} stdConffileArg;
+} StdConffileArg;
 
-typedef struct stdConffileEntry
+typedef struct StdConffileEntry
 {
     int32_t numArgs;
 #ifdef JKM_LIGHTING
-    stdConffileArg args[256];
+    StdConffileArg args[256];
 #else
-    stdConffileArg args[128];
+    StdConffileArg args[128];
 #endif
-} stdConffileEntry;
+} StdConffileEntry;
 
 typedef struct stdMemoryAlloc stdMemoryAlloc;
 
@@ -3330,13 +3330,13 @@ typedef struct stdMemoryAlloc
     uint32_t magic;
 } stdMemoryAlloc;
 
-typedef struct stdMemoryInfo
+typedef struct tMemoryState
 {
     uint32_t allocCur;
     uint32_t nextNum;
     uint32_t allocMax;
     stdMemoryAlloc allocTop;
-} stdMemoryInfo;
+} tMemoryState;
 
 typedef struct sith_cog_parser_node sith_cog_parser_node;
 

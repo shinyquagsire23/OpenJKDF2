@@ -25,7 +25,7 @@ MATH_FUNC void sithTrackThing_Tick(SithThing *thing, flex_t deltaSeconds);
 void sithTrackThing_BlockedIdk(SithThing* pThing);
 void sithTrackThing_StoppedMoving(SithThing* pThing);
 void sithTrackThing_PrepareForOrient(SithThing *thing, rdVector3 *a2, flex_t a3);
-int sithTrackThing_LoadPathParams(stdConffileArg *arg, SithThing *thing, int param);
+int sithTrackThing_LoadPathParams(StdConffileArg *arg, SithThing *thing, int param);
 void sithTrackThing_Stop(SithThing *thing);
 void sithTrackThing_idkpathmove(SithThing *thing, SithThing *thing2, rdVector3 *a3);
 flex_t sithTrackThing_CalcMoveDirection(SithThing *thing, rdVector3 *targetPos);
@@ -35,7 +35,7 @@ void sithTrackThing_SkipToFrame(SithThing *trackThing, uint32_t goalframeNum, fl
 int sithTrackThing_PathMovePause(SithThing *trackThing);
 int sithTrackThing_PathMoveResume(SithThing *trackThing);
 
-//static int (*sithTrackThing_LoadPathParams)(stdConffileArg *arg, SithThing *thing, int a3) = (void*)sithTrackThing_LoadPathParams_ADDR;
+//static int (*sithTrackThing_LoadPathParams)(StdConffileArg *arg, SithThing *thing, int a3) = (void*)sithTrackThing_LoadPathParams_ADDR;
 //static void (*sithTrackThing_Tick)(SithThing *thing, flex_t a2) = (void*)sithTrackThing_Tick_ADDR;
 //static void (*sithTrackThing_Stop)(SithThing* thing) = (void*)sithTrackThing_Stop_ADDR;
 //static void (*sithTrackThing_MoveToFrame)(SithThing *a1, int a2, flex_t a3) = (void*)sithTrackThing_MoveToFrame_ADDR;

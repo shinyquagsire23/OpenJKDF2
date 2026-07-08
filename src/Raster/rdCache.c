@@ -513,7 +513,7 @@ int rdCache_SendFaceListToHardware()
             // Look for the closest mipmap that's been loaded
 #ifdef TARGET_RETRO_HOMEBREW
             int mipmap_level_orig = mipmap_level;
-            stdVBuffer* mipmap = sith_tex_sel->texture_struct[mipmap_level];
+            tVBuffer* mipmap = sith_tex_sel->texture_struct[mipmap_level];
 
             alpha_is_opaque = 1;
             while (!mipmap && mipmap_level < sith_tex_sel->num_mipmaps) {

@@ -10,7 +10,7 @@
 
 #include "jk.h"
 
-static stdHashTable *sithParticle_alloc;
+static tHashTable *sithParticle_alloc;
 
 int sithParticle_Startup()
 {
@@ -90,7 +90,7 @@ int sithParticle_AllocWorldParticles(SithWorld *world, int numParticles)
     return 1;
 }
 
-int sithParticle_ParseArg(stdConffileArg *arg, SithThing *thing, int param)
+int sithParticle_ParseArg(StdConffileArg *arg, SithThing *thing, int param)
 {
     switch (param)
     {

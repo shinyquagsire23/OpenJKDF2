@@ -2,7 +2,7 @@
 
 #include "General/stdBitmap.h"
 #include "General/stdFont.h"
-#include "Engine/rdMaterial.h" // TODO move stdVBuffer
+#include "Engine/rdMaterial.h" // TODO move tVBuffer
 #include "stdPlatform.h"
 #include "jk.h"
 #include "Gui/jkGUIRend.h"
@@ -64,7 +64,7 @@ void jkGuiMap_Shutdown()
     stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
 }
 
-void jkGuiMap_DrawMapScreen(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)
+void jkGuiMap_DrawMapScreen(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, int redraw)
 {
     if ( g_app_suspended )
     {
@@ -269,7 +269,7 @@ int jkGuiMap_Show()
     int v0; // esi
     int result; // eax
     rdVector3 a2; // [esp+4h] [ebp-58h] BYREF
-    stdVBufferTexFmt v3; // [esp+10h] [ebp-4Ch] BYREF
+    tRasterInfo v3; // [esp+10h] [ebp-4Ch] BYREF
 
     v3.width = 520;
     v3.height = 320;

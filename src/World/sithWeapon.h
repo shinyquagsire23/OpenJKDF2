@@ -43,7 +43,7 @@ void sithWeapon_Startup();
 MATH_FUNC void sithWeapon_Update(SithThing *weapon, flex_t deltaSeconds);
 MATH_FUNC void sithWeapon_HandleImpact(SithThing *weapon);
 MATH_FUNC void sithWeapon_sub_4D3920(SithThing *weapon);
-int sithWeapon_ParseArg(stdConffileArg *arg, SithThing *thing, int param);
+int sithWeapon_ParseArg(StdConffileArg *arg, SithThing *thing, int param);
 MATH_FUNC SithThing* sithWeapon_WeaponFire(SithThing *weapon, SithThing *projectile, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, flex_t scale, int16_t scaleFlags, flex_t a9);
 MATH_FUNC SithThing* sithWeapon_WeaponFireProjectile(SithThing *sender, SithThing *projectileTemplate, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, flex_t scale, char scaleFlags, flex_t a9, int extra);
 void sithWeapon_DamageWeapon(SithThing *weapon, SithThing* a2, flex_t timeLeft);

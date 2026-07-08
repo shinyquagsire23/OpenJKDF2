@@ -27,22 +27,22 @@ void stdGob_Shutdown()
     stdGob_bInit = 0;
 }
 
-stdGob* stdGob_Load(char *fpath, int a2, int a3)
+Gob* stdGob_Load(char *fpath, int a2, int a3)
 {
-    stdGob* gob = (stdGob*)STD_ALLOC(sizeof(stdGob));
+    Gob* gob = (Gob*)STD_ALLOC(sizeof(Gob));
     if (gob)
     {
-        _memset(gob, 0, sizeof(stdGob)); // TODO why was this needed
+        _memset(gob, 0, sizeof(Gob)); // TODO why was this needed
         stdGob_LoadEntry(gob, fpath, a2, a3); // TODO verify this? it does weird stuff
         return gob;
     }
     return NULL;
 }
 
-int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
+int stdGob_LoadEntry(Gob *gob, char *fname, int a3, int a4)
 {
     int v8; // edx
-    stdGobFile *v9; // eax
+    GobFileHandle *v9; // eax
     stdGobHeader header; // [esp+10h] [ebp-Ch]
 
     stdString_SafeStrCopy(gob->fpath, fname, 128);
@@ -61,7 +61,7 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
         {
             v8 = gob->numFilesOpen;
             gob->viewMapped = 1;
-            v9 = (stdGobFile *)jk_LocalAlloc(0x40u, 16 * v8);
+            v9 = (GobFileHandle *)jk_LocalAlloc(0x40u, 16 * v8);
             gob->openedFile = v9;
             if ( v9 )
             {
@@ -84,16 +84,16 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
     gob->viewMapped = 0;
     gob->fhand = pGobHS->fileOpen(gob->fpath, "rb"); // Added: r+b -> rb, we don't actually need to write GOBs
     if ( !gob->fhand ) {
-        stdPlatform_Printf("OpenJKDF2: stdGob failed to open `%s`.\n", gob->fpath); // Added
+        stdPlatform_Printf("OpenJKDF2: Gob failed to open `%s`.\n", gob->fpath); // Added
         return 0;
     }
     else {
-        stdPlatform_Printf("OpenJKDF2: stdGob opened `%s`.\n", gob->fpath); // Added
+        stdPlatform_Printf("OpenJKDF2: Gob opened `%s`.\n", gob->fpath); // Added
     }
-    gob->openedFile = (stdGobFile *)STD_ALLOC(sizeof(stdGobFile) * gob->numFilesOpen);
+    gob->openedFile = (GobFileHandle *)STD_ALLOC(sizeof(GobFileHandle) * gob->numFilesOpen);
     if ( !gob->openedFile )
       return 0;
-    _memset(gob->openedFile, 0, sizeof(stdGobFile) * gob->numFilesOpen);
+    _memset(gob->openedFile, 0, sizeof(GobFileHandle) * gob->numFilesOpen);
     pGobHS->fileRead(gob->fhand, &header, sizeof(stdGobHeader));
     if ( _memcmp((const char *)&header, "GOB ", 4u) )
     {
@@ -136,12 +136,12 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
 #endif
     }
 
-    stdPlatform_Printf("OpenJKDF2: stdGob loaded GOB file `%s`...\n", fname);
+    stdPlatform_Printf("OpenJKDF2: Gob loaded GOB file `%s`...\n", fname);
     
     return 1;
 }
 
-void stdGob_Free(stdGob *gob)
+void stdGob_Free(Gob *gob)
 {
     if (!gob )
         return;
@@ -150,7 +150,7 @@ void stdGob_Free(stdGob *gob)
     STD_FREE(gob);
 }
 
-void stdGob_FreeEntry(stdGob *gob)
+void stdGob_FreeEntry(Gob *gob)
 {
     if ( gob->viewMapped )
     {
@@ -183,10 +183,10 @@ void stdGob_FreeEntry(stdGob *gob)
     }
 }
 
-stdGobFile* stdGob_FileOpen(stdGob *gob, const char *filepath)
+GobFileHandle* stdGob_FileOpen(Gob *gob, const char *filepath)
 {
     stdGobEntry *entry = NULL;
-    stdGobFile *result = NULL;
+    GobFileHandle *result = NULL;
     int v5;
 
     // Embedded resources
@@ -264,7 +264,7 @@ stdGobFile* stdGob_FileOpen(stdGob *gob, const char *filepath)
     return result;
 }
 
-void stdGob_FileClose(stdGobFile *f)
+void stdGob_FileClose(GobFileHandle *f)
 {
 #ifdef QOL_IMPROVEMENTS
     if (f->pMemory) {
@@ -274,7 +274,7 @@ void stdGob_FileClose(stdGobFile *f)
     f->bIsMemoryMapped = 0;
 #endif
 
-    stdGob* gob = f->parent;
+    Gob* gob = f->parent;
     f->isOpen = 0;
 
     if (f == gob->lastReadFile) {
@@ -282,10 +282,10 @@ void stdGob_FileClose(stdGobFile *f)
     }
 }
 
-int stdGob_FileSeek(stdGobFile *f, int pos, int whence)
+int stdGob_FileSeek(GobFileHandle *f, int pos, int whence)
 {
     int seekOffsAbsolute;
-    stdGob *gob;
+    Gob *gob;
 
     seekOffsAbsolute = 0;
     switch (whence)
@@ -312,21 +312,21 @@ int stdGob_FileSeek(stdGobFile *f, int pos, int whence)
     return 1;
 }
 
-int32_t stdGob_FileTell(stdGobFile *f)
+int32_t stdGob_FileTell(GobFileHandle *f)
 {
     return f->seekOffs;
 }
 
-bool stdGob_FileEOF(stdGobFile *f)
+bool stdGob_FileEOF(GobFileHandle *f)
 {
     int ret = 0;
     ret = f->seekOffs >= f->entry->fileSize - 1;
     return ret;
 }
 
-size_t stdGob_FileRead(stdGobFile *f, void *out, uint32_t len)
+size_t stdGob_FileRead(GobFileHandle *f, void *out, uint32_t len)
 {
-    stdGob *gob;
+    Gob *gob;
     size_t result;
 
     //printf("\x1b[0;0Hreading %s %p %x\n", f->entry->fname, out, len);
@@ -365,12 +365,12 @@ size_t stdGob_FileRead(stdGobFile *f, void *out, uint32_t len)
     return result;
 }
 
-const char* stdGob_FileGets(stdGobFile *f, char *out, unsigned int len)
+const char* stdGob_FileGets(GobFileHandle *f, char *out, unsigned int len)
 {
     stdGobEntry *entry;
     int seekOffs;
     const char *result;
-    stdGob *gob;
+    Gob *gob;
 
 #ifdef QOL_IMPROVEMENTS
     if (f->bIsMemoryMapped) {
@@ -423,11 +423,11 @@ const char* stdGob_FileGets(stdGobFile *f, char *out, unsigned int len)
     return result;
 }
 
-const wchar_t* stdGob_FileGetws(stdGobFile *f, wchar_t *out, unsigned int len)
+const wchar_t* stdGob_FileGetws(GobFileHandle *f, wchar_t *out, unsigned int len)
 {
     stdGobEntry *entry; // ecx
     int seekOffs; // edx
-    stdGob *gob; // eax
+    Gob *gob; // eax
     unsigned int seekOffs_; // edi
     unsigned int len_wide; // ecx
     const wchar_t *ret; // eax
@@ -484,7 +484,7 @@ const wchar_t* stdGob_FileGetws(stdGobFile *f, wchar_t *out, unsigned int len)
 }
 
 // ADDED
-size_t stdGob_FileSize(stdGobFile *f)
+size_t stdGob_FileSize(GobFileHandle *f)
 {
     if (!f) return 0;
     if (!f->entry) return 0;

@@ -1,10 +1,10 @@
 #include "stdLinkList.h"
 
 // Added
-stdLinklist* stdLinklist_InsertReplace(stdLinklist *pCur, stdLinklist *pNodeToAdd)
+tLinkListNode* stdLinklist_InsertReplace(tLinkListNode *pCur, tLinkListNode *pNodeToAdd)
 {
-    stdLinklist* pPrev = pCur->prev;
-    stdLinklist* pNext = pCur->next;
+    tLinkListNode* pPrev = pCur->prev;
+    tLinkListNode* pNext = pCur->next;
 
     pNodeToAdd->prev = pPrev;
     pNodeToAdd->next = pNext;
@@ -15,9 +15,9 @@ stdLinklist* stdLinklist_InsertReplace(stdLinklist *pCur, stdLinklist *pNodeToAd
     return pNext;
 }
 
-stdLinklist* stdLinkList_AddNode(stdLinklist *pCur, stdLinklist *pNodeToAdd)
+tLinkListNode* stdLinkList_AddNode(tLinkListNode *pCur, tLinkListNode *pNodeToAdd)
 {
-    stdLinklist* pNext = pCur->next;
+    tLinkListNode* pNext = pCur->next;
 
     pNodeToAdd->prev = pCur;
     pNodeToAdd->next = pNext;
@@ -29,9 +29,9 @@ stdLinklist* stdLinkList_AddNode(stdLinklist *pCur, stdLinklist *pNodeToAdd)
     return pNext;
 }
 
-stdLinklist* stdLinklist_InsertNode(stdLinklist *pCur, stdLinklist *pNodeToAdd)
+tLinkListNode* stdLinklist_InsertNode(tLinkListNode *pCur, tLinkListNode *pNodeToAdd)
 {
-    stdLinklist *pPrev = pCur->prev;
+    tLinkListNode *pPrev = pCur->prev;
 
     pNodeToAdd->prev = pPrev;
     pNodeToAdd->next = pCur;
@@ -43,9 +43,9 @@ stdLinklist* stdLinklist_InsertNode(stdLinklist *pCur, stdLinklist *pNodeToAdd)
     return pPrev;
 }
 
-stdLinklist* stdLinklist_AppendNode(stdLinklist *pCur, stdLinklist *pNodeToAdd)
+tLinkListNode* stdLinklist_AppendNode(tLinkListNode *pCur, tLinkListNode *pNodeToAdd)
 {
-    stdLinklist* pEnd = stdLinklist_GetLastNode(pCur);
+    tLinkListNode* pEnd = stdLinklist_GetLastNode(pCur);
 
     pEnd->next = pNodeToAdd;
     pNodeToAdd->prev = pEnd;
@@ -54,13 +54,13 @@ stdLinklist* stdLinklist_AppendNode(stdLinklist *pCur, stdLinklist *pNodeToAdd)
     return pNodeToAdd;
 }
 
-stdLinklist* stdLinkList_RemoveNode(stdLinklist *pCur)
+tLinkListNode* stdLinkList_RemoveNode(tLinkListNode *pCur)
 {
-    stdLinklist* pCurPrev = pCur->prev;
+    tLinkListNode* pCurPrev = pCur->prev;
     if ( pCur->prev )
         pCurPrev->next = pCur->next;
 
-    stdLinklist* pCurNext = pCur->next;
+    tLinkListNode* pCurNext = pCur->next;
     if ( pCurNext )
         pCurNext->prev = pCurPrev;
 
@@ -68,34 +68,34 @@ stdLinklist* stdLinkList_RemoveNode(stdLinklist *pCur)
     return pCur;
 }
 
-void stdLinklist_NewList(stdLinklist *pCur)
+void stdLinklist_NewList(tLinkListNode *pCur)
 {
     if ( pCur->prev )
         pCur->prev->next = NULL;
     pCur->prev = NULL;
 }
 
-stdLinklist* stdLinklist_DetachNode(stdLinklist *pCur)
+tLinkListNode* stdLinklist_DetachNode(tLinkListNode *pCur)
 {
     pCur->prev = NULL;
     pCur->next = NULL;
     return pCur;
 }
 
-int stdLinklist_GetCount(stdLinklist *pCur)
+int stdLinklist_GetCount(tLinkListNode *pCur)
 {
     int result;
 
-    stdLinklist* pIter = pCur;
+    tLinkListNode* pIter = pCur;
     for ( result = 0; pIter; ++result )
         pIter = pIter->next;
 
     return result;
 }
 
-stdLinklist* stdLinklist_GetNode(stdLinklist *pCur, int n)
+tLinkListNode* stdLinklist_GetNode(tLinkListNode *pCur, int n)
 {
-    stdLinklist* pOut = pCur;
+    tLinkListNode* pOut = pCur;
 
     while ( pOut )
     {
@@ -108,10 +108,10 @@ stdLinklist* stdLinklist_GetNode(stdLinklist *pCur, int n)
     return pOut;
 }
 
-stdLinklist* stdLinklist_GetLastNode(stdLinklist *pCur)
+tLinkListNode* stdLinklist_GetLastNode(tLinkListNode *pCur)
 {
-    stdLinklist *result; // eax
-    stdLinklist *i; // ecx
+    tLinkListNode *result; // eax
+    tLinkListNode *i; // ecx
 
     result = pCur;
     if ( pCur )
@@ -122,10 +122,10 @@ stdLinklist* stdLinklist_GetLastNode(stdLinklist *pCur)
     return result;
 }
 
-stdLinklist* stdLinklist_GetFirstNode(stdLinklist *pCur)
+tLinkListNode* stdLinklist_GetFirstNode(tLinkListNode *pCur)
 {
-    stdLinklist *result; // eax
-    stdLinklist *v2; // ecx
+    tLinkListNode *result; // eax
+    tLinkListNode *v2; // ecx
 
     result = pCur;
     if ( pCur )

@@ -180,7 +180,7 @@ LABEL_21:
     return result;
 }
 
-unsigned int stdFont_Draw1(stdVBuffer *vbuf, stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe)
+unsigned int stdFont_Draw1(tVBuffer *vbuf, stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe)
 {
     unsigned int v8; // edx
     unsigned int v9; // esi
@@ -193,7 +193,7 @@ unsigned int stdFont_Draw1(stdVBuffer *vbuf, stdFont *font, unsigned int blit_x,
     signed int v16; // ecx
     int v18; // [esp+10h] [ebp-14h]
     rdRect a5a; // [esp+14h] [ebp-10h] BYREF
-    stdVBuffer *a2a; // [esp+2Ch] [ebp+8h]
+    tVBuffer *a2a; // [esp+2Ch] [ebp+8h]
 
     v8 = blit_x;
     v9 = blit_x;
@@ -284,11 +284,11 @@ LABEL_26:
     return v9 - v8;
 }
 
-void stdFont_Draw2(stdVBuffer *a1, stdFont *a2, unsigned int a3, int a4, rdRect *a5, const wchar_t *a6, int a7)
+void stdFont_Draw2(tVBuffer *a1, stdFont *a2, unsigned int a3, int a4, rdRect *a5, const wchar_t *a6, int a7)
 {
     const wchar_t *v8; // ebx
     unsigned int v9; // edi
-    stdVBuffer *v10; // ebp
+    tVBuffer *v10; // ebp
     const wchar_t *v11; // eax
     int v12; // ecx
     int v13; // eax
@@ -299,7 +299,7 @@ void stdFont_Draw2(stdVBuffer *a1, stdFont *a2, unsigned int a3, int a4, rdRect 
     int v18; // [esp+10h] [ebp-18h] BYREF
     const wchar_t *v19; // [esp+14h] [ebp-14h]
     rdRect rect; // [esp+18h] [ebp-10h] BYREF
-    stdVBuffer *a2a; // [esp+30h] [ebp+8h]
+    tVBuffer *a2a; // [esp+30h] [ebp+8h]
     int a6a; // [esp+40h] [ebp+18h]
 
     v8 = a6;
@@ -401,12 +401,12 @@ LABEL_19:
     }
 }
 
-void stdFont_Draw3(stdVBuffer *paintSurface, stdFont *font, int a3, rdRect *a4, int a5, const wchar_t *a6, int a7)
+void stdFont_Draw3(tVBuffer *paintSurface, stdFont *font, int a3, rdRect *a4, int a5, const wchar_t *a6, int a7)
 {
     char v7; // bl
     int v8; // esi
     rdRect *v10; // ebp
-    stdVBuffer *v11; // eax
+    tVBuffer *v11; // eax
     const wchar_t *v12; // ecx
     const wchar_t *v13; // eax
     int v14; // eax
@@ -424,7 +424,7 @@ void stdFont_Draw3(stdVBuffer *paintSurface, stdFont *font, int a3, rdRect *a4, 
     stdFontCharset *v26; // eax
     wchar_t v27; // cx
     signed int v28; // eax
-    stdVBuffer *vbuf2; // [esp+10h] [ebp-18h]
+    tVBuffer *vbuf2; // [esp+10h] [ebp-18h]
     const wchar_t *v30; // [esp+14h] [ebp-14h]
     rdRect rect; // [esp+18h] [ebp-10h] BYREF
     int tmp;
@@ -627,7 +627,7 @@ LABEL_51:
     }
 }
 
-int stdFont_Draw4(stdVBuffer *a1, stdFont *font, int xPos, int yPos, int a5, int a6, int a7, const wchar_t *text, int alpha_maybe)
+int stdFont_Draw4(tVBuffer *a1, stdFont *font, int xPos, int yPos, int a5, int a6, int a7, const wchar_t *text, int alpha_maybe)
 {
     int v9; // ebp
     const wchar_t *v10; // edi
@@ -984,7 +984,7 @@ LABEL_15:
     return v4;
 }
 
-int stdFont_sub_434EC0(stdVBuffer *vBuffer, stdFont *font, int a3, int a4, int a5, int32_t *paddings, const wchar_t *text, int a8)
+int stdFont_sub_434EC0(tVBuffer *vBuffer, stdFont *font, int a3, int a4, int a5, int32_t *paddings, const wchar_t *text, int a8)
 {
     int32_t *paddingList; // ebp
     int padding; // edi
@@ -1079,11 +1079,11 @@ void stdFont_Free(stdFont *font)
     }
 }
 
-uint32_t stdFont_DrawAscii(stdVBuffer *a1, stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe)
+uint32_t stdFont_DrawAscii(tVBuffer *a1, stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe)
 {
     unsigned int v8; // ebp
     unsigned int v9; // esi
-    stdVBuffer *v10; // eax
+    tVBuffer *v10; // eax
     char v11; // al
     int v12; // ecx
     int v14; // eax
@@ -1326,12 +1326,12 @@ int stdFont_sub_4356B0(const wchar_t *text, stdFont *font, int *pMaxWidth)
     return maxWidth;
 }
 
-void stdFont_sub_435190(stdVBuffer *vbuf, stdFont *font, int destX, int destY, uint16_t ch, int alpha)
+void stdFont_sub_435190(tVBuffer *vbuf, stdFont *font, int destX, int destY, uint16_t ch, int alpha)
 {
     rdRect srcRect;
     int glyphTexX, glyphWidth;
 
-    stdVBuffer *fontSurf = *font->pBitmap->mipSurfaces;
+    tVBuffer *fontSurf = *font->pBitmap->mipSurfaces;
 
     if ( iswspace(ch) )
         return;

@@ -162,7 +162,7 @@ int sithSoundClass_ReadSoundClassesListText(SithWorld *world, int a2)
     char *v6; // ebp
     int idx; // eax
     sithSoundClass *current_soundclass; // esi
-    stdHashTable *v10; // [esp-Ch] [ebp-9Ch]
+    tHashTable *v10; // [esp-Ch] [ebp-9Ch]
     char soundclass_fname[128]; // [esp+10h] [ebp-80h] BYREF
 
     if ( a2 )
@@ -246,7 +246,7 @@ sithSoundClass* sithSoundClass_Load(char *fpath)
     sithSoundClass *result; // eax
     int v3; // eax
     sithSoundClass *v4; // esi
-    stdHashTable *v5; // [esp-Ch] [ebp-9Ch]
+    tHashTable *v5; // [esp-Ch] [ebp-9Ch]
     char v6[128]; // [esp+10h] [ebp-80h] BYREF
 
     v1 = sithWorld_g_pLastLoadedWorld;

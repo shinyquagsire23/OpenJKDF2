@@ -1601,8 +1601,8 @@ void jkMain_FixRes()
     Video_menuBuffer.format.height = newH;
     Video_otherBuf.format.height = newH;
     
-    _memcpy(&Video_format, &stdDisplay_pCurVideoMode->format, sizeof(stdVBufferTexFmt));
-    _memcpy(&Video_format2, &stdDisplay_pCurVideoMode->format, sizeof(stdVBufferTexFmt));
+    _memcpy(&Video_format, &stdDisplay_pCurVideoMode->format, sizeof(tRasterInfo));
+    _memcpy(&Video_format2, &stdDisplay_pCurVideoMode->format, sizeof(tRasterInfo));
     
     Video_format.width = newW;
     Video_format.height = newH;
@@ -1702,8 +1702,8 @@ int jkMain_SetVideoMode()
     Video_menuBuffer.format.height = newH;
     Video_otherBuf.format.height = newH;
     
-    _memcpy(&Video_format, &stdDisplay_pCurVideoMode->format, sizeof(stdVBufferTexFmt));
-    _memcpy(&Video_format2, &stdDisplay_pCurVideoMode->format, sizeof(stdVBufferTexFmt));
+    _memcpy(&Video_format, &stdDisplay_pCurVideoMode->format, sizeof(tRasterInfo));
+    _memcpy(&Video_format2, &stdDisplay_pCurVideoMode->format, sizeof(tRasterInfo));
     
     Video_format.width = newW;
     Video_format.height = newH;

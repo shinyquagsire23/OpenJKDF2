@@ -15,7 +15,7 @@
 
 void jkGuiMap_Startup();
 void jkGuiMap_Shutdown();
-void jkGuiMap_DrawMapScreen(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
+void jkGuiMap_DrawMapScreen(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, int redraw);
 void jkGuiMap_Update(jkGuiMenu *menu);
 int jkGuiMap_OrbitButtonClicked(jkGuiElement* pElement, jkGuiMenu *menu, int32_t mouseX, int32_t mouseY, int bRedraw);
 int jkGuiMap_TransformButtonClicked(jkGuiElement* pElement, jkGuiMenu *menu, int32_t mouseX, int32_t mouseY, int bRedraw);

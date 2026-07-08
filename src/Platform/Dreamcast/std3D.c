@@ -670,7 +670,7 @@ static pvr_ptr_t std3D_pvrAllocOrPurge(size_t bytes)
     return p;
 }
 
-int std3D_AddToTextureCache(stdVBuffer* vbuf, rdDDrawSurface* texture, int is_alpha_tex, int no_alpha)
+int std3D_AddToTextureCache(tVBuffer* vbuf, rdDDrawSurface* texture, int is_alpha_tex, int no_alpha)
 {
     if (Main_bHeadless) return 1;
     if (!vbuf || !texture) return 1;

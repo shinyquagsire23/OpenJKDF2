@@ -26,7 +26,7 @@ int stdBmp_LoadEntryFromFile(const char *fpath, stdBitmap *bitmap, int create_dd
     stdBmp_Header bmpHeader;
     stdBmp_InfoHeader infoHeader;
     void *paletteData = NULL;
-    stdVBufferTexFmt format;
+    tRasterInfo format;
     const char *fname;
 
     int fhand = std_g_pHS->fileOpen(fpath, "rb");
@@ -57,7 +57,7 @@ int stdBmp_LoadEntryFromFile(const char *fpath, stdBitmap *bitmap, int create_dd
     if ( infoHeader.bpp < 8 )
     {
         int paletteSize = (1 << infoHeader.bpp) * 4;
-        paletteData = STD_ALLOC(paletteSize + sizeof(stdVBufferTexFmt));
+        paletteData = STD_ALLOC(paletteSize + sizeof(tRasterInfo));
         int palRead = std_g_pHS->fileRead(fhand, paletteData, paletteSize);
         if ( palRead != paletteSize )
         {
@@ -114,7 +114,7 @@ int stdBmp_LoadEntryFromFile(const char *fpath, stdBitmap *bitmap, int create_dd
     }
 
     // Allocate mip surface pointers
-    bitmap->mipSurfaces = (stdVBuffer **)STD_ALLOC(bitmap->numMips * sizeof(stdVBuffer *));
+    bitmap->mipSurfaces = (tVBuffer **)STD_ALLOC(bitmap->numMips * sizeof(tVBuffer *));
     if ( !bitmap->mipSurfaces )
     {
         std_g_pHS->assert("Unable to allocate memory.", ".\\General\\stdBmp.c", 0x153);
@@ -138,7 +138,7 @@ int stdBmp_LoadEntryFromFile(const char *fpath, stdBitmap *bitmap, int create_dd
         std_g_pHS->assert("Unable to lock VBuffer memory.", ".\\General\\stdBmp.c", 0x169);
     }
 
-    stdVBuffer *vbuf = bitmap->mipSurfaces[0];
+    tVBuffer *vbuf = bitmap->mipSurfaces[0];
     int height = vbuf->format.height;
     uint8_t *pixels = (uint8_t *)vbuf->surface_lock_alloc;
     int stride = vbuf->format.width_in_bytes;
@@ -211,7 +211,7 @@ int stdBmp_Write(const char *fpath, stdBitmap *bitmap)
     stdBmp_Header bmpHeader;
     stdBmp_InfoHeader infoHeader;
 
-    stdVBuffer *vbuf = bitmap->mipSurfaces[0];
+    tVBuffer *vbuf = bitmap->mipSurfaces[0];
     uint32_t paletteSize;
 
     if ( vbuf->format.format.is16bit == 0 )

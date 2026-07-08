@@ -29,7 +29,7 @@ void sithActor_UpdateAimJoints(SithThing *a1);
 MATH_FUNC int sithActor_thing_anim_blocked(SithThing *a1, SithThing *thing2, SithCollision *a3);
 void sithActor_DestroyActor(SithThing *thing);
 void sithActor_DestroyCorpse(SithThing *corpse);
-int sithActor_ParseArg(stdConffileArg *arg, SithThing *thing, unsigned int param);
+int sithActor_ParseArg(StdConffileArg *arg, SithThing *thing, unsigned int param);
 
 //static int (__cdecl *sithActor_ActorCollisionHandler)(SithThing *thing, SithThing *a2, rdMatrix34 *a3, int a4) = (void*)sithActor_ActorCollisionHandler_ADDR;
 //static int (*sithActor_thing_anim_blocked)(SithThing *a1, SithThing *a2, rdMatrix34 *a3) = (void*)sithActor_thing_anim_blocked_ADDR;

@@ -5,7 +5,7 @@
 #include "General/stdFont.h"
 #include "General/stdStrTable.h"
 #include "General/stdFileUtil.h"
-#include "Engine/rdMaterial.h" // TODO move stdVBuffer
+#include "Engine/rdMaterial.h" // TODO move tVBuffer
 #include "globals.h"
 #include "stdPlatform.h"
 #include "jk.h"
@@ -19,7 +19,7 @@
 static wchar_t slider_val_text[5] = {0};
 static int32_t slider_images[2] = {JKGUI_BM_SLIDER_BACK_200, JKGUI_BM_SLIDER_THUMB};
 
-void jkGuiGameplay_ScaleDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
+void jkGuiGameplay_ScaleDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, int redraw);
 
 static jkGuiElement jkGuiGameplay_buttons[45] = {
     {ELEMENT_TEXT, 0, 0, 0, 3, {0, 410, 640, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
@@ -95,7 +95,7 @@ void jkGuiGameplay_Shutdown()
 }
 
 #ifdef QOL_IMPROVEMENTS
-void jkGuiGameplay_ScaleDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)
+void jkGuiGameplay_ScaleDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, int redraw)
 {
     flex_t tmp = ((flex_t)jkGuiGameplay_buttons[41].selectedTextEntry)*0.2f; // FLEXTODO
     

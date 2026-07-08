@@ -137,7 +137,7 @@ void sithItem_DestroyItem(SithThing *item)
 }
 
 // MOTS altered
-int sithItem_ParseArg(stdConffileArg *arg, SithThing *thing, int paramIdx)
+int sithItem_ParseArg(StdConffileArg *arg, SithThing *thing, int paramIdx)
 {
     if ( paramIdx == THINGPARAM_TYPEFLAGS )
     {

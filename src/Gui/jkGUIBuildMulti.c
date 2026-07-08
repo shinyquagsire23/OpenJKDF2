@@ -4,7 +4,7 @@
 #include "General/stdBitmap.h"
 #include "General/stdString.h"
 #include "General/stdFont.h"
-#include "Engine/rdMaterial.h" // TODO move stdVBuffer
+#include "Engine/rdMaterial.h" // TODO move tVBuffer
 #include "stdPlatform.h"
 #include "jk.h"
 #include "Gui/jkGUIRend.h"
@@ -234,8 +234,8 @@ static uint32_t jkGuiBuildMulti_startTimeSecs = 0; // Added: float -> u32
 static rdColormap jkGuiBuildMulti_colormap;
 static rdLight jkGuiBuildMulti_light;
 static rdMatrix34 jkGuiBuildMulti_matrix;
-static stdVBuffer* jkGuiBuildMulti_pVBuf1 = NULL;
-static stdVBuffer* jkGuiBuildMulti_pVBuf2 = NULL;
+static tVBuffer* jkGuiBuildMulti_pVBuf1 = NULL;
+static tVBuffer* jkGuiBuildMulti_pVBuf2 = NULL;
 static int32_t jkGuiBuildMulti_trackNum = 0;
 static wchar_t jkGuiBuildMulti_waTmp[128];
 static wchar_t jkGuiBuildMulti_waTmp2[32];
@@ -251,7 +251,7 @@ static jkMultiModelInfo *jkGuiBuildMulti_aModels = NULL;
 static int32_t jkGuiBuildMulti_renderOptions = 0x103;
 static rdVector3 jkGuiBuildMulti_projectRot;
 static rdVector3 jkGuiBuildMulti_projectPos;
-static stdVBufferTexFmt jkGuiBuildMulti_texFmt;
+static tRasterInfo jkGuiBuildMulti_texFmt;
 static rdMatrix34 jkGuiBuildMulti_orthoProjection;
 static rdVector3 jkGuiBuildMulti_lightPos;
 static uint32_t jkGuiBuildMulti_lastModelDrawMs;
@@ -633,7 +633,7 @@ LABEL_32:
 
 int jkGuiBuildMulti_DisplayModel()
 {
-    stdVBufferTexFmt v1; // [esp+8h] [ebp-4Ch] BYREF
+    tRasterInfo v1; // [esp+8h] [ebp-4Ch] BYREF
 
     int32_t tmp = jkGuiBuildMulti_bRendering; // Added
     jkGuiBuildMulti_bRendering = 1; // Added
@@ -691,7 +691,7 @@ int jkGuiBuildMulti_DisplayModel()
     return ret;
 }
 
-void jkGuiBuildMulti_ModelDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVBuffer *pVbuf, BOOL redraw)
+void jkGuiBuildMulti_ModelDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, tVBuffer *pVbuf, BOOL redraw)
 {
     uint32_t v5; // st7
     flex_d_t v6; // st7
@@ -765,7 +765,7 @@ void jkGuiBuildMulti_ModelDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVB
     }
 }
 
-void jkGuiBuildMulti_SaberDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVBuffer *pVbuf, BOOL redraw)
+void jkGuiBuildMulti_SaberDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, tVBuffer *pVbuf, BOOL redraw)
 {
     stdBitmap *pSabBm; // eax
     int32_t bmWidth; // esi

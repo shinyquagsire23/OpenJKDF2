@@ -1367,7 +1367,7 @@ void do_hooks()
     hook_function(stdFileUtil_RmDir_ADDR, stdFileUtil_RmDir);
     hook_function(stdFileUtil_DelFile_ADDR, stdFileUtil_DelFile);
     
-    // stdGob
+    // Gob
     hook_function(stdGob_Startup_ADDR, stdGob_Startup);
     hook_function(stdGob_Shutdown_ADDR, stdGob_Shutdown);
     hook_function(stdGob_Load_ADDR, stdGob_Load);
@@ -1392,7 +1392,7 @@ void do_hooks()
     hook_function(stdMci_CheckStatus_ADDR, stdMci_CheckStatus);
     hook_function(stdMci_GetTrackLength_ADDR, stdMci_GetTrackLength);
     
-    // stdHashTable
+    // tHashTable
     hook_function(stdHashtbl_HashStringToIdx_ADDR, stdHashtbl_HashStringToIdx);
     hook_function(stdHashtbl_New_ADDR, stdHashtbl_New);
     hook_function(stdHashtbl_GetTailNode_ADDR, stdHashtbl_GetTailNode);

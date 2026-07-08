@@ -1450,7 +1450,7 @@ int sithThing_ReadStaticThingsListText(SithWorld *pWorld, int a2)
     int32_t v23; // eax
     SithSector *v24; // edi
     int32_t v27; // edi
-    stdConffileArg *v28; // ebx
+    StdConffileArg *v28; // ebx
     rdVector3 a3; // [esp+14h] [ebp-48h] BYREF
     rdVector3 pos; // [esp+20h] [ebp-3Ch] BYREF
     rdMatrix34 a; // [esp+2Ch] [ebp-30h] BYREF
@@ -1569,7 +1569,7 @@ int sithThing_ReadStaticThingsListText(SithWorld *pWorld, int a2)
     return 1;
 }
 
-int sithThing_ParseArg(stdConffileArg *arg, SithThing* pThing)
+int sithThing_ParseArg(StdConffileArg *arg, SithThing* pThing)
 {
     int32_t v2; // ebp
     int32_t param; // eax
@@ -1627,7 +1627,7 @@ LABEL_18:
 }
 
 // MOTS altered
-int sithThing_ParseThingArg(stdConffileArg *arg, SithThing* pThing, int param)
+int sithThing_ParseThingArg(StdConffileArg *arg, SithThing* pThing, int param)
 {
     int32_t v3; // ebp
     const char **v4; // edi

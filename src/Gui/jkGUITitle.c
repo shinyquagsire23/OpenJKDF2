@@ -5,7 +5,7 @@
 #include "General/stdFont.h"
 #include "General/stdStrTable.h"
 #include "General/stdFileUtil.h"
-#include "Engine/rdMaterial.h" // TODO move stdVBuffer
+#include "Engine/rdMaterial.h" // TODO move tVBuffer
 #include "stdPlatform.h"
 #include "jk.h"
 #include "Gui/jkGUIRend.h"
@@ -177,7 +177,7 @@ wchar_t* jkGuiTitle_quicksave_related_func1(stdStrTable *strTable, char *jkl_fna
     return retval;
 }
 
-void jkGuiTitle_UnkDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int a4)
+void jkGuiTitle_UnkDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, int a4)
 {
     int v4; // esi
     jkGuiStringEntry *v5; // ecx
@@ -233,7 +233,7 @@ void jkGuiTitle_UnkDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf
     }
 }
 
-void jkGuiTitle_LoadBarDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int bForceRedraw)
+void jkGuiTitle_LoadBarDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, int bForceRedraw)
 {
     rdRect tmp;
 

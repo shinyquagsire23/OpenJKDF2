@@ -14,12 +14,12 @@
 #define stdLinklist_GetLastNode_ADDR (0x0043A910) // unused
 #define stdLinklist_GetFirstNode_ADDR (0x0043A930) // unused
 
-typedef struct stdLinklist stdLinklist;
+typedef struct tLinkListNode tLinkListNode;
 
-typedef struct stdLinklist
+typedef struct tLinkListNode
 {
-    stdLinklist* prev;
-    stdLinklist* next;
+    tLinkListNode* prev;
+    tLinkListNode* next;
     union {
         const char* key;
 #ifdef STDHASHTABLE_CRC32_KEYS
@@ -27,18 +27,18 @@ typedef struct stdLinklist
 #endif
     };
     void* value;
-} stdLinklist;
+} tLinkListNode;
 
-stdLinklist* stdLinklist_InsertReplace(stdLinklist *pCur, stdLinklist *pNodeToAdd); // Added
-stdLinklist* stdLinkList_AddNode(stdLinklist *pCur, stdLinklist *pNodeToAdd);
-stdLinklist* stdLinklist_InsertNode(stdLinklist *pCur, stdLinklist *pNodeToAdd);
-stdLinklist* stdLinklist_AppendNode(stdLinklist *pCur, stdLinklist *pNodeToAdd);
-stdLinklist* stdLinkList_RemoveNode(stdLinklist *pCur);
-void stdLinklist_NewList(stdLinklist *pCur);
-stdLinklist* stdLinklist_DetachNode(stdLinklist *pCur);
-int stdLinklist_GetCount(stdLinklist *pCur);
-stdLinklist* stdLinklist_GetNode(stdLinklist *pLL, int n);
-stdLinklist* stdLinklist_GetLastNode(stdLinklist *pLL);
-stdLinklist* stdLinklist_GetFirstNode(stdLinklist *a1);
+tLinkListNode* stdLinklist_InsertReplace(tLinkListNode *pCur, tLinkListNode *pNodeToAdd); // Added
+tLinkListNode* stdLinkList_AddNode(tLinkListNode *pCur, tLinkListNode *pNodeToAdd);
+tLinkListNode* stdLinklist_InsertNode(tLinkListNode *pCur, tLinkListNode *pNodeToAdd);
+tLinkListNode* stdLinklist_AppendNode(tLinkListNode *pCur, tLinkListNode *pNodeToAdd);
+tLinkListNode* stdLinkList_RemoveNode(tLinkListNode *pCur);
+void stdLinklist_NewList(tLinkListNode *pCur);
+tLinkListNode* stdLinklist_DetachNode(tLinkListNode *pCur);
+int stdLinklist_GetCount(tLinkListNode *pCur);
+tLinkListNode* stdLinklist_GetNode(tLinkListNode *pLL, int n);
+tLinkListNode* stdLinklist_GetLastNode(tLinkListNode *pLL);
+tLinkListNode* stdLinklist_GetFirstNode(tLinkListNode *a1);
 
 #endif // _LEC_STD_LINKLST

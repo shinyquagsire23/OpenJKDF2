@@ -80,7 +80,7 @@ SithPuppetClass* sithAnimClass_LoadEntry(char *a1)
     SithPuppetClass *result; // eax
     int v3; // ecx
     SithPuppetClass *v4; // esi
-    stdHashTable *v5; // [esp-Ch] [ebp-9Ch]
+    tHashTable *v5; // [esp-Ch] [ebp-9Ch]
     char v6[128]; // [esp+10h] [ebp-80h] BYREF
 #ifdef STDHASHTABLE_CRC32_KEYS
     char tmp[32];

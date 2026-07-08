@@ -17,11 +17,11 @@
 
 typedef struct jkGuiElement jkGuiElement;
 typedef struct jkGuiMenu jkGuiMenu;
-typedef struct stdVBuffer stdVBuffer;
+typedef struct tVBuffer tVBuffer;
 
 void jkGuiForce_ChoiceRemoveStar(jkGuiMenu *menu, int fpIdx, int amount);
 void jkGuiForce_ChoiceRemoveStars(jkGuiMenu *menu);
-void jkGuiForce_ForceStarsDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
+void jkGuiForce_ForceStarsDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, int redraw);
 int jkGuiForce_ExtraClick(jkGuiElement *element, jkGuiMenu *menu, int32_t a, int32_t b, int c);
 int jkGuiForce_ButtonClick(jkGuiElement *element, jkGuiMenu *menu, int32_t a, int32_t b, int c);
 int jkGuiForce_ResetClick(jkGuiElement *element, jkGuiMenu *menu, int32_t a, int32_t b, int c);
@@ -29,7 +29,7 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *p
 void jkGuiForce_Startup();
 void jkGuiForce_Shutdown();
 void jkGuiForce_UpdateViewForRank();
-void jkGuiForce_DarkLightHoverDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
+void jkGuiForce_DarkLightHoverDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, int redraw);
 
 //#define jkGuiForce_bCanSpendStars (*(int*)0x556688)
 //#define jkGuiForce_aBitmaps ((stdBitmap**)0x00856780)

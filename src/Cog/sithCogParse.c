@@ -379,7 +379,7 @@ SithCogSymbolTable* sithCogParse_DuplicateSymbolTable(SithCogSymbolTable *table)
 SithCogSymbolTable* sithCogParse_AllocSymbolTable(int amt)
 {
     SithCogSymbolTable *newTable; // esi
-    stdHashTable *newHashtable; // eax
+    tHashTable *newHashtable; // eax
     SithCogSymbol *buckets; // edi
     SithCogSymbolTable *result; // eax
 
@@ -875,7 +875,7 @@ int sithCogParse_ParseSymbolRef(SithCogScript *cogScript, int a2, int unk)
         
     for (unsigned int i = 2; i < stdConffile_g_entry.numArgs; i++)
     {
-        stdConffileArg* arg = &stdConffile_g_entry.args[i];
+        StdConffileArg* arg = &stdConffile_g_entry.args[i];
         if ( !_strcmp(arg->key, "local") )
         {
             cogIdk->flags |= 1;
@@ -934,7 +934,7 @@ int sithCogParse_ParseFlex(SithCogScript *cogScript, int a2)
     
     for (int i = 2; i < stdConffile_g_entry.numArgs; i++)
     {
-        stdConffileArg* arg = &stdConffile_g_entry.args[i];
+        StdConffileArg* arg = &stdConffile_g_entry.args[i];
         
         if ( !_strcmp(arg->key, "local") )
         {
@@ -985,7 +985,7 @@ int sithCogParse_ParseInt(SithCogScript *cogScript, int a2)
     
     for (int i = 2; i < stdConffile_g_entry.numArgs; i++)
     {
-        stdConffileArg* arg = &stdConffile_g_entry.args[i];
+        StdConffileArg* arg = &stdConffile_g_entry.args[i];
         
         if ( !_strcmp(arg->key, "local") )
         {
@@ -1036,7 +1036,7 @@ int sithCogParse_ParseVector(SithCogScript *cogScript, int a2)
     
     for (int i = 2; i < stdConffile_g_entry.numArgs; i++)
     {
-        stdConffileArg* arg = &stdConffile_g_entry.args[i];
+        StdConffileArg* arg = &stdConffile_g_entry.args[i];
         
         if ( !_strcmp(arg->key, "local") )
         {

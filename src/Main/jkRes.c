@@ -332,22 +332,22 @@ int jkRes_LoadCD(int cdNumberNeeded)
 {
     int v1; // eax
     unsigned int v3; // edi
-    stdGob **v4; // esi
+    Gob **v4; // esi
     unsigned int v5; // edi
-    stdGob **v6; // esi
+    Gob **v6; // esi
     wchar_t *v7; // eax
     wchar_t *v8; // eax
     wchar_t *v9; // eax
     unsigned int v10; // esi
-    stdGob **v11; // edi
+    Gob **v11; // edi
     unsigned int v12; // esi
-    stdGob **v13; // edi
+    Gob **v13; // edi
     unsigned int v14; // edi
-    stdGob **v15; // esi
+    Gob **v15; // esi
     unsigned int v16; // esi
     unsigned int v18; // esi
     unsigned int v20; // edi
-    stdGob **v21; // esi
+    Gob **v21; // esi
     int v23; // [esp+10h] [ebp-18Ch]
     int v24; // [esp+14h] [ebp-188h]
     int keyval; // [esp+18h] [ebp-184h] BYREF
@@ -482,10 +482,10 @@ stdFile_t jkRes_FileOpen(const char *fpath, const char *mode)
     const char *v11; // eax
     stdFile_t v12; // eax
     unsigned int v13; // esi
-    stdGobFile *v14; // eax
+    GobFileHandle *v14; // eax
     unsigned int v15; // esi
     bool v16; // cf
-    stdGob **v17; // [esp+10h] [ebp-Ch]
+    Gob **v17; // [esp+10h] [ebp-Ch]
     unsigned int v18; // [esp+14h] [ebp-8h]
     int v19; // [esp+18h] [ebp-4h]
 

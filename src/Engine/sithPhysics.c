@@ -289,7 +289,7 @@ void sithPhysics_ApplyDrag(rdVector3 *vec, flex_t drag, flex_t mag, flex_t delta
     }
 }
 
-int sithPhysics_ParseArg(stdConffileArg *arg, SithThing *pThing, int param)
+int sithPhysics_ParseArg(StdConffileArg *arg, SithThing *pThing, int param)
 {
     flex32_t tmp;
     int tmpInt;

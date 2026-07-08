@@ -1434,7 +1434,7 @@ int std3D_EstimateTWLSize(int width_e, int height_e, int type) {
 
 int std3D_highestTexId = 0;
 
-int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha)
+int std3D_AddToTextureCache(tVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha)
 {
     //printf("Add to cache %p %p\n", vbuf, texture);
     //if (Main_bHeadless) return 1;

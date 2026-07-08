@@ -74,7 +74,7 @@ int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *materi
                 
                 // Odd quirk: This requires the material be actually loaded
                 // Added: nullptr fallbacks
-                stdVBuffer* v24 = NULL;
+                tVBuffer* v24 = NULL;
                 if (sprite->face.material->texinfos[0] && sprite->face.material->texinfos[0]->texture_ptr) {
                     v24 = sprite->face.material->texinfos[0]->texture_ptr->texture_struct[0];
                 }

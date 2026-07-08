@@ -4,7 +4,7 @@
 #include "General/stdBitmap.h"
 #include "General/stdFont.h"
 #include "General/stdMath.h"
-#include "Engine/rdMaterial.h" // TODO move stdVBuffer
+#include "Engine/rdMaterial.h" // TODO move tVBuffer
 #include "Devices/sithSound.h"
 #include "Primitives/rdVector.h"
 #include "Win95/stdDisplay.h"
@@ -27,8 +27,8 @@ static WindowDrawHandler_t jkGuiRend_idk2 = 0;
 static WindowDrawHandler_t jkGuiRend_idk = 0;
 static stdSound_buffer_t* jkGuiRend_DsoundHandles[4] = {0};
 static jkGuiMenu *jkGuiRend_activeMenu = NULL;
-static stdVBuffer* jkGuiRend_menuBuffer = NULL;
-static stdVBuffer *jkGuiRend_texture_dword_8561E8 = NULL;
+static tVBuffer* jkGuiRend_menuBuffer = NULL;
+static tVBuffer *jkGuiRend_texture_dword_8561E8 = NULL;
 
 int32_t jkGuiRend_thing_five = 0;
 int32_t jkGuiRend_thing_four = 0;
@@ -91,7 +91,7 @@ void jkGuiRend_SetPalette(uint8_t* pal)
     _memcpy(jkGuiRend_palette, pal, 0x300); // TODO sizeof(jkGuiRend_palette)
 }
 
-void jkGuiRend_DrawRect(stdVBuffer *vbuf, rdRect *rect, int16_t color)
+void jkGuiRend_DrawRect(tVBuffer *vbuf, rdRect *rect, int16_t color)
 {
     int32_t v12; // edx
     int32_t v14; // edi
@@ -554,7 +554,7 @@ void jkGuiRend_Shutdown()
 #endif
 }
 
-void jkGuiRend_Open(stdVBuffer *menuBuffer, stdVBuffer *otherBuf, int32_t fillColor)
+void jkGuiRend_Open(tVBuffer *menuBuffer, tVBuffer *otherBuf, int32_t fillColor)
 {
     jkGuiRend_menuBuffer = menuBuffer;
     jkGuiRend_texture_dword_8561E8 = otherBuf;
@@ -1491,7 +1491,7 @@ int jkGuiRend_ListBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int32_
     return 0;
 }
 
-void jkGuiRend_ListBoxDraw(jkGuiElement *element_, jkGuiMenu *menu, stdVBuffer *vbuf, BOOL redraw)
+void jkGuiRend_ListBoxDraw(jkGuiElement *element_, jkGuiMenu *menu, tVBuffer *vbuf, BOOL redraw)
 {
     int32_t* bitmapIndices; // eax
     int32_t v10; // eax
@@ -1590,11 +1590,11 @@ void jkGuiRend_ListBoxDraw(jkGuiElement *element_, jkGuiMenu *menu, stdVBuffer *
     }
 }
 
-void jkGuiRend_CheckBoxDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, BOOL redraw)
+void jkGuiRend_CheckBoxDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, BOOL redraw)
 {
     stdBitmap *checkboxBitmap; // ebp
     int32_t v5; // eax
-    stdVBuffer *v6; // ecx
+    tVBuffer *v6; // ecx
     int32_t v7; // eax
     int32_t v9; // edx
     int32_t v10; // ebx
@@ -2040,7 +2040,7 @@ int jkGuiRend_SliderEventHandler(jkGuiElement *element, jkGuiMenu *menu, int32_t
     }
 }
 
-void jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, BOOL redraw)
+void jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, BOOL redraw)
 {
     uint32_t v6; // edi
     int32_t *bitmapIndices; // eax
@@ -2052,8 +2052,8 @@ void jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vb
     int32_t v14; // ebp
     int32_t v15; // ebx
     int32_t v16; // eax
-    stdVBuffer **v17; // edx
-    stdVBuffer *v18; // edi
+    tVBuffer **v17; // edx
+    tVBuffer *v18; // edi
     int32_t v19; // ecx
     uint32_t v20; // edi
     uint32_t blitX; // edx
@@ -2072,7 +2072,7 @@ void jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vb
     int32_t v35; // eax
     uint32_t blitX2; // esi
     int32_t blitY2; // edi
-    stdVBuffer *v38; // edx
+    tVBuffer *v38; // edx
     int32_t v39; // ecx
     uint32_t v40; // ebp
     int32_t v41; // edx
@@ -2364,7 +2364,7 @@ int jkGuiRend_TextBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int32_
     return 0;
 }
 
-void jkGuiRend_TextBoxDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, BOOL redraw)
+void jkGuiRend_TextBoxDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, BOOL redraw)
 {
     const wchar_t *v4; // edi
     int32_t v9; // ecx
@@ -2414,7 +2414,7 @@ void jkGuiRend_TextBoxDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *v
     }
 }
 
-void jkGuiRend_TextDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *outBuf, BOOL redraw)
+void jkGuiRend_TextDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *outBuf, BOOL redraw)
 {
     if ( redraw )
         jkGuiRend_CopyVBuffer(menu, &element->rect);
@@ -2454,7 +2454,7 @@ int jkGuiRend_PicButtonEventHandler(jkGuiElement *element, jkGuiMenu *menu, int3
     return 1;
 }
 
-void jkGuiRend_PicButtonDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, BOOL redraw)
+void jkGuiRend_PicButtonDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, BOOL redraw)
 {
     int32_t v4; // ebx
     rdRect rect; // [esp+Ch] [ebp-10h]
@@ -2516,7 +2516,7 @@ int jkGuiRend_TextButtonEventHandler(jkGuiElement *element, jkGuiMenu *menu, int
     return 1;
 }
 
-void jkGuiRend_TextButtonDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, BOOL redraw)
+void jkGuiRend_TextButtonDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, BOOL redraw)
 {
     int32_t v4; // ebx
     int32_t v5; // ebp

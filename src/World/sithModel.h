@@ -26,6 +26,6 @@ rdModel3* sithModel_GetModelByIndex(int idx);
 
 //static rdModel3* (*sithModel_LoadEntry_)(const char *model_3do_fname, int unk) = (void*)sithModel_Load_ADDR;
 
-//#define sithModel_hashtable (*(stdHashTable**)0x84DA3C)
+//#define sithModel_hashtable (*(tHashTable**)0x84DA3C)
 
 #endif // _SITHMODEL_H

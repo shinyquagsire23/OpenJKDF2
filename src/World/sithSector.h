@@ -33,7 +33,7 @@ void sithSector_SyncSector(SithSector *pSector, int a2);
 void sithSector_SyncSectors();
 SithSector* sithSector_FindSectorAtPos(SithWorld *pWorld, rdVector3 *pos);
 
-//static int (*sithSector_LoadThingPhysicsParams)(stdConffileArg *arg, SithThing *thing, int param) = (void*)sithSector_LoadThingPhysicsParams_ADDR;
+//static int (*sithSector_LoadThingPhysicsParams)(StdConffileArg *arg, SithThing *thing, int param) = (void*)sithSector_LoadThingPhysicsParams_ADDR;
 //static void (*sithSector_ThingPhysGeneral)(SithThing *thing, flex_t deltaSeconds) = (void*)sithSector_ThingPhysGeneral_ADDR;
 //static void (*sithSector_ThingPhysPlayer)(SithThing *player, flex_t deltaSeconds) = (void*)sithSector_ThingPhysPlayer_ADDR;
 //static void (*sithSector_ThingPhysUnderwater)(SithThing *a1, flex_t a2) = (void*)sithSector_ThingPhysUnderwater_ADDR;

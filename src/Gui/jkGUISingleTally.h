@@ -12,6 +12,6 @@
 int jkGuiSingleTally_Show();
 void jkGuiSingleTally_Startup();
 void jkGuiSingleTally_Shutdown();
-void jkGuiSingleTally_ForceStarsRender(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int d);
+void jkGuiSingleTally_ForceStarsRender(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, int d);
 
 #endif // _JKGUI_SINGLETALLY_H

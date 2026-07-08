@@ -15,7 +15,7 @@
 // Added: Simulate Disk 1 in menu
 int jkCredits_cdOverride = 0;
 
-static stdVBuffer* jkCredits_pVbufferTmp;
+static tVBuffer* jkCredits_pVbufferTmp;
 
 void jkCredits_Startup(char *fpath)
 {
@@ -63,7 +63,7 @@ int jkCredits_Show()
     char *v12; // ecx
     int v13; // edx
     int v14; // edx
-    stdVBuffer *v15; // eax
+    tVBuffer *v15; // eax
     char *v16; // edx
     int v17; // edi
     char *v18; // ebp
@@ -74,7 +74,7 @@ int jkCredits_Show()
     signed int result; // eax
     stdDeviceParams v24; // [esp+10h] [ebp-B4h] BYREF
     render_pair a1; // [esp+24h] [ebp-A0h] BYREF
-    stdVBufferTexFmt v26; // [esp+78h] [ebp-4Ch] BYREF
+    tRasterInfo v26; // [esp+78h] [ebp-4Ch] BYREF
 
     if ( jkCredits_dword_55AD94 )
         return 0;

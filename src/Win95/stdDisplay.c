@@ -52,7 +52,7 @@ void stdDisplay_Close()
     stdDisplay_bOpen = 0;
 }
 
-int stdDisplay_FindClosestMode(render_pair *a1, struct stdVideoMode *render_surface, unsigned int max_modes)
+int stdDisplay_FindClosestMode(render_pair *a1, struct StdVideoMode *render_surface, unsigned int max_modes)
 {
     Video_curMode = 0;
     stdDisplay_bPaged = 1;
@@ -187,7 +187,7 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
     return 1;
 }
 
-int stdDisplay_ClearRect(stdVBuffer *buf, int fillColor, rdRect *rect)
+int stdDisplay_ClearRect(tVBuffer *buf, int fillColor, rdRect *rect)
 {
     return stdDisplay_VBufferFill(buf, fillColor, rect);
 }
@@ -215,9 +215,9 @@ int stdDisplay_SetMasterPalette(uint8_t* pal)
     return 1;
 }
 
-stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surface, int gpu_mem, const void* palette)
+tVBuffer* stdDisplay_VBufferNew(tRasterInfo *fmt, int create_ddraw_surface, int gpu_mem, const void* palette)
 {
-    stdVBuffer* out = (stdVBuffer*)STD_ALLOC(sizeof(stdVBuffer));
+    tVBuffer* out = (tVBuffer*)STD_ALLOC(sizeof(tVBuffer));
     
     _memset(out, 0, sizeof(*out));
     
@@ -273,7 +273,7 @@ stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surfac
     return out;
 }
 
-int stdDisplay_VBufferLock(stdVBuffer *buf)
+int stdDisplay_VBufferLock(tVBuffer *buf)
 {
     if (!buf) return 0;
 
@@ -282,7 +282,7 @@ int stdDisplay_VBufferLock(stdVBuffer *buf)
     return 1;
 }
 
-void stdDisplay_VBufferUnlock(stdVBuffer *buf)
+void stdDisplay_VBufferUnlock(tVBuffer *buf)
 {
     if (!buf) return;
     
@@ -290,7 +290,7 @@ void stdDisplay_VBufferUnlock(stdVBuffer *buf)
     SDL_UnlockSurface(buf->sdlSurface);
 }
 
-int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int blit_x, int blit_y, rdRect *rect, int alpha_maybe)
+int stdDisplay_VBufferCopy(tVBuffer *vbuf, tVBuffer *vbuf2, unsigned int blit_x, int blit_y, rdRect *rect, int alpha_maybe)
 {
     if (!vbuf || !vbuf2) return 1;
     
@@ -410,7 +410,7 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
     return 1;
 }
 
-int stdDisplay_VBufferFill(stdVBuffer *vbuf, int fillColor, rdRect *rect)
+int stdDisplay_VBufferFill(tVBuffer *vbuf, int fillColor, rdRect *rect)
 {    
     rdRect fallback = {0,0,vbuf->format.width, vbuf->format.height};
     if (!rect)
@@ -445,7 +445,7 @@ int stdDisplay_VBufferFill(stdVBuffer *vbuf, int fillColor, rdRect *rect)
     return 1;
 }
 
-int stdDisplay_VBufferSetColorKey(stdVBuffer *vbuf, int color)
+int stdDisplay_VBufferSetColorKey(tVBuffer *vbuf, int color)
 {
     //DDCOLORKEY v3; // [esp+0h] [ebp-8h] BYREF
 
@@ -467,7 +467,7 @@ int stdDisplay_VBufferSetColorKey(stdVBuffer *vbuf, int color)
     return 1;
 }
 
-void stdDisplay_VBufferFree(stdVBuffer *vbuf)
+void stdDisplay_VBufferFree(tVBuffer *vbuf)
 {
     // Added: Safety fallbacks
     if (!vbuf) {
@@ -487,7 +487,7 @@ void stdDisplay_RestoreDisplayMode()
 
 }
 
-stdVBuffer* stdDisplay_VBufferConvertColorFormat(void* a, stdVBuffer* b)
+tVBuffer* stdDisplay_VBufferConvertColorFormat(void* a, tVBuffer* b)
 {
     return b;
 }

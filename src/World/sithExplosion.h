@@ -27,7 +27,7 @@ enum SithExplosionFlag
 void sithExplosion_CreateThing(SithThing *explosion);
 MATH_FUNC void sithExplosion_Update(SithThing *explosion);
 MATH_FUNC void sithExplosion_MakeBlast(SithThing *explosion);
-int sithExplosion_ParseArg(stdConffileArg *arg, SithThing *thing, int param);
+int sithExplosion_ParseArg(StdConffileArg *arg, SithThing *thing, int param);
 
 //static void (*sithExplosion_MakeBlast)(SithThing *explosion) = (void*)sithExplosion_MakeBlast_ADDR;
 

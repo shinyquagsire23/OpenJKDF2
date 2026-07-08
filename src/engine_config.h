@@ -299,7 +299,7 @@
 #if defined(TARGET_RETRO_HOMEBREW)
 #undef SITH_DEBUG_STRUCT_NAMES
 
-// stdHashTable memory optimizations
+// tHashTable memory optimizations
 #ifdef TARGET_TWL
 // Link nodes come from slab pools (freelist reuse) instead of thousands of
 // tiny heap allocations; slabs are extram-suggested. Risk-free on TWL where

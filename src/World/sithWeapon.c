@@ -406,7 +406,7 @@ LABEL_25:
     sithThing_DestroyThing(weapon);
 }
 
-int sithWeapon_ParseArg(stdConffileArg *arg, SithThing *thing, int param)
+int sithWeapon_ParseArg(StdConffileArg *arg, SithThing *thing, int param)
 {
     int tmp;
 

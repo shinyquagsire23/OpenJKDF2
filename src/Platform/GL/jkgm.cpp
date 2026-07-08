@@ -508,7 +508,7 @@ void jkgm_populate_cache()
     jkgm_cache_once = true;
 }
 
-std::string jkgm_get_tex_hash(stdVBuffer *vbuf, rdDDrawSurface *texture, rdMaterial* material, int is_alpha_tex)
+std::string jkgm_get_tex_hash(tVBuffer *vbuf, rdDDrawSurface *texture, rdMaterial* material, int is_alpha_tex)
 {
     if (!vbuf || !texture) return "AAAAAAAAAA";
 
@@ -556,7 +556,7 @@ std::string jkgm_get_tex_hash(stdVBuffer *vbuf, rdDDrawSurface *texture, rdMater
     return hash;
 }
 
-void jkgm_populate_shortcuts(stdVBuffer *vbuf, rdDDrawSurface *texture, rdMaterial* material, int is_alpha_tex, int mipmap_level, int cel)
+void jkgm_populate_shortcuts(tVBuffer *vbuf, rdDDrawSurface *texture, rdMaterial* material, int is_alpha_tex, int mipmap_level, int cel)
 {
     if (Main_bHeadless) return;
     if (texture && texture->texture_loaded) return;
@@ -621,7 +621,7 @@ void jkgm_populate_shortcuts(stdVBuffer *vbuf, rdDDrawSurface *texture, rdMateri
     }
 }
 
-int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha, rdMaterial* material, int cel)
+int jkgm_std3D_AddToTextureCache(tVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha, rdMaterial* material, int cel)
 {
     if (Main_bHeadless) return 0;
     if (texture->texture_loaded) return 1;

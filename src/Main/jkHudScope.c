@@ -177,10 +177,10 @@ void jkHudScope_Draw(void)
     jkHudMotsBitmap* pBmIter = jkHudScope_aBitmaps;
 
 #ifndef SDL2_RENDER
-    stdVBuffer* pOverlayBuffer = Video_pMenuBuffer;
+    tVBuffer* pOverlayBuffer = Video_pMenuBuffer;
     rdCanvas* pOverlayCanvas = Video_pCanvas;
 #else
-    stdVBuffer* pOverlayBuffer = Video_pCanvasOverlayMap->vbuffer;
+    tVBuffer* pOverlayBuffer = Video_pCanvasOverlayMap->vbuffer;
     rdCanvas* pOverlayCanvas = Video_pCanvasOverlayMap;
     stdDisplay_VBufferLock(pOverlayBuffer);
 #endif

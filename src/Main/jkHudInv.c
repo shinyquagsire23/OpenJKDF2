@@ -818,7 +818,7 @@ void jkHudInv_LoadItemRes()
     signed int v9; // ecx
     int i; // esi
     stdBitmap *v11; // eax
-    stdVBuffer *v12; // eax
+    tVBuffer *v12; // eax
     uint32_t v13; // ecx
     signed int v14; // eax
     int v15; // ecx

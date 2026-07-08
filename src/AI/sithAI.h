@@ -67,7 +67,7 @@ void sithAI_RegisterInstinct(const char *cmdName, sithAICommandFunc_t func, int 
 SithAIRegisteredInstinct* sithAI_FindInstinct(const char *cmdName);
 int sithAI_AIList(stdDebugConsoleCmd* a, const char* b);
 int sithAI_AIStatus(stdDebugConsoleCmd* a1, const char *idxStr);
-int sithAI_ParseArg(stdConffileArg *arg, SithThing *thing, int param);
+int sithAI_ParseArg(StdConffileArg *arg, SithThing *thing, int param);
 void sithAI_CreateAIFramesFomMarker(SithThing *a2, SithThing *a3, rdVector3 *a4);
 void sithAI_Tick(SithThing *thing, flex_t deltaSeconds);
 MATH_FUNC void sithAI_sub_4EA630(SithAIControlBlock *actor, flex_t deltaSeconds);
@@ -100,7 +100,7 @@ MATH_FUNC int sithAI_Leap(SithAIControlBlock *pActor,flex_t minDist,flex_t maxDi
 MATH_FUNC SithThing* sithAI_FUN_00539a60(SithAIControlBlock *pThing);
 
 //static int (*sithAI_Startup)() = (void*)sithAI_Startup_ADDR;
-//static int (*sithAI_ParseArg)(stdConffileArg *arg, SithThing *thing, int param) = (void*)sithAI_ParseArg_ADDR;
+//static int (*sithAI_ParseArg)(StdConffileArg *arg, SithThing *thing, int param) = (void*)sithAI_ParseArg_ADDR;
 //static void (*sithAI_Free)(SithThing *thing) = (void*)sithAI_Free_ADDR;
 //static void (*sithAI_Tick)(SithThing *thing, flex_t deltaSeconds) = (void*)sithAI_Tick_ADDR;
 //static void (*sithAI_InstinctUpdate)(SithAIControlBlock *actor) = (void*)sithAI_InstinctUpdate_ADDR;

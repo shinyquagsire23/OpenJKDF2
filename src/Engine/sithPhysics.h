@@ -23,7 +23,7 @@ MATH_FUNC void sithPhysics_UpdateThing(SithThing *pThing, flex_t force);
 MATH_FUNC void sithPhysics_ApplyForce(SithThing *pThing, rdVector3 *forceVec);
 MATH_FUNC void sithPhysics_SetThingLook(SithThing *pThing, const rdVector3 *look, flex_t a3);
 MATH_FUNC void sithPhysics_ApplyDrag(rdVector3 *vec, flex_t drag, flex_t mag, flex_t dragCoef);
-MATH_FUNC int sithPhysics_ParseArg(stdConffileArg *arg, SithThing *pThing, int param);
+MATH_FUNC int sithPhysics_ParseArg(StdConffileArg *arg, SithThing *pThing, int param);
 MATH_FUNC void sithPhysics_ResetThingMovement(SithThing *pThing);
 MATH_FUNC flex_t sithPhysics_GetThingHeight(SithThing *pThing);
 MATH_FUNC void sithPhysics_UpdateThingPhysics(SithThing *pThing, flex_t deltaSeconds);

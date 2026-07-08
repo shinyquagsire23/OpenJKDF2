@@ -11,7 +11,7 @@
 
 int sithConsole_Startup(int maxCmds)
 {
-    stdHashTable *v1; // eax
+    tHashTable *v1; // eax
     signed int result; // eax
 
     sithConsole_aCmds = (stdDebugConsoleCmd *)SITH_ALLOC(sizeof(stdDebugConsoleCmd) * maxCmds);

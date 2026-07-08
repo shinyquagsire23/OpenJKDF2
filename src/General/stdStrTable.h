@@ -22,7 +22,7 @@ typedef struct stdStrTable
 {
     uint32_t numMsgs;
     stdStrMsg* msgs;
-    stdHashTable* hashtable;
+    tHashTable* hashtable;
     uint32_t magic_sTbl;
 } stdStrTable;
 

@@ -86,7 +86,7 @@ int jkHud_Open()
     stdBitmap *v3; // eax
     jkHudFont* fontIter; // esi
     stdFont *v5; // eax
-    stdVBuffer *v6; // ecx
+    tVBuffer *v6; // ecx
     int v7; // esi
     int *aTeamColors; // esi
     char tmp[128]; // [esp+Ch] [ebp-80h] BYREF
@@ -430,10 +430,10 @@ void jkHud_Draw()
     //std3D_DrawUIBitmap(0,0,64,64,0,0,4.0,jkHud_pTestbitmap);
 
 #ifndef SDL2_RENDER
-    stdVBuffer* pOverlayBuffer = Video_pMenuBuffer;
+    tVBuffer* pOverlayBuffer = Video_pMenuBuffer;
     rdCanvas* pOverlayCanvas = Video_pCanvas;
 #else
-    stdVBuffer* pOverlayBuffer = Video_pCanvasOverlayMap->vbuffer;
+    tVBuffer* pOverlayBuffer = Video_pCanvasOverlayMap->vbuffer;
     rdCanvas* pOverlayCanvas = Video_pCanvasOverlayMap;
 #endif
 
@@ -1006,10 +1006,10 @@ void jkHud_DrawGPU()
     //std3D_DrawUIBitmap(0,0,64,64,0,0,4.0,jkHud_pTestbitmap);
 
 #ifndef SDL2_RENDER
-    stdVBuffer* pOverlayBuffer = Video_pMenuBuffer;
+    tVBuffer* pOverlayBuffer = Video_pMenuBuffer;
     rdCanvas* pOverlayCanvas = Video_pCanvas;
 #else
-    stdVBuffer* pOverlayBuffer = Video_pCanvasOverlayMap->vbuffer;
+    tVBuffer* pOverlayBuffer = Video_pCanvasOverlayMap->vbuffer;
     rdCanvas* pOverlayCanvas = Video_pCanvasOverlayMap;
 #endif
 

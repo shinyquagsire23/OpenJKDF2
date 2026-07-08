@@ -488,7 +488,7 @@ void sithActor_DestroyCorpse(SithThing *corpse)
     }
 }
 
-int sithActor_ParseArg(stdConffileArg *arg, SithThing *thing, unsigned int param)
+int sithActor_ParseArg(StdConffileArg *arg, SithThing *thing, unsigned int param)
 {
     int result; // eax
     flex_d_t v6; // st7

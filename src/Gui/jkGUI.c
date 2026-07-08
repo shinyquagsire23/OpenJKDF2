@@ -4,7 +4,7 @@
 #include "General/stdBitmap.h"
 #include "General/stdFont.h"
 #include "General/stdString.h"
-#include "Engine/rdMaterial.h" // TODO move stdVBuffer
+#include "Engine/rdMaterial.h" // TODO move tVBuffer
 #include "Primitives/rdVector.h"
 #include "Win95/stdDisplay.h"
 #include "Platform/stdControl.h"
@@ -294,7 +294,7 @@ int jkGui_Startup()
 #endif
 
 #ifdef JKGUI_SMOL_SCREEN
-    stdVBuffer* texA = jkGui_stdFonts[1]->pBitmap->mipSurfaces[0];
+    tVBuffer* texA = jkGui_stdFonts[1]->pBitmap->mipSurfaces[0];
     stdDisplay_VBufferLock(texA);
     uint8_t* pTexAPixels = (uint8_t*)texA->surface_lock_alloc; // Added: byte reads OK, writes word-safe
     for (int i = 0; i < texA->format.width * texA->format.height; i++) {
@@ -324,7 +324,7 @@ int jkGui_Startup()
     }
     stdDisplay_VBufferUnlock(texA);
 
-    stdVBuffer* texB = jkGui_stdFonts[0]->pBitmap->mipSurfaces[0];
+    tVBuffer* texB = jkGui_stdFonts[0]->pBitmap->mipSurfaces[0];
     stdDisplay_VBufferLock(texB);
     uint8_t* pTexBPixels = (uint8_t*)texB->surface_lock_alloc; // Added: byte reads OK, writes word-safe
     for (int i = 0; i < texB->format.width * texB->format.height; i++) {

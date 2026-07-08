@@ -6,7 +6,7 @@
 #include "General/stdStrTable.h"
 #include "General/stdFileUtil.h"
 #include "General/util.h"
-#include "Engine/rdMaterial.h" // TODO move stdVBuffer
+#include "Engine/rdMaterial.h" // TODO move tVBuffer
 #include "stdPlatform.h"
 #include "jk.h"
 #include "Gui/jkGUIRend.h"

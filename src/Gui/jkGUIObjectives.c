@@ -5,7 +5,7 @@
 #include "General/stdFont.h"
 #include "General/stdStrTable.h"
 #include "General/stdFileUtil.h"
-#include "Engine/rdMaterial.h" // TODO move stdVBuffer
+#include "Engine/rdMaterial.h" // TODO move tVBuffer
 #include "stdPlatform.h"
 #include "jk.h"
 #include "Gui/jkGUIRend.h"
@@ -29,7 +29,7 @@ static jkGuiElement jkGuiObjectives_elements[6] = {
 
 static jkGuiMenu jkGuiObjectives_menu = {jkGuiObjectives_elements, -1, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
-void jkGuiObjectives_CustomRender(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int bRedraw)
+void jkGuiObjectives_CustomRender(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, int bRedraw)
 {
     rdRect drawRect;
 

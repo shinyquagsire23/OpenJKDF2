@@ -14,8 +14,8 @@ void jkgm_aligned_free(void* p);
 #if defined(TARGET_CAN_JKGM)
 void jkgm_startup();
 void jkgm_populate_cache();
-void jkgm_populate_shortcuts(stdVBuffer *vbuf, rdDDrawSurface *texture, rdMaterial* material, int is_alpha_tex, int mipmap_level, int cel);
-int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha, rdMaterial* material, int cel);
+void jkgm_populate_shortcuts(tVBuffer *vbuf, rdDDrawSurface *texture, rdMaterial* material, int is_alpha_tex, int mipmap_level, int cel);
+int jkgm_std3D_AddToTextureCache(tVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha, rdMaterial* material, int cel);
 void jkgm_free_cache_entry(jkgm_cache_entry_t* entry);
 void jkgm_write_png(const char *pFname, int width, int height, uint8_t* paFramebuffer);
 

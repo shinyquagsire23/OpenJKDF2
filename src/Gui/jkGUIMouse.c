@@ -5,7 +5,7 @@
 #include "General/stdFont.h"
 #include "General/stdStrTable.h"
 #include "General/stdFileUtil.h"
-#include "Engine/rdMaterial.h" // TODO move stdVBuffer
+#include "Engine/rdMaterial.h" // TODO move tVBuffer
 #include "stdPlatform.h"
 #include "jk.h"
 #include "Gui/jkGUIRend.h"
@@ -23,7 +23,7 @@
 #include <math.h>
 #include <float.h>
 
-void jkGuiMouse_SensitivityDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, BOOL redraw);
+void jkGuiMouse_SensitivityDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, BOOL redraw);
 
 static const int32_t jkGUIMouse_listbox_paddings = 0xAA;
 static int32_t jkGUIMouse_listbox_images[2] = {JKGUI_BM_UP_15, JKGUI_BM_DOWN_15};
@@ -97,7 +97,7 @@ static jkGuiElement jkGuiMouse_aElements[26] =
 
 static jkGuiMenu jkGuiMouse_menu = {jkGuiMouse_aElements, 0, 225, 255, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, (intptr_t)&jkGUIMouse_listbox_paddings, NULL, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
-void jkGuiMouse_SensitivityDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, BOOL redraw)
+void jkGuiMouse_SensitivityDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, BOOL redraw)
 {
 #ifdef QOL_IMPROVEMENTS
     int32_t val = jkGuiMouse_aElements[20].selectedTextEntry;

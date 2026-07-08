@@ -7,7 +7,7 @@
 
 int rdPrimit2_DrawLine(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, uint16_t color16, int mask)
 {
-    stdVBuffer *v7; // ebx
+    tVBuffer *v7; // ebx
     int v8; // ebp
     int v9; // edi
     int v10; // esi

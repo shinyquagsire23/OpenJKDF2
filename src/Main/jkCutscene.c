@@ -45,7 +45,7 @@ static smk jkCutscene_smk;
 static int jkCutscene_bSmkValid = 0;
 static flex64_t jkCutscene_smk_usf;
 static uint32_t jkCutscene_smk_w, jkCutscene_smk_h, jkCutscene_smk_frames;
-static stdVBuffer* jkCutscene_frameBuf = NULL;
+static tVBuffer* jkCutscene_frameBuf = NULL;
 //static void* jkCutscene_audioBuf = NULL;
 static stdSound_buffer_t* jkCutscene_audio[AUDIO_NUM_STDBUFS];
 
@@ -381,7 +381,7 @@ int jkCutscene_sub_421310(char* fpath)
         //printf("%x %x %x %x %x %x %x\n", a_d[0], a_d[1], a_d[2], a_d[3], a_d[4], a_d[5], a_d[6]);
         //printf("%x %x %x %x %x %x %x\n", a_r[0], a_r[1], a_r[2], a_r[3], a_r[4], a_r[5], a_r[6]);
         
-        stdVBufferTexFmt texFmt;
+        tRasterInfo texFmt;
         texFmt.width = jkCutscene_smk_w;
         texFmt.height = jkCutscene_smk_h;
         texFmt.format.bpp = 8;
@@ -449,7 +449,7 @@ int jkCutscene_sub_421310(char* fpath)
 
         stdPlatform_Printf("Opened file %s as Smush\nWidth: %lu\nHeight: %lu\nFrames: %lu\nFPS: %f\n", tmp, jkCutscene_smk_w, jkCutscene_smk_h, jkCutscene_smk_frames, 1000000.0 / jkCutscene_smk_usf);
 
-        stdVBufferTexFmt texFmt;
+        tRasterInfo texFmt;
         texFmt.width = jkCutscene_smk_w;
         texFmt.height = jkCutscene_smk_h;
         texFmt.format.bpp = 8;

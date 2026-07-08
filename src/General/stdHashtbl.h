@@ -16,34 +16,34 @@
 #define stdHashtbl_PrintTableDiagnostics_ADDR (0x00437F20) // unused but interesting
 #define stdHashtbl_DumpTable_ADDR (0x00438040) // unused but interesting
 
-typedef struct stdLinklist stdLinklist;
+typedef struct tLinkListNode tLinkListNode;
 typedef struct stdSingleLinklist stdSingleLinklist;
 
 #ifdef STDHASHTABLE_SINGLE_LINKLIST
 typedef stdSingleLinklist tHashLink;
 #else
-typedef stdLinklist tHashLink;
+typedef tLinkListNode tHashLink;
 #endif
 
-typedef struct stdHashTable
+typedef struct tHashTable
 {
     int numBuckets;
     tHashLink* buckets;
     uint32_t (*keyHashToIndex)(const char *data, uint32_t numBuckets);
-} stdHashTable;
+} tHashTable;
 
 uint32_t stdHashtbl_HashStringToIdx(const char *data, uint32_t numBuckets);
-stdHashTable* stdHashtbl_New(int maxEntries);
+tHashTable* stdHashtbl_New(int maxEntries);
 tHashLink* stdHashtbl_GetTailNode(tHashLink *pLL);
 void stdHashtbl_FreeListNodes(tHashLink *a1);
-void stdHashtbl_Free(stdHashTable *table);
+void stdHashtbl_Free(tHashTable *table);
 #ifdef STDHASHTABLE_CRC32_KEYS
-int stdHashtbl_FreeKeyCrc32(stdHashTable *hashtable, uint32_t keyCrc32);
+int stdHashtbl_FreeKeyCrc32(tHashTable *hashtable, uint32_t keyCrc32);
 #endif
-void* stdHashtbl_Find(stdHashTable *table, const char *key);
-int stdHashtbl_Add(stdHashTable *hashmap, const char *key, void *value);
-int stdHashtbl_Remove(stdHashTable *hashtable, const char *key);
-void stdHashtbl_PrintTableDiagnostics(stdHashTable *hashtable);
-void stdHashtbl_DumpTable(stdHashTable *hashtable);
+void* stdHashtbl_Find(tHashTable *table, const char *key);
+int stdHashtbl_Add(tHashTable *hashmap, const char *key, void *value);
+int stdHashtbl_Remove(tHashTable *hashtable, const char *key);
+void stdHashtbl_PrintTableDiagnostics(tHashTable *hashtable);
+void stdHashtbl_DumpTable(tHashTable *hashtable);
 
 #endif // _STDHASHTABLE_H

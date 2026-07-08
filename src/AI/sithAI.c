@@ -30,7 +30,7 @@
 #include "Dss/sithMulti.h"
 #include "jk.h"
 
-stdHashTable* sithAI_commandsHashmap = NULL;
+tHashTable* sithAI_commandsHashmap = NULL;
 uint32_t sithAI_maxActors = 0;
 int sithAI_actorInitted[SITHAI_MAX_ACTORS] = {0};
 int sithAI_bOpened = 0;
@@ -622,7 +622,7 @@ int sithAI_AIStatus(stdDebugConsoleCmd* a1, const char *idxStr)
 #endif // SITH_DEBUG_STRUCT_NAMES
 }
 
-int sithAI_ParseArg(stdConffileArg *arg, SithThing *thing, int param)
+int sithAI_ParseArg(StdConffileArg *arg, SithThing *thing, int param)
 {
     SithAIControlBlock *v3; // esi
     intptr_t result; // eax

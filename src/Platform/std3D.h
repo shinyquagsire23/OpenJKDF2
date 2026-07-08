@@ -70,7 +70,7 @@ static void (*std3D_UnloadAllTextures)() = (void*)std3D_UnloadAllTextures_ADDR;
 static void (*std3D_AddRenderListTris)(rdTri *tris, unsigned int num_tris) = (void*)std3D_AddRenderListTris_ADDR;
 static int (*std3D_AddRenderListVertices)(D3DVERTEX *vertex_array, int count) = (void*)std3D_AddRenderListVertices_ADDR;
 static int (*std3D_ClearZBuffer)() = (void*)std3D_ClearZBuffer_ADDR;
-static int (*std3D_AddToTextureCache)(stdVBuffer *a1, rdDDrawSurface *tex_2, int is_16bit_maybe, int no_alpha) = (void*)std3D_AddToTextureCache_ADDR;
+static int (*std3D_AddToTextureCache)(tVBuffer *a1, rdDDrawSurface *tex_2, int is_16bit_maybe, int no_alpha) = (void*)std3D_AddToTextureCache_ADDR;
 static void (*std3D_UpdateFrameCount)(rdDDrawSurface *surface) = (void*)std3D_UpdateFrameCount_ADDR;
 static void (*std3D_PurgeTextureCache)() = (void*)std3D_PurgeTextureCache_ADDR;
 void std3D_InitializeViewport(rdRect *viewRect);
@@ -110,7 +110,7 @@ void std3D_AddTextureToCacheList(rdDDrawSurface *pTexture); // TODO: mark the ad
 int std3D_PurgeTextureCache(size_t size);
 void std3D_PurgeEntireTextureCache();
 int std3D_ClearZBuffer();
-int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha);
+int std3D_AddToTextureCache(tVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha);
 void std3D_DrawMenu();
 void std3D_DrawSceneFbo();
 void std3D_FreeResources();

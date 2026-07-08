@@ -14,6 +14,6 @@ int sithItem_PlayerCollisionHandler(SithThing *a1, SithThing *a2, SithCollision 
 void sithItem_Initialize(SithThing *out);
 MATH_FUNC void sithItem_SetItemTaken(SithThing *item, SithThing *actor, int a3);
 void sithItem_DestroyItem(SithThing *item);
-int sithItem_ParseArg(stdConffileArg *arg, SithThing *thing, int paramIdx);
+int sithItem_ParseArg(StdConffileArg *arg, SithThing *thing, int paramIdx);
 
 #endif // _SITHITEM_H

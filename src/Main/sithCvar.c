@@ -15,7 +15,7 @@
 #endif
 
 static int sithCvar_numRegistered = 0;
-static stdHashTable* sithCvar_pHashTable = NULL;
+static tHashTable* sithCvar_pHashTable = NULL;
 static tSithCvar sithCvar_aCvars[SITHCVAR_MAX_CVARS];
 static int sithCvar_bInitted = 0;
 

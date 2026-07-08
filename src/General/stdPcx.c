@@ -10,12 +10,12 @@
 stdBitmap* stdPcx_Load(char *fpath, int create_ddraw_surface, int gpu_mem)
 {
     stdBitmap *bitmap;
-    stdVBuffer **mipSurfaces;
-    stdVBuffer *vbuf;
-    stdVBuffer *mipSurface;
+    tVBuffer **mipSurfaces;
+    tVBuffer *vbuf;
+    tVBuffer *mipSurface;
     char *lockAlloc;
     void *paletteAlloc;
-    stdVBufferTexFmt format;
+    tRasterInfo format;
     stdPcx_Header pcxHeader;
 
     int fhand = std_g_pHS->fileOpen(fpath, "rb");
@@ -38,7 +38,7 @@ stdBitmap* stdPcx_Load(char *fpath, int create_ddraw_surface, int gpu_mem)
     bitmap->format.is16bit = 0;
     bitmap->format.bpp = pcxHeader.bitDepth;
 
-    bitmap->mipSurfaces = (stdVBuffer **)STD_ALLOC(sizeof(stdVBuffer *) * 1);
+    bitmap->mipSurfaces = (tVBuffer **)STD_ALLOC(sizeof(tVBuffer *) * 1);
     if ( !bitmap->mipSurfaces )
         goto fail;
     _memset(&format, 0, sizeof(format));
@@ -103,7 +103,7 @@ fail:
 
 int stdPcx_Write(char *fpath, stdBitmap *bitmap)
 {
-    stdVBuffer *mipSurface;
+    tVBuffer *mipSurface;
     uint8_t* lockAlloc;
     stdPcx_Header pcxHeader;
 

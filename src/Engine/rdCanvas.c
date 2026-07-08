@@ -4,7 +4,7 @@
 
 #include "Engine/rdroid.h"
 
-rdCanvas* rdCanvas_New(int bIdk, stdVBuffer *vbuf1, stdVBuffer *vbuf2, int x, int y, int w, int h, int a8)
+rdCanvas* rdCanvas_New(int bIdk, tVBuffer *vbuf1, tVBuffer *vbuf2, int x, int y, int w, int h, int a8)
 {
     rdCanvas *result; // eax
     rdCanvas *v9; // esi
@@ -19,7 +19,7 @@ rdCanvas* rdCanvas_New(int bIdk, stdVBuffer *vbuf1, stdVBuffer *vbuf2, int x, in
     return result;
 }
 
-int rdCanvas_NewEntry(rdCanvas *canvas, int bIdk, stdVBuffer *vbuf, stdVBuffer *a4, int x, int y, int width, int height, int a9)
+int rdCanvas_NewEntry(rdCanvas *canvas, int bIdk, tVBuffer *vbuf, tVBuffer *a4, int x, int y, int width, int height, int a9)
 {
     int v9; // eax
     signed int result; // eax

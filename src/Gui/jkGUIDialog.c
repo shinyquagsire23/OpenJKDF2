@@ -4,7 +4,7 @@
 #include "General/stdBitmap.h"
 #include "General/stdString.h"
 #include "General/stdFont.h"
-#include "Engine/rdMaterial.h" // TODO move stdVBuffer
+#include "Engine/rdMaterial.h" // TODO move tVBuffer
 #include "stdPlatform.h"
 #include "jk.h"
 #include "Gui/jkGUIRend.h"
@@ -42,10 +42,10 @@ void jkGuiDialog_Shutdown()
     stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
 }
 
-stdVBuffer *jkGuiDialog_sub_416900()
+tVBuffer *jkGuiDialog_sub_416900()
 {
-    stdVBuffer *v0; // eax
-    stdVBuffer *v1; // esi
+    tVBuffer *v0; // eax
+    tVBuffer *v1; // esi
 
     // Added
     stdBitmap_EnsureData(jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]);

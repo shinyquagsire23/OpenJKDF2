@@ -4,7 +4,7 @@
 
 #include "General/stdBitmap.h"
 #include "General/stdFont.h"
-#include "Engine/rdMaterial.h" // TODO move stdVBuffer
+#include "Engine/rdMaterial.h" // TODO move tVBuffer
 #include "Dss/sithMulti.h"
 #include "stdPlatform.h"
 #include "jk.h"

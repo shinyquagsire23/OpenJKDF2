@@ -110,16 +110,16 @@ uint32_t stdHashtbl_HashStringToIdx(const char *data, uint32_t numBuckets)
     return hash % numBuckets;
 }
 
-stdHashTable* stdHashtbl_New(int maxEntries)
+tHashTable* stdHashtbl_New(int maxEntries)
 {
-    stdHashTable *hashtable;
+    tHashTable *hashtable;
     int sizeIterIdx;
     signed int calcedPrime;
     int *sizeIter;
     int actualNumBuckets = 1999;
     signed int v7;
 
-    hashtable = (stdHashTable *)STD_ALLOC(sizeof(stdHashTable));
+    hashtable = (tHashTable *)STD_ALLOC(sizeof(tHashTable));
     if (!hashtable)
         return NULL;
 
@@ -133,7 +133,7 @@ stdHashTable* stdHashtbl_New(int maxEntries)
     // means everything is an O(1) lookup but also that the linked lists
     // never actually get uh, linked. lol
     //
-    // So this just log2's the argument to make stdHashTable smaller in RAM
+    // So this just log2's the argument to make tHashTable smaller in RAM
     // and O(log2(n)) lookups
 #ifdef STDHASHTABLE_LOG2_BUCKETS
     maxEntries = (int)log2(maxEntries) / 2;
@@ -224,7 +224,7 @@ void stdHashtbl_FreeListNodes(tHashLink *a1)
     }
 }
 
-void stdHashtbl_Free(stdHashTable *table)
+void stdHashtbl_Free(tHashTable *table)
 {
     int bucketIdx;
     int bucketIdx2;
@@ -253,7 +253,7 @@ void stdHashtbl_Free(stdHashTable *table)
     STD_FREE(table);
 }
 
-int stdHashtbl_Add(stdHashTable *hashmap, const char *key, void *value)
+int stdHashtbl_Add(tHashTable *hashmap, const char *key, void *value)
 {
     tHashLink *new_child; // eax
     tHashLink *v9; // ecx
@@ -317,7 +317,7 @@ int stdHashtbl_Add(stdHashTable *hashmap, const char *key, void *value)
     return 1;
 }
 
-void* stdHashtbl_Find(stdHashTable *hashmap, const char *key)
+void* stdHashtbl_Find(tHashTable *hashmap, const char *key)
 {
     tHashLink *i;
     tHashLink *foundKey;
@@ -363,7 +363,7 @@ void* stdHashtbl_Find(stdHashTable *hashmap, const char *key)
     return 0;
 }
 
-int stdHashtbl_Remove(stdHashTable *hashtable, const char *key)
+int stdHashtbl_Remove(tHashTable *hashtable, const char *key)
 {
     int v2;
     tHashLink *foundKey;
@@ -455,7 +455,7 @@ int stdHashtbl_Remove(stdHashTable *hashtable, const char *key)
 }
 
 #ifdef STDHASHTABLE_CRC32_KEYS
-int stdHashtbl_FreeKeyCrc32(stdHashTable *hashtable, uint32_t keyCrc32)
+int stdHashtbl_FreeKeyCrc32(tHashTable *hashtable, uint32_t keyCrc32)
 {
     int v2;
     tHashLink *foundKey;
@@ -525,7 +525,7 @@ int stdHashtbl_FreeKeyCrc32(stdHashTable *hashtable, uint32_t keyCrc32)
 }
 #endif
 
-void stdHashtbl_PrintTableDiagnostics(stdHashTable *hashtable)
+void stdHashtbl_PrintTableDiagnostics(tHashTable *hashtable)
 {
     int maxLookups; // edi
     int bucketIdx2; // ebp
@@ -569,7 +569,7 @@ void stdHashtbl_PrintTableDiagnostics(stdHashTable *hashtable)
     std_g_pHS->debugPrint("---------------------\n");
 }
 
-void stdHashtbl_DumpTable(stdHashTable *hashtable)
+void stdHashtbl_DumpTable(tHashTable *hashtable)
 {
     int index;
     tHashLink *key_iter;

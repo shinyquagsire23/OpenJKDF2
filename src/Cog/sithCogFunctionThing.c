@@ -1882,7 +1882,7 @@ void sithCogFunctionThing_ParseArg(sithCog *ctx)
         stdConffile_ReadArgsFromStr(std_g_genBuffer);
         for (int i = 0 ; i < stdConffile_g_entry.numArgs; i++)
         {
-            stdConffileArg* arg = &stdConffile_g_entry.args[i];
+            StdConffileArg* arg = &stdConffile_g_entry.args[i];
             sithThing_ParseArg(arg, pThing);
         }
     }

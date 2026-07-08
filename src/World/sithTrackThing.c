@@ -280,7 +280,7 @@ void sithTrackThing_PrepareForOrient(SithThing *thing, rdVector3 *pGoalFrameRot,
     }
 }
 
-int sithTrackThing_LoadPathParams(stdConffileArg *arg, SithThing *thing, int param)
+int sithTrackThing_LoadPathParams(StdConffileArg *arg, SithThing *thing, int param)
 {
     switch (param)
     {

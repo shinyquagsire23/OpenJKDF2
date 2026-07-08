@@ -4,7 +4,7 @@
 #include "General/stdBitmap.h"
 #include "General/stdString.h"
 #include "General/stdFont.h"
-#include "Engine/rdMaterial.h" // TODO move stdVBuffer
+#include "Engine/rdMaterial.h" // TODO move tVBuffer
 #include "stdPlatform.h"
 #include "jk.h"
 #include "Gui/jkGUIRend.h"
@@ -294,7 +294,7 @@ void jkGuiForce_ChoiceRemoveStars(jkGuiMenu *menu)
     }
 }
 
-void jkGuiForce_ForceStarsDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)
+void jkGuiForce_ForceStarsDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, int redraw)
 {
     int spendStars = (int)sithPlayer_GetInvItemAmount(SITHBIN_SPEND_STARS);
     if ( spendStars <= 0 )
@@ -308,7 +308,7 @@ void jkGuiForce_ForceStarsDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffe
     }
     else
     {
-        stdVBuffer* bitmap = jkGuiForce_aBitmaps[IDX_FOSTARS]->mipSurfaces[Main_bMotsCompat ? 10 : 0];
+        tVBuffer* bitmap = jkGuiForce_aBitmaps[IDX_FOSTARS]->mipSurfaces[Main_bMotsCompat ? 10 : 0];
 
         // MOTS added
         int spendStarsVisualMax = element->rect.width / bitmap->format.width;
@@ -820,6 +820,6 @@ void jkGuiForce_UpdateViewForRank()
     }
 }
 
-void jkGuiForce_DarkLightHoverDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)
+void jkGuiForce_DarkLightHoverDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, int redraw)
 {
 }

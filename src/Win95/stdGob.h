@@ -28,8 +28,8 @@
 
 #define GOB_VERSION_LATEST (20)
 
-typedef struct stdGob stdGob;
-typedef struct stdHashTable stdHashTable;
+typedef struct Gob Gob;
+typedef struct tHashTable tHashTable;
 
 typedef struct stdGobHeader
 {
@@ -56,10 +56,10 @@ typedef struct stdGobDiskEntry
     char fname[128];
 } stdGobDiskEntry;
 
-typedef struct stdGobFile
+typedef struct GobFileHandle
 {
     uint32_t isOpen;
-    stdGob* parent;
+    Gob* parent;
     stdGobEntry* entry;
     int32_t seekOffs;
 #ifdef QOL_IMPROVEMENTS
@@ -67,40 +67,40 @@ typedef struct stdGobFile
     intptr_t pMemory;
     size_t memorySz;
 #endif
-} stdGobFile;
+} GobFileHandle;
 
-typedef struct stdGob
+typedef struct Gob
 {
     char fpath[128];
     stdFile_t fhand;
     uint32_t numFiles;
     stdGobEntry* entries;
-    stdHashTable* entriesHashtable;
+    tHashTable* entriesHashtable;
     uint32_t numFilesOpen;
-    stdGobFile *openedFile;
-    stdGobFile *lastReadFile;
+    GobFileHandle *openedFile;
+    GobFileHandle *lastReadFile;
     uint32_t viewMapped;
     void* viewAddr;
     uint32_t viewHandle2;
     uint32_t viewHandle;
-} stdGob;
+} Gob;
 
 int stdGob_Startup(HostServices *pHS_in);
 void stdGob_Shutdown();
-stdGob* stdGob_Load(char *fpath, int a2, int a3);
-int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4);
-void stdGob_Free(stdGob *gob);
-void stdGob_FreeEntry(stdGob *gob);
-stdGobFile* stdGob_FileOpen(stdGob *gob, const char *filepath);
-void stdGob_FileClose(stdGobFile *f);
-int stdGob_FileSeek(stdGobFile *f, int pos, int whence);
-int32_t stdGob_FileTell(stdGobFile *f);
-bool stdGob_FileEOF(stdGobFile *f);
-size_t stdGob_FileRead(stdGobFile *f, void *out, uint32_t len);
-const char* stdGob_FileGets(stdGobFile *f, char *out, unsigned int len);
-const wchar_t* stdGob_FileGetws(stdGobFile *f, wchar_t *out, unsigned int len);
+Gob* stdGob_Load(char *fpath, int a2, int a3);
+int stdGob_LoadEntry(Gob *gob, char *fname, int a3, int a4);
+void stdGob_Free(Gob *gob);
+void stdGob_FreeEntry(Gob *gob);
+GobFileHandle* stdGob_FileOpen(Gob *gob, const char *filepath);
+void stdGob_FileClose(GobFileHandle *f);
+int stdGob_FileSeek(GobFileHandle *f, int pos, int whence);
+int32_t stdGob_FileTell(GobFileHandle *f);
+bool stdGob_FileEOF(GobFileHandle *f);
+size_t stdGob_FileRead(GobFileHandle *f, void *out, uint32_t len);
+const char* stdGob_FileGets(GobFileHandle *f, char *out, unsigned int len);
+const wchar_t* stdGob_FileGetws(GobFileHandle *f, wchar_t *out, unsigned int len);
 
 // ADDED
-size_t stdGob_FileSize(stdGobFile *f);
+size_t stdGob_FileSize(GobFileHandle *f);
 
 #endif // _STDGOB_H

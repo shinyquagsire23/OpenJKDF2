@@ -127,7 +127,7 @@ void sithExplosion_MakeBlast(SithThing *explosion)
     }
 }
 
-int sithExplosion_ParseArg(stdConffileArg *arg, SithThing *thing, int param)
+int sithExplosion_ParseArg(StdConffileArg *arg, SithThing *thing, int param)
 {
     int v15; // esi
     SithThing **i; // eax

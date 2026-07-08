@@ -29,8 +29,8 @@ static flex_d_t aGammaTable[10] = {
 
 #ifdef SDL2_RENDER
 rdCanvas* Video_pCanvasOverlayMap = NULL;
-stdVBuffer* Video_pOverlayMapBuffer = NULL;
-stdVBuffer Video_overlayMapBuffer;
+tVBuffer* Video_pOverlayMapBuffer = NULL;
+tVBuffer Video_overlayMapBuffer;
 #endif
 
 void Video_SwitchToGDI()

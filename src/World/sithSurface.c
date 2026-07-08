@@ -245,10 +245,10 @@ int sithSurface_ReadSurfacesListText(SithWorld *world)
             if (face->material && face->material->bDataLoaded) {
                 rdMaterial* mat = face->material;
                 rdTexture* texture = &mat->textures[0];
-                stdVBuffer* lowestMipBuf = NULL;
+                tVBuffer* lowestMipBuf = NULL;
                 for (int mip = 0; mip < texture->num_mipmaps; mip++) {
                     if (!texture->texture_struct) continue;
-                    stdVBuffer* buf = texture->texture_struct[mip];
+                    tVBuffer* buf = texture->texture_struct[mip];
                     if (buf && buf->surface_lock_alloc && !buf->format.format.is16bit) {
                         lowestMipBuf = buf;
                     }

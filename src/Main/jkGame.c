@@ -272,7 +272,7 @@ int jkGame_Update()
 #endif
 
 #if defined(SDL2_RENDER)
-    stdVBuffer* pOverlayBuffer = Video_pCanvasOverlayMap->vbuffer;
+    tVBuffer* pOverlayBuffer = Video_pCanvasOverlayMap->vbuffer;
     stdDisplay_VBufferLock(pOverlayBuffer);
     stdDisplay_VBufferFill(pOverlayBuffer, Video_fillColor, 0);
     stdDisplay_VBufferUnlock(pOverlayBuffer);

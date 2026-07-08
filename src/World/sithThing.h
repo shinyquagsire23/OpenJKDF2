@@ -71,9 +71,9 @@ void sithThing_FreeThing(SithThing* pThing);
 MATH_FUNC void sithThing_Initialize(SithThing* pThing);
 int sithThing_Reset(SithThing* pThing);
 SithThing* sithThing_SetThingBasedOn(SithThing *pThing, SithThing *pTemplateThing);
-int sithThing_ParseArg(stdConffileArg *arg, SithThing* pThing);
+int sithThing_ParseArg(StdConffileArg *arg, SithThing* pThing);
 int sithThing_ReadStaticThingsListText(SithWorld *pWorld, int a2);
-int sithThing_ParseThingArg(stdConffileArg *arg, SithThing* pThing, int param);
+int sithThing_ParseThingArg(StdConffileArg *arg, SithThing* pThing, int param);
 void sithThing_SetPositionAndOrient(SithThing *pThing, rdVector3 *pos, rdMatrix34 *rot);
 int sithThing_SetThingModel(SithThing* pThing, rdModel3 *model);
 void sithThing_ExitSector(SithThing* pThing);
@@ -110,12 +110,12 @@ int sithThing_MotsTick(int param_1,int param_2,flex_t param_3); // MOTS added
 //static flex_t (*sithThing_Hit)(SithThing *sender, SithThing *receiver, flex_t amount, int a4) = (void*)sithThing_Hit_ADDR;
 //static void (*sithThing_AttachThingToThingFace)(SithThing *a1, SithThing *a2, rdFace *a3, rdVector3* a4, int a5) = (void*)sithThing_AttachThingToThingFace_ADDR;
 //static int (*_sithThing_Load)(SithWorld *pWorld, int a2) = (void*)sithThing_ReadStaticThingsListText_ADDR;
-//static int (*sithThing_ParseThingArg)(stdConffileArg *arg, SithThing* pThing, int param) = (void*)sithThing_ParseThingArg_ADDR;
-//static int (*sithThing_LoadActorPlayerParams)(stdConffileArg *arg, SithThing* pThing, unsigned int param) = (void*)sithThing_LoadActorPlayerParams_ADDR;
+//static int (*sithThing_ParseThingArg)(StdConffileArg *arg, SithThing* pThing, int param) = (void*)sithThing_ParseThingArg_ADDR;
+//static int (*sithThing_LoadActorPlayerParams)(StdConffileArg *arg, SithThing* pThing, unsigned int param) = (void*)sithThing_LoadActorPlayerParams_ADDR;
 //static void (*sithThing_UpdateMove)(SithThing* pThing, flex_t arg4) = (void*)sithThing_UpdateMove_ADDR;
 //static int (__cdecl *sithThing_Reset)(SithThing* pThing) = (void*)0x4CD190;
 //static int (__cdecl *sithThing_SetThingBasedOn)(SithThing* pThing, SithThing *a2) = (void*)0x4CD8A0;
-//static signed int (*sithThing_ParseArg)(stdConffileArg *a1, SithThing* pThing) = (void*)0x004CEB90;
+//static signed int (*sithThing_ParseArg)(StdConffileArg *a1, SithThing* pThing) = (void*)0x004CEB90;
 //static void (*sithThing_FreeWorldThings)(SithWorld* pWorld) = (void*)sithThing_FreeWorldThings_ADDR;
 
 //static SithThing* (*sithThing_CreateThingAtPos)(SithThing *a1, rdVector3 *a2, const rdMatrix34 *a3, SithSector *sector, SithThing *a5) = (void*)sithThing_CreateThingAtPos_ADDR;
