@@ -79,8 +79,8 @@ void sithExplosion_MakeBlast(sithThing *explosion)
     if ( range > 0.0 && (damage > 0.0 || force > 0.0) )
     {
         sithAIAwareness_CreateTransmittingEvent(explosion->sector, &explosion->position, 1, 3.0, explosion);
-        sithCollision_SearchRadiusForThings(explosion->sector, 0, &explosion->position, &rdroid_zeroVector3, 0.0, range, RAYCAST_400 | RAYCAST_80 | RAYCAST_2);
-        for ( i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult() )
+        sithCollision_SearchForCollisions(explosion->sector, 0, &explosion->position, &rdroid_zeroVector3, 0.0, range, RAYCAST_400 | RAYCAST_80 | RAYCAST_2);
+        for ( i = sithCollision_PopStack(); i; i = sithCollision_PopStack() )
         {
             flex_d_t v3 = i->distance / range;
             flex_t a1a = rdMath_clampf(1.0 - (v3 * v3), 0.25, 1.0);
@@ -95,7 +95,7 @@ void sithExplosion_MakeBlast(sithThing *explosion)
                 if ( ((explosion->explosionParams.typeflags & SITHEXPLOSION_FLAG_NO_DAMAGE_TO_SHOOTER) == 0
                    || v4 != explosion->prev_thing
                    || v4->signature != explosion->child_signature)
-                  && sithCollision_HasLos(explosion, v4, 1) )
+                  && sithCollision_HasLOS(explosion, v4, 1) )
                 {
                     if ( force != 0.0 && v4->moveType == SITH_MT_PHYSICS && (v4->physicsParams.physflags & SITH_PF_FEELBLASTFORCE) != 0 )
                     {
@@ -109,7 +109,7 @@ void sithExplosion_MakeBlast(sithThing *explosion)
                 }
             }
         }
-        sithCollision_SearchClose();
+        sithCollision_DecreaseStackLevel();
     }
     
     debrisTemplates = explosion->explosionParams.debrisTemplates;

@@ -273,7 +273,7 @@ void sithCamera_Update(sithCamera *cam)
             }
             // Added: nullptr check
             if (focusThing->sector)
-                cam->sector = sithCollision_GetSectorLookAt(focusThing->sector, &focusThing->position, &cam->viewMat.scale, 0.02);
+                cam->sector = sithCollision_FindSectorInRadius(focusThing->sector, &focusThing->position, &cam->viewMat.scale, 0.02);
             break;
         case 4:
             if ( focusThing->type == SITH_THING_ACTOR || focusThing->type == SITH_THING_PLAYER )
@@ -347,7 +347,7 @@ void sithCamera_Update(sithCamera *cam)
         case 128:
             rdMatrix_Copy34(&cam->viewMat, &sithCamera_viewMat);
             rdMatrix_PostTranslate34(&cam->viewMat, &focusThing->position);
-            cam->sector = sithCollision_GetSectorLookAt(focusThing->sector, &focusThing->position, &cam->viewMat.scale, 0.02);
+            cam->sector = sithCollision_FindSectorInRadius(focusThing->sector, &focusThing->position, &cam->viewMat.scale, 0.02);
             break;
         default:
             break;
@@ -574,8 +574,8 @@ sithSector* sithCamera_SearchSectorInRadius(sithThing *a3, sithSector *a2, rdVec
     v7 = rdVector_Normalize3Acc(&a5);
     a6a = v7;
     v9 = a2;
-    sithCollision_SearchRadiusForThings(a2, a3, a4, &a5, a6a, a7, flags | RAYCAST_800);
-    for ( i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult() )
+    sithCollision_SearchForCollisions(a2, a3, a4, &a5, a6a, a7, flags | RAYCAST_800);
+    for ( i = sithCollision_PopStack(); i; i = sithCollision_PopStack() )
     {
         if ( (i->hitType & SITHCOLLISION_ADJOINCROSS) != 0 )
         {
@@ -588,7 +588,7 @@ sithSector* sithCamera_SearchSectorInRadius(sithThing *a3, sithSector *a2, rdVec
             break;
         }
     }
-    sithCollision_SearchClose();
+    sithCollision_DecreaseStackLevel();
     return v9;
 }
 

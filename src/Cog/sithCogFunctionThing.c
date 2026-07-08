@@ -2225,7 +2225,7 @@ void sithCogFunctionThing_HasLos(sithCog *ctx)
 
     if ( pThingA && pThingB )
     {
-        if (sithCollision_HasLos(pThingA, pThingB, 0))
+        if (sithCollision_HasLOS(pThingA, pThingB, 0))
             sithCogExec_PushInt(ctx, 1);
         else
             sithCogExec_PushInt(ctx, 0);

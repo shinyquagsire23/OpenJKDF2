@@ -316,7 +316,7 @@ int sithMulti_GetSpawnIdx(sithThing *pPlayerThing)
     {
         v8 = v12[v7];
         v8 = v8 % realMaxSpawns; // Added: HACK for weird maps w/ <32 spawn points
-        sithCollision_SearchRadiusForThings(
+        sithCollision_SearchForCollisions(
             jkPlayer_playerInfos[v8].pSpawnSector,
             0,
             &jkPlayer_playerInfos[v8].spawnPosOrient.scale,
@@ -324,7 +324,7 @@ int sithMulti_GetSpawnIdx(sithThing *pPlayerThing)
             0.0,
             pPlayerThing->moveSize,
             RAYCAST_400 | RAYCAST_80 | RAYCAST_2);
-        for ( i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult() )
+        for ( i = sithCollision_PopStack(); i; i = sithCollision_PopStack() )
         {
             if ( (i->hitType & SITHCOLLISION_THING) != 0 )
             {
@@ -333,7 +333,7 @@ int sithMulti_GetSpawnIdx(sithThing *pPlayerThing)
                     break;
             }
         }
-        sithCollision_SearchClose();
+        sithCollision_DecreaseStackLevel();
         if ( !i || v11 >= v2 )
             break;
         ++v11;

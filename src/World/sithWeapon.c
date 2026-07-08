@@ -108,8 +108,8 @@ void sithWeapon_sub_4D35E0(sithThing *weapon)
     sector = weapon->sector;
     rdVector_Copy3(&weaponPos_, weaponPos);
     moveSize = weapon->moveSize;
-    sithCollision_SearchRadiusForThings(sector, weapon, &weapon->position, &weaponPos_, weapon->weaponParams.range, moveSize, 0);
-    searchRes = sithCollision_NextSearchResult();
+    sithCollision_SearchForCollisions(sector, weapon, &weapon->position, &weaponPos_, weapon->weaponParams.range, moveSize, 0);
+    searchRes = sithCollision_PopStack();
     if ( searchRes )
     {
         while ( 1 )
@@ -130,7 +130,7 @@ void sithWeapon_sub_4D35E0(sithThing *weapon)
             if ( (searchRes->hitType & SITHCOLLISION_ADJOINCROSS) == 0 )
                 break;
             sector = searchRes->surface->adjoin->sector;
-            searchRes = sithCollision_NextSearchResult();
+            searchRes = sithCollision_PopStack();
             if ( !searchRes )
                 goto LABEL_20;
         }
@@ -166,7 +166,7 @@ void sithWeapon_sub_4D35E0(sithThing *weapon)
     }
 
 LABEL_20:
-    sithCollision_SearchClose();
+    sithCollision_DecreaseStackLevel();
     if ( !searchRes
       && (weapon->weaponParams.typeflags & SITH_WF_OBJECT_TRAIL) != 0
       && weapon->weaponParams.trailThing
@@ -250,13 +250,13 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
     range = weapon->weaponParams.range;
     elementSize_ = elementSize;
     sector = weapon->sector;
-    sithCollision_SearchRadiusForThings(sector, weapon, &weapon->position, &lookOrient, range, moveSize, 0);
+    sithCollision_SearchForCollisions(sector, weapon, &weapon->position, &lookOrient, range, moveSize, 0);
     elementSize__ = weapon->weaponParams.elementSize;
     _memcpy(&camera, &weapon->lookOrientation, sizeof(camera));
     vertex.x = 0.0;
     vertex.y = elementSize__;
     vertex.z = 0.0;
-    searchRes = sithCollision_NextSearchResult();
+    searchRes = sithCollision_PopStack();
     if ( searchRes )
     {
         while ( 1 )
@@ -304,7 +304,7 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
                         rdVector_ExtractAngle(&tmp, &rot);
                         rdMatrix_BuildRotate34(&camera, &rot);
                     }
-                    sectorLook = sithCollision_GetSectorLookAt(sector, &a3, &weaponPos, 0.0);
+                    sectorLook = sithCollision_FindSectorInRadius(sector, &a3, &weaponPos, 0.0);
                     sithThing_Create(weapon->weaponParams.trailThing, &weaponPos, &camera, sectorLook, 0);
                     rdMatrix_TransformPoint34(&vertex_out, &vertex, &camera);
                     rdVector_Add3Acc(&weaponPos, &vertex_out);
@@ -314,7 +314,7 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
             if ( (searchRes->hitType & SITHCOLLISION_ADJOINCROSS) == 0 )
                 break;
             sector = searchRes->surface->adjoin->sector;
-            searchRes = sithCollision_NextSearchResult();
+            searchRes = sithCollision_PopStack();
             if ( !searchRes )
                 goto LABEL_25;
         }
@@ -354,7 +354,7 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
         }
     }
 LABEL_25:
-    sithCollision_SearchClose();
+    sithCollision_DecreaseStackLevel();
     if ( !searchRes
       && (weapon->weaponParams.typeflags & SITH_WF_OBJECT_TRAIL) != 0
       && weapon->weaponParams.trailThing
@@ -396,7 +396,7 @@ LABEL_25:
                 rdVector_ExtractAngle(&tmp, &rot);
                 rdMatrix_BuildRotate34(&camera, &rot);
             }
-            sectorLook_ = sithCollision_GetSectorLookAt(sector, &a3, &weaponPos, 0.0);
+            sectorLook_ = sithCollision_FindSectorInRadius(sector, &a3, &weaponPos, 0.0);
             sithThing_Create(weapon->weaponParams.trailThing, &weaponPos, &camera, sectorLook_, 0);
             rdMatrix_TransformPoint34(&vertex_out, &vertex, &camera);
             rdVector_Add3Acc(&weaponPos, &vertex_out);
@@ -569,7 +569,7 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
         if (!rdVector_IsZero3(&a1))
         {
             a6a = rdVector_Normalize3Acc(&a1);
-            sithCollision_UpdateThingCollision(v9, &a1, a6a, 0);
+            sithCollision_MoveThing(v9, &a1, a6a, 0);
         }
         if ( a9 > 0.02 )
         {
@@ -578,7 +578,7 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
             if ( v17 > 0.0 )
             {
                 a6c = v17;
-                sithCollision_UpdateThingCollision(v9, &a5a, a6c, v9->physicsParams.physflags);
+                sithCollision_MoveThing(v9, &a5a, a6c, v9->physicsParams.physflags);
             }
         }
 
@@ -587,9 +587,9 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
         {
             v18 = rdVector_Normalize3(&a5a, &v9->physicsParams.vel) * 3.0;
             a6 = v18 >= 5.0 ? (flex_t)5.0 : (flex_t)v18; // FLEXTODO
-            sithCollision_SearchRadiusForThings(v9->sector, v9, &v9->position, &a5a, a6, 0.0, RAYCAST_2);
-            v19 = sithCollision_NextSearchResult();
-            sithCollision_SearchClose();
+            sithCollision_SearchForCollisions(v9->sector, v9, &v9->position, &a5a, a6, 0.0, RAYCAST_2);
+            v19 = sithCollision_PopStack();
+            sithCollision_DecreaseStackLevel();
             if (v19 && v19->hitType & SITHCOLLISION_THING)
             {
                 v20 = v19->receiver;
@@ -666,7 +666,7 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
         if ( physicsThing->weaponParams.numDeflectionBounces++ < MAX_DEFLECTION_BOUNCES )
         {
             rdVector3 v31 = physicsThing->physicsParams.vel;
-            result = sithCollision_DebrisDebrisCollide(physicsThing, collidedThing, a4, 0);
+            result = sithCollision_ThingCollisionHandler(physicsThing, collidedThing, a4, 0);
             if ( result )
             {
                 v8 = rdVector_Dot3(&a4->hitNorm, &v31) * -2.0;
@@ -704,7 +704,7 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
             return 1;
         }
         if (!(physicsThing->weaponParams.typeflags & SITH_WF_ATTACH_TO_WALL)) {
-            return sithCollision_DebrisDebrisCollide(physicsThing, collidedThing, a4, a5);
+            return sithCollision_ThingCollisionHandler(physicsThing, collidedThing, a4, a5);
         }
         sithPhysics_ThingStop(physicsThing);
         sithSoundClass_StopMode(physicsThing, SITH_PF_USEGRAVITY);
@@ -728,7 +728,7 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
     if ( physicsThing->weaponParams.damage == 0.0 && !(physicsThing->weaponParams.typeflags & (SITH_WF_ATTACH_TO_THING | SITH_WF_EXPLODE_ON_THING_HIT)))
         return 0;
 
-    if (sithCollision_DebrisDebrisCollide(physicsThing, collidedThing, a4, a5))
+    if (sithCollision_ThingCollisionHandler(physicsThing, collidedThing, a4, a5))
     {
         if (physicsThing->weaponParams.damage != 0.0) {
             sithThing_Damage(collidedThing, physicsThing, physicsThing->weaponParams.damage, physicsThing->weaponParams.damageClass);
@@ -792,7 +792,7 @@ int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSea
       && (++thing->weaponParams.numDeflectionBounces < MAX_DEFLECTION_BOUNCES) )
     {
         thing->physicsParams.physflags |= SITH_PF_SURFACEBOUNCE;
-        sithCollision_DefaultHitHandler(thing, surface, a3);
+        sithCollision_HandleThingHitSurface(thing, surface, a3);
         if ( (thing->physicsParams.physflags & SITH_PF_SURFACEBOUNCE) == 0 )
         {
             thing->physicsParams.physflags &= ~SITH_PF_SURFACEBOUNCE;
@@ -823,11 +823,11 @@ int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSea
         }
         if ( (thing->weaponParams.typeflags & SITH_WF_ATTACH_TO_WALL) == 0 )
         {
-            result = sithCollision_DefaultHitHandler(thing, surface, a3);
+            result = sithCollision_HandleThingHitSurface(thing, surface, a3);
         }
         else
         {
-            sithCollision_DefaultHitHandler(thing, surface, a3);
+            sithCollision_HandleThingHitSurface(thing, surface, a3);
             sithPhysics_ThingStop(thing);
             sithSoundClass_StopMode(thing, SITH_SC_CREATE);
             thing->moveSize = 0.0;
@@ -1320,7 +1320,7 @@ void sithWeapon_ProjectileAutoAim(rdMatrix34 *out, sithThing *sender, rdMatrix34
             v12 = *v11;
             if ( *v11 != sender && (v12->actorParams.typeflags & SITH_AF_NOTARGET) == 0 )
             {
-                if ( sithCollision_HasLos(sender, v12, 0) )
+                if ( sithCollision_HasLOS(sender, v12, 0) )
                 {
                     v13 = *v11;
                     rdVector_Sub3(&v16, &v13->position, &sender->position);

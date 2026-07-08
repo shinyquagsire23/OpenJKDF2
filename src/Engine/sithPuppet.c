@@ -353,7 +353,7 @@ void sithPuppet_Tick(sithThing *thing, flex_t deltaSeconds)
             if (!rdVector_IsZero3(&a1a))
             {
                 a2a = rdVector_Normalize3Acc(&a1a);
-                sithCollision_UpdateThingCollision(thing, &a1a, a2a, 0);
+                sithCollision_MoveThing(thing, &a1a, a2a, 0);
             }
             v23 = thing->rdthing.hierarchyNodeMatrices;
             rdVector_Sub3(&a1a, &thing->position, &v23->scale);

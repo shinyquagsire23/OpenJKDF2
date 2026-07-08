@@ -42,24 +42,24 @@ void sithPhysics_FindFloor(sithThing *pThing, int a3)
     // There are no floors underwater, unless you're the player
     if ((pThing->sector->flags & SITH_SECTOR_UNDERWATER) && pThing->type == SITH_THING_PLAYER)
     {
-        sithCollision_SearchRadiusForThings(pThing->sector, pThing, &pThing->position, &rdroid_zVector3, 0.05, 0.0, RAYCAST_1);
-        v5 = sithCollision_NextSearchResult();
+        sithCollision_SearchForCollisions(pThing->sector, pThing, &pThing->position, &rdroid_zVector3, 0.05, 0.0, RAYCAST_1);
+        v5 = sithCollision_PopStack();
         if ( v5 )
         {
             while ( (v5->hitType & SITHCOLLISION_ADJOINCROSS) == 0 || (v5->surface->adjoin->sector->flags & SITH_SECTOR_UNDERWATER) != 0 )
             {
-                v5 = sithCollision_NextSearchResult();
+                v5 = sithCollision_PopStack();
                 if ( !v5 )
                     goto LABEL_8;
             }
             pThing->field_48 = v5->distance;
             pThing->physicsParams.physflags |= SITH_PF_WATERSURFACE;
-            sithCollision_SearchClose();
+            sithCollision_DecreaseStackLevel();
         }
         else
         {
 LABEL_8:
-            sithCollision_SearchClose();
+            sithCollision_DecreaseStackLevel();
             pThing->physicsParams.physflags &= ~SITH_PF_WATERSURFACE;
         }
     }
@@ -100,16 +100,16 @@ LABEL_8:
 
         if ( v8 > 0.0 )
         {
-            sithCollision_SearchRadiusForThings(pThing->sector, 0, &pThing->position, &direction, v8, 0.0, searchFlags | RAYCAST_2000 | RAYCAST_800 | RAYCAST_2);
+            sithCollision_SearchForCollisions(pThing->sector, 0, &pThing->position, &direction, v8, 0.0, searchFlags | RAYCAST_2000 | RAYCAST_800 | RAYCAST_2);
             while ( 1 )
             {
-                for ( i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult() )
+                for ( i = sithCollision_PopStack(); i; i = sithCollision_PopStack() )
                 {
                     if ( (i->hitType & SITHCOLLISION_WORLD) != 0 )
                     {
                         //printf("Attach to new surface? %x\n", i->surface->field_0);
                         sithThing_AttachToSurface(pThing, i->surface, a3);
-                        sithCollision_SearchClose();
+                        sithCollision_DecreaseStackLevel();
                         return;
                     }
                     if ( (i->hitType & SITHCOLLISION_THING) != 0 )
@@ -120,7 +120,7 @@ LABEL_8:
                             v12 = i->face;
                             if ( !v12 || !i->sender )
                             {
-                                sithCollision_SearchClose();
+                                sithCollision_DecreaseStackLevel();
                                 return;
                             }
                             
@@ -129,13 +129,13 @@ LABEL_8:
                               || (rdMatrix_TransformVector34(&a1, &v12->normal, &v11->lookOrientation), rdVector_Dot3(&a1, &rdroid_zVector3) >= 0.6) )
                             {
                                 sithThing_LandThing(pThing, v11, i->face, i->sender->vertices, a3);
-                                sithCollision_SearchClose();
+                                sithCollision_DecreaseStackLevel();
                                 return;
                             }
                         }
                     }
                 }
-                sithCollision_SearchClose();
+                sithCollision_DecreaseStackLevel();
                 if ( range != 0.0 )
                     break;
 
@@ -144,7 +144,7 @@ LABEL_8:
                 if ( pThing->moveSize == 0.0 )
                     break;
                 range = pThing->moveSize;
-                sithCollision_SearchRadiusForThings(pThing->sector, 0, &pThing->position, &direction, v8, range, searchFlags | RAYCAST_2000 | RAYCAST_800 | RAYCAST_2);
+                sithCollision_SearchForCollisions(pThing->sector, 0, &pThing->position, &direction, v8, range, searchFlags | RAYCAST_2000 | RAYCAST_800 | RAYCAST_2);
             }
         }
         if ( pThing->attach_flags )
@@ -491,7 +491,7 @@ void sithPhysics_ThingPhysGeneral(sithThing *pThing, flex_t deltaSeconds)
     if (!rdVector_IsZero3(&a3))
     {
         rdMatrix_BuildRotate34(&a, &a3);
-        sithCollision_sub_4E7670(pThing, &a);
+        sithCollision_RotateThing(pThing, &a);
 
         if (pThing->physicsParams.physflags & SITH_PF_FLY)
             rdMatrix_TransformVector34Acc(&pThing->physicsParams.vel, &a);
@@ -620,7 +620,7 @@ void sithPhysics_ThingPhysPlayer(sithThing *player, flex_t deltaSeconds)
     if (!rdVector_IsZero3(&a3))
     {
         rdMatrix_BuildRotate34(&a, &a3);
-        sithCollision_sub_4E7670(player, &a);
+        sithCollision_RotateThing(player, &a);
 
         if (player->physicsParams.physflags & SITH_PF_FLY)
             rdMatrix_TransformVector34Acc(&player->physicsParams.vel, &a);
@@ -712,7 +712,7 @@ void sithPhysics_ThingPhysUnderwater(sithThing *pThing, flex_t deltaSeconds)
     if (!rdVector_IsZero3(&a3))
     {
         rdMatrix_BuildRotate34(&tmpMat, &a3);
-        sithCollision_sub_4E7670(pThing, &tmpMat);
+        sithCollision_RotateThing(pThing, &tmpMat);
         if ( (((jkPlayer_currentTickIdx & 0xFF) + (pThing->thingIdx & 0xFF)) & 7) == 0 )
             rdMatrix_Normalize34(&pThing->lookOrientation);
     }
@@ -896,7 +896,7 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, flex_t deltaSeconds)
 #endif
 
         rdMatrix_BuildRotate34(&a, &a3);
-        sithCollision_sub_4E7670(pThing, &a);
+        sithCollision_RotateThing(pThing, &a);
         if ( possibly_undef_2 >= 1.0 )
         {
             rdMatrix_TransformVector34Acc(&pThing->physicsParams.vel, &a);
@@ -988,7 +988,7 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, flex_t deltaSeconds)
             if ( !rdVector_IsZero3(&a3) )
             {
                 rdMatrix_BuildRotate34(&a, &a3);
-                sithCollision_sub_4E7670(pThing, &a);
+                sithCollision_RotateThing(pThing, &a);
                 if ( (pThing->physicsParams.physflags & SITH_PF_FLY) != 0 )
                     rdMatrix_TransformVector34Acc(&pThing->physicsParams.vel, &a);
                 if ( ((jkPlayer_currentTickIdx + (pThing->thingIdx & 0xFF)) & 7) == 0 )

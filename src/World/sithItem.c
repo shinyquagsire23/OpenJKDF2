@@ -18,7 +18,7 @@ int sithItem_PlayerCollisionHandler(sithThing *a1, sithThing *a2, sithCollisionS
         // MOTS added
         if (Main_bMotsCompat && (a2->actorParams.typeflags & (THING_TYPEFLAGS_40000 | THING_TYPEFLAGS_8000000))) return 0;
 
-        if ( sithCollision_HasLos(a2, a1, 0) && a1->itemParams.respawnTime < sithTime_curMs )
+        if ( sithCollision_HasLOS(a2, a1, 0) && a1->itemParams.respawnTime < sithTime_curMs )
         {
             sithCog_SendMessageFromThing(a1, a2, SITH_MESSAGE_TOUCHED);
             a1->itemParams.respawnTime = sithTime_curMs + 500;

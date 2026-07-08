@@ -1091,13 +1091,13 @@ int sithAICmd_Jump(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinc
     }
     rdVector_Copy3(&tmpPos, &actorThing->position);
     rdVector_MultAcc3(&tmpPos, &rdroid_zVector3, aiclass->argsAsFloat[1]);
-    sithSector* result = sithCollision_GetSectorLookAt(actorSector, &actorThing->position, &tmpPos, 0.0);
+    sithSector* result = sithCollision_FindSectorInRadius(actorSector, &actorThing->position, &tmpPos, 0.0);
     if ( result )
     {
         pos.x = _actor->toMovePos.x * 0.1 + tmpPos.x;
         pos.y = _actor->toMovePos.y * 0.1 + tmpPos.y;
         pos.z = tmpPos.z;
-        result = sithCollision_GetSectorLookAt(result, &tmpPos, &pos, 0.0);
+        result = sithCollision_FindSectorInRadius(result, &tmpPos, &pos, 0.0);
         if ( result )
         {
             int tmp;

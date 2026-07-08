@@ -354,7 +354,7 @@ void sithThing_TickPhysics(sithThing *pThing, flex_t deltaSecs)
         if (qolSqueeze)
             pThing->moveSize *= SITHTHING_SQUEEZE_RADIUS_FACTOR;
 #endif
-        pThing->waggle = sithCollision_UpdateThingCollision(pThing, &v1, arg4a, v2);
+        pThing->waggle = sithCollision_MoveThing(pThing, &v1, arg4a, v2);
 #ifdef QOL_IMPROVEMENTS
         if (qolSqueeze)
             pThing->moveSize = qolSavedMoveSize;
@@ -1129,7 +1129,7 @@ sithThing* sithThing_SpawnTemplate(sithThing *pTemplateThing, sithThing *spawnTh
     rdVector_Sub3Acc(&diffVec, &v7);
     rdMatrix_TransformVector34(&dstVec, &diffVec, &spawnThing->lookOrientation);
     rdVector_Add3(&v7, &dstVec, &spawnThing->position);
-    v2 = sithCollision_GetSectorLookAt(spawnThing->sector, &spawnThing->position, &v7, 0.0);
+    v2 = sithCollision_FindSectorInRadius(spawnThing->sector, &spawnThing->position, &v7, 0.0);
     result = sithThing_Create(pTemplateThing, &v7, &spawnThing->lookOrientation, v2, 0);
     v4 = result;
     if ( result )

@@ -303,7 +303,7 @@ void sithActor_KillActor(sithThing *thing, sithThing *a3, int a4)
 
 int sithActor_SurfaceCollisionHandler(sithThing *thing, sithSurface *surface, sithCollisionSearchEntry *searchEnt)
 {
-    int ret = sithCollision_DefaultHitHandler(thing, surface, searchEnt);
+    int ret = sithCollision_HandleThingHitSurface(thing, surface, searchEnt);
     if (ret && thing->controlType == SITH_CT_AI) {
         sithAI_SetActorFireTarget(thing->actor, SITHAI_MODE_ACTIVE, 0);
     }
@@ -383,7 +383,7 @@ void sithActor_SetHeadPYR(sithThing *actor, const rdVector3 *eyePYR)
 
 int sithActor_ActorCollisionHandler(sithThing *thing, sithThing *thing2, sithCollisionSearchEntry *a3, int a4)
 {
-    int ret = sithCollision_DebrisDebrisCollide(thing, thing2, a3, a4);
+    int ret = sithCollision_ThingCollisionHandler(thing, thing2, a3, a4);
     if (ret)
     {
         if (thing->controlType == SITH_CT_AI && thing->actor)
@@ -435,7 +435,7 @@ int sithActor_thing_anim_blocked(sithThing *a1, sithThing *thing2, sithCollision
     rdVector_Normalize3Acc(&v18);
     if ( rdVector_Dot3(&v18, &a1a) < thing2->actorParams.fov )
         return 0;
-    if (!sithCollision_DebrisDebrisCollide(a1, thing2, a3, 0))
+    if (!sithCollision_ThingCollisionHandler(a1, thing2, a3, 0))
         return 0;
 
     rdVector_Neg3(&a1->physicsParams.vel, &vAngs);

@@ -210,17 +210,17 @@ void  jkSaber_UpdateCollision2(sithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
     rdMatrix34 tmpMat;
     
     playerInfo = pPlayerThing->playerInfo;
-    pSector = sithCollision_GetSectorLookAt(pPlayerThing->sector,&pPlayerThing->position,pSaberPos,0.0);
+    pSector = sithCollision_FindSectorInRadius(pPlayerThing->sector,&pPlayerThing->position,pSaberPos,0.0);
     if (!pSector) {
         return;
     }
-    sithCollision_SearchRadiusForThings(pSector,pPlayerThing,pSaberPos,pSaberDir,pCollideInfo->bladeLength,0.0,0);
+    sithCollision_SearchForCollisions(pSector,pPlayerThing,pSaberPos,pSaberDir,pCollideInfo->bladeLength,0.0,0);
     
 
     sithSector* pSectorIter = pSector;
     while (1) 
     {
-        searchResult = sithCollision_NextSearchResult();
+        searchResult = sithCollision_PopStack();
         if (!searchResult)
             break;
 
@@ -332,7 +332,7 @@ void  jkSaber_UpdateCollision2(sithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
             break;
         }
     }
-    sithCollision_SearchClose();
+    sithCollision_DecreaseStackLevel();
 }
 
 // MOTS altered: interpolation and multiple blades

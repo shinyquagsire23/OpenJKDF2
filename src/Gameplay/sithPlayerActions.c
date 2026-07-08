@@ -39,15 +39,15 @@ void sithPlayerActions_Activate(sithThing *thing)
             rdMatrix_PreRotate34(&out, &thing->actorParams.eyePYR);
             rdVector_Add3Acc(&thingPos, &thing->actorParams.eyeOffset);
         }
-        v4 = sithCollision_GetSectorLookAt(thing->sector, &thing->position, &thingPos, 0.0);
+        v4 = sithCollision_FindSectorInRadius(thing->sector, &thing->position, &thingPos, 0.0);
         if ( v4 )
         {
             v5 = sithPuppet_PlayMode(thing, SITH_ANIM_ACTIVATE, 0);
             if ( sithComm_multiplayerFlags && v5 >= 0 )
                 sithDSSThing_PlayKeyMode(thing, SITH_ANIM_ACTIVATE, thing->rdthing.puppet->tracks[v5].field_130, -1, 255);
             a6 = thing->moveSize - -0.1;
-            sithCollision_SearchRadiusForThings(v4, thing, &thingPos, &out.lvec, a6, 0.025, /*SITH_THING_ACTOR*/RAYCAST_2);
-            for ( searchResult = sithCollision_NextSearchResult(); searchResult; searchResult = sithCollision_NextSearchResult() )
+            sithCollision_SearchForCollisions(v4, thing, &thingPos, &out.lvec, a6, 0.025, /*SITH_THING_ACTOR*/RAYCAST_2);
+            for ( searchResult = sithCollision_PopStack(); searchResult; searchResult = sithCollision_PopStack() )
             {
                 if ( (searchResult->hitType & SITHCOLLISION_WORLD) != 0 )
                 {
@@ -58,7 +58,7 @@ void sithPlayerActions_Activate(sithThing *thing)
                     if (searchResult->surface->surfaceFlags & SITH_SURFACE_COG_LINKED)
                     {
                         sithCog_SendMessageFromSurface(searchResult->surface, thing, SITH_MESSAGE_ACTIVATE);
-                        sithCollision_SearchClose();
+                        sithCollision_DecreaseStackLevel();
                         return;
                     }
                 }
@@ -78,7 +78,7 @@ void sithPlayerActions_Activate(sithThing *thing)
                     }
                 }
             }
-            sithCollision_SearchClose();
+            sithCollision_DecreaseStackLevel();
         }
     }
 }
@@ -209,12 +209,12 @@ sithThing* sithPlayerActions_SpawnThingAtLookAt(sithThing *pPlayerThing, sithThi
         return NULL;
     }
 
-    sithSector* pSectorIter = sithCollision_GetSectorLookAt(pPlayerThing->sector, &pPlayerThing->position, &thingPos, 0.0);
+    sithSector* pSectorIter = sithCollision_FindSectorInRadius(pPlayerThing->sector, &pPlayerThing->position, &thingPos, 0.0);
     if ( pSectorIter )
     {
         a6 = pPlayerThing->moveSize*10;//pPlayerThing->moveSize - -0.1;
-        sithCollision_SearchRadiusForThings(pSectorIter, pPlayerThing, &thingPos, &out.lvec, a6, 0.025, 0);
-        for ( searchResult = sithCollision_NextSearchResult(); searchResult; searchResult = sithCollision_NextSearchResult() )
+        sithCollision_SearchForCollisions(pSectorIter, pPlayerThing, &thingPos, &out.lvec, a6, 0.025, 0);
+        for ( searchResult = sithCollision_PopStack(); searchResult; searchResult = sithCollision_PopStack() )
         {
             if (searchResult->hitType & SITHCOLLISION_ADJOINCROSS)
             {
@@ -239,7 +239,7 @@ sithThing* sithPlayerActions_SpawnThingAtLookAt(sithThing *pPlayerThing, sithThi
                 rdVector_Add3Acc(&tmp, &tmp2);
                 pSpawned->position = tmp;
 
-                sithCollision_SearchClose();
+                sithCollision_DecreaseStackLevel();
                 return pSpawned;
             }
             /*else if ( (searchResult->hitType & SITHCOLLISION_THING) != 0 )
@@ -251,7 +251,7 @@ sithThing* sithPlayerActions_SpawnThingAtLookAt(sithThing *pPlayerThing, sithThi
                     sithThing_MoveToSector(i, v5->sector, 0);
 
                     //sithCog_SendMessageFromThing(searchResult->receiver, pPlayerThing, SITH_MESSAGE_ACTIVATE);
-                    sithCollision_SearchClose();
+                    sithCollision_DecreaseStackLevel();
                     return pSpawned;
                 }
             }*/
@@ -263,6 +263,6 @@ sithThing* sithPlayerActions_SpawnThingAtLookAt(sithThing *pPlayerThing, sithThi
         pSpawned->position = tmp;
     }
 
-    sithCollision_SearchClose();
+    sithCollision_DecreaseStackLevel();
     return pSpawned;
 }

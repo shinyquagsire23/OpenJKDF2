@@ -2361,17 +2361,17 @@ void do_hooks()
     // sithCollision
 #if 0
     hook_function(sithCollision_Startup_ADDR, sithCollision_Startup);
-    hook_function(sithCollision_RegisterCollisionHandler_ADDR, sithCollision_RegisterCollisionHandler);
-    hook_function(sithCollision_NextSearchResult_ADDR, sithCollision_NextSearchResult);
-    hook_function(sithCollision_SearchRadiusForThings_ADDR, sithCollision_SearchRadiusForThings);
-    hook_function(sithCollision_SearchClose_ADDR, sithCollision_SearchClose);
-    hook_function(sithCollision_sub_4E7670_ADDR, sithCollision_sub_4E7670);
-    hook_function(sithCollision_UpdateThingCollision_ADDR, sithCollision_UpdateThingCollision);
-    hook_function(sithCollision_DefaultHitHandler_ADDR, sithCollision_DefaultHitHandler);
-    hook_function(sithCollision_DebrisDebrisCollide_ADDR, sithCollision_DebrisDebrisCollide);
+    hook_function(sithCollision_AddCollisionHandler_ADDR, sithCollision_AddCollisionHandler);
+    hook_function(sithCollision_PopStack_ADDR, sithCollision_PopStack);
+    hook_function(sithCollision_SearchForCollisions_ADDR, sithCollision_SearchForCollisions);
+    hook_function(sithCollision_DecreaseStackLevel_ADDR, sithCollision_DecreaseStackLevel);
+    hook_function(sithCollision_RotateThing_ADDR, sithCollision_RotateThing);
+    hook_function(sithCollision_MoveThing_ADDR, sithCollision_MoveThing);
+    hook_function(sithCollision_HandleThingHitSurface_ADDR, sithCollision_HandleThingHitSurface);
+    hook_function(sithCollision_ThingCollisionHandler_ADDR, sithCollision_ThingCollisionHandler);
     hook_function(sithCollision_CollideHurt_ADDR, sithCollision_CollideHurt);
-    hook_function(sithCollision_HasLos_ADDR, sithCollision_HasLos);
-    hook_function(sithCollision_DebrisPlayerCollide_ADDR, sithCollision_DebrisPlayerCollide);
+    hook_function(sithCollision_HasLOS_ADDR, sithCollision_HasLOS);
+    hook_function(sithCollision_ParticleAndActorCollisionHandler_ADDR, sithCollision_ParticleAndActorCollisionHandler);
     hook_function(sithCollision_sub_4E6FB0_ADDR, sithCollision_RaycastFromCamera);
     hook_function(sithCollision_sub_4E7310_ADDR, sithCollision_RaycastSector);
     hook_function(sithCollision_sub_4E73F0_ADDR, sithCollision_CheckPathClear);
@@ -3015,21 +3015,21 @@ void do_hooks()
 #if 0
     hook_function_inv(sithCollision_Startup_ADDR, sithCollision_Startup);
     hook_function_inv(sithCollision_Shutdown_ADDR, sithCollision_Shutdown);
-    hook_function_inv(sithCollision_RegisterCollisionHandler_ADDR, sithCollision_RegisterCollisionHandler);
-    hook_function_inv(sithCollision_RegisterHitHandler_ADDR, sithCollision_RegisterHitHandler);
-    hook_function_inv(sithCollision_NextSearchResult_ADDR, sithCollision_NextSearchResult);
-    hook_function_inv(sithCollision_SearchRadiusForThings_ADDR, sithCollision_SearchRadiusForThings);
-    hook_function_inv(sithCollision_SearchClose_ADDR, sithCollision_SearchClose);
-    hook_function_inv(sithCollision_GetSectorLookAt_ADDR, sithCollision_GetSectorLookAt);
+    hook_function_inv(sithCollision_AddCollisionHandler_ADDR, sithCollision_AddCollisionHandler);
+    hook_function_inv(sithCollision_AddSurfaceCollisionHandler_ADDR, sithCollision_AddSurfaceCollisionHandler);
+    hook_function_inv(sithCollision_PopStack_ADDR, sithCollision_PopStack);
+    hook_function_inv(sithCollision_SearchForCollisions_ADDR, sithCollision_SearchForCollisions);
+    hook_function_inv(sithCollision_DecreaseStackLevel_ADDR, sithCollision_DecreaseStackLevel);
+    hook_function_inv(sithCollision_FindSectorInRadius_ADDR, sithCollision_FindSectorInRadius);
     hook_function_inv(sithCollision_FallHurt_ADDR, sithCollision_FallHurt);
-    hook_function_inv(sithCollision_sub_4E7670_ADDR, sithCollision_sub_4E7670);*/
-    hook_function_inv(sithCollision_UpdateThingCollision_ADDR, sithCollision_UpdateThingCollision);
-    hook_function_inv(sithCollision_DefaultHitHandler_ADDR, sithCollision_DefaultHitHandler);
-    hook_function_inv(sithCollision_DebrisDebrisCollide_ADDR, sithCollision_DebrisDebrisCollide);
+    hook_function_inv(sithCollision_RotateThing_ADDR, sithCollision_RotateThing);*/
+    hook_function_inv(sithCollision_MoveThing_ADDR, sithCollision_MoveThing);
+    hook_function_inv(sithCollision_HandleThingHitSurface_ADDR, sithCollision_HandleThingHitSurface);
+    hook_function_inv(sithCollision_ThingCollisionHandler_ADDR, sithCollision_ThingCollisionHandler);
     hook_function_inv(sithCollision_CollideHurt_ADDR, sithCollision_CollideHurt);
-    hook_function_inv(sithCollision_HasLos_ADDR, sithCollision_HasLos);
+    hook_function_inv(sithCollision_HasLOS_ADDR, sithCollision_HasLOS);
     hook_function_inv(sithCollision_sub_4E77A0_ADDR, sithCollision_sub_4E77A0);
-    hook_function_inv(sithCollision_DebrisPlayerCollide_ADDR, sithCollision_DebrisPlayerCollide);
+    hook_function_inv(sithCollision_ParticleAndActorCollisionHandler_ADDR, sithCollision_ParticleAndActorCollisionHandler);
 #endif
 
 #if 0
