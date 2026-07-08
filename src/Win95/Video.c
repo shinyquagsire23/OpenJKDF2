@@ -235,7 +235,7 @@ LABEL_9:
             result = rdOpen(0);
             if ( !result )
                 return result;
-            v6 = rdGetRenderOptions();
+            v6 = rdGetRenterOptions();
             v6 &= ~0x100;
             rdSetRenderOptions(v6);
             _memcpy(&Video_format2, &Video_format, sizeof(Video_format2));
@@ -259,7 +259,7 @@ LABEL_9:
     result = rdOpen(1);
     if ( result )
     {
-        v5 = rdGetRenderOptions();
+        v5 = rdGetRenterOptions();
         v5 |= 0x100;
         rdSetRenderOptions(v5);
         Video_pVbufIdk = &Video_bufIdk;

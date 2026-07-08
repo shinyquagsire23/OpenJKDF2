@@ -351,11 +351,11 @@ void sithRender_Draw()
     else
         rdSetLightingMode(sithRender_lightMode);
     rdSetTextureMode(sithRender_texMode);
-    rdSetRenderOptions(rdGetRenderOptions() | 2);
+    rdSetRenderOptions(rdGetRenterOptions() | 2);
 
     // Somehow backface culling on models got unset...?
 #ifdef QOL_IMPROVEMENTS
-    rdSetRenderOptions(rdGetRenderOptions() | 1);
+    rdSetRenderOptions(rdGetRenterOptions() | 1);
 #endif
 
     if (!sithCamera_currentCamera || !sithCamera_currentCamera->sector)

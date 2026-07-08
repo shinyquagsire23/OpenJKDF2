@@ -1588,7 +1588,7 @@ void do_hooks()
     hook_function(rdSetZBufferMethod_ADDR, rdSetZBufferMethod);
     hook_function(rdSetCullFlags_ADDR, rdSetCullFlags);
     hook_function(rdSetProcFaceUserData_ADDR, rdSetProcFaceUserData);
-    hook_function(rdGetRenderOptions_ADDR, rdGetRenderOptions);
+    hook_function(rdGetRenterOptions_ADDR, rdGetRenterOptions);
     hook_function(rdGetGeometryMode_ADDR, rdGetGeometryMode);
     hook_function(rdGetLightingMode_ADDR, rdGetLightingMode);
     hook_function(rdGetTextureMode_ADDR, rdGetTextureMode);

@@ -1046,7 +1046,7 @@ rdSetOcclusionMethod	.text	0043AAB0	0000000A	00000000	00000004	R	.	.	.	.	.	T	.
 rdSetZBufferMethod	.text	0043AAC0	0000000A	00000000	00000004	R	.	.	.	.	.	T	.
 rdSetCullFlags	.text	0043AAD0	0000000A	00000000	00000004	R	.	.	.	.	.	T	.
 rdSetProcFaceUserData	.text	0043AAE0	0000000A	00000000	00000004	R	.	.	.	.	.	T	.
-rdGetRenderOptions	.text	0043AAF0	00000006			R	.	.	.	.	.	.	.
+rdGetRenterOptions	.text	0043AAF0	00000006			R	.	.	.	.	.	.	.
 rdGetGeometryMode	.text	0043AB00	00000006	00000000	00000000	R	.	.	.	.	.	T	.
 rdGetLightingMode	.text	0043AB10	00000006	00000000	00000000	R	.	.	.	.	.	.	.
 rdGetTextureMode	.text	0043AB20	00000006	00000000	00000000	R	.	.	.	.	.	.	.

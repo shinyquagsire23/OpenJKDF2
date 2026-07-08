@@ -18,7 +18,7 @@
 #define rdSetZBufferMethod_ADDR (0x0043AAC0)
 #define rdSetCullFlags_ADDR (0x0043AAD0)
 #define rdSetProcFaceUserData_ADDR (0x0043AAE0)
-#define rdGetRenderOptions_ADDR (0x0043AAF0)
+#define rdGetRenterOptions_ADDR (0x0043AAF0)
 #define rdGetGeometryMode_ADDR (0x0043AB00)
 #define rdGetLightingMode_ADDR (0x0043AB10)
 #define rdGetTextureMode_ADDR (0x0043AB20)
@@ -51,7 +51,7 @@ void rdSetCullFlags(int a1);
 void rdSetProcFaceUserData(int a1);
 void rdSetVertexColorMode(int a1);
 
-int rdGetRenderOptions(void);
+int rdGetRenterOptions(void);
 int rdGetGeometryMode(void);
 int rdGetLightingMode(void);
 int rdGetTextureMode(void);

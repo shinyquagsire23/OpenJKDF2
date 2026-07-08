@@ -119,7 +119,7 @@ void rdSetVertexColorMode(int a1)
     rdroid_curVertexColorMode = a1;
 }
 
-int rdGetRenderOptions(void)
+int rdGetRenterOptions(void)
 {
     return rdroid_curRenderOptions;
 }
