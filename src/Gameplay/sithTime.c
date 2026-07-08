@@ -53,9 +53,9 @@ void sithTime_Resume()
 }
 
 // MOTS altered: min/max are variables
-void sithTime_SetFrameTime(int deltaMs)
+void sithTime_SetFrameTime(int frameTime)
 {
-    sithTime_g_frameTime = deltaMs;
+    sithTime_g_frameTime = frameTime;
     sithTime_g_clockTime = stdPlatform_GetTimeMsec();
     if ( sithTime_g_frameTime < SITHTIME_MINDELTA )
     {
@@ -133,7 +133,7 @@ void sithTime_Startup()
     sithTime_physicsRolloverFrames = 0.0; // Added
 }
 
-void sithTime_SetGameTime(uint32_t curMs)
+void sithTime_SetGameTime(uint32_t msecTime)
 {
 #ifdef MICROSECOND_TIME
     sithTime_curUsAbsolute = Linux_TimeUs();
@@ -142,8 +142,8 @@ void sithTime_SetGameTime(uint32_t curMs)
 #endif
     sithTime_g_frameTimeFlex = 0.0;
     sithTime_g_fps = 0.0;
-    sithTime_g_msecGameTime = curMs;
+    sithTime_g_msecGameTime = msecTime;
     sithTime_g_frameTime = 0;
-    sithTime_g_secGameTime = (flex32_t)curMs * 0.001;
+    sithTime_g_secGameTime = (flex32_t)msecTime * 0.001;
     sithTime_g_clockTime = stdPlatform_GetTimeMsec();
 }

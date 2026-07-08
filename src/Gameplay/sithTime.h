@@ -14,9 +14,9 @@
 MATH_FUNC void sithTime_Advance();
 void sithTime_Pause();
 void sithTime_Resume();
-MATH_FUNC void sithTime_SetFrameTime(int deltaMs);
+MATH_FUNC void sithTime_SetFrameTime(int frameTime);
 void sithTime_Startup();
-MATH_FUNC void sithTime_SetGameTime(uint32_t curMs);
+MATH_FUNC void sithTime_SetGameTime(uint32_t msecTime);
 
 extern flex_d_t sithTime_physicsRolloverFrames;
 
