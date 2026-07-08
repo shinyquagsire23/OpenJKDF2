@@ -145,9 +145,9 @@ int jkGuiPlayer_sub_410640(Darray *array, jkGuiElement *element)
                     
                     if ( stdConffile_OpenReadBypass(jkl_fname) )
                     {
-                        if ( stdConffile_ReadLine() && _sscanf(stdConffile_aLine, "version %d", &v8) == 1 && v8 == 1 && stdConffile_ReadLine() )
+                        if ( stdConffile_ReadLine() && _sscanf(stdConffile_g_aLine, "version %d", &v8) == 1 && v8 == 1 && stdConffile_ReadLine() )
                         {
-                            _sscanf(stdConffile_aLine, "diff %d", &v9);
+                            _sscanf(stdConffile_g_aLine, "diff %d", &v9);
                             stdConffile_Close();
                             v5 = v9;
                             if ( v9 < 0 )

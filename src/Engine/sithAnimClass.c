@@ -19,9 +19,9 @@ int sithAnimClass_Load(sithWorld *world, int a2)
     if ( a2 )
         return 0;
     stdConffile_ReadArgs();
-    if ( _strcmp(stdConffile_entry.args[0].value, "world") || _strcmp(stdConffile_entry.args[1].value, "puppets") )
+    if ( _strcmp(stdConffile_g_entry.args[0].value, "world") || _strcmp(stdConffile_g_entry.args[1].value, "puppets") )
         return 0;
-    num_animclasses = _atoi(stdConffile_entry.args[2].value);
+    num_animclasses = _atoi(stdConffile_g_entry.args[2].value);
     if ( !num_animclasses )
         return 1;
 #ifdef TARGET_RETRO_HOMEBREW
@@ -42,15 +42,15 @@ int sithAnimClass_Load(sithWorld *world, int a2)
     stdPlatform_Memzero32(animclasses, sizeof(sithAnimclass) * num_animclasses); // Added: word-safe
     while ( stdConffile_ReadArgs() )
     {
-        if ( !_strcmp(stdConffile_entry.args[0].value, "end") )
+        if ( !_strcmp(stdConffile_g_entry.args[0].value, "end") )
             break;
-        if ( !stdHashtbl_Find(sithPuppet_pClassHashtable, stdConffile_entry.args[1].value) )
+        if ( !stdHashtbl_Find(sithPuppet_pClassHashtable, stdConffile_g_entry.args[1].value) )
         {
             if ( sithWorld_g_pLastLoadedWorld->numAnimClassesLoaded != sithWorld_g_pLastLoadedWorld->numAnimClasses )
             {
                 animclass = &sithWorld_g_pLastLoadedWorld->animclasses[sithWorld_g_pLastLoadedWorld->numAnimClassesLoaded];
                 stdPlatform_Memzero32(animclass, sizeof(sithAnimclass)); // Added: word-safe
-                const char* name = stdConffile_entry.args[1].value;
+                const char* name = stdConffile_g_entry.args[1].value;
 #ifdef SITH_DEBUG_STRUCT_NAMES
                 stdString_SafeStrCopy(animclass->name, name, 32);
 #endif
@@ -58,7 +58,7 @@ int sithAnimClass_Load(sithWorld *world, int a2)
                 animclass->namecrc = stdCrc32(name, strlen(name));
 #endif
                 // Added: sprintf -> snprintf
-                stdString_snprintf(pup_path, 128, "%s%c%s", "misc\\pup", 92, stdConffile_entry.args[1].value);
+                stdString_snprintf(pup_path, 128, "%s%c%s", "misc\\pup", 92, stdConffile_g_entry.args[1].value);
                 if ( sithAnimClass_LoadPupEntry(animclass, pup_path) )
                 {
                     ++sithWorld_g_pLastLoadedWorld->numAnimClassesLoaded;
@@ -143,50 +143,50 @@ int sithAnimClass_LoadPupEntry(sithAnimclass *animclass, char *fpath)
     stdPlatform_Memset32(animclass->bodypart_to_joint, 0xFFu, sizeof(animclass->bodypart_to_joint)); // Added: word-safe
     while ( stdConffile_ReadArgs() )
     {
-        if ( !stdConffile_entry.numArgs )
+        if ( !stdConffile_g_entry.numArgs )
             continue;
-        if ( !_strcmp(stdConffile_entry.args[0].key, "mode") )
+        if ( !_strcmp(stdConffile_g_entry.args[0].key, "mode") )
         {
-            mode = _atoi(stdConffile_entry.args[0].value);
-            if ( stdConffile_entry.numArgs > 1u && !_strcmp(stdConffile_entry.args[1].key, "basedon") )
-                stdPlatform_Memcpy32(&animclass->modes[mode], &animclass->modes[_atoi(stdConffile_entry.args[1].value)], sizeof(animclass->modes[mode])); // Added: word-safe
+            mode = _atoi(stdConffile_g_entry.args[0].value);
+            if ( stdConffile_g_entry.numArgs > 1u && !_strcmp(stdConffile_g_entry.args[1].key, "basedon") )
+                stdPlatform_Memcpy32(&animclass->modes[mode], &animclass->modes[_atoi(stdConffile_g_entry.args[1].value)], sizeof(animclass->modes[mode])); // Added: word-safe
         }
-        else if ( !_strcmp(stdConffile_entry.args[0].value, "joints") )
+        else if ( !_strcmp(stdConffile_g_entry.args[0].value, "joints") )
         {
             while ( stdConffile_ReadArgs() )
             {
-                if ( !stdConffile_entry.numArgs || !_strcmp(stdConffile_entry.args[0].key, "end") )
+                if ( !stdConffile_g_entry.numArgs || !_strcmp(stdConffile_g_entry.args[0].key, "end") )
                     break;
-                bodypart_idx = _atoi(stdConffile_entry.args[0].key);
-                joint_idx = _atoi(stdConffile_entry.args[0].value);
+                bodypart_idx = _atoi(stdConffile_g_entry.args[0].key);
+                joint_idx = _atoi(stdConffile_g_entry.args[0].value);
                 if ( bodypart_idx < 0xA )
                     animclass->bodypart_to_joint[bodypart_idx] = joint_idx;
             }
         }
-        else if ( stdConffile_entry.numArgs > 1u )
+        else if ( stdConffile_g_entry.numArgs > 1u )
         {
-            animNameIdx = (intptr_t)stdHashtbl_Find(sithPuppet_pHashtblSubmodes, stdConffile_entry.args[0].value);
+            animNameIdx = (intptr_t)stdHashtbl_Find(sithPuppet_pHashtblSubmodes, stdConffile_g_entry.args[0].value);
             if ( animNameIdx )
             {
-                if ( stdConffile_entry.numArgs <= 2u )
+                if ( stdConffile_g_entry.numArgs <= 2u )
                     flags = 0;
                 else
-                    _sscanf(stdConffile_entry.args[2].value, "%x", &flags);
-                if ( stdConffile_entry.numArgs <= 3u )
+                    _sscanf(stdConffile_g_entry.args[2].value, "%x", &flags);
+                if ( stdConffile_g_entry.numArgs <= 3u )
                     lowpri = 0;
                 else
-                    lowpri = _atoi(stdConffile_entry.args[3].value);
-                if ( stdConffile_entry.numArgs <= 4u )
+                    lowpri = _atoi(stdConffile_g_entry.args[3].value);
+                if ( stdConffile_g_entry.numArgs <= 4u )
                     hipri = lowpri;
                 else
-                    hipri = _atoi(stdConffile_entry.args[4].value);
-                if ( _strcmp(stdConffile_entry.args[1].value, "none") )
+                    hipri = _atoi(stdConffile_g_entry.args[4].value);
+                if ( _strcmp(stdConffile_g_entry.args[1].value, "none") )
                 {
                     world = sithWorld_g_pLastLoadedWorld;
-                    key_fname = stdConffile_entry.args[1].value;
+                    key_fname = stdConffile_g_entry.args[1].value;
                     if ( sithWorld_g_pLastLoadedWorld->keyframes )
                     {
-                        _sprintf(keyframe_fpath, "%s%c%s", "3do\\key", 92, stdConffile_entry.args[1].value);
+                        _sprintf(keyframe_fpath, "%s%c%s", "3do\\key", 92, stdConffile_g_entry.args[1].value);
                         v10 = (rdKeyframe *)stdHashtbl_Find(sithPuppet_pKeyHashtable, key_fname);
                         if ( v10 )
                         {

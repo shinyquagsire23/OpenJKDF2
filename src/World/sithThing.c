@@ -1487,11 +1487,11 @@ int sithThing_ReadStaticThingsListText(sithWorld *pWorld, int a2)
         pWorld->numThings = -1;
     }
     stdConffile_ReadArgs();
-    if ( _strcmp(stdConffile_entry.args[0].value, "world") )
+    if ( _strcmp(stdConffile_g_entry.args[0].value, "world") )
         return 0;
-    if ( _strcmp(stdConffile_entry.args[1].value, "things") )
+    if ( _strcmp(stdConffile_g_entry.args[1].value, "things") )
         return 0;
-    v10 = _atoi(stdConffile_entry.args[2].value);
+    v10 = _atoi(stdConffile_g_entry.args[2].value);
     { TWL_EXTRAM_SUGGEST(pSithHS); // Added: word-safe struct (audited); slow-but-loads on NDS
     paThings = (sithThing *)SITH_ALLOC(sizeof(sithThing) * v10);
     TWL_EXTRAM_RESTORE(pSithHS); }
@@ -1510,27 +1510,27 @@ int sithThing_ReadStaticThingsListText(sithWorld *pWorld, int a2)
     v38 = v20;
     while ( stdConffile_ReadArgs() )
     {
-        if ( !_strcmp(stdConffile_entry.args[0].value, "end") )
+        if ( !_strcmp(stdConffile_g_entry.args[0].value, "end") )
             break;
-        v21 = &sithWorld_g_pCurrentWorld->things[_atoi(stdConffile_entry.args[0].value)];
-        v22 = sithTemplate_GetTemplate(stdConffile_entry.args[1].value);
-        if ( stdConffile_entry.numArgs >= 0xAu )
+        v21 = &sithWorld_g_pCurrentWorld->things[_atoi(stdConffile_g_entry.args[0].value)];
+        v22 = sithTemplate_GetTemplate(stdConffile_g_entry.args[1].value);
+        if ( stdConffile_g_entry.numArgs >= 0xAu )
         {
-            pos.x = _atof(stdConffile_entry.args[3].value);
-            pos.y = _atof(stdConffile_entry.args[4].value);
-            pos.z = _atof(stdConffile_entry.args[5].value);
-            a3.x = _atof(stdConffile_entry.args[6].value);
-            a3.y = _atof(stdConffile_entry.args[7].value);
-            a3.z = _atof(stdConffile_entry.args[8].value);
+            pos.x = _atof(stdConffile_g_entry.args[3].value);
+            pos.y = _atof(stdConffile_g_entry.args[4].value);
+            pos.z = _atof(stdConffile_g_entry.args[5].value);
+            a3.x = _atof(stdConffile_g_entry.args[6].value);
+            a3.y = _atof(stdConffile_g_entry.args[7].value);
+            a3.z = _atof(stdConffile_g_entry.args[8].value);
             rdMatrix_BuildRotate34(&a, &a3);
-            v23 = _atoi(stdConffile_entry.args[9].value);
+            v23 = _atoi(stdConffile_g_entry.args[9].value);
             if ( v23 >= 0 && v23 < sithWorld_g_pCurrentWorld->numSectors )
             {
                 v24 = &sithWorld_g_pCurrentWorld->sectors[v23];
-                if ( stdConffile_entry.numArgs >= 11 && (stdConffile_entry.args[10].key == stdConffile_entry.args[10].value)) // MOTS added (w/o comparison)
+                if ( stdConffile_g_entry.numArgs >= 11 && (stdConffile_g_entry.args[10].key == stdConffile_g_entry.args[10].value)) // MOTS added (w/o comparison)
                 {
-                    // && (!stdConffile_entry.args[10].key || strlen(stdConffile_entry.args[10].key) == 0)
-                    v23 = _atoi(stdConffile_entry.args[10].value);
+                    // && (!stdConffile_g_entry.args[10].key || strlen(stdConffile_g_entry.args[10].key) == 0)
+                    v23 = _atoi(stdConffile_g_entry.args[10].value);
                     v21->archlightIdx = v23;
                     //printf("%p %p %x\n", , v21->archlightIdx);
                 }
@@ -1541,16 +1541,16 @@ int sithThing_ReadStaticThingsListText(sithWorld *pWorld, int a2)
                 v21->signature = sithThing_bInitted2++;
                 v21->thing_id = v21->thingIdx;
                 v27 = 10;
-                if ( stdConffile_entry.numArgs > 10 )
+                if ( stdConffile_g_entry.numArgs > 10 )
                 {
-                    v28 = &stdConffile_entry.args[10];
+                    v28 = &stdConffile_g_entry.args[10];
                     do
                     {
                         sithThing_ParseArg(v28, v21);
                         ++v27;
                         ++v28;
                     }
-                    while ( v27 < stdConffile_entry.numArgs );
+                    while ( v27 < stdConffile_g_entry.numArgs );
                 }
                 if ( (v21->thingflags & v38) != 0 )
                 {
@@ -1559,7 +1559,7 @@ int sithThing_ReadStaticThingsListText(sithWorld *pWorld, int a2)
                 else
                 {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-                    stdString_SafeStrCopy(v21->template_name, stdConffile_entry.args[2].value, 0x20);
+                    stdString_SafeStrCopy(v21->template_name, stdConffile_g_entry.args[2].value, 0x20);
 #endif
                 }
             }

@@ -448,7 +448,7 @@ int jkGuiBuildMulti_ShowEditCharacter(BOOL bIdk)
     if ( stdConffile_Open("misc\\sabers.dat") )
     {
         stdConffile_ReadLine();
-        if ( _sscanf(stdConffile_aLine, "numsabers: %d", &jkGuiBuildMulti_numSabers) == 1 )
+        if ( _sscanf(stdConffile_g_aLine, "numsabers: %d", &jkGuiBuildMulti_numSabers) == 1 )
         {
             jkGame_aSabers = (jkSaberInfo *)JK_ALLOC(sizeof(jkSaberInfo) * jkGuiBuildMulti_numSabers);
             memset(jkGame_aSabers, 0, sizeof(jkSaberInfo) * jkGuiBuildMulti_numSabers);
@@ -456,7 +456,7 @@ int jkGuiBuildMulti_ShowEditCharacter(BOOL bIdk)
                   stdConffile_ReadLine();
                   jkGuiBuildMulti_apSaberBitmaps[idx] = v7 )
             {
-                _sscanf(stdConffile_aLine, "%d: %s %s %s", &idx, tmp3, tmp2, tmp1);
+                _sscanf(stdConffile_g_aLine, "%d: %s %s %s", &idx, tmp3, tmp2, tmp1);
                 _strncpy(jkGame_aSabers[idx].BM, tmp3, 0x1Fu);
                 v5 = jkGame_aSabers;
                 jkGame_aSabers[idx].BM[31] = 0;
@@ -508,13 +508,13 @@ LABEL_16:
     if ( stdConffile_Open("misc\\models.dat") )
     {
         stdConffile_ReadLine();
-        if ( _sscanf(stdConffile_aLine, "nummodels: %d", &jkGuiBuildMulti_numModels) == 1 )
+        if ( _sscanf(stdConffile_g_aLine, "nummodels: %d", &jkGuiBuildMulti_numModels) == 1 )
         {
             jkGuiBuildMulti_aModels = (jkMultiModelInfo *)JK_ALLOC(jkGuiBuildMulti_numModels * sizeof(jkMultiModelInfo));
             memset(jkGuiBuildMulti_aModels, 0, jkGuiBuildMulti_numModels * sizeof(jkMultiModelInfo));
             while ( stdConffile_ReadLine() )
             {
-                if ( _sscanf(stdConffile_aLine, "%d: %s %s", &idx, tmp1, tmp2) == 3 )
+                if ( _sscanf(stdConffile_g_aLine, "%d: %s %s", &idx, tmp1, tmp2) == 3 )
                 {
                     _strncpy(jkGuiBuildMulti_aModels[idx].modelFpath, tmp1, 0x1Fu);
                     v10 = jkGuiBuildMulti_aModels;

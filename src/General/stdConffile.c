@@ -51,11 +51,11 @@ int stdConffile_OpenModeCommon(char *fpath, const char* mode, BOOL bBypassGobs)
         openFileIsBypass[stackLevel] = stdConffile_pHS == pLowLevelHS ? 1 : 0;
         openFileStack[stackLevel] = openFile;
         linenumStack[stackLevel] = stdConffile_linenum;
-        apBufferStack[stackLevel] = stdConffile_aLine;
+        apBufferStack[stackLevel] = stdConffile_g_aLine;
         
         stdConffile_linenum = 0;
         openFile = 0;
-        _memcpy((void *)(aEntryStack + ((STDCONF_LINEBUFFER_LEN+4) * stackLevel)), &stdConffile_entry, sizeof(stdConffileEntry));
+        _memcpy((void *)(aEntryStack + ((STDCONF_LINEBUFFER_LEN+4) * stackLevel)), &stdConffile_g_entry, sizeof(stdConffileEntry));
         stackLevel++;
     }
 
@@ -78,7 +78,7 @@ int stdConffile_OpenModeCommon(char *fpath, const char* mode, BOOL bBypassGobs)
             goto fail_open;
     }
 
-    stdConffile_aLine = (char*)STD_ALLOC(STDCONF_LINEBUFFER_LEN);
+    stdConffile_g_aLine = (char*)STD_ALLOC(STDCONF_LINEBUFFER_LEN);
     stdString_SafeStrCopy(stdConffile_pFilename, fpath, 128);
     stdConffile_linenum = 0;
     stdConffile_bOpen = 1;
@@ -96,10 +96,10 @@ fail_open:
     
     openFile = openFileStack[stackLevel];
     stdConffile_linenum = linenumStack[stackLevel];
-    stdConffile_aLine = apBufferStack[stackLevel];
+    stdConffile_g_aLine = apBufferStack[stackLevel];
     stdConffile_pHS = openFileIsBypass[stackLevel] ? pLowLevelHS : std_g_pHS; // Added: Split off local file access from GOB access
 
-    _memcpy(&stdConffile_entry, (const void *)(aEntryStack + ((STDCONF_LINEBUFFER_LEN+4) * stackLevel)), sizeof(stdConffileEntry));
+    _memcpy(&stdConffile_g_entry, (const void *)(aEntryStack + ((STDCONF_LINEBUFFER_LEN+4) * stackLevel)), sizeof(stdConffileEntry));
     return 0;
 }
 
@@ -140,7 +140,7 @@ void stdConffile_Close()
     }
 
     openFile = 0;
-    STD_FREE(stdConffile_aLine);
+    STD_FREE(stdConffile_g_aLine);
     
     if (!stackLevel)
     {
@@ -151,9 +151,9 @@ void stdConffile_Close()
     _strcpy(stdConffile_pFilename, &aFilenameStack[128 * (stackLevel-- - 1)]);
     openFile = openFileStack[stackLevel];
     stdConffile_linenum = linenumStack[stackLevel];
-    stdConffile_aLine = apBufferStack[stackLevel];
+    stdConffile_g_aLine = apBufferStack[stackLevel];
     stdConffile_pHS = openFileIsBypass[stackLevel] ? pLowLevelHS : std_g_pHS; // Added: Split off local file access from GOB access
-    _memcpy(&stdConffile_entry, (const void *)(aEntryStack + ((STDCONF_LINEBUFFER_LEN+4) * stackLevel)), sizeof(stdConffileEntry));
+    _memcpy(&stdConffile_g_entry, (const void *)(aEntryStack + ((STDCONF_LINEBUFFER_LEN+4) * stackLevel)), sizeof(stdConffileEntry));
 }
 
 void stdConffile_CloseWrite()
@@ -214,11 +214,11 @@ int stdConffile_ReadArgsFromStr(char *str)
   char *valstr;
 
   i = 0;
-  stdConffile_entry.numArgs = 0;
+  stdConffile_g_entry.numArgs = 0;
   iter = _strtok(str, ", \t\n\r");
   if ( iter )
   {
-    stdConffileArg* arg = &stdConffile_entry.args[0];
+    stdConffileArg* arg = &stdConffile_g_entry.args[0];
     do
     {
       valstr = _strchr(iter, '=');
@@ -239,7 +239,7 @@ int stdConffile_ReadArgsFromStr(char *str)
     }
     while ( iter );
   }
-  stdConffile_entry.numArgs = i;
+  stdConffile_g_entry.numArgs = i;
   return i;
 }
 
@@ -250,7 +250,7 @@ int stdConffile_ReadArgs()
 
     while (1)
     {
-        if ( stdConffile_ReadArgsFromStr(stdConffile_aLine) )
+        if ( stdConffile_ReadArgsFromStr(stdConffile_g_aLine) )
             break;
 
         if ( !stdConffile_ReadLine() )
@@ -267,7 +267,7 @@ int stdConffile_ReadLine()
   char *find_comment;
   unsigned int line_len;
 
-  line_iter = stdConffile_aLine;
+  line_iter = stdConffile_g_aLine;
   is_eol = 0;
   buf_left = (STDCONF_LINEBUFFER_LEN-1);
   while (buf_left)
@@ -285,17 +285,17 @@ int stdConffile_ReadLine()
         *find_comment = 0;
       stdString_CStrToLower(line_iter);
 
-      line_len = _strlen(stdConffile_aLine);
-      if (line_len >= 2 && stdConffile_aLine[line_len - 2] == '\\' ) // added: line_len >= 2
+      line_len = _strlen(stdConffile_g_aLine);
+      if (line_len >= 2 && stdConffile_g_aLine[line_len - 2] == '\\' ) // added: line_len >= 2
       {
-        line_iter = &stdConffile_aLine[line_len - 2];
+        line_iter = &stdConffile_g_aLine[line_len - 2];
         buf_left = STDCONF_LINEBUFFER_LEN - line_len;
       }
       else
       {
         is_eol = 1;
-        if (line_len >= 1 && (stdConffile_aLine[line_len - 1] == '\r' || stdConffile_aLine[line_len - 1] == '\n') ) // added: line_len >= 1
-          stdConffile_aLine[line_len - 1] = 0;
+        if (line_len >= 1 && (stdConffile_g_aLine[line_len - 1] == '\r' || stdConffile_g_aLine[line_len - 1] == '\n') ) // added: line_len >= 1
+          stdConffile_g_aLine[line_len - 1] = 0;
       }
     }
 

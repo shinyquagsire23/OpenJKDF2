@@ -92,38 +92,38 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
     if (!stdConffile_ReadLine())
       goto read_fail;
 
-    if (_sscanf(stdConffile_aLine, " section: %s", std_g_genBuffer) != 1)
+    if (_sscanf(stdConffile_g_aLine, " section: %s", std_g_genBuffer) != 1)
       goto read_fail;
 
     if (!stdConffile_ReadLine())
       goto read_fail;
 
-    if (_sscanf(stdConffile_aLine, " flags %d", &keyframe->flags) != 1)
+    if (_sscanf(stdConffile_g_aLine, " flags %d", &keyframe->flags) != 1)
       goto read_fail;
 
     if (!stdConffile_ReadLine())
       goto read_fail;
 
-    if (_sscanf(stdConffile_aLine, " type %x", &keyframe->type) != 1)
+    if (_sscanf(stdConffile_g_aLine, " type %x", &keyframe->type) != 1)
       goto read_fail;
 
     if (!stdConffile_ReadLine())
       goto read_fail;
 
-    if (_sscanf(stdConffile_aLine, " frames %d", &keyframe->numFrames) != 1)
+    if (_sscanf(stdConffile_g_aLine, " frames %d", &keyframe->numFrames) != 1)
       goto read_fail;
 
     if (!stdConffile_ReadLine())
       goto read_fail;
 
-    if (_sscanf(stdConffile_aLine, " fps %f", &ftmp) != 1)
+    if (_sscanf(stdConffile_g_aLine, " fps %f", &ftmp) != 1)
       goto read_fail;
     keyframe->fps = ftmp; // FLEXTODO
 
     if (!stdConffile_ReadLine())
       goto read_fail;
 
-    if (_sscanf(stdConffile_aLine, " joints %d", &keyframe->numJoints) != 1)
+    if (_sscanf(stdConffile_g_aLine, " joints %d", &keyframe->numJoints) != 1)
       goto read_fail;
 
     { TWL_EXTRAM_SUGGEST(rdroid_g_pHS); // Added: joints are word-width on RETRO
@@ -136,7 +136,7 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
     stdPlatform_Memzero32(paJoints, sizeof(rdJoint) * (keyframe->numJoints+1)); // Added: word-safe
     keyframe->numJoints2 = keyframe->numJoints;
 
-    if (!stdConffile_ReadLine() || _sscanf(stdConffile_aLine, " section: %s", std_g_genBuffer) != 1)
+    if (!stdConffile_ReadLine() || _sscanf(stdConffile_g_aLine, " section: %s", std_g_genBuffer) != 1)
       goto read_fail;
 
     if (!_memcmp(std_g_genBuffer, "markers", 8u))
@@ -144,7 +144,7 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
       if (!stdConffile_ReadLine())
         goto read_fail;
 
-      if (_sscanf(stdConffile_aLine, " markers %d", &num_markers) != 1)
+      if (_sscanf(stdConffile_g_aLine, " markers %d", &num_markers) != 1)
         goto read_fail;
 
       if (num_markers > 8)
@@ -157,7 +157,7 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
         if (!stdConffile_ReadLine())
             break;
         
-        if (_sscanf(stdConffile_aLine, "%f %d", &ftmp, &markers->marker_int[num_markers_read]) != 2)
+        if (_sscanf(stdConffile_g_aLine, "%f %d", &ftmp, &markers->marker_int[num_markers_read]) != 2)
             break;
         markers->marker_float[num_markers_read] = ftmp;
       }
@@ -168,12 +168,12 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
       if (!stdConffile_ReadLine())
         goto read_fail;
 
-      if (_sscanf(stdConffile_aLine, " section: %s", std_g_genBuffer) != 1)
+      if (_sscanf(stdConffile_g_aLine, " section: %s", std_g_genBuffer) != 1)
         goto read_fail;
     }
     
     
-    if (!stdConffile_ReadLine() || _sscanf(stdConffile_aLine, " nodes %d", &num_nodes) != 1)
+    if (!stdConffile_ReadLine() || _sscanf(stdConffile_g_aLine, " nodes %d", &num_nodes) != 1)
     {
       goto read_fail;
     }
@@ -182,11 +182,11 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
     {
         if (!stdConffile_ReadLine())
             goto read_fail;
-        if (_sscanf(stdConffile_aLine, " node %d", &node_idx) != 1)
+        if (_sscanf(stdConffile_g_aLine, " node %d", &node_idx) != 1)
             goto read_fail;
         if (!stdConffile_ReadLine())
             goto read_fail;
-        if (_sscanf(stdConffile_aLine, " mesh name %s", mesh_name) != 1)
+        if (_sscanf(stdConffile_g_aLine, " mesh name %s", mesh_name) != 1)
             goto read_fail;
         joint = &keyframe->paJoints[node_idx];
         
@@ -197,7 +197,7 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
         if (!stdConffile_ReadLine())
             goto read_fail;
 
-        if (_sscanf(stdConffile_aLine, " entries %d", &anim_entry_cnt) != 1)
+        if (_sscanf(stdConffile_g_aLine, " entries %d", &anim_entry_cnt) != 1)
             goto read_fail;
 
         joint->nodeIdx = node_idx;
@@ -223,7 +223,7 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
             }
             
             if (_sscanf(
-                   stdConffile_aLine,
+                   stdConffile_g_aLine,
                    " %d: %f %x %f %f %f %f %f %f",
                    &entry_num,
                    &ftmp,
@@ -246,7 +246,7 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
             anim_entry->orientation.z = orientationz; // FLEXTODO
             
             if (!stdConffile_ReadLine()
-              || _sscanf(stdConffile_aLine, " %f %f %f %f %f %f", &velx, &vely, &velz, &angVelx, &angVely, &angVelz) != 6)
+              || _sscanf(stdConffile_g_aLine, " %f %f %f %f %f %f", &velx, &vely, &velz, &angVelx, &angVely, &angVelz) != 6)
             {
               goto read_fail;
             }

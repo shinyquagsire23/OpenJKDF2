@@ -1490,33 +1490,33 @@ int sithWeapon_WriteConf()
 int sithWeapon_ReadConf()
 {
     return stdConffile_ReadArgs()
-        && stdConffile_entry.numArgs
-        && !_strcmp(stdConffile_entry.args[0].key, "autopickup")
-        && _sscanf(stdConffile_entry.args[1].value, "%d", &sithWeapon_bAutoPickup) == 1
+        && stdConffile_g_entry.numArgs
+        && !_strcmp(stdConffile_g_entry.args[0].key, "autopickup")
+        && _sscanf(stdConffile_g_entry.args[1].value, "%d", &sithWeapon_bAutoPickup) == 1
         && stdConffile_ReadArgs()
-        && stdConffile_entry.numArgs
-        && !_strcmp(stdConffile_entry.args[0].key, "autoswitch")
-        && _sscanf(stdConffile_entry.args[1].value, "%d", &sithWeapon_bAutoSwitch) == 1
+        && stdConffile_g_entry.numArgs
+        && !_strcmp(stdConffile_g_entry.args[0].key, "autoswitch")
+        && _sscanf(stdConffile_g_entry.args[1].value, "%d", &sithWeapon_bAutoSwitch) == 1
         && stdConffile_ReadArgs()
-        && stdConffile_entry.numArgs
-        && !_strcmp(stdConffile_entry.args[0].key, "autoreload")
-        && _sscanf(stdConffile_entry.args[1].value, "%d", &sithWeapon_bAutoReload) == 1
+        && stdConffile_g_entry.numArgs
+        && !_strcmp(stdConffile_g_entry.args[0].key, "autoreload")
+        && _sscanf(stdConffile_g_entry.args[1].value, "%d", &sithWeapon_bAutoReload) == 1
         && stdConffile_ReadArgs()
-        && stdConffile_entry.numArgs
-        && !_strcmp(stdConffile_entry.args[0].key, "multiautopickup")
-        && _sscanf(stdConffile_entry.args[1].value, "%d", &sithWeapon_bMultiAutoPickup) == 1
+        && stdConffile_g_entry.numArgs
+        && !_strcmp(stdConffile_g_entry.args[0].key, "multiautopickup")
+        && _sscanf(stdConffile_g_entry.args[1].value, "%d", &sithWeapon_bMultiAutoPickup) == 1
         && stdConffile_ReadArgs()
-        && stdConffile_entry.numArgs
-        && !_strcmp(stdConffile_entry.args[0].key, "multiautoswitch")
-        && _sscanf(stdConffile_entry.args[1].value, "%d", &sithWeapon_bMultiplayerAutoSwitch) == 1
+        && stdConffile_g_entry.numArgs
+        && !_strcmp(stdConffile_g_entry.args[0].key, "multiautoswitch")
+        && _sscanf(stdConffile_g_entry.args[1].value, "%d", &sithWeapon_bMultiplayerAutoSwitch) == 1
         && stdConffile_ReadArgs()
-        && stdConffile_entry.numArgs
-        && !_strcmp(stdConffile_entry.args[0].key, "multiautoreload")
-        && _sscanf(stdConffile_entry.args[1].value, "%d", &sithWeapon_bMultiAutoReload) == 1
+        && stdConffile_g_entry.numArgs
+        && !_strcmp(stdConffile_g_entry.args[0].key, "multiautoreload")
+        && _sscanf(stdConffile_g_entry.args[1].value, "%d", &sithWeapon_bMultiAutoReload) == 1
         && stdConffile_ReadArgs()
-        && stdConffile_entry.numArgs
-        && !_strcmp(stdConffile_entry.args[0].key, "autoaim")
-        && _sscanf(stdConffile_entry.args[1].value, "%d", &sithWeapon_bAutoAim) == 1;
+        && stdConffile_g_entry.numArgs
+        && !_strcmp(stdConffile_g_entry.args[0].key, "autoaim")
+        && _sscanf(stdConffile_g_entry.args[1].value, "%d", &sithWeapon_bAutoAim) == 1;
 }
 
 // TODO these functions are interesting

@@ -84,10 +84,10 @@ int sithTemplate_ReadThingTemplatesListText(sithWorld *world, int a2)
         return 0;
 
     stdConffile_ReadArgs();
-    if ( _memcmp(stdConffile_entry.args[0].value, "world", 6u) || _memcmp(stdConffile_entry.args[1].value, "templates", 0xAu) )
+    if ( _memcmp(stdConffile_g_entry.args[0].value, "world", 6u) || _memcmp(stdConffile_g_entry.args[1].value, "templates", 0xAu) )
         return 0;
 
-    numTemplates = _atoi(stdConffile_entry.args[2].value);
+    numTemplates = _atoi(stdConffile_g_entry.args[2].value);
     if ( !numTemplates )
         return 1;
     
@@ -95,7 +95,7 @@ int sithTemplate_ReadThingTemplatesListText(sithWorld *world, int a2)
     
     while ( stdConffile_ReadArgs() )
     {
-        if ( !_memcmp(stdConffile_entry.args[0].value, "end", 4u) )
+        if ( !_memcmp(stdConffile_g_entry.args[0].value, "end", 4u) )
             break;
         sithTemplate_Parse(world);
     }
@@ -173,7 +173,7 @@ sithThing* sithTemplate_Parse(sithWorld *world)
     sithThing tmp;
     const char* template_name;
 
-    result = (sithThing *)stdHashtbl_Find(sithTemplate_pHashtable, (const char*)stdConffile_entry.args[0].value);
+    result = (sithThing *)stdHashtbl_Find(sithTemplate_pHashtable, (const char*)stdConffile_g_entry.args[0].value);
     if ( result )
         return result;
 
@@ -181,10 +181,10 @@ sithThing* sithTemplate_Parse(sithWorld *world)
     memset(&tmp, 0, sizeof(tmp));
 
     sithThing_Reset(&tmp);
-    result = (sithThing *)stdHashtbl_Find(sithTemplate_pHashtable, (const char*)stdConffile_entry.args[1].value);
+    result = (sithThing *)stdHashtbl_Find(sithTemplate_pHashtable, (const char*)stdConffile_g_entry.args[1].value);
     sithThing_SetThingBasedOn(&tmp, result);
 
-    template_name = stdConffile_entry.args[0].value;
+    template_name = stdConffile_g_entry.args[0].value;
 #ifdef SITH_DEBUG_STRUCT_NAMES
     stdString_SafeStrCopy(tmp.template_name, template_name, sizeof(tmp.template_name));
 #endif
@@ -192,9 +192,9 @@ sithThing* sithTemplate_Parse(sithWorld *world)
     tmp.templateNameCrc = stdCrc32(template_name, strlen(template_name));
 #endif
 
-    for (int i = 2; i < stdConffile_entry.numArgs; i++)
+    for (int i = 2; i < stdConffile_g_entry.numArgs; i++)
     {
-        sithThing_ParseArg(&stdConffile_entry.args[i], &tmp);
+        sithThing_ParseArg(&stdConffile_g_entry.args[i], &tmp);
     }
 
     if (!tmp.type )

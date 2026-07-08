@@ -53,7 +53,7 @@ int sithSector_ReadSectorsListText(sithWorld *world, int tmp)
 
     if ( tmp )
         return 0;
-    if ( !stdConffile_ReadLine() || _sscanf(stdConffile_aLine, " world sectors %d", &sectors_amt) != 1 )
+    if ( !stdConffile_ReadLine() || _sscanf(stdConffile_g_aLine, " world sectors %d", &sectors_amt) != 1 )
         return 0;
 
 #ifdef STDPLATFORM_HEAP_SUGGESTIONS
@@ -90,29 +90,29 @@ int sithSector_ReadSectorsListText(sithWorld *world, int tmp)
     {
         while ( stdConffile_ReadLine() )
         {
-            if ( _sscanf(stdConffile_aLine, " sector %d", &junk) != 1 )
+            if ( _sscanf(stdConffile_g_aLine, " sector %d", &junk) != 1 )
                 break;
             if ( !stdConffile_ReadLine() )
                 break;
-            if ( _sscanf(stdConffile_aLine, " flags %x", &sectors->flags) != 1 )
+            if ( _sscanf(stdConffile_g_aLine, " flags %x", &sectors->flags) != 1 )
                 break;
             if ( !stdConffile_ReadLine() )
                 break;
-            if ( _sscanf(stdConffile_aLine, " ambient light %f", &tmpf1) != 1 )
+            if ( _sscanf(stdConffile_g_aLine, " ambient light %f", &tmpf1) != 1 )
                 break;
             sectors->ambientLight = tmpf1; // FLEXTODO
             if ( !stdConffile_ReadLine() )
                 break;
-            if ( _sscanf(stdConffile_aLine, " extra light %f", &tmpf1) != 1 )
+            if ( _sscanf(stdConffile_g_aLine, " extra light %f", &tmpf1) != 1 )
                 break;
             sectors->extraLight = tmpf1; // FLEXTODO
             if ( !stdConffile_ReadLine() )
                 break;
-            if ( _sscanf(stdConffile_aLine, " colormap %d", &tmp) != 1 )
+            if ( _sscanf(stdConffile_g_aLine, " colormap %d", &tmp) != 1 )
                 break;
             sectors->colormap = &world->colormaps[tmp];
             if ( !stdConffile_ReadLine()
-              || _sscanf(stdConffile_aLine, " tint %f %f %f", &tmpf1, &tmpf2, &tmpf3) == 3 && !stdConffile_ReadLine() )
+              || _sscanf(stdConffile_g_aLine, " tint %f %f %f", &tmpf1, &tmpf2, &tmpf3) == 3 && !stdConffile_ReadLine() )
             {
                 break;
             }
@@ -120,7 +120,7 @@ int sithSector_ReadSectorsListText(sithWorld *world, int tmp)
             sectors->tint.y = tmpf2; // FLEXTODO
             sectors->tint.z = tmpf3; // FLEXTODO
             if ( _sscanf(
-                     stdConffile_aLine,
+                     stdConffile_g_aLine,
                      " boundbox %f %f %f %f %f %f ",
                      &tmpf1,
                      &tmpf2,
@@ -138,7 +138,7 @@ int sithSector_ReadSectorsListText(sithWorld *world, int tmp)
             if ( !stdConffile_ReadLine() )
                 break;
             if ( _sscanf(
-                     stdConffile_aLine,
+                     stdConffile_g_aLine,
                      " collidebox %f %f %f %f %f %f ",
                      &tmpf1,
                      &tmpf2,
@@ -157,26 +157,26 @@ int sithSector_ReadSectorsListText(sithWorld *world, int tmp)
                 if ( !stdConffile_ReadLine() )
                     break;
             }
-            if ( _sscanf(stdConffile_aLine, "sound %s %f", sound_fname, &tmpf1) == 2 )
+            if ( _sscanf(stdConffile_g_aLine, "sound %s %f", sound_fname, &tmpf1) == 2 )
             {
                 sectors->sectorSoundVol = tmpf1; // FLEXTODO
                 sectors->sectorSound = sithSound_Load(sound_fname, 0);
                 if ( !stdConffile_ReadLine() )
                     break;
             }
-            if ( _sscanf(stdConffile_aLine, " center %f %f %f", &tmpf1, &tmpf2, &tmpf3) != 3 )
+            if ( _sscanf(stdConffile_g_aLine, " center %f %f %f", &tmpf1, &tmpf2, &tmpf3) != 3 )
                 break;
             sectors->center.x = tmpf1; // FLEXTODO
             sectors->center.y = tmpf2; // FLEXTODO
             sectors->center.z = tmpf3; // FLEXTODO
             if ( !stdConffile_ReadLine() )
                 break;
-            if ( _sscanf(stdConffile_aLine, " radius %f", &tmpf1) != 1 )
+            if ( _sscanf(stdConffile_g_aLine, " radius %f", &tmpf1) != 1 )
                 break;
             sectors->radius = tmpf1; // FLEXTODO
             if ( !stdConffile_ReadLine() )
                 break;
-            if ( _sscanf(stdConffile_aLine, " vertices %d", &num_vertices) != 1 )
+            if ( _sscanf(stdConffile_g_aLine, " vertices %d", &num_vertices) != 1 )
                 break;
             { TWL_EXTRAM_SUGGEST(pSithHS); // Added: word-width fields/writes (audited)
             sectors->verticeIdxs = (int32_t *)SITH_ALLOC(sizeof(int32_t) * num_vertices);
@@ -188,13 +188,13 @@ int sithSector_ReadSectorsListText(sithWorld *world, int tmp)
             {
                 if (!stdConffile_ReadLine())
                     return 0;
-                if (_sscanf(stdConffile_aLine, " %d: %d", &junk, &vtx_idx) != 2)
+                if (_sscanf(stdConffile_g_aLine, " %d: %d", &junk, &vtx_idx) != 2)
                     return 0;
                 sectors->verticeIdxs[v13] = vtx_idx;
             }
 
             sectors->numVertices = num_vertices;
-            if ( !stdConffile_ReadLine() || _sscanf(stdConffile_aLine, " surfaces %d %d", &amount_1, &amount_2) != 2 )
+            if ( !stdConffile_ReadLine() || _sscanf(stdConffile_g_aLine, " surfaces %d %d", &amount_1, &amount_2) != 2 )
                 return 0;
             sectors->numSurfaces = amount_2;
 

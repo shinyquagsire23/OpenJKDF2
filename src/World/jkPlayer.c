@@ -615,19 +615,19 @@ void jkPlayer_ParseLegacyExt()
     flex32_t ftmp;
     if (stdConffile_ReadLine())
     {
-        _sscanf(stdConffile_aLine, "fov %d", &jkPlayer_fov);
+        _sscanf(stdConffile_g_aLine, "fov %d", &jkPlayer_fov);
     }
 
     if (stdConffile_ReadLine())
     {
-        _sscanf(stdConffile_aLine, "fovisvertical %d", &jkPlayer_fovIsVertical);
+        _sscanf(stdConffile_g_aLine, "fovisvertical %d", &jkPlayer_fovIsVertical);
         jkPlayer_fovIsVertical = !!jkPlayer_fovIsVertical;
     }
 
     int dpi_tmp = 0;
     if (stdConffile_ReadLine())
     {
-        _sscanf(stdConffile_aLine, "windowishidpi %d", &dpi_tmp);
+        _sscanf(stdConffile_g_aLine, "windowishidpi %d", &dpi_tmp);
         dpi_tmp = !!dpi_tmp;
         Window_SetHiDpi(dpi_tmp);
     }
@@ -635,43 +635,43 @@ void jkPlayer_ParseLegacyExt()
     int fulltmp = 0;
     if (stdConffile_ReadLine())
     {
-        _sscanf(stdConffile_aLine, "windowfullscreen %d", &fulltmp);
+        _sscanf(stdConffile_g_aLine, "windowfullscreen %d", &fulltmp);
         fulltmp = !!fulltmp;
         Window_SetFullscreen(fulltmp);
     }
 
     if (stdConffile_ReadLine())
     {
-        _sscanf(stdConffile_aLine, "texturefiltering %d", &jkPlayer_enableTextureFilter);
+        _sscanf(stdConffile_g_aLine, "texturefiltering %d", &jkPlayer_enableTextureFilter);
         jkPlayer_enableTextureFilter = !!jkPlayer_enableTextureFilter;
     }
 
     if (stdConffile_ReadLine())
     {
-        _sscanf(stdConffile_aLine, "originalaspect %d", &jkPlayer_enableOrigAspect);
+        _sscanf(stdConffile_g_aLine, "originalaspect %d", &jkPlayer_enableOrigAspect);
         jkPlayer_enableOrigAspect = !!jkPlayer_enableOrigAspect;
     }
 
     if (stdConffile_ReadLine())
     {
-        _sscanf(stdConffile_aLine, "fpslimit %d", &jkPlayer_fpslimit);
+        _sscanf(stdConffile_g_aLine, "fpslimit %d", &jkPlayer_fpslimit);
     }
 
     if (stdConffile_ReadLine())
     {
-        _sscanf(stdConffile_aLine, "enablevsync %d", &jkPlayer_enableVsync);
+        _sscanf(stdConffile_g_aLine, "enablevsync %d", &jkPlayer_enableVsync);
         jkPlayer_enableVsync = !!jkPlayer_enableVsync;
     }
 
     if (stdConffile_ReadLine())
     {
-        _sscanf(stdConffile_aLine, "enablebloom %d", &jkPlayer_enableBloom);
+        _sscanf(stdConffile_g_aLine, "enablebloom %d", &jkPlayer_enableBloom);
         jkPlayer_enableBloom = !!jkPlayer_enableBloom;
     }
 
     if (stdConffile_ReadLine())
     {
-        if (_sscanf(stdConffile_aLine, "ssaamultiple %f", &ftmp) != 1)
+        if (_sscanf(stdConffile_g_aLine, "ssaamultiple %f", &ftmp) != 1)
             jkPlayer_ssaaMultiple = 1.0;
         else
             jkPlayer_ssaaMultiple = ftmp;
@@ -679,13 +679,13 @@ void jkPlayer_ParseLegacyExt()
 
     if (stdConffile_ReadLine())
     {
-        _sscanf(stdConffile_aLine, "enablessao %d", &jkPlayer_enableSSAO);
+        _sscanf(stdConffile_g_aLine, "enablessao %d", &jkPlayer_enableSSAO);
         jkPlayer_enableSSAO = !!jkPlayer_enableSSAO;
     }
 
     if (stdConffile_ReadLine())
     {
-        if (_sscanf(stdConffile_aLine, "gamma %f", &ftmp) != 1)
+        if (_sscanf(stdConffile_g_aLine, "gamma %f", &ftmp) != 1)
             jkPlayer_gamma = 1.0;
         else
             jkPlayer_gamma = ftmp;
@@ -715,9 +715,9 @@ int jkPlayer_ReadConf(wchar_t *name)
     if (!stdConffile_OpenReadBypass(fpath))
         return 0;
 
-    if ( stdConffile_ReadLine() && _sscanf(stdConffile_aLine, "version %d", &version) == 1 && version == 1 && stdConffile_ReadLine() )
+    if ( stdConffile_ReadLine() && _sscanf(stdConffile_g_aLine, "version %d", &version) == 1 && version == 1 && stdConffile_ReadLine() )
     {
-        _sscanf(stdConffile_aLine, "diff %d", &jkPlayer_setDiff);
+        _sscanf(stdConffile_g_aLine, "diff %d", &jkPlayer_setDiff);
         if ( jkPlayer_setDiff < 0 )
         {
             jkPlayer_setDiff = 0;
@@ -728,7 +728,7 @@ int jkPlayer_ReadConf(wchar_t *name)
         }
         jkPlayer_ReadOptionsConf();
         sithWeapon_ReadConf();
-        //jk_printf("%s\n", stdConffile_aLine);
+        //jk_printf("%s\n", stdConffile_g_aLine);
         sithControl_ReadConf();
 
         // HACK
@@ -737,20 +737,20 @@ int jkPlayer_ReadConf(wchar_t *name)
 #endif
         if ( stdConffile_ReadArgs() )
         {
-            if ( stdConffile_entry.numArgs >= 1u
-              && !_memcmp(stdConffile_entry.args[0].key, "numcutscenes", 0xDu)
-              && _sscanf(stdConffile_entry.args[1].value, "%d", &jkPlayer_setNumCutscenes) == 1 )
+            if ( stdConffile_g_entry.numArgs >= 1u
+              && !_memcmp(stdConffile_g_entry.args[0].key, "numcutscenes", 0xDu)
+              && _sscanf(stdConffile_g_entry.args[1].value, "%d", &jkPlayer_setNumCutscenes) == 1 )
             {
                 v4 = jkPlayer_cutscenePath;
                 for (int i = 0; i < jkPlayer_setNumCutscenes; i++)
                 {
                     if ( !stdConffile_ReadArgs() )
                         break;
-                    if ( stdConffile_entry.numArgs < 2u )
+                    if ( stdConffile_g_entry.numArgs < 2u )
                         break;
-                    if ( _sscanf(stdConffile_entry.args[0].key, "%s", v4) != 1 )
+                    if ( _sscanf(stdConffile_g_entry.args[0].key, "%s", v4) != 1 )
                         break;
-                    if ( _sscanf(stdConffile_entry.args[1].value, "%d", &jkPlayer_aCutsceneVal[i]) != 1 )
+                    if ( _sscanf(stdConffile_g_entry.args[1].value, "%d", &jkPlayer_aCutsceneVal[i]) != 1 )
                         break;
                     v4 += 32;
                 }
@@ -1321,19 +1321,19 @@ int jkPlayer_MPCParse(jkPlayerMpcInfo *info, sithPlayerInfo* unk, wchar_t *fname
         return 0;
 
     if ( stdConffile_ReadLine()
-      && _sscanf(stdConffile_aLine, "version %d", &v8) == 1
+      && _sscanf(stdConffile_g_aLine, "version %d", &v8) == 1
       && v8 == 1
       && stdConffile_ReadLine()
-      && _sscanf(stdConffile_aLine, "model: %s", jkPlayer_model) == 1
+      && _sscanf(stdConffile_g_aLine, "model: %s", jkPlayer_model) == 1
       && stdConffile_ReadLine()
-      && _sscanf(stdConffile_aLine, "soundclass: %s", jkPlayer_soundClass) == 1
+      && _sscanf(stdConffile_g_aLine, "soundclass: %s", jkPlayer_soundClass) == 1
       && stdConffile_ReadLine()
-      && _sscanf(stdConffile_aLine, "sidemat: %s", jkPlayer_sideMat) == 1
+      && _sscanf(stdConffile_g_aLine, "sidemat: %s", jkPlayer_sideMat) == 1
       && stdConffile_ReadLine()
-      && _sscanf(stdConffile_aLine, "tipmat: %s", jkPlayer_tipMat) == 1 )
+      && _sscanf(stdConffile_g_aLine, "tipmat: %s", jkPlayer_tipMat) == 1 )
     {
         if (Main_bMotsCompat) {
-            if (!stdConffile_ReadLine() || _sscanf(stdConffile_aLine, "personality: %d", &jkPlayer_personality) != 1) {
+            if (!stdConffile_ReadLine() || _sscanf(stdConffile_g_aLine, "personality: %d", &jkPlayer_personality) != 1) {
                 stdConffile_Close();
                 return 0;
             }
@@ -1439,14 +1439,14 @@ int jkPlayer_MPCBinRead()
     stdConffile_ReadLine();
     for (int i = SITHBIN_FP_START; i <= SITHBIN_FP_END; ++i )
     {
-        if ( !stdConffile_ReadLine() || _sscanf(stdConffile_aLine, "bin: %d value: %f\n", &v3, &a2) != 2 )
+        if ( !stdConffile_ReadLine() || _sscanf(stdConffile_g_aLine, "bin: %d value: %f\n", &v3, &a2) != 2 )
             return 0;
 
         sithPlayer_SetInvItemAmount(i, a2);
         sithPlayer_SetInvItemAvailable(i, 1);
     }
 
-    if ( !stdConffile_ReadLine() || _sscanf(stdConffile_aLine, "spendable stars: %f\n", &a2) != 1 )
+    if ( !stdConffile_ReadLine() || _sscanf(stdConffile_g_aLine, "spendable stars: %f\n", &a2) != 1 )
         return 0;
 
     sithPlayer_SetInvItemAmount(SITHBIN_SPEND_STARS, a2);
@@ -1695,9 +1695,9 @@ int jkPlayer_ReadCutsceneConf()
     char *i; // edi
 
     if ( stdConffile_ReadArgs()
-      && stdConffile_entry.numArgs
-      && !_strcmp(stdConffile_entry.args[0].key, "numcutscenes")
-      && _sscanf(stdConffile_entry.args[1].value, "%d", &jkPlayer_setNumCutscenes) == 1 )
+      && stdConffile_g_entry.numArgs
+      && !_strcmp(stdConffile_g_entry.args[0].key, "numcutscenes")
+      && _sscanf(stdConffile_g_entry.args[1].value, "%d", &jkPlayer_setNumCutscenes) == 1 )
     {
         v0 = 0;
         if ( jkPlayer_setNumCutscenes <= 0 )
@@ -1705,9 +1705,9 @@ int jkPlayer_ReadCutsceneConf()
         v1 = jkPlayer_aCutsceneVal;
         for ( i = jkPlayer_cutscenePath;
               stdConffile_ReadArgs()
-           && stdConffile_entry.numArgs >= 2u
-           && _sscanf(stdConffile_entry.args[0].key, "%s", i) == 1
-           && _sscanf(stdConffile_entry.args[1].value, "%d", v1) == 1;
+           && stdConffile_g_entry.numArgs >= 2u
+           && _sscanf(stdConffile_g_entry.args[0].key, "%s", i) == 1
+           && _sscanf(stdConffile_g_entry.args[1].value, "%d", v1) == 1;
               i += 32 )
         {
             ++v0;
@@ -2017,17 +2017,17 @@ int jkPlayer_WriteOptionsConf()
 int jkPlayer_ReadOptionsConf()
 {
     return stdConffile_ReadLine()
-        && _sscanf(stdConffile_aLine, "fullsubtitles %d\n", &jkPlayer_setFullSubtitles) == 1
+        && _sscanf(stdConffile_g_aLine, "fullsubtitles %d\n", &jkPlayer_setFullSubtitles) == 1
         && stdConffile_ReadLine()
-        && _sscanf(stdConffile_aLine, "disablecutscenes %d\n", &jkPlayer_setDisableCutscenes) == 1
+        && _sscanf(stdConffile_g_aLine, "disablecutscenes %d\n", &jkPlayer_setDisableCutscenes) == 1
         && stdConffile_ReadLine()
-        && _sscanf(stdConffile_aLine, "rotateoverlaymap %d\n", &jkPlayer_setRotateOverlayMap) == 1
+        && _sscanf(stdConffile_g_aLine, "rotateoverlaymap %d\n", &jkPlayer_setRotateOverlayMap) == 1
         && stdConffile_ReadLine()
-        && _sscanf(stdConffile_aLine, "drawstatus %d\n", &jkPlayer_setDrawStatus) == 1
+        && _sscanf(stdConffile_g_aLine, "drawstatus %d\n", &jkPlayer_setDrawStatus) == 1
         && stdConffile_ReadLine()
-        && _sscanf(stdConffile_aLine, "crosshair %d\n", &jkPlayer_setCrosshair) == 1
+        && _sscanf(stdConffile_g_aLine, "crosshair %d\n", &jkPlayer_setCrosshair) == 1
         && stdConffile_ReadLine()
-        && _sscanf(stdConffile_aLine, "sabercam %d\n", &jkPlayer_setSaberCam) == 1;
+        && _sscanf(stdConffile_g_aLine, "sabercam %d\n", &jkPlayer_setSaberCam) == 1;
 }
 
 int jkPlayer_GetJediRank()
@@ -2065,9 +2065,9 @@ uint32_t jkPlayer_ChecksumExtra(uint32_t hash)
         stdString_snprintf(local_80, 128, "misc\\per\\%s.per", jkPlayer_aClassNames[uVar2]); // Added: sprintf -> snprintf
         if (stdConffile_Open(local_80)) 
         {
-            if ((stdConffile_ReadLine() && (iVar1 = _sscanf(stdConffile_aLine,"version %d",&local_84), iVar1 == 1)) && (local_84 == 2)) {
+            if ((stdConffile_ReadLine() && (iVar1 = _sscanf(stdConffile_g_aLine,"version %d",&local_84), iVar1 == 1)) && (local_84 == 2)) {
                 hash = hash + 2;
-                while (((stdConffile_ReadLine() && (iVar1 = _sscanf(stdConffile_aLine,"param %d: %f",&local_8c,&local_88), iVar1 == 2)) && ((-1 < local_8c && (local_8c < 0x100))))) {
+                while (((stdConffile_ReadLine() && (iVar1 = _sscanf(stdConffile_g_aLine,"param %d: %f",&local_8c,&local_88), iVar1 == 2)) && ((-1 < local_8c && (local_8c < 0x100))))) {
                     iVar1 = local_8c + 1;
                     lVar3 = (int64_t)(local_88 * 1000.0);
                     hash = hash + (iVar1 + uVar2) * ((uint32_t)lVar3 ^ 0x5b32a);
@@ -2124,7 +2124,7 @@ int jkPlayer_SetAmmoMaximums(int classIdx)
     iVar1 = stdConffile_Open(local_80);
     if (iVar1 != 0) {
         iVar1 = stdConffile_ReadLine();
-        if (((iVar1 != 0) && (iVar1 = _sscanf(stdConffile_aLine,"version %d",&local_84), iVar1 == 1)) && (local_84 == 2)) {
+        if (((iVar1 != 0) && (iVar1 = _sscanf(stdConffile_g_aLine,"version %d",&local_84), iVar1 == 1)) && (local_84 == 2)) {
             pfVar2 = jkPlayer_aMultiParams;
             for (iVar1 = 0x100; iVar1 != 0; iVar1 = iVar1 + -1) {
                 *pfVar2 = 0.0;
@@ -2145,7 +2145,7 @@ int jkPlayer_SetAmmoMaximums(int classIdx)
                     } while (pfVar2 < &jkPlayer_aMultiParams[61]);
                     return 1;
                 }
-                iVar1 = _sscanf(stdConffile_aLine,"param %d: %f",&local_8c,&local_88);
+                iVar1 = _sscanf(stdConffile_g_aLine,"param %d: %f",&local_8c,&local_88);
                 if (((iVar1 != 2) || (local_8c < 0)) || (0xff < local_8c)) break;
                 jkPlayer_aMultiParams[local_8c] = local_88;
                 iVar1 = stdConffile_ReadLine();

@@ -551,9 +551,9 @@ int sithCog_ReadCogsListText(sithWorld *world, int a2)
     if ( a2 )
         return 0;
     stdConffile_ReadArgs();
-    if ( _strcmp(stdConffile_entry.args[0].value, "world") || _strcmp(stdConffile_entry.args[1].value, "cogs") )
+    if ( _strcmp(stdConffile_g_entry.args[0].value, "world") || _strcmp(stdConffile_g_entry.args[1].value, "cogs") )
         return 0;
-    num_cogs = _atoi(stdConffile_entry.args[2].value);
+    num_cogs = _atoi(stdConffile_g_entry.args[2].value);
     if ( !num_cogs )
         return 1;
     { TWL_EXTRAM_SUGGEST(pSithHS); // Added: word-width fields (fpath is debug-only)
@@ -567,13 +567,13 @@ int sithCog_ReadCogsListText(sithWorld *world, int a2)
         world->numCogsLoaded = 0;
         while ( stdConffile_ReadArgs() )
         {
-            if ( !_strcmp(stdConffile_entry.args[0].value, "end") )
+            if ( !_strcmp(stdConffile_g_entry.args[0].value, "end") )
                 break;
-            if ( stdConffile_entry.numArgs < 2u )
+            if ( stdConffile_g_entry.numArgs < 2u )
                 return 0;
-            v9 = sithCog_Load(stdConffile_entry.args[1].value);
+            v9 = sithCog_Load(stdConffile_g_entry.args[1].value);
 
-            //printf("%s\n", stdConffile_entry.args[1].value);
+            //printf("%s\n", stdConffile_g_entry.args[1].value);
 
             if ( v9 )
             {
@@ -594,10 +594,10 @@ int sithCog_ReadCogsListText(sithWorld *world, int a2)
                 v22 = 2;
                 for (v23 = 0; v23 < v9->cogscript->numIdk; v23++)
                 {
-                    //printf("%s\n", stdConffile_entry.args[v22].value);
-                    if ( v21 && (v18->aIdk[v23].flags & 1) == 0 && stdConffile_entry.numArgs > v22 )
+                    //printf("%s\n", stdConffile_g_entry.args[v22].value);
+                    if ( v21 && (v18->aIdk[v23].flags & 1) == 0 && stdConffile_g_entry.numArgs > v22 )
                     {
-                        stdString_SafeStrCopy(v21, stdConffile_entry.args[v22].value, 32);
+                        stdString_SafeStrCopy(v21, stdConffile_g_entry.args[v22].value, 32);
                         v21 += 32;
                         ++v22;
                     }
@@ -1556,9 +1556,9 @@ int sithCog_ReadCogScriptsListText(sithWorld *lvl, int a2)
     if ( a2 )
         return 0;
     stdConffile_ReadArgs();
-    if ( _strcmp(stdConffile_entry.args[0].value, "world") || _strcmp(stdConffile_entry.args[1].value, "scripts") )
+    if ( _strcmp(stdConffile_g_entry.args[0].value, "world") || _strcmp(stdConffile_g_entry.args[1].value, "scripts") )
         return 0;
-    numCogScripts = _atoi(stdConffile_entry.args[2].value);
+    numCogScripts = _atoi(stdConffile_g_entry.args[2].value);
     if ( !numCogScripts )
         return 1;
     cogScripts = (sithCogScript *)SITH_ALLOC(sizeof(sithCogScript) * numCogScripts);
@@ -1570,15 +1570,15 @@ int sithCog_ReadCogScriptsListText(sithWorld *lvl, int a2)
         lvl->numCogScriptsLoaded = 0;
         while ( stdConffile_ReadArgs() )
         {
-            if ( !_strcmp(stdConffile_entry.args[0].value, "end") )
+            if ( !_strcmp(stdConffile_g_entry.args[0].value, "end") )
                 break;
             if ( lvl->numCogScriptsLoaded < (unsigned int)lvl->numCogScripts )
             {
-                if ( !stdConffile_entry.numArgs )
+                if ( !stdConffile_g_entry.numArgs )
                     return 0;
 
 
-                sithCog_LoadScript(stdConffile_entry.args[1].value, v8);
+                sithCog_LoadScript(stdConffile_g_entry.args[1].value, v8);
             }
         }
         result = 1;

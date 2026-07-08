@@ -81,7 +81,7 @@ int sithMaterial_ReadMaterialsListText(sithWorld *world, int a2)
     if ( result )
     {
         sithWorld_UpdateLoadProgress(5.0);
-        if ( _sscanf(stdConffile_aLine, " world materials %d", &a2) == 1 )
+        if ( _sscanf(stdConffile_g_aLine, " world materials %d", &a2) == 1 )
         {
             // Added: needed for JKE?
             a2 *= 2;
@@ -105,15 +105,15 @@ int sithMaterial_ReadMaterialsListText(sithWorld *world, int a2)
             sithMaterial_aMaterials = (rdMaterial **)SITH_ALLOC(sizeof(rdMaterial*) * a2);
             if ( stdConffile_ReadArgs() )
             {
-                while ( _strcmp(stdConffile_entry.args[0].value, "end") )
+                while ( _strcmp(stdConffile_g_entry.args[0].value, "end") )
                 {
-                    v7 = sithMaterial_Load(stdConffile_entry.args[1].value, 0, 0);
+                    v7 = sithMaterial_Load(stdConffile_g_entry.args[1].value, 0, 0);
                     if ( !v7 )
                         return 0;
-                    a1 = stdConffile_entry.args[2].value;
+                    a1 = stdConffile_g_entry.args[2].value;
                     sithMaterial_aMaterials[v2] = v7;
                     v8 = _atof(a1);
-                    v9 = stdConffile_entry.args[3].value;
+                    v9 = stdConffile_g_entry.args[3].value;
                     world->materials2[v2].x = v8;
                     world->materials2[v2++].y = _atof(v9);
                     a1a = (flex_d_t)(unsigned int)v2 * v12 - -5.0;

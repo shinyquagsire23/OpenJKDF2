@@ -77,13 +77,13 @@ int sithSound_ReadSoundsListText(sithWorld *world, int a2)
 
     sithWorld_UpdateLoadProgress(0.0);
     if (!stdConffile_ReadArgs() 
-        || _strcmp(stdConffile_entry.args[0].value, "world") 
-        || _strcmp(stdConffile_entry.args[1].value, "sounds") )
+        || _strcmp(stdConffile_g_entry.args[0].value, "world") 
+        || _strcmp(stdConffile_g_entry.args[1].value, "sounds") )
     {
         sithSound_FreeWorldSounds(world);
         return 0;
     }
-    numSounds = _atoi(stdConffile_entry.args[2].value);
+    numSounds = _atoi(stdConffile_g_entry.args[2].value);
     if ( !numSounds )
         return 1;
 
@@ -91,10 +91,10 @@ int sithSound_ReadSoundsListText(sithWorld *world, int a2)
     
     while ( stdConffile_ReadArgs() )
     {
-        if ( !_strcmp(stdConffile_entry.args[0].value, "end") )
+        if ( !_strcmp(stdConffile_g_entry.args[0].value, "end") )
             break;
         if ( sithSound_bInit )
-            sithSound_Load(stdConffile_entry.args[0].value, stdConffile_entry.numArgs > 1u);
+            sithSound_Load(stdConffile_g_entry.args[0].value, stdConffile_g_entry.numArgs > 1u);
     }
     return 1;
 }

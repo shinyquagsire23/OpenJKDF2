@@ -167,7 +167,7 @@ int sithWorld_Load(sithWorld *pWorld, char *map_jkl_fname)
 
         while ( stdConffile_ReadLine() )
         {
-            if ( _sscanf(stdConffile_aLine, " section: %s", section) == 1 )
+            if ( _sscanf(stdConffile_g_aLine, " section: %s", section) == 1 )
             {
                 v3 = 0;
                 if ( sithWorld_numParsers <= 0 )
@@ -469,7 +469,7 @@ int sithWorld_ReadHeaderText(sithWorld *pWorld, int junk)
         return 0;
     if ( !stdConffile_ReadLine() )
         return 0;
-    if (_sscanf(stdConffile_aLine, "version %d", &junk) != 1) // MOTS added: check 1
+    if (_sscanf(stdConffile_g_aLine, "version %d", &junk) != 1) // MOTS added: check 1
         return 0;
     // MOTS added
     if (junk != 1) {
@@ -477,34 +477,34 @@ int sithWorld_ReadHeaderText(sithWorld *pWorld, int junk)
     }
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "world gravity %f", &tmp);
+    _sscanf(stdConffile_g_aLine, "world gravity %f", &tmp);
     pWorld->worldGravity = tmp; // FLEXTODO
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "ceiling sky z %f", &tmp);
+    _sscanf(stdConffile_g_aLine, "ceiling sky z %f", &tmp);
     pWorld->ceilingSky = tmp; // FLEXTODO
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "horizon distance %f", &tmp);
+    _sscanf(stdConffile_g_aLine, "horizon distance %f", &tmp);
     pWorld->horizontalDistance = tmp; // FLEXTODO
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "horizon pixels per rev %f", &tmp);
+    _sscanf(stdConffile_g_aLine, "horizon pixels per rev %f", &tmp);
     pWorld->horizontalPixelsPerRev = tmp; // FLEXTODO
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "horizon sky offset %f %f", &tmp, &tmp2);
+    _sscanf(stdConffile_g_aLine, "horizon sky offset %f %f", &tmp, &tmp2);
     pWorld->horizontalSkyOffs.x = tmp; // FLEXTODO
     pWorld->horizontalSkyOffs.y = tmp2; // FLEXTODO
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "ceiling sky offset %f %f", &tmp, &tmp2);
+    _sscanf(stdConffile_g_aLine, "ceiling sky offset %f %f", &tmp, &tmp2);
     pWorld->ceilingSkyOffs.x = tmp; // FLEXTODO
     pWorld->ceilingSkyOffs.y = tmp2; // FLEXTODO
     if ( !stdConffile_ReadLine() )
         return 0;
     _sscanf(
-        stdConffile_aLine,
+        stdConffile_g_aLine,
         "mipmap distances %f %f %f %f",
         &tmp,
         &tmp2,
@@ -516,18 +516,18 @@ int sithWorld_ReadHeaderText(sithWorld *pWorld, int junk)
     pWorld->mipmapDistance.w = tmp4; // FLEXTODO
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "lod distances %f %f %f %f", &tmp, &tmp2, &tmp3, &tmp4);
+    _sscanf(stdConffile_g_aLine, "lod distances %f %f %f %f", &tmp, &tmp2, &tmp3, &tmp4);
     pWorld->lodDistance.x = tmp; // FLEXTODO
     pWorld->lodDistance.y = tmp2; // FLEXTODO
     pWorld->lodDistance.z = tmp3; // FLEXTODO
     pWorld->lodDistance.w = tmp4; // FLEXTODO
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "perspective distance %f", &tmp);
+    _sscanf(stdConffile_g_aLine, "perspective distance %f", &tmp);
     pWorld->perspectiveDistance = tmp; // FLEXTODO
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "gouraud distance %f", &tmp);
+    _sscanf(stdConffile_g_aLine, "gouraud distance %f", &tmp);
     pWorld->gouradDistance = tmp; // FLEXTODO
 
 // Old-style mipmap/LOD removal
@@ -558,7 +558,7 @@ int sithWorld_ReadCopyrightText(sithWorld *lvl, int junk)
     {
         if (!stdConffile_ReadLine())
             return 0;
-        _memcpy(iter, stdConffile_aLine, 0x20);
+        _memcpy(iter, stdConffile_g_aLine, 0x20);
         iter += 0x20;
     }
     while (iter < &jkl_read_copyright[0x440]);
@@ -704,7 +704,7 @@ int sithWorld_ReadGeoresourceText(sithWorld *pWorld, int a2)
         return 0;
     }
 
-    if ( _sscanf(stdConffile_aLine, " world colormaps %d", &numColormaps) != 1 )
+    if ( _sscanf(stdConffile_g_aLine, " world colormaps %d", &numColormaps) != 1 )
     {
         return 0;
     }
@@ -725,7 +725,7 @@ int sithWorld_ReadGeoresourceText(sithWorld *pWorld, int a2)
             return 0;
         }
 
-        if ( _sscanf(stdConffile_aLine, " %d: %s", &v_idx, std_g_genBuffer) != 2 )
+        if ( _sscanf(stdConffile_g_aLine, " %d: %s", &v_idx, std_g_genBuffer) != 2 )
         {
             return 0;
         }
@@ -742,7 +742,7 @@ int sithWorld_ReadGeoresourceText(sithWorld *pWorld, int a2)
         return 0;
     }
 
-    if (_sscanf(stdConffile_aLine, " world vertices %d", &numVertices) != 1 )
+    if (_sscanf(stdConffile_g_aLine, " world vertices %d", &numVertices) != 1 )
     {
         return 0;
     }
@@ -769,7 +769,7 @@ int sithWorld_ReadGeoresourceText(sithWorld *pWorld, int a2)
             return 0;
         }
 
-        if (_sscanf(stdConffile_aLine, " %d: %f %f %f", &v_idx, &v_x, &v_y, &v_z) != 4 )
+        if (_sscanf(stdConffile_g_aLine, " %d: %f %f %f", &v_idx, &v_x, &v_y, &v_z) != 4 )
         {
             return 0;
         }
@@ -785,7 +785,7 @@ int sithWorld_ReadGeoresourceText(sithWorld *pWorld, int a2)
         return 0;
     }
 
-    if (_sscanf(stdConffile_aLine, " world texture vertices %d", &textureVertices) != 1)
+    if (_sscanf(stdConffile_g_aLine, " world texture vertices %d", &textureVertices) != 1)
     {
         return 0;
     }
@@ -806,7 +806,7 @@ int sithWorld_ReadGeoresourceText(sithWorld *pWorld, int a2)
         if (!stdConffile_ReadLine()) {
             return 0;
         }
-        if (_sscanf(stdConffile_aLine, " %d: %f %f", &v_idx, &v_u, &v_v) != 3) {
+        if (_sscanf(stdConffile_g_aLine, " %d: %f %f", &v_idx, &v_u, &v_v) != 3) {
             return 0;
         }
 

@@ -34,9 +34,9 @@ int sithSprite_ReadStaticSpritesListText(sithWorld *world, int a2)
         return 0;
 
     stdConffile_ReadArgs();
-    if ( _memcmp(stdConffile_entry.args[0].value, "world", 6u) || _memcmp(stdConffile_entry.args[1].value, "sprites", 8u) )
+    if ( _memcmp(stdConffile_g_entry.args[0].value, "world", 6u) || _memcmp(stdConffile_g_entry.args[1].value, "sprites", 8u) )
         return 0;
-    sprites_amt = _atoi(stdConffile_entry.args[2].value);
+    sprites_amt = _atoi(stdConffile_g_entry.args[2].value);
     if ( !sprites_amt )
         return 1;
 
@@ -51,9 +51,9 @@ int sithSprite_ReadStaticSpritesListText(sithWorld *world, int a2)
     flex_t loadPercent = 70.0;
     if ( stdConffile_ReadArgs() )
     {
-        while ( _memcmp(stdConffile_entry.args[0].value, "end", 4u) )
+        while ( _memcmp(stdConffile_g_entry.args[0].value, "end", 4u) )
         {
-            if ( !sithSprite_Load(stdConffile_entry.args[1].value) )
+            if ( !sithSprite_Load(stdConffile_g_entry.args[1].value) )
             {
                 stdPrintf(
                     pSithHS->errorPrint,
@@ -66,7 +66,7 @@ int sithSprite_ReadStaticSpritesListText(sithWorld *world, int a2)
                     ".\\World\\sithSprite.c",
                     159,
                     "OpenJKDF2: Failed sprite was `%s`\n",
-                    stdConffile_entry.args[1].value);
+                    stdConffile_g_entry.args[1].value);
                 return 0;
             }
             flex_t percentDelta = 10.0 / (flex_d_t)sprites_amt;
@@ -114,22 +114,22 @@ rdSprite* sithSprite_Load(char *fpath)
             _sprintf(spriteFpath, "%s%c%s", "misc\\spr", '\\', fpath);
             if ( stdConffile_Open(spriteFpath) )
             {
-                if ( stdConffile_ReadArgs() && stdConffile_entry.numArgs >= 0xBu )
+                if ( stdConffile_ReadArgs() && stdConffile_g_entry.numArgs >= 0xBu )
                 {
                     rdVector3 off;
                     char mat[32];
 
-                    stdString_SafeStrCopy(mat, stdConffile_entry.args[0].value, 0x20);
-                    uint32_t type_id = _atoi(stdConffile_entry.args[1].value);
-                    flex32_t width = _atof(stdConffile_entry.args[2].value);
-                    flex32_t height = _atof(stdConffile_entry.args[3].value);
-                    int geometryMode = _atoi(stdConffile_entry.args[4].value);
-                    int lightMode = _atoi(stdConffile_entry.args[5].value);
-                    int textureMode = _atoi(stdConffile_entry.args[6].value);
-                    flex32_t extralight = _atof(stdConffile_entry.args[7].value);
-                    off.x = _atof(stdConffile_entry.args[8].value);
-                    off.y = _atof(stdConffile_entry.args[9].value);
-                    off.z = _atof(stdConffile_entry.args[10].value);
+                    stdString_SafeStrCopy(mat, stdConffile_g_entry.args[0].value, 0x20);
+                    uint32_t type_id = _atoi(stdConffile_g_entry.args[1].value);
+                    flex32_t width = _atof(stdConffile_g_entry.args[2].value);
+                    flex32_t height = _atof(stdConffile_g_entry.args[3].value);
+                    int geometryMode = _atoi(stdConffile_g_entry.args[4].value);
+                    int lightMode = _atoi(stdConffile_g_entry.args[5].value);
+                    int textureMode = _atoi(stdConffile_g_entry.args[6].value);
+                    flex32_t extralight = _atof(stdConffile_g_entry.args[7].value);
+                    off.x = _atof(stdConffile_g_entry.args[8].value);
+                    off.y = _atof(stdConffile_g_entry.args[9].value);
+                    off.z = _atof(stdConffile_g_entry.args[10].value);
                     stdConffile_Close();
                     if ( type_id <= 2 && width > 0.0 && height > 0.0 )
                     {
@@ -145,12 +145,12 @@ rdSprite* sithSprite_Load(char *fpath)
                         }
                     }
                     else { // Added
-                        jk_printf("OpenJKDF2: Failed to read sprite `%s`! type_id %x > 2? width %f (%s) height %f (%s)\n", spriteFpath, type_id, (flex32_t)width, stdConffile_entry.args[2].value, (flex32_t)height, stdConffile_entry.args[3].value);
+                        jk_printf("OpenJKDF2: Failed to read sprite `%s`! type_id %x > 2? width %f (%s) height %f (%s)\n", spriteFpath, type_id, (flex32_t)width, stdConffile_g_entry.args[2].value, (flex32_t)height, stdConffile_g_entry.args[3].value);
                     }
                 }
                 else // Added
                 {
-                    jk_printf("OpenJKDF2: Failed to read sprite `%s`! NumArgs %x < 0xB?\n", spriteFpath, stdConffile_entry.numArgs);
+                    jk_printf("OpenJKDF2: Failed to read sprite `%s`! NumArgs %x < 0xB?\n", spriteFpath, stdConffile_g_entry.numArgs);
                     stdConffile_Close();
                 }
             }

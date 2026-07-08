@@ -58,10 +58,10 @@ int sithArchLighting_ParseSection(sithWorld *pWorld, int unk)
 
     stdConffile_ReadArgs();
 
-    if (strncmp(stdConffile_entry.args[0].value, "num", strlen("num"))) return 0;
-    if (strncmp(stdConffile_entry.args[1].value, "archobjects", strlen("archobjects"))) return 0;
+    if (strncmp(stdConffile_g_entry.args[0].value, "num", strlen("num"))) return 0;
+    if (strncmp(stdConffile_g_entry.args[1].value, "archobjects", strlen("archobjects"))) return 0;
 
-    uVar2 = _atoi(stdConffile_entry.args[2].value);
+    uVar2 = _atoi(stdConffile_g_entry.args[2].value);
     uVar8 = uVar2 * sizeof(sithArchLight);
     if (uVar8 == 0) {
         uVar8 = sizeof(sithArchLight); // Added: 1 -> sizeof(sithArchLight)
@@ -76,10 +76,10 @@ int sithArchLighting_ParseSection(sithWorld *pWorld, int unk)
         do {
             psVar3 = pWorld->aArchlights + unk;
             stdConffile_ReadArgs();
-            _atoi(stdConffile_entry.args[1].value);
+            _atoi(stdConffile_g_entry.args[1].value);
             stdConffile_ReadArgs();
-            if (!strncmp(stdConffile_entry.args[0].value, "nummeshes:", strlen("nummeshes:"))) {
-                iStack12 = _atoi(stdConffile_entry.args[1].value);
+            if (!strncmp(stdConffile_g_entry.args[0].value, "nummeshes:", strlen("nummeshes:"))) {
+                iStack12 = _atoi(stdConffile_g_entry.args[1].value);
                 psVar3->numMeshes = iStack12;
                 psVar4 = (sithArchLightMesh *)SITH_ALLOC(iStack12 * sizeof(sithArchLightMesh));
                 psVar3->aMeshes = psVar4;
@@ -87,12 +87,12 @@ int sithArchLighting_ParseSection(sithWorld *pWorld, int unk)
                     iVar9 = 0;
                     do {
                         stdConffile_ReadArgs();
-                        _atoi(stdConffile_entry.args[1].value);
+                        _atoi(stdConffile_g_entry.args[1].value);
                         ppvVar11 = &psVar3->aMeshes[iVar9];
                         stdConffile_ReadArgs();
                         
-                        if (!strncmp(stdConffile_entry.args[0].value, "numvertices:", strlen("numvertices:"))) {
-                            uVar5 = _atoi(stdConffile_entry.args[1].value);
+                        if (!strncmp(stdConffile_g_entry.args[0].value, "numvertices:", strlen("numvertices:"))) {
+                            uVar5 = _atoi(stdConffile_g_entry.args[1].value);
                             ppvVar11->numVertices = uVar5;
                             uVar8 = uVar5 * sizeof(flex_t);
                             pfVar6 = (flex_t *)SITH_ALLOC(uVar8);
@@ -107,14 +107,14 @@ int sithArchLighting_ParseSection(sithWorld *pWorld, int unk)
                             if (uVar5 != 0) {
                                 do {
                                     stdConffile_ReadArgs();
-                                    fVar14 = _atof(stdConffile_entry.args[1].value);
-                                    pcVar11 = stdConffile_entry.args[2].value;
+                                    fVar14 = _atof(stdConffile_g_entry.args[1].value);
+                                    pcVar11 = stdConffile_g_entry.args[2].value;
                                     ppvVar11->aMono[uVar8] = fVar14;
                                     fVar15 = _atof(pcVar11);
-                                    pcVar11 = stdConffile_entry.args[3].value;
+                                    pcVar11 = stdConffile_g_entry.args[3].value;
                                     ppvVar11->aRed[uVar8] = fVar15;
                                     fVar15 = _atof(pcVar11);
-                                    pcVar11 = stdConffile_entry.args[4].value;
+                                    pcVar11 = stdConffile_g_entry.args[4].value;
                                     ppvVar11->aGreen[uVar8] = fVar15;
                                     fVar15 = _atof(pcVar11);
                                     ppvVar11->aBlue[uVar8] = fVar15;

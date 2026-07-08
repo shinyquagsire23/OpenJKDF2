@@ -169,12 +169,12 @@ int sithSoundClass_ReadSoundClassesListText(sithWorld *world, int a2)
         return 0;
 
     stdConffile_ReadArgs();
-    if ( _strcmp(stdConffile_entry.args[0].value, "world") || _strcmp(stdConffile_entry.args[1].value, "soundclasses") ) {
+    if ( _strcmp(stdConffile_g_entry.args[0].value, "world") || _strcmp(stdConffile_g_entry.args[1].value, "soundclasses") ) {
         jk_printf("OpenJKDF2: sithSoundClass_ReadSoundClassesListText failed first strcmp");
         return 0;
     }
 
-    num_soundclasses = _atoi(stdConffile_entry.args[2].value);
+    num_soundclasses = _atoi(stdConffile_g_entry.args[2].value);
 
     // Added
     if ( num_soundclasses <= 0 ) {
@@ -201,12 +201,12 @@ int sithSoundClass_ReadSoundClassesListText(sithWorld *world, int a2)
     
     while ( stdConffile_ReadArgs() )
     {
-        if ( !_strcmp(stdConffile_entry.args[0].value, "end") )
+        if ( !_strcmp(stdConffile_g_entry.args[0].value, "end") )
             break;
-        v6 = stdConffile_entry.args[1].value;
-        if ( _strcmp(stdConffile_entry.args[1].value, "none") && sithWorld_g_pLastLoadedWorld->soundclasses)
+        v6 = stdConffile_g_entry.args[1].value;
+        if ( _strcmp(stdConffile_g_entry.args[1].value, "none") && sithWorld_g_pLastLoadedWorld->soundclasses)
         {
-            _sprintf(soundclass_fname, "%s%c%s", "misc\\snd", 92, stdConffile_entry.args[1].value);
+            _sprintf(soundclass_fname, "%s%c%s", "misc\\snd", 92, stdConffile_g_entry.args[1].value);
             if ( !stdHashtbl_Find(sithSoundClass_pHashtblModes, v6) )
             {
                 idx = sithWorld_g_pLastLoadedWorld->numSoundClassesLoaded;
@@ -293,22 +293,22 @@ int sithSoundClass_LoadEntry(sithSoundClass *soundClass, char *fpath)
 
     while ( stdConffile_ReadArgs() )
     {
-        if ( stdConffile_entry.numArgs < 2u ) {
+        if ( stdConffile_g_entry.numArgs < 2u ) {
             continue;
         }
 
-        soundIdx = (uint32_t)((intptr_t)stdHashtbl_Find(sithSoundClass_pHashTable, (const char*)(intptr_t)stdConffile_entry.args[0].value) & 0xFFFFFFFF);
+        soundIdx = (uint32_t)((intptr_t)stdHashtbl_Find(sithSoundClass_pHashTable, (const char*)(intptr_t)stdConffile_g_entry.args[0].value) & 0xFFFFFFFF);
         if (soundIdx < 0 || soundIdx >= SITH_SC_MAX) {
             continue;
         }
 
-        //printf("%s, %s\n", fpath, stdConffile_entry.args[1].value);
-        if ( !_strcmp(stdConffile_entry.args[1].value, "none") )
+        //printf("%s, %s\n", fpath, stdConffile_g_entry.args[1].value);
+        if ( !_strcmp(stdConffile_g_entry.args[1].value, "none") )
         {
             v5 = 0;
         }
         else {
-            v5 = sithSound_Load(stdConffile_entry.args[1].value, 0);
+            v5 = sithSound_Load(stdConffile_g_entry.args[1].value, 0);
             if (!v5)
                 continue;
         }
@@ -324,14 +324,14 @@ int sithSoundClass_LoadEntry(sithSoundClass *soundClass, char *fpath)
             newEntry->minRadius = 0.5;
             newEntry->maxRadius = 2.5;
             newEntry->maxVolume = 1.0;
-            if (stdConffile_entry.numArgs > 2u)
-                _sscanf(stdConffile_entry.args[2].value, "%x", &newEntry->playflags);
-            if ( stdConffile_entry.numArgs > 3u )
-                newEntry->minRadius = _atof(stdConffile_entry.args[3].value);
-            if ( stdConffile_entry.numArgs > 4u )
-                newEntry->maxRadius = _atof(stdConffile_entry.args[4].value);
-            if ( stdConffile_entry.numArgs > 5u )
-                newEntry->maxVolume = _atof(stdConffile_entry.args[5].value);
+            if (stdConffile_g_entry.numArgs > 2u)
+                _sscanf(stdConffile_g_entry.args[2].value, "%x", &newEntry->playflags);
+            if ( stdConffile_g_entry.numArgs > 3u )
+                newEntry->minRadius = _atof(stdConffile_g_entry.args[3].value);
+            if ( stdConffile_g_entry.numArgs > 4u )
+                newEntry->maxRadius = _atof(stdConffile_g_entry.args[4].value);
+            if ( stdConffile_g_entry.numArgs > 5u )
+                newEntry->maxVolume = _atof(stdConffile_g_entry.args[5].value);
             if ( (newEntry->playflags & 0x4000) != 0 && newEntry->sound )
                 sithSound_LoadFileData(newEntry->sound);
             v8 = soundClass->entries[soundIdx];

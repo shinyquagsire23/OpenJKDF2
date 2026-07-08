@@ -866,9 +866,9 @@ openFile 0x00563568 stdFile_t
 writeFile 0x0056356C stdFile_t
 stackLevel 0x00563570 uint32_t
 stdConffile_aWriteFilename 0x860820 char[128]
-stdConffile_entry 0x8608A0 stdConffileEntry
+stdConffile_g_entry 0x8608A0 stdConffileEntry
 stdConffile_pFilename 0x860CC0 char[128]
-stdConffile_aLine 0x860D40 char*
+stdConffile_g_aLine 0x860D40 char*
 
 stdMemory_bInitted 0x00570384 int
 stdMemory_bOpened 0x00570388 int

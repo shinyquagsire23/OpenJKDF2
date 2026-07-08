@@ -145,17 +145,17 @@ int rdParticle_LoadEntry(char *fpath, rdParticle *pParticle)
     if (!stdConffile_ReadLine())
         goto done_close;
         
-    if ( _sscanf(stdConffile_aLine, " section: %s", std_g_genBuffer) != 1 )
+    if ( _sscanf(stdConffile_g_aLine, " section: %s", std_g_genBuffer) != 1 )
         goto done_close;
     
     if (!stdConffile_ReadLine())
         goto done_close;
         
-    _sscanf(stdConffile_aLine, " par %d.%d", &versMajor, &versMinor);
+    _sscanf(stdConffile_g_aLine, " par %d.%d", &versMajor, &versMinor);
     if (!stdConffile_ReadLine())
         goto done_close;
 
-    if (_sscanf(stdConffile_aLine, " size %f", &size) != 1)
+    if (_sscanf(stdConffile_g_aLine, " size %f", &size) != 1)
         goto done_close;
 
     pParticle->diameter = size; // FLEXTODO
@@ -163,7 +163,7 @@ int rdParticle_LoadEntry(char *fpath, rdParticle *pParticle)
     if (!stdConffile_ReadLine())
         goto done_close;
 
-    if ( _sscanf(stdConffile_aLine, " material %s", std_g_genBuffer) != 1 )
+    if ( _sscanf(stdConffile_g_aLine, " material %s", std_g_genBuffer) != 1 )
         goto done_close;
         
     v7 = rdMaterial_Load(std_g_genBuffer, 0, 0);
@@ -175,26 +175,26 @@ int rdParticle_LoadEntry(char *fpath, rdParticle *pParticle)
     if (!stdConffile_ReadLine())
         goto done_close;
 
-    if ( _sscanf(stdConffile_aLine, " lightingmode %d", &pParticle->lightingMode) != 1 )
+    if ( _sscanf(stdConffile_g_aLine, " lightingmode %d", &pParticle->lightingMode) != 1 )
         goto done_close;
 
     if (!stdConffile_ReadLine())
         goto done_close;
 
-    if ( _sscanf(stdConffile_aLine, " section: %s", std_g_genBuffer) != 1 )
+    if ( _sscanf(stdConffile_g_aLine, " section: %s", std_g_genBuffer) != 1 )
         goto done_close;
 
     if (!stdConffile_ReadLine() )
         goto done_close;
 
-    if ( _sscanf(stdConffile_aLine, " radius %f", &v21) != 1 )
+    if ( _sscanf(stdConffile_g_aLine, " radius %f", &v21) != 1 )
         goto done_close;
 
     pParticle->cloudRadius = v21; // FLEXTODO
     if (!stdConffile_ReadLine())
         goto done_close;
 
-    if ( _sscanf(stdConffile_aLine, " insert offset %f %f %f", &fx, &fy, &fz) != 3 )
+    if ( _sscanf(stdConffile_g_aLine, " insert offset %f %f %f", &fx, &fy, &fz) != 3 )
         goto done_close;
 
     pParticle->insertOffset.x = fx; // FLEXTODO
@@ -204,7 +204,7 @@ int rdParticle_LoadEntry(char *fpath, rdParticle *pParticle)
         goto done_close;
 
     uint32_t numVertices;
-    if ( _sscanf(stdConffile_aLine, " vertices %d", &numVertices) == 1
+    if ( _sscanf(stdConffile_g_aLine, " vertices %d", &numVertices) == 1
       && numVertices <= 0x100 )
     {
         pParticle->numVertices = numVertices;
@@ -223,7 +223,7 @@ LABEL_28:
             }
             while ( stdConffile_ReadLine()
                  && _sscanf(
-                        stdConffile_aLine,
+                        stdConffile_g_aLine,
                         " %d: %f %f %f %d",
                         &v24,
                         &fx,
