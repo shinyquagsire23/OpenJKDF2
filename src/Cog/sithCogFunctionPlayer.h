@@ -4,7 +4,7 @@
 #include "types.h"
 #include "sithCog.h"
 
-void sithCogFunctionPlayer_GetLocalPlayerThing(sithCog *ctx);
+void sithCogFunctionPlayer_GetLocalPlayerThing(sithCog *pCog);
 
 void sithCogFunctionPlayer_Startup(SithCogSymbolTable* a1);
 

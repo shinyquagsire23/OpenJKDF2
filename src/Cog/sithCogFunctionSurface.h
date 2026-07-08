@@ -3,8 +3,8 @@
 
 #include "sithCog.h"
 
-void sithCogFunctionSurface_Startup(SithCogSymbolTable* ctx);
+void sithCogFunctionSurface_Startup(SithCogSymbolTable* pCog);
 
-//MATH_FUNC void sithCogFunctionSurface_SlideWall(sithCog *ctx);
+//MATH_FUNC void sithCogFunctionSurface_SlideWall(sithCog *pCog);
 
 #endif // _SITHCOGFUNCTIONSURFACE_H
