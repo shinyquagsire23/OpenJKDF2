@@ -60,13 +60,26 @@ lets fixes/insights flow between them.
        Dreamcast** — member accesses live in platform-specific files the macOS
        build never compiles (e.g. `timer`→`msecTimerTime` silently hit maxmod's
        `mm_stream.timer` in `Platform/TWL/stdSound.c`; only the TWL build caught it).
+     - **cog/AI/camera/player/event structs ✅** — 64 member renames (SithCog,
+       SithCogScript, SithCogSymbol[Table/Value/Ref], SithCamera, SithPlayer,
+       SithInventoryType/Item, SithPuppetClass[Submode], SithEvent[Params/Task],
+       SithSurfaceAdjoin, SithPathFrame/MoveInfo, SithAIControlBlock, SithAIClass,
+       SithAIInstinct[State]). All three platforms green. Tooling: scratchpad
+       `process_members.py` (normalizes the 3 agent map formats + filters) →
+       `apply_types.py` → build macOS+TWL+DC. The processor now also drops any old
+       name shared across >1 CURRENT struct (caught the cross-batch `pLocalPlayer`
+       collision).
      - **DEFERRED generic members** (need scoped/AST rename, not token): `position`,
-       `sector`, `timer`, `vel`, `acceleration`, `puppet`, `contents`, `count`,
-       `material`, `range`, `rate`, `surfaces`, `adjoins`, all `field_XX`.
-     - **STILL TODO**: remaining structs (SithCog, SithCogScript, SithAIClass,
-       SithCamera, SithPlayer, SithInventory descriptors, rd* structs, std* structs,
-       …); and **enum-type field retyping** (`uint32_t type`→`SithThingType type`,
-       creating the 27 enum typedefs) — `retype` fields captured in the member maps.
+       `sector`, `timer`, `vel`, `flags`, `type`, `surface`, `heap`, `next`, `val`,
+       `state`, `thing`, `param1/2/3`, `nextUpdate`, `trigId`, `keyframe`, `func`,
+       `linkid`, all `field_XX`, and other shared-in-N names (see process_members.py
+       GENERIC list + shared-drop). ~39 dropped in batch 2 alone.
+     - **STILL TODO**: remaining structs — `rd*` (rdThing/Model3/Mesh/Material/
+       Camera/Light/Keyframe/Puppet/Sprite…), `std*` (tVBuffer/Gob/tHashTable/
+       stdFont…), and leftover sith (SithSoundClass, SithMap/MapView, collision
+       structs); and **enum-type field retyping** (`uint32_t type`→`SithThingType`,
+       creating the enum typedefs) — retype targets captured in scratchpad
+       `members_*_retype.json` (28 so far).
 4. **Style match (final)** — for each function, match OpenJones3D's *style* as
    closely as possible **without changing functionality**:
    - **argument names** → adopt J3D's parameter names.
