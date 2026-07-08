@@ -1067,7 +1067,7 @@ debug_controls:
             int old = jkPlayer_maxPlayers;// Added
             jkPlayer_maxPlayers = 10; // Added
             sithControl_curDebugCam = v3 - INPUT_FUNC_SELECT1; // Added
-            sithPlayerActions_WarpToCheckpoint(player, sithControl_curDebugCam);
+            sithPlayerActions_MoveToPlayerPosition(player, sithControl_curDebugCam);
             jkPlayer_maxPlayers = old; // Added
 
             // Added
@@ -1103,7 +1103,7 @@ debug_controls:
             sithConsole_PrintWString(sithControl_debugWStrTmp);
             
             if (!sithControl_followingPlayer) {
-                sithPlayerActions_WarpToCheckpoint(player, sithControl_curDebugCam);
+                sithPlayerActions_MoveToPlayerPosition(player, sithControl_curDebugCam);
             }
         }
     }

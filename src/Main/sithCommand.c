@@ -629,7 +629,7 @@ int sithCommand_Jump(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     result = _sscanf(pArgStr, "%d", &idx);
     if ( result )
     {
-        sithPlayerActions_WarpToCheckpoint(sithPlayer_pLocalPlayerThing, idx - 1);
+        sithPlayerActions_MoveToPlayerPosition(sithPlayer_pLocalPlayerThing, idx - 1);
         result = 1;
     }
     return result;

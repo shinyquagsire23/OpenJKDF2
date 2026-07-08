@@ -1930,7 +1930,7 @@ void do_hooks()
     // sithPlayerActions
     hook_function(sithPlayerActions_Activate_ADDR, sithPlayerActions_Activate);
     hook_function(sithPlayerActions_JumpWithVel_ADDR, sithPlayerActions_JumpWithVel);
-    hook_function(sithPlayerActions_WarpToCheckpoint_ADDR, sithPlayerActions_WarpToCheckpoint);
+    hook_function(sithPlayerActions_MoveToPlayerPosition_ADDR, sithPlayerActions_MoveToPlayerPosition);
     
     // sithThing
     hook_function(sithThing_Startup_ADDR, sithThing_Startup);
