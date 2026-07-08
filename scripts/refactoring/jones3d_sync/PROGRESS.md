@@ -46,9 +46,27 @@ lets fixes/insights flow between them.
      it, so create the typedef + retype the width-matching field together per struct.
      Map is in scratchpad (27 enums: THINGTYPE→SithThingType, SITH_TF→SithThingFlag,
      MOVETYPE→SithThingMoveType, SITH_CT→SithControlType, ATTACHFLAGS→SithAttachFlag, …).
-   - **3c struct members + enum-type field retyping** — NOT STARTED (name-only,
-     layout-preserving; largest blast radius). Member map from J3D struct defs
-     (`thingflags`→`flags`, `lifeLeftMs`→`msecLifeLeft`, `sector`→`pInSector`, …).
+   - **3c struct members + enum-type field retyping** ◐ IN PROGRESS.
+     - **thing-family structs ✅** — 106 member renames (SithThing, SithSector,
+       SithSurface, SithWorld, SithActorInfo, SithPhysicsInfo, SithWeaponInfo,
+       SithItemInfo, SithExplosionInfo, SithParticleInfo): `thingflags`→`flags`,
+       `lifeLeftMs`→`msecLifeLeft`, `nextThing`→`pNextThingInSector`, World's
+       `numXLoaded`/`numX`→`numX`/`sizeX` swap-cycles, … Verified on **macOS + TWL
+       + Dreamcast** (all three built green).
+     - **HARD LESSON (member renames):** member names are NOT globally unique, so
+       token-renaming a shared name is unsafe. Must (a) drop cross-struct
+       CONFLICTS (`surfaces`/`adjoins` map differently in Sector vs World),
+       positional `field_XX`, and generic-common names; (b) **build macOS + TWL +
+       Dreamcast** — member accesses live in platform-specific files the macOS
+       build never compiles (e.g. `timer`→`msecTimerTime` silently hit maxmod's
+       `mm_stream.timer` in `Platform/TWL/stdSound.c`; only the TWL build caught it).
+     - **DEFERRED generic members** (need scoped/AST rename, not token): `position`,
+       `sector`, `timer`, `vel`, `acceleration`, `puppet`, `contents`, `count`,
+       `material`, `range`, `rate`, `surfaces`, `adjoins`, all `field_XX`.
+     - **STILL TODO**: remaining structs (SithCog, SithCogScript, SithAIClass,
+       SithCamera, SithPlayer, SithInventory descriptors, rd* structs, std* structs,
+       …); and **enum-type field retyping** (`uint32_t type`→`SithThingType type`,
+       creating the 27 enum typedefs) — `retype` fields captured in the member maps.
 4. **Style match (final)** — for each function, match OpenJones3D's *style* as
    closely as possible **without changing functionality**:
    - **argument names** → adopt J3D's parameter names.
