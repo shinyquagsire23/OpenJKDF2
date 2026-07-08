@@ -2071,13 +2071,13 @@ void do_hooks()
     hook_function(sithIntersect_IsSphereInSector_ADDR, sithIntersect_IsSphereInSector);
     //hook_function(sithIntersect_sub_5080D0_ADDR, sithIntersect_sub_5080D0); // TODO: not yet decompiled
     //hook_function(sithIntersect_sub_508540_ADDR, sithIntersect_sub_508540); // TODO: not yet decompiled
-    hook_function(sithIntersect_sub_508D20_ADDR, sithIntersect_sub_508D20);
-    hook_function(sithIntersect_SphereHit_ADDR, sithIntersect_SphereHit);
-    hook_function(sithIntersect_sub_508750_ADDR, sithIntersect_sub_508750);
-    hook_function(sithIntersect_sub_5090B0_ADDR, sithIntersect_sub_5090B0);
-    hook_function(sithIntersect_sub_508400_ADDR, sithIntersect_sub_508400);
-    hook_function(sithIntersect_sub_508990_ADDR, sithIntersect_sub_508990);
-    hook_function(sithIntersect_sub_508070_ADDR, sithIntersect_CheckFaceIntersection);
+    hook_function(sithIntersect_CheckSphereFaceIntersectionEx_ADDR, sithIntersect_CheckSphereFaceIntersectionEx);
+    hook_function(sithIntersect_CheckSphereHit_ADDR, sithIntersect_CheckSphereHit);
+    hook_function(sithIntersect_TestSphereFaceHit_ADDR, sithIntersect_TestSphereFaceHit);
+    hook_function(sithIntersect_CheckSphereFaceIntersection_ADDR, sithIntersect_CheckSphereFaceIntersection);
+    hook_function(sithIntersect_CheckSphereMeshIntersection_ADDR, sithIntersect_CheckSphereMeshIntersection);
+    hook_function(sithIntersect_CheckSphereFaceHitVerticesIntersection_ADDR, sithIntersect_CheckSphereFaceHitVerticesIntersection);
+    hook_function(sithIntersect_sub_508070_ADDR, sithIntersect_CheckFaceVerticesIntersection);
 #endif
 
     // sithTime
@@ -3004,12 +3004,12 @@ void do_hooks()
     hook_function_inv(sithIntersect_IsSphereInSector_ADDR, sithIntersect_IsSphereInSector);
     hook_function_inv(sithIntersect_sub_5080D0_ADDR, sithIntersect_sub_5080D0);
     hook_function_inv(sithIntersect_sub_508540_ADDR, sithIntersect_sub_508540);
-    hook_function_inv(sithIntersect_sub_508D20_ADDR, sithIntersect_sub_508D20);
-    hook_function_inv(sithIntersect_SphereHit_ADDR, sithIntersect_SphereHit); // regressed
-    hook_function_inv(sithIntersect_sub_508750_ADDR, sithIntersect_sub_508750);
-    hook_function_inv(sithIntersect_sub_5090B0_ADDR, sithIntersect_sub_5090B0);
-    hook_function_inv(sithIntersect_sub_508400_ADDR, sithIntersect_sub_508400);
-    hook_function_inv(sithIntersect_sub_508990_ADDR, sithIntersect_sub_508990);
+    hook_function_inv(sithIntersect_CheckSphereFaceIntersectionEx_ADDR, sithIntersect_CheckSphereFaceIntersectionEx);
+    hook_function_inv(sithIntersect_CheckSphereHit_ADDR, sithIntersect_CheckSphereHit); // regressed
+    hook_function_inv(sithIntersect_TestSphereFaceHit_ADDR, sithIntersect_TestSphereFaceHit);
+    hook_function_inv(sithIntersect_CheckSphereFaceIntersection_ADDR, sithIntersect_CheckSphereFaceIntersection);
+    hook_function_inv(sithIntersect_CheckSphereMeshIntersection_ADDR, sithIntersect_CheckSphereMeshIntersection);
+    hook_function_inv(sithIntersect_CheckSphereFaceHitVerticesIntersection_ADDR, sithIntersect_CheckSphereFaceHitVerticesIntersection);
 #endif
 
 #if 0

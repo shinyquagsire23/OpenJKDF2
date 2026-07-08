@@ -270,7 +270,7 @@ flex_t sithCollision_UpdateSectorThingCollision(sithSector *pSector, sithThing *
                                 if ( (v7->attach_flags & (SITH_ATTACH_THINGSURFACE | SITH_ATTACH_THING)) == 0 || v7->attachedThing != v8 || (v7->attach_flags & SITH_ATTACH_NO_MOVE) == 0 && (flags & RAYCAST_40) == 0 )
                                 {
 LABEL_41:
-                                    v19 = sithIntersect_CollideThings(v8, a2, a3, a4, range, v7, flags, &v23, &senderMesh, &a10, &a11);
+                                    v19 = sithIntersect_CheckSphereThingIntersection(v8, a2, a3, a4, range, v7, flags, &v23, &senderMesh, &a10, &a11);
                                     if ( v19 )
                                     {
                                         v21 = a10;
@@ -375,7 +375,7 @@ LABEL_46:
                 
                 if ( rdMath_DistancePointToPlane(&tmp, &v12->surfaceInfo.face.normal, &v35[*v12->surfaceInfo.face.vertexPosIdx]) <= a5 )
                 {
-                    v36 = sithIntersect_sub_508D20(vec1, vec2, a4, a5, &v12->surfaceInfo.face, v35, &a7, &pushVel, raycastFlags);
+                    v36 = sithIntersect_CheckSphereFaceIntersectionEx(vec1, vec2, a4, a5, &v12->surfaceInfo.face, v35, &a7, &pushVel, raycastFlags);
                     if ( v36 )
                     {
                         if ( (raycastFlags & RAYCAST_400) != 0 || rdVector_Dot3(vec2, &pushVel) < 0.0 )
@@ -417,7 +417,7 @@ LABEL_46:
         }
 LABEL_22:
         // Standing?
-        if ( sithIntersect_sub_5090B0(vec1, vec2, a4, a5, &v12->surfaceInfo, sithWorld_pCurrentWorld->vertices, &a7, raycastFlags) )
+        if ( sithIntersect_CheckSphereFaceIntersection(vec1, vec2, a4, a5, &v12->surfaceInfo, sithWorld_pCurrentWorld->vertices, &a7, raycastFlags) )
         {
             if ( !(raycastFlags & RAYCAST_4) || (raycastFlags & RAYCAST_1) == 0 )
             {
@@ -455,7 +455,7 @@ LABEL_30:
             }
 
             // Falling?
-            if ( (raycastFlags & RAYCAST_2) == 0 && sithIntersect_sub_5090B0(vec1, vec2, a4, 0.0, &v12->surfaceInfo, sithWorld_pCurrentWorld->vertices, &v48, raycastFlags) )
+            if ( (raycastFlags & RAYCAST_2) == 0 && sithIntersect_CheckSphereFaceIntersection(vec1, vec2, a4, 0.0, &v12->surfaceInfo, sithWorld_pCurrentWorld->vertices, &v48, raycastFlags) )
             {
                 v24 = sithCollision_searchStackIdx;
                 if ( (raycastFlags & RAYCAST_4) && (raycastFlags & RAYCAST_1) != 0 )

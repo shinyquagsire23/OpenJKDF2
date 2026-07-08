@@ -116,7 +116,7 @@ void sithRenderSky_CeilingFaceToPlane(rdProcEntry *pProcEntry, sithSurfaceInfo *
 
         const flex_t hitTestMaxZ = 1000.0;
         flex_t tmp = 0.0;
-        if (!sithIntersect_SphereHit(&sithCamera_currentCamera->vec3_1, &a1a, hitTestMaxZ, 0.0, &sithSector_surfaceNormal, &sithSector_zMaxVec, &tmp, 0)) {
+        if (!sithIntersect_CheckSphereHit(&sithCamera_currentCamera->vec3_1, &a1a, hitTestMaxZ, 0.0, &sithSector_surfaceNormal, &sithSector_zMaxVec, &tmp, 0)) {
             tmp = hitTestMaxZ;
 #ifdef QOL_IMPROVEMENTS
             /*bHitTestFailed = true;
