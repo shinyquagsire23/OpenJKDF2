@@ -842,7 +842,7 @@
 
 #if defined(MBEDTLS_SSL_TLS_C) && \
     !( defined(MBEDTLS_SSL_PROTO_TLS1_2) || defined(MBEDTLS_SSL_PROTO_TLS1_3) )
-#error "MBEDTLS_SSL_TLS_C defined, but no protocols are bEnabled"
+#error "MBEDTLS_SSL_TLS_C defined, but no protocols are active"
 #endif
 
 #if defined(MBEDTLS_SSL_DTLS_HELLO_VERIFY) && !defined(MBEDTLS_SSL_PROTO_DTLS)

@@ -74,7 +74,7 @@ const char* sithThing_aParams[NUM_THING_PARAMS] = {
 #endif
     "move",
     "size",
-    "flags",
+    "thingflags",
     "timer",
     "light",
     "attach",
@@ -86,12 +86,12 @@ const char* sithThing_aParams[NUM_THING_PARAMS] = {
     "staticdrag",
     "mass",
     "height",
-    "flags",
+    "physflags",
     "maxrotvel",
     "maxvel",
     "vel",
     "angvel",
-    "flags",
+    "typeflags",
     "health",
     "maxthrust",
     "maxrotthrust",
@@ -1158,12 +1158,12 @@ void sithThing_AttachThingToSurface(SithThing* pThing, SithSurface *surface, int
 
     // Added: Safety checking
     if (!pThing) {
-        stdPlatform_Printf("OpenJKDF2: NULL parentSithThing in sithThing_AttachThingToSurface!\n");
+        stdPlatform_Printf("OpenJKDF2: NULL pThing in sithThing_AttachThingToSurface!\n");
         return;
     }
     // Added: Safety checking
     if (pThing->moveType != SITH_MT_PHYSICS) {
-        stdPlatform_Printf("OpenJKDF2: Non-physics parentSithThing in sithThing_AttachThingToSurface!\n");
+        stdPlatform_Printf("OpenJKDF2: Non-physics pThing in sithThing_AttachThingToSurface!\n");
         return;
     }
 

@@ -505,7 +505,7 @@ int jkGuiBuildMulti_ShowEditCharacter(BOOL bIdk)
 LABEL_16:
     jkGuiBuildMulti_numModels = 0;
     jkGuiBuildMulti_bSabersLoaded = 1;
-    if ( stdConffile_Open("misc\\aModels.dat") )
+    if ( stdConffile_Open("misc\\models.dat") )
     {
         stdConffile_ReadLine();
         if ( _sscanf(stdConffile_g_aLine, "nummodels: %d", &jkGuiBuildMulti_numModels) == 1 )

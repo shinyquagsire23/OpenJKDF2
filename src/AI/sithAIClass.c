@@ -202,7 +202,7 @@ int sithAIClass_LoadEntry(char *fpath, SithAIClass *aiclass)
                     stdMath_SinCos(fov, &a3, &a4);
                     aiclass->fov = a4;
                 }
-                else if ( !_strcmp(arg->key, "accurancy") )
+                else if ( !_strcmp(arg->key, "accuracy") )
                 {
                     aiclass->accurancy = _atof(arg->value);
                 }
