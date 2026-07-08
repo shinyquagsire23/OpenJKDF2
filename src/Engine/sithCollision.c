@@ -27,7 +27,7 @@ int sithCollision_Startup()
         return 0;
 
     _memset(sithCollision_collisionHandlers, 0, 144 * sizeof(sithCollisionEntry)); // sizeof(sithCollision_collisionHandlers)
-    _memset(sithCollision_funcList, 0, 12 * sizeof(int)); // sizeof(sithCollision_funcList)
+    _memset(sithCollision_aThingSurfaceCollideResults, 0, 12 * sizeof(int)); // sizeof(sithCollision_aThingSurfaceCollideResults)
     sithCollision_AddCollisionHandler(SITH_THING_ACTOR, SITH_THING_ACTOR, sithActor_ActorCollisionHandler, 0);
     sithCollision_AddCollisionHandler(SITH_THING_ACTOR, SITH_THING_PLAYER, sithActor_ActorCollisionHandler, 0);
     sithCollision_AddCollisionHandler(SITH_THING_ACTOR, SITH_THING_COG, sithActor_ActorCollisionHandler, 0);
@@ -76,7 +76,7 @@ void sithCollision_AddCollisionHandler(int type1, int type2, sithCollision_colli
 
 void sithCollision_AddSurfaceCollisionHandler(int type, sithCollisionHitHandler_t a2)
 {
-    sithCollision_funcList[type] = a2;
+    sithCollision_aThingSurfaceCollideResults[type] = a2;
 }
 
 sithCollisionSearchEntry* sithCollision_PopStack()
@@ -84,9 +84,9 @@ sithCollisionSearchEntry* sithCollision_PopStack()
     sithCollisionSearchEntry* retVal = NULL;
     flex_t maxDist = 3.4e38;
     
-    for (int i = 0; i < sithCollision_searchNumResults[sithCollision_searchStackIdx]; i++)
+    for (int i = 0; i < sithCollision_aNumStackCollisions[sithCollision_searchStackIdx]; i++)
     {
-        sithCollisionSearchEntry* iter = &sithCollision_searchStack[sithCollision_searchStackIdx].collisions[i];
+        sithCollisionSearchEntry* iter = &sithCollision_aCollisions[sithCollision_searchStackIdx].collisions[i];
         if ( !iter->hasBeenEnumerated )
         {
             if ( maxDist <= iter->distance )
@@ -109,8 +109,8 @@ sithCollisionSearchEntry* sithCollision_PopStack()
     }
     else
     {
-        sithCollision_searchNumResults[sithCollision_searchStackIdx] = 0;
-        sithCollision_stackIdk[sithCollision_searchStackIdx] = 0;
+        sithCollision_aNumStackCollisions[sithCollision_searchStackIdx] = 0;
+        sithCollision_aNumSearchedSectors[sithCollision_searchStackIdx] = 0;
         return NULL;
     }
 }
@@ -132,10 +132,10 @@ flex_t sithCollision_SearchForCollisions(sithSector *pStartSector, sithThing *pT
 
 
     sithCollision_searchStackIdx++;
-    sithCollision_searchNumResults[sithCollision_searchStackIdx] = 0;
-    sithCollision_stackIdk[sithCollision_searchStackIdx] = 1;
+    sithCollision_aNumStackCollisions[sithCollision_searchStackIdx] = 0;
+    sithCollision_aNumSearchedSectors[sithCollision_searchStackIdx] = 1;
     curMoveDist = moveDist;
-    sithCollision_stackSectors[sithCollision_searchStackIdx].sectors[0] = pStartSector;
+    sithCollision_apSearchedSectors[sithCollision_searchStackIdx].sectors[0] = pStartSector;
 
     if (!pStartSector) {
         jk_printf("OpenJKDF2 WARN: sithCollision_SearchForCollisions received NULL pStartSector!\n");
@@ -147,24 +147,24 @@ flex_t sithCollision_SearchForCollisions(sithSector *pStartSector, sithThing *pT
     sithCollision_SearchForSurfaceCollisions(pStartSector, pStartPos, pMoveNorm, curMoveDist, radius, flags);
 
     v26 = 0;
-    for ( i = sithCollision_searchStack[sithCollision_searchStackIdx].collisions; v26 < sithCollision_searchNumResults[sithCollision_searchStackIdx]; ++v26 )
+    for ( i = sithCollision_aCollisions[sithCollision_searchStackIdx].collisions; v26 < sithCollision_aNumStackCollisions[sithCollision_searchStackIdx]; ++v26 )
     {
         if ( i->hitType == SITHCOLLISION_ADJOINTOUCH )
         {
             if ( (flags & RAYCAST_400) != 0 || i->distance <= (flex_d_t)curMoveDist )
             {
                 pSurfAdjSector = i->surface->adjoin->sector;
-                num = sithCollision_stackIdk[sithCollision_searchStackIdx];
+                num = sithCollision_aNumSearchedSectors[sithCollision_searchStackIdx];
                 for (chk = 0; chk < num; chk++)
                 {
-                    if ( sithCollision_stackSectors[sithCollision_searchStackIdx].sectors[chk] == pSurfAdjSector )
+                    if ( sithCollision_apSearchedSectors[sithCollision_searchStackIdx].sectors[chk] == pSurfAdjSector )
                         break;
                 }
                 
                 if ( chk >= num && num != 64)
                 {
-                    sithCollision_stackIdk[sithCollision_searchStackIdx] = num + 1;
-                    sithCollision_stackSectors[sithCollision_searchStackIdx].sectors[num] = pSurfAdjSector;
+                    sithCollision_aNumSearchedSectors[sithCollision_searchStackIdx] = num + 1;
+                    sithCollision_apSearchedSectors[sithCollision_searchStackIdx].sectors[num] = pSurfAdjSector;
                     if ( (flags & RAYCAST_1) == 0 )
                         curMoveDist = sithCollision_SearchForThingCollisions(pSurfAdjSector, pThing, pStartPos, pMoveNorm, curMoveDist, radius, flags);
                     sithCollision_SearchForSurfaceCollisions(pSurfAdjSector, pStartPos, pMoveNorm, curMoveDist, radius, flags);
@@ -176,10 +176,10 @@ flex_t sithCollision_SearchForCollisions(sithSector *pStartSector, sithThing *pT
     }
     if ( curMoveDist != 0.0 && (flags & RAYCAST_800) != 0 )
     {
-        v17 = sithCollision_stackIdk[sithCollision_searchStackIdx];
+        v17 = sithCollision_aNumSearchedSectors[sithCollision_searchStackIdx];
         for (v18 = 0; v18 < v17; v18++)
         {
-            j = sithCollision_stackSectors[sithCollision_searchStackIdx].sectors[v18];
+            j = sithCollision_apSearchedSectors[sithCollision_searchStackIdx].sectors[v18];
             for (pAdjoin = j->adjoins; pAdjoin != NULL; pAdjoin = pAdjoin->next)
             {
                 if (!(pAdjoin->flags & SITHSURF_ADJOIN_ALLOW_MOVEMENT)) continue;
@@ -187,18 +187,18 @@ flex_t sithCollision_SearchForCollisions(sithSector *pStartSector, sithThing *pT
                 pAdjoinSector = pAdjoin->sector;
                 if (!pAdjoinSector->thingsList) continue;
                 
-                num = sithCollision_stackIdk[sithCollision_searchStackIdx];
+                num = sithCollision_aNumSearchedSectors[sithCollision_searchStackIdx];
                 for (chk = 0; chk < num; chk++)
                 {
-                    v24 = sithCollision_stackSectors[sithCollision_searchStackIdx].sectors[chk];
+                    v24 = sithCollision_apSearchedSectors[sithCollision_searchStackIdx].sectors[chk];
                     if ( v24 == pAdjoinSector )
                         break;
                 }
 
                 if (chk >= num && num != 64)
                 {
-                    sithCollision_stackIdk[sithCollision_searchStackIdx] = num + 1;
-                    sithCollision_stackSectors[sithCollision_searchStackIdx].sectors[num] = pAdjoinSector;
+                    sithCollision_aNumSearchedSectors[sithCollision_searchStackIdx] = num + 1;
+                    sithCollision_apSearchedSectors[sithCollision_searchStackIdx].sectors[num] = pAdjoinSector;
                     curMoveDist = sithCollision_SearchForThingCollisions(pAdjoinSector, pThing, pStartPos, pMoveNorm, curMoveDist, radius, flags);
                 }
             }
@@ -274,12 +274,12 @@ LABEL_41:
                                     if ( v19 )
                                     {
                                         v21 = a10;
-                                        v22 = sithCollision_searchNumResults[sithCollision_searchStackIdx];
+                                        v22 = sithCollision_aNumStackCollisions[sithCollision_searchStackIdx];
                                         if ( v22 != 128 )
                                         {
                                             v19 |= SITHCOLLISION_THING;
-                                            sithCollision_searchNumResults[sithCollision_searchStackIdx] = v22 + 1;
-                                            v24 = &sithCollision_searchStack[sithCollision_searchStackIdx].collisions[v22];
+                                            sithCollision_aNumStackCollisions[sithCollision_searchStackIdx] = v22 + 1;
+                                            v24 = &sithCollision_aCollisions[sithCollision_searchStackIdx].collisions[v22];
                                             v24->surface = 0;
                                             v24->hasBeenEnumerated = 0;
                                             v24->hitType = v19;
@@ -381,11 +381,11 @@ LABEL_46:
                         if ( (raycastFlags & RAYCAST_400) != 0 || rdVector_Dot3(vec2, &pushVel) < 0.0 )
                         {
                             v37 = a7;
-                            v38 = sithCollision_searchNumResults[sithCollision_searchStackIdx];
+                            v38 = sithCollision_aNumStackCollisions[sithCollision_searchStackIdx];
                             if ( v38 != 128 )
                             {
-                                sithCollision_searchNumResults[sithCollision_searchStackIdx] = v38 + 1;
-                                v40 = &sithCollision_searchStack[sithCollision_searchStackIdx].collisions[v38];
+                                sithCollision_aNumStackCollisions[sithCollision_searchStackIdx] = v38 + 1;
+                                v40 = &sithCollision_aCollisions[sithCollision_searchStackIdx].collisions[v38];
                                 v40->receiver = 0;
                                 v40->hasBeenEnumerated = 0;
                                 v40->hitType = v36 | SITHCOLLISION_WORLD;
@@ -422,10 +422,10 @@ LABEL_22:
             if ( !(raycastFlags & RAYCAST_4) || (raycastFlags & RAYCAST_1) == 0 )
             {
                 v17 = 0;
-                v18 = sithCollision_stackIdk[sithCollision_searchStackIdx];
+                v18 = sithCollision_aNumSearchedSectors[sithCollision_searchStackIdx];
                 if ( v18 )
                 {
-                    v19 = sithCollision_stackSectors[sithCollision_searchStackIdx].sectors;
+                    v19 = sithCollision_apSearchedSectors[sithCollision_searchStackIdx].sectors;
                     while ( *v19 != v15->sector )
                     {
                         ++v17;
@@ -439,12 +439,12 @@ LABEL_22:
                 else
                 {
 LABEL_30:
-                    v20 = sithCollision_searchNumResults[sithCollision_searchStackIdx];
+                    v20 = sithCollision_aNumStackCollisions[sithCollision_searchStackIdx];
                     v21 = a7;
                     if ( v20 != 128 )
                     {
-                        sithCollision_searchNumResults[sithCollision_searchStackIdx] = v20 + 1;
-                        v23 = &sithCollision_searchStack[sithCollision_searchStackIdx].collisions[v20];
+                        sithCollision_aNumStackCollisions[sithCollision_searchStackIdx] = v20 + 1;
+                        v23 = &sithCollision_aCollisions[sithCollision_searchStackIdx].collisions[v20];
                         v23->receiver = 0;
                         v23->hasBeenEnumerated = 0;
                         v23->hitType = SITHCOLLISION_ADJOINTOUCH;
@@ -460,11 +460,11 @@ LABEL_30:
                 v24 = sithCollision_searchStackIdx;
                 if ( (raycastFlags & RAYCAST_4) && (raycastFlags & RAYCAST_1) != 0 )
                 {
-                    v25 = sithCollision_stackIdk[sithCollision_searchStackIdx];
+                    v25 = sithCollision_aNumSearchedSectors[sithCollision_searchStackIdx];
                     v26 = 0;
                     if ( v25 )
                     {
-                        v27 = sithCollision_stackSectors[sithCollision_searchStackIdx].sectors;
+                        v27 = sithCollision_apSearchedSectors[sithCollision_searchStackIdx].sectors;
                         while ( *v27 != v15->sector )
                         {
                             ++v26;
@@ -476,12 +476,12 @@ LABEL_30:
                     else
                     {
 LABEL_42:
-                        v28 = sithCollision_searchNumResults[sithCollision_searchStackIdx];
+                        v28 = sithCollision_aNumStackCollisions[sithCollision_searchStackIdx];
                         v29 = a7;
                         if ( v28 != 128 )
                         {
-                            sithCollision_searchNumResults[sithCollision_searchStackIdx] = v28 + 1;
-                            v31 = &sithCollision_searchStack[sithCollision_searchStackIdx].collisions[v28];
+                            sithCollision_aNumStackCollisions[sithCollision_searchStackIdx] = v28 + 1;
+                            v31 = &sithCollision_aCollisions[sithCollision_searchStackIdx].collisions[v28];
                             v31->receiver = 0;
                             v31->hasBeenEnumerated = 0;
                             v31->hitType = SITHCOLLISION_ADJOINTOUCH;
@@ -490,12 +490,12 @@ LABEL_42:
                         }
                     }
                 }
-                v32 = sithCollision_searchNumResults[v24];
+                v32 = sithCollision_aNumStackCollisions[v24];
                 v33 = v48;
                 if ( v32 != 128 )
                 {
-                    sithCollision_searchNumResults[v24] = v32 + 1;
-                    v34 = &sithCollision_searchStack[sithCollision_searchStackIdx].collisions[v32];
+                    sithCollision_aNumStackCollisions[v24] = v32 + 1;
+                    v34 = &sithCollision_aCollisions[sithCollision_searchStackIdx].collisions[v32];
                     v34->receiver = 0;
                     v34->hasBeenEnumerated = 0;
                     v34->hitType = SITHCOLLISION_ADJOINCROSS;
@@ -526,15 +526,15 @@ sithSector* sithCollision_FindSectorInRadius(sithSector *pStartSector, const rdV
     a3a = rdVector_Normalize3Acc(&a1);
     sithCollision_SearchForCollisions(pStartSector, 0, pStartPos, &a1, a3a, a5, RAYCAST_1);
     v7 = sithCollision_searchStackIdx;
-    v8 = &sithCollision_searchStack[sithCollision_searchStackIdx];
+    v8 = &sithCollision_aCollisions[sithCollision_searchStackIdx];
     while ( 1 )
     {
         v9 = 0;
         v10 = 3.4e38;
         v11 = (sithCollisionSearchEntry *)v8;
-        if ( sithCollision_searchNumResults[v7] )
+        if ( sithCollision_aNumStackCollisions[v7] )
         {
-            v12 = sithCollision_searchNumResults[v7];
+            v12 = sithCollision_aNumStackCollisions[v7];
             do
             {
                 if ( !v11->hasBeenEnumerated )
@@ -561,8 +561,8 @@ sithSector* sithCollision_FindSectorInRadius(sithSector *pStartSector, const rdV
         }
         else
         {
-            sithCollision_searchNumResults[v7] = 0;
-            sithCollision_stackIdk[v7] = 0;
+            sithCollision_aNumStackCollisions[v7] = 0;
+            sithCollision_aNumSearchedSectors[v7] = 0;
         }
         if ( !v9 )
             break;
@@ -791,8 +791,8 @@ LABEL_78:
                     if (!(g_debugmodeFlags & DEBUGFLAG_NOCLIP) || pThing != sithPlayer_pLocalPlayerThing)
                     {
                         amount = v19->surface;
-                        if ( sithCollision_funcList[v5->type] )
-                            v36 = sithCollision_funcList[v5->type](v5, amount, v19);
+                        if ( sithCollision_aThingSurfaceCollideResults[v5->type] )
+                            v36 = sithCollision_aThingSurfaceCollideResults[v5->type](v5, amount, v19);
                         else
                             v36 = sithCollision_HandleThingHitSurface(v5, amount, v19);
                     }
@@ -1150,13 +1150,13 @@ int sithCollision_HasLOS(sithThing *thing1, sithThing *thing2, int flag)
     a6 = rdVector_Normalize3Acc(&a1a);
     sithCollision_SearchForCollisions(thing1->sector, 0, &thing1->position, &a1a, a6, 0.0, searchFlags);
     v4 = sithCollision_searchStackIdx;
-    v5 = sithCollision_searchStack[sithCollision_searchStackIdx].collisions;
+    v5 = sithCollision_aCollisions[sithCollision_searchStackIdx].collisions;
     while ( 1 )
     {
         v6 = 3.4e38;
         v7 = 0;
         v8 = v5;
-        for (int i = 0; i < sithCollision_searchNumResults[v4]; i++)
+        for (int i = 0; i < sithCollision_aNumStackCollisions[v4]; i++)
         {
             if ( !v8->hasBeenEnumerated )
             {
@@ -1181,8 +1181,8 @@ int sithCollision_HasLOS(sithThing *thing1, sithThing *thing2, int flag)
         }
         else
         {
-            sithCollision_searchNumResults[v4] = 0;
-            sithCollision_stackIdk[v4] = 0;
+            sithCollision_aNumStackCollisions[v4] = 0;
+            sithCollision_aNumSearchedSectors[v4] = 0;
         }
         if ( !v7 )
             break;
@@ -1281,11 +1281,11 @@ static sithCollisionSearchEntry* sithCollision_PopClosest()
 {
     sithCollisionSearchEntry *best = NULL;
     flex_t bestDist = 3.4e38f;
-    int numResults = sithCollision_searchNumResults[sithCollision_searchStackIdx];
+    int numResults = sithCollision_aNumStackCollisions[sithCollision_searchStackIdx];
 
     for (int i = 0; i < numResults; i++)
     {
-        sithCollisionSearchEntry *entry = &sithCollision_searchStack[sithCollision_searchStackIdx].collisions[i];
+        sithCollisionSearchEntry *entry = &sithCollision_aCollisions[sithCollision_searchStackIdx].collisions[i];
         if ( !entry->hasBeenEnumerated )
         {
             if ( bestDist <= entry->distance )
@@ -1331,8 +1331,8 @@ sithThing* sithCollision_RaycastFromCamera(rdVector3 *pos)
         result = best->receiver;
     }
 
-    sithCollision_searchNumResults[sithCollision_searchStackIdx] = 0;
-    sithCollision_stackIdk[sithCollision_searchStackIdx] = 0;
+    sithCollision_aNumStackCollisions[sithCollision_searchStackIdx] = 0;
+    sithCollision_aNumSearchedSectors[sithCollision_searchStackIdx] = 0;
     sithCollision_searchStackIdx--;
     return result;
 }
@@ -1350,8 +1350,8 @@ sithThing* sithCollision_RaycastSector(sithSector *sector, rdVector3 *startPos, 
         result = best->receiver;
     }
 
-    sithCollision_searchNumResults[sithCollision_searchStackIdx] = 0;
-    sithCollision_stackIdk[sithCollision_searchStackIdx] = 0;
+    sithCollision_aNumStackCollisions[sithCollision_searchStackIdx] = 0;
+    sithCollision_aNumSearchedSectors[sithCollision_searchStackIdx] = 0;
     sithCollision_searchStackIdx--;
     return result;
 }
@@ -1372,8 +1372,8 @@ int sithCollision_CheckPathClear(sithSector *sector, rdVector3 *startPos, rdVect
         result = 0;
     }
 
-    sithCollision_searchNumResults[sithCollision_searchStackIdx] = 0;
-    sithCollision_stackIdk[sithCollision_searchStackIdx] = 0;
+    sithCollision_aNumStackCollisions[sithCollision_searchStackIdx] = 0;
+    sithCollision_aNumSearchedSectors[sithCollision_searchStackIdx] = 0;
     sithCollision_searchStackIdx--;
     return result;
 }

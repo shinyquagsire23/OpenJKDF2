@@ -748,13 +748,13 @@ jkPlayer_soundClass 0x00860520 char[32]
 jkPlayer_sideMat 0x00860560 char[32]
 jkPlayer_tipMat 0x00860580 char[32]
 
-sithCollision_stackIdk 0x847F28 int[4]
+sithCollision_aNumSearchedSectors 0x847F28 int[4]
 sithCollision_collisionHandlers 0x00847F38 sithCollisionEntry[144]
-sithCollision_funcList 0x8485F8 sithCollisionHitHandler_t[12]
-sithCollision_searchStack 0x00848628 sithCollisionSearchResult[4]
-sithCollision_searchNumResults 0x84DA28 int[4]
+sithCollision_aThingSurfaceCollideResults 0x8485F8 sithCollisionHitHandler_t[12]
+sithCollision_aCollisions 0x00848628 sithCollisionSearchResult[4]
+sithCollision_aNumStackCollisions 0x84DA28 int[4]
 sithCollision_searchStackIdx 0x0054BA90 int = -1
-sithCollision_stackSectors 0x0084D628 sithCollisionSectorEntry[4]
+sithCollision_apSearchedSectors 0x0084D628 sithCollisionSectorEntry[4]
 sithCollision_dword_8B4BE4 0x008B4BE4 int
 sithCollision_collideHurtIdk 0x008B4BF0 rdVector3
 
