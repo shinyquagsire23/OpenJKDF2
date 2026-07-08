@@ -8,14 +8,14 @@
 #include "stdPlatform.h"
 #include "jk.h"
 
-int sithKeyFrame_Load(SithWorld *world, int a2)
+int sithKeyFrame_Load(SithWorld *pWorld, int bSkip)
 {
     unsigned int alloc_size;
 
     flex_t percent_delta;
     flex_t load_percent = 80.0;
 
-    if ( a2 )
+    if ( bSkip )
         return 0;
 
     stdConffile_ReadArgs();
@@ -27,7 +27,7 @@ int sithKeyFrame_Load(SithWorld *world, int a2)
         return 1;
 
     percent_delta = 15.0 / (flex_d_t)sizeKeyframes;
-    if ( !sithKeyFrame_New(world, sizeKeyframes) )
+    if ( !sithKeyFrame_New(pWorld, sizeKeyframes) )
     {
         stdPrintf(pSithHS->errorPrint, ".\\Engine\\sithPuppet.c", 1538, "Memory error while reading keyframes, line %d.\n", stdConffile_linenum, 0, 0, 0);
         return 0;
@@ -61,26 +61,26 @@ int sithKeyFrame_Load(SithWorld *world, int a2)
     return 1;
 }
 
-rdKeyframe* sithKeyFrame_GetByIdx(int idx)
+rdKeyframe* sithKeyFrame_GetByIdx(int index)
 {
     rdKeyframe *result;
 
     SithWorld* world = sithWorld_g_pCurrentWorld;
-    if ( (idx & 0x8000) != 0 )
+    if ( (index & 0x8000) != 0 )
     {
         world = sithWorld_g_pStaticWorld;
-        idx &= ~0x8000;
+        index &= ~0x8000;
     }
 
-    if ( idx < 0 || idx >= world->numKeyframes )
+    if ( index < 0 || index >= world->numKeyframes )
         result = 0;
     else
-        result = &world->aKeyframes[idx];
+        result = &world->aKeyframes[index];
 
     return result;
 }
 
-rdKeyframe* sithKeyFrame_LoadEntry(const char *fpath)
+rdKeyframe* sithKeyFrame_LoadEntry(const char *pName)
 {
     rdKeyframe *keyframe;
     char key_fpath[128];
@@ -89,8 +89,8 @@ rdKeyframe* sithKeyFrame_LoadEntry(const char *fpath)
     if ( !sithWorld_g_pLastLoadedWorld->aKeyframes )
         return NULL;
 
-    _sprintf(key_fpath, "%s%c%s", "3do\\key", 92, fpath);
-    keyframe = (rdKeyframe *)stdHashtbl_Find(sithPuppet_pKeyHashtable, fpath);
+    _sprintf(key_fpath, "%s%c%s", "3do\\key", 92, pName);
+    keyframe = (rdKeyframe *)stdHashtbl_Find(sithPuppet_pKeyHashtable, pName);
 
     // Keyframe already loaded
     if (keyframe)
@@ -120,36 +120,36 @@ rdKeyframe* sithKeyFrame_LoadEntry(const char *fpath)
     return keyframe;
 }
 
-int sithKeyFrame_New(SithWorld *world, int sizeKeyframes)
+int sithKeyFrame_New(SithWorld *pWorld, int size)
 {
     { TWL_EXTRAM_SUGGEST(pSithHS); // Added: rdKeyframe fields are word-width on RETRO
-    world->aKeyframes = (rdKeyframe *)SITH_ALLOC(sizeof(rdKeyframe) * sizeKeyframes);
+    pWorld->aKeyframes = (rdKeyframe *)SITH_ALLOC(sizeof(rdKeyframe) * size);
     TWL_EXTRAM_RESTORE(pSithHS); }
-    if ( !world->aKeyframes )
+    if ( !pWorld->aKeyframes )
         return 0;
-    world->sizeKeyframes = sizeKeyframes;
-    world->numKeyframes = 0;
-    _memset(world->aKeyframes, 0, sizeof(rdKeyframe) * sizeKeyframes);
+    pWorld->sizeKeyframes = size;
+    pWorld->numKeyframes = 0;
+    _memset(pWorld->aKeyframes, 0, sizeof(rdKeyframe) * size);
     return 1;
 }
 
-void sithKeyFrame_Free(SithWorld *world)
+void sithKeyFrame_Free(SithWorld *pWorld)
 {
-    if (!world->sizeKeyframes)
+    if (!pWorld->sizeKeyframes)
         return;
 
-    for (int idx = 0; idx < world->numKeyframes; idx++)
+    for (int idx = 0; idx < pWorld->numKeyframes; idx++)
     {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-        stdHashtbl_Remove(sithPuppet_pKeyHashtable, world->aKeyframes[idx].name);
+        stdHashtbl_Remove(sithPuppet_pKeyHashtable, pWorld->aKeyframes[idx].name);
 #else
-        stdHashtbl_FreeKeyCrc32(sithPuppet_pKeyHashtable, world->aKeyframes[idx].namecrc);
+        stdHashtbl_FreeKeyCrc32(sithPuppet_pKeyHashtable, pWorld->aKeyframes[idx].namecrc);
 #endif
-        rdKeyframe_FreeEntry(&world->aKeyframes[idx]);
+        rdKeyframe_FreeEntry(&pWorld->aKeyframes[idx]);
     }
     
-    SITH_FREE(world->aKeyframes);
-    world->aKeyframes = 0;
-    world->numKeyframes = 0;
-    world->sizeKeyframes = 0;
+    SITH_FREE(pWorld->aKeyframes);
+    pWorld->aKeyframes = 0;
+    pWorld->numKeyframes = 0;
+    pWorld->sizeKeyframes = 0;
 }

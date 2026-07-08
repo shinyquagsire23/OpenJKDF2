@@ -54,37 +54,37 @@ void sithWeapon_Startup()
     sithWeapon_InitDefaults();
 }
 
-void sithWeapon_Update(SithThing* weapon, flex_t deltaSeconds)
+void sithWeapon_Update(SithThing* pThing, flex_t secDeltaTime)
 {
-    sithWeaponFlags_t flags = weapon->weaponParams.flags;
+    sithWeaponFlags_t flags = pThing->weaponParams.flags;
     if (flags & SITH_WF_INSTANT_IMPACT) // shooting walls?
     {
-        sithWeapon_HandleImpact(weapon);
+        sithWeapon_HandleImpact(pThing);
     }
     else if (flags & SITH_WF_10000)
     {
-        sithWeapon_sub_4D3920(weapon);
+        sithWeapon_sub_4D3920(pThing);
     }
     else
     {
         if (flags & SITH_WF_DAMAGE_DECAY 
-            && weapon->weaponParams.damage > (flex_d_t)weapon->weaponParams.minDamage)
+            && pThing->weaponParams.damage > (flex_d_t)pThing->weaponParams.minDamage)
         {
-            flex_t v3 = weapon->weaponParams.damage - weapon->weaponParams.rate * deltaSeconds;
-            weapon->weaponParams.damage = v3;
+            flex_t v3 = pThing->weaponParams.damage - pThing->weaponParams.rate * secDeltaTime;
+            pThing->weaponParams.damage = v3;
             // no idea if this is even correct but it makes sense?
             // c0 | c3, https://c9x.me/x86/html/file_module_x86_id_87.html
             if (v3 <= 0.0)
-                v3 = weapon->weaponParams.minDamage;
-            weapon->weaponParams.damage = v3;
+                v3 = pThing->weaponParams.minDamage;
+            pThing->weaponParams.damage = v3;
         }
-        if ( (flags & SITH_WF_DECAYEMITSOUNDAWARENESSEVENT) != 0 && (((uint8_t)jkPlayer_currentTickIdx + (weapon->idx & 0xFF)) & 7) == 0 )
-            sithAIAwareness_CreateTransmittingEvent(weapon->sector, &weapon->position, 2, 2.0, weapon);
+        if ( (flags & SITH_WF_DECAYEMITSOUNDAWARENESSEVENT) != 0 && (((uint8_t)jkPlayer_currentTickIdx + (pThing->idx & 0xFF)) & 7) == 0 )
+            sithAIAwareness_CreateTransmittingEvent(pThing->sector, &pThing->position, 2, 2.0, pThing);
     }
 }
 
 // MOTS altered: don't affect cog aThings?
-void sithWeapon_HandleImpact(SithThing *weapon)
+void sithWeapon_HandleImpact(SithThing *pWeapon)
 {
     flex_t damage; // ecx
     rdVector3 *weaponPos; // edx
@@ -101,29 +101,29 @@ void sithWeapon_HandleImpact(SithThing *weapon)
     rdVector3 tmp2; // [esp+2Ch] [ebp-Ch] BYREF
     flex_t size; // [esp+3Ch] [ebp+4h]
 
-    damage = weapon->weaponParams.damage;
-    weaponPos = &weapon->orient.lvec;
-    size = weapon->weaponParams.size;
+    damage = pWeapon->weaponParams.damage;
+    weaponPos = &pWeapon->orient.lvec;
+    size = pWeapon->weaponParams.size;
     damage_ = damage;
-    sector = weapon->sector;
+    sector = pWeapon->sector;
     rdVector_Copy3(&weaponPos_, weaponPos);
-    moveSize = weapon->moveSize;
-    sithCollision_SearchForCollisions(sector, weapon, &weapon->position, &weaponPos_, weapon->weaponParams.range, moveSize, 0);
+    moveSize = pWeapon->moveSize;
+    sithCollision_SearchForCollisions(sector, pWeapon, &pWeapon->position, &weaponPos_, pWeapon->weaponParams.range, moveSize, 0);
     searchRes = sithCollision_PopStack();
     if ( searchRes )
     {
         while ( 1 )
         {
-            if ( (weapon->weaponParams.flags & SITH_WF_OBJECT_TRAIL) != 0
-              && weapon->weaponParams.trailThing
+            if ( (pWeapon->weaponParams.flags & SITH_WF_OBJECT_TRAIL) != 0
+              && pWeapon->weaponParams.trailThing
               && size < (flex_d_t)searchRes->distance )
             {
                 do
                 {
-                    rdVector_Copy3(&tmp, &weapon->position);
+                    rdVector_Copy3(&tmp, &pWeapon->position);
                     rdVector_ScaleAdd3Acc(&tmp, &weaponPos_, size);
-                    sithThing_CreateThingAtPos(weapon->weaponParams.trailThing, &tmp, &weapon->orient, sector, 0);
-                    size += weapon->weaponParams.size;
+                    sithThing_CreateThingAtPos(pWeapon->weaponParams.trailThing, &tmp, &pWeapon->orient, sector, 0);
+                    size += pWeapon->weaponParams.size;
                 }
                 while ( size < searchRes->distance );
             }
@@ -134,54 +134,54 @@ void sithWeapon_HandleImpact(SithThing *weapon)
             if ( !searchRes )
                 goto LABEL_20;
         }
-        if ( (weapon->weaponParams.flags & SITH_WF_DAMAGE_DECAY) != 0 )
+        if ( (pWeapon->weaponParams.flags & SITH_WF_DAMAGE_DECAY) != 0 )
         {
-            damage_ = damage_ - weapon->weaponParams.rate * searchRes->distance;
-            if ( weapon->weaponParams.minDamage > (flex_d_t)damage_ )
-                damage_ = weapon->weaponParams.minDamage;
+            damage_ = damage_ - pWeapon->weaponParams.rate * searchRes->distance;
+            if ( pWeapon->weaponParams.minDamage > (flex_d_t)damage_ )
+                damage_ = pWeapon->weaponParams.minDamage;
         }
         if (searchRes->type & SITHCOLLISION_THING)
         {
-            sithThing_DamageThing(searchRes->pThingCollided, weapon, damage_, weapon->weaponParams.damageType);
-            if ( weapon->weaponParams.force != 0.0 )
+            sithThing_DamageThing(searchRes->pThingCollided, pWeapon, damage_, pWeapon->weaponParams.damageType);
+            if ( pWeapon->weaponParams.force != 0.0 )
             {
                 damageReceiver = searchRes->pThingCollided;
                 if ( damageReceiver->moveType == SITH_MT_PHYSICS && MOTS_ONLY_FLAG(damageReceiver->type != SITH_THING_COG))
                 {
-                    rdVector_Scale3(&tmp2, &weaponPos_, weapon->weaponParams.force);
+                    rdVector_Scale3(&tmp2, &weaponPos_, pWeapon->weaponParams.force);
                     sithPhysics_ApplyForce(damageReceiver, &tmp2);
                 }
             }
         }
         else if ( (searchRes->type & SITHCOLLISION_WORLD) != 0 )
         {
-            sithSurface_HandleThingImpact(searchRes->surface, weapon, damage_, weapon->weaponParams.damageType);
+            sithSurface_HandleThingImpact(searchRes->surface, pWeapon, damage_, pWeapon->weaponParams.damageType);
         }
-        if ( weapon->weaponParams.pExplosionTemplate )
+        if ( pWeapon->weaponParams.pExplosionTemplate )
         {
-            rdVector_Copy3(&tmp2, &weapon->position);
+            rdVector_Copy3(&tmp2, &pWeapon->position);
             rdVector_ScaleAdd3Acc(&tmp2, &weaponPos_, searchRes->distance);
-            sithThing_CreateThingAtPos(weapon->weaponParams.pExplosionTemplate, &tmp2, &rdroid_identMatrix34, sector, 0);
+            sithThing_CreateThingAtPos(pWeapon->weaponParams.pExplosionTemplate, &tmp2, &rdroid_identMatrix34, sector, 0);
         }
     }
 
 LABEL_20:
     sithCollision_DecreaseStackLevel();
     if ( !searchRes
-      && (weapon->weaponParams.flags & SITH_WF_OBJECT_TRAIL) != 0
-      && weapon->weaponParams.trailThing
-      && size < (flex_d_t)weapon->weaponParams.range )
+      && (pWeapon->weaponParams.flags & SITH_WF_OBJECT_TRAIL) != 0
+      && pWeapon->weaponParams.trailThing
+      && size < (flex_d_t)pWeapon->weaponParams.range )
     {
         do
         {
-            rdVector_Copy3(&tmp, &weapon->position);
+            rdVector_Copy3(&tmp, &pWeapon->position);
             rdVector_ScaleAdd3Acc(&tmp, &weaponPos_, size);
-            sithThing_CreateThingAtPos(weapon->weaponParams.trailThing, &tmp, &weapon->orient, sector, 0);
-            size += weapon->weaponParams.size;
+            sithThing_CreateThingAtPos(pWeapon->weaponParams.trailThing, &tmp, &pWeapon->orient, sector, 0);
+            size += pWeapon->weaponParams.size;
         }
-        while ( size < weapon->weaponParams.range );
+        while ( size < pWeapon->weaponParams.range );
     }
-    sithThing_DestroyThing(weapon);
+    sithThing_DestroyThing(pWeapon);
 }
 
 void sithWeapon_sub_4D3920(SithThing *weapon)
@@ -406,66 +406,66 @@ LABEL_25:
     sithThing_DestroyThing(weapon);
 }
 
-int sithWeapon_ParseArg(StdConffileArg *arg, SithThing *thing, int param)
+int sithWeapon_ParseArg(StdConffileArg *pArg, SithThing *pThing, int adjNum)
 {
     int tmp;
 
-    switch ( param )
+    switch ( adjNum )
     {
         case THINGPARAM_TYPEFLAGS:
-            if ( _sscanf(arg->value, "%x", &tmp) != 1 )
+            if ( _sscanf(pArg->value, "%x", &tmp) != 1 )
                 return 1;
-            thing->weaponParams.flags = (sithWeaponFlags_t)tmp;
+            pThing->weaponParams.flags = (sithWeaponFlags_t)tmp;
             return 1;
 
         case THINGPARAM_DAMAGE:
-            thing->weaponParams.damage = _atof(arg->value);
+            pThing->weaponParams.damage = _atof(pArg->value);
             return 1;
 
         case SITHTHING_ARG_MINDAMAGE:
-            thing->weaponParams.minDamage = _atof(arg->value);
+            pThing->weaponParams.minDamage = _atof(pArg->value);
             return 1;
 
         case THINGPARAM_DAMAGECLASS:
-            if ( _sscanf(arg->value, "%x", &tmp) == 1 )
+            if ( _sscanf(pArg->value, "%x", &tmp) == 1 )
             {
-                thing->weaponParams.damageType = tmp;
+                pThing->weaponParams.damageType = tmp;
             }
             return 1;
         case THINGPARAM_EXPLODE:
-            thing->weaponParams.pExplosionTemplate = sithTemplate_GetTemplate(arg->value);
+            pThing->weaponParams.pExplosionTemplate = sithTemplate_GetTemplate(pArg->value);
             return 1;
 
         case THINGPARAM_FORCE:
-            thing->weaponParams.force = _atof(arg->value);
+            pThing->weaponParams.force = _atof(pArg->value);
             return 1;
 
         case THINGPARAM_RANGE:
-            thing->weaponParams.range = _atof(arg->value);
+            pThing->weaponParams.range = _atof(pArg->value);
             return 1;
 
         case THINGPARAM_RATE:
-            thing->weaponParams.rate = _atof(arg->value);
+            pThing->weaponParams.rate = _atof(pArg->value);
             return 1;
 
         case THINGPARAM_ELEMENTSIZE:
-            thing->weaponParams.size = _atof(arg->value);
+            pThing->weaponParams.size = _atof(pArg->value);
             return 1;
 
         case THINGPARAM_TRAILTHING:
-            thing->weaponParams.trailThing = sithTemplate_GetTemplate(arg->value);
+            pThing->weaponParams.trailThing = sithTemplate_GetTemplate(pArg->value);
             return 1;
 
         case THINGPARAM_TRAILCYLRADIUS:
-            thing->weaponParams.trailCylRadius = _atof(arg->value);
+            pThing->weaponParams.trailCylRadius = _atof(pArg->value);
             return 1;
 
         case THINGPARAM_TRAINRANDANGLE:
-            thing->weaponParams.trainRandAngle = _atof(arg->value);
+            pThing->weaponParams.trainRandAngle = _atof(pArg->value);
             return 1;
 
         case THINGPARAM_FLESHHIT:
-            thing->weaponParams.fleshHitTemplate = sithTemplate_GetTemplate(arg->value);
+            pThing->weaponParams.fleshHitTemplate = sithTemplate_GetTemplate(pArg->value);
             return 1;
 
         default:
@@ -489,22 +489,22 @@ SithThing* sithWeapon_FireMots(SithThing *weapon, SithThing *projectile, rdVecto
     return spawned;
 }
 
-SithThing* sithWeapon_WeaponFire(SithThing *weapon, SithThing *projectile, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, flex_t scale, int16_t scaleFlags, flex_t a9)
+SithThing* sithWeapon_WeaponFire(SithThing *pShooter, SithThing *pProjectileTemplate, rdVector3 *pFireDir, rdVector3 *pFirePos, sithSound *hFireSnd, int submode, flex_t extra, int16_t projectileFlags, flex_t secDeltaTime)
 {
     SithThing *spawned; // esi
 
-    if ( fireSound )
-        sithAIAwareness_CreateTransmittingEvent(weapon->sector, &weapon->position, 1, 4.0, weapon);
+    if ( hFireSnd )
+        sithAIAwareness_CreateTransmittingEvent(pShooter->sector, &pShooter->position, 1, 4.0, pShooter);
 
-    spawned = sithWeapon_WeaponFireProjectile(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9, 0);
+    spawned = sithWeapon_WeaponFireProjectile(pShooter, pProjectileTemplate, pFireDir, pFirePos, hFireSnd, submode, extra, projectileFlags, secDeltaTime, 0);
 
     if ( spawned && sithMessage_g_outputstream )
-        sithDSSThing_Fire(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9, spawned->guid, -1, 255, 0);
+        sithDSSThing_Fire(pShooter, pProjectileTemplate, pFireDir, pFirePos, hFireSnd, submode, extra, projectileFlags, secDeltaTime, spawned->guid, -1, 255, 0);
 
     return spawned;
 }
 
-SithThing* sithWeapon_WeaponFireProjectile(SithThing *pMeshCollided, SithThing *projectileTemplate, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, flex_t scale, char scaleFlags, flex_t a9, int extra)
+SithThing* sithWeapon_WeaponFireProjectile(SithThing *pShooter, SithThing *pProjectileTemplate, rdVector3 *pFireDir, rdVector3 *pFirePos, sithSound *hFireSnd, int submode, flex_t scale, char flags, flex_t secDeltaTime, int extra)
 {
     SithThing *v9; // esi
     flex_d_t v17; // st7
@@ -521,29 +521,29 @@ SithThing* sithWeapon_WeaponFireProjectile(SithThing *pMeshCollided, SithThing *
     //return sithWeapon_FireProjectile_0_(pMeshCollided, projectileTemplate, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9);
 
     v9 = 0;
-    if ( !pMeshCollided || !fireOffset )
+    if ( !pShooter || !pFireDir )
         return 0;
 
-    if ( projectileTemplate )
+    if ( pProjectileTemplate )
     {
-        rdMatrix_BuildFromLook34(&a3a, fireOffset);
+        rdMatrix_BuildFromLook34(&a3a, pFireDir);
 
         flex_t fVar3, fVar2;
         if (Main_bMotsCompat) {
-            fVar3 = projectileTemplate->physicsParams.vel.z;
-            fVar2 = stdMath_ArcTan1(projectileTemplate->physicsParams.vel.y,fVar3);
+            fVar3 = pProjectileTemplate->physicsParams.vel.z;
+            fVar2 = stdMath_ArcTan1(pProjectileTemplate->physicsParams.vel.y,fVar3);
             rdMatrix_ExtractAngles34(&a3a,&a5a);
             a5a.x = -fVar2 + a5a.x;
             if (a5a.x < 0.0) {
                 a5a.x = -a5a.x;
             }
             if (a5a.x > 80.0) {
-                projectileTemplate->physicsParams.vel.z = 0;
+                pProjectileTemplate->physicsParams.vel.z = 0;
             }
         }
-        v9 = sithThing_CreateThingAtPos(projectileTemplate, &pMeshCollided->position, &a3a, pMeshCollided->sector, pMeshCollided);
+        v9 = sithThing_CreateThingAtPos(pProjectileTemplate, &pShooter->position, &a3a, pShooter->sector, pShooter);
         if (Main_bMotsCompat) {
-            projectileTemplate->physicsParams.vel.z = fVar3;
+            pProjectileTemplate->physicsParams.vel.z = fVar3;
         }
 
         if (!v9 )
@@ -555,25 +555,25 @@ SithThing* sithWeapon_WeaponFireProjectile(SithThing *pMeshCollided, SithThing *
             v9->userval = (flex_t)extra; // FLEXTODO
         }
 
-        if ((scaleFlags & 1) && v9->moveType == SITH_MT_PHYSICS) // Added: physics check
+        if ((flags & 1) && v9->moveType == SITH_MT_PHYSICS) // Added: physics check
         {
             rdVector_Scale3Acc(&v9->physicsParams.vel, scale);
         }
-        if (scaleFlags & 2)
+        if (flags & 2)
             v9->weaponParams.damage *= scale;
-        if (scaleFlags & 4)
+        if (flags & 4)
             v9->weaponParams.damage *= scale;
-        if (scaleFlags & 8)
+        if (flags & 8)
             v9->weaponParams.unk8 *= scale;
-        rdVector_Sub3(&a1, aimError, &pMeshCollided->position);
+        rdVector_Sub3(&a1, pFirePos, &pShooter->position);
         if (!rdVector_IsZero3(&a1))
         {
             a6a = rdVector_Normalize3Acc(&a1);
             sithCollision_MoveThing(v9, &a1, a6a, 0);
         }
-        if ( a9 > 0.02 )
+        if ( secDeltaTime > 0.02 )
         {
-            sithPhysics_UpdateThing(v9, a9);
+            sithPhysics_UpdateThing(v9, secDeltaTime);
             v17 = rdVector_Normalize3(&a5a, &v9->physicsParams.deltaVelocity);
             if ( v17 > 0.0 )
             {
@@ -583,7 +583,7 @@ SithThing* sithWeapon_WeaponFireProjectile(SithThing *pMeshCollided, SithThing *
         }
 
         // TODO Co-op
-        if ( !sithNet_isMulti && jkPlayer_setDiff && pMeshCollided == sithPlayer_g_pLocalPlayerThing && (v9->weaponParams.flags & SITH_WF_EMITAITARGETEDEVENT) != 0 )
+        if ( !sithNet_isMulti && jkPlayer_setDiff && pShooter == sithPlayer_g_pLocalPlayerThing && (v9->weaponParams.flags & SITH_WF_EMITAITARGETEDEVENT) != 0 )
         {
             v18 = rdVector_Normalize3(&a5a, &v9->physicsParams.vel) * 3.0;
             a6 = v18 >= 5.0 ? (flex_t)5.0 : (flex_t)v18; // FLEXTODO
@@ -601,35 +601,35 @@ SithThing* sithWeapon_WeaponFireProjectile(SithThing *pMeshCollided, SithThing *
     }
 
 LABEL_31:
-    if ( fireSound ) {
-        sithSoundMixer_PlaySoundThing(fireSound, pMeshCollided, 1.0, 1.0, 4.0, SITHSOUNDFLAG_FOLLOWSTHING|SITHSOUNDFLAG_HIGHPRIO);
+    if ( hFireSnd ) {
+        sithSoundMixer_PlaySoundThing(hFireSnd, pShooter, 1.0, 1.0, 4.0, SITHSOUNDFLAG_FOLLOWSTHING|SITHSOUNDFLAG_HIGHPRIO);
     }
-    if ( anim >= 0 )
+    if ( submode >= 0 )
     {
-        if ( pMeshCollided->pPuppetClass ) {
-            sithPuppet_PlayMode(pMeshCollided, anim, 0);
+        if ( pShooter->pPuppetClass ) {
+            sithPuppet_PlayMode(pShooter, submode, 0);
         }
     }
 
     return v9;
 }
 
-void sithWeapon_DamageWeapon(SithThing *weapon, SithThing* a2, flex_t timeLeft)
+void sithWeapon_DamageWeapon(SithThing *pThing, SithThing* pPurpetrator, flex_t damage)
 {
     unsigned int v3; // eax
     
     // TODO: ??? why is timeLeft unused
 
-    if ( (weapon->weaponParams.flags & SITH_WF_DAMAGEDESTROY) != 0 && timeLeft > 1.0 )
+    if ( (pThing->weaponParams.flags & SITH_WF_DAMAGEDESTROY) != 0 && damage > 1.0 )
     {
-        if ( !weapon->msecLifeLeft || weapon->msecLifeLeft > 250 )
-            weapon->msecLifeLeft = 250;
+        if ( !pThing->msecLifeLeft || pThing->msecLifeLeft > 250 )
+            pThing->msecLifeLeft = 250;
     }
 }
 
 // MOTS altered
 // TODO: I think there's some inlining happening in here
-int sithWeapon_ThingCollisionHandler(SithThing *physicsThing, SithThing *collidedThing, SithCollision *a4, int a5)
+int sithWeapon_ThingCollisionHandler(SithThing *pWeapon, SithThing *pThing, SithCollision *pCollision, int a5)
 {
     int v4; // eax
     int result; // eax
@@ -640,126 +640,126 @@ int sithWeapon_ThingCollisionHandler(SithThing *physicsThing, SithThing *collide
     flex_d_t v14; // st7
 
     // MoTS added
-    if (MOTS_ONLY_FLAG(collidedThing->type == SITH_THING_ITEM && !(collidedThing->itemParams.flags & SITH_ITEM_10))) {
+    if (MOTS_ONLY_FLAG(pThing->type == SITH_THING_ITEM && !(pThing->itemParams.flags & SITH_ITEM_10))) {
         return 0;
     }
 
     // Make the mines go Beep Beep Beep before exploding
-    if (physicsThing->weaponParams.flags & SITH_WF_PROXIMITY)
+    if (pWeapon->weaponParams.flags & SITH_WF_PROXIMITY)
     {
         // MoTS added
-        if (MOTS_ONLY_FLAG(collidedThing->type == SITH_THING_COG && a5)) {
+        if (MOTS_ONLY_FLAG(pThing->type == SITH_THING_COG && a5)) {
             return 0;
         }
-        physicsThing->weaponParams.flags &= ~SITH_WF_PROXIMITY;
-        physicsThing->weaponParams.flags |= SITH_WF_EXPLODE;
-        physicsThing->collideSize = 0.0;
-        physicsThing->msecLifeLeft = 550;
-        sithSoundClass_PlayModeFirst(physicsThing, SITH_SC_ACTIVATE);
+        pWeapon->weaponParams.flags &= ~SITH_WF_PROXIMITY;
+        pWeapon->weaponParams.flags |= SITH_WF_EXPLODE;
+        pWeapon->collideSize = 0.0;
+        pWeapon->msecLifeLeft = 550;
+        sithSoundClass_PlayModeFirst(pWeapon, SITH_SC_ACTIVATE);
         return 0;
     }
 
-    int bFlagsHadWfImpactSoundFxEarlier = physicsThing->weaponParams.flags & SITH_WF_IMPACTSOUND;
-    if ( physicsThing->weaponParams.flags & SITH_WF_IMPACTSOUND && collidedThing->flags & SITH_TF_4
-      || collidedThing->type == SITH_THING_COG && physicsThing->weaponParams.flags & SITH_WF_SURFACERICOCHET && physicsThing->weaponParams.numRicochets < 2 )
+    int bFlagsHadWfImpactSoundFxEarlier = pWeapon->weaponParams.flags & SITH_WF_IMPACTSOUND;
+    if ( pWeapon->weaponParams.flags & SITH_WF_IMPACTSOUND && pThing->flags & SITH_TF_4
+      || pThing->type == SITH_THING_COG && pWeapon->weaponParams.flags & SITH_WF_SURFACERICOCHET && pWeapon->weaponParams.numRicochets < 2 )
     {
-        if ( physicsThing->weaponParams.numRicochets++ < MAX_DEFLECTION_BOUNCES )
+        if ( pWeapon->weaponParams.numRicochets++ < MAX_DEFLECTION_BOUNCES )
         {
-            rdVector3 v31 = physicsThing->physicsParams.vel;
-            result = sithCollision_ThingCollisionHandler(physicsThing, collidedThing, a4, 0);
+            rdVector3 v31 = pWeapon->physicsParams.vel;
+            result = sithCollision_ThingCollisionHandler(pWeapon, pThing, pCollision, 0);
             if ( result )
             {
-                v8 = rdVector_Dot3(&a4->hitNorm, &v31) * -2.0;
+                v8 = rdVector_Dot3(&pCollision->hitNorm, &v31) * -2.0;
                 if ( a5 )
                     v8 = -v8;
 
-                rdVector_Copy3(&physicsThing->physicsParams.vel, &v31);
-                rdVector_ScaleAdd3Acc(&physicsThing->physicsParams.vel, &a4->hitNorm, v8);
+                rdVector_Copy3(&pWeapon->physicsParams.vel, &v31);
+                rdVector_ScaleAdd3Acc(&pWeapon->physicsParams.vel, &pCollision->hitNorm, v8);
 
                 rdVector3 tmp;
-                rdVector_Normalize3(&tmp, &physicsThing->physicsParams.vel);
-                rdMatrix_BuildFromLook34(&physicsThing->orient, &tmp);
+                rdVector_Normalize3(&tmp, &pWeapon->physicsParams.vel);
+                rdMatrix_BuildFromLook34(&pWeapon->orient, &tmp);
 
-                sithSoundClass_PlayModeRandom(physicsThing, SITH_SC_DEFLECTED);
-                physicsThing->weaponParams.flags &= ~SITH_WF_NOSHOOTERDAMAGE;
+                sithSoundClass_PlayModeRandom(pWeapon, SITH_SC_DEFLECTED);
+                pWeapon->weaponParams.flags &= ~SITH_WF_NOSHOOTERDAMAGE;
                 result = 1;
             }
             return result;
         }
     }
-    if ( collidedThing->type != SITH_THING_ACTOR && collidedThing->type != SITH_THING_PLAYER )
+    if ( pThing->type != SITH_THING_ACTOR && pThing->type != SITH_THING_PLAYER )
     {
         // MoTS added
-        if (MOTS_ONLY_FLAG(collidedThing->type == SITH_THING_COG && a5)) {
+        if (MOTS_ONLY_FLAG(pThing->type == SITH_THING_COG && a5)) {
             return 0;
         }
 
-        if (physicsThing->weaponParams.damage != 0.0) {
-            sithThing_DamageThing(collidedThing, physicsThing, physicsThing->weaponParams.damage, physicsThing->weaponParams.damageType);
+        if (pWeapon->weaponParams.damage != 0.0) {
+            sithThing_DamageThing(pThing, pWeapon, pWeapon->weaponParams.damage, pWeapon->weaponParams.damageType);
         }
 
-        if (physicsThing->weaponParams.flags & SITH_WF_FACEHITEXPLODE)
+        if (pWeapon->weaponParams.flags & SITH_WF_FACEHITEXPLODE)
         {
-            sithWeapon_CreateWeaponExplosion(physicsThing, physicsThing->weaponParams.pExplosionTemplate);
+            sithWeapon_CreateWeaponExplosion(pWeapon, pWeapon->weaponParams.pExplosionTemplate);
             return 1;
         }
-        if (!(physicsThing->weaponParams.flags & SITH_WF_ATTACHFACE)) {
-            return sithCollision_ThingCollisionHandler(physicsThing, collidedThing, a4, a5);
+        if (!(pWeapon->weaponParams.flags & SITH_WF_ATTACHFACE)) {
+            return sithCollision_ThingCollisionHandler(pWeapon, pThing, pCollision, a5);
         }
-        sithPhysics_ResetThingMovement(physicsThing);
-        sithSoundClass_StopMode(physicsThing, SITH_PF_USEGRAVITY);
-        sithSoundClass_PlayModeFirst(physicsThing, SITH_SC_HITHARD);
-        physicsThing->moveSize = 0.0;
-        sithThing_AttachThingToThing(physicsThing, collidedThing);
-        sithPhysics_SetThingLook(physicsThing, &a4->hitNorm, 0.0);
+        sithPhysics_ResetThingMovement(pWeapon);
+        sithSoundClass_StopMode(pWeapon, SITH_PF_USEGRAVITY);
+        sithSoundClass_PlayModeFirst(pWeapon, SITH_SC_HITHARD);
+        pWeapon->moveSize = 0.0;
+        sithThing_AttachThingToThing(pWeapon, pThing);
+        sithPhysics_SetThingLook(pWeapon, &pCollision->hitNorm, 0.0);
         
-        physicsThing->attach_flags |= SITH_ATTACH_NOMOVE;
-        physicsThing->physicsParams.flags |= SITH_PF_USEGRAVITY;
+        pWeapon->attach_flags |= SITH_ATTACH_NOMOVE;
+        pWeapon->physicsParams.flags |= SITH_PF_USEGRAVITY;
         return 1;
     }
-    if (collidedThing->weaponParams.flags & SITH_WF_INSTANT_IMPACT
+    if (pThing->weaponParams.flags & SITH_WF_INSTANT_IMPACT
       && bFlagsHadWfImpactSoundFxEarlier
-      && !(collidedThing->flags & (SITH_TF_DEAD|SITH_TF_DESTROYED))
-      && (collidedThing != sithPlayer_g_pLocalPlayerThing || sithTime_g_secGameTime >= (flex_d_t)sithWeapon_fireWait)
-      && sithActor_thing_anim_blocked(physicsThing, collidedThing, a4) )
+      && !(pThing->flags & (SITH_TF_DEAD|SITH_TF_DESTROYED))
+      && (pThing != sithPlayer_g_pLocalPlayerThing || sithTime_g_secGameTime >= (flex_d_t)sithWeapon_fireWait)
+      && sithActor_thing_anim_blocked(pWeapon, pThing, pCollision) )
     {
         return 1;
     }
-    if ( physicsThing->weaponParams.damage == 0.0 && !(physicsThing->weaponParams.flags & (SITH_WF_ATTACHTHING | SITH_WF_THINGHITEXPLODE)))
+    if ( pWeapon->weaponParams.damage == 0.0 && !(pWeapon->weaponParams.flags & (SITH_WF_ATTACHTHING | SITH_WF_THINGHITEXPLODE)))
         return 0;
 
-    if (sithCollision_ThingCollisionHandler(physicsThing, collidedThing, a4, a5))
+    if (sithCollision_ThingCollisionHandler(pWeapon, pThing, pCollision, a5))
     {
-        if (physicsThing->weaponParams.damage != 0.0) {
-            sithThing_DamageThing(collidedThing, physicsThing, physicsThing->weaponParams.damage, physicsThing->weaponParams.damageType);
+        if (pWeapon->weaponParams.damage != 0.0) {
+            sithThing_DamageThing(pThing, pWeapon, pWeapon->weaponParams.damage, pWeapon->weaponParams.damageType);
         }
-        if (physicsThing->weaponParams.flags & SITH_WF_THINGHITEXPLODE)
+        if (pWeapon->weaponParams.flags & SITH_WF_THINGHITEXPLODE)
         {
             // Proximity mines did the Beep Beep Beep, time to explode
-            if (collidedThing->weaponParams.flags & SITH_WF_EXPLODE)
+            if (pThing->weaponParams.flags & SITH_WF_EXPLODE)
             {
-                sithWeapon_CreateWeaponExplosion(physicsThing, physicsThing->weaponParams.pExplosionTemplate);
+                sithWeapon_CreateWeaponExplosion(pWeapon, pWeapon->weaponParams.pExplosionTemplate);
                 return 1;
             }
 
             // Gun splat spawning
-            sithWeapon_CreateWeaponExplosion(physicsThing, physicsThing->weaponParams.fleshHitTemplate);
+            sithWeapon_CreateWeaponExplosion(pWeapon, pWeapon->weaponParams.fleshHitTemplate);
             return 1;
         }
-        if (!(physicsThing->weaponParams.flags & SITH_WF_ATTACHTHING))
+        if (!(pWeapon->weaponParams.flags & SITH_WF_ATTACHTHING))
             return 1;
-        sithPhysics_ResetThingMovement(physicsThing);
-        sithThing_AttachThingToThing(physicsThing, collidedThing);
+        sithPhysics_ResetThingMovement(pWeapon);
+        sithThing_AttachThingToThing(pWeapon, pThing);
 
-        physicsThing->attach_flags |= SITH_ATTACH_NOMOVE;
-        physicsThing->physicsParams.flags |= SITH_PF_USEGRAVITY;
+        pWeapon->attach_flags |= SITH_ATTACH_NOMOVE;
+        pWeapon->physicsParams.flags |= SITH_PF_USEGRAVITY;
         return 1;
     }
     return 0;
 }
 
 // MoTS altered: floor hit explode
-int sithWeapon_SurfaceCollisionHandler(SithThing *thing, SithSurface *surface, SithCollision *a3)
+int sithWeapon_SurfaceCollisionHandler(SithThing *pThing, SithSurface *pSurf, SithCollision *pStack)
 {
     int result; // eax
     rdMaterial *v4; // eax
@@ -770,108 +770,108 @@ int sithWeapon_SurfaceCollisionHandler(SithThing *thing, SithSurface *surface, S
     char v10; // bl
     int v11; // eax
 
-    if ( thing->moveType != SITH_MT_PHYSICS )
+    if ( pThing->moveType != SITH_MT_PHYSICS )
         return 0;
     if ( (g_debugmodeFlags & DEBUGFLAG_PRINT_HITS) != 0 )
     {
-        v4 = surface->surfaceInfo.face.material;
+        v4 = pSurf->surfaceInfo.face.material;
         if ( v4 )
             v5 = v4->mat_fpath;
         else
             v5 = "none";
-        _sprintf(std_g_genBuffer, "Weapon hit surface %d, sector %d, material '%s'.\n", surface->index, surface->pSector->id, v5);
+        _sprintf(std_g_genBuffer, "Weapon hit surface %d, sector %d, material '%s'.\n", pSurf->index, pSurf->pSector->id, v5);
         sithConsole_PrintString(std_g_genBuffer);
     }
-    v6 = surface->flags;
+    v6 = pSurf->flags;
     if (v6 & (SITH_SURFACE_CEILING_SKY|SITH_SURFACE_HORIZON_SKY)) {
-        sithThing_DestroyThing(thing);
+        sithThing_DestroyThing(pThing);
         return 1;
     }
-    flags = thing->weaponParams.flags;
-    if ( ((flags & SITH_WF_IMPACTSOUND) != 0 && (v6 & SITH_SURFACE_MAGSEALED) != 0 || (flags & SITH_WF_SURFACERICOCHET) != 0 && thing->weaponParams.numRicochets < 2u)
-      && (++thing->weaponParams.numRicochets < MAX_DEFLECTION_BOUNCES) )
+    flags = pThing->weaponParams.flags;
+    if ( ((flags & SITH_WF_IMPACTSOUND) != 0 && (v6 & SITH_SURFACE_MAGSEALED) != 0 || (flags & SITH_WF_SURFACERICOCHET) != 0 && pThing->weaponParams.numRicochets < 2u)
+      && (++pThing->weaponParams.numRicochets < MAX_DEFLECTION_BOUNCES) )
     {
-        thing->physicsParams.flags |= SITH_PF_SURFACEBOUNCE;
-        sithCollision_HandleThingHitSurface(thing, surface, a3);
-        if ( (thing->physicsParams.flags & SITH_PF_SURFACEBOUNCE) == 0 )
+        pThing->physicsParams.flags |= SITH_PF_SURFACEBOUNCE;
+        sithCollision_HandleThingHitSurface(pThing, pSurf, pStack);
+        if ( (pThing->physicsParams.flags & SITH_PF_SURFACEBOUNCE) == 0 )
         {
-            thing->physicsParams.flags &= ~SITH_PF_SURFACEBOUNCE;
+            pThing->physicsParams.flags &= ~SITH_PF_SURFACEBOUNCE;
         }
-        rdVector_Normalize3(&thing->orient.lvec, &thing->physicsParams.vel);
-        thing->orient.rvec.x = (thing->orient.lvec.y * 1.0) - (thing->orient.lvec.z * 0.0);
-        thing->orient.rvec.y = (thing->orient.lvec.z * 0.0) - (thing->orient.lvec.x * 1.0);
-        thing->orient.rvec.z = (thing->orient.lvec.x * 0.0) - (thing->orient.lvec.y * 0.0);
-        rdVector_Normalize3Acc(&thing->orient.rvec);
-        thing->orient.uvec.x = (thing->orient.rvec.y * thing->orient.lvec.z) - (thing->orient.rvec.z * thing->orient.lvec.y);
-        thing->orient.uvec.y = (thing->orient.rvec.z * thing->orient.lvec.x) - (thing->orient.lvec.z * thing->orient.rvec.x);
-        thing->orient.uvec.z = (thing->orient.lvec.y * thing->orient.rvec.x) - (thing->orient.rvec.y * thing->orient.lvec.x);
-        thing->weaponParams.flags &= ~SITH_WF_NOSHOOTERDAMAGE;
+        rdVector_Normalize3(&pThing->orient.lvec, &pThing->physicsParams.vel);
+        pThing->orient.rvec.x = (pThing->orient.lvec.y * 1.0) - (pThing->orient.lvec.z * 0.0);
+        pThing->orient.rvec.y = (pThing->orient.lvec.z * 0.0) - (pThing->orient.lvec.x * 1.0);
+        pThing->orient.rvec.z = (pThing->orient.lvec.x * 0.0) - (pThing->orient.lvec.y * 0.0);
+        rdVector_Normalize3Acc(&pThing->orient.rvec);
+        pThing->orient.uvec.x = (pThing->orient.rvec.y * pThing->orient.lvec.z) - (pThing->orient.rvec.z * pThing->orient.lvec.y);
+        pThing->orient.uvec.y = (pThing->orient.rvec.z * pThing->orient.lvec.x) - (pThing->orient.lvec.z * pThing->orient.rvec.x);
+        pThing->orient.uvec.z = (pThing->orient.lvec.y * pThing->orient.rvec.x) - (pThing->orient.rvec.y * pThing->orient.lvec.x);
+        pThing->weaponParams.flags &= ~SITH_WF_NOSHOOTERDAMAGE;
         
-        sithSoundClass_PlayModeRandom(thing, SITH_SC_DEFLECTED);
+        sithSoundClass_PlayModeRandom(pThing, SITH_SC_DEFLECTED);
         result = 1;
     }
     else
     {
-        if ( thing->weaponParams.damage != 0.0 )
-            sithSurface_HandleThingImpact(surface, thing, thing->weaponParams.damage, thing->weaponParams.damageType);
+        if ( pThing->weaponParams.damage != 0.0 )
+            sithSurface_HandleThingImpact(pSurf, pThing, pThing->weaponParams.damage, pThing->weaponParams.damageType);
 
         // MOTS added: floor explode?
-        if (thing->weaponParams.flags & SITH_WF_FACEHITEXPLODE || MOTS_ONLY_FLAG(thing->weaponParams.flags & SITH_WF_ACTORKILLDESTROY && surface->flags & SITH_SURFACE_FLOOR))
+        if (pThing->weaponParams.flags & SITH_WF_FACEHITEXPLODE || MOTS_ONLY_FLAG(pThing->weaponParams.flags & SITH_WF_ACTORKILLDESTROY && pSurf->flags & SITH_SURFACE_FLOOR))
         {
-            sithWeapon_CreateWeaponExplosion(thing, thing->weaponParams.pExplosionTemplate);
+            sithWeapon_CreateWeaponExplosion(pThing, pThing->weaponParams.pExplosionTemplate);
             return 1;
         }
-        if ( (thing->weaponParams.flags & SITH_WF_ATTACHFACE) == 0 )
+        if ( (pThing->weaponParams.flags & SITH_WF_ATTACHFACE) == 0 )
         {
-            result = sithCollision_HandleThingHitSurface(thing, surface, a3);
+            result = sithCollision_HandleThingHitSurface(pThing, pSurf, pStack);
         }
         else
         {
-            sithCollision_HandleThingHitSurface(thing, surface, a3);
-            sithPhysics_ResetThingMovement(thing);
-            sithSoundClass_StopMode(thing, SITH_SC_CREATE);
-            thing->moveSize = 0.0;
-            sithThing_AttachThingToSurface(thing, surface, 0);
-            sithPhysics_SetThingLook(thing, &surface->surfaceInfo.face.normal, 0.0);
-            thing->physicsParams.flags |= SITH_PF_NOTHRUST;
+            sithCollision_HandleThingHitSurface(pThing, pSurf, pStack);
+            sithPhysics_ResetThingMovement(pThing);
+            sithSoundClass_StopMode(pThing, SITH_SC_CREATE);
+            pThing->moveSize = 0.0;
+            sithThing_AttachThingToSurface(pThing, pSurf, 0);
+            sithPhysics_SetThingLook(pThing, &pSurf->surfaceInfo.face.normal, 0.0);
+            pThing->physicsParams.flags |= SITH_PF_NOTHRUST;
             result = 1;
         }
     }
     return result;
 }
 
-void sithWeapon_DestroyWeapon(SithThing *weapon)
+void sithWeapon_DestroyWeapon(SithThing *pWeapon)
 {
     // This gets called for thermal detonators and prox mines when they run out of lifetime
-    if (weapon->weaponParams.flags & SITH_WF_EXPLODE)
+    if (pWeapon->weaponParams.flags & SITH_WF_EXPLODE)
     {
-        sithWeapon_CreateWeaponExplosion(weapon, weapon->weaponParams.pExplosionTemplate);
+        sithWeapon_CreateWeaponExplosion(pWeapon, pWeapon->weaponParams.pExplosionTemplate);
     }
     else
     {
-        sithThing_DestroyThing(weapon);
+        sithThing_DestroyThing(pWeapon);
     }
 }
 
-void sithWeapon_CreateWeaponExplosion(SithThing *weapon, SithThing *pExplosionTemplate)
+void sithWeapon_CreateWeaponExplosion(SithThing *pWeapon, SithThing *pExplosionTemplate)
 {
     if (pExplosionTemplate)
     {
-        SithThing* player = sithThing_GetThingParent(weapon);
-        SithThing* spawned = sithThing_CreateThingAtPos(pExplosionTemplate, &weapon->position, &rdroid_identMatrix34, weapon->sector, player);
+        SithThing* player = sithThing_GetThingParent(pWeapon);
+        SithThing* spawned = sithThing_CreateThingAtPos(pExplosionTemplate, &pWeapon->position, &rdroid_identMatrix34, pWeapon->sector, player);
         if (spawned)
         {
             // Added: second comparison, co-op
             if (player == sithPlayer_g_pLocalPlayerThing || player->type == SITH_THING_PLAYER) {
                 sithAIAwareness_CreateTransmittingEvent(spawned->sector, &spawned->position, 0, 2.0, player);
             }
-            if (weapon->flags & SITH_TF_INVULN)
+            if (pWeapon->flags & SITH_TF_INVULN)
             {
                 spawned->flags |= SITH_TF_INVULN;
             }
         }
     }
-    sithThing_DestroyThing(weapon);
+    sithThing_DestroyThing(pWeapon);
 }
 
 void sithWeapon_StartupEntry()
@@ -896,7 +896,7 @@ void sithWeapon_ShutdownEntry()
 }
 
 // MOTS altered
-int sithWeapon_SelectWeapon(SithThing *player, int binIdx, int a3)
+int sithWeapon_SelectWeapon(SithThing *pThing, int typeId, int a3)
 {
     int v4; // edi
     sithCog *v5; // edx
@@ -912,10 +912,10 @@ int sithWeapon_SelectWeapon(SithThing *player, int binIdx, int a3)
 
     //printf("%x\n", sithWeapon_8BD024);
 
-    v4 = sithInventory_GetCurrentWeapon(player);
-    if ( binIdx == v4 || sithInventory_GetInventory(player, binIdx) == 0.0 || !sithInventory_IsInventoryAvailable(player, binIdx) || sithWeapon_8BD024 != -1 )
+    v4 = sithInventory_GetCurrentWeapon(pThing);
+    if ( typeId == v4 || sithInventory_GetInventory(pThing, typeId) == 0.0 || !sithInventory_IsInventoryAvailable(pThing, typeId) || sithWeapon_8BD024 != -1 )
         return 0;
-    v5 = sithInventory_GetType(binIdx)->cog;
+    v5 = sithInventory_GetType(typeId)->cog;
     if ( v5 )
     {
         v7 = 0;
@@ -925,7 +925,7 @@ int sithWeapon_SelectWeapon(SithThing *player, int binIdx, int a3)
         sithWeapon_bAutoSwitch &= ~2;
         
         sithWeapon_bMultiplayerAutoSwitch &= ~2u;
-        if ( sithCog_SendMessageEx(v5, SITH_MESSAGE_AUTOSELECT, SENDERTYPE_SYSTEM, -1, SENDERTYPE_THING, player->idx, 0, 0.0, 0.0, 0.0, 0.0) < 0.0 )
+        if ( sithCog_SendMessageEx(v5, SITH_MESSAGE_AUTOSELECT, SENDERTYPE_SYSTEM, -1, SENDERTYPE_THING, pThing->idx, 0, 0.0, 0.0, 0.0, 0.0) < 0.0 )
             v7 = 1;
         if ( v9 )
         {
@@ -943,46 +943,46 @@ int sithWeapon_SelectWeapon(SithThing *player, int binIdx, int a3)
     if ( v13 && v13->cog ) // Added: v13 nullptr check
     {
         //printf("Send deselect %x\n", v4);
-        sithCog_SendMessage(v13->cog, SITH_MESSAGE_DESELECTED, SENDERTYPE_SYSTEM, sithWeapon_8BD024, SENDERTYPE_THING, player->idx, 0);
+        sithCog_SendMessage(v13->cog, SITH_MESSAGE_DESELECTED, SENDERTYPE_SYSTEM, sithWeapon_8BD024, SENDERTYPE_THING, pThing->idx, 0);
         for (int i = 0; i < 2; i++)
         {
             if (sithWeapon_8BD0A0[i] != -1.0 ) {
-                sithCog_SendMessage(v13->cog, SITH_MESSAGE_DEACTIVATED, SENDERTYPE_SYSTEM, i, SENDERTYPE_THING, player->idx, 0);
+                sithCog_SendMessage(v13->cog, SITH_MESSAGE_DEACTIVATED, SENDERTYPE_SYSTEM, i, SENDERTYPE_THING, pThing->idx, 0);
             }
         }
     }
 
-    sithWeapon_8BD024 = binIdx;
+    sithWeapon_8BD024 = typeId;
     sithWeapon_senderIndex = a3 != 0;
 
     // MoTS added
     if (Main_bMotsCompat) {
-        sithWeapon_mots_5a3258 = sithInventory_SelectWeaponPrior(binIdx);
+        sithWeapon_mots_5a3258 = sithInventory_SelectWeaponPrior(typeId);
     }
 
     return 1;
 }
 
-void sithWeapon_SetMountWait(SithThing *a1, flex32_t mountWait)
+void sithWeapon_SetMountWait(SithThing *a1, flex32_t secWait)
 {
-    sithWeapon_secMountWait = mountWait + sithTime_g_secGameTime;
+    sithWeapon_secMountWait = secWait + sithTime_g_secGameTime;
 }
 
-void sithWeapon_SetFireWait(SithThing *weapon, flex32_t firewait)
+void sithWeapon_SetFireWait(SithThing *pThing, flex32_t waitTime)
 {
-    if ( firewait == -1.0 )
+    if ( waitTime == -1.0 )
     {
         sithWeapon_fireWait = -1.0;
         sithWeapon_fireRate = -1.0;
     }
     else
     {
-        sithWeapon_fireRate = firewait;
-        sithWeapon_fireWait = firewait + sithTime_g_secGameTime;
+        sithWeapon_fireRate = waitTime;
+        sithWeapon_fireWait = waitTime + sithTime_g_secGameTime;
     }
 }
 
-void sithWeapon_UpdateActorWeaponState(SithThing *player)
+void sithWeapon_UpdateActorWeaponState(SithThing *pThing)
 {
     SithInventoryType *v1; // eax
     int v3; // eax
@@ -998,22 +998,22 @@ void sithWeapon_UpdateActorWeaponState(SithThing *player)
         // aaaaaaaaaaa ????? wtf is going on here
         if ( sithWeapon_8BD05C == 1 && sithTime_g_secGameTime >= (flex_d_t)sithWeapon_secMountWait )
         {
-            v3 = sithInventory_GetCurrentWeapon(player);
+            v3 = sithInventory_GetCurrentWeapon(pThing);
             v4 = sithInventory_GetType(v3);
             if ( v4 && (v4->flags & ITEMINFO_WEAPON) != 0 && sithWeapon_CurWeaponMode != -1 ) // Added: nullptr check
             {
                 if ( v4->cog )
-                    sithCog_SendMessage(v4->cog, SITH_MESSAGE_ACTIVATE, SENDERTYPE_SYSTEM, sithWeapon_CurWeaponMode, SENDERTYPE_THING, player->idx, 0);
+                    sithCog_SendMessage(v4->cog, SITH_MESSAGE_ACTIVATE, SENDERTYPE_SYSTEM, sithWeapon_CurWeaponMode, SENDERTYPE_THING, pThing->idx, 0);
             }
             sithWeapon_8BD05C = 0;
         }
         else if ( sithWeapon_CurWeaponMode != -1 && sithWeapon_fireRate > 0.0 && sithTime_g_secGameTime >= (flex_d_t)sithWeapon_fireWait )
         {
-            v6 = sithInventory_GetCurrentWeapon(player);
+            v6 = sithInventory_GetCurrentWeapon(pThing);
             v7 = sithInventory_GetType(v6);
             if ( v7 && (v7->flags & ITEMINFO_WEAPON) && v7->cog ) // Added: nullptr check
             {
-                v9 = player->idx;
+                v9 = pThing->idx;
                 sithWeapon_fireWait = sithWeapon_fireRate + sithTime_g_secGameTime;
                 sithCog_SendMessageEx(v7->cog, SITH_MESSAGE_FIRE, SENDERTYPE_SYSTEM, sithWeapon_CurWeaponMode, SENDERTYPE_THING, v9, 0, 0.0, 0.0, 0.0, 0.0);
             }
@@ -1025,16 +1025,16 @@ void sithWeapon_UpdateActorWeaponState(SithThing *player)
         if ( v1 && (v1->flags & ITEMINFO_WEAPON) && v1->cog && sithWeapon_8BD024 != -1) // Added: nullptr check
         {
             sithWeapon_LastFireTimeSecs = -1.0;
-            sithCog_SendMessage(v1->cog, SITH_MESSAGE_SELECTED, SENDERTYPE_SYSTEM, sithWeapon_senderIndex, SENDERTYPE_THING, player->idx, 0);
+            sithCog_SendMessage(v1->cog, SITH_MESSAGE_SELECTED, SENDERTYPE_SYSTEM, sithWeapon_senderIndex, SENDERTYPE_THING, pThing->idx, 0);
             sithWeapon_8BD05C = 1;
         }
         sithWeapon_8BD024 = -1;
     }
 }
 
-void sithWeapon_ActivateWeapon(SithThing *weapon, sithCog *cogCtx, flex_t fireRate, int mode)
+void sithWeapon_ActivateWeapon(SithThing *pThing, sithCog *pCog, flex_t waitTime, int mode)
 {
-    sithWeapon_fireRate = fireRate;
+    sithWeapon_fireRate = waitTime;
     sithWeapon_CurWeaponMode = mode;
     sithWeapon_8BD0A0[mode] = sithTime_g_secGameTime;
 
@@ -1044,12 +1044,12 @@ void sithWeapon_ActivateWeapon(SithThing *weapon, sithCog *cogCtx, flex_t fireRa
     if ( sithWeapon_fireWait != -1.0 && sithTime_g_secGameTime >= (flex_d_t)sithWeapon_fireWait )
     {
         if ( mode != -1 )
-            sithCog_SendMessageEx(cogCtx, SITH_MESSAGE_FIRE, 1, mode, 3, weapon->idx, 0, 0.0, 0.0, 0.0, 0.0);
+            sithCog_SendMessageEx(pCog, SITH_MESSAGE_FIRE, 1, mode, 3, pThing->idx, 0, 0.0, 0.0, 0.0, 0.0);
         sithWeapon_fireWait = sithWeapon_fireRate + sithTime_g_secGameTime;
     }
 }
 
-flex_t sithWeapon_DeactivateWeapon(SithThing *weapon, sithCog *cogCtx, int mode)
+flex_t sithWeapon_DeactivateWeapon(SithThing *pThing, sithCog *cogCtx, int mode)
 {
     int v3; // edx
     flex_t result; // st7
@@ -1108,7 +1108,7 @@ int sithWeapon_AutoSelect(SithThing *player, int weapIdx)
 }
 
 // MOTS altered TODO?
-int sithWeapon_ProcessWeaponControls(SithThing *player, flex_t a2)
+int sithWeapon_ProcessWeaponControls(SithThing *pThing, flex_t secDeltaTime)
 {
     flex_t *v3; // edi
     int v4; // eax
@@ -1133,10 +1133,10 @@ int sithWeapon_ProcessWeaponControls(SithThing *player, flex_t a2)
     
     //return sithWeapon_HandleWeaponKeys_(player, a2);
 
-    if ( player->type != SITH_THING_PLAYER || (player->flags & SITH_TF_DEAD) != 0 )
+    if ( pThing->type != SITH_THING_PLAYER || (pThing->flags & SITH_TF_DEAD) != 0 )
         return 0;
 
-    if ( (player->weaponParams.flags & SITH_WF_EMITAITARGETEDEVENT) == 0 )
+    if ( (pThing->weaponParams.flags & SITH_WF_EMITAITARGETEDEVENT) == 0 )
     {
         if ( sithTime_g_secGameTime < sithWeapon_secMountWait )
             return 0;
@@ -1148,12 +1148,12 @@ int sithWeapon_ProcessWeaponControls(SithThing *player, flex_t a2)
             if ( readInput && sithThing_MotsTick(7,0,inputFunc))
             {
                 if (!Main_bMotsCompat) {
-                    if ( sithWeapon_SelectWeapon(player, sithInventory_SelectWeaponFollowing(inputFunc - INPUT_FUNC_ACTIVATE), 0) )
+                    if ( sithWeapon_SelectWeapon(pThing, sithInventory_SelectWeaponFollowing(inputFunc - INPUT_FUNC_ACTIVATE), 0) )
                         break;
                 }
                 else {
                     flex_t fVar7 = 0.0;
-                    int iVar2 = sithInventory_GetCurrentWeapon(player);
+                    int iVar2 = sithInventory_GetCurrentWeapon(pThing);
                     int iVar5 = inputFunc + -0xc;
                     if ((iVar5 % 10 != sithWeapon_mots_5a3258 % 10) && ((iVar5 < 0xb && (sithWeapon_motsAConv[iVar5 % 10] != iVar5)))) {
                         iVar5 = sithWeapon_motsAConv[iVar5 % 10];
@@ -1164,14 +1164,14 @@ int sithWeapon_ProcessWeaponControls(SithThing *player, flex_t a2)
                             iVar5 = iVar5 + 10;
                         }
                     }
-                    else if ((iVar5 < 0xb) && ((fVar7 = sithInventory_GetInventory(player,iVar4), fVar7 == 0.0 || (iVar2 = sithInventory_IsInventoryAvailable(player,iVar4), iVar2 == 0))))
+                    else if ((iVar5 < 0xb) && ((fVar7 = sithInventory_GetInventory(pThing,iVar4), fVar7 == 0.0 || (iVar2 = sithInventory_IsInventoryAvailable(pThing,iVar4), iVar2 == 0))))
                     {
                         iVar5 = iVar5 + 10;
                     }
 
                     iVar2 = sithInventory_SelectWeaponFollowing(iVar5);
                     sithWeapon_motsAConv[iVar5 % 10] = iVar5;
-                    iVar2 = sithWeapon_SelectWeapon(player,iVar2,0);
+                    iVar2 = sithWeapon_SelectWeapon(pThing,iVar2,0);
                     if (iVar2 == 0) {
                         if (iVar5 < 0xb) {
                             iVar5 = iVar5 + 10;
@@ -1181,7 +1181,7 @@ int sithWeapon_ProcessWeaponControls(SithThing *player, flex_t a2)
                         }
                         iVar2 = sithInventory_SelectWeaponFollowing(iVar5);
                         sithWeapon_motsAConv[iVar5 % 10] = iVar5;
-                        iVar5 = sithWeapon_SelectWeapon(player,iVar2,0);
+                        iVar5 = sithWeapon_SelectWeapon(pThing,iVar2,0);
                         if (iVar5 != 0) {
                             return 0;
                         }
@@ -1196,7 +1196,7 @@ int sithWeapon_ProcessWeaponControls(SithThing *player, flex_t a2)
             while (readInput--)
             {
                 if (sithThing_MotsTick(7,1,1.0)) {
-                    sithWeapon_SelectNextWeapon(player);
+                    sithWeapon_SelectNextWeapon(pThing);
                 }
             }
 
@@ -1204,14 +1204,14 @@ int sithWeapon_ProcessWeaponControls(SithThing *player, flex_t a2)
             while (readInput--)
             {
                 if (sithThing_MotsTick(7,1,-1.0)) {
-                    sithWeapon_SelectPreviousWeapon(player);
+                    sithWeapon_SelectPreviousWeapon(pThing);
                 }
             }
 
             if ( sithWeapon_8BD024 != -1 )
                 return 0;
 
-            v18 = sithInventory_GetCurrentWeapon(player);
+            v18 = sithInventory_GetCurrentWeapon(pThing);
             v19 = sithInventory_GetType(v18);
             v20 = INPUT_FUNC_FIRE2;
             v26 = INPUT_FUNC_FIRE2;
@@ -1229,9 +1229,9 @@ int sithWeapon_ProcessWeaponControls(SithThing *player, flex_t a2)
                         if ( v23 )
                         {
                             if (sithWeapon_a8BD030[v21]) {
-                                sithCog_SendMessage(v23, SITH_MESSAGE_DEACTIVATED, SENDERTYPE_SYSTEM, 1 - v22, SENDERTYPE_THING, player->idx, 0);
+                                sithCog_SendMessage(v23, SITH_MESSAGE_DEACTIVATED, SENDERTYPE_SYSTEM, 1 - v22, SENDERTYPE_THING, pThing->idx, 0);
                             }
-                            sithCog_SendMessage(v19->cog, SITH_MESSAGE_ACTIVATE, SENDERTYPE_SYSTEM, v22, SENDERTYPE_THING, player->idx, 0);
+                            sithCog_SendMessage(v19->cog, SITH_MESSAGE_ACTIVATE, SENDERTYPE_SYSTEM, v22, SENDERTYPE_THING, pThing->idx, 0);
                         }
                     }
                 }
@@ -1241,9 +1241,9 @@ int sithWeapon_ProcessWeaponControls(SithThing *player, flex_t a2)
                     v24 = v19->cog;
                     if ( v24 )
                     {
-                        sithCog_SendMessage(v24, SITH_MESSAGE_DEACTIVATED, SENDERTYPE_SYSTEM, v22, SENDERTYPE_THING, player->idx, 0);
+                        sithCog_SendMessage(v24, SITH_MESSAGE_DEACTIVATED, SENDERTYPE_SYSTEM, v22, SENDERTYPE_THING, pThing->idx, 0);
                         if (sithWeapon_a8BD030[v21])
-                            sithCog_SendMessage(v19->cog, SITH_MESSAGE_ACTIVATE, SENDERTYPE_SYSTEM, 1 - v22, SENDERTYPE_THING, player->idx, 0);
+                            sithCog_SendMessage(v19->cog, SITH_MESSAGE_ACTIVATE, SENDERTYPE_SYSTEM, 1 - v22, SENDERTYPE_THING, pThing->idx, 0);
                     }
                 }
                 ++v21;
@@ -1263,10 +1263,10 @@ int sithWeapon_ProcessWeaponControls(SithThing *player, flex_t a2)
         if (sithWeapon_a8BD030[v2] == 1 )
         {
             sithWeapon_a8BD030[v2] = 0;
-            v4 = sithInventory_GetCurrentWeapon(player);
+            v4 = sithInventory_GetCurrentWeapon(pThing);
             v5 = sithInventory_GetType(v4)->cog;
             if ( v5 ) {
-                sithCog_SendMessage(v5, SITH_MESSAGE_DEACTIVATED, SENDERTYPE_SYSTEM, v2, SENDERTYPE_THING, player->idx, 0);
+                sithCog_SendMessage(v5, SITH_MESSAGE_DEACTIVATED, SENDERTYPE_SYSTEM, v2, SENDERTYPE_THING, pThing->idx, 0);
             }
         }
     }
@@ -1274,7 +1274,7 @@ int sithWeapon_ProcessWeaponControls(SithThing *player, flex_t a2)
 }
 
 // MOTS altered ??
-void sithWeapon_GetAimOrient(rdMatrix34 *out, SithThing *pMeshCollided, rdMatrix34 *in, rdVector3 *fireOffset, flex_t autoaimFov, flex_t autoaimMaxDist)
+void sithWeapon_GetAimOrient(rdMatrix34 *pOutOrient, SithThing *pShooter, rdMatrix34 *pStartOrient, rdVector3 *pFireOffset, flex_t autoAimFovX, flex_t autoAimFovZ)
 {
     unsigned int v9; // ebp
     unsigned int v10; // ebx
@@ -1288,27 +1288,27 @@ void sithWeapon_GetAimOrient(rdMatrix34 *out, SithThing *pMeshCollided, rdMatrix
     flex_t a3a; // [esp+6Ch] [ebp+14h]
     int a4a; // [esp+70h] [ebp+18h]
 
-    if ( autoaimFov == 0.0 && autoaimMaxDist == 0.0 )
+    if ( autoAimFovX == 0.0 && autoAimFovZ == 0.0 )
         return;
     if ( jkPlayer_setDiff == 2 )
     {
-        autoaimFov = autoaimFov * g_flt_8BD054;
-        autoaimMaxDist = autoaimMaxDist * g_flt_8BD054;
+        autoAimFovX = autoAimFovX * g_flt_8BD054;
+        autoAimFovZ = autoAimFovZ * g_flt_8BD054;
     }
     else if ( !jkPlayer_setDiff )
     {
-        autoaimFov = autoaimFov * g_flt_8BD050;
-        autoaimMaxDist = autoaimMaxDist * g_flt_8BD050;
+        autoAimFovX = autoAimFovX * g_flt_8BD050;
+        autoAimFovZ = autoAimFovZ * g_flt_8BD050;
     }
 
     if ( sithCamera_g_pCurCamera - sithCamera_g_aCameras == 1 )
     {
-        autoaimFov = autoaimFov * g_flt_8BD058;
-        autoaimMaxDist = autoaimMaxDist * g_flt_8BD058;
+        autoAimFovX = autoAimFovX * g_flt_8BD058;
+        autoAimFovZ = autoAimFovZ * g_flt_8BD058;
     }
-    _memcpy(out, in, sizeof(rdMatrix34));
-    rdVector_Copy3(&out->scale, fireOffset);
-    v9 = sithAI_FirstThingInView(pMeshCollided->sector, out, autoaimFov, autoaimMaxDist, 16, thingList, 1028, g_flt_8BD044);
+    _memcpy(pOutOrient, pStartOrient, sizeof(rdMatrix34));
+    rdVector_Copy3(&pOutOrient->scale, pFireOffset);
+    v9 = sithAI_FirstThingInView(pShooter->sector, pOutOrient, autoAimFovX, autoAimFovZ, 16, thingList, 1028, g_flt_8BD044);
     if ( v9 )
     {
         v10 = 0;
@@ -1318,15 +1318,15 @@ void sithWeapon_GetAimOrient(rdMatrix34 *out, SithThing *pMeshCollided, rdMatrix
         do
         {
             v12 = *v11;
-            if ( *v11 != pMeshCollided && (v12->actorParams.flags & SITH_AF_NOTARGET) == 0 )
+            if ( *v11 != pShooter && (v12->actorParams.flags & SITH_AF_NOTARGET) == 0 )
             {
-                if ( sithCollision_HasLOS(pMeshCollided, v12, 0) )
+                if ( sithCollision_HasLOS(pShooter, v12, 0) )
                 {
                     v13 = *v11;
-                    rdVector_Sub3(&v16, &v13->position, &pMeshCollided->position);
+                    rdVector_Sub3(&v16, &v13->position, &pShooter->position);
                     if (rdVector_Len3(&v16) > g_flt_8BD040)
                     {
-                        v17 = out->lvec;
+                        v17 = pOutOrient->lvec;
                         rdVector_Normalize3Acc(&v16);
                         rdVector_Normalize3Acc(&v17);
                         v15 = rdVector_Dot3(&v16, &v17);
@@ -1345,14 +1345,14 @@ void sithWeapon_GetAimOrient(rdMatrix34 *out, SithThing *pMeshCollided, rdMatrix
         }
         while ( v10 < v9 );
         if ( a4a >= 0 ) {
-            rdMatrix_LookAt(out, fireOffset, &thingList[a4a]->position, 0.0);
+            rdMatrix_LookAt(pOutOrient, pFireOffset, &thingList[a4a]->position, 0.0);
             //jkHud_SetTarget(thingList[a4a]);
         }
     }
 }
 
 // MOTS altered ??
-SithThing* sithWeapon_FireProjectile(SithThing *pSender, SithThing *pProjectileTemplate, sithSound *pFireSound, int mode, rdVector3 *pFireOffset, rdVector3 *pAimError, flex_t scale, int16_t scaleFlags, flex_t autoaimFov, flex_t autoaimMaxDist, int extra)
+SithThing* sithWeapon_FireProjectile(SithThing *pShooter, SithThing *pProjectile, sithSound *hFireSnd, int submode, rdVector3 *pFireOffset, rdVector3 *pAimError, flex_t scale, int16_t flags, flex_t autoAimFovX, flex_t autoAimFovZ, int extra)
 {
     int thingType; // eax
     flex_t finalTimeOffset; // esi
@@ -1363,28 +1363,28 @@ SithThing* sithWeapon_FireProjectile(SithThing *pSender, SithThing *pProjectileT
     flex_t catchupFactor; // [esp+80h] [ebp+4h]
     flex_t catchupTimeOffset; // [esp+90h] [ebp+14h]
 
-    thingType = pSender->type;
-    _memcpy(&senderOrient, &pSender->orient, sizeof(senderOrient));
+    thingType = pShooter->type;
+    _memcpy(&senderOrient, &pShooter->orient, sizeof(senderOrient));
     if ( thingType == SITH_THING_ACTOR || thingType == SITH_THING_PLAYER )
-        rdMatrix_PreRotate34(&senderOrient, &pSender->actorParams.headPYR);
+        rdMatrix_PreRotate34(&senderOrient, &pShooter->actorParams.headPYR);
     if ( pFireOffset->x == 0.0 && pFireOffset->y == 0.0 && pFireOffset->z == 0.0 )
     {
-        *pFireOffset = pSender->position;
+        *pFireOffset = pShooter->position;
     }
     else
     {
         rdMatrix_TransformVector34Acc(pFireOffset, &senderOrient);
-        rdVector_Add3Acc(pFireOffset, &pSender->position);
+        rdVector_Add3Acc(pFireOffset, &pShooter->position);
     }
 
-    if ( (sithWeapon_bAutoAim & 1) != 0 && (scaleFlags & 0x20) != 0 && (!sithNet_isMulti || (scaleFlags & 0x40) != 0) )
-        sithWeapon_GetAimOrient(&fireOrient, pSender, &senderOrient, pFireOffset, autoaimFov, autoaimMaxDist);
+    if ( (sithWeapon_bAutoAim & 1) != 0 && (flags & 0x20) != 0 && (!sithNet_isMulti || (flags & 0x40) != 0) )
+        sithWeapon_GetAimOrient(&fireOrient, pShooter, &senderOrient, pFireOffset, autoAimFovX, autoAimFovZ);
     else
         _memcpy(&fireOrient, &senderOrient, sizeof(fireOrient));
     if ( pAimError->x != 0.0 || pAimError->y != 0.0 || pAimError->z != 0.0 )
         rdMatrix_PreRotate34(&fireOrient, pAimError);
     fireDir = fireOrient.lvec;
-    if ( (scaleFlags & 0x10) == 0 )
+    if ( (flags & 0x10) == 0 )
     {
         sithWeapon_LastFireTimeSecs = -1.0;
         finalTimeOffset = 0.0;
@@ -1402,9 +1402,9 @@ SithThing* sithWeapon_FireProjectile(SithThing *pSender, SithThing *pProjectileT
                 catchupFactor -= 1.0;
                 catchupTimeOffset = catchupFactor * sithWeapon_fireRate;
                 finalTimeOffset = catchupTimeOffset;
-                SithThing *pFired = sithWeapon_WeaponFireProjectile(pSender, pProjectileTemplate, &fireDir, pFireOffset, 0, mode, scale, scaleFlags, catchupTimeOffset, extra);
+                SithThing *pFired = sithWeapon_WeaponFireProjectile(pShooter, pProjectile, &fireDir, pFireOffset, 0, submode, scale, flags, catchupTimeOffset, extra);
                 if ( pFired && sithMessage_g_outputstream )
-                    sithDSSThing_Fire(pSender, pProjectileTemplate, &fireDir, pFireOffset, 0, mode, scale, scaleFlags, catchupTimeOffset, pFired->guid, -1, 255, extra);
+                    sithDSSThing_Fire(pShooter, pProjectile, &fireDir, pFireOffset, 0, submode, scale, flags, catchupTimeOffset, pFired->guid, -1, 255, extra);
             }
             while ( catchupFactor > 1.0 );
         }
@@ -1413,20 +1413,20 @@ SithThing* sithWeapon_FireProjectile(SithThing *pSender, SithThing *pProjectileT
             finalTimeOffset = 0.0;
         }
     }
-    if ( pFireSound )
-        sithAIAwareness_CreateTransmittingEvent(pSender->sector, &pSender->position, 1, 4.0, pSender);
-    pResult = sithWeapon_WeaponFireProjectile(pSender, pProjectileTemplate, &fireDir, pFireOffset, pFireSound, mode, scale, scaleFlags, finalTimeOffset, extra);
+    if ( hFireSnd )
+        sithAIAwareness_CreateTransmittingEvent(pShooter->sector, &pShooter->position, 1, 4.0, pShooter);
+    pResult = sithWeapon_WeaponFireProjectile(pShooter, pProjectile, &fireDir, pFireOffset, hFireSnd, submode, scale, flags, finalTimeOffset, extra);
     if ( pResult && sithMessage_g_outputstream )
     {
         sithDSSThing_Fire(
-            pSender,
-            pProjectileTemplate,
+            pShooter,
+            pProjectile,
             &fireDir,
             pFireOffset,
-            pFireSound,
-            mode,
+            hFireSnd,
+            submode,
             scale,
-            scaleFlags,
+            flags,
             finalTimeOffset,
             pResult->guid,
             -1,
@@ -1520,7 +1520,7 @@ int sithWeapon_ReadConf()
 }
 
 // TODO these functions are interesting
-void sithWeapon_SelectNextWeapon(SithThing* player)
+void sithWeapon_SelectNextWeapon(SithThing* pThing)
 {
     if (Main_bMotsCompat) {
         int iVar1;
@@ -1529,7 +1529,7 @@ void sithWeapon_SelectNextWeapon(SithThing* player)
         SithInventoryType *psVar3;
         flex_t fVar4;
         
-        iVar1 = sithInventory_GetCurrentWeapon(player);
+        iVar1 = sithInventory_GetCurrentWeapon(pThing);
         iVar1 = sithInventory_SelectWeaponPrior(iVar1);
         do {
             do {
@@ -1548,40 +1548,40 @@ void sithWeapon_SelectNextWeapon(SithThing* player)
                         iVar1 = 0;
                         binIdx = sithInventory_SelectWeaponFollowing(0);
                     }
-                    fVar4 = sithInventory_GetInventory(player,binIdx);
+                    fVar4 = sithInventory_GetInventory(pThing,binIdx);
                 } while (fVar4 == 0.0);
-                iVar2 = sithInventory_IsInventoryAvailable(player,binIdx);
+                iVar2 = sithInventory_IsInventoryAvailable(pThing,binIdx);
             } while (iVar2 == 0);
-            psVar3 = sithInventory_GetInventoryType(player,binIdx);
-            fVar4 = sithCog_SendMessageEx(psVar3->cog, SITH_MESSAGE_AUTOSELECT, 0, 0, SENDERTYPE_THING, player->idx, 0, 0.0, 0.0, 0.0, 0.0);
+            psVar3 = sithInventory_GetInventoryType(pThing,binIdx);
+            fVar4 = sithCog_SendMessageEx(psVar3->cog, SITH_MESSAGE_AUTOSELECT, 0, 0, SENDERTYPE_THING, pThing->idx, 0, 0.0, 0.0, 0.0, 0.0);
         } while (fVar4 == -1.0);
-        sithWeapon_SelectWeapon(player,binIdx,0);
+        sithWeapon_SelectWeapon(pThing,binIdx,0);
     }
     else {
         SithInventoryType *v12; // eax
         SithInventoryType *v13; // eax
-        int binIdx = sithInventory_GetCurrentWeapon(player);
+        int binIdx = sithInventory_GetCurrentWeapon(pThing);
 
-        int v11 = sithInventory_FindNextTypeID(player, binIdx, ITEMINFO_WEAPON);
+        int v11 = sithInventory_FindNextTypeID(pThing, binIdx, ITEMINFO_WEAPON);
         if ( v11 == -1 )
-            v11 = sithInventory_FindNextTypeID(player, 0, ITEMINFO_WEAPON);
-        v12 = sithInventory_GetInventoryType(player, v11);
-        if ( sithCog_SendMessageEx(v12->cog, SITH_MESSAGE_AUTOSELECT, 0, 0, SENDERTYPE_THING, player->idx, 0, 0.0, 0.0, 0.0, 0.0) == -1.0 )
+            v11 = sithInventory_FindNextTypeID(pThing, 0, ITEMINFO_WEAPON);
+        v12 = sithInventory_GetInventoryType(pThing, v11);
+        if ( sithCog_SendMessageEx(v12->cog, SITH_MESSAGE_AUTOSELECT, 0, 0, SENDERTYPE_THING, pThing->idx, 0, 0.0, 0.0, 0.0, 0.0) == -1.0 )
         {
             do
             {
-                v11 = sithInventory_FindNextTypeID(player, v11, ITEMINFO_WEAPON);
+                v11 = sithInventory_FindNextTypeID(pThing, v11, ITEMINFO_WEAPON);
                 if ( v11 == -1 )
-                    v11 = sithInventory_FindNextTypeID(player, 0, ITEMINFO_WEAPON);
-                v13 = sithInventory_GetInventoryType(player, v11);
+                    v11 = sithInventory_FindNextTypeID(pThing, 0, ITEMINFO_WEAPON);
+                v13 = sithInventory_GetInventoryType(pThing, v11);
             }
-            while ( sithCog_SendMessageEx(v13->cog, SITH_MESSAGE_AUTOSELECT, 0, 0, SENDERTYPE_THING, player->idx, 0, 0.0, 0.0, 0.0, 0.0) == -1.0 );
+            while ( sithCog_SendMessageEx(v13->cog, SITH_MESSAGE_AUTOSELECT, 0, 0, SENDERTYPE_THING, pThing->idx, 0, 0.0, 0.0, 0.0, 0.0) == -1.0 );
         }
-        sithWeapon_SelectWeapon(player, v11, 0);
+        sithWeapon_SelectWeapon(pThing, v11, 0);
     }
 }
 
-void sithWeapon_SelectPreviousWeapon(SithThing* player)
+void sithWeapon_SelectPreviousWeapon(SithThing* pThing)
 {
     if (Main_bMotsCompat) {
         int iVar1;
@@ -1590,7 +1590,7 @@ void sithWeapon_SelectPreviousWeapon(SithThing* player)
         SithInventoryType *psVar3;
         flex_t fVar4;
         
-        iVar1 = sithInventory_GetCurrentWeapon(player);
+        iVar1 = sithInventory_GetCurrentWeapon(pThing);
         iVar1 = sithInventory_SelectWeaponPrior(iVar1);
         do {
             do {
@@ -1605,38 +1605,38 @@ void sithWeapon_SelectPreviousWeapon(SithThing* player)
                         iVar1 = iVar1 + -10;
                     }
                     binIdx = sithInventory_SelectWeaponFollowing(iVar1);
-                    fVar4 = sithInventory_GetInventory(player,binIdx);
+                    fVar4 = sithInventory_GetInventory(pThing,binIdx);
                 } while (fVar4 == 0.0);
-                iVar2 = sithInventory_IsInventoryAvailable(player,binIdx);
+                iVar2 = sithInventory_IsInventoryAvailable(pThing,binIdx);
             } while (iVar2 == 0);
-            psVar3 = sithInventory_GetInventoryType(player,binIdx);
-            fVar4 = sithCog_SendMessageEx(psVar3->cog, SITH_MESSAGE_AUTOSELECT, 0, 0, SENDERTYPE_THING, player->idx, 0, 0.0, 0.0, 0.0, 0.0);
+            psVar3 = sithInventory_GetInventoryType(pThing,binIdx);
+            fVar4 = sithCog_SendMessageEx(psVar3->cog, SITH_MESSAGE_AUTOSELECT, 0, 0, SENDERTYPE_THING, pThing->idx, 0, 0.0, 0.0, 0.0, 0.0);
         } while (fVar4 == -1.0);
-        sithWeapon_SelectWeapon(player,binIdx,0);
+        sithWeapon_SelectWeapon(pThing,binIdx,0);
     }
     else {
         SithInventoryType *v16; // eax
         SithInventoryType *v17; // eax
 
-        int v14 = sithInventory_GetCurrentWeapon(player);
+        int v14 = sithInventory_GetCurrentWeapon(pThing);
                     
-        int v15 = sithInventory_FindPreviousTypeID(player, v14, ITEMINFO_WEAPON);
+        int v15 = sithInventory_FindPreviousTypeID(pThing, v14, ITEMINFO_WEAPON);
         if ( v15 == -1 )
-            v15 = sithInventory_FindPreviousTypeID(player, 0, ITEMINFO_WEAPON);
+            v15 = sithInventory_FindPreviousTypeID(pThing, 0, ITEMINFO_WEAPON);
         
-        v16 = sithInventory_GetInventoryType(player, v15);
-        if ( sithCog_SendMessageEx(v16->cog, SITH_MESSAGE_AUTOSELECT, 0, 0, SENDERTYPE_THING, player->idx, 0, 0.0, 0.0, 0.0, 0.0) == -1.0 )
+        v16 = sithInventory_GetInventoryType(pThing, v15);
+        if ( sithCog_SendMessageEx(v16->cog, SITH_MESSAGE_AUTOSELECT, 0, 0, SENDERTYPE_THING, pThing->idx, 0, 0.0, 0.0, 0.0, 0.0) == -1.0 )
         {
             do
             {
-                v15 = sithInventory_FindPreviousTypeID(player, v15, ITEMINFO_WEAPON);
+                v15 = sithInventory_FindPreviousTypeID(pThing, v15, ITEMINFO_WEAPON);
                 if ( v15 == -1 )
-                    v15 = sithInventory_FindPreviousTypeID(player, 0, ITEMINFO_WEAPON);
-                v17 = sithInventory_GetInventoryType(player, v15);
+                    v15 = sithInventory_FindPreviousTypeID(pThing, 0, ITEMINFO_WEAPON);
+                v17 = sithInventory_GetInventoryType(pThing, v15);
             }
-            while ( sithCog_SendMessageEx(v17->cog, SITH_MESSAGE_AUTOSELECT, 0, 0, SENDERTYPE_THING, player->idx, 0, 0.0, 0.0, 0.0, 0.0) == -1.0 );
+            while ( sithCog_SendMessageEx(v17->cog, SITH_MESSAGE_AUTOSELECT, 0, 0, SENDERTYPE_THING, pThing->idx, 0, 0.0, 0.0, 0.0, 0.0) == -1.0 );
         }
-        sithWeapon_SelectWeapon(player, v15, 0);
+        sithWeapon_SelectWeapon(pThing, v15, 0);
     }
 }
 

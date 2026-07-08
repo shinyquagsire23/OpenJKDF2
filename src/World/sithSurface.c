@@ -54,7 +54,7 @@ int sithSurface_Startup3()
     return sithSurface_Startup();
 }
 
-int sithSurface_ReadSurfacesListText(SithWorld *world)
+int sithSurface_ReadSurfacesListText(SithWorld *pWorld)
 {
     uint32_t numAdjoins; // ebp
     uint32_t allocSize; // esi
@@ -101,7 +101,7 @@ int sithSurface_ReadSurfacesListText(SithWorld *world)
 #ifdef STDPLATFORM_HEAP_SUGGESTIONS
         pSithHS->suggestHeap(prevSuggest);
 #endif
-        world->adjoins = adjoins;
+        pWorld->adjoins = adjoins;
         if ( !adjoins ) {
             stdPrintf(
                 pSithHS->errorPrint,
@@ -112,28 +112,28 @@ int sithSurface_ReadSurfacesListText(SithWorld *world)
             return 0;
         }
         stdPlatform_Memzero32(adjoins, allocSize); // Added: word-safe
-        world->numAdjoins = numAdjoins;
-        world->numAdjoinsLoaded = 0;
+        pWorld->numAdjoins = numAdjoins;
+        pWorld->numAdjoinsLoaded = 0;
     }
     else
     {
-        world->adjoins = 0;
+        pWorld->adjoins = 0;
     }
 
-    world->numAdjoinsLoaded = numAdjoins;
-    for (int32_t i = 0; i < world->numAdjoinsLoaded; i++)
+    pWorld->numAdjoinsLoaded = numAdjoins;
+    for (int32_t i = 0; i < pWorld->numAdjoinsLoaded; i++)
     {
         if ( !stdConffile_ReadArgs() )
             return 0;
-        if ( _sscanf(stdConffile_g_entry.aArgs[1].value, "%x", &world->adjoins[i].flags) != 1 )
+        if ( _sscanf(stdConffile_g_entry.aArgs[1].value, "%x", &pWorld->adjoins[i].flags) != 1 )
             return 0;
 
         mirror = _atoi(stdConffile_g_entry.aArgs[2].value);
-        if ( mirror >= world->numAdjoinsLoaded )
+        if ( mirror >= pWorld->numAdjoinsLoaded )
             return 0;
         distStr = stdConffile_g_entry.aArgs[3].value;
-        world->adjoins[i].mirror = &world->adjoins[mirror];
-        world->adjoins[i].dist = _atof(distStr);
+        pWorld->adjoins[i].mirror = &pWorld->adjoins[mirror];
+        pWorld->adjoins[i].dist = _atof(distStr);
     }
     if (!stdConffile_ReadLine())
     {
@@ -160,11 +160,11 @@ int sithSurface_ReadSurfacesListText(SithWorld *world)
 #ifdef STDPLATFORM_HEAP_SUGGESTIONS
     int prevSuggest = pSithHS->suggestHeap(HEAP_FAST);
 #endif
-    world->surfaces = (SithSurface *)SITH_ALLOC(sizeof(SithSurface) * numSurfaces);
+    pWorld->surfaces = (SithSurface *)SITH_ALLOC(sizeof(SithSurface) * numSurfaces);
 #ifdef STDPLATFORM_HEAP_SUGGESTIONS
     pSithHS->suggestHeap(prevSuggest);
 #endif
-    if (!world->surfaces)
+    if (!pWorld->surfaces)
     {
         stdPrintf(
                 pSithHS->errorPrint,
@@ -175,14 +175,14 @@ int sithSurface_ReadSurfacesListText(SithWorld *world)
         return 0;
     }
 
-    _memset(world->surfaces, 0, sizeof(SithSurface) * numSurfaces);
-    world->numSurfaces = numSurfaces;
+    _memset(pWorld->surfaces, 0, sizeof(SithSurface) * numSurfaces);
+    pWorld->numSurfaces = numSurfaces;
     for (int32_t v14 = 0; v14 < numSurfaces; v14++)
     {
-        rdFace_NewEntry(&world->surfaces[v14].surfaceInfo.face);
-        world->surfaces[v14].index = v14;
+        rdFace_NewEntry(&pWorld->surfaces[v14].surfaceInfo.face);
+        pWorld->surfaces[v14].index = v14;
     }
-    surfaces = world->surfaces;
+    surfaces = pWorld->surfaces;
 
 #ifdef SITHSURFACE_POOLED_ARRAYS
     // Added: one pool for every surface's index/intensity arrays (3 tiny allocs
@@ -271,7 +271,7 @@ int sithSurface_ReadSurfacesListText(SithWorld *world)
         }
         else
         {
-            surfaceAdjoin = &world->adjoins[adjoinIdx];
+            surfaceAdjoin = &pWorld->adjoins[adjoinIdx];
 
             surfaceIter->pAdjoin = surfaceAdjoin;
             surfaceAdjoin->surface = surfaceIter;
@@ -285,7 +285,7 @@ int sithSurface_ReadSurfacesListText(SithWorld *world)
             else {
                 v66 = NULL; // Added
             }
-            if ( (world->adjoins[adjoinIdx].flags & 1) == 0
+            if ( (pWorld->adjoins[adjoinIdx].flags & 1) == 0
               || (face->material 
                   && face->geometryMode 
                   && (face->type & 2) == 0 
@@ -326,7 +326,7 @@ int sithSurface_ReadSurfacesListText(SithWorld *world)
                     return 0;
                 pIdxPool = pNewPool;
                 poolCap = newCap;
-                world->paSurfaceIdxPool = pIdxPool; // keep current for the fail path
+                pWorld->paSurfaceIdxPool = pIdxPool; // keep current for the fail path
             }
             pPosIdx = pIdxPool + poolUsed;
             face->vertexPosIdx = (int*)(intptr_t)(poolUsed + 1);
@@ -486,7 +486,7 @@ int sithSurface_ReadSurfacesListText(SithWorld *world)
         }
     }
 #endif
-    world->paSurfaceIdxPool = pIdxPool;
+    pWorld->paSurfaceIdxPool = pIdxPool;
     for (int32_t vFix = 0; vFix < numSurfaces; vFix++)
     {
         rdFace* pFixFace = &surfaces[vFix].surfaceInfo.face;
@@ -509,12 +509,12 @@ int sithSurface_ReadSurfacesListText(SithWorld *world)
         
         //jk_printf("%u: %x\n", v50, &world->surfaces[0].flags);
         
-        world->surfaces[v50].surfaceInfo.face.normal.x = norm_x;
-        world->surfaces[v50].surfaceInfo.face.normal.y = norm_y;
-        world->surfaces[v50].surfaceInfo.face.normal.z = norm_z;
+        pWorld->surfaces[v50].surfaceInfo.face.normal.x = norm_x;
+        pWorld->surfaces[v50].surfaceInfo.face.normal.y = norm_y;
+        pWorld->surfaces[v50].surfaceInfo.face.normal.z = norm_z;
     }
     
-    world->numSurfaces = numSurfaces;
+    pWorld->numSurfaces = numSurfaces;
 #ifdef RDMATERIAL_LRU_LOAD_UNLOAD
     for (uint32_t i = 0; i < sithMaterial_numMaterials; i++) {
         rdMaterial_OptionalFree(sithMaterial_aMaterials[i]);
@@ -526,21 +526,21 @@ int sithSurface_ReadSurfacesListText(SithWorld *world)
     return 1;
 }
 
-int sithSurface_ValidateWorldSurfaces(SithWorld *world)
+int sithSurface_ValidateWorldSurfaces(SithWorld *pWorld)
 {
-    for (int32_t i = 0; i < world->numSurfaces; i++)
+    for (int32_t i = 0; i < pWorld->numSurfaces; i++)
     {
-        if (world->surfaces[i].pSector == (SithSector*)8 || !world->surfaces[i].pSector)
+        if (pWorld->surfaces[i].pSector == (SithSector*)8 || !pWorld->surfaces[i].pSector)
             return 0;
     }
     
     return 1;
 }
 
-int sithSurface_ValidateSurfacePointer(SithSurface *surface)
+int sithSurface_ValidateSurfacePointer(SithSurface *pSurf)
 {
-    if ( surface )
-        return (surface->pSector != 0);
+    if ( pSurf )
+        return (pSurf->pSector != 0);
 
     return 0;
 }
@@ -671,15 +671,15 @@ rdSurface* sithSurface_SurfaceAnim(SithSurface *parent, flex_t a2, uint16_t flag
     return result;
 }
 
-int sithSurface_AllocWorldSurfaces(SithWorld *world, int num)
+int sithSurface_AllocWorldSurfaces(SithWorld *pWorld, int numSurfaces)
 {
-    SithSurface *surfaces = (SithSurface *)SITH_ALLOC(num * sizeof(SithSurface));
-    world->surfaces = surfaces;
+    SithSurface *surfaces = (SithSurface *)SITH_ALLOC(numSurfaces * sizeof(SithSurface));
+    pWorld->surfaces = surfaces;
     if ( !surfaces )
         return 0;
-    _memset(surfaces, 0, num * sizeof(SithSurface));
-    world->numSurfaces = num;
-    for (uint32_t i = 0; i < (uint32_t)num; i++)
+    _memset(surfaces, 0, numSurfaces * sizeof(SithSurface));
+    pWorld->numSurfaces = numSurfaces;
+    for (uint32_t i = 0; i < (uint32_t)numSurfaces; i++)
     {
         rdFace_NewEntry(&surfaces[i].surfaceInfo.face);
         surfaces[i].index = i;
@@ -687,38 +687,38 @@ int sithSurface_AllocWorldSurfaces(SithWorld *world, int num)
     return 1;
 }
 
-int sithSurface_AllocWorldAdjoins(SithWorld *world, int num)
+int sithSurface_AllocWorldAdjoins(SithWorld *pWorld, int numAdjoins)
 {
-    if ( num == 0 )
+    if ( numAdjoins == 0 )
     {
-        world->adjoins = NULL;
+        pWorld->adjoins = NULL;
         return 1;
     }
     SithSurfaceAdjoin *adjoins;
     { TWL_EXTRAM_SUGGEST(pSithHS); // Added
-    adjoins = (SithSurfaceAdjoin *)SITH_ALLOC(num * sizeof(SithSurfaceAdjoin));
+    adjoins = (SithSurfaceAdjoin *)SITH_ALLOC(numAdjoins * sizeof(SithSurfaceAdjoin));
     TWL_EXTRAM_RESTORE(pSithHS); }
-    world->adjoins = adjoins;
+    pWorld->adjoins = adjoins;
     if ( !adjoins )
         return 0;
-    stdPlatform_Memzero32(adjoins, num * sizeof(SithSurfaceAdjoin)); // Added: word-safe
-    world->numAdjoins = num;
-    world->numAdjoinsLoaded = 0;
+    stdPlatform_Memzero32(adjoins, numAdjoins * sizeof(SithSurfaceAdjoin)); // Added: word-safe
+    pWorld->numAdjoins = numAdjoins;
+    pWorld->numAdjoinsLoaded = 0;
     return 1;
 }
 
-void sithSurface_FreeWorldSurfaces(SithWorld *world)
+void sithSurface_FreeWorldSurfaces(SithWorld *pWorld)
 {
 #ifdef SITHSURFACE_POOLED_ARRAYS
     // Added: pooled surface arrays free as one block (per-surface pointers alias
     // into it; a partially-parsed world may still hold offsets instead).
-    if (world->paSurfaceIdxPool)
+    if (pWorld->paSurfaceIdxPool)
     {
-        SITH_FREE(world->paSurfaceIdxPool);
-        world->paSurfaceIdxPool = NULL;
-        for (int32_t i = 0; i < world->numSurfaces; i++)
+        SITH_FREE(pWorld->paSurfaceIdxPool);
+        pWorld->paSurfaceIdxPool = NULL;
+        for (int32_t i = 0; i < pWorld->numSurfaces; i++)
         {
-            SithSurface* surface = &world->surfaces[i];
+            SithSurface* surface = &pWorld->surfaces[i];
             surface->surfaceInfo.face.numVertices = 0;
             surface->surfaceInfo.face.vertexPosIdx = NULL;
             surface->surfaceInfo.face.vertexUVIdx = NULL;
@@ -728,9 +728,9 @@ void sithSurface_FreeWorldSurfaces(SithWorld *world)
     }
     else
 #endif
-    for (int32_t i = 0; i < world->numSurfaces; i++)
+    for (int32_t i = 0; i < pWorld->numSurfaces; i++)
     {
-        SithSurface* surface = &world->surfaces[i];
+        SithSurface* surface = &pWorld->surfaces[i];
 
         surface->surfaceInfo.face.numVertices = 0;
         if ( surface->surfaceInfo.face.vertexPosIdx )
@@ -742,16 +742,16 @@ void sithSurface_FreeWorldSurfaces(SithWorld *world)
         surface->surfaceInfo.lastTouchedMs = 0;
     }
 
-    SITH_FREE(world->surfaces);
-    world->surfaces = 0;
-    world->numSurfaces = 0;
+    SITH_FREE(pWorld->surfaces);
+    pWorld->surfaces = 0;
+    pWorld->numSurfaces = 0;
     sithSurface_numUnsyncedSurfaces = 0;
-    if ( world->adjoins )
+    if ( pWorld->adjoins )
     {
-        SITH_FREE(world->adjoins);
-        world->adjoins = 0;
-        world->numAdjoins = 0;
-        world->numAdjoinsLoaded = 0;
+        SITH_FREE(pWorld->adjoins);
+        pWorld->adjoins = 0;
+        pWorld->numAdjoins = 0;
+        pWorld->numAdjoinsLoaded = 0;
     }
 }
 
@@ -1349,23 +1349,23 @@ void sithSurface_DetachThing(SithSurface *a1, rdVector3 *out)
     }
 }
 
-int sithSurface_GetCenterPoint(SithSurface *surface, rdVector3 *out)
+int sithSurface_GetCenterPoint(SithSurface *pSurface, rdVector3 *centerpoint)
 {
     rdVector3 a1a; // [esp+14h] [ebp-18h] BYREF
     rdVector3 a2a; // [esp+20h] [ebp-Ch] BYREF
 
     rdVector_Zero3(&a1a);
-    for (uint32_t i = 0; i < surface->surfaceInfo.face.numVertices; ++i )
-        rdVector_Add3Acc(&a1a, &sithWorld_g_pCurrentWorld->aVertices[surface->surfaceInfo.face.vertexPosIdx[i]]);
+    for (uint32_t i = 0; i < pSurface->surfaceInfo.face.numVertices; ++i )
+        rdVector_Add3Acc(&a1a, &sithWorld_g_pCurrentWorld->aVertices[pSurface->surfaceInfo.face.vertexPosIdx[i]]);
 
-    rdVector_InvScale3(out, &a1a, (flex_t)(uint32_t)surface->surfaceInfo.face.numVertices); // FLEXTODO
+    rdVector_InvScale3(centerpoint, &a1a, (flex_t)(uint32_t)pSurface->surfaceInfo.face.numVertices); // FLEXTODO
 
-    if ( !sithIntersect_IsSphereInSector(out, 0.0, surface->pSector) )
+    if ( !sithIntersect_IsSphereInSector(centerpoint, 0.0, pSurface->pSector) )
     {
-        rdVector_Scale3(&a2a, &surface->surfaceInfo.face.normal, 0.0002);
-        rdVector_Add3Acc(out, &a2a);
+        rdVector_Scale3(&a2a, &pSurface->surfaceInfo.face.normal, 0.0002);
+        rdVector_Add3Acc(centerpoint, &a2a);
     }
-    return sithIntersect_IsSphereInSector(out, 0.0, surface->pSector);
+    return sithIntersect_IsSphereInSector(centerpoint, 0.0, pSurface->pSector);
 }
 
 rdSurface* sithSurface_SlideHorizonSky(int skyType, rdVector2 *a2)
@@ -1479,14 +1479,14 @@ rdSurface* sithSurface_SetThingLight(SithThing *thing, flex_t a2, flex_t a3, int
     return result;
 }
 
-void sithSurface_HandleThingImpact(SithSurface *pMeshCollided, SithThing *pThingCollided, flex_t damage, int damageType)
+void sithSurface_HandleThingImpact(SithSurface *pSurf, SithThing *pThing, flex_t damage, int damageType)
 {
     flex_t v4; // [esp+0h] [ebp-14h]
 
-    if ( (!sithNet_isMulti || !pThingCollided || (pThingCollided->flags & SITH_TF_INVULN) == 0) && (pMeshCollided->flags & SITH_SURFACE_COG_LINKED) != 0 )
+    if ( (!sithNet_isMulti || !pThing || (pThing->flags & SITH_TF_INVULN) == 0) && (pSurf->flags & SITH_SURFACE_COG_LINKED) != 0 )
     {
         v4 = (flex_t)(uint32_t)damageType; // FLEXTODO
-        sithCog_SurfaceSendMessageEx(pMeshCollided, pThingCollided, SITH_MESSAGE_DAMAGED, damage, v4, 0.0, 0.0);
+        sithCog_SurfaceSendMessageEx(pSurf, pThing, SITH_MESSAGE_DAMAGED, damage, v4, 0.0, 0.0);
     }
 }
 

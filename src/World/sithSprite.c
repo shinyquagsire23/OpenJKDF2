@@ -26,11 +26,11 @@ void sithSprite_Shutdown()
     }
 }
 
-int sithSprite_ReadStaticSpritesListText(SithWorld *world, int a2)
+int sithSprite_ReadStaticSpritesListText(SithWorld *pWorld, int bSkip)
 {
     int sprites_amt;
 
-    if (a2)
+    if (bSkip)
         return 0;
 
     stdConffile_ReadArgs();
@@ -40,7 +40,7 @@ int sithSprite_ReadStaticSpritesListText(SithWorld *world, int a2)
     if ( !sprites_amt )
         return 1;
 
-    if ( !sithSprite_AllocWorldSprites(world, sprites_amt) )
+    if ( !sithSprite_AllocWorldSprites(pWorld, sprites_amt) )
     {
         stdPrintf(pSithHS->errorPrint, ".\\World\\sithSprite.c", 163, "Memory error while reading sprites, line %d.\n", stdConffile_linenum, 0, 0, 0);
         return 0;
@@ -80,23 +80,23 @@ int sithSprite_ReadStaticSpritesListText(SithWorld *world, int a2)
     return 1;
 }
 
-void sithSprite_FreeWorldSprites(SithWorld *world)
+void sithSprite_FreeWorldSprites(SithWorld *pWorld)
 {
-    if (!world->sizeSprites)
+    if (!pWorld->sizeSprites)
         return;
 
-    for (int idx = 0; idx < world->numSprites; idx++)
+    for (int idx = 0; idx < pWorld->numSprites; idx++)
     {
-        stdHashtbl_Remove(sithSprite_pHashtable, world->aSprites[idx].path);
-        rdSprite_FreeEntry(&world->aSprites[idx]);
+        stdHashtbl_Remove(sithSprite_pHashtable, pWorld->aSprites[idx].path);
+        rdSprite_FreeEntry(&pWorld->aSprites[idx]);
     }
-    SITH_FREE(world->aSprites);
-    world->aSprites = 0;
-    world->numSprites = 0;
-    world->sizeSprites = 0;
+    SITH_FREE(pWorld->aSprites);
+    pWorld->aSprites = 0;
+    pWorld->numSprites = 0;
+    pWorld->sizeSprites = 0;
 }
 
-rdSprite* sithSprite_Load(char *fpath)
+rdSprite* sithSprite_Load(char *pName)
 {
     SithWorld *world;
     rdSprite *result;
@@ -104,14 +104,14 @@ rdSprite* sithSprite_Load(char *fpath)
     char spriteFpath[128];
 
     world = sithWorld_g_pLastLoadedWorld;
-    result = (rdSprite *)stdHashtbl_Find(sithSprite_pHashtable, fpath);
+    result = (rdSprite *)stdHashtbl_Find(sithSprite_pHashtable, pName);
     if ( !result )
     {
         uint32_t idx = world->numSprites;
         if ( idx < world->sizeSprites )
         {
             sprite = &world->aSprites[idx];
-            _sprintf(spriteFpath, "%s%c%s", "misc\\spr", '\\', fpath);
+            _sprintf(spriteFpath, "%s%c%s", "misc\\spr", '\\', pName);
             if ( stdConffile_Open(spriteFpath) )
             {
                 if ( stdConffile_ReadArgs() && stdConffile_g_entry.numArgs >= 0xBu )
@@ -134,7 +134,7 @@ rdSprite* sithSprite_Load(char *fpath)
                     if ( type_id <= 2 && width > 0.0 && height > 0.0 )
                     {
                         
-                        if ( rdSprite_NewEntry(sprite, fpath, type_id, mat, width, height, geometryMode, lightMode, textureMode, extralight, &off) )
+                        if ( rdSprite_NewEntry(sprite, pName, type_id, mat, width, height, geometryMode, lightMode, textureMode, extralight, &off) )
                         {
                             stdHashtbl_Add(sithSprite_pHashtable, sprite->path, sprite);
                             ++world->numSprites;
@@ -154,7 +154,7 @@ rdSprite* sithSprite_Load(char *fpath)
                     stdConffile_Close();
                 }
             }
-            else if ( _memcmp(fpath, "default.spr", 0xCu) )
+            else if ( _memcmp(pName, "default.spr", 0xCu) )
             {
                 return sithSprite_Load("default.spr");
             }
@@ -163,22 +163,22 @@ rdSprite* sithSprite_Load(char *fpath)
             }
         }
         else { // Added
-            jk_printf("OpenJKDF2: Failed allocate sprite `%s`! numSpritesLoaded < numSprites -> %x < %x failed\n", fpath, world->numSprites, world->sizeSprites);
+            jk_printf("OpenJKDF2: Failed allocate sprite `%s`! numSpritesLoaded < numSprites -> %x < %x failed\n", pName, world->numSprites, world->sizeSprites);
         }
     }
     return result;
 }
 
-int sithSprite_AllocWorldSprites(SithWorld *world, int num)
+int sithSprite_AllocWorldSprites(SithWorld *pWorld, int size)
 {
     rdSprite *aSprites; // edi
 
-    aSprites = (rdSprite *)SITH_ALLOC(sizeof(rdSprite) * num);
-    world->aSprites = aSprites;
+    aSprites = (rdSprite *)SITH_ALLOC(sizeof(rdSprite) * size);
+    pWorld->aSprites = aSprites;
     if ( !aSprites )
         return 0;
-    world->sizeSprites = num;
-    world->numSprites = 0;
-    _memset(aSprites, 0, sizeof(rdSprite) * num);
+    pWorld->sizeSprites = size;
+    pWorld->numSprites = 0;
+    _memset(aSprites, 0, sizeof(rdSprite) * size);
     return 1;
 }

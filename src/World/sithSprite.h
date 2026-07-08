@@ -13,9 +13,9 @@
 
 int sithSprite_Startup();
 void sithSprite_Shutdown();
-int sithSprite_ReadStaticSpritesListText(SithWorld *world, int a2);
-void sithSprite_FreeWorldSprites(SithWorld *world);
-rdSprite* sithSprite_Load(char *fpath);
-int sithSprite_AllocWorldSprites(SithWorld *world, int num);
+int sithSprite_ReadStaticSpritesListText(SithWorld *pWorld, int bSkip);
+void sithSprite_FreeWorldSprites(SithWorld *pWorld);
+rdSprite* sithSprite_Load(char *pName);
+int sithSprite_AllocWorldSprites(SithWorld *pWorld, int size);
 
 #endif // _SITHSPRITE_H
