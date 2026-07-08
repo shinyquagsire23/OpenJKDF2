@@ -5,6 +5,6 @@
 
 void sithCogFunctionSurface_Startup(sithCogSymboltable* ctx);
 
-//MATH_FUNC void sithCogFunctionSurface_SlideWallSurface(sithCog *ctx);
+//MATH_FUNC void sithCogFunctionSurface_SlideWall(sithCog *ctx);
 
 #endif // _SITHCOGFUNCTIONSURFACE_H

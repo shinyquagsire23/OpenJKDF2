@@ -2734,11 +2734,11 @@ sithCogFunctionSurface_GetCeilingSkyOffset	.text	00500050	0000003A	0000000C	0000
 sithCogFunctionSurface_SlideHorizonSky	.text	00500090	00000061	0000000C	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionSurface_SlideCeilingSky	.text	00500100	00000061	0000000C	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionSurface_SurfaceLightAnim	.text	00500170	000000A8	00000014	00000004	R	.	.	.	.	.	T	.
-sithCogFunctionSurface_SlideWallSurface	.text	00500220	000000DD	00000018	00000004	R	.	.	.	.	.	T	.
+sithCogFunctionSurface_SlideWall	.text	00500220	000000DD	00000018	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionSurface_GetWallCel	.text	00500300	00000035	00000004	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionSurface_SetWallCel	.text	00500340	0000007B	0000000C	00000004	R	.	.	.	.	.	T	.
-sithCogFunctionSurface_GetSurfaceMat	.text	005003C0	00000050	00000004	00000004	R	.	.	.	.	.	T	.
-sithCogFunctionSurface_SetSurfaceMat	.text	00500410	00000091	0000000C	00000004	R	.	.	.	.	.	T	.
+sithCogFunctionSurface_GetSurfaceMaterial	.text	005003C0	00000050	00000004	00000004	R	.	.	.	.	.	T	.
+sithCogFunctionSurface_SetSurfaceMaterial	.text	00500410	00000091	0000000C	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionSurface_SetSurfaceFlags	.text	005004B0	00000055	00000008	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionSurface_ClearSurfaceFlags	.text	00500510	00000057	00000008	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionSurface_GetSurfaceFlags	.text	00500570	0000002E	00000004	00000004	R	.	.	.	.	.	T	.

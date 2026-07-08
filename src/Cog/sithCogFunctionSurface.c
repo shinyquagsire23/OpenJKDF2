@@ -138,7 +138,7 @@ void sithCogFunctionSurface_SurfaceLightAnim(sithCog *ctx)
         sithCogExec_PushInt(ctx, -1);
 }
 
-void sithCogFunctionSurface_SlideWallSurface(sithCog *ctx)
+void sithCogFunctionSurface_SlideWall(sithCog *ctx)
 {
     signed int pop_vec; // ebx
     sithSurface *surface; // eax
@@ -201,7 +201,7 @@ void sithCogFunctionSurface_SetWallCel(sithCog *ctx)
     }
 }
 
-void sithCogFunctionSurface_GetSurfaceMat(sithCog *ctx)
+void sithCogFunctionSurface_GetSurfaceMaterial(sithCog *ctx)
 {
     rdMaterial *v2; // eax
 
@@ -212,7 +212,7 @@ void sithCogFunctionSurface_GetSurfaceMat(sithCog *ctx)
         sithCogExec_PushInt(ctx, -1);
 }
 
-void sithCogFunctionSurface_SetSurfaceMat(sithCog *ctx)
+void sithCogFunctionSurface_SetSurfaceMaterial(sithCog *ctx)
 {
     rdMaterial *v4; // eax
 
@@ -648,14 +648,14 @@ void sithCogFunctionSurface_Startup(sithCogSymboltable* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SlideHorizonSky, "slidehorizonsky");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SlideCeilingSky, "slideceilingsky");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetSurfaceCount, "getsurfacecount");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SlideWallSurface, "slidewall");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SlideWallSurface, "slidesurface");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SlideWall, "slidewall");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SlideWall, "slidesurface");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetWallCel, "getwallcel");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SetWallCel, "setwallcel");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetWallCel, "getsurfacecel");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SetWallCel, "setsurfacecel");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetSurfaceMat, "getsurfacemat");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SetSurfaceMat, "setsurfacemat");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetSurfaceMaterial, "getsurfacemat");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SetSurfaceMaterial, "setsurfacemat");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetSurfaceFlags, "getsurfaceflags");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SetSurfaceFlags, "setsurfaceflags");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_ClearSurfaceFlags, "clearsurfaceflags");
