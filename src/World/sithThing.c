@@ -1983,13 +1983,13 @@ void sithThing_Sync()
         // Added: Co-op
         if (sithMulti_multiModeFlags & MULTIMODEFLAG_COOP && (sithNet_aSyncFlags[v0] & THING_SYNC_AI)) {
             if (sithNet_aSyncThings[v0]->actor && sithNet_aSyncThings[v0]->actor->pAIClass)
-                sithDSS_SendAIStatus(sithNet_aSyncThings[v0]->actor, -1, 1);
+                sithDSS_AIStatus(sithNet_aSyncThings[v0]->actor, -1, 1);
         }
 
         // Added: Co-op
         if (sithMulti_multiModeFlags & MULTIMODEFLAG_COOP && (sithNet_aSyncFlags[v0] & THING_SYNC_PUPPET)) {
             if (sithNet_aSyncThings[v0]->rdthing.puppet)
-                sithDSS_SendSyncPuppet(sithNet_aSyncThings[v0], -1, 255);
+                sithDSS_PuppetStatus(sithNet_aSyncThings[v0], -1, 255);
         }
     }
 

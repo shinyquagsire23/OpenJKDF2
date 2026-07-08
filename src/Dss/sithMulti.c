@@ -1342,12 +1342,12 @@ void sithMulti_HandleTimeLimit(int deltaMs)
                             v11 = &sithWorld_pCurrentWorld->sectors[stdComm_dword_832208++];
                             if (v11->flags & SITH_SECTOR_SYNC )
                             {
-                                sithDSS_SendSectorStatus(v11, sithMulti_sendto_id, 1);
+                                sithDSS_SectorStatus(v11, sithMulti_sendto_id, 1);
                                 break;
                             }
                             else if (v11->flags & SITH_SECTOR_ADJOINS_SET)
                             {
-                                sithDSS_SendSectorFlags(v11, sithMulti_sendto_id, 1);
+                                sithDSS_SectorFlags(v11, sithMulti_sendto_id, 1);
                                 break;
                             }
                         }
@@ -1366,7 +1366,7 @@ void sithMulti_HandleTimeLimit(int deltaMs)
                             v8 = &sithWorld_pCurrentWorld->surfaces[stdComm_dword_832208++];
                             if (v8->surfaceFlags & SITH_SURFACE_CHANGED)
                             {
-                                sithDSS_SendSurfaceStatus(v8, sithMulti_sendto_id, 1);
+                                sithDSS_SurfaceStatus(v8, sithMulti_sendto_id, 1);
                                 break;
                             }
                         }
@@ -1400,7 +1400,7 @@ void sithMulti_HandleTimeLimit(int deltaMs)
                                         //sithDSSThing_UpdateState(v14, sithMulti_sendto_id, 1);
                                         //sithDSS_SendSyncAI(v14->actor, sithMulti_sendto_id, 1);
                                         if (v14->rdthing.puppet)
-                                            sithDSS_SendSyncPuppet(v14, sithMulti_sendto_id, 255);
+                                            sithDSS_PuppetStatus(v14, sithMulti_sendto_id, 255);
                                     }
                                     break; // Weird?
                                 }

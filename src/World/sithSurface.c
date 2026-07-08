@@ -1529,7 +1529,7 @@ void sithSurface_SyncFull(int mpFlags)
     {
         int32_t flags = sithSurface_aSurfaces[i].flags;
         if ( flags && ((flags & 0xC0000) == 0 || !sithSurface_aSurfaces[i].parent_thing || sithThing_ShouldSync(sithSurface_aSurfaces[i].parent_thing)) )
-            sithDSS_SendSurface(&sithSurface_aSurfaces[i], 0, mpFlags);
+            sithDSS_AnimStatus(&sithSurface_aSurfaces[i], 0, mpFlags);
     }
 }
 
@@ -1578,7 +1578,7 @@ void sithSurface_Sync()
 
     for (uint32_t v0 = 0; v0 < sithSurface_numSurfaces_0; v0++)
     {
-        sithDSS_SendSurfaceStatus(aSithSurfaces[v0], -1, 255);
+        sithDSS_SurfaceStatus(aSithSurfaces[v0], -1, 255);
     }
 
     sithSurface_numSurfaces_0 = 0;

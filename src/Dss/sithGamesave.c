@@ -409,7 +409,7 @@ int sithGamesave_SerializeInventoryOnly(int mpFlags)
     for (int v19 = 0; v19 < SITHBIN_NUMBINS; v19++)
     {
         if ( (sithInventory_aDescriptors[v19].flags & ITEMINFO_VALID) != 0 )
-            sithDSS_SendInventory(sithPlayer_pLocalPlayerThing, v19, 0, mpFlags);
+            sithDSS_Inventory(sithPlayer_pLocalPlayerThing, v19, 0, mpFlags);
     }
     return 1;
 }
@@ -432,7 +432,7 @@ int sithGamesave_SaveCurrentWorld(int mpFlags)
         {
             sithDSSThing_FullDescription(v4, 0, mpFlags);
             if ( v4->rdthing.puppet )
-                sithDSS_SendSyncPuppet(v4, 0, mpFlags);
+                sithDSS_PuppetStatus(v4, 0, mpFlags);
         }
     }
 
@@ -455,7 +455,7 @@ int sithGamesave_SaveCurrentWorld(int mpFlags)
     for (uint32_t i = 0; i < SITHAI_MAX_ACTORS; i++) // TODO define this maximum
     {
         if ( sithAI_actors[i].pAIClass ) {
-            sithDSS_SendAIStatus(&sithAI_actors[i], 0, mpFlags);
+            sithDSS_AIStatus(&sithAI_actors[i], 0, mpFlags);
         }
     }
 
@@ -474,29 +474,29 @@ int sithGamesave_SaveCurrentWorld(int mpFlags)
 
     for (uint32_t i = 0; i < sithWorld_pCurrentWorld->numSurfaces; i++)
     {
-        sithDSS_SendSurfaceStatus(&sithWorld_pCurrentWorld->surfaces[i], 0, mpFlags);
+        sithDSS_SurfaceStatus(&sithWorld_pCurrentWorld->surfaces[i], 0, mpFlags);
     }
 
     for (uint32_t i = 0; i < sithWorld_pCurrentWorld->numSectors; i++)
     {
-        sithDSS_SendSectorStatus(&sithWorld_pCurrentWorld->sectors[i], 0, mpFlags);
+        sithDSS_SectorStatus(&sithWorld_pCurrentWorld->sectors[i], 0, mpFlags);
     }
 
     for (v19 = 0; v19 < SITHBIN_NUMBINS; v19++) // TODO define this maximum
     {
         if ( (sithInventory_aDescriptors[v19].flags & ITEMINFO_VALID) != 0 )
-            sithDSS_SendInventory(sithPlayer_pLocalPlayerThing, v19, 0, mpFlags);
+            sithDSS_Inventory(sithPlayer_pLocalPlayerThing, v19, 0, mpFlags);
     }
 
     sithSurface_SyncFull(mpFlags);
 
     for (sithEvent* timerIter = sithEvent_list; timerIter; timerIter = timerIter->nextTimer )
-        sithDSS_SendSyncEvents(timerIter, 0, mpFlags);
+        sithDSS_SyncTaskEvents(timerIter, 0, mpFlags);
 
     sithDSS_SendSyncPalEffects(0, mpFlags);
-    sithDSS_SendSyncCameras(0, mpFlags);
+    sithDSS_SyncCameras(0, mpFlags);
     sithSoundMixer_SyncSounds();
-    sithDSS_SendMisc(0, mpFlags);
+    sithDSS_SyncGameState(0, mpFlags);
 
     return 1;
 }

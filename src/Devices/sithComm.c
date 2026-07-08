@@ -36,13 +36,13 @@ int sithComm_Startup()
     sithComm_msgFuncs[DSS_SURFACESTATUS] = sithDSS_ProcessSurfaceStatus;
     sithComm_msgFuncs[DSS_AISTATUS] = sithDSS_ProcessAIStatus;
     sithComm_msgFuncs[DSS_INVENTORY] = sithDSS_ProcessInventory;
-    sithComm_msgFuncs[DSS_SURFACE] = sithDSS_ProcessSurface;
+    sithComm_msgFuncs[DSS_SURFACE] = sithDSS_ProcessAnimStatus;
     sithComm_msgFuncs[DSS_SECTORSTATUS] = sithDSS_ProcessSectorStatus;
     sithComm_msgFuncs[DSS_PATHMOVE] = sithDSSThing_ProcessPathMove;
-    sithComm_msgFuncs[DSS_SYNCPUPPET] = sithDSS_ProcessSyncPuppet;
+    sithComm_msgFuncs[DSS_SYNCPUPPET] = sithDSS_ProcessPuppetStatus;
     sithComm_msgFuncs[DSS_LEAVEJOIN] = sithMulti_ProcessLeaveJoin;
     sithComm_msgFuncs[DSS_SYNCTHINGATTACHMENT] = sithDSSThing_ProcessAttachment;
-    sithComm_msgFuncs[DSS_SYNCEVENTS] = sithDSS_ProcessSyncEvents;
+    sithComm_msgFuncs[DSS_SYNCEVENTS] = sithDSS_ProcessSyncTaskEvents;
     sithComm_msgFuncs[DSS_SYNCCAMERAS] = sithDSS_ProcessSyncCameras;
     sithComm_msgFuncs[DSS_TAKEITEM1] = sithDSSThing_ProcessTake;
     sithComm_msgFuncs[DSS_TAKEITEM2] = sithDSSThing_ProcessTake;
@@ -50,7 +50,7 @@ int sithComm_Startup()
     sithComm_msgFuncs[DSS_STOPSOUND] = sithDSSThing_ProcessStopSound;
     sithComm_msgFuncs[DSS_CREATETHING] = sithDSSThing_ProcessCreateThing;
     sithComm_msgFuncs[DSS_SYNCPALEFFECTS] = sithDSS_ProcessSyncPalEffects;
-    sithComm_msgFuncs[DSS_ID_1F] = sithDSS_ProcessMisc;
+    sithComm_msgFuncs[DSS_ID_1F] = sithDSS_ProcessSyncGameState;
     sithComm_msgFuncs[DSS_CHAT] = sithMulti_ProcessChat;
     sithComm_msgFuncs[DSS_DESTROYTHING] = sithDSSThing_ProcessDestroyThing;
     sithComm_msgFuncs[DSS_SECTORFLAGS] = sithDSS_ProcessSectorFlags;

@@ -2005,7 +2005,7 @@ void do_hooks()
 #endif
 
 #if 0
-    hook_function(sithDSS_SendSyncPuppet_ADDR, sithDSS_SendSyncPuppet);
+    hook_function(sithDSS_PuppetStatus_ADDR, sithDSS_PuppetStatus);
     //hook_function(sithDSS_SendSyncAI_ADDR, sithDSS_SendSyncAI); // TODO: not yet decompiled
     //hook_function(sithDSS_SendSyncSurface_ADDR, sithDSS_SendSyncSurface); // TODO: not yet decompiled
     //hook_function(sithDSS_SendSyncSector_ADDR, sithDSS_SendSyncSector); // TODO: not yet decompiled
@@ -2013,9 +2013,9 @@ void do_hooks()
     //hook_function(sithDSS_SendStopAnim_ADDR, sithDSS_SendStopAnim); // TODO: not yet decompiled
     hook_function(sithDSS_SendSyncTimers_ADDR, sithDSS_SendSyncTimers);
     hook_function(sithDSS_SendSyncPalEffects_ADDR, sithDSS_SendSyncPalEffects);
-    hook_function(sithDSS_SendSyncCameras_ADDR, sithDSS_SendSyncCameras);
-    hook_function(sithDSS_SendMisc_ADDR, sithDSS_SendMisc);
-    hook_function(sithDSS_ProcessSyncPuppet_ADDR, sithDSS_ProcessSyncPuppet);
+    hook_function(sithDSS_SyncCameras_ADDR, sithDSS_SyncCameras);
+    hook_function(sithDSS_SyncGameState_ADDR, sithDSS_SyncGameState);
+    hook_function(sithDSS_ProcessPuppetStatus_ADDR, sithDSS_ProcessPuppetStatus);
     //hook_function(sithDSS_ProcessSyncAI_ADDR, sithDSS_ProcessSyncAI); // TODO: not yet decompiled
     //hook_function(sithDSS_ProcessSyncSurface_ADDR, sithDSS_ProcessSyncSurface); // TODO: not yet decompiled
     //hook_function(sithDSS_ProcessSyncSector_ADDR, sithDSS_ProcessSyncSector); // TODO: not yet decompiled
@@ -2024,7 +2024,7 @@ void do_hooks()
     hook_function(sithDSS_ProcessSyncTimers_ADDR, sithDSS_ProcessSyncTimers);
     hook_function(sithDSS_ProcessSyncPalEffects_ADDR, sithDSS_ProcessSyncPalEffects);
     hook_function(sithDSS_ProcessSyncCameras_ADDR, sithDSS_ProcessSyncCameras);
-    hook_function(sithDSS_ProcessMisc_ADDR, sithDSS_ProcessMisc);
+    hook_function(sithDSS_ProcessSyncGameState_ADDR, sithDSS_ProcessSyncGameState);
 #endif
     
     // sithWeapon
@@ -3062,16 +3062,16 @@ void do_hooks()
     hook_function_inv(sithDSS_ProcessSyncItemDesc_ADDR, sithDSS_ProcessSyncItemDesc);
     hook_function_inv(sithDSS_SendStopAnim_ADDR, sithDSS_SendStopAnim);
     hook_function_inv(sithDSS_ProcessStopAnim_ADDR, sithDSS_ProcessStopAnim);
-    hook_function_inv(sithDSS_SendSyncPuppet_ADDR, sithDSS_SendSyncPuppet);
-    hook_function_inv(sithDSS_ProcessSyncPuppet_ADDR, sithDSS_ProcessSyncPuppet);
+    hook_function_inv(sithDSS_PuppetStatus_ADDR, sithDSS_PuppetStatus);
+    hook_function_inv(sithDSS_ProcessPuppetStatus_ADDR, sithDSS_ProcessPuppetStatus);
     hook_function_inv(sithDSS_SendSyncTimers_ADDR, sithDSS_SendSyncTimers);
     hook_function_inv(sithDSS_ProcessSyncTimers_ADDR, sithDSS_ProcessSyncTimers);
     hook_function_inv(sithDSS_SendSyncPalEffects_ADDR, sithDSS_SendSyncPalEffects);
     hook_function_inv(sithDSS_ProcessSyncPalEffects_ADDR, sithDSS_ProcessSyncPalEffects);
-    hook_function_inv(sithDSS_SendSyncCameras_ADDR, sithDSS_SendSyncCameras);
+    hook_function_inv(sithDSS_SyncCameras_ADDR, sithDSS_SyncCameras);
     hook_function_inv(sithDSS_ProcessSyncCameras_ADDR, sithDSS_ProcessSyncCameras);
-    hook_function_inv(sithDSS_SendMisc_ADDR, sithDSS_SendMisc);
-    hook_function_inv(sithDSS_ProcessMisc_ADDR, sithDSS_ProcessMisc);
+    hook_function_inv(sithDSS_SyncGameState_ADDR, sithDSS_SyncGameState);
+    hook_function_inv(sithDSS_ProcessSyncGameState_ADDR, sithDSS_ProcessSyncGameState);
     
     hook_function_inv(sithDSSThing_SendSyncThingFull_ADDR, sithDSSThing_SendSyncThingFull);
     hook_function_inv(sithDSSThing_SendPlaySoundPos_ADDR, sithDSSThing_SendPlaySoundPos);
