@@ -509,10 +509,27 @@ Model/SoundClass/Material; **batch2** sithSurface/Sprite/KeyFrame/Template/Weapo
 Material/Model3/Light/Keyframe (rdColormap has no J3D counterpart); **batch5** sithWorld/
 Render/Map/CogExec/CogParse (sithNav absent in both); **batch6** sithCog +
 stdConffile/String/Fnames; **batch7** sithAI/AIClass/AIAwareness/AICmd + sithCogFunction/
-Thing (sithAICmd ↔ J3D sithAIInstinct/Move/Util split). = **40 modules.**
-Tool: scratchpad `apply_argnames.py` + per-module subagent maps. Remaining ~51 modules
-(sithThing, remaining sithCogFunction* verb modules [Player/AI/Sector/Sound/Surface],
-std* utilities, jk* game layer, etc.).
+Thing (sithAICmd ↔ J3D sithAIInstinct/Move/Util split); **batch8** sithCogFunction
+{Player,AI,Sector,Sound,Surface} + sithThing; **batch9** stdColor/Math/Memory/Hashtbl/
+FileUtil/Gob; **batch10** sithDSS/DSSThing/Multi + sithComm + stdStrTable (sithGamesave
+had no unambiguous renames); **batch11** rdParticle/Thing/Puppet/Clip (rdCanvas + stdBmp
+already matched / arg-count mismatch). = **61 modules.**
+Tool: scratchpad `apply_argnames.py` + per-module subagent maps. **jk\* game layer has NO
+J3D counterpart** (JK-specific; Indy has its own game code) — do NOT attempt. Remaining
+candidates: sithPlayer, sithNet, sithSoundSys, sithVoice/Trap/Save, w32util modules,
+rdMatrix/rdVector/rdString math helpers (likely already matched), assorted std leftovers.
+
+**Batch 8-11 process refinements (all byte-identical except batch7's WARN strings):**
+- **Collision pre-check before applying** (avoids the batch-7 rebuild loop): for each
+  rename, scan the function BODY for the NEW name as a standalone identifier
+  (`(?<![.>\w])<new>\b`); a hit means it may shadow/merge a local — investigate or drop.
+  Caveat: the check also matches comments (false positive) — verify the hit is real code,
+  not a comment word (batch-11 rdClip_Face3T "aVertices" was a comment).
+- **Homogeneous verb modules generate mechanically:** cog verb fns are all single
+  `ctx`→`pCog` (or sole `a1`→`pCog`); scan the .c for defs and emit — but auto-EXCLUDE any
+  fn whose body declares a local `sithCog* pCog` (self-ref/shadow).
+- Agents return `[]` correctly when the module is absent in J3D or all shared fns have
+  arg-count mismatches (rdCanvas, stdBmp, sithGamesave) — don't force renames.
 
 **Batch-7 caveats (new):**
 - **`#var`-stringizing macros break byte-identity — BENIGN (like `__func__`).** A param
