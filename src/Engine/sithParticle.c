@@ -243,7 +243,7 @@ void sithParticle_Initalize(sithThing *thing)
     v3 = &thing->rdthing;
     if ( thing->rdthing.type == RD_THINGTYPE_PARTICLECLOUD )
     {
-        v4 = rdParticle_Clone(thing->rdthing.particlecloud);
+        v4 = rdParticle_Duplicate(thing->rdthing.particlecloud);
         rdThing_SetParticleCloud(v3, v4);
         v5 = v4->numVertices;
         thing->particleParams.material = v4->material;

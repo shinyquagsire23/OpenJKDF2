@@ -1747,7 +1747,7 @@ void do_hooks()
     hook_function(rdParticle_RegisterLoader_ADDR, rdParticle_RegisterLoader);
     hook_function(rdParticle_New_ADDR, rdParticle_New);
     hook_function(rdParticle_NewEntry_ADDR, rdParticle_NewEntry);
-    hook_function(rdParticle_Clone_ADDR, rdParticle_Clone);
+    hook_function(rdParticle_Duplicate_ADDR, rdParticle_Duplicate);
     hook_function(rdParticle_Free_ADDR, rdParticle_Free);
     hook_function(rdParticle_FreeEntry_ADDR, rdParticle_FreeEntry);
     hook_function(rdParticle_Load_ADDR, rdParticle_Load);

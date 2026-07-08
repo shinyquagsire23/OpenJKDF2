@@ -1504,7 +1504,7 @@ rdZRaster_sub_46B750	.text	0046B750	0000081D	00000064	00000008	R	.	.	.	.	B	.	.
 rdParticle_RegisterLoader	.text	0046BF70	0000000A	00000000	00000004	R	.	.	.	.	.	.	.
 rdParticle_New	.text	0046BF80	0000003C	00000004	00000014	R	.	.	.	.	.	T	.
 rdParticle_NewEntry	.text	0046BFC0	000000CD	00000004	00000018	R	.	.	.	.	.	T	.
-rdParticle_Clone	.text	0046C090	00000076	00000004	00000004	R	.	.	.	.	.	T	.
+rdParticle_Duplicate	.text	0046C090	00000076	00000004	00000004	R	.	.	.	.	.	T	.
 rdParticle_Free	.text	0046C110	00000049	00000008	00000004	R	.	.	.	.	.	T	.
 rdParticle_FreeEntry	.text	0046C160	00000039	00000008	00000004	R	.	.	.	.	.	T	.
 rdParticle_Load	.text	0046C1A0	00000085	00000008	00000004	R	.	.	.	.	.	T	.

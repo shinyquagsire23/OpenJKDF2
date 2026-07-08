@@ -8,7 +8,7 @@
 #define rdParticle_RegisterLoader_ADDR (0x0046BF70)
 #define rdParticle_New_ADDR (0x0046BF80)
 #define rdParticle_NewEntry_ADDR (0x0046BFC0)
-#define rdParticle_Clone_ADDR (0x0046C090)
+#define rdParticle_Duplicate_ADDR (0x0046C090)
 #define rdParticle_Free_ADDR (0x0046C110)
 #define rdParticle_FreeEntry_ADDR (0x0046C160)
 #define rdParticle_Load_ADDR (0x0046C1A0)
@@ -38,7 +38,7 @@ typedef rdParticle* (__cdecl *rdParticleLoader_t)(char*);
 void rdParticle_RegisterLoader(rdParticleLoader_t loader);
 rdParticle* rdParticle_New(int numVertices, flex_t size, rdMaterial *material, int lightingMode, int allocateVertices);
 int rdParticle_NewEntry(rdParticle *particle, int numVertices, flex_t size, rdMaterial *material, int lightingMode, int allocateVertices);
-rdParticle* rdParticle_Clone(rdParticle *particle);
+rdParticle* rdParticle_Duplicate(rdParticle *particle);
 void rdParticle_Free(rdParticle *particle);
 void rdParticle_FreeEntry(rdParticle *particle);
 rdParticle* rdParticle_Load(char *path);

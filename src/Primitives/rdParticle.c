@@ -62,7 +62,7 @@ int rdParticle_NewEntry(rdParticle *particle, int numVertices, flex_t size, rdMa
     return 0;
 }
 
-rdParticle* rdParticle_Clone(rdParticle *particle)
+rdParticle* rdParticle_Duplicate(rdParticle *particle)
 {
     rdParticle *clonedPart; // eax
 
