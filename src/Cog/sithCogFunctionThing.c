@@ -727,7 +727,7 @@ void sithCogFunctionThing_SetThingPosEx(sithCog *ctx)
             sithPhysics_FindFloor(pThing, 1);
 
         if ( pThing == sithPlayer_pLocalPlayerThing )
-            sithCamera_FollowFocus(sithCamera_currentCamera);
+            sithCamera_Update(sithCamera_currentCamera);
 
         if (COG_SHOULD_SYNC(ctx))
         {
@@ -1238,7 +1238,7 @@ void sithCogFunctionThing_TeleportThing(sithCog *ctx)
             sithPhysics_FindFloor(pThing, 1);
 
         if ( pThing == sithPlayer_pLocalPlayerThing )
-            sithCamera_FollowFocus(sithCamera_currentCamera);
+            sithCamera_Update(sithCamera_currentCamera);
 
         if (COG_SHOULD_SYNC(ctx))
         {

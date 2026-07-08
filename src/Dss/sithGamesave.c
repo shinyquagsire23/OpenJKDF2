@@ -285,7 +285,7 @@ LABEL_11:
         // TODO add message
         //sithGamesave_currentState = SITH_GS_LOAD_DEBUG_NEXTCHECKPOINT;
         curMs = 0;
-        sithCamera_SetsFocus();
+        sithCamera_ResetAllCameras();
         goto skip_free_things;
     }
 

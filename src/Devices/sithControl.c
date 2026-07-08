@@ -273,7 +273,7 @@ void sithControl_Tick(flex_t deltaSecs, int deltaMs)
     {
         if ( sithCamera_currentCamera == &sithCamera_cameras[4] )
         {
-            sithCamera_DoIdleAnimation();
+            sithCamera_SetCurrentToCycleCamera();
         }
     }
     else
@@ -285,7 +285,7 @@ void sithControl_Tick(flex_t deltaSecs, int deltaMs)
                 sithCamera_SetCurrentCamera(&sithCamera_cameras[4]);
 #ifdef QOL_IMPROVEMENTS
             else if (sithControl_msIdle < 30000 && sithCamera_currentCamera == &sithCamera_cameras[4] ) {
-                sithCamera_DoIdleAnimation();
+                sithCamera_SetCurrentToCycleCamera();
             }
 #endif
 
@@ -293,7 +293,7 @@ void sithControl_Tick(flex_t deltaSecs, int deltaMs)
         else {
             sithControl_msIdle = 0;
             if ( sithCamera_currentCamera == &sithCamera_cameras[4] ) {
-                sithCamera_DoIdleAnimation();
+                sithCamera_SetCurrentToCycleCamera();
             }
         }
     }
@@ -1113,7 +1113,7 @@ debug_controls:
         if ( input_read )
         {
             if ( sithCamera_currentCamera->cameraPerspective == 128 )
-                sithCamera_DoIdleAnimation();
+                sithCamera_SetCurrentToCycleCamera();
             else
                 sithCamera_SetCurrentCamera(&sithCamera_cameras[6]);
         }

@@ -479,8 +479,8 @@ void sithMain_UpdateCamera()
 #endif
 
         //sithCamera_currentCamera->rdCam.screenAspectRatio += 0.01;
-        sithCamera_FollowFocus(sithCamera_currentCamera);
-        sithCamera_SetRdCameraAndRenderidk();
+        sithCamera_Update(sithCamera_currentCamera);
+        sithCamera_RenderScene();
     }
 }
 

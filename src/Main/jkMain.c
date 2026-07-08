@@ -605,7 +605,7 @@ void jkMain_GameplayShow(int a1, int a2)
             jkMain_bInit = 1;
             if ( jkSmack_gameMode == 2 || !jkSmack_gameMode )
             {
-                sithCamera_SetsFocus();
+                sithCamera_ResetAllCameras();
                 jkPlayer_InitSaber();
                 sithMain_AutoSave();
             }
@@ -621,7 +621,7 @@ LABEL_28:
             jkMain_bInit = 1;
             if ( jkSmack_gameMode == 2 || !jkSmack_gameMode )
             {
-                sithCamera_SetsFocus();
+                sithCamera_ResetAllCameras();
                 jkPlayer_InitSaber();
                 sithMain_AutoSave();
             }

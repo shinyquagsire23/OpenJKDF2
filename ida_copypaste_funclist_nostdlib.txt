@@ -1769,7 +1769,7 @@ sithCamera_Startup	.text	004C4DE0	00000101			R	.	.	.	.	.	.	.
 sithCamera_Shutdown	.text	004C4EF0	00000029	00000004	00000000	R	.	.	.	.	.	.	.
 sithCamera_Open	.text	004C4F20	00000201	00000000	00000008	R	.	.	.	.	.	T	.
 sithCamera_Close	.text	004C5130	00000014			R	.	.	.	.	.	T	.
-sithCamera_SetsFocus	.text	004C5150	00000106	00000018	00000000	R	.	.	.	.	.	.	.
+sithCamera_ResetAllCameras	.text	004C5150	00000106	00000018	00000000	R	.	.	.	.	.	.	.
 sithCamera_New	.text	004C5260	0000004D	00000004	0000001C	R	.	.	.	.	.	T	.
 sithCamera_NewEntry	.text	004C52B0	000000BF	0000000C	00000020	R	.	.	.	.	.	T	.
 sithCamera_FreeEntry	.text	004C5370	00000024	00000004	00000004	R	.	.	.	.	.	.	.
@@ -1777,17 +1777,17 @@ sithCamera_Free	.text	004C53A0	00000011	00000000	00000004	R	.	.	.	.	.	.	.
 sithCamera_SetCanvas	.text	004C53C0	00000053	00000000	0000000C	R	.	.	.	.	.	T	.
 sithCamera_SetCurrentCamera	.text	004C5420	000000A2	00000014	00000004	R	.	.	.	.	.	T	.
 sithCamera_CycleCamera	.text	004C54D0	000000C0	00000014	00000000	R	.	.	.	.	.	.	.
-sithCamera_DoIdleAnimation	.text	004C5590	000000AE	00000014	00000000	R	.	.	.	.	.	.	.
+sithCamera_SetCurrentToCycleCamera	.text	004C5590	000000AE	00000014	00000000	R	.	.	.	.	.	.	.
 sithCamera_IdkChecksDword4	.text	004C5640	0000002A	00000000	00000004	R	.	.	.	.	.	T	.
 sithCamera_SetCameraFocus	.text	004C5670	00000013	00000000	0000000C	R	.	.	.	.	.	T	.
 sithCamera_GetPrimaryFocus	.text	004C5690	00000008	00000000	00000004	R	.	.	.	.	.	T	.
 sithCamera_GetSecondaryFocus	.text	004C56A0	00000008	00000000	00000004	R	.	.	.	.	.	T	.
-sithCamera_FollowFocus	.text	004C56B0	00000884	0000008C	00000004	R	.	.	.	.	.	T	.
-sithCamera_SetRdCameraAndRenderidk	.text	004C5FD0	0000002C	00000000	00000000	R	.	.	.	.	.	.	.
-sithCamera_SetPovShake	.text	004C6000	0000004E	00000000	00000010	R	.	.	.	.	.	T	.
-sithCamera_create_unk_struct	.text	004C6050	00000107	00000018	00000018	R	.	.	.	.	.	T	.
-sithCamera_SetState	.text	004C6160	0000000A	00000000	00000004	R	.	.	.	.	.	.	.
-sithCamera_GetState	.text	004C6170	00000006			R	.	.	.	.	.	.	.
+sithCamera_Update	.text	004C56B0	00000884	0000008C	00000004	R	.	.	.	.	.	T	.
+sithCamera_RenderScene	.text	004C5FD0	0000002C	00000000	00000000	R	.	.	.	.	.	.	.
+sithCamera_SetPOVShake	.text	004C6000	0000004E	00000000	00000010	R	.	.	.	.	.	T	.
+sithCamera_SearchSectorInRadius	.text	004C6050	00000107	00000018	00000018	R	.	.	.	.	.	T	.
+sithCamera_SetCameraStateFlags	.text	004C6160	0000000A	00000000	00000004	R	.	.	.	.	.	.	.
+sithCamera_GetCameraStateFlags	.text	004C6170	00000006			R	.	.	.	.	.	.	.
 sithRender_Startup	.text	004C6180	00000039			R	.	.	.	.	.	.	.
 sithRender_Open	.text	004C61C0	00000090	00000004	00000000	R	.	.	.	.	.	.	.
 sithRender_Close	.text	004C6250	00000005			R	.	.	.	.	.	T	.

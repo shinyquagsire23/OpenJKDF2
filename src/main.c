@@ -1908,14 +1908,14 @@ void do_hooks()
     
     // sithCamera
     hook_function(sithCamera_Startup_ADDR, sithCamera_Startup);
-    hook_function(sithCamera_SetsFocus_ADDR, sithCamera_SetsFocus);
+    hook_function(sithCamera_ResetAllCameras_ADDR, sithCamera_ResetAllCameras);
     hook_function(sithCamera_NewEntry_ADDR, sithCamera_NewEntry);
-    hook_function(sithCamera_FollowFocus_ADDR, sithCamera_FollowFocus);
+    hook_function(sithCamera_Update_ADDR, sithCamera_Update);
     hook_function(sithCamera_SetCurrentCamera_ADDR, sithCamera_SetCurrentCamera);
     hook_function(sithCamera_Open_ADDR, sithCamera_Open);
     hook_function(sithCamera_Close_ADDR, sithCamera_Close);
     hook_function(sithCamera_SetCameraFocus_ADDR, sithCamera_SetCameraFocus);
-    hook_function(sithCamera_SetPovShake_ADDR, sithCamera_SetPovShake);
+    hook_function(sithCamera_SetPOVShake_ADDR, sithCamera_SetPOVShake);
     hook_function(sithCamera_GetPrimaryFocus_ADDR, sithCamera_GetPrimaryFocus);
     hook_function(sithCamera_CycleCamera_ADDR, sithCamera_CycleCamera);
     

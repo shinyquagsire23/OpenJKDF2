@@ -506,7 +506,7 @@ void sithPlayer_debug_ToNextCheckpoint(sithThing *player)
         {
             sithCamera_SetCameraFocus(sithCamera_cameras, player, 0);
             sithCamera_SetCameraFocus(&sithCamera_cameras[1], player, 0);
-            sithCamera_DoIdleAnimation();
+            sithCamera_SetCurrentToCycleCamera();
             v6 = stdPalEffects_GetEffectPointer(sithPlayer_pLocalPlayer->palEffectsIdx1);
             stdPalEffects_ResetEffect(v6);
         }
@@ -523,7 +523,7 @@ void sithPlayer_debug_ToNextCheckpoint(sithThing *player)
                 &jkPlayer_playerInfos[v9].spawnPosOrient.scale,
                 &jkPlayer_playerInfos[v9].spawnPosOrient);
             sithThing_EnterSector(player, jkPlayer_playerInfos[v9].pSpawnSector, 1, 0);
-            sithCamera_FollowFocus(sithCamera_currentCamera);
+            sithCamera_Update(sithCamera_currentCamera);
             sithPhysics_ThingStop(player);
             sithWeapon_SyncPuppet(player);
             sithCog_SendSimpleMessageToAll(SITH_MESSAGE_NEWPLAYER, SENDERTYPE_THING, player->thingIdx, SENDERTYPE_THING, player->thingIdx);

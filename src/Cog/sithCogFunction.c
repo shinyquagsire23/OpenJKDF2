@@ -924,7 +924,7 @@ void sithCogFunction_SetPovShake(sithCog *ctx)
     if ( sithCogExec_PopVector3(ctx, &v3) )
     {
         if ( sithCogExec_PopVector3(ctx, &v4) )
-            sithCamera_SetPovShake(&v4, &v3, v2, a1a);
+            sithCamera_SetPOVShake(&v4, &v3, v2, a1a);
     }
 }
 
@@ -1426,7 +1426,7 @@ void sithCogFunction_GetCameraStateFlags(sithCog *ctx)
 {
     int v1; // eax
 
-    v1 = sithCamera_GetState();
+    v1 = sithCamera_GetCameraStateFlags();
     sithCogExec_PushInt(ctx, v1);
 }
 
@@ -1435,7 +1435,7 @@ void sithCogFunction_SetCameraStateFlags(sithCog *ctx)
     int v1; // eax
 
     v1 = sithCogExec_PopInt(ctx);
-    sithCamera_SetState(v1);
+    sithCamera_SetCameraStateFlags(v1);
 }
 
 void sithCogFunction_SetMultiModeFlags(sithCog *ctx)
