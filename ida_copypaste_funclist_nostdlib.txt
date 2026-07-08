@@ -2762,13 +2762,13 @@ sithCogFunctionSurface_GetSurfaceNormal	.text	00500AA0	00000031	00000004	0000000
 sithCogFunctionSurface_SyncSurface	.text	00500AE0	0000001B	00000000	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionAI_Startup	.text	00500B00	0000015D	00000004	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionAI_AISetMoveSpeed	.text	00500C60	0000006B	00000004	00000004	R	.	.	.	.	.	T	.
-sithCogFunctionAI_SetMovePos	.text	00500CD0	00000051	00000010	00000004	R	.	.	.	.	.	T	.
+sithCogFunctionAI_AISetMovePos	.text	00500CD0	00000051	00000010	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionAI_AIJump	.text	00500D30	00000067	00000014	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionAI_AISetMoveFrame	.text	00500DA0	0000005A	00000008	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionAI_AISetMoveThing	.text	00500E00	00000052	00000008	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionAI_AISetLookPos	.text	00500E60	0000004A	00000010	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionAI_AISetLookFrame	.text	00500EB0	00000053	00000008	00000004	R	.	.	.	.	.	T	.
-sithCogFunctionAI_GetMovePos	.text	00500F10	00000033	00000004	00000004	R	.	.	.	.	.	T	.
+sithCogFunctionAI_AIGetMovePos	.text	00500F10	00000033	00000004	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionAI_AISetMode	.text	00500F50	0000004E	00000008	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionAI_AIGetMode	.text	00500FA0	0000003E	00000004	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionAI_AIClearMode	.text	00500FE0	00000050	00000008	00000004	R	.	.	.	.	.	T	.

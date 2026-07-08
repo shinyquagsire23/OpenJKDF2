@@ -18,7 +18,7 @@ void sithCogFunctionAI_AISetMoveSpeed(sithCog *ctx)
     }
 }
 
-void sithCogFunctionAI_SetMovePos(sithCog *ctx)
+void sithCogFunctionAI_AISetMovePos(sithCog *ctx)
 {
     sithThing *v1; // eax
     sithActor *v2; // eax
@@ -172,7 +172,7 @@ void sithCogFunctionAI_AISetLookFrame(sithCog *ctx)
     }
 }
 
-void sithCogFunctionAI_GetMovePos(sithCog *ctx)
+void sithCogFunctionAI_AIGetMovePos(sithCog *ctx)
 {
     sithThing *v1; // eax
     sithActor *v2; // eax
@@ -703,8 +703,8 @@ void sithCogFunctionAI_Startup(sithCogSymboltable* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIGetMode, "aigetmode");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetMode, "aisetmode");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIClearMode, "aiclearmode");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_GetMovePos, "aigetmovepos");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_SetMovePos, "aisetmovepos");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIGetMovePos, "aigetmovepos");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetMovePos, "aisetmovepos");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_FirstThingInView, "firstthinginview");
     if (Main_bMotsCompat) {
         sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_FirstThingInCone,"firstthingincone");
