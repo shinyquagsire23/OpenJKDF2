@@ -129,7 +129,7 @@ void sithItem_DestroyItem(sithThing *item)
         sithCog_ThingSendMessage(item, item, SITH_MESSAGE_RESPAWN);
     }
 
-    if ( sithComm_multiplayerFlags )
+    if ( sithMessage_g_outputstream )
     {
         sithDSSThing_UpdateState(item, -1, 255);
         sithDSSThing_Pos(item, -1, 1);

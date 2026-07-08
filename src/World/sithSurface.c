@@ -1523,7 +1523,7 @@ rdSurface* sithSurface_GetByIdx(int idx)
 
 void sithSurface_SyncFull(int mpFlags)
 {
-    if (!(sithComm_multiplayerFlags & mpFlags)) return;
+    if (!(sithMessage_g_outputstream & mpFlags)) return;
 
     for (int32_t i = 0; i <= sithSurface_numSurfaces; i++) // TODO: off by one?
     {
@@ -1574,7 +1574,7 @@ void sithSurface_SyncSurface(sithSurface *pSurface)
 
 void sithSurface_SyncSurfaces()
 {
-    if (!sithComm_multiplayerFlags) return;
+    if (!sithMessage_g_outputstream) return;
 
     for (uint32_t v0 = 0; v0 < sithSurface_numSurfaces_0; v0++)
     {

@@ -404,7 +404,7 @@ load_fail:
 // consumes -- so the save stays a few KB and fits the memory card.
 int sithGamesave_SerializeInventoryOnly(int mpFlags)
 {
-    if ( (sithComm_multiplayerFlags & mpFlags) == 0 )
+    if ( (sithMessage_g_outputstream & mpFlags) == 0 )
         return 0;
     for (int v19 = 0; v19 < SITHBIN_NUMBINS; v19++)
     {
@@ -423,7 +423,7 @@ int sithGamesave_SaveCurrentWorld(int mpFlags)
     int v19; // ebx
     sithItemDescriptor *v20; // esi
 
-    if ( (sithComm_multiplayerFlags & mpFlags) == 0 )
+    if ( (sithMessage_g_outputstream & mpFlags) == 0 )
         return 0;
     for (uint32_t i = 0; i < sithWorld_pCurrentWorld->numThingsLoaded; i++)
     {
@@ -610,8 +610,8 @@ int sithGamesave_Process()
     }
     if ( (sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD) == 0 && stdConffile_OpenWriteBypass(sithGamesave_fpath) )
     {
-        int multiplayerFlagsSave = sithComm_multiplayerFlags;
-        sithComm_multiplayerFlags = 4;
+        int multiplayerFlagsSave = sithMessage_g_outputstream;
+        sithMessage_g_outputstream = 4;
         stdConffile_Write((const char*)&sithGamesave_headerTmp, sizeof(sithGamesave_Header));
         if ( sithGamesave_funcWrite )
             sithGamesave_funcWrite();
@@ -655,7 +655,7 @@ int sithGamesave_Process()
             sithGamesave_wsaveName[255] = 0;
             sithConsole_PrintWString(sithStrTable_GetUniStringWithFallback("GAME_SAVED"));
         }
-        sithComm_multiplayerFlags = multiplayerFlagsSave;
+        sithMessage_g_outputstream = multiplayerFlagsSave;
 #ifdef TARGET_DREAMCAST
         // Added: flush to the VMU only for slim saves (the card carries just the
         // slim copy) -- and not when re-materialising a save the card already

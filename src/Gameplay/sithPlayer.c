@@ -527,7 +527,7 @@ void sithPlayer_NewPlayer(sithThing *player)
             sithPhysics_ResetThingMovement(player);
             sithWeapon_SyncPuppet(player);
             sithCog_BroadcastMessage(SITH_MESSAGE_NEWPLAYER, SENDERTYPE_THING, player->thingIdx, SENDERTYPE_THING, player->thingIdx);
-            if ( sithComm_multiplayerFlags )
+            if ( sithMessage_g_outputstream )
                 sithDSSThing_UpdateState(player, -1, 255);
         }
     }

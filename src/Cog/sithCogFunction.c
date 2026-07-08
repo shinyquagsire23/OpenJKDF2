@@ -235,7 +235,7 @@ void sithCogFunction_StopAnim(sithCog *ctx)
     if ( v2 )
     {
         sithSurface_StopAnim(v2);
-        if ( sithComm_multiplayerFlags )
+        if ( sithMessage_g_outputstream )
             sithDSS_AnimStatus(v2, -1, 255); // TODO ??
     }
 }
@@ -252,7 +252,7 @@ void sithCogFunction_StopSurfaceAnim(sithCog *ctx)
         if ( v2 )
         {
             sithSurface_StopAnim(v2);
-            if ( sithComm_multiplayerFlags )
+            if ( sithMessage_g_outputstream )
                 sithDSS_AnimStatus(v2, -1, 255); // TODO ??
         }
     }
@@ -1181,10 +1181,10 @@ void sithCogFunction_FireProjectileData(sithCog *ctx)
 // MOTS added
 void sithCogFunction_FireProjectileLocal(sithCog *ctx)
 {
-    int tmp = sithComm_multiplayerFlags;
-    sithComm_multiplayerFlags = 0;
+    int tmp = sithMessage_g_outputstream;
+    sithMessage_g_outputstream = 0;
     sithCogFunction_FireProjectile(ctx);
-    sithComm_multiplayerFlags = tmp;
+    sithMessage_g_outputstream = tmp;
     return;
 }
 

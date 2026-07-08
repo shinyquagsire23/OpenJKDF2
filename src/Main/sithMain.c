@@ -345,7 +345,7 @@ int sithUpdate()
                 sithSoundMixer_Update(sithTime_g_frameTimeFlex);
                 sithEvent_Process();
 
-                if ( sithComm_bSyncMultiplayer )
+                if ( sithMessage_g_inputstream )
                     sithMessage_ProcessMessages();
 
                 if ( (g_debugmodeFlags & DEBUGFLAG_NO_AIEVENTS) == 0  && (!sithNet_isMulti || sithNet_isMulti && sithNet_isServer))
@@ -380,7 +380,7 @@ int sithUpdate()
             sithSoundMixer_Update(sithTime_g_frameTimeFlex);
             sithEvent_Process();
 
-            if ( sithComm_bSyncMultiplayer )
+            if ( sithMessage_g_inputstream )
                 sithMessage_ProcessMessages();
 
             if ( (g_debugmodeFlags & DEBUGFLAG_NO_AIEVENTS) == 0 && (!sithNet_isMulti || sithNet_isMulti && sithNet_isServer))

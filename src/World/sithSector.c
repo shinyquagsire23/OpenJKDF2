@@ -323,7 +323,7 @@ void sithSector_SyncSector(sithSector *pSector, int a2)
         pSector->flags |= SITH_SECTOR_SYNC;
     }
 
-    if (!sithComm_multiplayerFlags || sithSector_numModifiedSectors >= 0x10)
+    if (!sithMessage_g_outputstream || sithSector_numModifiedSectors >= 0x10)
         return;
 
     for (v4 = 0; v4 < sithSector_numModifiedSectors; v4++ )

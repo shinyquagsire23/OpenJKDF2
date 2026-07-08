@@ -1935,7 +1935,7 @@ uint32_t sithThing_CalcThingChecksum(sithThing* pThing, uint32_t last_hash)
 
 void sithThing_SyncThing(sithThing *pThing, int flags)
 {
-    if (!sithComm_multiplayerFlags) return;
+    if (!sithMessage_g_outputstream) return;
 
     for (uint32_t v3 = 0; v3 < sithNet_syncIdx; v3++)
     {

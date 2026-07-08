@@ -601,7 +601,7 @@ void jkCog_EnableSaber(sithCog *ctx)
     if ( v2 && v2->type == SITH_THING_PLAYER )
     {
         jkSaber_Enable(v2, a2, a3, a1a);
-        if ( sithComm_multiplayerFlags )
+        if ( sithMessage_g_outputstream )
             jkDSS_SendJKEnableSaber(v3);
     }
 }
@@ -859,7 +859,7 @@ LABEL_8:
             jkDev_PrintUniString(jkCog_jkstring);
             return;
         }
-        if ( sithComm_multiplayerFlags )
+        if ( sithMessage_g_outputstream )
         {
             if ( (ctx->flags & SITH_COG_NO_SYNC) == 0 )
             {
@@ -878,7 +878,7 @@ LABEL_8:
             goto LABEL_8;
         }
         jkDev_PrintUniString(jkCog_jkstring);
-        if ( sithComm_multiplayerFlags )
+        if ( sithMessage_g_outputstream )
         {
             if ( (ctx->flags & SITH_COG_NO_SYNC) == 0 )
             {

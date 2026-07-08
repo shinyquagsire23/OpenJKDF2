@@ -159,7 +159,7 @@ LABEL_32:
         sithActor_PlayDamageSoundFx(sender, amount, flags);
         return amount;
     }
-    if ( sithComm_multiplayerFlags )
+    if ( sithMessage_g_outputstream )
         sithDSSThing_Death(sender, receiver_, 0, -1, 255);
     sithActor_KillActor(sender, receiver_, flags);
     return amount - sender->actorParams.health;

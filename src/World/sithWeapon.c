@@ -483,7 +483,7 @@ sithThing* sithWeapon_FireMots(sithThing *weapon, sithThing *projectile, rdVecto
 
     spawned = sithWeapon_WeaponFireProjectile(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9, 0);
 
-    if ( spawned && sithComm_multiplayerFlags )
+    if ( spawned && sithMessage_g_outputstream )
         sithDSSThing_Fire(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9, spawned->thing_id, -1, 255, extra);
 
     return spawned;
@@ -498,7 +498,7 @@ sithThing* sithWeapon_WeaponFire(sithThing *weapon, sithThing *projectile, rdVec
 
     spawned = sithWeapon_WeaponFireProjectile(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9, 0);
 
-    if ( spawned && sithComm_multiplayerFlags )
+    if ( spawned && sithMessage_g_outputstream )
         sithDSSThing_Fire(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9, spawned->thing_id, -1, 255, 0);
 
     return spawned;
@@ -1403,7 +1403,7 @@ sithThing* sithWeapon_FireProjectile(sithThing *pSender, sithThing *pProjectileT
                 catchupTimeOffset = catchupFactor * sithWeapon_fireRate;
                 finalTimeOffset = catchupTimeOffset;
                 sithThing *pFired = sithWeapon_WeaponFireProjectile(pSender, pProjectileTemplate, &fireDir, pFireOffset, 0, mode, scale, scaleFlags, catchupTimeOffset, extra);
-                if ( pFired && sithComm_multiplayerFlags )
+                if ( pFired && sithMessage_g_outputstream )
                     sithDSSThing_Fire(pSender, pProjectileTemplate, &fireDir, pFireOffset, 0, mode, scale, scaleFlags, catchupTimeOffset, pFired->thing_id, -1, 255, extra);
             }
             while ( catchupFactor > 1.0 );
@@ -1416,7 +1416,7 @@ sithThing* sithWeapon_FireProjectile(sithThing *pSender, sithThing *pProjectileT
     if ( pFireSound )
         sithAIAwareness_CreateTransmittingEvent(pSender->sector, &pSender->position, 1, 4.0, pSender);
     pResult = sithWeapon_WeaponFireProjectile(pSender, pProjectileTemplate, &fireDir, pFireOffset, pFireSound, mode, scale, scaleFlags, finalTimeOffset, extra);
-    if ( pResult && sithComm_multiplayerFlags )
+    if ( pResult && sithMessage_g_outputstream )
     {
         sithDSSThing_Fire(
             pSender,

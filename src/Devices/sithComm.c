@@ -15,71 +15,71 @@ int sithComm_version = 6;
 // MOTS altered
 int sithComm_Startup()
 {
-    if (sithComm_bInit)
+    if (sithMessage_bSturtup)
         return 0;
-    _memset(sithComm_msgFuncs, 0, sizeof(cogMsg_Handler) * 65);  // TODO define
+    _memset(sithMessage_aTypeFuncs, 0, sizeof(cogMsg_Handler) * 65);  // TODO define
     _memset(sithComm_aMsgPairs, 0, sizeof(sithCogMsg_Pair) * 0x80); // TODO define
     sithComm_dword_847E84 = 0;
     sithComm_msgId = 1;
-    sithComm_msgFuncs[DSS_THINGPOS] = sithDSSThing_ProcessPos;
-    sithComm_msgFuncs[DSS_FIREPROJECTILE] = sithDSSThing_ProcessFire;
-    sithComm_msgFuncs[DSS_JOINREQUEST] = sithMulti_ProcessJoinRequest;
-    sithComm_msgFuncs[DSS_WELCOME] = sithMulti_ProcessWelcome;
-    sithComm_msgFuncs[DSS_DEATH] = sithDSSThing_ProcessDeath;
-    sithComm_msgFuncs[DSS_DAMAGE] = sithDSSThing_ProcessDamage;
-    sithComm_msgFuncs[DSS_SENDTRIGGER] = sithDSSCog_ProcessMessage;
-    sithComm_msgFuncs[DSS_SYNCTHING] = sithDSSThing_ProcessStateUpdate;
-    sithComm_msgFuncs[DSS_PLAYSOUND] = sithDSSThing_ProcessPlaySound;
-    sithComm_msgFuncs[DSS_PLAYKEY] = sithDSSThing_ProcessPlayKey;
-    sithComm_msgFuncs[DSS_THINGFULLDESC] = sithDSSThing_ProcessFullDescription;
-    sithComm_msgFuncs[DSS_SYNCCOG] = sithDSSCog_ProcessCogState;
-    sithComm_msgFuncs[DSS_SURFACESTATUS] = sithDSS_ProcessSurfaceStatus;
-    sithComm_msgFuncs[DSS_AISTATUS] = sithDSS_ProcessAIStatus;
-    sithComm_msgFuncs[DSS_INVENTORY] = sithDSS_ProcessInventory;
-    sithComm_msgFuncs[DSS_SURFACE] = sithDSS_ProcessAnimStatus;
-    sithComm_msgFuncs[DSS_SECTORSTATUS] = sithDSS_ProcessSectorStatus;
-    sithComm_msgFuncs[DSS_PATHMOVE] = sithDSSThing_ProcessPathMove;
-    sithComm_msgFuncs[DSS_SYNCPUPPET] = sithDSS_ProcessPuppetStatus;
-    sithComm_msgFuncs[DSS_LEAVEJOIN] = sithMulti_ProcessSyncPlayers;
-    sithComm_msgFuncs[DSS_SYNCTHINGATTACHMENT] = sithDSSThing_ProcessAttachment;
-    sithComm_msgFuncs[DSS_SYNCEVENTS] = sithDSS_ProcessSyncTaskEvents;
-    sithComm_msgFuncs[DSS_SYNCCAMERAS] = sithDSS_ProcessSyncCameras;
-    sithComm_msgFuncs[DSS_TAKEITEM1] = sithDSSThing_ProcessTake;
-    sithComm_msgFuncs[DSS_TAKEITEM2] = sithDSSThing_ProcessTake;
-    sithComm_msgFuncs[DSS_STOPKEY] = sithDSSThing_ProcessStopKey;
-    sithComm_msgFuncs[DSS_STOPSOUND] = sithDSSThing_ProcessStopSound;
-    sithComm_msgFuncs[DSS_CREATETHING] = sithDSSThing_ProcessCreateThing;
-    sithComm_msgFuncs[DSS_SYNCPALEFFECTS] = sithDSS_ProcessSyncPalEffects;
-    sithComm_msgFuncs[DSS_ID_1F] = sithDSS_ProcessSyncGameState;
-    sithComm_msgFuncs[DSS_CHAT] = sithMulti_ProcessChat;
-    sithComm_msgFuncs[DSS_DESTROYTHING] = sithDSSThing_ProcessDestroyThing;
-    sithComm_msgFuncs[DSS_SECTORFLAGS] = sithDSS_ProcessSectorFlags;
-    sithComm_msgFuncs[DSS_PLAYSOUNDMODE] = sithDSSThing_ProcessPlaySoundMode;
-    sithComm_msgFuncs[DSS_PLAYKEYMODE] = sithDSSThing_ProcessPlayKeyMode;
-    sithComm_msgFuncs[DSS_SETTHINGMODEL] = sithDSSThing_ProcessSetModel;
-    sithComm_msgFuncs[DSS_PING] = sithMulti_ProcessPing;
-    sithComm_msgFuncs[DSS_PINGREPLY] = sithMulti_ProcessPong;
-    sithComm_msgFuncs[DSS_ENUMPLAYERS] = stdComm_cogMsg_HandleEnumPlayers;
-    sithComm_msgFuncs[DSS_RESET] = sithComm_cogMsg_Reset;
-    sithComm_msgFuncs[DSS_QUIT] = sithMulti_ProcessQuit;
+    sithMessage_aTypeFuncs[DSS_THINGPOS] = sithDSSThing_ProcessPos;
+    sithMessage_aTypeFuncs[DSS_FIREPROJECTILE] = sithDSSThing_ProcessFire;
+    sithMessage_aTypeFuncs[DSS_JOINREQUEST] = sithMulti_ProcessJoinRequest;
+    sithMessage_aTypeFuncs[DSS_WELCOME] = sithMulti_ProcessWelcome;
+    sithMessage_aTypeFuncs[DSS_DEATH] = sithDSSThing_ProcessDeath;
+    sithMessage_aTypeFuncs[DSS_DAMAGE] = sithDSSThing_ProcessDamage;
+    sithMessage_aTypeFuncs[DSS_SENDTRIGGER] = sithDSSCog_ProcessMessage;
+    sithMessage_aTypeFuncs[DSS_SYNCTHING] = sithDSSThing_ProcessStateUpdate;
+    sithMessage_aTypeFuncs[DSS_PLAYSOUND] = sithDSSThing_ProcessPlaySound;
+    sithMessage_aTypeFuncs[DSS_PLAYKEY] = sithDSSThing_ProcessPlayKey;
+    sithMessage_aTypeFuncs[DSS_THINGFULLDESC] = sithDSSThing_ProcessFullDescription;
+    sithMessage_aTypeFuncs[DSS_SYNCCOG] = sithDSSCog_ProcessCogState;
+    sithMessage_aTypeFuncs[DSS_SURFACESTATUS] = sithDSS_ProcessSurfaceStatus;
+    sithMessage_aTypeFuncs[DSS_AISTATUS] = sithDSS_ProcessAIStatus;
+    sithMessage_aTypeFuncs[DSS_INVENTORY] = sithDSS_ProcessInventory;
+    sithMessage_aTypeFuncs[DSS_SURFACE] = sithDSS_ProcessAnimStatus;
+    sithMessage_aTypeFuncs[DSS_SECTORSTATUS] = sithDSS_ProcessSectorStatus;
+    sithMessage_aTypeFuncs[DSS_PATHMOVE] = sithDSSThing_ProcessPathMove;
+    sithMessage_aTypeFuncs[DSS_SYNCPUPPET] = sithDSS_ProcessPuppetStatus;
+    sithMessage_aTypeFuncs[DSS_LEAVEJOIN] = sithMulti_ProcessSyncPlayers;
+    sithMessage_aTypeFuncs[DSS_SYNCTHINGATTACHMENT] = sithDSSThing_ProcessAttachment;
+    sithMessage_aTypeFuncs[DSS_SYNCEVENTS] = sithDSS_ProcessSyncTaskEvents;
+    sithMessage_aTypeFuncs[DSS_SYNCCAMERAS] = sithDSS_ProcessSyncCameras;
+    sithMessage_aTypeFuncs[DSS_TAKEITEM1] = sithDSSThing_ProcessTake;
+    sithMessage_aTypeFuncs[DSS_TAKEITEM2] = sithDSSThing_ProcessTake;
+    sithMessage_aTypeFuncs[DSS_STOPKEY] = sithDSSThing_ProcessStopKey;
+    sithMessage_aTypeFuncs[DSS_STOPSOUND] = sithDSSThing_ProcessStopSound;
+    sithMessage_aTypeFuncs[DSS_CREATETHING] = sithDSSThing_ProcessCreateThing;
+    sithMessage_aTypeFuncs[DSS_SYNCPALEFFECTS] = sithDSS_ProcessSyncPalEffects;
+    sithMessage_aTypeFuncs[DSS_ID_1F] = sithDSS_ProcessSyncGameState;
+    sithMessage_aTypeFuncs[DSS_CHAT] = sithMulti_ProcessChat;
+    sithMessage_aTypeFuncs[DSS_DESTROYTHING] = sithDSSThing_ProcessDestroyThing;
+    sithMessage_aTypeFuncs[DSS_SECTORFLAGS] = sithDSS_ProcessSectorFlags;
+    sithMessage_aTypeFuncs[DSS_PLAYSOUNDMODE] = sithDSSThing_ProcessPlaySoundMode;
+    sithMessage_aTypeFuncs[DSS_PLAYKEYMODE] = sithDSSThing_ProcessPlayKeyMode;
+    sithMessage_aTypeFuncs[DSS_SETTHINGMODEL] = sithDSSThing_ProcessSetModel;
+    sithMessage_aTypeFuncs[DSS_PING] = sithMulti_ProcessPing;
+    sithMessage_aTypeFuncs[DSS_PINGREPLY] = sithMulti_ProcessPong;
+    sithMessage_aTypeFuncs[DSS_ENUMPLAYERS] = stdComm_cogMsg_HandleEnumPlayers;
+    sithMessage_aTypeFuncs[DSS_RESET] = sithComm_cogMsg_Reset;
+    sithMessage_aTypeFuncs[DSS_QUIT] = sithMulti_ProcessQuit;
 
     if (Main_bMotsCompat) {
-        sithComm_msgFuncs[DSS_MOTS_NEW_1] = sithDSSThing_ProcessMOTSNew1;
-        sithComm_msgFuncs[DSS_MOTS_NEW_2] = sithDSSThing_ProcessMOTSNew2;
+        sithMessage_aTypeFuncs[DSS_MOTS_NEW_1] = sithDSSThing_ProcessMOTSNew1;
+        sithMessage_aTypeFuncs[DSS_MOTS_NEW_2] = sithDSSThing_ProcessMOTSNew2;
     }
 
     // Added: clean reset
     sithComm_009a1160 = 0;
     sithComm_version = 6;
 
-    sithComm_bInit = 1;
+    sithMessage_bSturtup = 1;
     return 1;
 }
 
 void sithMessage_Shutdown()
 {
-    if ( sithComm_bInit )
-        sithComm_bInit = 0;
+    if ( sithMessage_bSturtup )
+        sithMessage_bSturtup = 0;
 
     // Added: clean reset
     sithComm_009a1160 = 0;
@@ -107,7 +107,7 @@ static int sithComm_EnsureMsgTmpBuf(void)
 
 void sithMessage_RegisterFunction(int msgid, cogMsg_Handler func)
 {
-    sithComm_msgFuncs[msgid] = func;
+    sithMessage_aTypeFuncs[msgid] = func;
 }
 
 // MOTS altered
@@ -126,7 +126,7 @@ int sithComm_SendMsgToPlayer(sithCogMsg *msg, int a2, int mpFlags, int a4)
     //printf("sithComm_SendMsgToPlayer %x %x %x %x\n", msg->netMsg.cogMsgId, a2, mpFlags, a4);
 
     int ret = 1;
-    multiplayerFlags = sithComm_multiplayerFlags & mpFlags;
+    multiplayerFlags = sithMessage_g_outputstream & mpFlags;
     if (!multiplayerFlags)
         return 1;
     curMs = sithTime_g_msecGameTime;
@@ -241,8 +241,8 @@ int sithMessage_ProcessMessages()
     int v13; // [esp+4h] [ebp-4h]
 
     v13 = 0;
-    sithComm_needsSync = 0;
-    if ( !sithComm_bSyncMultiplayer )
+    sithMessage_bStopProcessMessages = 0;
+    if ( !sithMessage_g_inputstream )
         return 0;
     while ( stdComm_Recv(&sithComm_netMsgTmp) == 1 )
     {
@@ -286,8 +286,8 @@ LABEL_14:
 LABEL_22:
                     if ( v2 < (unsigned int)DSS_MAX )
                     {
-                        if ( sithComm_msgFuncs[v2] )
-                            sithComm_msgFuncs[v2](&sithComm_netMsgTmp);
+                        if ( sithMessage_aTypeFuncs[v2] )
+                            sithMessage_aTypeFuncs[v2](&sithComm_netMsgTmp);
                     }
                 }
                 goto LABEL_25;
@@ -304,7 +304,7 @@ LABEL_22:
                 sithMulti_QuitPlayer(sithComm_netMsgTmp.netMsg.thingIdx);
         }
 LABEL_25:
-        if ( sithComm_needsSync )
+        if ( sithMessage_bStopProcessMessages )
             break;
     }
     sithComm_SyncWithPlayers();
@@ -313,7 +313,7 @@ LABEL_25:
 
 void sithMessage_StopProcessMessages()
 {
-    sithComm_needsSync = 1;
+    sithMessage_bStopProcessMessages = 1;
 }
 
 int sithMessage_Process(sithCogMsg *a1)
@@ -322,8 +322,8 @@ int sithMessage_Process(sithCogMsg *a1)
 
     int msgId = a1->netMsg.cogMsgId;
 
-    if ( (signed int)(uint16_t)msgId < 65 && sithComm_msgFuncs[msgId])
-        result = sithComm_msgFuncs[msgId](a1);
+    if ( (signed int)(uint16_t)msgId < 65 && sithMessage_aTypeFuncs[msgId])
+        result = sithMessage_aTypeFuncs[msgId](a1);
     else
         result = 1;
     return result;

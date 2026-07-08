@@ -211,8 +211,8 @@ int sithMulti_Startup()
     g_submodeFlags |= 1u;
     sithMulti_quitGameState = 0;
     sithMulti_bTimelimitMet = 0;
-    sithComm_multiplayerFlags |= 1u;
-    sithComm_bSyncMultiplayer |= 1u;
+    sithMessage_g_outputstream |= 1u;
+    sithMessage_g_inputstream |= 1u;
 
     // Remove all actor things from the world
     sithMulti_RemoveAllActorsFromWorld(sithWorld_pCurrentWorld);
@@ -243,10 +243,10 @@ void sithMulti_RemoveStaticThing(int a1)
 
 void sithMulti_Shutdown()
 {
-    sithComm_multiplayerFlags &= ~1u;
+    sithMessage_g_outputstream &= ~1u;
     sithNet_isMulti = 0;
     sithNet_isServer = 0;
-    sithComm_bSyncMultiplayer &= ~1u;
+    sithMessage_g_inputstream &= ~1u;
     sithEvent_RegisterTask(2, 0, 0, 0);
     stdComm_Close();
     stdComm_CloseConnection();
