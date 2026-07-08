@@ -475,3 +475,29 @@ three platforms (macOS + TWL + Dreamcast) regardless.
 
 **Phase 3 is effectively complete**: 3a type names, 3b enum constants, 3c member names
 (247) + enum typedefs (21). Remaining project work is Phase 4 (style match).
+
+## Phase 4 workflow (style match) — established via sithTime pilot
+**Key realization:** J3D and DF2 function BODIES often genuinely differ (DF2 carries
+added features — MICROSECOND_TIME, MOTS variants, platform tweaks — and different
+constants). Rewriting a body to match J3D would CHANGE FUNCTIONALITY → out of scope.
+So Phase 4's safe backbone is **argument names**, plus *selective* debug-prints/asserts/
+named-enum-usage only where behavior is provably unchanged.
+
+- **Argument names (primary, byte-clean):** adopt J3D's parameter names. Param names
+  don't survive to machine code, so a correct batch is **NDS byte-identical** (oracle-
+  verifiable). MUST be **function-scoped** — arg names like `deltaMs`/`curMs` are NOT
+  globally unique (reused across many functions), so rename per-function (perl on the
+  specific file, or edit the specific signature+body), never tree-wide.
+- **Debug prints / asserts:** may ADD J3D's (adapted to DF2 macros: stdPlatform_Printf /
+  the DF2 assert). These change the binary (new strings/calls) → verify via runtime
+  dedicated-server load, not byte-compare. Only add asserts that cannot abort on a path
+  DF2 currently allows (else behavior changes).
+- **De-inlining / enum-usage:** case-by-case; only call helpers that ALREADY exist in DF2
+  (renamed in phase 1), and only swap a magic number for a named constant when the value
+  is identical. Skip when DF2's body diverges.
+- **Gate:** arg-name batch → NDS byte-identical before commit; anything that adds prints/
+  asserts/codegen → runtime parse clean. Build all three platforms.
+
+Pilot done: `sithTime` (deltaMs→frameTime, curMs→msecTime), byte-identical.
+Remaining: arg-name pass over the other ~90 shared modules (per-module J3D-vs-DF2
+signature diff → function-scoped rename → byte-verify).
