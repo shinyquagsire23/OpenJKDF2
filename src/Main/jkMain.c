@@ -613,8 +613,8 @@ void jkMain_GameplayShow(int a1, int a2)
         else if ( sithNet_isServer )
         {
 LABEL_28:
-            sithInventory_InitInventory(sithPlayer_pLocalPlayerThing);
-            jkPlayer_MpcInitBins(sithPlayer_pLocalPlayer);
+            sithInventory_InitInventory(sithPlayer_g_pLocalPlayerThing);
+            jkPlayer_MpcInitBins(sithPlayer_g_pLocalPlayer);
             
             jkPlayer_Startup();
             jkPlayer_InitForceBins();

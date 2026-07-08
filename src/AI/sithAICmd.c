@@ -24,9 +24,9 @@
 sithThing* sithAICmd_NearestPlayer(sithActor *actor)
 {
     if (!sithNet_isMulti)
-        return sithPlayer_pLocalPlayerThing;
+        return sithPlayer_g_pLocalPlayerThing;
 
-    sithThing* closest = sithPlayer_pLocalPlayerThing;
+    sithThing* closest = sithPlayer_g_pLocalPlayerThing;
     flex_t closestDist = FLEX(999999.0);
     for (int i = 0; i < jkPlayer_maxPlayers; i++)
     {

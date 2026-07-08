@@ -102,7 +102,7 @@ int jkDSS_Startup()
 int jkDSS_JKM1(int32_t unused1, sithEventInfo* unused2)
 {
     if (jkDSS_005aec8c != 0) {
-        jkDSS_SendSaberInfo_alt_Mots(sithPlayer_pLocalPlayerThing,jkGuiMultiplayer_mpcInfo.model,jkGuiMultiplayer_mpcInfo.soundClass,jkGuiMultiplayer_mpcInfo.sideMat,jkGuiMultiplayer_mpcInfo.tipMat,jkGuiMultiplayer_mpcInfo.personality);
+        jkDSS_SendSaberInfo_alt_Mots(sithPlayer_g_pLocalPlayerThing,jkGuiMultiplayer_mpcInfo.model,jkGuiMultiplayer_mpcInfo.soundClass,jkGuiMultiplayer_mpcInfo.sideMat,jkGuiMultiplayer_mpcInfo.tipMat,jkGuiMultiplayer_mpcInfo.personality);
     }
     return 1;
 }
@@ -115,7 +115,7 @@ void jkDSS_Shutdown()
 // MOTS altered
 int jkDSS_idk4()
 {
-    if ( sithPlayer_pLocalPlayerThing )
+    if ( sithPlayer_g_pLocalPlayerThing )
     {
         if ( sithNet_isServer )
         {
@@ -131,16 +131,16 @@ int jkDSS_idk4()
                 sithMulti_QuitGame(sithTime_g_msecGameTime + MULTI_NEXTLEVEL_DELAY_MS, 1);
             }
         }
-        jkDSS_SendSetSaberInfo2(sithPlayer_pLocalPlayerThing);
+        jkDSS_SendSetSaberInfo2(sithPlayer_g_pLocalPlayerThing);
 
 #ifdef JKM_PARAMS
         if (Main_bMotsCompat) {
-            jkDSS_SendSetSaberInfoMots(sithPlayer_pLocalPlayerThing, jkGuiMultiplayer_mpcInfo.personality);
+            jkDSS_SendSetSaberInfoMots(sithPlayer_g_pLocalPlayerThing, jkGuiMultiplayer_mpcInfo.personality);
         }
         else
 #endif
         {
-            jkDSS_SendSetSaberInfo(sithPlayer_pLocalPlayerThing);
+            jkDSS_SendSetSaberInfo(sithPlayer_g_pLocalPlayerThing);
         }
         return 1;
     }
@@ -149,15 +149,15 @@ int jkDSS_idk4()
 
 void jkDSS_playerconfig_idksync()
 {
-    jkDSS_SendSetSaberInfo2(sithPlayer_pLocalPlayerThing);
+    jkDSS_SendSetSaberInfo2(sithPlayer_g_pLocalPlayerThing);
 #ifdef JKM_PARAMS
     if (Main_bMotsCompat) {
-        jkDSS_SendSetSaberInfoMots(sithPlayer_pLocalPlayerThing, jkGuiMultiplayer_mpcInfo.personality);
+        jkDSS_SendSetSaberInfoMots(sithPlayer_g_pLocalPlayerThing, jkGuiMultiplayer_mpcInfo.personality);
     }
     else
 #endif
     {
-        jkDSS_SendSetSaberInfo(sithPlayer_pLocalPlayerThing);
+        jkDSS_SendSetSaberInfo(sithPlayer_g_pLocalPlayerThing);
     }
     jkDSS_Sendx32(&playerThings[playerThingIdx]);
     jkDSS_Sendx36(); // MOTS didn't inline
@@ -234,7 +234,7 @@ int jkDSS_wrap_SendSaberInfo_alt()
 #ifdef JKM_PARAMS
     if (Main_bMotsCompat) {
         return jkDSS_SendSaberInfo_alt_Mots(
-               sithPlayer_pLocalPlayerThing,
+               sithPlayer_g_pLocalPlayerThing,
                jkGuiMultiplayer_mpcInfo.model,
                jkGuiMultiplayer_mpcInfo.soundClass,
                jkGuiMultiplayer_mpcInfo.sideMat,
@@ -243,7 +243,7 @@ int jkDSS_wrap_SendSaberInfo_alt()
     }
 #endif
     return jkDSS_SendSaberInfo_alt(
-               sithPlayer_pLocalPlayerThing,
+               sithPlayer_g_pLocalPlayerThing,
                jkGuiMultiplayer_mpcInfo.model,
                jkGuiMultiplayer_mpcInfo.soundClass,
                jkGuiMultiplayer_mpcInfo.sideMat,
@@ -362,7 +362,7 @@ int jkDSS_ProcessSetSaberInfoMots(sithCogMsg *msg)
             stdString_SafeStrCopy(v14, "ky.snd", 0x20);
         }
     }
-    else if (v2 == sithPlayer_pLocalPlayerThing) {
+    else if (v2 == sithPlayer_g_pLocalPlayerThing) {
         jkDSS_005aec8c = 0;
     }
     rdModel3* v5 = sithModel_Load(model_3do_fname, 1);
@@ -964,11 +964,11 @@ int jkDSS_Sendx36()
         }
 
         jkPlayerInfo *pPlayerInfo;
-        if (!sithPlayer_pLocalPlayerThing) {
+        if (!sithPlayer_g_pLocalPlayerThing) {
             pPlayerInfo = NULL;
         }
         else {
-            pPlayerInfo = sithPlayer_pLocalPlayerThing->playerInfo;
+            pPlayerInfo = sithPlayer_g_pLocalPlayerThing->playerInfo;
         }
 
         if (!pPlayerInfo) {
@@ -1012,11 +1012,11 @@ int jkDSS_Processx36_setwaggle(sithCogMsg *msg)
         }
 
         jkPlayerInfo *pPlayerInfo;
-        if (!sithPlayer_pLocalPlayerThing) {
+        if (!sithPlayer_g_pLocalPlayerThing) {
             pPlayerInfo = NULL;
         }
         else {
-            pPlayerInfo = sithPlayer_pLocalPlayerThing->playerInfo;
+            pPlayerInfo = sithPlayer_g_pLocalPlayerThing->playerInfo;
         }
 
         if (pPlayerInfo) {

@@ -226,7 +226,7 @@ int sithDSSThing_ProcessStateUpdate(sithCogMsg *msg)
     sithThing_SetSector(pThing, pSector, 0);
 
     uint32_t thingflags = NETMSG_POPS32();
-    if ( pThing->type == SITH_THING_PLAYER && (pThing->thingflags & SITH_TF_DEAD) && !(thingflags & SITH_TF_DEAD) && MOTS_ONLY_COND(pThing != sithPlayer_pLocalPlayerThing))
+    if ( pThing->type == SITH_THING_PLAYER && (pThing->thingflags & SITH_TF_DEAD) && !(thingflags & SITH_TF_DEAD) && MOTS_ONLY_COND(pThing != sithPlayer_g_pLocalPlayerThing))
         sithPlayer_debug_loadauto(pThing);
     
     // Lol, anticheat?

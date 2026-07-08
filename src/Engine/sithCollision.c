@@ -718,7 +718,7 @@ LABEL_78:
             sectTmp = v5->sector;
 
             sithCollision_bDebugCollide = 0; // Added
-            if (pThing == sithPlayer_pLocalPlayerThing) {
+            if (pThing == sithPlayer_g_pLocalPlayerThing) {
                 sithCollision_bDebugCollide = 0;
             }
             sithCollision_SearchForCollisions(sectTmp, v5, &v5->position, &direction, a6, v17, flags);
@@ -756,9 +756,9 @@ LABEL_78:
                 if ( (v19->hitType & SITHCOLLISION_THING) != 0 )
                 {
                     // Added: noclip
-                    if (!(g_debugmodeFlags & DEBUGFLAG_NOCLIP) || pThing != sithPlayer_pLocalPlayerThing)
+                    if (!(g_debugmodeFlags & DEBUGFLAG_NOCLIP) || pThing != sithPlayer_g_pLocalPlayerThing)
                     {
-                        if (!(g_debugmodeFlags & DEBUGFLAG_NOCLIP) || ((g_debugmodeFlags & DEBUGFLAG_NOCLIP) && v19->receiver != sithPlayer_pLocalPlayerThing))
+                        if (!(g_debugmodeFlags & DEBUGFLAG_NOCLIP) || ((g_debugmodeFlags & DEBUGFLAG_NOCLIP) && v19->receiver != sithPlayer_g_pLocalPlayerThing))
                         {
                             v34 = v19->receiver;
                             v35 = v34->type + 12 * v5->type;
@@ -788,7 +788,7 @@ LABEL_78:
                 else
                 {
                     // Added: noclip
-                    if (!(g_debugmodeFlags & DEBUGFLAG_NOCLIP) || pThing != sithPlayer_pLocalPlayerThing)
+                    if (!(g_debugmodeFlags & DEBUGFLAG_NOCLIP) || pThing != sithPlayer_g_pLocalPlayerThing)
                     {
                         amount = v19->surface;
                         if ( sithCollision_aThingSurfaceCollideResults[v5->type] )
@@ -814,7 +814,7 @@ LABEL_78:
             sithCollision_DecreaseStackLevel();
 
             // Added: noclip
-            if ((g_debugmodeFlags & DEBUGFLAG_NOCLIP) && pThing == sithPlayer_pLocalPlayerThing) {
+            if ((g_debugmodeFlags & DEBUGFLAG_NOCLIP) && pThing == sithPlayer_g_pLocalPlayerThing) {
                 v16 = 0;
             }
 
@@ -843,7 +843,7 @@ LABEL_78:
     }
 
     // Added: noclip
-    if (!(g_debugmodeFlags & DEBUGFLAG_NOCLIP) || pThing != sithPlayer_pLocalPlayerThing)
+    if (!(g_debugmodeFlags & DEBUGFLAG_NOCLIP) || pThing != sithPlayer_g_pLocalPlayerThing)
     {
         if ( v5->moveType == SITH_MT_PHYSICS )
             sithPhysics_ResetThingMovement(v5);
@@ -854,7 +854,7 @@ LABEL_81:
     if ( v5->collide && v5->moveType == SITH_MT_PHYSICS && !sithIntersect_IsSphereInSector(&v5->position, 0.0, v5->sector) )
     {
         // Added: noclip
-        if (!(g_debugmodeFlags & DEBUGFLAG_NOCLIP) || pThing != sithPlayer_pLocalPlayerThing)
+        if (!(g_debugmodeFlags & DEBUGFLAG_NOCLIP) || pThing != sithPlayer_g_pLocalPlayerThing)
         {
             rdVector_Copy3(&v5->position, &posCopy);
             rdVector_Copy3(&direction, &out);

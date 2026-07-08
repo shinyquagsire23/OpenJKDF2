@@ -25,7 +25,7 @@ void sithPhysics_FindFloor(sithThing *pThing, int a3)
     flex_t thinga; // [esp+34h] [ebp+4h]
 
     // Added: noclip
-    if ((g_debugmodeFlags & DEBUGFLAG_NOCLIP) && pThing == sithPlayer_pLocalPlayerThing)
+    if ((g_debugmodeFlags & DEBUGFLAG_NOCLIP) && pThing == sithPlayer_g_pLocalPlayerThing)
     {
         pThing->physicsParams.physflags &= ~SITH_PF_USEGRAVITY;
         pThing->physicsParams.physflags |= SITH_PF_FLY;
@@ -207,7 +207,7 @@ void sithPhysics_UpdateThing(sithThing *pThing, flex_t deltaSecs)
 void sithPhysics_ApplyForce(sithThing *pThing, rdVector3 *forceVec)
 {
     // Added: noclip
-    if (pThing == sithPlayer_pLocalPlayerThing && (g_debugmodeFlags & DEBUGFLAG_NOCLIP)) {
+    if (pThing == sithPlayer_g_pLocalPlayerThing && (g_debugmodeFlags & DEBUGFLAG_NOCLIP)) {
         return;
     }
 

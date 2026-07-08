@@ -726,7 +726,7 @@ void sithCogFunctionThing_SetThingPosEx(sithCog *ctx)
         if (pThing->moveType == SITH_MT_PHYSICS && pThing->physicsParams.physflags & SITH_PF_FLOORSTICK)
             sithPhysics_FindFloor(pThing, 1);
 
-        if ( pThing == sithPlayer_pLocalPlayerThing )
+        if ( pThing == sithPlayer_g_pLocalPlayerThing )
             sithCamera_Update(sithCamera_g_pCurCamera);
 
         if (COG_SHOULD_SYNC(ctx))
@@ -1070,7 +1070,7 @@ void sithCogFunctionThing_PlayKey(sithCog *ctx)
     }
 
     // MOTS added: bugfix?
-    if ( Main_bMotsCompat && pThing == sithPlayer_pLocalPlayerThing && pThing->actorParams.health < 1.0) {
+    if ( Main_bMotsCompat && pThing == sithPlayer_g_pLocalPlayerThing && pThing->actorParams.health < 1.0) {
         goto fail;
     }
 
@@ -1237,7 +1237,7 @@ void sithCogFunctionThing_TeleportThing(sithCog *ctx)
         if (pThing->moveType == SITH_MT_PHYSICS && pThing->physicsParams.physflags & SITH_PF_FLOORSTICK)
             sithPhysics_FindFloor(pThing, 1);
 
-        if ( pThing == sithPlayer_pLocalPlayerThing )
+        if ( pThing == sithPlayer_g_pLocalPlayerThing )
             sithCamera_Update(sithCamera_g_pCurCamera);
 
         if (COG_SHOULD_SYNC(ctx))

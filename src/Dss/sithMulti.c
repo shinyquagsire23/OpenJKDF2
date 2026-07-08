@@ -602,7 +602,7 @@ int sithMulti_ProcessWelcome(sithCogMsg *msg)
                 sithCog_BroadcastMessage(SITH_MESSAGE_JOIN, 3, jkPlayer_playerInfos[v1].playerThing->thingIdx, 0, v1);
             if ( sithMulti_pfNewPlayerJoinedCallback )
                 sithMulti_pfNewPlayerJoinedCallback();
-            sithDSSThing_UpdateState(sithPlayer_pLocalPlayerThing, -1, 255);
+            sithDSSThing_UpdateState(sithPlayer_g_pLocalPlayerThing, -1, 255);
             if ( sithNet_isServer )
                 sithNet_bSyncScores = 1;
         }
@@ -731,8 +731,8 @@ int sithMulti_CheckPlayers(int32_t a, sithEventInfo* b)
     wchar_t *v7; // eax
     wchar_t a1[128]; // [esp+10h] [ebp-100h] BYREF
 
-    if ( sithWorld_g_pCurrentWorld && sithPlayer_pLocalPlayerThing && (g_submodeFlags & 8) == 0 )
-        sithDSSThing_Pos(sithPlayer_pLocalPlayerThing, -1, 0);
+    if ( sithWorld_g_pCurrentWorld && sithPlayer_g_pLocalPlayerThing && (g_submodeFlags & 8) == 0 )
+        sithDSSThing_Pos(sithPlayer_g_pLocalPlayerThing, -1, 0);
     if ( sithNet_isServer )
     {
         v0 = 1;
@@ -926,7 +926,7 @@ int sithMulti_ProcessSyncPlayers(sithCogMsg *msg)
                     sithCog_BroadcastMessage(SITH_MESSAGE_JOIN, 3, v6->playerThing->thingIdx, 0, v3);
                 if ( sithMulti_pfNewPlayerJoinedCallback )
                     sithMulti_pfNewPlayerJoinedCallback();
-                sithDSSThing_UpdateState(sithPlayer_pLocalPlayerThing, -1, 255);
+                sithDSSThing_UpdateState(sithPlayer_g_pLocalPlayerThing, -1, 255);
             }
             NETMSG_POPSTR(a2, 0x10);
 
@@ -1584,7 +1584,7 @@ void sithMulti_ProcessPlayerJoin(int playerIdx)
         sithMulti_pfNewPlayerJoinedCallback();
     }
 
-    sithDSSThing_UpdateState(sithPlayer_pLocalPlayerThing, -1, 0xFF);
+    sithDSSThing_UpdateState(sithPlayer_g_pLocalPlayerThing, -1, 0xFF);
 }
 
 void sithMulti_FinishJoining(int param1, int param2, int sendtoId)

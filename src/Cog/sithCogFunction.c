@@ -877,7 +877,7 @@ void sithCogFunction_SetCameraMode(sithCog *ctx)
     if (camIdx == 7)
     {
         camIdx = 0;
-        sithCamera_SetCameraFocus(&sithCamera_g_aCameras[camIdx], sithPlayer_pLocalPlayerThing, 0);
+        sithCamera_SetCameraFocus(&sithCamera_g_aCameras[camIdx], sithPlayer_g_pLocalPlayerThing, 0);
     }
 #endif
 
@@ -1118,7 +1118,7 @@ void sithCogFunction_AddDynamicTint(sithCog *ctx)
     cog_flex_t fG = sithCogExec_PopFlex(v1);
     cog_flex_t fR = sithCogExec_PopFlex(v1);
     player = sithCogExec_PopThing(v1);
-    if ( player && player->type == SITH_THING_PLAYER && player == sithPlayer_pLocalPlayerThing )
+    if ( player && player->type == SITH_THING_PLAYER && player == sithPlayer_g_pLocalPlayerThing )
         sithPlayer_AddDynamicTint(fR, fG, fB);
 }
 
@@ -1133,7 +1133,7 @@ void sithCogFunction_AddDynamicAdd(sithCog *ctx)
     g = sithCogExec_PopInt(ctx);
     r = sithCogExec_PopInt(ctx);
     playerThing = sithCogExec_PopThing(ctx);
-    if ( playerThing && playerThing->type == SITH_THING_PLAYER && playerThing == sithPlayer_pLocalPlayerThing )
+    if ( playerThing && playerThing->type == SITH_THING_PLAYER && playerThing == sithPlayer_g_pLocalPlayerThing )
         sithPlayer_AddDyamicAdd(r, g, b);
 }
 
@@ -1208,14 +1208,14 @@ void sithCogFunction_SendTrigger(sithCog *ctx)
             {
                 if ( playerinfo->flags & 1 )
                 {
-                    if ( sourceThing == sithPlayer_pLocalPlayerThing )
-                        sithCog_BroadcastMessageEx(SITH_MESSAGE_TRIGGER, SENDERTYPE_THING, sithPlayer_pLocalPlayerThing->thingIdx, 0, sourceType, arg0, arg1, arg2, arg3);
+                    if ( sourceThing == sithPlayer_g_pLocalPlayerThing )
+                        sithCog_BroadcastMessageEx(SITH_MESSAGE_TRIGGER, SENDERTYPE_THING, sithPlayer_g_pLocalPlayerThing->thingIdx, 0, sourceType, arg0, arg1, arg2, arg3);
                     else
                         sithDSSCog_SendMessage(
                             0,
                             SITH_MESSAGE_TRIGGER,
                             SENDERTYPE_THING,
-                            sithPlayer_pLocalPlayerThing->thingIdx,
+                            sithPlayer_g_pLocalPlayerThing->thingIdx,
                             0,
                             sourceType,
                             0,
@@ -1234,7 +1234,7 @@ void sithCogFunction_SendTrigger(sithCog *ctx)
             0,
             SITH_MESSAGE_TRIGGER,
             SENDERTYPE_THING,
-            sithPlayer_pLocalPlayerThing->thingIdx,
+            sithPlayer_g_pLocalPlayerThing->thingIdx,
             0,
             sourceType,
             0,
@@ -1243,7 +1243,7 @@ void sithCogFunction_SendTrigger(sithCog *ctx)
             arg2,
             arg3,
             -1);
-        sithCog_BroadcastMessageEx(SITH_MESSAGE_TRIGGER, SENDERTYPE_THING, sithPlayer_pLocalPlayerThing->thingIdx, 0, sourceType, arg0, arg1, arg2, arg3);
+        sithCog_BroadcastMessageEx(SITH_MESSAGE_TRIGGER, SENDERTYPE_THING, sithPlayer_g_pLocalPlayerThing->thingIdx, 0, sourceType, arg0, arg1, arg2, arg3);
     }
 }
 
@@ -1276,7 +1276,7 @@ void sithCogFunction_SetFireWait(sithCog *ctx)
     cog_flex_t fireRate = sithCogExec_PopFlex(ctx);
     sithThing* weapon = sithCogExec_PopThing(ctx);
 
-    if ( weapon && weapon == sithPlayer_pLocalPlayerThing && fireRate >= -1.0 )
+    if ( weapon && weapon == sithPlayer_g_pLocalPlayerThing && fireRate >= -1.0 )
         sithWeapon_SetFireWait(weapon, fireRate);
 }
 
@@ -1285,7 +1285,7 @@ void sithCogFunction_SetMountWait(sithCog *ctx)
     cog_flex_t mountWait = sithCogExec_PopFlex(ctx);
     sithThing* weapon = sithCogExec_PopThing(ctx);
 
-    if ( weapon && weapon == sithPlayer_pLocalPlayerThing && mountWait >= -1.0 )
+    if ( weapon && weapon == sithPlayer_g_pLocalPlayerThing && mountWait >= -1.0 )
         sithWeapon_SetMountWait(weapon, mountWait);
 }
 
@@ -1525,7 +1525,7 @@ void sithCogFunction_ChangeFireRate(sithCog *ctx)
     cog_flex_t fireRate = sithCogExec_PopFlex(ctx);
     sithThing* player = sithCogExec_PopThing(ctx);
 
-    if ( player && player == sithPlayer_pLocalPlayerThing && fireRate > 0.0 )
+    if ( player && player == sithPlayer_g_pLocalPlayerThing && fireRate > 0.0 )
         sithWeapon_SetFireRate(player, fireRate);
 }
 

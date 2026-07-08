@@ -348,7 +348,7 @@ void sithThing_UpdateMove(sithThing *pThing, flex_t deltaSecs)
         flex_t qolSavedMoveSize = pThing->moveSize;
         int qolSqueeze = jkPlayer_bLedgeSqueeze
                       && !sithNet_isMulti
-                      && pThing == sithPlayer_pLocalPlayerThing
+                      && pThing == sithPlayer_g_pLocalPlayerThing
                       && !pThing->attach_flags
                       && stdMath_Fabs(v1.z) < 1.0;
         if (qolSqueeze)
@@ -454,7 +454,7 @@ flex_t sithThing_DamageThing(sithThing *sender, sithThing *reciever, flex_t amou
     flex_t param1; // [esp+0h] [ebp-20h]
 
     // Added: noclip
-    if (sender == sithPlayer_pLocalPlayerThing && (g_debugmodeFlags & DEBUGFLAG_NOCLIP)) {
+    if (sender == sithPlayer_g_pLocalPlayerThing && (g_debugmodeFlags & DEBUGFLAG_NOCLIP)) {
         return 0.0;
     }
 
@@ -700,7 +700,7 @@ void sithThing_ExitSector(sithThing* pThing)
     sithThing *nextThing; // eax
     rdVector3 pos; // [esp+Ch] [ebp-Ch] BYREF
 
-    if (pThing == sithPlayer_pLocalPlayerThing) {
+    if (pThing == sithPlayer_g_pLocalPlayerThing) {
         //jk_printf("OpenJKDF2: Leave sector %p, idx %d\n", pThing->sector, pThing->sector ? pThing->sector->id : -1);
     }
 
@@ -747,7 +747,7 @@ void sithThing_EnterSector(sithThing* pThing, sithSector *sector, int a3, int a4
     sithSector *v7; // eax
     sithThing* i;
 
-    if (pThing == sithPlayer_pLocalPlayerThing) {
+    if (pThing == sithPlayer_g_pLocalPlayerThing) {
         //jk_printf("OpenJKDF2: Enter sector %p, idx %d\n", sector, sector ? sector->id : -1);
     }
 
@@ -824,14 +824,14 @@ void sithThing_EnterWater(sithThing* pThing, int a2)
             else
                 sithSoundClass_PlayModeRandom(pThing, SITH_SC_ENTERWATER);
         }
-        v4 = sithPlayer_pLocalPlayerThing;
-        if ( sithPlayer_pLocalPlayerThing && (pThing->thingflags & SITH_TF_SPLASHES) != 0 && (pThing->thingflags & SITH_TF_INVULN) == 0 )
+        v4 = sithPlayer_g_pLocalPlayerThing;
+        if ( sithPlayer_g_pLocalPlayerThing && (pThing->thingflags & SITH_TF_SPLASHES) != 0 && (pThing->thingflags & SITH_TF_INVULN) == 0 )
         {
-            v5 = sithPlayer_pLocalPlayerThing->class_cog;
+            v5 = sithPlayer_g_pLocalPlayerThing->class_cog;
             if ( v5 )
             {
                 sithCog_SendMessage(v5, SITH_MESSAGE_SPLASH, SENDERTYPE_THING, pThing->thingIdx, 0, 1, 0);
-                v4 = sithPlayer_pLocalPlayerThing;
+                v4 = sithPlayer_g_pLocalPlayerThing;
             }
             v6 = v4->capture_cog;
             if ( v6 )
@@ -886,18 +886,18 @@ void sithThing_ExitWater(sithThing* pThing, int a2)
     }
     else if ( !a2 )
     {
-        if ( sithPlayer_pLocalPlayerThing )
+        if ( sithPlayer_g_pLocalPlayerThing )
         {
             if ( (pThing->thingflags & SITH_TF_SPLASHES) != 0 && (pThing->thingflags & SITH_TF_INVULN) == 0 )
             {
-                if ( sithPlayer_pLocalPlayerThing->class_cog )
+                if ( sithPlayer_g_pLocalPlayerThing->class_cog )
                 {
-                    sithCog_SendMessage(sithPlayer_pLocalPlayerThing->class_cog, SITH_MESSAGE_SPLASH, 3, pThing->thingIdx, 0, 0, 0);
+                    sithCog_SendMessage(sithPlayer_g_pLocalPlayerThing->class_cog, SITH_MESSAGE_SPLASH, 3, pThing->thingIdx, 0, 0, 0);
                 }
 
-                if ( sithPlayer_pLocalPlayerThing->capture_cog )
+                if ( sithPlayer_g_pLocalPlayerThing->capture_cog )
                 {
-                    sithCog_SendMessage(sithPlayer_pLocalPlayerThing->capture_cog, SITH_MESSAGE_SPLASH, 3, pThing->thingIdx, 0, 0, 0);
+                    sithCog_SendMessage(sithPlayer_g_pLocalPlayerThing->capture_cog, SITH_MESSAGE_SPLASH, 3, pThing->thingIdx, 0, 0, 0);
                 }
             }
         }

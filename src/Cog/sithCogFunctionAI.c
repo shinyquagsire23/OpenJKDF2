@@ -535,7 +535,7 @@ void sithCogFunctionAI_AISetInterest(sithCog *ctx)
     sithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing && pThing->controlType == SITH_CT_AI && pThing->actor) 
     {
-        if (pInterest == sithPlayer_pLocalPlayerThing) {
+        if (pInterest == sithPlayer_g_pLocalPlayerThing) {
             pThing->actor->pInterest = 0;
         }
         else {

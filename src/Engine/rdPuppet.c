@@ -160,7 +160,7 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
     {
         v4 = &puppet->tracks[i];
 
-        //if (thing->parentSithThing == sithPlayer_pLocalPlayerThing && v4->keyframe)
+        //if (thing->parentSithThing == sithPlayer_g_pLocalPlayerThing && v4->keyframe)
         //    stdPlatform_Printf("%d %s (%x/%u) %p %x %f\n", i, v4->keyframe->name, v4->keyframe->id, v4->keyframe->id, v4->keyframe, v4->status, v4->playSpeed);
 
         // Added: paJoints check
@@ -421,7 +421,7 @@ int rdPuppet_UpdateTracks(rdPuppet *puppet, flex_t deltaSeconds)
         {
             track->playSpeed -= track->fadeSpeed * deltaSeconds;
             
-            //if (puppet->rdthing->parentSithThing == sithPlayer_pLocalPlayerThing)
+            //if (puppet->rdthing->parentSithThing == sithPlayer_g_pLocalPlayerThing)
             //    stdPlatform_Printf("%u %f %f %f %f %u\n", v2, track->playSpeed, track->fadeSpeed, deltaSeconds, track->field_124, track->keyframe->numFrames);
             
             if ( track->playSpeed <= 0.0 ) // verified

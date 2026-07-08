@@ -334,8 +334,8 @@ void jkPlayer_Shutdown()
 void jkPlayer_Open()
 {
     // MOTS added
-    if (sithPlayer_pLocalPlayerThing && sithPlayer_pLocalPlayerThing->playerInfo) {
-        sithPlayer_pLocalPlayerThing->playerInfo->personality = jkPlayer_personality;
+    if (sithPlayer_g_pLocalPlayerThing && sithPlayer_g_pLocalPlayerThing->playerInfo) {
+        sithPlayer_g_pLocalPlayerThing->playerInfo->personality = jkPlayer_personality;
     }
 }
 
@@ -1025,7 +1025,7 @@ void jkPlayer_renderSaberWeaponMesh(sithThing *thing)
 
     if (thing->jkFlags & JKFLAG_PERSUASION)
     {
-        if ( sithPlayer_pLocalPlayer->iteminfo[SITHBIN_F_SEEING].state & ITEMSTATE_ACTIVATE )
+        if ( sithPlayer_g_pLocalPlayer->iteminfo[SITHBIN_F_SEEING].state & ITEMSTATE_ACTIVATE )
         {
             rdGeoMode_t oldGeoMode = thing->rdthing.curGeoMode;
 #ifdef TARGET_TWL

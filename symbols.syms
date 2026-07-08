@@ -722,8 +722,8 @@ jkPlayer_otherThings 0x008592E0 jkPlayerInfo[NUM_JKPLAYER_THINGS]
 jkPlayer_bLoadingSomething 0x00525470 int = 1
 playerThingIdx 0x83199C int
 jkPlayer_maxPlayers 0x8319A0 uint32_t
-sithPlayer_pLocalPlayerThing 0x8319A4 sithThing*
-sithPlayer_pLocalPlayer 0x8319A8 sithPlayerInfo*
+sithPlayer_g_pLocalPlayerThing 0x8319A4 sithThing*
+sithPlayer_g_pLocalPlayer 0x8319A8 sithPlayerInfo*
 playerThings 0x85B580 jkPlayerInfo[JKPLAYER_NUM_INFOS]
 jkSaber_rotateMat 0x85FA80 rdMatrix34
 jkPlayer_setRotateOverlayMap 0x00860764 int

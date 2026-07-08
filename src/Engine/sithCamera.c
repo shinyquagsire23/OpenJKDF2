@@ -254,7 +254,7 @@ void sithCamera_Update(sithCamera *cam)
                 }
 
                 // MOTS added: hmm??
-                if (Main_bMotsCompat || focusThing == sithPlayer_pLocalPlayerThing )
+                if (Main_bMotsCompat || focusThing == sithPlayer_g_pLocalPlayerThing )
                 {
                     rdVector_Add3Acc(&v76, &sithCamera_g_vecCameraAngleOffset);
                 }
@@ -266,7 +266,7 @@ void sithCamera_Update(sithCamera *cam)
                     rdMatrix_PreTranslate34(&cam->viewMat, &focusThing->actorParams.eyeOffset);
                     
                     // MOTS added: hmm??
-                    if (Main_bMotsCompat || focusThing == sithPlayer_pLocalPlayerThing )
+                    if (Main_bMotsCompat || focusThing == sithPlayer_g_pLocalPlayerThing )
                         rdMatrix_PreTranslate34(&cam->viewMat, &sithCamera_g_vecCameraPosOffset);
                 }
                 rdMatrix_Normalize34(&cam->viewMat);

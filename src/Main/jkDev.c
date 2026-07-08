@@ -575,7 +575,7 @@ int jkDev_CmdDispStats(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 
 int jkDev_CmdKill(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
-    sithActor_DamageActor(sithPlayer_pLocalPlayerThing, sithPlayer_pLocalPlayerThing, 200.0, 1);
+    sithActor_DamageActor(sithPlayer_g_pLocalPlayerThing, sithPlayer_g_pLocalPlayerThing, 200.0, 1);
     return 1;
 }
 
@@ -686,47 +686,47 @@ int jkDev_CmdAllWeapons(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     if ( !sithNet_isMulti )
     {
         if (!Main_bMotsCompat) {
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_STORMTROOPER_RIFLE, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_THERMAL_DETONATOR, 100.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_TUSKEN_PROD, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_REPEATER, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_RAIL_DETONATOR, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_SEQUENCER_CHARGE, 100.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_CONCUSSION_RIFLE, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_LIGHTSABER, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_ENERGY, 500.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_POWER, 500.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_BATTERY, 100.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_FORCEMANA, 100.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_RAILCHARGES, 100.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_STORMTROOPER_RIFLE, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_THERMAL_DETONATOR, 100.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_TUSKEN_PROD, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_REPEATER, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_RAIL_DETONATOR, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_SEQUENCER_CHARGE, 100.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_CONCUSSION_RIFLE, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_LIGHTSABER, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_ENERGY, 500.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_POWER, 500.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_BATTERY, 100.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_FORCEMANA, 100.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_RAILCHARGES, 100.0);
         }
 
         if (Main_bMotsCompat) {
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_BRYARPISTOL, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_STORMTROOPER_RIFLE, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_THERMAL_DETONATOR, 100.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_CARBO_GUN, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_REPEATER, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_RAIL_DETONATOR, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_SEQUENCER_CHARGE, 100.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_CONCUSSION_RIFLE, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_EWEB, 100.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_LIGHTSABER, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_BLASTECH, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_STORMTROOPER_SCOPE, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_FLASH_BOMB, 100.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_TUSKEN_PROD, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_RAIL_SEEKER, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_MOTS_MANUAL_SEQUENCER, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_MOTS_BRYARPISTOL, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_MOTS_STORMTROOPER_RIFLE, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_MOTS_THERMAL_DETONATOR, 100.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_MOTS_CARBO_GUN, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_MOTS_REPEATER, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_MOTS_RAIL_DETONATOR, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_MOTS_SEQUENCER_CHARGE, 100.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_MOTS_CONCUSSION_RIFLE, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_MOTS_EWEB, 100.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_MOTS_LIGHTSABER, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_MOTS_BLASTECH, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_MOTS_STORMTROOPER_SCOPE, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_MOTS_FLASH_BOMB, 100.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_MOTS_TUSKEN_PROD, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_MOTS_RAIL_SEEKER, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_MOTS_MANUAL_SEQUENCER, 1.0);
 
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_ENERGY, 500.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_POWER, 500.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_BATTERY, 100.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_FORCEMANA, 100.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_RAILCHARGES, 100.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_CARBPELLETS, 100.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_SEEKRAILS, 100.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_EWEB_ROUNDS, 500.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_ENERGY, 500.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_POWER, 500.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_BATTERY, 100.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_FORCEMANA, 100.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_RAILCHARGES, 100.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_CARBPELLETS, 100.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_SEEKRAILS, 100.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_EWEB_ROUNDS, 500.0);
         }
 
         sithConsole_PrintWString(jkStrings_GetUniStringWithFallback("GAME_ALLWEAPONS"));
@@ -741,70 +741,70 @@ int jkDev_CmdAllItems(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     {
         if (!Main_bMotsCompat)
         {
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_BACTATANK, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_IRGOGGLES, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_FIELDLIGHT, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_KEYIMPERIAL, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_WRENCH, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_DATADISK, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_KEYRED, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_KEYBLUE, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_KEYYELLOW, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_WRCHBLUE, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_WRCHYELLOW, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_KEYGREEN, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_BACTATANK, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_IRGOGGLES, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_FIELDLIGHT, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_KEYIMPERIAL, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_WRENCH, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_DATADISK, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_KEYRED, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_KEYBLUE, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_KEYYELLOW, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_WRCHBLUE, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_WRCHYELLOW, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_KEYGREEN, 1);
 
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_BACTATANK, 9.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_IRGOGGLES, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_FIELDLIGHT, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_KEYIMPERIAL, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_WRENCH, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_DATADISK, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_KEYRED, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_KEYBLUE, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_KEYYELLOW, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_WRCHBLUE, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_WRCHYELLOW, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_KEYGREEN, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_BACTATANK, 9.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_IRGOGGLES, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_FIELDLIGHT, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_KEYIMPERIAL, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_WRENCH, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_DATADISK, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_KEYRED, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_KEYBLUE, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_KEYYELLOW, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_WRCHBLUE, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_WRCHYELLOW, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_KEYGREEN, 1.0);
         }
         else {
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_BACTATANK, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_IRGOGGLES, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_FIELDLIGHT, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_KEYIMPERIAL, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_WRENCH, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_DATADISK, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_KEYRED, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_KEYBLUE, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_KEYYELLOW, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_WRCHBLUE, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_WRCHYELLOW, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_KEYGREEN, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_TSKNCLOTHES, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_HVYEXPLOSIVE, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_HLCRN, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_DRARM, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_PRYBAR, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_RADIO, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_BACTATANK, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_IRGOGGLES, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_FIELDLIGHT, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_KEYIMPERIAL, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_WRENCH, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_DATADISK, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_KEYRED, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_KEYBLUE, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_KEYYELLOW, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_WRCHBLUE, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_WRCHYELLOW, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_KEYGREEN, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_TSKNCLOTHES, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_HVYEXPLOSIVE, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_HLCRN, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_DRARM, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_PRYBAR, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_RADIO, 1);
 
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_BACTATANK, 9.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_IRGOGGLES, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_FIELDLIGHT, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_KEYIMPERIAL, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_WRENCH, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_DATADISK, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_KEYRED, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_KEYBLUE, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_KEYYELLOW, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_WRCHBLUE, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_WRCHYELLOW, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_KEYGREEN, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_TSKNCLOTHES, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_HVYEXPLOSIVE, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_HLCRN, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_DRARM, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_PRYBAR, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_RADIO, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_BACTATANK, 9.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_IRGOGGLES, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_FIELDLIGHT, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_KEYIMPERIAL, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_WRENCH, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_DATADISK, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_KEYRED, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_KEYBLUE, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_KEYYELLOW, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_WRCHBLUE, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_WRCHYELLOW, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_KEYGREEN, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_TSKNCLOTHES, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_HVYEXPLOSIVE, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_HLCRN, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_DRARM, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_PRYBAR, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_RADIO, 1.0);
         }
         sithConsole_PrintWString(jkStrings_GetUniStringWithFallback("GAME_ALLITEMS"));
     }
@@ -817,32 +817,32 @@ int jkDev_CmdLightMaster(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 
     if ( !sithNet_isMulti )
     {
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_JEDI_RANK, 2.0);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_JEDI_RANK, 2.0);
         jkPlayer_SetRank(2);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_FORCEMANA, (flex_t)(50 * jkPlayer_GetJediRank()));
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_JUMP, 1);
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_SPEED, 1);
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_SEEING, 1);
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_PULL, 1);
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_HEALING, 1);
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_PERSUASION, 1);
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_ABSORB, 1);
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_BLINDING, 1);
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_PROTECTION, 1);
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_THROW, 0);
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_GRIP, 0);
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_LIGHTNING, 0);
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_DESTRUCTION, 0);
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_DEADLYSIGHT, 0);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_JUMP, 1.0);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_SPEED, 1.0);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_SEEING, 1.0);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_PULL, 1.0);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_HEALING, 1.0);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_PERSUASION, 1.0);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_BLINDING, 1.0);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_ABSORB, 1.0);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_PROTECTION, 1.0);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_FORCEMANA, (flex_t)(50 * jkPlayer_GetJediRank()));
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_JUMP, 1);
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_SPEED, 1);
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_SEEING, 1);
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PULL, 1);
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_HEALING, 1);
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PERSUASION, 1);
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_ABSORB, 1);
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_BLINDING, 1);
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PROTECTION, 1);
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_THROW, 0);
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_GRIP, 0);
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_LIGHTNING, 0);
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_DESTRUCTION, 0);
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_DEADLYSIGHT, 0);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_JUMP, 1.0);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_SPEED, 1.0);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_SEEING, 1.0);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PULL, 1.0);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_HEALING, 1.0);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PERSUASION, 1.0);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_BLINDING, 1.0);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_ABSORB, 1.0);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PROTECTION, 1.0);
         sithConsole_PrintWString(jkStrings_GetUniStringWithFallback("GAME_LIGHTMASTER"));
     }
     return 1;
@@ -854,32 +854,32 @@ int jkDev_CmdDarkMaster(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 
     if ( !sithNet_isMulti )
     {
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_JEDI_RANK, 2.0);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_JEDI_RANK, 2.0);
         jkPlayer_SetRank(2);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_FORCEMANA, (flex_t)(50 * jkPlayer_GetJediRank()));
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_JUMP, 1);
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_SPEED, 1);
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_SEEING, 1);
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_PULL, 1);
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_HEALING, 0);
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_PERSUASION, 0);
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_ABSORB, 0);
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_BLINDING, 0);
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_PROTECTION, 0);
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_THROW, 1);
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_GRIP, 1);
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_LIGHTNING, 1);
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_DESTRUCTION, 1);
-        sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_DEADLYSIGHT, 1);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_JUMP, 1.0);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_SPEED, 1.0);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_SEEING, 1.0);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_PULL, 1.0);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_THROW, 1.0);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_GRIP, 1.0);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_LIGHTNING, 1.0);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_DESTRUCTION, 1.0);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_DEADLYSIGHT, 1.0);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_FORCEMANA, (flex_t)(50 * jkPlayer_GetJediRank()));
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_JUMP, 1);
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_SPEED, 1);
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_SEEING, 1);
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PULL, 1);
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_HEALING, 0);
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PERSUASION, 0);
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_ABSORB, 0);
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_BLINDING, 0);
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PROTECTION, 0);
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_THROW, 1);
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_GRIP, 1);
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_LIGHTNING, 1);
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_DESTRUCTION, 1);
+        sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_DEADLYSIGHT, 1);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_JUMP, 1.0);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_SPEED, 1.0);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_SEEING, 1.0);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PULL, 1.0);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_THROW, 1.0);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_GRIP, 1.0);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_LIGHTNING, 1.0);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_DESTRUCTION, 1.0);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_DEADLYSIGHT, 1.0);
         sithConsole_PrintWString(jkStrings_GetUniStringWithFallback("GAME_DARKMASTER"));
     }
     return 1;
@@ -892,80 +892,80 @@ int jkDev_CmdUberJedi(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     {
         if (!Main_bMotsCompat)
         {
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_JEDI_RANK, 2.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_JEDI_RANK, 2.0);
             jkPlayer_SetRank(2);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_FORCEMANA, 100.0);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_JUMP, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_SPEED, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_SEEING, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_PULL, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_HEALING, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_PERSUASION, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_ABSORB, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_BLINDING, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_PROTECTION, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_THROW, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_GRIP, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_LIGHTNING, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_DESTRUCTION, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_DEADLYSIGHT, 1);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_JUMP, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_SPEED, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_SEEING, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_PULL, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_HEALING, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_PERSUASION, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_BLINDING, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_ABSORB, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_PROTECTION, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_THROW, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_GRIP, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_LIGHTNING, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_DESTRUCTION, 1.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_DEADLYSIGHT, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_FORCEMANA, 100.0);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_JUMP, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_SPEED, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_SEEING, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PULL, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_HEALING, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PERSUASION, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_ABSORB, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_BLINDING, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PROTECTION, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_THROW, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_GRIP, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_LIGHTNING, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_DESTRUCTION, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_DEADLYSIGHT, 1);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_JUMP, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_SPEED, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_SEEING, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PULL, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_HEALING, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PERSUASION, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_BLINDING, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_ABSORB, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PROTECTION, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_THROW, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_GRIP, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_LIGHTNING, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_DESTRUCTION, 1.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_DEADLYSIGHT, 1.0);
         }
         else {
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_JEDI_RANK, 8.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_JEDI_RANK, 8.0);
             jkPlayer_SetRank(8);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_FORCEMANA, 400.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_FORCEMANA, 400.0);
 
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_JUMP, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_SPEED, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_SEEING, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_PULL, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_HEALING, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_PERSUASION, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_ABSORB, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_BLINDING, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_PROTECTION, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_GRIP, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_DESTRUCTION, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_DEADLYSIGHT, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_FARSIGHT, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_PROJECT, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_SABERTHROW, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_PUSH, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_CHAINLIGHT, 1);
-            sithInventory_SetInventoryAvailable(sithPlayer_pLocalPlayerThing, SITHBIN_F_DEFENSE, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_JUMP, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_SPEED, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_SEEING, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PULL, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_HEALING, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PERSUASION, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_ABSORB, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_BLINDING, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PROTECTION, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_GRIP, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_DESTRUCTION, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_DEADLYSIGHT, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_FARSIGHT, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PROJECT, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_SABERTHROW, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PUSH, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_CHAINLIGHT, 1);
+            sithInventory_SetInventoryAvailable(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_DEFENSE, 1);
 
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_JUMP, 4.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_SPEED, 4.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_SEEING, 4.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_PULL, 4.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_HEALING, 4.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_PERSUASION, 4.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_ABSORB, 4.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_BLINDING, 4.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_PROTECTION, 4.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_GRIP, 4.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_DESTRUCTION, 4.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_DEADLYSIGHT, 4.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_FARSIGHT, 4.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_PROJECT, 4.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_SABERTHROW, 4.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_PUSH, 4.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_CHAINLIGHT, 4.0);
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_DEFENSE, 4.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_JUMP, 4.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_SPEED, 4.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_SEEING, 4.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PULL, 4.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_HEALING, 4.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PERSUASION, 4.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_ABSORB, 4.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_BLINDING, 4.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PROTECTION, 4.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_GRIP, 4.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_DESTRUCTION, 4.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_DEADLYSIGHT, 4.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_FARSIGHT, 4.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PROJECT, 4.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_SABERTHROW, 4.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PUSH, 4.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_CHAINLIGHT, 4.0);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_DEFENSE, 4.0);
         }
         
         sithConsole_PrintWString(jkStrings_GetUniStringWithFallback("GAME_UBERJEDI"));
@@ -981,37 +981,37 @@ int jkDev_CmdLevelUp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         jkDev_amt = jkDev_amt - -1.0;
         if ( jkDev_amt > 4.0 )
             jkDev_amt = 1.0;
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_JEDI_RANK, jkDev_amt + jkDev_amt);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_JEDI_RANK, jkDev_amt + jkDev_amt);
         jkPlayer_SetRank((__int64)(jkDev_amt + jkDev_amt));
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_FORCEMANA, (flex_t)(50 * jkPlayer_GetJediRank()));
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_JUMP, jkDev_amt);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_SPEED, jkDev_amt);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_SEEING, jkDev_amt);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_PULL, jkDev_amt);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_HEALING, jkDev_amt);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_PERSUASION, jkDev_amt);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_ABSORB, jkDev_amt);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_BLINDING, jkDev_amt);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_PROTECTION, jkDev_amt);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_FORCEMANA, (flex_t)(50 * jkPlayer_GetJediRank()));
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_JUMP, jkDev_amt);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_SPEED, jkDev_amt);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_SEEING, jkDev_amt);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PULL, jkDev_amt);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_HEALING, jkDev_amt);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PERSUASION, jkDev_amt);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_ABSORB, jkDev_amt);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_BLINDING, jkDev_amt);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_PROTECTION, jkDev_amt);
         if (!Main_bMotsCompat)
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_THROW, jkDev_amt);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_GRIP, jkDev_amt);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_THROW, jkDev_amt);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_GRIP, jkDev_amt);
         if (!Main_bMotsCompat)
-            sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_LIGHTNING, jkDev_amt);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_DESTRUCTION, jkDev_amt);
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_F_DEADLYSIGHT, jkDev_amt);
+            sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_LIGHTNING, jkDev_amt);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_DESTRUCTION, jkDev_amt);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_F_DEADLYSIGHT, jkDev_amt);
 
         if (!Main_bMotsCompat) {
             flex_t v9 = 0.0;
             for (int i = SITHBIN_F_HEALING; i <= SITHBIN_F_ABSORB; ++i )
             {
-                if ( sithInventory_GetCarries(sithPlayer_pLocalPlayerThing, i) )
-                    v9 = sithInventory_GetInventory(sithPlayer_pLocalPlayerThing, i) * 5.0 + v9;
+                if ( sithInventory_GetCarries(sithPlayer_g_pLocalPlayerThing, i) )
+                    v9 = sithInventory_GetInventory(sithPlayer_g_pLocalPlayerThing, i) * 5.0 + v9;
             }
             for (int j = SITHBIN_F_THROW; j <= SITHBIN_F_DESTRUCTION; ++j )
             {
-                if ( sithInventory_GetCarries(sithPlayer_pLocalPlayerThing, j) )
-                    v9 = v9 - sithInventory_GetInventory(sithPlayer_pLocalPlayerThing, j) * 5.0;
+                if ( sithInventory_GetCarries(sithPlayer_g_pLocalPlayerThing, j) )
+                    v9 = v9 - sithInventory_GetInventory(sithPlayer_g_pLocalPlayerThing, j) * 5.0;
             }
         }
 
@@ -1024,8 +1024,8 @@ int jkDev_CmdHeal(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
     {
-        sithPlayer_pLocalPlayerThing->actorParams.health = sithPlayer_pLocalPlayerThing->actorParams.maxHealth;
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_SHIELDS, 200.0);
+        sithPlayer_g_pLocalPlayerThing->actorParams.health = sithPlayer_g_pLocalPlayerThing->actorParams.maxHealth;
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_SHIELDS, 200.0);
         sithConsole_PrintWString(jkStrings_GetUniStringWithFallback("GAME_HEAL"));
     }
     return 1;
@@ -1045,7 +1045,7 @@ int jkDev_CmdMana(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
     {
-        sithInventory_SetInventory(sithPlayer_pLocalPlayerThing, SITHBIN_FORCEMANA, 400.0);
+        sithInventory_SetInventory(sithPlayer_g_pLocalPlayerThing, SITHBIN_FORCEMANA, 400.0);
         sithConsole_PrintWString(jkStrings_GetUniStringWithFallback("GAME_MANA"));
     }
     return 1;

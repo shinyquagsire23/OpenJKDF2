@@ -52,7 +52,7 @@ void sithPlayerActions_Activate(sithThing *thing)
                 if ( (searchResult->hitType & SITHCOLLISION_WORLD) != 0 )
                 {
 #ifdef DEBUG_QOL_CHEATS
-                    if (searchResult->surface && searchResult->surface->surfaceInfo.face.material && thing == sithPlayer_pLocalPlayerThing)
+                    if (searchResult->surface && searchResult->surface->surfaceInfo.face.material && thing == sithPlayer_g_pLocalPlayerThing)
                         jk_printf("OpenJKDF2: Debug surf %s\n", searchResult->surface->surfaceInfo.face.material->mat_fpath);
 #endif
                     if (searchResult->surface->surfaceFlags & SITH_SURFACE_COG_LINKED)
@@ -67,7 +67,7 @@ void sithPlayerActions_Activate(sithThing *thing)
                     v7 = searchResult->receiver;
 #ifdef DEBUG_QOL_CHEATS
 #ifdef SITH_DEBUG_STRUCT_NAMES
-                    if (v7 && thing == sithPlayer_pLocalPlayerThing)
+                    if (v7 && thing == sithPlayer_g_pLocalPlayerThing)
                         jk_printf("OpenJKDF2: Debug thing %s\n", v7->template_name);
 #endif
 #endif

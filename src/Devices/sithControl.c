@@ -266,9 +266,9 @@ void sithControl_Update(flex_t deltaSecs, int deltaMs)
         return;
 
     // MOTS altered
-    if ( !sithPlayer_pLocalPlayerThing
-      || (sithPlayer_pLocalPlayerThing->actorParams.typeflags & (Main_bMotsCompat ? (SITH_AF_NOHUD|SITH_AF_SCOPEHUD|SITH_AF_80000000) : SITH_AF_NOHUD))
-      || (sithPlayer_pLocalPlayerThing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0
+    if ( !sithPlayer_g_pLocalPlayerThing
+      || (sithPlayer_g_pLocalPlayerThing->actorParams.typeflags & (Main_bMotsCompat ? (SITH_AF_NOHUD|SITH_AF_SCOPEHUD|SITH_AF_80000000) : SITH_AF_NOHUD))
+      || (sithPlayer_g_pLocalPlayerThing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0
       || (sithCamera_g_stateFlags & 1) != 0 )
     {
         if ( sithCamera_g_pCurCamera == &sithCamera_g_aCameras[4] )

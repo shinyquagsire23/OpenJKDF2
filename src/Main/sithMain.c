@@ -516,7 +516,7 @@ void sithOpenPostProcess()
     //g_debugmodeFlags |= 1;
 #endif
     sithTime_Startup();
-    sithInventory_ResetInventory(sithPlayer_pLocalPlayerThing);
+    sithInventory_ResetInventory(sithPlayer_g_pLocalPlayerThing);
 
     sithCog_BroadcastMessage(SITH_MESSAGE_STARTUP, 0, 0, 0, 0);
     for (uint32_t v2 = 0; v2 < sithWorld_g_pCurrentWorld->numThingsLoaded; v2++)
@@ -537,7 +537,7 @@ void sithOpenPostProcess()
 
     if ( sithNet_isMulti )
     {
-        sithPlayer_NewPlayer(sithPlayer_pLocalPlayerThing);
+        sithPlayer_NewPlayer(sithPlayer_g_pLocalPlayerThing);
         sithMulti_SendWelcome(stdComm_dplayIdSelf, playerThingIdx, -1);
         sithMulti_SendWelcome(stdComm_dplayIdSelf, playerThingIdx, -1);
         sithTime_Startup();

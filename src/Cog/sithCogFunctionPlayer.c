@@ -124,8 +124,8 @@ void sithCogFunctionPlayer_GetAbsoluteMaxPlayers(sithCog *ctx)
 
 void sithCogFunctionPlayer_GetLocalPlayerThing(sithCog *ctx)
 {
-    if (sithPlayer_pLocalPlayerThing)
-        sithCogExec_PushInt(ctx, sithPlayer_pLocalPlayerThing->thingIdx);
+    if (sithPlayer_g_pLocalPlayerThing)
+        sithCogExec_PushInt(ctx, sithPlayer_g_pLocalPlayerThing->thingIdx);
     else
         sithCogExec_PushInt(ctx, -1);
 }
@@ -571,7 +571,7 @@ void sithCogFunctionPlayer_SyncScores(sithCog *ctx)
 // MOTS added
 void sithCogFunctionPlayer_KillPlayerQuietly(sithCog *ctx)
 {
-    sithActor_KillActor(sithPlayer_pLocalPlayerThing, NULL, 12345678); // Magic number special case
+    sithActor_KillActor(sithPlayer_g_pLocalPlayerThing, NULL, 12345678); // Magic number special case
     return;
 }
 

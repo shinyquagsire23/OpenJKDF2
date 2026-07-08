@@ -610,10 +610,10 @@ void jkHud_Draw()
     if (
         jkPlayer_setCrosshair 
         && sithCamera_g_pCurCamera->cameraPerspective == 1
-        && !(sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD) 
-        && MOTS_ONLY_COND(!(sithPlayer_pLocalPlayerThing->actorParams.typeflags & SITH_AF_SCOPEHUD))
+        && !(sithPlayer_g_pLocalPlayerThing->thingflags & SITH_TF_DEAD) 
+        && MOTS_ONLY_COND(!(sithPlayer_g_pLocalPlayerThing->actorParams.typeflags & SITH_AF_SCOPEHUD))
 #ifdef QOL_IMPROVEMENTS
-        && jkHud_shouldCrosshairBeShownForWeapon(sithPlayer_pLocalPlayerThing)
+        && jkHud_shouldCrosshairBeShownForWeapon(sithPlayer_g_pLocalPlayerThing)
 #endif /* ifdef QOL_IMPROVEMENTS */
 
     )
@@ -1201,10 +1201,10 @@ void jkHud_DrawGPU()
     if (
         jkPlayer_setCrosshair
         && sithCamera_g_pCurCamera->cameraPerspective == 1 
-        && !(sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD) 
-        && MOTS_ONLY_COND(!(sithPlayer_pLocalPlayerThing->actorParams.typeflags & SITH_AF_SCOPEHUD))
+        && !(sithPlayer_g_pLocalPlayerThing->thingflags & SITH_TF_DEAD) 
+        && MOTS_ONLY_COND(!(sithPlayer_g_pLocalPlayerThing->actorParams.typeflags & SITH_AF_SCOPEHUD))
 #ifdef QOL_IMPROVEMENTS
-        && jkHud_shouldCrosshairBeShownForWeapon(sithPlayer_pLocalPlayerThing)
+        && jkHud_shouldCrosshairBeShownForWeapon(sithPlayer_g_pLocalPlayerThing)
 #endif /* ifdef QOL_IMPROVEMENTS */
   )
     {

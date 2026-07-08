@@ -409,7 +409,7 @@ int sithGamesave_SerializeInventoryOnly(int mpFlags)
     for (int v19 = 0; v19 < SITHBIN_NUMBINS; v19++)
     {
         if ( (sithInventory_g_aTypes[v19].flags & ITEMINFO_VALID) != 0 )
-            sithDSS_Inventory(sithPlayer_pLocalPlayerThing, v19, 0, mpFlags);
+            sithDSS_Inventory(sithPlayer_g_pLocalPlayerThing, v19, 0, mpFlags);
     }
     return 1;
 }
@@ -485,7 +485,7 @@ int sithGamesave_SaveCurrentWorld(int mpFlags)
     for (v19 = 0; v19 < SITHBIN_NUMBINS; v19++) // TODO define this maximum
     {
         if ( (sithInventory_g_aTypes[v19].flags & ITEMINFO_VALID) != 0 )
-            sithDSS_Inventory(sithPlayer_pLocalPlayerThing, v19, 0, mpFlags);
+            sithDSS_Inventory(sithPlayer_g_pLocalPlayerThing, v19, 0, mpFlags);
     }
 
     sithSurface_SyncFull(mpFlags);
@@ -512,7 +512,7 @@ int sithGamesave_Save(char *saveFname, int a2, int a3, wchar_t *saveName)
 
     if ( (g_submodeFlags & 1) != 0 )
         return 0;
-    if ( (sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD) != 0 )
+    if ( (sithPlayer_g_pLocalPlayerThing->thingflags & SITH_TF_DEAD) != 0 )
         return 0;
 
     // Added: multiple versions
@@ -557,10 +557,10 @@ int sithGamesave_Save(char *saveFname, int a2, int a3, wchar_t *saveName)
         sithGamesave_headerTmp.jklName[127] = 0;
         _wcsncpy(sithGamesave_headerTmp.saveName, v5, 0xFFu);
         sithGamesave_headerTmp.saveName[255] = 0;
-        sithGamesave_headerTmp.playerHealth = sithPlayer_pLocalPlayerThing->actorParams.health;
-        sithGamesave_headerTmp.playerMaxHealth = sithPlayer_pLocalPlayerThing->actorParams.maxHealth;
+        sithGamesave_headerTmp.playerHealth = sithPlayer_g_pLocalPlayerThing->actorParams.health;
+        sithGamesave_headerTmp.playerMaxHealth = sithPlayer_g_pLocalPlayerThing->actorParams.maxHealth;
         v7 = sithGamesave_headerTmp.binAmts;
-        v8 = sithPlayer_pLocalPlayer->iteminfo;
+        v8 = sithPlayer_g_pLocalPlayer->iteminfo;
         do
         {
             *v7++ = v8->ammoAmt;
@@ -599,7 +599,7 @@ int sithGamesave_Process()
             return sithGamesave_state - SITH_GS_LOAD_DEBUG_NEXTCHECKPOINT;
         if ( sithGamesave_RestoreFile(sithGamesave_aCurFilename) )
         {
-            sithPlayer_NewPlayer(sithPlayer_pLocalPlayerThing);
+            sithPlayer_NewPlayer(sithPlayer_g_pLocalPlayerThing);
             sithGamesave_state = SITH_GS_NONE;
             return 1;
         }
@@ -608,7 +608,7 @@ int sithGamesave_Process()
         sithGamesave_state = SITH_GS_NONE;
         return 1;
     }
-    if ( (sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD) == 0 && stdConffile_OpenWriteBypass(sithGamesave_aCurFilename) )
+    if ( (sithPlayer_g_pLocalPlayerThing->thingflags & SITH_TF_DEAD) == 0 && stdConffile_OpenWriteBypass(sithGamesave_aCurFilename) )
     {
         int multiplayerFlagsSave = sithMessage_g_outputstream;
         sithMessage_g_outputstream = 4;

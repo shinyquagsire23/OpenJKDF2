@@ -583,7 +583,7 @@ sithThing* sithWeapon_WeaponFireProjectile(sithThing *sender, sithThing *project
         }
 
         // TODO Co-op
-        if ( !sithNet_isMulti && jkPlayer_setDiff && sender == sithPlayer_pLocalPlayerThing && (v9->weaponParams.typeflags & SITH_WF_TRIGGER_AIEVENT) != 0 )
+        if ( !sithNet_isMulti && jkPlayer_setDiff && sender == sithPlayer_g_pLocalPlayerThing && (v9->weaponParams.typeflags & SITH_WF_TRIGGER_AIEVENT) != 0 )
         {
             v18 = rdVector_Normalize3(&a5a, &v9->physicsParams.vel) * 3.0;
             a6 = v18 >= 5.0 ? (flex_t)5.0 : (flex_t)v18; // FLEXTODO
@@ -720,7 +720,7 @@ int sithWeapon_ThingCollisionHandler(sithThing *physicsThing, sithThing *collide
     if (collidedThing->weaponParams.typeflags & SITH_WF_INSTANT_IMPACT
       && bFlagsHadWfImpactSoundFxEarlier
       && !(collidedThing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED))
-      && (collidedThing != sithPlayer_pLocalPlayerThing || sithTime_g_secGameTime >= (flex_d_t)sithWeapon_fireWait)
+      && (collidedThing != sithPlayer_g_pLocalPlayerThing || sithTime_g_secGameTime >= (flex_d_t)sithWeapon_fireWait)
       && sithActor_thing_anim_blocked(physicsThing, collidedThing, a4) )
     {
         return 1;
@@ -862,7 +862,7 @@ void sithWeapon_CreateWeaponExplosion(sithThing *weapon, sithThing *explodeTempl
         if (spawned)
         {
             // Added: second comparison, co-op
-            if (player == sithPlayer_pLocalPlayerThing || player->type == SITH_THING_PLAYER) {
+            if (player == sithPlayer_g_pLocalPlayerThing || player->type == SITH_THING_PLAYER) {
                 sithAIAwareness_CreateTransmittingEvent(spawned->sector, &spawned->position, 0, 2.0, player);
             }
             if (weapon->thingflags & SITH_TF_INVULN)

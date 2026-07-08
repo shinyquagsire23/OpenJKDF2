@@ -568,7 +568,7 @@ int jkEpisode_UpdateExtra(sithThing *pPlayerThing)
     jkSaber_UpdateLength(pPlayerThing);
 
 #ifdef JKM_DSS
-    if (Main_bMotsCompat && pPlayerThing == sithPlayer_pLocalPlayerThing) {
+    if (Main_bMotsCompat && pPlayerThing == sithPlayer_g_pLocalPlayerThing) {
         uint32_t uVar1;
         int iVar3;
         int iVar4;

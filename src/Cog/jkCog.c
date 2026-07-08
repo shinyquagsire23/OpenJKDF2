@@ -122,7 +122,7 @@ void jkCog_dwPlayCammySpeech(sithCog* ctx)
 
 void jkCog_dwGetActivateBin(sithCog *ctx)
 {
-    sithCogExec_PushInt(ctx, sithInventory_GetCurrentItem(sithPlayer_pLocalPlayerThing));
+    sithCogExec_PushInt(ctx, sithInventory_GetCurrentItem(sithPlayer_g_pLocalPlayerThing));
 }
 #endif
 
@@ -327,7 +327,7 @@ void jkCog_StopPovKey(sithCog *ctx)
 
 void jkCog_SetForceSpeed(sithCog *pCog)
 {
-    sithPlayer_pLocalPlayerThing->actorParams.extraSpeed = sithCogExec_PopFlex(pCog);
+    sithPlayer_g_pLocalPlayerThing->actorParams.extraSpeed = sithCogExec_PopFlex(pCog);
 }
 
 void jkCog_SetInvis(sithCog *pCog)
@@ -894,8 +894,8 @@ LABEL_8:
 void jkCog_BeginCutscene(sithCog *ctx)
 {
     jkGuiMultiplayer_mpcInfo.pCutsceneCog = ctx;
-    if (sithPlayer_pLocalPlayerThing) {
-        sithPlayer_pLocalPlayerThing->actorParams.typeflags |= SITH_AF_NOHUD;
+    if (sithPlayer_g_pLocalPlayerThing) {
+        sithPlayer_g_pLocalPlayerThing->actorParams.typeflags |= SITH_AF_NOHUD;
     }
 }
 
@@ -903,8 +903,8 @@ void jkCog_BeginCutscene(sithCog *ctx)
 void jkCog_EndCutscene(sithCog *ctx)
 {
     jkGuiMultiplayer_mpcInfo.pCutsceneCog = NULL;
-    if (sithPlayer_pLocalPlayerThing) {
-        sithPlayer_pLocalPlayerThing->actorParams.typeflags &= ~SITH_AF_NOHUD;
+    if (sithPlayer_g_pLocalPlayerThing) {
+        sithPlayer_g_pLocalPlayerThing->actorParams.typeflags &= ~SITH_AF_NOHUD;
     }
 }
 
@@ -966,7 +966,7 @@ void jkCog_GetBubbleDistance(sithCog *ctx)
     flex_t tmp;
     
     sithThing* pThing = sithCogExec_PopThing(ctx);
-    if (pThing == sithPlayer_pLocalPlayerThing) {
+    if (pThing == sithPlayer_g_pLocalPlayerThing) {
         iVar1 = playerThings[playerThingIdx].jkmUnk4;
         tmp = playerThings[playerThingIdx].jkmUnk6;
     }

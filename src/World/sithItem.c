@@ -52,7 +52,7 @@ void sithItem_SetItemTaken(sithThing *item, sithThing *actor, int a3)
         return;
     }
 
-    if ( actor == sithPlayer_pLocalPlayerThing )
+    if ( actor == sithPlayer_g_pLocalPlayerThing )
     {
         sithCog_ThingSendMessage(item, actor, SITH_MESSAGE_TAKEN);
     }

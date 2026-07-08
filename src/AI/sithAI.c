@@ -1658,7 +1658,7 @@ void sithAI_SetDistractor(sithThing *pDistractor)
     sithThing **ppsVar2;
     sithThing *pPlayer;
 
-    pPlayer = sithPlayer_pLocalPlayerThing;
+    pPlayer = sithPlayer_g_pLocalPlayerThing;
     if (sithAI_pDistractor) 
     {
         for (int i = 0; i < SITHAI_MAX_ACTORS; i++) {

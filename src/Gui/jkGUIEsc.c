@@ -95,16 +95,16 @@ void jkGuiEsc_Show()
 
         // MOTS added
         if (Main_bMotsCompat) {
-            if (sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD || sithPlayer_pLocalPlayerThing->actorParams.typeflags & SITH_AF_DISABLED)
+            if (sithPlayer_g_pLocalPlayerThing->thingflags & SITH_TF_DEAD || sithPlayer_g_pLocalPlayerThing->actorParams.typeflags & SITH_AF_DISABLED)
                 jkGuiEsc_aElements[JKGUIESC_ELMT_SAVE].bIsVisible = 0;
-            if (sithPlayer_pLocalPlayerThing->actorParams.typeflags & SITH_AF_DISABLED) {
+            if (sithPlayer_g_pLocalPlayerThing->actorParams.typeflags & SITH_AF_DISABLED) {
                 jkGuiEsc_aElements[JKGUIESC_ELMT_LOAD].bIsVisible = 0;
                 jkGuiEsc_aElements[JKGUIESC_ELMT_SAVE].bIsVisible = 0;
                 jkGuiEsc_aElements[JKGUIESC_ELMT_RESTART].bIsVisible = 0;
             }
         }
         else {
-            if (sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD)
+            if (sithPlayer_g_pLocalPlayerThing->thingflags & SITH_TF_DEAD)
                 jkGuiEsc_aElements[JKGUIESC_ELMT_SAVE].bIsVisible = 0;
         }
     }

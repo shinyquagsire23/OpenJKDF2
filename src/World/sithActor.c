@@ -146,7 +146,7 @@ flex_t sithActor_DamageActor(sithThing *sender, sithThing *receiver, flex_t amou
     }
 
     sender->actorParams.health -= amount;
-    if ( sender == sithPlayer_pLocalPlayerThing )
+    if ( sender == sithPlayer_g_pLocalPlayerThing )
     {
         fR = amount * 0.04;
         sithPlayer_AddDynamicTint(fR, 0.0, 0.0);
