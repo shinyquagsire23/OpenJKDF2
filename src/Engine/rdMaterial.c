@@ -18,7 +18,7 @@
 #endif
 
 // Added: SafeStrCopy variant for destinations that may live in word-addressable-
-// only memory (the world materials array on TWL): stage on the stack, then a
+// only memory (the world aMaterials array on TWL): stage on the stack, then a
 // word-safe copy of the terminated string.
 static void rdMaterial_WordSafeStrCopy(char* pDst, const char* pSrc, int len)
 {
@@ -252,7 +252,7 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
       material->textures = textures;
     }
     else {
-        // Some materials are solid colors
+        // Some aMaterials are solid colors
 #if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
         material->bDataLoaded = bDoLoad;
 #endif

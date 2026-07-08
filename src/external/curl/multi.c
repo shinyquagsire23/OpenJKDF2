@@ -313,7 +313,7 @@ static struct Curl_sh_entry *sh_addentry(struct Curl_hash *sh,
     return NULL; /* major failure */
   }
 
-  return check; /* things are good in sockhash land */
+  return check; /* aThings are good in sockhash land */
 }
 
 
@@ -508,7 +508,7 @@ CURLMcode curl_multi_add_handle(struct Curl_multi *multi,
      be taken care of even when this handle is added in the midst of operation
      when only the curl_multi_socket() API is used. During that flow, only
      sockets that time-out or have actions will be dealt with. Since this
-     handle has no action yet, we make sure it times out to get things to
+     handle has no action yet, we make sure it times out to get aThings to
      happen. */
   Curl_expire(data, 0, EXPIRE_RUN_NOW);
 
@@ -2820,7 +2820,7 @@ CURLMcode curl_multi_cleanup(struct Curl_multi *multi)
  * This function is the primary way for a multi/multi_socket application to
  * figure out if a transfer has ended. We MUST make this function as fast as
  * possible as it will be polled frequently and we MUST NOT scan any lists in
- * here to figure out things. We must scale fine to thousands of handles and
+ * here to figure out aThings. We must scale fine to thousands of handles and
  * beyond. The current design is fully O(1).
  */
 

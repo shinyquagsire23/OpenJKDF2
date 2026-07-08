@@ -99,8 +99,8 @@ rdProcEntry *rdCache_GetProcEntry()
     }
 
     out_procEntry = &rdCache_aProcFaces[idx];
-    out_procEntry->vertices = &rdCache_aVertices[rdCache_numUsedVertices];
-    out_procEntry->vertexUVs = &rdCache_aTexVertices[rdCache_numUsedTexVertices];
+    out_procEntry->aVertices = &rdCache_aVertices[rdCache_numUsedVertices];
+    out_procEntry->aTexVerticies = &rdCache_aTexVertices[rdCache_numUsedTexVertices];
     out_procEntry->vertexIntensities = &rdCache_aIntensities[rdCache_numUsedIntensities];
 #ifdef JKM_LIGHTING
     out_procEntry->paRedIntensities = &rdCache_aRedIntensities[rdCache_numUsedIntensities];
@@ -702,7 +702,7 @@ int rdCache_SendFaceListToHardware()
 #endif
             }
 
-            iterating_6c_vtxs = active_6c->vertices;
+            iterating_6c_vtxs = active_6c->aVertices;
             vertex_a = red_and_alpha << 8;
 
             for (int vtx_idx = 0; vtx_idx < active_6c->numVertices; vtx_idx++)
@@ -710,15 +710,15 @@ int rdCache_SendFaceListToHardware()
 #ifndef TARGET_TWL
 #ifdef RENDER_ROUND_VERTICES
                 rdCache_aHWVertices[rdCache_totalVerts].x = (iterating_6c_vtxs[vtx_idx].x);
-                rdCache_aHWVertices[rdCache_totalVerts].y = (active_6c->vertices[vtx_idx].y);
+                rdCache_aHWVertices[rdCache_totalVerts].y = (active_6c->aVertices[vtx_idx].y);
 #else
                 rdCache_aHWVertices[rdCache_totalVerts].x = (iterating_6c_vtxs[vtx_idx].x); // Added: The original game rounded to ints here (with ceilf?)
-                rdCache_aHWVertices[rdCache_totalVerts].y = (active_6c->vertices[vtx_idx].y); // Added: The original game rounded to ints here (with ceilf?)
+                rdCache_aHWVertices[rdCache_totalVerts].y = (active_6c->aVertices[vtx_idx].y); // Added: The original game rounded to ints here (with ceilf?)
 #endif
 #endif
-                iterating_6c_vtxs_ = active_6c->vertices;
+                iterating_6c_vtxs_ = active_6c->aVertices;
 
-                // DSi prefers z vertices directly
+                // DSi prefers z aVertices directly
 #ifdef TARGET_TWL
                 v36 = iterating_6c_vtxs_[vtx_idx].z;
                 iterating_6c_vtxs = iterating_6c_vtxs_;
@@ -739,10 +739,10 @@ int rdCache_SendFaceListToHardware()
 #endif
 
 #ifdef TARGET_TWL
-                rdCache_aHWVertices[rdCache_totalVerts].x = ((active_6c->vertices[vtx_idx].x)); // Added: The original game rounded to ints here (with ceilf?)
-                rdCache_aHWVertices[rdCache_totalVerts].y = ((active_6c->vertices[vtx_idx].z)); // Added: The original game rounded to ints here (with ceilf?)
+                rdCache_aHWVertices[rdCache_totalVerts].x = ((active_6c->aVertices[vtx_idx].x)); // Added: The original game rounded to ints here (with ceilf?)
+                rdCache_aHWVertices[rdCache_totalVerts].y = ((active_6c->aVertices[vtx_idx].z)); // Added: The original game rounded to ints here (with ceilf?)
                 //v38 = stdMath_Clamp(v38, 0.0, SITHCAMERA_ZFAR);
-                v38 = active_6c->vertices[vtx_idx].y;
+                v38 = active_6c->aVertices[vtx_idx].y;
 #endif
                 rdCache_aHWVertices[rdCache_totalVerts].z = v38;
 
@@ -903,7 +903,7 @@ int rdCache_SendFaceListToHardware()
                 
                 // For some reason, ny holds the vertex color.
                 rdCache_aHWVertices[rdCache_totalVerts].color = final_vertex_color;
-                uvs_in_pixels = v52->vertexUVs;
+                uvs_in_pixels = v52->aTexVerticies;
 
                 // DSi wants UVs in pixels
 #if defined(TARGET_TWL)
@@ -1078,14 +1078,14 @@ LABEL_232:
         for (int vtx_idx = 0; vtx_idx < active_6c->numVertices; vtx_idx++)
         {
 #ifndef TARGET_TWL
-            rdCache_aHWVertices[rdCache_totalVerts].x = (active_6c->vertices[tmpiter].x);  // Added: The original game rounded to ints here (with ceilf?)
-            rdCache_aHWVertices[rdCache_totalVerts].y = (active_6c->vertices[tmpiter].y);  // Added: The original game rounded to ints here (with ceilf?)
+            rdCache_aHWVertices[rdCache_totalVerts].x = (active_6c->aVertices[tmpiter].x);  // Added: The original game rounded to ints here (with ceilf?)
+            rdCache_aHWVertices[rdCache_totalVerts].y = (active_6c->aVertices[tmpiter].y);  // Added: The original game rounded to ints here (with ceilf?)
 #endif
-            v87 = active_6c->vertices[tmpiter].z;
+            v87 = active_6c->aVertices[tmpiter].z;
 
-            // DSi prefers z vertices directly
+            // DSi prefers z aVertices directly
 #ifdef TARGET_TWL
-            v88 = active_6c->vertices[tmpiter].z;
+            v88 = active_6c->aVertices[tmpiter].z;
             v89 = v88;
             if ( rdCache_dword_865258 != 16 )
                 v89 = SITHCAMERA_ZFAR - v89;
@@ -1093,16 +1093,16 @@ LABEL_232:
             if ( v87 == 0.0 )
                 v88 = 0.0;
             else
-                v88 = 1.0 / active_6c->vertices[tmpiter].z;
+                v88 = 1.0 / active_6c->aVertices[tmpiter].z;
             v89 = v88 * invZFar;
             if ( rdCache_dword_865258 != 16 )
                 v89 = 1.0 - v89;
 #endif
 #ifdef TARGET_TWL
-            rdCache_aHWVertices[rdCache_totalVerts].x = ((active_6c->vertices[tmpiter].x));  // Added: The original game rounded to ints here (with ceilf?)
-            rdCache_aHWVertices[rdCache_totalVerts].y = ((active_6c->vertices[tmpiter].z));  // Added: The original game rounded to ints here (with ceilf?)
+            rdCache_aHWVertices[rdCache_totalVerts].x = ((active_6c->aVertices[tmpiter].x));  // Added: The original game rounded to ints here (with ceilf?)
+            rdCache_aHWVertices[rdCache_totalVerts].y = ((active_6c->aVertices[tmpiter].z));  // Added: The original game rounded to ints here (with ceilf?)
             //v89 = stdMath_Clamp(v89, 0.0, SITHCAMERA_ZFAR);
-            v89 = active_6c->vertices[tmpiter].y;
+            v89 = active_6c->aVertices[tmpiter].y;
 #endif
             rdCache_aHWVertices[rdCache_totalVerts].z = v89;
 
@@ -1481,7 +1481,7 @@ int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
     
     if ( num_vertices )
     {
-        v10 = rdCache_aProcFaces[current_rend_6c_idx].vertices;
+        v10 = rdCache_aProcFaces[current_rend_6c_idx].aVertices;
 
         do
         {

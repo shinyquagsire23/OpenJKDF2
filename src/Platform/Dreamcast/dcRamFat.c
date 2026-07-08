@@ -71,14 +71,14 @@ static void dcRamFat_Format(uint8_t* img)
     bs[0] = 0xEB; bs[1] = 0x3C; bs[2] = 0x90;      // jump
     memcpy(bs + 0x03, "OPENJKDF", 8);              // OEM name
     dcRamFat_put16(bs + 0x0B, DCRF_SECTOR_SIZE);   // bytes/sector
-    bs[0x0D] = 1;                                  // sectors/cluster
-    dcRamFat_put16(bs + 0x0E, DCRF_RESERVED);      // reserved sectors
+    bs[0x0D] = 1;                                  // aSectors/cluster
+    dcRamFat_put16(bs + 0x0E, DCRF_RESERVED);      // reserved aSectors
     bs[0x10] = DCRF_NUM_FATS;                      // number of FATs
     dcRamFat_put16(bs + 0x11, DCRF_ROOT_ENTRIES);  // root dir entries
-    dcRamFat_put16(bs + 0x13, DCRF_TOTAL_SECTORS); // total sectors (16-bit)
+    dcRamFat_put16(bs + 0x13, DCRF_TOTAL_SECTORS); // total aSectors (16-bit)
     bs[0x15] = 0xF8;                               // media descriptor
-    dcRamFat_put16(bs + 0x16, DCRF_FAT_SECTORS);   // sectors/FAT
-    dcRamFat_put16(bs + 0x18, 63);                 // sectors/track
+    dcRamFat_put16(bs + 0x16, DCRF_FAT_SECTORS);   // aSectors/FAT
+    dcRamFat_put16(bs + 0x18, 63);                 // aSectors/track
     dcRamFat_put16(bs + 0x1A, 255);                // heads
     bs[0x24] = 0x80;                               // drive number
     bs[0x26] = 0x29;                               // extended boot signature

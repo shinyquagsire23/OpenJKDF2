@@ -222,7 +222,7 @@ int rdCamera_BuildFOV(rdCamera *camera)
     flex_d_t v15; // st4
     flex_t camerac; // [esp+1Ch] [ebp+4h]
 
-    rdClipFrustum* clipFrustum = camera->pClipFrustum;
+    rdClipFrustum* pClipFrustum = camera->pClipFrustum;
     rdCanvas* canvas = camera->canvas;
     if ( !canvas )
         return 0;
@@ -234,14 +234,14 @@ int rdCamera_BuildFOV(rdCamera *camera)
             camera->fovDx = 0.0;
             camerac = ((flex_d_t)(canvas->heightMinusOne - canvas->yStart) * 0.5) / camera->orthoScale;
             v15 = ((flex_d_t)(canvas->widthMinusOne - canvas->xStart) * 0.5) / camera->orthoScale;
-            clipFrustum->orthoLeft = -v15;
-            clipFrustum->orthoTop = camerac / camera->screenAspectRatio;
-            clipFrustum->orthoRight = v15;
-            clipFrustum->orthoBottom = -camerac / camera->screenAspectRatio;
-            clipFrustum->farTop = 0.0;
-            clipFrustum->bottom = 0.0;
-            clipFrustum->farLeft = 0.0;
-            clipFrustum->right = 0.0;
+            pClipFrustum->orthoLeft = -v15;
+            pClipFrustum->orthoTop = camerac / camera->screenAspectRatio;
+            pClipFrustum->orthoRight = v15;
+            pClipFrustum->orthoBottom = -camerac / camera->screenAspectRatio;
+            pClipFrustum->farTop = 0.0;
+            pClipFrustum->bottom = 0.0;
+            pClipFrustum->farLeft = 0.0;
+            pClipFrustum->right = 0.0;
             return 1;
         }
         
@@ -276,21 +276,21 @@ int rdCamera_BuildFOV(rdCamera *camera)
 
             // This area is very susceptible to fixed-point error 
 #ifdef EXPERIMENTAL_FIXED_POINT
-            clipFrustum->bClipFar = 1;
+            pClipFrustum->bClipFar = 1;
             flex_t aspect = project_height_half_2/project_width_half;
-            clipFrustum->farTop = tangent * aspect; // far top
-            clipFrustum->farLeft = -tangent; // far left
-            clipFrustum->bottom = -clipFrustum->farTop;
-            clipFrustum->right = tangent; // right
-            clipFrustum->nearTop = ((project_height_half - -1.0) / project_width_half) * tangent; // near top
-            clipFrustum->nearLeft = (-(project_width_half - -1.0) / project_width_half) * tangent; // near left
+            pClipFrustum->farTop = tangent * aspect; // far top
+            pClipFrustum->farLeft = -tangent; // far left
+            pClipFrustum->bottom = -pClipFrustum->farTop;
+            pClipFrustum->right = tangent; // right
+            pClipFrustum->nearTop = ((project_height_half - -1.0) / project_width_half) * tangent; // near top
+            pClipFrustum->nearLeft = (-(project_width_half - -1.0) / project_width_half) * tangent; // near left
 #else
-            clipFrustum->farTop = project_height_half / fovDy; // far top
-            clipFrustum->farLeft = -project_width_half / fovDx; // far left
-            clipFrustum->bottom = -project_height_half_2 / fovDy; // bottom
-            clipFrustum->right = project_width_half_2 / fovDx; // right
-            clipFrustum->nearTop = (project_height_half - -1.0) / fovDy; // near top
-            clipFrustum->nearLeft = -(project_width_half - -1.0) / fovDx; // near left
+            pClipFrustum->farTop = project_height_half / fovDy; // far top
+            pClipFrustum->farLeft = -project_width_half / fovDx; // far left
+            pClipFrustum->bottom = -project_height_half_2 / fovDy; // bottom
+            pClipFrustum->right = project_width_half_2 / fovDx; // right
+            pClipFrustum->nearTop = (project_height_half - -1.0) / fovDy; // near top
+            pClipFrustum->nearLeft = -(project_width_half - -1.0) / fovDx; // near left
 #endif
             return 1;
         }
@@ -337,12 +337,12 @@ int rdCamera_SetFrustrum(rdCamera *camera, rdClipFrustum *outClip, signed int mi
 #if 0 //def EXPERIMENTAL_FIXED_POINT
     flex_t tangent = stdMath_Tan(camera->fov * 0.5);
     flex_t aspect = project_height_half_2/project_width_half;
-    clipFrustum->farTop = tangent * aspect; // far top
-    clipFrustum->farLeft = -tangent; // far left
-    clipFrustum->bottom = -clipFrustum->farTop;
-    clipFrustum->right = tangent; // right
-    clipFrustum->nearTop = ((project_height_half - -1.0) / project_width_half) * tangent; // near top
-    clipFrustum->nearLeft = (-(project_width_half - -1.0) / project_width_half) * tangent; // near left
+    pClipFrustum->farTop = tangent * aspect; // far top
+    pClipFrustum->farLeft = -tangent; // far left
+    pClipFrustum->bottom = -pClipFrustum->farTop;
+    pClipFrustum->right = tangent; // right
+    pClipFrustum->nearTop = ((project_height_half - -1.0) / project_width_half) * tangent; // near top
+    pClipFrustum->nearLeft = (-(project_width_half - -1.0) / project_width_half) * tangent; // near left
 #else
     outClip->farTop = project_width_half / fovDy;
     outClip->farLeft = -project_height_half / fovDx;

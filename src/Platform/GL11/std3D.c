@@ -232,13 +232,13 @@ int std3D_RenderListVerticesFinish()
     return 0;
 }
 
-int std3D_AddRenderListVertices(D3DVERTEX* vertices, int count)
+int std3D_AddRenderListVertices(D3DVERTEX* aVertices, int count)
 {
     if (Main_bHeadless) return 1;
     if (GL_tmpVerticesAmt + count >= STD3D_MAX_VERTICES)
         return 0;
 
-    memcpy(&GL_tmpVertices[GL_tmpVerticesAmt], vertices, sizeof(D3DVERTEX) * count);
+    memcpy(&GL_tmpVertices[GL_tmpVerticesAmt], aVertices, sizeof(D3DVERTEX) * count);
     GL_tmpVerticesAmt += count;
     return 1;
 }
@@ -334,7 +334,7 @@ void std3D_DrawRenderList()
 
     for (size_t j = 0; j < GL_tmpTrisAmt; j++)
     {
-        // Safety net: never index past the vertices actually submitted this batch
+        // Safety net: never index past the aVertices actually submitted this batch
         // (reading the stale tail of the static array shows last frame's geometry).
         if ((size_t)tris[j].v1 >= GL_tmpVerticesAmt ||
             (size_t)tris[j].v2 >= GL_tmpVerticesAmt ||

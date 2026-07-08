@@ -12,9 +12,9 @@ void sithCogFunctionSurface_GetSurfaceAdjoin(sithCog *ctx)
     SithSurface* pSurface = sithCogExec_PopSurface(ctx);
 
     // TODO was this borked in JKDF2 and fixed in MoTS?
-    // Previously: (v2 = &pSurface->adjoin->mirror->surface->index) != 0
-    if ( pSurface && pSurface->adjoin->mirror->surface) 
-        sithCogExec_PushInt(ctx, pSurface->adjoin->mirror->surface->index);
+    // Previously: (v2 = &pSurface->pAdjoin->mirror->surface->index) != 0
+    if ( pSurface && pSurface->pAdjoin->mirror->surface) 
+        sithCogExec_PushInt(ctx, pSurface->pAdjoin->mirror->surface->index);
     else
         sithCogExec_PushInt(ctx, -1);
 }
@@ -25,7 +25,7 @@ void sithCogFunctionSurface_GetSurfaceSector(sithCog *ctx)
     uint32_t *v2; // eax
 
     v1 = sithCogExec_PopSurface(ctx);
-    if ( v1 && (v2 = &v1->parent_sector->id) != 0 )
+    if ( v1 && (v2 = &v1->pSector->id) != 0 )
         sithCogExec_PushInt(ctx, *v2);
     else
         sithCogExec_PushInt(ctx, -1);
@@ -50,7 +50,7 @@ void sithCogFunctionSurface_GetSurfaceVertexPos(sithCog *ctx)
     vtx_idx = sithCogExec_PopInt(ctx);
     surface = sithCogExec_PopSurface(ctx);
     if ( surface && vtx_idx < surface->surfaceInfo.face.numVertices && (vtx_idx & 0x80000000) == 0 )
-        sithCogExec_PushVector(ctx, &sithWorld_g_pCurrentWorld->vertices[surface->surfaceInfo.face.vertexPosIdx[vtx_idx]]);
+        sithCogExec_PushVector(ctx, &sithWorld_g_pCurrentWorld->aVertices[surface->surfaceInfo.face.vertexPosIdx[vtx_idx]]);
     else
         sithCogExec_PushVector(ctx, &rdroid_zeroVector3);
 }
@@ -61,16 +61,16 @@ void sithCogFunctionSurface_SetHorizonSkyOffset(sithCog *ctx)
 
     // TODO add valid check?
     sithCogExec_PopVector(ctx, &offs);
-    sithWorld_g_pCurrentWorld->horizontalSkyOffs.x = offs.x;
-    sithWorld_g_pCurrentWorld->horizontalSkyOffs.y = offs.y;
+    sithWorld_g_pCurrentWorld->horizonSkyOffset.x = offs.x;
+    sithWorld_g_pCurrentWorld->horizonSkyOffset.y = offs.y;
 }
 
 void sithCogFunctionSurface_GetHorizonSkyOffset(sithCog *ctx)
 {
     rdVector3 offs;
 
-    offs.x = sithWorld_g_pCurrentWorld->horizontalSkyOffs.x;
-    offs.y = sithWorld_g_pCurrentWorld->horizontalSkyOffs.y;
+    offs.x = sithWorld_g_pCurrentWorld->horizonSkyOffset.x;
+    offs.y = sithWorld_g_pCurrentWorld->horizonSkyOffset.y;
     offs.z = 0.0;
     sithCogExec_PushVector(ctx, &offs);
 }
@@ -81,16 +81,16 @@ void sithCogFunctionSurface_SetCeilingSkyOffset(sithCog *ctx)
 
     // TODO add valid check?
     sithCogExec_PopVector(ctx, &offs);
-    sithWorld_g_pCurrentWorld->ceilingSkyOffs.x = offs.x;
-    sithWorld_g_pCurrentWorld->ceilingSkyOffs.y = offs.y;
+    sithWorld_g_pCurrentWorld->ceilingSkyOffset.x = offs.x;
+    sithWorld_g_pCurrentWorld->ceilingSkyOffset.y = offs.y;
 }
 
 void sithCogFunctionSurface_GetCeilingSkyOffset(sithCog *ctx)
 {
     rdVector3 offs;
 
-    offs.x = sithWorld_g_pCurrentWorld->ceilingSkyOffs.x;
-    offs.y = sithWorld_g_pCurrentWorld->ceilingSkyOffs.y;
+    offs.x = sithWorld_g_pCurrentWorld->ceilingSkyOffset.x;
+    offs.y = sithWorld_g_pCurrentWorld->ceilingSkyOffset.y;
     offs.z = 0.0;
     sithCogExec_PushVector(ctx, &offs);
 }
@@ -207,7 +207,7 @@ void sithCogFunctionSurface_GetSurfaceMaterial(sithCog *ctx)
 
     SithSurface* surface = sithCogExec_PopSurface(ctx);
     if ( surface && (v2 = surface->surfaceInfo.face.material) != 0 )
-        sithCogExec_PushInt(ctx, v2 - sithWorld_g_pCurrentWorld->materials);
+        sithCogExec_PushInt(ctx, v2 - sithWorld_g_pCurrentWorld->aMaterials);
     else
         sithCogExec_PushInt(ctx, -1);
 }
@@ -223,7 +223,7 @@ void sithCogFunctionSurface_SetSurfaceMaterial(sithCog *ctx)
         v4 = surface->surfaceInfo.face.material;
         surface->surfaceInfo.face.material = mat;
         if ( v4 )
-            sithCogExec_PushInt(ctx, v4 - sithWorld_g_pCurrentWorld->materials);
+            sithCogExec_PushInt(ctx, v4 - sithWorld_g_pCurrentWorld->aMaterials);
         else
             sithCogExec_PushInt(ctx, -1);
         if ( COG_SHOULD_SYNC(ctx) )
@@ -244,7 +244,7 @@ void sithCogFunctionSurface_SetSurfaceFlags(sithCog *ctx)
 
     if (surface && flags)
     {
-        surface->surfaceFlags |= flags;
+        surface->flags |= flags;
         if (COG_SHOULD_SYNC(ctx))
         {
             sithSurface_SyncSurface(surface);
@@ -259,7 +259,7 @@ void sithCogFunctionSurface_ClearSurfaceFlags(sithCog *ctx)
 
     if (surface && flags)
     {
-        surface->surfaceFlags &= ~flags;
+        surface->flags &= ~flags;
         if (COG_SHOULD_SYNC(ctx))
         {
             sithSurface_SyncSurface(surface);
@@ -272,7 +272,7 @@ void sithCogFunctionSurface_GetSurfaceFlags(sithCog *ctx)
     SithSurface* surface = sithCogExec_PopSurface(ctx);
 
     if ( surface )
-        sithCogExec_PushInt(ctx, surface->surfaceFlags);
+        sithCogExec_PushInt(ctx, surface->flags);
     else
         sithCogExec_PushInt(ctx, -1);
 }
@@ -284,12 +284,12 @@ void sithCogFunctionSurface_SetAdjoinFlags(sithCog *ctx)
 
     if ( surface )
     {
-        SithSurfaceAdjoin* adjoin = surface->adjoin;
-        if ( adjoin )
+        SithSurfaceAdjoin* pAdjoin = surface->pAdjoin;
+        if ( pAdjoin )
         {
             if ( flags )
             {
-                adjoin->flags |= flags;
+                pAdjoin->flags |= flags;
                 if ( COG_SHOULD_SYNC(ctx) )
                 {
                     sithSurface_SyncSurface(surface);
@@ -306,12 +306,12 @@ void sithCogFunctionSurface_ClearAdjoinFlags(sithCog *ctx)
 
     if ( surface )
     {
-        SithSurfaceAdjoin* adjoin = surface->adjoin;
-        if ( adjoin )
+        SithSurfaceAdjoin* pAdjoin = surface->pAdjoin;
+        if ( pAdjoin )
         {
             if ( flags )
             {
-                adjoin->flags &= ~flags;
+                pAdjoin->flags &= ~flags;
                 if ( COG_SHOULD_SYNC(ctx) )
                 {
                      sithSurface_SyncSurface(surface);
@@ -324,9 +324,9 @@ void sithCogFunctionSurface_ClearAdjoinFlags(sithCog *ctx)
 void sithCogFunctionSurface_GetAdjoinFlags(sithCog *ctx)
 {
     SithSurface* surface = sithCogExec_PopSurface(ctx);
-    if (surface && surface->adjoin)
+    if (surface && surface->pAdjoin)
     {
-        sithCogExec_PushInt(ctx, surface->adjoin->flags);
+        sithCogExec_PushInt(ctx, surface->pAdjoin->flags);
     }
     else
     {
@@ -596,7 +596,7 @@ void sithCogFunctionSurface_GetSurfaceVertexLightRGB(sithCog *ctx)
 
     uint32_t numVerts = (pSurface->surfaceInfo).face.numVertices;
     if ((num < numVerts) && (-1 < num)) {
-        if ((pSurface->surfaceFlags & SITH_SURFACE_1000000) == 0) {
+        if ((pSurface->flags & SITH_SURFACE_1000000) == 0) {
             tmp.x = -1.0;
             tmp.y = -1.0;
             tmp.z = -1.0;
@@ -628,7 +628,7 @@ void sithCogFunctionSurface_SetSurfaceVertexLightRGB(sithCog *ctx)
 
     if ((((pSurface != (SithSurface *)0x0) 
         && (uVar1 = (pSurface->surfaceInfo).face.numVertices, (uint32_t)num < uVar1)) && (-1 < num)) 
-        && ((pSurface->surfaceFlags & SITH_SURFACE_1000000) != 0)) {
+        && ((pSurface->flags & SITH_SURFACE_1000000) != 0)) {
         (pSurface->surfaceInfo).intensities[num + uVar1] = valRGB.x;
         (pSurface->surfaceInfo).intensities[num + (pSurface->surfaceInfo).face.numVertices * 2] = valRGB.y;
         (pSurface->surfaceInfo).intensities[num + (pSurface->surfaceInfo).face.numVertices * 3] = valRGB.z;

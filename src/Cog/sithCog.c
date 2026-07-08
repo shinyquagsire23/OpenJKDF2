@@ -83,7 +83,7 @@ int32_t sithCog_Startup()
     sithCog_AddIntSymbol(sithCog_g_pSymbolTable, 20, "changed");
     sithCog_AddIntSymbol(sithCog_g_pSymbolTable, 21, "deactivated");
     sithCog_AddIntSymbol(sithCog_g_pSymbolTable, 22, "shutdown");
-    sithCog_AddIntSymbol(sithCog_g_pSymbolTable, 23, "respawn");
+    sithCog_AddIntSymbol(sithCog_g_pSymbolTable, 23, "secRespawnInterval");
     sithCog_AddIntSymbol(sithCog_g_pSymbolTable, 2, "removed");
     sithCog_AddIntSymbol(sithCog_g_pSymbolTable, 19, "autoselect");
     sithCog_AddIntSymbol(sithCog_g_pSymbolTable, 24, "aievent");
@@ -427,8 +427,8 @@ int32_t sithCog_Open()
         return 0;
     if ( sithWorld_g_pStaticWorld )
     {
-        v2 = sithWorld_g_pStaticWorld->cogs;
-        for (int32_t i = 0; i < sithWorld_g_pStaticWorld->numCogsLoaded; i++)
+        v2 = sithWorld_g_pStaticWorld->aCogs;
+        for (int32_t i = 0; i < sithWorld_g_pStaticWorld->numCogs; i++)
         {
             for (int32_t j = 0; j < v2->cogscript->numIdk; j++)
             {
@@ -437,7 +437,7 @@ int32_t sithCog_Open()
                     sithCog_ParseSymbolRef(&v2->pSymbolTable->buckets[v3->hash], v3, v3->value);
             }
 #ifdef COG_HEAP_INIT_ARGS
-            // Added: static-world cogs never consume jkl init strings; drop them
+            // Added: static-world aCogs never consume jkl init strings; drop them
             if (v2->aInitArgs) {
                 SITH_FREE(v2->aInitArgs);
                 v2->aInitArgs = NULL;
@@ -447,39 +447,39 @@ int32_t sithCog_Open()
             world = world_;
         }
     }
-    sithCog* cogs = world->cogs;
+    sithCog* aCogs = world->aCogs;
     v12 = 0;
-    if ( world->numCogsLoaded )
+    if ( world->numCogs )
     {
         SithCogSymbolRef* idk = NULL;
         while ( 1 )
         {
             v10 = 0;
-            v6 = cogs->cogscript->aIdk;
-            if ( cogs->cogscript->numIdk )
+            v6 = aCogs->cogscript->aIdk;
+            if ( aCogs->cogscript->numIdk )
                 break;
 LABEL_25:
 #ifdef COG_HEAP_INIT_ARGS
             // Added: the init strings were only needed for the linking above
-            if (cogs->aInitArgs) {
-                SITH_FREE(cogs->aInitArgs);
-                cogs->aInitArgs = NULL;
+            if (aCogs->aInitArgs) {
+                SITH_FREE(aCogs->aInitArgs);
+                aCogs->aInitArgs = NULL;
             }
 #endif
-            sithCog_SendMessage(cogs++, SITH_MESSAGE_LOADING, 0, 0, 0, 0, 0);
-            if (++v12 >= world_->numCogsLoaded )
+            sithCog_SendMessage(aCogs++, SITH_MESSAGE_LOADING, 0, 0, 0, 0, 0);
+            if (++v12 >= world_->numCogs )
                 goto LABEL_26;
         }
 
 #ifdef COG_HEAP_INIT_ARGS
-        v13 = cogs->aInitArgs; // may be NULL (no jkl args / arg-less cog)
+        v13 = aCogs->aInitArgs; // may be NULL (no jkl args / arg-less cog)
 #else
-        v13 = cogs->field_4BC;
+        v13 = aCogs->field_4BC;
 #endif
         while ( 1 )
         {
-            idk = &cogs->cogscript->aIdk[v10];
-            v8 = &cogs->pSymbolTable->buckets[idk->hash];
+            idk = &aCogs->cogscript->aIdk[v10];
+            v8 = &aCogs->pSymbolTable->buckets[idk->hash];
             v14 = v8;
             if ( (idk->flags & 1) != 0 )
             {
@@ -498,12 +498,12 @@ LABEL_25:
             }
             if (v13) // Added: NULL guard for COG_HEAP_INIT_ARGS
                 v13 += 32;
-            sithCog_LinkCog(cogs, v6, v8);
+            sithCog_LinkCog(aCogs, v6, v8);
 
 
 LABEL_24:
             ++v6;
-            if (++v10 >= cogs->cogscript->numIdk )
+            if (++v10 >= aCogs->cogscript->numIdk )
                 goto LABEL_25;
         }
     }
@@ -534,7 +534,7 @@ int sithCog_ReadCogsListText(SithWorld *world, int a2)
 {
     int32_t num_cogs; // esi
     int32_t result; // eax
-    sithCog *cogs; // eax
+    sithCog *aCogs; // eax
     uint32_t v7; // eax
     int32_t *v8; // ebx
     sithCog *v9; // eax
@@ -551,20 +551,20 @@ int sithCog_ReadCogsListText(SithWorld *world, int a2)
     if ( a2 )
         return 0;
     stdConffile_ReadArgs();
-    if ( _strcmp(stdConffile_g_entry.args[0].value, "world") || _strcmp(stdConffile_g_entry.args[1].value, "cogs") )
+    if ( _strcmp(stdConffile_g_entry.args[0].value, "world") || _strcmp(stdConffile_g_entry.args[1].value, "aCogs") )
         return 0;
     num_cogs = _atoi(stdConffile_g_entry.args[2].value);
     if ( !num_cogs )
         return 1;
     { TWL_EXTRAM_SUGGEST(pSithHS); // Added: word-width fields (fpath is debug-only)
-    cogs = (sithCog *)SITH_ALLOC(sizeof(sithCog) * num_cogs);
+    aCogs = (sithCog *)SITH_ALLOC(sizeof(sithCog) * num_cogs);
     TWL_EXTRAM_RESTORE(pSithHS); }
-    world->cogs = cogs;
-    if ( cogs )
+    world->aCogs = aCogs;
+    if ( aCogs )
     {
-        stdPlatform_Memzero32(cogs, sizeof(sithCog) * num_cogs); // Added: word-safe
-        world->numCogs = num_cogs;
-        world->numCogsLoaded = 0;
+        stdPlatform_Memzero32(aCogs, sizeof(sithCog) * num_cogs); // Added: word-safe
+        world->sizeCogs = num_cogs;
+        world->numCogs = 0;
         while ( stdConffile_ReadArgs() )
         {
             if ( !_strcmp(stdConffile_g_entry.args[0].value, "end") )
@@ -624,11 +624,11 @@ sithCog* sithCog_Load(const char *fpath)
     uint32_t v9; // eax
     char cog_fpath[128]; // [esp+10h] [ebp-80h] BYREF
 
-    cogIdx = sithWorld_g_pLastLoadedWorld->numCogsLoaded;
-    if ( cogIdx >= sithWorld_g_pLastLoadedWorld->numCogs )
+    cogIdx = sithWorld_g_pLastLoadedWorld->numCogs;
+    if ( cogIdx >= sithWorld_g_pLastLoadedWorld->sizeCogs )
         return 0;
 
-    cog = &sithWorld_g_pLastLoadedWorld->cogs[cogIdx];
+    cog = &sithWorld_g_pLastLoadedWorld->aCogs[cogIdx];
     cog->selfCog = cogIdx;
     if (sithWorld_g_pLastLoadedWorld->level_type_maybe & 1)
     {
@@ -642,11 +642,11 @@ sithCog* sithCog_Load(const char *fpath)
     }
     else
     {
-        v9 = sithWorld_g_pLastLoadedWorld->numCogScriptsLoaded;
-        if ( v9 < sithWorld_g_pLastLoadedWorld->numCogScripts && (v8 = &sithWorld_g_pLastLoadedWorld->cogScripts[v9], sithCogParse_Load(cog_fpath, v8, 0)) )
+        v9 = sithWorld_g_pLastLoadedWorld->numCogScripts;
+        if ( v9 < sithWorld_g_pLastLoadedWorld->sizeCogScripts && (v8 = &sithWorld_g_pLastLoadedWorld->aCogScripts[v9], sithCogParse_Load(cog_fpath, v8, 0)) )
         {
             stdHashtbl_Add(sithCog_g_pHashtable, cog_fpath, v8); // Added: v8 -> no v8 for cog_fpath
-            ++sithWorld_g_pLastLoadedWorld->numCogScriptsLoaded;
+            ++sithWorld_g_pLastLoadedWorld->numCogScripts;
         }
         else
         {
@@ -663,7 +663,7 @@ sithCog* sithCog_Load(const char *fpath)
     cog->pSymbolTable = sithCogParse_DuplicateSymbolTable(v8->pSymbolTable);
     if ( cog->pSymbolTable )
     {
-        sithWorld_g_pLastLoadedWorld->numCogsLoaded++;
+        sithWorld_g_pLastLoadedWorld->numCogs++;
         return cog;
     }
     return NULL;
@@ -700,7 +700,7 @@ int32_t sithCog_ParseSymbolRef(SithCogSymbol *cogSymbol, SithCogSymbolRef *cogId
                 cogSymbol->val.data[0] = -1;
                 return 0;
             }
-            cogSymbol->val.data[0] = v14->thingIdx;
+            cogSymbol->val.data[0] = v14->idx;
             return 1;
 
         case SITHCOG_SYM_REF_KEYFRAME:
@@ -713,16 +713,16 @@ int32_t sithCog_ParseSymbolRef(SithCogSymbol *cogSymbol, SithCogSymbolRef *cogId
                 return 0;
             }
 
-            // HACK HACK HACK HACK HACK somehow some keyframes aren't being set correctly?
+            // HACK HACK HACK HACK HACK somehow some aKeyframes aren't being set correctly?
             if (!(v17->id & 0x8000)) {
-                v17->id = (v17 - sithWorld_g_pCurrentWorld->keyframes) & 0xFFFF;
+                v17->id = (v17 - sithWorld_g_pCurrentWorld->aKeyframes) & 0xFFFF;
                 if (v17->id >= 0x8000)
                 {
-                    v17->id = (v17 - sithWorld_g_pStaticWorld->keyframes) | 0x8000;
+                    v17->id = (v17 - sithWorld_g_pStaticWorld->aKeyframes) | 0x8000;
                 }
             }
             else {
-                v17->id = (v17 - sithWorld_g_pStaticWorld->keyframes) | 0x8000;
+                v17->id = (v17 - sithWorld_g_pStaticWorld->aKeyframes) | 0x8000;
             }
 
             cogSymbol->val.data[0] = v17->id;
@@ -830,11 +830,11 @@ int32_t sithCog_LinkCog(sithCog *cog, SithCogSymbolRef *idk, SithCogSymbol *symb
         case 3:
             if ( v3 >= sithWorld_g_pCurrentWorld->numThingsLoaded )
                 return 0;
-            return sithCog_LinkCogToThing(cog, &sithWorld_g_pCurrentWorld->things[v3], idk->linkid, idk->mask);
+            return sithCog_LinkCogToThing(cog, &sithWorld_g_pCurrentWorld->aThings[v3], idk->linkid, idk->mask);
         case 5:
             if ( v3 >= sithWorld_g_pCurrentWorld->numSectors )
                 return 0;
-            return sithCog_LinkCogToSector(cog, &sithWorld_g_pCurrentWorld->sectors[v3], idk->linkid, idk->mask);
+            return sithCog_LinkCogToSector(cog, &sithWorld_g_pCurrentWorld->aSectors[v3], idk->linkid, idk->mask);
         case 6:
             if ( v3 >= sithWorld_g_pCurrentWorld->numSurfaces )
                 return 0;
@@ -869,7 +869,7 @@ cog_flex_t sithCog_ThingSendMessageEx(SithThing *sender, SithThing *receiver, SI
         v19 = param0;
     if ( receiver )
     {
-        v7 = receiver->thingIdx;
+        v7 = receiver->idx;
         v8 = 3;
         receivera = 1 << receiver->type;
     }
@@ -879,7 +879,7 @@ cog_flex_t sithCog_ThingSendMessageEx(SithThing *sender, SithThing *receiver, SI
         v8 = 0;
         receivera = 1;
     }
-    v9 = sender->class_cog;
+    v9 = sender->pCog;
     if ( v9 )
     {
 #ifdef DEBUG_QOL_CHEATS
@@ -892,7 +892,7 @@ cog_flex_t sithCog_ThingSendMessageEx(SithThing *sender, SithThing *receiver, SI
 
         if ( message == SITH_MESSAGE_DAMAGED )
         {
-            v10 = sithCog_SendMessageEx(v9, SITH_MESSAGE_DAMAGED, SENDERTYPE_THING, sender->thingIdx, v8, v7, 0, param0, param1, param2, param3);
+            v10 = sithCog_SendMessageEx(v9, SITH_MESSAGE_DAMAGED, SENDERTYPE_THING, sender->idx, v8, v7, 0, param0, param1, param2, param3);
             if ( v10 != -9999.9873046875 )
             {
                 v19 = v10;
@@ -901,14 +901,14 @@ cog_flex_t sithCog_ThingSendMessageEx(SithThing *sender, SithThing *receiver, SI
         }
         else
         {
-            v11 = sithCog_SendMessageEx(v9, message, SENDERTYPE_THING, sender->thingIdx, v8, v7, 0, param0, param1, param2, param3);
+            v11 = sithCog_SendMessageEx(v9, message, SENDERTYPE_THING, sender->idx, v8, v7, 0, param0, param1, param2, param3);
             if ( v11 != -9999.9873046875 )
             {
                 v19 = v11 + v19;
             }
         }
     }
-    v12 = sender->capture_cog;
+    v12 = sender->pCaptureCog;
     if ( v12 )
     {
 #ifdef DEBUG_QOL_CHEATS
@@ -920,7 +920,7 @@ cog_flex_t sithCog_ThingSendMessageEx(SithThing *sender, SithThing *receiver, SI
 #endif
         if ( message == SITH_MESSAGE_DAMAGED )
         {
-            v13 = sithCog_SendMessageEx(v12, SITH_MESSAGE_DAMAGED, SENDERTYPE_THING, sender->thingIdx, v8, v7, 0, param0, param1, param2, param3);
+            v13 = sithCog_SendMessageEx(v12, SITH_MESSAGE_DAMAGED, SENDERTYPE_THING, sender->idx, v8, v7, 0, param0, param1, param2, param3);
             if ( v13 != -9999.9873046875 )
             {
                 v19 = v13;
@@ -929,7 +929,7 @@ cog_flex_t sithCog_ThingSendMessageEx(SithThing *sender, SithThing *receiver, SI
         }
         else
         {
-            v14 = sithCog_SendMessageEx(v12, message, SENDERTYPE_THING, sender->thingIdx, v8, v7, 0, param0, param1, param2, param3);
+            v14 = sithCog_SendMessageEx(v12, message, SENDERTYPE_THING, sender->idx, v8, v7, 0, param0, param1, param2, param3);
             if ( v14 != -9999.9873046875 )
                 v19 = v14 + v19;
         }
@@ -952,7 +952,7 @@ cog_flex_t sithCog_ThingSendMessageEx(SithThing *sender, SithThing *receiver, SI
                           v15->cog,
                           SITH_MESSAGE_DAMAGED,
                           SENDERTYPE_THING,
-                          sender->thingIdx,
+                          sender->idx,
                           v8,
                           v7,
                           0,
@@ -972,7 +972,7 @@ cog_flex_t sithCog_ThingSendMessageEx(SithThing *sender, SithThing *receiver, SI
                           v15->cog,
                           message,
                           SENDERTYPE_THING,
-                          sender->thingIdx,
+                          sender->idx,
                           v8,
                           v7,
                           v15->linkid,
@@ -1006,7 +1006,7 @@ cog_flex_t sithCog_SurfaceSendMessageEx(SithSurface *sender, SithThing *thing, S
     v14 = 0.0;
     if ( thing )
     {
-        v8 = thing->thingIdx;
+        v8 = thing->idx;
         sourceType = SENDERTYPE_THING;
         v15 = 1 << thing->type;
     }
@@ -1081,7 +1081,7 @@ cog_flex_t sithCog_SectorSendMessageEx(SithSector *a1, SithThing *sourceType, SI
     v13 = 0.0;
     if ( sourceType )
     {
-        v8 = sourceType->thingIdx;
+        v8 = sourceType->idx;
         sourceTypea = SENDERTYPE_THING;
         v14 = 1 << sourceType->type;
     }
@@ -1149,14 +1149,14 @@ void sithCog_BroadcastMessageEx(int32_t cmdid, int32_t senderType, int32_t sende
 
     if ( sithWorld_g_pStaticWorld )
     {
-        v9 = sithWorld_g_pStaticWorld->cogs;
-        for ( i = 0; i < sithWorld_g_pStaticWorld->numCogsLoaded; ++i )
+        v9 = sithWorld_g_pStaticWorld->aCogs;
+        for ( i = 0; i < sithWorld_g_pStaticWorld->numCogs; ++i )
             sithCog_SendMessageEx(v9++, cmdid, senderType, senderIdx, sourceType, sourceIdx, 0, arg0, arg1, arg2, arg3);
     }
     if ( sithWorld_g_pCurrentWorld )
     {
-        v11 = sithWorld_g_pCurrentWorld->cogs;
-        for ( j = 0; j < sithWorld_g_pCurrentWorld->numCogsLoaded; ++j )
+        v11 = sithWorld_g_pCurrentWorld->aCogs;
+        for ( j = 0; j < sithWorld_g_pCurrentWorld->numCogs; ++j )
             sithCog_SendMessageEx(v11++, cmdid, senderType, senderIdx, sourceType, sourceIdx, 0, arg0, arg1, arg2, arg3);
     }
 }
@@ -1450,11 +1450,11 @@ void sithCog_FreeWorldCogs(SithWorld *world)
     uint32_t i; // ebx
     sithCog *v9; // esi
 
-    if ( world->cogScripts )
+    if ( world->aCogScripts )
     {
-        for (int32_t i = 0; i < world->numCogScriptsLoaded; i++)
+        for (int32_t i = 0; i < world->numCogScripts; i++)
         {
-            v4 = &world->cogScripts[i];
+            v4 = &world->aCogScripts[i];
             sithCogParse_FreeSymbolTable(v4->pSymbolTable);
             for (v5 = 0; v5 < v4->numIdk; v5++)
             {
@@ -1485,16 +1485,16 @@ void sithCog_FreeWorldCogs(SithWorld *world)
             stdHashtbl_Remove(sithCog_g_pHashtable, v4->cog_fpath);
 #endif
         }
-        SITH_FREE(world->cogScripts);
-        world->cogScripts = 0;
+        SITH_FREE(world->aCogScripts);
+        world->aCogScripts = 0;
+        world->sizeCogScripts = 0;
         world->numCogScripts = 0;
-        world->numCogScriptsLoaded = 0;
     }
-    if ( world->cogs )
+    if ( world->aCogs )
     {
-        for (int32_t i = 0; i < world->numCogsLoaded; i++ )
+        for (int32_t i = 0; i < world->numCogs; i++ )
         {
-            v9 = &world->cogs[i];
+            v9 = &world->aCogs[i];
             sithCogParse_FreeSymbolTable(v9->pSymbolTable);
 #ifdef COG_HEAP_INIT_ARGS
             if ( v9->aInitArgs ) // Added: failed-load path can leave these live
@@ -1517,23 +1517,23 @@ void sithCog_FreeWorldCogs(SithWorld *world)
             }
 #endif
         }
-        SITH_FREE(world->cogs);
-        world->cogs = 0;
+        SITH_FREE(world->aCogs);
+        world->aCogs = 0;
+        world->sizeCogs = 0;
         world->numCogs = 0;
-        world->numCogsLoaded = 0;
     }
 }
 
 void sithCog_UpdateThingTimer(SithThing *thing)
 {
-    if ( (thing->thingflags & SITH_TF_PULSESET) != 0 && thing->pulse_end_ms <= sithTime_g_msecGameTime )
+    if ( (thing->flags & SITH_TF_PULSESET) != 0 && thing->msecNextPulseTime <= sithTime_g_msecGameTime )
     {
-        thing->pulse_end_ms = sithTime_g_msecGameTime + thing->pulse_ms;
+        thing->msecNextPulseTime = sithTime_g_msecGameTime + thing->msecPulseInterval;
         sithCog_ThingSendMessageEx(thing, 0, SITH_MESSAGE_PULSE, 0.0, 0.0, 0.0, 0.0);
     }
-    if ( (thing->thingflags & SITH_TF_TIMERSET) != 0 && thing->timer <= sithTime_g_msecGameTime )
+    if ( (thing->flags & SITH_TF_TIMERSET) != 0 && thing->timer <= sithTime_g_msecGameTime )
     {
-        thing->thingflags &= ~SITH_TF_TIMERSET;
+        thing->flags &= ~SITH_TF_TIMERSET;
         sithCog_ThingSendMessageEx(thing, 0, SITH_MESSAGE_TIMER, 0.0, 0.0, 0.0, 0.0);
     }
 }
@@ -1541,9 +1541,9 @@ void sithCog_UpdateThingTimer(SithThing *thing)
 // MOTS altered?
 int sithCog_ReadCogScriptsListText(SithWorld *lvl, int a2)
 {
-    int32_t numCogScripts; // esi
+    int32_t sizeCogScripts; // esi
     int32_t result; // eax
-    SithCogScript *cogScripts; // edi
+    SithCogScript *aCogScripts; // edi
     char *v5; // esi
     SithWorld *v6; // edi
     uint32_t v7; // eax
@@ -1558,21 +1558,21 @@ int sithCog_ReadCogScriptsListText(SithWorld *lvl, int a2)
     stdConffile_ReadArgs();
     if ( _strcmp(stdConffile_g_entry.args[0].value, "world") || _strcmp(stdConffile_g_entry.args[1].value, "scripts") )
         return 0;
-    numCogScripts = _atoi(stdConffile_g_entry.args[2].value);
-    if ( !numCogScripts )
+    sizeCogScripts = _atoi(stdConffile_g_entry.args[2].value);
+    if ( !sizeCogScripts )
         return 1;
-    cogScripts = (SithCogScript *)SITH_ALLOC(sizeof(SithCogScript) * numCogScripts);
-    lvl->cogScripts = cogScripts;
-    if ( cogScripts )
+    aCogScripts = (SithCogScript *)SITH_ALLOC(sizeof(SithCogScript) * sizeCogScripts);
+    lvl->aCogScripts = aCogScripts;
+    if ( aCogScripts )
     {
-        _memset(cogScripts, 0, sizeof(SithCogScript) * numCogScripts);
-        lvl->numCogScripts = numCogScripts;
-        lvl->numCogScriptsLoaded = 0;
+        _memset(aCogScripts, 0, sizeof(SithCogScript) * sizeCogScripts);
+        lvl->sizeCogScripts = sizeCogScripts;
+        lvl->numCogScripts = 0;
         while ( stdConffile_ReadArgs() )
         {
             if ( !_strcmp(stdConffile_g_entry.args[0].value, "end") )
                 break;
-            if ( lvl->numCogScriptsLoaded < (unsigned int)lvl->numCogScripts )
+            if ( lvl->numCogScripts < (unsigned int)lvl->sizeCogScripts )
             {
                 if ( !stdConffile_g_entry.numArgs )
                     return 0;
@@ -1602,8 +1602,8 @@ SithCogScript* sithCog_LoadScript(const char *pFpath, int32_t unk)
     result = (SithCogScript *)stdHashtbl_Find(sithCog_g_pHashtable, pFpath);
     if ( !result )
     {
-        v4 = sithWorld_g_pLastLoadedWorld->numCogScriptsLoaded;
-        if ( v4 < sithWorld_g_pLastLoadedWorld->numCogScripts && (v5 = &sithWorld_g_pLastLoadedWorld->cogScripts[v4], sithCogParse_Load(v6, v5, unk)) )
+        v4 = sithWorld_g_pLastLoadedWorld->numCogScripts;
+        if ( v4 < sithWorld_g_pLastLoadedWorld->sizeCogScripts && (v5 = &sithWorld_g_pLastLoadedWorld->aCogScripts[v4], sithCogParse_Load(v6, v5, unk)) )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
             // The copies of names are load-bearing, SetKeyVal stores a reference
@@ -1611,7 +1611,7 @@ SithCogScript* sithCog_LoadScript(const char *pFpath, int32_t unk)
 #else
             stdHashtbl_Add(sithCog_g_pHashtable, pFpath, v5);
 #endif
-            ++sithWorld_g_pLastLoadedWorld->numCogScriptsLoaded;
+            ++sithWorld_g_pLastLoadedWorld->numCogScripts;
             result = v5;
         }
         else
@@ -1666,16 +1666,16 @@ void sithCog_ProcessCogs()
     if (g_sithMode == 2)
         return;
 
-    for (uint32_t i = 0; i < sithWorld_g_pCurrentWorld->numCogsLoaded; i++)
+    for (uint32_t i = 0; i < sithWorld_g_pCurrentWorld->numCogs; i++)
     {
-        sithCog_ProcessCog(&sithWorld_g_pCurrentWorld->cogs[i]);
+        sithCog_ProcessCog(&sithWorld_g_pCurrentWorld->aCogs[i]);
     }
 
     if ( sithWorld_g_pStaticWorld )
     {
-        for (uint32_t i = 0; i < sithWorld_g_pStaticWorld->numCogsLoaded; i++)
+        for (uint32_t i = 0; i < sithWorld_g_pStaticWorld->numCogs; i++)
         {
-            sithCog_ProcessCog(&sithWorld_g_pStaticWorld->cogs[i]);
+            sithCog_ProcessCog(&sithWorld_g_pStaticWorld->aCogs[i]);
         }
     }
 }
@@ -1712,7 +1712,7 @@ void sithCog_ProcessCog(sithCog *cog)
             sithCogExec_Execute(cog);
             return;
         }
-        if ( cog->script_running == 3 && (sithWorld_g_pCurrentWorld->things[cog->wakeTimeMs].trackParams.flags & 3) == 0 )
+        if ( cog->script_running == 3 && (sithWorld_g_pCurrentWorld->aThings[cog->wakeTimeMs].trackParams.flags & 3) == 0 )
         {
             if ((cog->flags & SITH_COG_DEBUG))
             {
@@ -1741,8 +1741,8 @@ int sithCog_TimerEventTask(int32_t deltaMs, SithEventParams *info)
         v2 = sithWorld_g_pStaticWorld;
         v3 &= ~0x8000u;
     }
-    if ( v2 && v3 >= 0 && v3 < v2->numCogsLoaded )
-        v4 = &v2->cogs[v3];
+    if ( v2 && v3 >= 0 && v3 < v2->numCogs )
+        v4 = &v2->aCogs[v3];
     else
         v4 = 0;
     if ( v4 )
@@ -1766,8 +1766,8 @@ int sithCog_CogStatus(stdDebugConsoleCmd *cmd, const char *extra)
     if ( sithWorld_g_pCurrentWorld
       && extra
       && _sscanf(extra, "%d", &tmp) == 1
-      && tmp <= world->numCogsLoaded
-      && (v3 = &world->cogs[tmp], v3->cogscript)
+      && tmp <= world->numCogs
+      && (v3 = &world->aCogs[tmp], v3->cogscript)
       && v3->pSymbolTable )
     {
         _sprintf(std_g_genBuffer, "Cog #%d: Name:%s  Script %s\n", tmp, v3->cogscript_fpath, v3->cogscript->cog_fpath);
@@ -1818,8 +1818,8 @@ sithCog* sithCog_GetCogByIndex(int32_t idx)
         idx &= ~0x8000u;
     }
 
-    if ( world && idx >= 0 && idx < world->numCogsLoaded )
-        result = &world->cogs[idx];
+    if ( world && idx >= 0 && idx < world->numCogs )
+        result = &world->aCogs[idx];
     else
         result = NULL;
 
@@ -1857,7 +1857,7 @@ void sithCog_FreeScriptEntry(SithCogScript *cogscript)
 int sithCog_AllocWorldCogScripts(SithWorld *world, int num)
 {
     SithCogScript *scripts = (SithCogScript *)SITH_ALLOC(num * sizeof(SithCogScript));
-    world->cogScripts = scripts;
+    world->aCogScripts = scripts;
     if ( !scripts )
     {
         stdPrintf(pSithHS->errorPrint, ".\\Cog\\sithCog.c", 0x34B,
@@ -1865,38 +1865,38 @@ int sithCog_AllocWorldCogScripts(SithWorld *world, int num)
         return 0;
     }
     _memset(scripts, 0, num * sizeof(SithCogScript));
-    world->numCogScripts = num;
-    world->numCogScriptsLoaded = 0;
+    world->sizeCogScripts = num;
+    world->numCogScripts = 0;
     return 1;
 }
 
 int sithCog_AllocWorldCogs(SithWorld *world, int num)
 {
-    sithCog *cogs;
+    sithCog *aCogs;
     { TWL_EXTRAM_SUGGEST(pSithHS); // Added
-    cogs = (sithCog *)SITH_ALLOC(num * sizeof(sithCog));
+    aCogs = (sithCog *)SITH_ALLOC(num * sizeof(sithCog));
     TWL_EXTRAM_RESTORE(pSithHS); }
-    world->cogs = cogs;
-    if ( !cogs )
+    world->aCogs = aCogs;
+    if ( !aCogs )
     {
         stdPrintf(pSithHS->errorPrint, ".\\Cog\\sithCog.c", 0x373,
-                  "Memory alloc failure initializing cogs.");
+                  "Memory alloc failure initializing aCogs.");
         return 0;
     }
-    stdPlatform_Memzero32(cogs, num * sizeof(sithCog)); // Added: word-safe
-    world->numCogs = num;
-    world->numCogsLoaded = 0;
+    stdPlatform_Memzero32(aCogs, num * sizeof(sithCog)); // Added: word-safe
+    world->sizeCogs = num;
+    world->numCogs = 0;
     return 1;
 }
 
 int sithCog_LinkCogToThing(sithCog *cog, SithThing *thing, int linkId, int mask)
 {
-    int thingIdx = sithThing_ValidateThingPointer(thing);
-    if ( !thingIdx || !thing->type )
+    int idx = sithThing_ValidateThingPointer(thing);
+    if ( !idx || !thing->type )
         return 0;
     if ( linkId >= 0 )
     {
-        thing->thingflags |= SITH_TF_CAPTURED;
+        thing->flags |= SITH_TF_CAPTURED;
         sithCog_aThingLinks[sithCog_numThingLinks].thing = thing;
         sithCog_aThingLinks[sithCog_numThingLinks].cog = cog;
         sithCog_aThingLinks[sithCog_numThingLinks].linkid = linkId;
@@ -1914,7 +1914,7 @@ int sithCog_LinkCogToSurface(sithCog *cog, SithSurface *surface, int linkId, int
         return 0;
     if ( linkId >= 0 )
     {
-        surface->surfaceFlags |= SITH_SURFACE_COG_LINKED;
+        surface->flags |= SITH_SURFACE_COG_LINKED;
         sithCog_aSurfaceLinks[sithCog_numSurfaceLinks].surface = surface;
         sithCog_aSurfaceLinks[sithCog_numSurfaceLinks].cog = cog;
         sithCog_aSurfaceLinks[sithCog_numSurfaceLinks].linkid = linkId;

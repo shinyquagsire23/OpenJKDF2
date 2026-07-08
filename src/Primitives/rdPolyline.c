@@ -214,7 +214,7 @@ int rdPolyline_Draw(rdThing *thing, rdMatrix34 *matrix)
     
     // This is slightly different than IDA?
     idxInfo.numVertices = 4;
-    idxInfo.vertices = polylineVerts;
+    idxInfo.aVertices = polylineVerts;
     idxInfo.paDynamicLight = 0;
     idxInfo.intensities = 0;
 
@@ -244,7 +244,7 @@ int rdPolyline_Draw(rdThing *thing, rdMatrix34 *matrix)
         polylineVerts[3].x = tip_left;
         polylineVerts[3].y = vertex_out.y - epislon;
         polylineVerts[3].z = tip_top;
-        idxInfo.vertexUVs = polyline->extraUVFaceMaybe;
+        idxInfo.aTexVerticies = polyline->extraUVFaceMaybe;
         rdPolyline_DrawFace(thing, &polyline->tipFace, polylineVerts, &idxInfo);
     }
 
@@ -262,7 +262,7 @@ int rdPolyline_Draw(rdThing *thing, rdMatrix34 *matrix)
         polylineVerts[3].x = out.scale.x - polyline->baseRadius;
         polylineVerts[3].y = out.scale.y - epislon;
         polylineVerts[3].z = out.scale.z + polyline->baseRadius;
-        idxInfo.vertexUVs = polyline->extraUVFaceMaybe;
+        idxInfo.aTexVerticies = polyline->extraUVFaceMaybe;
         rdPolyline_DrawFace(thing, &polyline->tipFace, polylineVerts, &idxInfo);
     }
     
@@ -303,7 +303,7 @@ int rdPolyline_Draw(rdThing *thing, rdMatrix34 *matrix)
         polylineVerts[3].x = (polyline->baseRadius * angCos) - (flex_t)0.0 + out.scale.x;
         polylineVerts[3].y = out.scale.y;
         polylineVerts[3].z = (polyline->baseRadius * angSin) + (flex_t)0.0 + out.scale.z;
-        idxInfo.vertexUVs = polyline->extraUVTipMaybe;
+        idxInfo.aTexVerticies = polyline->extraUVTipMaybe;
         rdPolyline_DrawFace(thing, &polyline->edgeFace, polylineVerts, &idxInfo);
     }
     return 1;
@@ -319,9 +319,9 @@ void rdPolyline_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdMesh
     if (!procEntry)
         return;
 
-    mesh_out.vertices = rdPolyline_FaceVerts;
-    mesh_out.verticesOrig = procEntry->vertices;
-    mesh_out.vertexUVs = procEntry->vertexUVs;
+    mesh_out.aVertices = rdPolyline_FaceVerts;
+    mesh_out.verticesOrig = procEntry->aVertices;
+    mesh_out.aTexVerticies = procEntry->aTexVerticies;
     mesh_out.paDynamicLight = procEntry->vertexIntensities;
     
     idxInfo->numVertices = face->numVertices;
@@ -383,7 +383,7 @@ void rdPolyline_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdMesh
     if ( mesh_out.numVertices < 3 )
         return;
 
-    rdCamera_g_pCurCamera->fnProjectLst(mesh_out.verticesOrig, mesh_out.vertices, mesh_out.numVertices);
+    rdCamera_g_pCurCamera->fnProjectLst(mesh_out.verticesOrig, mesh_out.aVertices, mesh_out.numVertices);
 
     if ( rdroid_g_curRenderOptions & 2 )
         procEntry->ambientLight = rdCamera_g_pCurCamera->ambientLight;

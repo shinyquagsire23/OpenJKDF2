@@ -827,7 +827,7 @@ int std3D_StartScene()
     }
 #endif
 
-    // Describe our vertices array to OpenGL (it can't guess its format automatically)
+    // Describe our aVertices array to OpenGL (it can't guess its format automatically)
     glBindBuffer(GL_ARRAY_BUFFER, world_vbo_all);
     glBufferData(GL_ARRAY_BUFFER, 1 * sizeof(D3DVERTEX), GL_tmpVertices, GL_STREAM_DRAW);
     glVertexAttribPointer(
@@ -1850,7 +1850,7 @@ void std3D_DrawUIRenderList()
     last_ui_tex = 0;
     last_ui_flags = -1;
 
-    // Generate vertices list
+    // Generate aVertices list
     D3DVERTEX* vertexes = GL_tmpUIVertices;
 
     float maxX, maxY, scaleX, scaleY, width, height;
@@ -2435,7 +2435,7 @@ void std3D_DrawRenderList()
     
     last_tex = NULL;
 
-    // Generate vertices list
+    // Generate aVertices list
     D3DVERTEX* vertexes = GL_tmpVertices;
 
     float maxX, maxY, scaleX, scaleY, width, height;
@@ -2835,7 +2835,7 @@ void std3D_AddRenderListLines(rdLine* lines, uint32_t num_lines)
     GL_tmpLinesAmt += num_lines;
 }
 
-int std3D_AddRenderListVertices(D3DVERTEX *vertices, int count)
+int std3D_AddRenderListVertices(D3DVERTEX *aVertices, int count)
 {
     if (Main_bHeadless) return 1;
 
@@ -2844,7 +2844,7 @@ int std3D_AddRenderListVertices(D3DVERTEX *vertices, int count)
         return 0;
     }
     
-    memcpy(&GL_tmpVertices[GL_tmpVerticesAmt], vertices, sizeof(D3DVERTEX) * count);
+    memcpy(&GL_tmpVertices[GL_tmpVerticesAmt], aVertices, sizeof(D3DVERTEX) * count);
     
     GL_tmpVerticesAmt += count;
     

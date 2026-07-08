@@ -12,8 +12,8 @@
 int sithAnimClass_Load(SithWorld *world, int a2)
 {
     int num_animclasses; // ebx
-    SithPuppetClass *animclasses; // edi
-    SithPuppetClass *animclass; // esi
+    SithPuppetClass *aPuppetClasses; // edi
+    SithPuppetClass *pPuppetClass; // esi
     char pup_path[128]; // [esp+10h] [ebp-80h] BYREF
 
     if ( a2 )
@@ -25,48 +25,48 @@ int sithAnimClass_Load(SithWorld *world, int a2)
     if ( !num_animclasses )
         return 1;
 #ifdef TARGET_RETRO_HOMEBREW
-    // Added: animclass data is all 32-bit fields, written only at parse time and
+    // Added: pPuppetClass data is all 32-bit fields, written only at parse time and
     // read when animations start -- cold and word-safe, so it can live in
     // word-addressable-only memory (DC VRAM arena / NDS slot-2 RAM).
     int prevSuggest = pSithHS->suggestHeap(HEAP_WORD_ADDRESSABLE);
 #endif
-    animclasses = (SithPuppetClass *)SITH_ALLOC(sizeof(SithPuppetClass) * num_animclasses);
+    aPuppetClasses = (SithPuppetClass *)SITH_ALLOC(sizeof(SithPuppetClass) * num_animclasses);
 #ifdef TARGET_RETRO_HOMEBREW
     pSithHS->suggestHeap(prevSuggest);
 #endif
-    world->animclasses = animclasses;
-    if ( !animclasses )
+    world->aPuppetClasses = aPuppetClasses;
+    if ( !aPuppetClasses )
         return 0;
-    world->numAnimClasses = num_animclasses;
-    world->numAnimClassesLoaded = 0;
-    stdPlatform_Memzero32(animclasses, sizeof(SithPuppetClass) * num_animclasses); // Added: word-safe
+    world->sizePuppetClasses = num_animclasses;
+    world->numPuppetClasses = 0;
+    stdPlatform_Memzero32(aPuppetClasses, sizeof(SithPuppetClass) * num_animclasses); // Added: word-safe
     while ( stdConffile_ReadArgs() )
     {
         if ( !_strcmp(stdConffile_g_entry.args[0].value, "end") )
             break;
         if ( !stdHashtbl_Find(sithPuppet_pClassHashtable, stdConffile_g_entry.args[1].value) )
         {
-            if ( sithWorld_g_pLastLoadedWorld->numAnimClassesLoaded != sithWorld_g_pLastLoadedWorld->numAnimClasses )
+            if ( sithWorld_g_pLastLoadedWorld->numPuppetClasses != sithWorld_g_pLastLoadedWorld->sizePuppetClasses )
             {
-                animclass = &sithWorld_g_pLastLoadedWorld->animclasses[sithWorld_g_pLastLoadedWorld->numAnimClassesLoaded];
-                stdPlatform_Memzero32(animclass, sizeof(SithPuppetClass)); // Added: word-safe
+                pPuppetClass = &sithWorld_g_pLastLoadedWorld->aPuppetClasses[sithWorld_g_pLastLoadedWorld->numPuppetClasses];
+                stdPlatform_Memzero32(pPuppetClass, sizeof(SithPuppetClass)); // Added: word-safe
                 const char* name = stdConffile_g_entry.args[1].value;
 #ifdef SITH_DEBUG_STRUCT_NAMES
-                stdString_SafeStrCopy(animclass->name, name, 32);
+                stdString_SafeStrCopy(pPuppetClass->name, name, 32);
 #endif
 #ifdef STDHASHTABLE_CRC32_KEYS
-                animclass->namecrc = stdCrc32(name, strlen(name));
+                pPuppetClass->namecrc = stdCrc32(name, strlen(name));
 #endif
                 // Added: sprintf -> snprintf
                 stdString_snprintf(pup_path, 128, "%s%c%s", "misc\\pup", 92, stdConffile_g_entry.args[1].value);
-                if ( sithAnimClass_LoadPupEntry(animclass, pup_path) )
+                if ( sithAnimClass_LoadPupEntry(pPuppetClass, pup_path) )
                 {
-                    ++sithWorld_g_pLastLoadedWorld->numAnimClassesLoaded;
+                    ++sithWorld_g_pLastLoadedWorld->numPuppetClasses;
 #ifdef SITH_DEBUG_STRUCT_NAMES
                     // The copies of names are load-bearing, SetKeyVal stores a reference
-                    stdHashtbl_Add(sithPuppet_pClassHashtable, animclass->name, animclass);
+                    stdHashtbl_Add(sithPuppet_pClassHashtable, pPuppetClass->name, pPuppetClass);
 #else
-                    stdHashtbl_Add(sithPuppet_pClassHashtable, name, animclass);
+                    stdHashtbl_Add(sithPuppet_pClassHashtable, name, pPuppetClass);
 #endif
                 }
             }
@@ -89,9 +89,9 @@ SithPuppetClass* sithAnimClass_LoadEntry(char *a1)
     result = (SithPuppetClass *)stdHashtbl_Find(sithPuppet_pClassHashtable, a1);
     if ( !result )
     {
-        v3 = sithWorld_g_pLastLoadedWorld->numAnimClassesLoaded;
-        if ( v3 == sithWorld_g_pLastLoadedWorld->numAnimClasses
-          || (v4 = &sithWorld_g_pLastLoadedWorld->animclasses[v3],
+        v3 = sithWorld_g_pLastLoadedWorld->numPuppetClasses;
+        if ( v3 == sithWorld_g_pLastLoadedWorld->sizePuppetClasses
+          || (v4 = &sithWorld_g_pLastLoadedWorld->aPuppetClasses[v3],
               stdPlatform_Memzero32(v4, sizeof(SithPuppetClass)), // Added: word-safe
 #ifdef SITH_DEBUG_STRUCT_NAMES
               stdString_SafeStrCopy(v4->name, a1, 32),
@@ -108,7 +108,7 @@ SithPuppetClass* sithAnimClass_LoadEntry(char *a1)
         else
         {
             v5 = sithPuppet_pClassHashtable;
-            ++sithWorld_g_pLastLoadedWorld->numAnimClassesLoaded;
+            ++sithWorld_g_pLastLoadedWorld->numPuppetClasses;
 #ifdef SITH_DEBUG_STRUCT_NAMES
             stdHashtbl_Add(v5, v4->name, v4);
 #else
@@ -120,7 +120,7 @@ SithPuppetClass* sithAnimClass_LoadEntry(char *a1)
     return result;
 }
 
-int sithAnimClass_LoadPupEntry(SithPuppetClass *animclass, char *fpath)
+int sithAnimClass_LoadPupEntry(SithPuppetClass *pPuppetClass, char *fpath)
 {
     int mode; // ebx
     unsigned int bodypart_idx; // esi
@@ -140,7 +140,7 @@ int sithAnimClass_LoadPupEntry(SithPuppetClass *animclass, char *fpath)
     if (!stdConffile_Open(fpath))
         return 0;
 
-    stdPlatform_Memset32(animclass->bodypart_to_joint, 0xFFu, sizeof(animclass->bodypart_to_joint)); // Added: word-safe
+    stdPlatform_Memset32(pPuppetClass->bodypart_to_joint, 0xFFu, sizeof(pPuppetClass->bodypart_to_joint)); // Added: word-safe
     while ( stdConffile_ReadArgs() )
     {
         if ( !stdConffile_g_entry.numArgs )
@@ -149,7 +149,7 @@ int sithAnimClass_LoadPupEntry(SithPuppetClass *animclass, char *fpath)
         {
             mode = _atoi(stdConffile_g_entry.args[0].value);
             if ( stdConffile_g_entry.numArgs > 1u && !_strcmp(stdConffile_g_entry.args[1].key, "basedon") )
-                stdPlatform_Memcpy32(&animclass->modes[mode], &animclass->modes[_atoi(stdConffile_g_entry.args[1].value)], sizeof(animclass->modes[mode])); // Added: word-safe
+                stdPlatform_Memcpy32(&pPuppetClass->modes[mode], &pPuppetClass->modes[_atoi(stdConffile_g_entry.args[1].value)], sizeof(pPuppetClass->modes[mode])); // Added: word-safe
         }
         else if ( !_strcmp(stdConffile_g_entry.args[0].value, "joints") )
         {
@@ -160,7 +160,7 @@ int sithAnimClass_LoadPupEntry(SithPuppetClass *animclass, char *fpath)
                 bodypart_idx = _atoi(stdConffile_g_entry.args[0].key);
                 joint_idx = _atoi(stdConffile_g_entry.args[0].value);
                 if ( bodypart_idx < 0xA )
-                    animclass->bodypart_to_joint[bodypart_idx] = joint_idx;
+                    pPuppetClass->bodypart_to_joint[bodypart_idx] = joint_idx;
             }
         }
         else if ( stdConffile_g_entry.numArgs > 1u )
@@ -184,27 +184,27 @@ int sithAnimClass_LoadPupEntry(SithPuppetClass *animclass, char *fpath)
                 {
                     world = sithWorld_g_pLastLoadedWorld;
                     key_fname = stdConffile_g_entry.args[1].value;
-                    if ( sithWorld_g_pLastLoadedWorld->keyframes )
+                    if ( sithWorld_g_pLastLoadedWorld->aKeyframes )
                     {
                         _sprintf(keyframe_fpath, "%s%c%s", "3do\\key", 92, stdConffile_g_entry.args[1].value);
                         v10 = (rdKeyframe *)stdHashtbl_Find(sithPuppet_pKeyHashtable, key_fname);
                         if ( v10 )
                         {
 LABEL_39:
-                            animclass->modes[mode].keyframe[animNameIdx].keyframe = v10;
-                            animclass->modes[mode].keyframe[animNameIdx].flags = flags;
-                            animclass->modes[mode].keyframe[animNameIdx].lowPri = lowpri;
-                            animclass->modes[mode].keyframe[animNameIdx].highPri = hipri;
+                            pPuppetClass->modes[mode].keyframe[animNameIdx].keyframe = v10;
+                            pPuppetClass->modes[mode].keyframe[animNameIdx].flags = flags;
+                            pPuppetClass->modes[mode].keyframe[animNameIdx].lowPri = lowpri;
+                            pPuppetClass->modes[mode].keyframe[animNameIdx].highPri = hipri;
 
                             continue;
                         }
-                        v12 = world->numKeyframesLoaded;
-                        if ( v12 < world->numKeyframes )
+                        v12 = world->numKeyframes;
+                        if ( v12 < world->sizeKeyframes )
                         {
-                            keyframe = &world->keyframes[v12];
+                            keyframe = &world->aKeyframes[v12];
                             if ( rdKeyframe_LoadEntry(keyframe_fpath, keyframe) )
                             {
-                                keyframe->id = world->numKeyframesLoaded;
+                                keyframe->id = world->numKeyframes;
                                 if ( (world->level_type_maybe & 1) )
                                 {
                                     keyframe->id |= 0x8000u;
@@ -215,7 +215,7 @@ LABEL_39:
                                 stdHashtbl_Add(sithPuppet_pKeyHashtable, /*keyframe->name*//*key_fname*/stdFileFromPath(keyframe_fpath), keyframe);
 #endif
                                 v10 = keyframe;
-                                ++world->numKeyframesLoaded;
+                                ++world->numKeyframes;
                                 goto LABEL_39;
                             }
                         }
@@ -232,21 +232,21 @@ LABEL_39:
 
 int sithAnimClass_New(SithWorld *world, int num)
 {
-    SithPuppetClass *animclasses;
+    SithPuppetClass *aPuppetClasses;
 
 #ifdef TARGET_RETRO_HOMEBREW
     int prevSuggest = pSithHS->suggestHeap(HEAP_WORD_ADDRESSABLE); // Added: see sithAnimClass_Load
 #endif
-    animclasses = (SithPuppetClass *)SITH_ALLOC(sizeof(SithPuppetClass) * num);
+    aPuppetClasses = (SithPuppetClass *)SITH_ALLOC(sizeof(SithPuppetClass) * num);
 #ifdef TARGET_RETRO_HOMEBREW
     pSithHS->suggestHeap(prevSuggest);
 #endif
-    world->animclasses = animclasses;
-    if ( !animclasses )
+    world->aPuppetClasses = aPuppetClasses;
+    if ( !aPuppetClasses )
         return 0;
-    world->numAnimClasses = num;
-    world->numAnimClassesLoaded = 0;
-    stdPlatform_Memzero32(animclasses, sizeof(SithPuppetClass) * num); // Added: word-safe
+    world->sizePuppetClasses = num;
+    world->numPuppetClasses = 0;
+    stdPlatform_Memzero32(aPuppetClasses, sizeof(SithPuppetClass) * num); // Added: word-safe
     return 1;
 }
 
@@ -255,30 +255,30 @@ void sithAnimClass_Free(SithWorld *world)
     unsigned int v1; // edi
     int v2; // ebx
 
-    if ( world->numAnimClasses )
+    if ( world->sizePuppetClasses )
     {
 
         v1 = 0;
-        if ( world->numAnimClassesLoaded )
+        if ( world->numPuppetClasses )
         {
             v2 = 0;
             do
             {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-                stdHashtbl_Remove(sithPuppet_pClassHashtable, world->animclasses[v2].name);
+                stdHashtbl_Remove(sithPuppet_pClassHashtable, world->aPuppetClasses[v2].name);
 #elif defined(STDHASHTABLE_CRC32_KEYS)
-                stdHashtbl_FreeKeyCrc32(sithPuppet_pClassHashtable, world->animclasses[v2].namecrc);
+                stdHashtbl_FreeKeyCrc32(sithPuppet_pClassHashtable, world->aPuppetClasses[v2].namecrc);
 #endif
                 ++v1;
                 ++v2;
             }
-            while ( v1 < world->numAnimClassesLoaded );
+            while ( v1 < world->numPuppetClasses );
         }
 
-        SITH_FREE(world->animclasses);
-        world->animclasses = 0;
-        world->numAnimClassesLoaded = 0;
-        world->numAnimClasses = 0;
+        SITH_FREE(world->aPuppetClasses);
+        world->aPuppetClasses = 0;
+        world->numPuppetClasses = 0;
+        world->sizePuppetClasses = 0;
     }
 }
 

@@ -1093,7 +1093,7 @@ psa_status_t psa_destroy_key(mbedtls_svc_key_id_t key)
 #if defined(MBEDTLS_PSA_CRYPTO_SE_C)
     driver = psa_get_se_driver_entry(slot->attr.lifetime);
     if (driver != NULL) {
-        /* For a key in a secure element, we need to do three things:
+        /* For a key in a secure element, we need to do three aThings:
          * remove the key file in internal storage, destroy the
          * key inside the secure element, and update the driver's
          * persistent data. Start a transaction that will encompass these
@@ -1337,7 +1337,7 @@ psa_status_t psa_export_key(mbedtls_svc_key_id_t key,
 
     /* Reject a zero-length output buffer now, since this can never be a
      * valid key representation. This way we know that data must be a valid
-     * pointer and we can do things like memset(data, ..., data_size). */
+     * pointer and we can do aThings like memset(data, ..., data_size). */
     if (data_size == 0) {
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
@@ -1436,7 +1436,7 @@ psa_status_t psa_export_public_key(mbedtls_svc_key_id_t key,
 
     /* Reject a zero-length output buffer now, since this can never be a
      * valid key representation. This way we know that data must be a valid
-     * pointer and we can do things like memset(data, ..., data_size). */
+     * pointer and we can do aThings like memset(data, ..., data_size). */
     if (data_size == 0) {
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
@@ -1645,7 +1645,7 @@ static psa_status_t psa_start_key_creation(
     slot->attr.flags &= ~MBEDTLS_PSA_KA_MASK_EXTERNAL_ONLY;
 
 #if defined(MBEDTLS_PSA_CRYPTO_SE_C)
-    /* For a key in a secure element, we need to do three things
+    /* For a key in a secure element, we need to do three aThings
      * when creating or registering a persistent key:
      * create the key file in internal storage, create the
      * key inside the secure element, and update the driver's

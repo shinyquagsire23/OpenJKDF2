@@ -309,10 +309,10 @@ struct Widget_Guard {
     }
 };
 
-void FileActivatedSignalHandler(GtkButton* saveButton, void* userdata) {
+void FileActivatedSignalHandler(GtkButton* saveButton, void* userval) {
     (void)saveButton;  // silence the unused arg warning
 
-    ButtonClickedArgs* args = static_cast<ButtonClickedArgs*>(userdata);
+    ButtonClickedArgs* args = static_cast<ButtonClickedArgs*>(userval);
     GtkFileChooserNative* chooser = args->chooser;
     char* currentFileName = gtk_file_chooser_get_current_name(GTK_FILE_CHOOSER(chooser));
     if (*currentFileName) {  // string is not empty

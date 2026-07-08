@@ -268,7 +268,7 @@ int jkHud_ClearRects(int unk)
     }
     if ( !jkHud_bViewScores && jkHud_tallyWhich )
         --jkHud_tallyWhich;
-    if ( (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_NOIDLECAMERA) == 0 )
+    if ( (playerThings[playerThingIdx].actorThing->actorParams.flags & SITH_AF_NOIDLECAMERA) == 0 )
     {
         result = 0;
 LABEL_29:
@@ -308,7 +308,7 @@ LABEL_30:
 // MOTS altered
 void jkHud_Draw()
 {
-    SithThing *playerThing; // esi
+    SithThing *pLocalPlayer; // esi
     SithInventoryItem *v1; // eax
     int v2; // eax
     int v3; // eax
@@ -383,10 +383,10 @@ void jkHud_Draw()
 #ifdef SITH_DEBUG_STRUCT_NAMES
     if ( Main_bDispStats )
     {
-        playerThing = sithWorld_g_pCurrentWorld->playerThing;
-        if ( playerThing->type == SITH_THING_PLAYER )
+        pLocalPlayer = sithWorld_g_pCurrentWorld->pLocalPlayer;
+        if ( pLocalPlayer->type == SITH_THING_PLAYER )
         {
-            v1 = sithInventory_GetBin(playerThing, SITHBIN_FORCEMANA);
+            v1 = sithInventory_GetBin(pLocalPlayer, SITHBIN_FORCEMANA);
             if ( v1 )
             {
                 tmpFloat1 = v1->ammoAmt;
@@ -396,19 +396,19 @@ void jkHud_Draw()
                 tmpFloat1 = 0.0;
             }
             stdString_snprintf(std_g_genBuffer, 1024, "force: %3.0f, ", tmpFloat1);
-            jkHud_GetWeaponAmmo(playerThing);
-            if ( playerThing->type == SITH_THING_PLAYER )
+            jkHud_GetWeaponAmmo(pLocalPlayer);
+            if ( pLocalPlayer->type == SITH_THING_PLAYER )
             {
-                v2 = playerThing->actorParams.playerinfo->curItem;
+                v2 = pLocalPlayer->actorParams.pPlayer->curItem;
                 if ( v2 >= 0 )
                     stdString_snprintf(
                         &std_g_genBuffer[_strlen(std_g_genBuffer)],
                         1024 - _strlen(std_g_genBuffer),
                         " item: %s,",
                         sithInventory_g_aTypes[v2].fpath);
-                if ( playerThing->type == SITH_THING_PLAYER )
+                if ( pLocalPlayer->type == SITH_THING_PLAYER )
                 {
-                    v3 = playerThing->actorParams.playerinfo->curPower;
+                    v3 = pLocalPlayer->actorParams.pPlayer->curPower;
                     if ( v3 >= 0 )
                         stdString_snprintf(
                             &std_g_genBuffer[_strlen(std_g_genBuffer)],
@@ -444,7 +444,7 @@ void jkHud_Draw()
         return;
     }
 
-    v4 = sithWorld_g_pCurrentWorld->playerThing;
+    v4 = sithWorld_g_pCurrentWorld->pLocalPlayer;
     if ( Video_modeStruct.b3DAccel )
         stdDisplay_VBufferLock(Video_pMenuBuffer);
 
@@ -610,8 +610,8 @@ void jkHud_Draw()
     if (
         jkPlayer_setCrosshair 
         && sithCamera_g_pCurCamera->cameraPerspective == 1
-        && !(sithPlayer_g_pLocalPlayerThing->thingflags & SITH_TF_DEAD) 
-        && MOTS_ONLY_COND(!(sithPlayer_g_pLocalPlayerThing->actorParams.typeflags & SITH_AF_SCOPEHUD))
+        && !(sithPlayer_g_pLocalPlayerThing->flags & SITH_TF_DEAD) 
+        && MOTS_ONLY_COND(!(sithPlayer_g_pLocalPlayerThing->actorParams.flags & SITH_AF_SCOPEHUD))
 #ifdef QOL_IMPROVEMENTS
         && jkHud_shouldCrosshairBeShownForWeapon(sithPlayer_g_pLocalPlayerThing)
 #endif /* ifdef QOL_IMPROVEMENTS */
@@ -702,7 +702,7 @@ void jkHud_Draw()
                 if ((playerInfoIter->flags & 1) != 0)
                 {
                     stdString_SafeWStrCopy(jkHud_aPlayerScores[v29].playerName, playerInfoIter->player_name, 0x20);
-                    v33 = v32->playerThing->rdthing.model3->filename;
+                    v33 = v32->pLocalPlayer->renderData.model3->filename;
                     stdFnames_CopyShortName(tmpFname, 16, v33);
                     jkGuiTitle_sub_4189A0(tmpFname);
                     v34 = jkStrings_GetUniStringWithFallback(tmpFname);
@@ -926,7 +926,7 @@ LABEL_116:
 // MOTS altered
 void jkHud_DrawGPU()
 {
-    SithThing *playerThing; // esi
+    SithThing *pLocalPlayer; // esi
     SithInventoryItem *v1; // eax
     int v2; // eax
     int v3; // eax
@@ -1020,7 +1020,7 @@ void jkHud_DrawGPU()
         return;
     }
 
-    v4 = sithWorld_g_pCurrentWorld->playerThing;
+    v4 = sithWorld_g_pCurrentWorld->pLocalPlayer;
     if ( Video_modeStruct.b3DAccel )
         stdDisplay_VBufferLock(Video_pMenuBuffer);
 
@@ -1201,8 +1201,8 @@ void jkHud_DrawGPU()
     if (
         jkPlayer_setCrosshair
         && sithCamera_g_pCurCamera->cameraPerspective == 1 
-        && !(sithPlayer_g_pLocalPlayerThing->thingflags & SITH_TF_DEAD) 
-        && MOTS_ONLY_COND(!(sithPlayer_g_pLocalPlayerThing->actorParams.typeflags & SITH_AF_SCOPEHUD))
+        && !(sithPlayer_g_pLocalPlayerThing->flags & SITH_TF_DEAD) 
+        && MOTS_ONLY_COND(!(sithPlayer_g_pLocalPlayerThing->actorParams.flags & SITH_AF_SCOPEHUD))
 #ifdef QOL_IMPROVEMENTS
         && jkHud_shouldCrosshairBeShownForWeapon(sithPlayer_g_pLocalPlayerThing)
 #endif /* ifdef QOL_IMPROVEMENTS */
@@ -1307,7 +1307,7 @@ void jkHud_DrawGPU()
                 if ((playerInfoIter->flags & 1) != 0)
                 {
                     stdString_SafeWStrCopy(jkHud_aPlayerScores[v29].playerName, playerInfoIter->player_name, 0x20);
-                    v33 = v32->playerThing->rdthing.model3->filename;
+                    v33 = v32->pLocalPlayer->renderData.model3->filename;
                     stdFnames_CopyShortName(tmpFname, 16, v33);
                     jkGuiTitle_sub_4189A0(tmpFname);
                     // MOTS altered here "_SHORT" TODO
@@ -1560,7 +1560,7 @@ int jkHud_GetWeaponAmmo(SithThing *player)
         weaponToAmmo[18] = SITHBIN_MOTS_SEQUENCER_CHARGE;
         weaponToAmmo[19] = -1;
 
-        binIdxWeap = sithInventory_SelectWeaponPrior(player->actorParams.playerinfo->curWeapon);
+        binIdxWeap = sithInventory_SelectWeaponPrior(player->actorParams.pPlayer->curWeapon);
         if (binIdxWeap < 0) {
             return -999;
         }
@@ -1595,7 +1595,7 @@ int jkHud_GetWeaponAmmo(SithThing *player)
         weaponToAmmo[5] = SITHBIN_POWER;
         weaponToAmmo[6] = SITHBIN_POWER;
         weaponToAmmo[9] = SITHBIN_POWER;
-        v1 = player->actorParams.playerinfo;
+        v1 = player->actorParams.pPlayer;
         weaponToAmmo[4] = SITHBIN_THERMAL_DETONATOR;
         v2 = v1->curWeapon;
         weaponToAmmo[0] = -1;

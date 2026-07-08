@@ -595,7 +595,7 @@ typedef struct rdAnimEntry
     rdVector3 pos;
     rdVector3 orientation;
     rdVector3 vel;
-    rdVector3 angVel;
+    rdVector3 angularVelocity;
 } rdAnimEntry;
 
 typedef struct rdJoint
@@ -662,8 +662,8 @@ typedef struct rdProcEntry
     uint32_t anonymous_4;
     uint32_t anonymous_5;
     uint32_t numVertices;
-    rdVector3* vertices;
-    rdVector2* vertexUVs;
+    rdVector3* aVertices;
+    rdVector2* aTexVerticies;
     flex_t* vertexIntensities;
 #ifdef JKM_LIGHTING
     flex_t* paRedIntensities;
@@ -1543,8 +1543,8 @@ typedef struct rdMeshinfo
     uint32_t numVertices;
     int* vertexPosIdx;
     int* vertexUVIdx;
-    rdVector3* vertices;
-    rdVector2* vertexUVs;
+    rdVector3* aVertices;
+    rdVector2* aTexVerticies;
     flex_t* paDynamicLight;
     flex_t* intensities;
 #ifdef JKM_LIGHTING
@@ -1603,9 +1603,9 @@ typedef struct SithSurface
 {
     uint32_t index;
     uint32_t field_4;
-    SithSector* parent_sector;
-    SithSurfaceAdjoin* adjoin;
-    uint32_t surfaceFlags;
+    SithSector* pSector;
+    SithSurfaceAdjoin* pAdjoin;
+    uint32_t flags;
     sithSurfaceInfo surfaceInfo;
 #ifdef SITHRENDER_SPHERE_TEST_SURFACES
     flex_t radius;
@@ -1827,7 +1827,7 @@ typedef struct net_msg
     uint32_t timeMs2;
     uint32_t field_14;
     uint32_t field_18;
-    uint32_t thingIdx;
+    uint32_t idx;
     uint32_t msg_size;
     uint16_t cogMsgId;
     uint16_t msgId;
@@ -1835,7 +1835,7 @@ typedef struct net_msg
 
 typedef struct sithCogMsg_Pair
 {
-    uint32_t thingIdx;
+    uint32_t idx;
     uint32_t msgId;
 } sithCogMsg_Pair;
 
@@ -2261,28 +2261,28 @@ typedef struct SithWorld
     int32_t numColormaps;
     rdColormap* colormaps;
     int32_t numSectors;
-    SithSector* sectors;
-    int32_t numMaterialsLoaded;
+    SithSector* aSectors;
     int32_t numMaterials;
-    rdMaterial* materials;
+    int32_t sizeMaterials;
+    rdMaterial* aMaterials;
     rdVector2* materials2;
-    uint32_t numModelsLoaded;
     uint32_t numModels;
-    rdModel3* models;
-    int32_t numSpritesLoaded;
+    uint32_t sizeModels;
+    rdModel3* aModels;
     int32_t numSprites;
-    rdSprite* sprites;
-    int32_t numParticlesLoaded;
+    int32_t sizeSprites;
+    rdSprite* aSprites;
     int32_t numParticles;
-    rdParticle* particles;
+    int32_t sizeParticles;
+    rdParticle* aParticles;
     int32_t numVertices;
-    rdVector3* vertices;
-    rdVector3* verticesTransformed;
+    rdVector3* aVertices;
+    rdVector3* aTransformedVertices;
     int32_t* alloc_unk98;
-    flex_t* verticesDynamicLight;
+    flex_t* aVertDynamicLights;
     int32_t* alloc_unk9c;
-    int32_t numVertexUVs;
-    rdVector2* vertexUVs;
+    int32_t numTexVertices;
+    rdVector2* aTexVerticies;
     int32_t numSurfaces;
     SithSurface* surfaces;
 #ifdef SITHSURFACE_POOLED_ARRAYS
@@ -2293,45 +2293,45 @@ typedef struct SithWorld
     SithSurfaceAdjoin* adjoins;
     int32_t numThingsLoaded;
     int32_t numThings;
-    SithThing* things;
-    int32_t numTemplatesLoaded;
-    int32_t numTemplates;
-    SithThing* templates;
-    flex_t worldGravity;
+    SithThing* aThings;
+    int32_t numThingTemplates;
+    int32_t sizeThingTemplates;
+    SithThing* aThingTemplates;
+    flex_t gravity;
     uint32_t field_D8;
-    flex_t ceilingSky;
-    flex_t horizontalDistance;
+    flex_t ceilingSkyHeight;
+    flex_t horizonDistance;
     flex_t horizontalPixelsPerRev;
-    rdVector2 horizontalSkyOffs;
-    rdVector2 ceilingSkyOffs;
+    rdVector2 horizonSkyOffset;
+    rdVector2 ceilingSkyOffset;
     rdVector4 mipmapDistance;
-    rdVector4 lodDistance;
+    rdVector4 distancesLOD;
     flex_t perspectiveDistance;
     flex_t gouradDistance;
-    SithThing* cameraFocus;
-    SithThing* playerThing;
+    SithThing* pCameraFocusThing;
+    SithThing* pLocalPlayer;
     uint32_t field_128;
     int32_t numSoundsLoaded;
     int32_t numSounds;
     sithSound* sounds;
-    int32_t numSoundClassesLoaded;
     int32_t numSoundClasses;
-    sithSoundClass* soundclasses;
-    int32_t numCogScriptsLoaded;
+    int32_t sizeSoundClasses;
+    sithSoundClass* aSoundClasses;
     int32_t numCogScripts;
-    SithCogScript* cogScripts;
-    int32_t numCogsLoaded;
+    int32_t sizeCogScripts;
+    SithCogScript* aCogScripts;
     int32_t numCogs;
-    sithCog* cogs;
-    int32_t numAIClassesLoaded;
+    int32_t sizeCogs;
+    sithCog* aCogs;
     int32_t numAIClasses;
-    SithAIClass* aiclasses;
-    int32_t numKeyframesLoaded;
+    int32_t sizeAIClasses;
+    SithAIClass* aAIClasses;
     int32_t numKeyframes;
-    rdKeyframe* keyframes;
-    int32_t numAnimClassesLoaded;
-    int32_t numAnimClasses;
-    SithPuppetClass* animclasses;
+    int32_t sizeKeyframes;
+    rdKeyframe* aKeyframes;
+    int32_t numPuppetClasses;
+    int32_t sizePuppetClasses;
+    SithPuppetClass* aPuppetClasses;
 #ifdef JKM_LIGHTING
     int32_t numArchLights;
     //int sizeArchLights;
@@ -2482,7 +2482,7 @@ typedef struct rdPuppetTrack
 typedef struct rdPuppet
 {
     uint32_t paused;
-    rdThing *rdthing;
+    rdThing *renderData;
     rdPuppetTrack tracks[4];
 } rdPuppet;
 
@@ -2507,7 +2507,7 @@ typedef struct SithPlayer
 #ifndef DW_TYPES
     int32_t field_1354;
 #endif
-    SithThing* playerThing;
+    SithThing* pLocalPlayer;
     rdMatrix34 spawnPosOrient;
     SithSector* pSpawnSector;
 #ifndef DW_TYPES
@@ -2557,7 +2557,7 @@ typedef struct jkPlayerInfo
     SithThing* saber_sparks;
     SithThing* actorThing;
 #ifdef JKM_DSS
-    uint32_t thing_id;
+    uint32_t guid;
 #endif // JKM_TYPES
     uint32_t maxTwinkles;
     uint32_t twinkleSpawnRate;
@@ -2620,7 +2620,7 @@ typedef struct SithCollision
 
 typedef struct sithCollisionSectorEntry
 {
-    SithSector* sectors[64];
+    SithSector* aSectors[64];
 } sithCollisionSectorEntry;
 
 typedef struct sithCollisionSearchResult
@@ -2637,16 +2637,16 @@ typedef struct SithSector
     rdColormap* colormap;
     rdVector3 tint;
     uint32_t numVertices;
-    int32_t* verticeIdxs;
+    int32_t* aVertIdxs;
     uint32_t numSurfaces;
     SithSurface* surfaces;
     SithSurfaceAdjoin* adjoins;
-    SithThing* thingsList;
+    SithThing* pFirstThingInSector;
     uint32_t flags;
     rdVector3 center;
     rdVector3 thrust;
-    sithSound* sectorSound;
-    flex_t sectorSoundVol;
+    sithSound* hAmbientSound;
+    flex_t ambientSoundVolume;
     rdVector3 collidebox_onecorner;
     rdVector3 collidebox_othercorner;
     rdVector3 boundingbox_onecorner;
@@ -2654,7 +2654,7 @@ typedef struct SithSector
     flex_t radius;
     uint32_t renderTick;
     uint32_t clipVisited;
-    rdClipFrustum* clipFrustum;
+    rdClipFrustum* pClipFrustum;
 #ifdef TARGET_TWL
     uint32_t geoRenderTick;
 #endif
@@ -2728,7 +2728,7 @@ typedef struct SithAIControlBlock
     rdVector3 field_23C;
     int32_t field_248;
     rdVector3 position;
-    rdVector3 lookOrientation;
+    rdVector3 orient;
     flex_t field_264;
     int32_t field_268;
     int32_t field_26C;
@@ -2756,12 +2756,12 @@ typedef struct sithAIAlign
 
 typedef struct SithParticleInfo
 {
-    uint32_t typeFlags;
+    uint32_t flags;
     uint32_t count;
     rdMaterial* material;
-    flex_t elementSize;
+    flex_t size;
     flex_t growthSpeed;
-    flex_t minSize;
+    flex_t minRadius;
     flex_t range;
     flex_t pitchRange;
     flex_t yawRange;
@@ -2790,19 +2790,19 @@ typedef struct SithParticleInfo
 
 typedef struct SithExplosionInfo
 {
-    uint32_t typeflags;
-    uint32_t lifeLeftMs;
+    uint32_t flags;
+    uint32_t msecLifeLeft;
     flex_t range;
     flex_t force;
-    uint32_t blastTime;
+    uint32_t msecBlastTime;
     flex_t maxLight;
     uint32_t field_18;
     flex_t damage;
-    uint32_t damageClass;
+    uint32_t damageType;
     int32_t flashR;
     int32_t flashG;
     int32_t flashB;
-    SithThing* debrisTemplates[4];
+    SithThing* apDebries[4];
     uint32_t field_40;
     uint32_t field_44;
     uint32_t field_48;
@@ -2831,14 +2831,14 @@ typedef struct SithBackpackItem
 
 typedef struct SithItemInfo
 {
-    uint32_t typeflags;
+    uint32_t flags;
     rdVector3 position;
     SithSector* sector;
-    flex_t respawn;
+    flex_t secRespawnInterval;
 #ifdef JKM_PARAMS
     flex_t respawnFactor;
 #endif
-    uint32_t respawnTime;
+    uint32_t msecLastTouchTime;
     int16_t numBins;
     int16_t field_1E;
     SithBackpackItem contents[12];
@@ -2847,17 +2847,17 @@ typedef struct SithItemInfo
 
 typedef struct SithWeaponInfo
 {
-    sithWeaponFlags_t typeflags; // 00
-    uint32_t damageClass; // 04
+    sithWeaponFlags_t flags; // 00
+    uint32_t damageType; // 04
     flex_t unk8; // 08
     flex_t damage; // 0C
-    SithThing* explodeTemplate; // 10
+    SithThing* pExplosionTemplate; // 10
     SithThing* fleshHitTemplate; // 14
-    uint32_t numDeflectionBounces; // 18
+    uint32_t numRicochets; // 18
     flex_t rate; // 1C
-    flex_t mindDamage; // 20
+    flex_t minDamage; // 20
     SithThing* trailThing; // 24
-    flex_t elementSize; // 28
+    flex_t size; // 28
     flex_t trailCylRadius; // 2C
     flex_t trainRandAngle; // 30
 #ifdef JKM_PARAMS
@@ -2893,18 +2893,18 @@ typedef struct SithWeaponInfo
 
 typedef struct SithActorInfo
 {
-    uint32_t typeflags;
+    uint32_t flags;
     flex_t health;
     flex_t maxHealth;
-    uint32_t msUnderwater;
+    uint32_t endurance;
     flex_t jumpSpeed;
     flex_t extraSpeed;
     flex_t maxThrust;
-    flex_t maxRotThrust;
-    SithThing* templateWeapon;
+    flex_t maxRotVelocity;
+    SithThing* pWeaponTemplate;
     SithThing* templateWeapon2;
-    SithThing* templateExplode;
-    rdVector3 eyePYR;
+    SithThing* pExplodeTemplate;
+    rdVector3 headPYR;
     rdVector3 eyeOffset;
     flex_t minHeadPitch;
     flex_t maxHeadPitch;
@@ -2919,7 +2919,7 @@ typedef struct SithActorInfo
     flex_t fov;
     flex_t error;
     uint32_t field_1BC;
-    SithPlayer *playerinfo;
+    SithPlayer *pPlayer;
     uint32_t field_1C4;
     uint32_t field_1C8;
     uint32_t field_1CC;
@@ -2930,25 +2930,25 @@ typedef struct SithActorInfo
 
 typedef struct SithPhysicsInfo
 {
-    uint32_t physflags;
+    uint32_t flags;
 #ifdef JKM_TYPES
     //uint32_t unk_4;
 #endif
     rdVector3 vel;
-    rdVector3 angVel;
+    rdVector3 angularVelocity;
     rdVector3 acceleration;
     rdVector3 field_1F8;
     flex_t mass;
     flex_t height;
     flex_t airDrag;
-    flex_t surfaceDrag;
+    flex_t surfDrag;
     flex_t staticDrag;
-    flex_t maxRotVel;
-    flex_t maxVel;
+    flex_t maxRotationVelocity;
+    flex_t maxVelocity;
     flex_t orientSpeed;
     flex_t buoyancy;
-    rdVector3 addedVelocity;
-    rdVector3 velocityMaybe;
+    rdVector3 gravityForce;
+    rdVector3 deltaVelocity;
     flex_t physicsRolloverFrames;
     flex_t field_74;
     flex_t field_78;
@@ -2978,19 +2978,19 @@ typedef struct SithPathMoveInfo
 
 typedef struct SithThing
 {
-    uint32_t thingflags;
-    uint32_t thingIdx;
-    uint32_t thing_id;
+    uint32_t flags;
+    uint32_t idx;
+    uint32_t guid;
 #ifdef JKM_PARAMS
     uint32_t unk;
 #endif // JKM_TYPES
     uint32_t type;
     uint32_t moveType;
     uint32_t controlType;
-    int32_t lifeLeftMs;
+    int32_t msecLifeLeft;
     uint32_t timer;
-    uint32_t pulse_end_ms;
-    uint32_t pulse_ms;
+    uint32_t msecNextPulseTime;
+    uint32_t msecPulseInterval;
     uint32_t collide;
     flex_t moveSize;
     flex_t collideSize;
@@ -3016,25 +3016,25 @@ typedef struct SithThing
 
 
     SithSector* sector;
-    SithThing* nextThing;
-    SithThing* prevThing;
-    SithThing* attachedParentMaybe;
-    SithThing* childThing;
-    SithThing* parentThing;
+    SithThing* pNextThingInSector;
+    SithThing* pPrevThingInSector;
+    SithThing* pAttachedThing;
+    SithThing* pNextAttachedThing;
+    SithThing* pPrevAttachedThing;
     uint32_t signature;
-    SithThing* templateBase;
     SithThing* pTemplate;
-    SithThing* prev_thing;
-    uint32_t child_signature;
-    rdMatrix34 lookOrientation;
+    SithThing* pCreateThingTemplate;
+    SithThing* pParent;
+    uint32_t parentSignature;
+    rdMatrix34 orient;
     rdVector3 position;
-    rdThing rdthing;
-    rdVector3 screenPos;
+    rdThing renderData;
+    rdVector3 transformedPos;
     flex_t light;
     flex_t lightMin;
-    int32_t lastRenderedTickIdx;
-    sithSoundClass* soundclass;
-    SithPuppetClass* animclass;
+    int32_t renderFrame;
+    sithSoundClass* pSoundClass;
+    SithPuppetClass* pPuppetClass;
     sithPuppet* puppet;
     union
     {
@@ -3068,16 +3068,16 @@ typedef struct SithThing
     SithAIClass* pAIClass;
     SithAIControlBlock* actor;
 #ifdef SITH_DEBUG_STRUCT_NAMES
-    char template_name[32];
+    char aName[32];
 #endif
 #ifdef STDHASHTABLE_CRC32_KEYS
     uint32_t templateNameCrc;
 #endif
-    sithCog* class_cog;
-    sithCog* capture_cog;
+    sithCog* pCog;
+    sithCog* pCaptureCog;
     jkPlayerInfo* playerInfo;
     uint32_t jkFlags;
-    flex_t userdata;
+    flex_t userval;
 #ifdef JKM_TYPES
     int32_t idk1;
 #endif

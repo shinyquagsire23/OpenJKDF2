@@ -60,7 +60,7 @@ int jkControl_HandleHudKeys(SithThing *player, flex_t b)
     wchar_t a4[256]; // [esp+108h] [ebp-200h] BYREF
 
     // Added: dedicated
-    if ((sithNet_isServer && jkGuiNetHost_bIsDedicated) || (player->actorParams.typeflags & SITH_TF_RENDERWEAPON) == 0 )
+    if ((sithNet_isServer && jkGuiNetHost_bIsDedicated) || (player->actorParams.flags & SITH_TF_RENDERWEAPON) == 0 )
     {
         if ( !jkHud_bChatOpen )
         {
@@ -85,7 +85,7 @@ int jkControl_HandleHudKeys(SithThing *player, flex_t b)
         sithControl_GetKey(INPUT_FUNC_CAMERAMODE, &v15);
         for (int i = v15-- == 0; !i; --v15 )
         {
-            if ( (player->thingflags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) == 0 && sithThing_MotsTick(0xe,0,0.0)) // MOTS altered
+            if ( (player->flags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) == 0 && sithThing_MotsTick(0xe,0,0.0)) // MOTS altered
             {
                 sithCamera_CycleCamera();
                 //DAT_005b9254 = 2; // MOTS TODO

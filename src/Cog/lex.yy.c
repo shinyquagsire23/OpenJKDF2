@@ -1068,7 +1068,7 @@ YY_CHAR c;
     *yy_cp = yy_hold_char;
 
     if ( yy_cp < yy_current_buffer->yy_ch_buf + 2 )
-	{ /* need to shift things up to make room */
+	{ /* need to shift aThings up to make room */
 	/*register*/ int number_to_move = yy_n_chars + 2; /* +2 for EOB chars */
 	/*register*/ YY_CHAR *dest =
 	    &yy_current_buffer->yy_ch_buf[yy_current_buffer->yy_buf_size + 2];

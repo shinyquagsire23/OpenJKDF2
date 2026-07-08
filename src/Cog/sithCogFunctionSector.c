@@ -305,7 +305,7 @@ void sithCogFunctionSector_GetSectorVertexPos(sithCog *ctx)
     vertex_idx = sithCogExec_PopInt(ctx);
     sector = sithCogExec_PopSector(ctx);
     if ( sector && (unsigned int)vertex_idx < sector->numVertices && vertex_idx >= 0 )
-        sithCogExec_PushVector(ctx, &active_jkl->vertices[sector->verticeIdxs[vertex_idx]]);
+        sithCogExec_PushVector(ctx, &active_jkl->aVertices[sector->aVertIdxs[vertex_idx]]);
     else
         sithCogExec_PushVector(ctx, &rdroid_zeroVector3);
 }
@@ -339,7 +339,7 @@ void sithCogFunctionSector_ChangeAllSectorsLight(sithCog *ctx)
 
     cog_flex_t val = sithCogExec_PopFlex(ctx);
     for (int i = 0; i < sithWorld_g_pCurrentWorld->numSectors; i++) {
-        SithSector* pSector = &sithWorld_g_pCurrentWorld->sectors[i];
+        SithSector* pSector = &sithWorld_g_pCurrentWorld->aSectors[i];
         pSector->extraLight = val;
     }
 }

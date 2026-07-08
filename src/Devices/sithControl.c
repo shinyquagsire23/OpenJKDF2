@@ -267,8 +267,8 @@ void sithControl_Update(flex_t deltaSecs, int deltaMs)
 
     // MOTS altered
     if ( !sithPlayer_g_pLocalPlayerThing
-      || (sithPlayer_g_pLocalPlayerThing->actorParams.typeflags & (Main_bMotsCompat ? (SITH_AF_NOIDLECAMERA|SITH_AF_SCOPEHUD|SITH_AF_ARACHNID) : SITH_AF_NOIDLECAMERA))
-      || (sithPlayer_g_pLocalPlayerThing->thingflags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) != 0
+      || (sithPlayer_g_pLocalPlayerThing->actorParams.flags & (Main_bMotsCompat ? (SITH_AF_NOIDLECAMERA|SITH_AF_SCOPEHUD|SITH_AF_ARACHNID) : SITH_AF_NOIDLECAMERA))
+      || (sithPlayer_g_pLocalPlayerThing->flags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) != 0
       || (sithCamera_g_stateFlags & 1) != 0 )
     {
         if ( sithCamera_g_pCurCamera == &sithCamera_g_aCameras[4] )
@@ -297,14 +297,14 @@ void sithControl_Update(flex_t deltaSecs, int deltaMs)
             }
         }
     }
-    if ( sithWorld_g_pCurrentWorld->playerThing && sithControl_numHandlers > 0 )
+    if ( sithWorld_g_pCurrentWorld->pLocalPlayer && sithControl_numHandlers > 0 )
     {
 #ifndef FIXED_TIMESTEP_PHYS
         sithControl_ReadControls();
 #endif
         for (int i = 0; i < sithControl_numHandlers; i++)
         {
-            if (sithControl_aHandlers[i] && sithControl_aHandlers[i](sithWorld_g_pCurrentWorld->playerThing, deltaSecs) )
+            if (sithControl_aHandlers[i] && sithControl_aHandlers[i](sithWorld_g_pCurrentWorld->pLocalPlayer, deltaSecs) )
                 break;
         }
 #ifndef FIXED_TIMESTEP_PHYS
@@ -950,9 +950,9 @@ int sithControl_HandlePlayer(SithThing *player, flex_t deltaSecs)
 
     if ( (g_debugmodeFlags & DEBUGFLAG_IN_EDITOR) == 0 || !sithControl_GetKey(INPUT_FUNC_DEBUG, 0) )
     {
-        if (player->thingflags & SITH_TF_DEAD)
+        if (player->flags & SITH_TF_DEAD)
         {
-            if (!(player->actorParams.typeflags & SITH_AF_FALLKILLED))
+            if (!(player->actorParams.flags & SITH_AF_FALLKILLED))
             {
                 if ( !sithControl_death_msgtimer )
                     goto LABEL_39;
@@ -1009,7 +1009,7 @@ LABEL_39:
                 sithControl_008d7f44 = 1.0;
                 sithControl_PlayerLook(player, deltaSecs);
             }
-            if ( player->type != SITH_THING_PLAYER || (player->actorParams.typeflags & SITH_AF_CONTROLSDISABLED) == 0 )
+            if ( player->type != SITH_THING_PLAYER || (player->actorParams.flags & SITH_AF_CONTROLSDISABLED) == 0 )
             {
                 // MOTS added
                 if (Main_bMotsCompat) {
@@ -1047,13 +1047,13 @@ debug_controls:
 
     // Added
     if (sithControl_followingPlayer > 0) {
-        SithThing* pThing = jkPlayer_playerInfos[sithControl_followingPlayer].playerThing;
+        SithThing* pThing = jkPlayer_playerInfos[sithControl_followingPlayer].pLocalPlayer;
         if (pThing) {
             rdVector_Copy3(&player->position, &pThing->position);
-            rdMatrix_Copy34(&player->lookOrientation, &pThing->lookOrientation);
+            rdMatrix_Copy34(&player->orient, &pThing->orient);
             sithThing_SetSector(player, pThing->sector, 0);
-            sithWorld_g_pCurrentWorld->cameraFocus = pThing;
-            sithWorld_g_pCurrentWorld->playerThing = jkPlayer_playerInfos[0].playerThing;
+            sithWorld_g_pCurrentWorld->pCameraFocusThing = pThing;
+            sithWorld_g_pCurrentWorld->pLocalPlayer = jkPlayer_playerInfos[0].pLocalPlayer;
             stdPalEffects_FlushAllAdds();
         }
     }
@@ -1199,13 +1199,13 @@ void sithControl_PlayerLook(SithThing *player, flex_t deltaSecs)
     v3 = 0;
     if ( (player->type == SITH_THING_ACTOR || player->type == SITH_THING_PLAYER) && deltaSecs != 0.0 )
     {
-        if ( (player->actorParams.typeflags & SITH_AF_CANROTATEHEAD) != 0 )
+        if ( (player->actorParams.flags & SITH_AF_CANROTATEHEAD) != 0 )
         {
             if ( (sithWeapon_controlOptions & 4) == 0 && !sithControl_GetKey(INPUT_FUNC_MLOOK, 0) )
                 goto LABEL_20;
 
             
-            a2 = player->actorParams.eyePYR;
+            a2 = player->actorParams.headPYR;
 
             // Map directly to axis, the value we have is an angular velocity
             v5 = sithControl_GetAxis(INPUT_FUNC_PITCH);
@@ -1242,12 +1242,12 @@ void sithControl_PlayerLook(SithThing *player, flex_t deltaSecs)
                 if (!sithThing_MotsTick(8, (int)(local_10 * 100.0), a2.x)) return;
 
                 sithActor_SetHeadPYR(player, &a2);
-                player->actorParams.typeflags &= ~SITH_AF_VIEWCENTRING;
+                player->actorParams.flags &= ~SITH_AF_VIEWCENTRING;
             }
             else
             {
 LABEL_20:
-                if ( sithControl_GetKey(INPUT_FUNC_CENTER, 0) || (player->actorParams.typeflags & SITH_AF_VIEWCENTRING) != 0 )
+                if ( sithControl_GetKey(INPUT_FUNC_CENTER, 0) || (player->actorParams.flags & SITH_AF_VIEWCENTRING) != 0 )
                 {
 #ifdef QOL_IMPROVEMENTS
                     // Scale appropriately to high framerates
@@ -1255,17 +1255,17 @@ LABEL_20:
 #else
                     v8 = deltaSecs * 180.0;
 #endif
-                    player->actorParams.typeflags |= SITH_AF_VIEWCENTRING;
-                    v9 = stdMath_ClipNearZero(stdMath_ClampValue(-player->actorParams.eyePYR.x, v8));
+                    player->actorParams.flags |= SITH_AF_VIEWCENTRING;
+                    v9 = stdMath_ClipNearZero(stdMath_ClampValue(-player->actorParams.headPYR.x, v8));
                     if ( v9 == 0.0 )
                     {
-                        player->actorParams.typeflags &= ~SITH_AF_VIEWCENTRING;
-                        player->actorParams.typeflags |= SITH_AF_VIEWCENTRED;
+                        player->actorParams.flags &= ~SITH_AF_VIEWCENTRING;
+                        player->actorParams.flags |= SITH_AF_VIEWCENTRED;
                     }
                     else
                     {
-                        player->actorParams.eyePYR.x += v9;
-                        sithActor_SetHeadPYR(player, &player->actorParams.eyePYR);
+                        player->actorParams.headPYR.x += v9;
+                        sithActor_SetHeadPYR(player, &player->actorParams.headPYR);
                     }
                 }
             }
@@ -1299,8 +1299,8 @@ void sithControl_PlayerMovementMots(SithThing *player)
     if (iVar2 != 0) {
         move_multiplier *= 0.5;
     }
-    thing->physicsParams.physflags =
-         thing->physicsParams.physflags & ~SITH_PF_CROUCHING;
+    thing->physicsParams.flags =
+         thing->physicsParams.flags & ~SITH_PF_CROUCHING;
     iVar2 = sithControl_GetKey(INPUT_FUNC_DUCK,(int *)0x0);
     if (iVar2 == 0) {
         if (sithControl_008d7f58 != 0) {
@@ -1315,17 +1315,17 @@ void sithControl_PlayerMovementMots(SithThing *player)
         }
         sithControl_008d7f58 = 1;
         iVar2 = sithThing_MotsTick(1,0,local_8);
-        if ((iVar2 != 0) && ((thing->actorParams.typeflags & SITH_AF_COMBO_FREEZE) == 0)) {
+        if ((iVar2 != 0) && ((thing->actorParams.flags & SITH_AF_COMBO_FREEZE) == 0)) {
             move_multiplier = 0.5;
-            thing->physicsParams.physflags =
-                 thing->physicsParams.physflags | SITH_PF_CROUCHING;
+            thing->physicsParams.flags =
+                 thing->physicsParams.flags | SITH_PF_CROUCHING;
         }
     }
-    if ((thing->physicsParams.physflags & SITH_PF_200000) != 0) {
+    if ((thing->physicsParams.flags & SITH_PF_200000) != 0) {
         move_multiplier = 0.5;
     }
     if (((thing->attach_flags & SITH_ATTACH_SURFACE) != 0) &&
-       (player->attachedSurface->surfaceFlags & (SITH_SURFACE_VERYDEEPWATER|SITH_SURFACE_WATER))) {
+       (player->attachedSurface->flags & (SITH_SURFACE_VERYDEEPWATER|SITH_SURFACE_WATER))) {
         move_multiplier *= 0.5;
     }
     if ((thing->type != 2) && (thing->type != 10)) {
@@ -1352,14 +1352,14 @@ void sithControl_PlayerMovementMots(SithThing *player)
         //fVar3 *= (sithTime_g_fps / 25.0) * 2.0;
 #endif
 
-        fVar4 += fVar3 * thing->actorParams.maxRotThrust * local_8;
+        fVar4 += fVar3 * thing->actorParams.maxRotVelocity * local_8;
 
         if (fVar4 == 0.0) {
             if (sithControl_008d7f50 != 0) {
                 sithThing_MotsTick(5,0,fVar4);
                 sithControl_008d7f50 = 0;
             }
-            thing->physicsParams.angVel.y = fVar4;
+            thing->physicsParams.angularVelocity.y = fVar4;
             fVar4 = sithControl_GetKeyAsAxisNormalized(INPUT_FUNC_SLIDE);
             fVar4 = (thing->actorParams.maxThrust +
                     thing->actorParams.extraSpeed) * -fVar4 * 0.7;
@@ -1376,10 +1376,10 @@ void sithControl_PlayerMovementMots(SithThing *player)
             sithControl_008d7f50 = 1;
             iVar2 = sithThing_MotsTick(5,0,fVar4);
             if (iVar2 == 0) {
-                thing->physicsParams.angVel.y = 0.0;
+                thing->physicsParams.angularVelocity.y = 0.0;
             }
             else {
-                thing->physicsParams.angVel.y = fVar4;
+                thing->physicsParams.angularVelocity.y = fVar4;
                 fVar4 = sithControl_GetKeyAsAxisNormalized(INPUT_FUNC_SLIDE);
                 fVar4 = (thing->actorParams.maxThrust +
                         thing->actorParams.extraSpeed) * -fVar4 * 0.7;
@@ -1410,10 +1410,10 @@ void sithControl_PlayerMovementMots(SithThing *player)
             iVar2 = sithThing_MotsTick(4,0,fVar4 * move_multiplier);
             if (iVar2 == 0) {
                 thing->physicsParams.acceleration.x = 0.0;
-                thing->physicsParams.angVel.y = 0.0;
+                thing->physicsParams.angularVelocity.y = 0.0;
             }
             else {
-                thing->physicsParams.angVel.y = 0.0;
+                thing->physicsParams.angularVelocity.y = 0.0;
                 thing->physicsParams.acceleration.x = fVar4;
             }
             goto LAB_00527d1c;
@@ -1453,8 +1453,8 @@ LAB_00527d1c:
         sithControl_008d7f4c = 1;
     }
     if (((0.2 < local_8) && ((sithWeapon_controlOptions & 0x10) != 0)) &&
-       (uVar1 = thing->actorParams.typeflags, (uVar1 & SITH_AF_VIEWCENTRED) == 0)) {
-        thing->actorParams.typeflags = uVar1 | SITH_AF_VIEWCENTRING;
+       (uVar1 = thing->actorParams.flags, (uVar1 & SITH_AF_VIEWCENTRED) == 0)) {
+        thing->actorParams.flags = uVar1 | SITH_AF_VIEWCENTRING;
     }
     thing->physicsParams.acceleration.z = 0.0;
     if (move_multiplier != 1.0) {
@@ -1502,7 +1502,7 @@ void sithControl_PlayerMovement(SithThing *player)
         move_multiplier = 2.0;
     if ( sithControl_GetKey(INPUT_FUNC_SLOW, 0) )
         move_multiplier = move_multiplier * 0.5;
-    int old_state = player->physicsParams.physflags;
+    int old_state = player->physicsParams.flags;
     if ( !sithControl_GetKey(INPUT_FUNC_DUCK, 0) )
     {
         new_state = old_state & ~SITH_PF_CROUCHING;
@@ -1512,14 +1512,14 @@ void sithControl_PlayerMovement(SithThing *player)
         new_state = old_state | SITH_PF_CROUCHING;
         move_multiplier = 0.5;
     }
-    player->physicsParams.physflags = new_state;
-    if ( (player->physicsParams.physflags & SITH_PF_200000) != 0 )
+    player->physicsParams.flags = new_state;
+    if ( (player->physicsParams.flags & SITH_PF_200000) != 0 )
     {
         move_multiplier = 0.5;
     }
 
     if ( (player->attach_flags & SITH_ATTACH_SURFACE)
-         && (player->attachedSurface->surfaceFlags & (SITH_SURFACE_VERYDEEPWATER|SITH_SURFACE_WATER)) )
+         && (player->attachedSurface->flags & (SITH_SURFACE_VERYDEEPWATER|SITH_SURFACE_WATER)) )
     {
         move_multiplier *= 0.5;
     }
@@ -1539,7 +1539,7 @@ void sithControl_PlayerMovement(SithThing *player)
                 v6 = 1.0;
             }
             v7 = player->actorParams.maxThrust + player->actorParams.extraSpeed;
-            player->physicsParams.angVel.y = 0.0;
+            player->physicsParams.angularVelocity.y = 0.0;
             player->physicsParams.acceleration.x = v7 * v6 * 0.7;
         }
         else
@@ -1549,9 +1549,9 @@ void sithControl_PlayerMovement(SithThing *player)
             // These base values only come from raw axis fetches
 #ifdef QOL_IMPROVEMENTS
             // Scale appropriately to high and low framerates
-            player->physicsParams.angVel.y = sithControl_GetAxis(INPUT_FUNC_TURN) * sithTime_g_fps;
+            player->physicsParams.angularVelocity.y = sithControl_GetAxis(INPUT_FUNC_TURN) * sithTime_g_fps;
 #else
-            player->physicsParams.angVel.y = sithControl_GetAxis(INPUT_FUNC_TURN) * sithTime_g_fps;
+            player->physicsParams.angularVelocity.y = sithControl_GetAxis(INPUT_FUNC_TURN) * sithTime_g_fps;
 #endif
             if ( move_multiplier <= 1.0 )
                 move_multiplier_ = move_multiplier;
@@ -1561,9 +1561,9 @@ void sithControl_PlayerMovement(SithThing *player)
             // These axis values only come from non-raw axis fetches
 #ifdef QOL_IMPROVEMENTS
             // Scale appropriately to high framerates
-            player->physicsParams.angVel.y += sithControl_GetKeyAsAxis(INPUT_FUNC_TURN) * player->actorParams.maxRotThrust * move_multiplier_;// * (sithTime_g_fps / 25.0) * 2.0;
+            player->physicsParams.angularVelocity.y += sithControl_GetKeyAsAxis(INPUT_FUNC_TURN) * player->actorParams.maxRotVelocity * move_multiplier_;// * (sithTime_g_fps / 25.0) * 2.0;
 #else
-            player->physicsParams.angVel.y += sithControl_GetKeyAsAxis(INPUT_FUNC_TURN) * player->actorParams.maxRotThrust * move_multiplier_;
+            player->physicsParams.angularVelocity.y += sithControl_GetKeyAsAxis(INPUT_FUNC_TURN) * player->actorParams.maxRotVelocity * move_multiplier_;
 #endif
 
             player->physicsParams.acceleration.x = sithControl_GetKeyAsAxisNormalized(INPUT_FUNC_SLIDE)
@@ -1577,9 +1577,9 @@ void sithControl_PlayerMovement(SithThing *player)
         player->physicsParams.acceleration.y = y_vel;
         if ( v11 > 0.2 && (sithWeapon_controlOptions & 0x10) != 0 )
         {
-            if ( (player->actorParams.typeflags & SITH_AF_VIEWCENTRED) == 0 )
+            if ( (player->actorParams.flags & SITH_AF_VIEWCENTRED) == 0 )
             {
-                player->actorParams.typeflags |= SITH_AF_VIEWCENTRING;
+                player->actorParams.flags |= SITH_AF_VIEWCENTRING;
             }
         }
         player->physicsParams.acceleration.z = 0;
@@ -1617,7 +1617,7 @@ void sithControl_FreeCam(SithThing *player)
 
     v1 = player;
     v2 = 0;
-    if ( (player->physicsParams.physflags & SITH_PF_FLY) != 0 || (v3 = player->sector) != 0 && (v3->flags & SITH_SECTOR_UNDERWATER) != 0 )
+    if ( (player->physicsParams.flags & SITH_PF_FLY) != 0 || (v3 = player->sector) != 0 && (v3->flags & SITH_SECTOR_UNDERWATER) != 0 )
         v2 = 1;
     if ( (sithWeapon_controlOptions & 2) == 0 )
         sithControl_GetKey(INPUT_FUNC_FAST, 0);
@@ -1631,11 +1631,11 @@ void sithControl_FreeCam(SithThing *player)
         v9 = v5 * v6;
         v1->physicsParams.acceleration.y = v9;
         if ( (v1->physicsParams.acceleration.x != 0.0 || v1->physicsParams.acceleration.y != 0.0) // TODO verified first comparison?
-          && (v1->actorParams.eyePYR.x != 0.0 || v1->actorParams.eyePYR.y != 0.0 || v1->actorParams.eyePYR.z != 0.0)
+          && (v1->actorParams.headPYR.x != 0.0 || v1->actorParams.headPYR.y != 0.0 || v1->actorParams.headPYR.z != 0.0)
           && v2
-          && (v1->physicsParams.physflags & SITH_PF_ONWATERSURFACE) == 0 )
+          && (v1->physicsParams.flags & SITH_PF_ONWATERSURFACE) == 0 )
         {
-            rdMatrix_BuildRotate34(&a, &v1->actorParams.eyePYR);
+            rdMatrix_BuildRotate34(&a, &v1->actorParams.headPYR);
             rdMatrix_TransformVector34Acc(&v1->physicsParams.acceleration, &a);
         }
         if ( sithControl_GetKey(INPUT_FUNC_SLIDETOGGLE, &tmp) )
@@ -1656,7 +1656,7 @@ void sithControl_FreeCam(SithThing *player)
                 v11 = 1.0;
             }
             v12 = v1->actorParams.extraSpeed + v1->actorParams.maxThrust;
-            v1->physicsParams.angVel.y = 0.0;
+            v1->physicsParams.angularVelocity.y = 0.0;
             v7->x = v12 * v11 * 0.7;
         }
         else
@@ -1666,11 +1666,11 @@ void sithControl_FreeCam(SithThing *player)
             
 #ifdef QOL_IMPROVEMENTS
             // Scale appropriately to high framerates
-            v1->physicsParams.angVel.y = sithControl_GetAxis(INPUT_FUNC_TURN) * sithTime_g_fps;
-            v1->physicsParams.angVel.y +=  sithControl_GetKeyAsAxis(INPUT_FUNC_TURN) * v1->actorParams.maxRotThrust;// * (sithTime_g_fps / 25.0) * 2.0;
+            v1->physicsParams.angularVelocity.y = sithControl_GetAxis(INPUT_FUNC_TURN) * sithTime_g_fps;
+            v1->physicsParams.angularVelocity.y +=  sithControl_GetKeyAsAxis(INPUT_FUNC_TURN) * v1->actorParams.maxRotVelocity;// * (sithTime_g_fps / 25.0) * 2.0;
 #else
-            v1->physicsParams.angVel.y = sithControl_GetAxis(INPUT_FUNC_TURN) * sithTime_g_fps;
-            v1->physicsParams.angVel.y += sithControl_GetKeyAsAxis(INPUT_FUNC_TURN) * v1->actorParams.maxRotThrust;
+            v1->physicsParams.angularVelocity.y = sithControl_GetAxis(INPUT_FUNC_TURN) * sithTime_g_fps;
+            v1->physicsParams.angularVelocity.y += sithControl_GetKeyAsAxis(INPUT_FUNC_TURN) * v1->actorParams.maxRotVelocity;
 #endif
         }
         if ( v2 )
@@ -1696,7 +1696,7 @@ void sithControl_FreeCam(SithThing *player)
                     mult *= 0.5;
                 }
 
-                rdMatrix_BuildRotate34(&a, &v1->actorParams.eyePYR);
+                rdMatrix_BuildRotate34(&a, &v1->actorParams.headPYR);
                 rdVector_Zero3(&addVec);
                 rdVector_ScaleAdd3Acc(&addVec, &rdroid_yVector3, sithControl_GetKeyAsAxis(INPUT_FUNC_FORWARD) * mult);
 #ifdef TARGET_RETRO_HOMEBREW
@@ -1709,7 +1709,7 @@ void sithControl_FreeCam(SithThing *player)
 #endif
 
                 rdMatrix_TransformVector34Acc(&addVec, &a);
-                rdMatrix_TransformVector34Acc(&addVec, &v1->lookOrientation);
+                rdMatrix_TransformVector34Acc(&addVec, &v1->orient);
                 rdVector_Add3Acc(&v1->physicsParams.vel, &addVec);
             }
 
@@ -1718,12 +1718,12 @@ void sithControl_FreeCam(SithThing *player)
                 rdMatrix34 a;
                 rdVector3 addVec;
 
-                rdMatrix_BuildRotate34(&a, &v1->actorParams.eyePYR);
+                rdMatrix_BuildRotate34(&a, &v1->actorParams.headPYR);
                 rdVector_Zero3(&addVec);
                 rdVector_ScaleAdd3Acc(&addVec, &rdroid_xVector3, (Main_bMotsCompat ? -1.0 : 1.0) * sithControl_GetKeyAsAxis(INPUT_FUNC_SLIDE));
 
                 rdMatrix_TransformVector34Acc(&addVec, &a);
-                rdMatrix_TransformVector34Acc(&addVec, &v1->lookOrientation);
+                rdMatrix_TransformVector34Acc(&addVec, &v1->orient);
                 rdVector_Add3Acc(&v1->physicsParams.vel, &addVec);
             }
 
@@ -1733,7 +1733,7 @@ void sithControl_FreeCam(SithThing *player)
                 if ((g_debugmodeFlags & DEBUGFLAG_NOCLIP)) {
 
                 }
-                else if ( (v1->physicsParams.physflags & SITH_PF_ONWATERSURFACE) != 0 )
+                else if ( (v1->physicsParams.flags & SITH_PF_ONWATERSURFACE) != 0 )
                 {
                     if ( tmp )
                         sithPlayerActions_JumpWithVel(v1, 1.0);
@@ -1751,9 +1751,9 @@ void sithControl_FreeCam(SithThing *player)
         else
         {
             if ( !sithControl_GetKey(INPUT_FUNC_DUCK, &tmp) )
-                v1->physicsParams.physflags &= ~SITH_PF_CROUCHING;
+                v1->physicsParams.flags &= ~SITH_PF_CROUCHING;
             else
-                v1->physicsParams.physflags |= SITH_PF_CROUCHING;
+                v1->physicsParams.flags |= SITH_PF_CROUCHING;
         }
     }
 }
@@ -1920,12 +1920,12 @@ stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction
     v20 = sithControl_aInputFuncToKeyinfo;
     for (int j = 0; j < INPUT_FUNC_MAX; j++)
     {
-        int typeflags = sithControl_inputFuncToControlType[v7];
+        int flags = sithControl_inputFuncToControlType[v7];
 
         v18 = 0;
         v19 = 0;
         v17 = 0;
-        v21 = typeflags & INPUT_MAPPING_FLAG_DXKEY;
+        v21 = flags & INPUT_MAPPING_FLAG_DXKEY;
         v16 = 0;
         v8 = &result->aEntries[0];
 
@@ -1940,7 +1940,7 @@ stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction
               && (((v9 & 1) == 0 || v10 >= AXIS_MOUSE_X) 
               && (!v11 || v10 < JK_EXTENDED_KEY_START || KEY_IS_MOUSE(v10)) || a3) )
             {
-                v6 = pfEnumFunction(v7, sithControl_aFunctionStrs[v7], typeflags, v16, v10, v9, v8, a5);
+                v6 = pfEnumFunction(v7, sithControl_aFunctionStrs[v7], flags, v16, v10, v9, v8, a5);
                 if ( v18 || (v12 = i, (i->flags & INPUT_MAPPING_FLAG_DXKEY) != 0) && (i->flags & 4) == 0 )
                 {
                     v12 = i;
@@ -1962,16 +1962,16 @@ stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction
         if ( v6 && v21 && !v17 )
         {
             v13 = a5;
-            v6 = pfEnumFunction(v7, sithControl_aFunctionStrs[v7], typeflags, -1u, 0, 1, 0, a5);
+            v6 = pfEnumFunction(v7, sithControl_aFunctionStrs[v7], flags, -1u, 0, 1, 0, a5);
         }
         else
         {
             v13 = a5;
         }
         if ( v6 && !v18 || !v20->numEntries )
-            v6 = pfEnumFunction(v7, sithControl_aFunctionStrs[v7], typeflags, -1u, 0, 2, 0, v13);
+            v6 = pfEnumFunction(v7, sithControl_aFunctionStrs[v7], flags, -1u, 0, 2, 0, v13);
         if ( v6 && v21 && !v19 )
-            v6 = pfEnumFunction(v7, sithControl_aFunctionStrs[v7], typeflags, -1u, 0, 6, 0, v13);
+            v6 = pfEnumFunction(v7, sithControl_aFunctionStrs[v7], flags, -1u, 0, 6, 0, v13);
         ++v7;
         result = ++v20;
     }

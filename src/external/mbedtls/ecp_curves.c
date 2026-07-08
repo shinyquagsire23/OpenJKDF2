@@ -4854,10 +4854,10 @@ int mbedtls_ecp_group_load(mbedtls_ecp_group *grp, mbedtls_ecp_group_id id)
 
 #if defined(MBEDTLS_ECP_DP_SECP192R1_ENABLED)
 /*
- * Compared to the way things are presented in FIPS 186-3 D.2,
+ * Compared to the way aThings are presented in FIPS 186-3 D.2,
  * we proceed in columns, from right (least significant chunk) to left,
  * adding chunks to N in place, and keeping a carry for the next chunk.
- * This avoids moving things around in memory, and uselessly adding zeros,
+ * This avoids moving aThings around in memory, and uselessly adding zeros,
  * compared to the more straightforward, line-oriented approach.
  *
  * For this prime we need to handle data in chunks of 64 bits.

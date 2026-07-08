@@ -117,13 +117,13 @@ size_t Curl_hyper_send(void *userp, hyper_context *ctx,
   return (size_t)nwrote;
 }
 
-static int hyper_each_header(void *userdata,
+static int hyper_each_header(void *userval,
                              const uint8_t *name,
                              size_t name_len,
                              const uint8_t *value,
                              size_t value_len)
 {
-  struct Curl_easy *data = (struct Curl_easy *)userdata;
+  struct Curl_easy *data = (struct Curl_easy *)userval;
   size_t len;
   char *headp;
   CURLcode result;
@@ -179,11 +179,11 @@ static int hyper_each_header(void *userdata,
   return HYPER_ITER_CONTINUE;
 }
 
-static int hyper_body_chunk(void *userdata, const hyper_buf *chunk)
+static int hyper_body_chunk(void *userval, const hyper_buf *chunk)
 {
   char *buf = (char *)hyper_buf_bytes(chunk);
   size_t len = hyper_buf_len(chunk);
-  struct Curl_easy *data = (struct Curl_easy *)userdata;
+  struct Curl_easy *data = (struct Curl_easy *)userval;
   struct SingleRequest *k = &data->req;
   CURLcode result = CURLE_OK;
 
@@ -658,10 +658,10 @@ static CURLcode request_target(struct Curl_easy *data,
   return result;
 }
 
-static int uploadpostfields(void *userdata, hyper_context *ctx,
+static int uploadpostfields(void *userval, hyper_context *ctx,
                             hyper_buf **chunk)
 {
-  struct Curl_easy *data = (struct Curl_easy *)userdata;
+  struct Curl_easy *data = (struct Curl_easy *)userval;
   (void)ctx;
   if(data->req.exp100 > EXP100_SEND_DATA) {
     if(data->req.exp100 == EXP100_FAILED)
@@ -694,11 +694,11 @@ static int uploadpostfields(void *userdata, hyper_context *ctx,
   return HYPER_POLL_READY;
 }
 
-static int uploadstreamed(void *userdata, hyper_context *ctx,
+static int uploadstreamed(void *userval, hyper_context *ctx,
                           hyper_buf **chunk)
 {
   size_t fillcount;
-  struct Curl_easy *data = (struct Curl_easy *)userdata;
+  struct Curl_easy *data = (struct Curl_easy *)userval;
   struct connectdata *conn = (struct connectdata *)data->conn;
   CURLcode result;
   (void)ctx;

@@ -42,12 +42,12 @@ void rdDebug_DrawScreenLine3(rdVector3* v1, rdVector3* v2, uint32_t color)
     procEntry->colormap = rdColormap_pCurMap;
     procEntry->vertexIntensities[0] = 1.0;
     procEntry->vertexIntensities[1] = 1.0;
-    procEntry->vertexUVs[0].x = 1.0;
-    procEntry->vertexUVs[0].y = 1.0;
-    procEntry->vertexUVs[1].x = 1.0;
-    procEntry->vertexUVs[1].y = 1.0;
-    procEntry->vertices[0] = *v1;
-    procEntry->vertices[1] = *v2;
+    procEntry->aTexVerticies[0].x = 1.0;
+    procEntry->aTexVerticies[0].y = 1.0;
+    procEntry->aTexVerticies[1].x = 1.0;
+    procEntry->aTexVerticies[1].y = 1.0;
+    procEntry->aVertices[0] = *v1;
+    procEntry->aVertices[1] = *v2;
     rdCache_AddProcFace(color, 2, procFaceFlags);
 }
 

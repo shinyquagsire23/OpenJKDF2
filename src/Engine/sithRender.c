@@ -120,7 +120,7 @@ void sithRender_RenderDebugLights()
     SithSector *sectorIter; // edx
     //rdLight **lightIter; // ebx
     //rdLight **curCamera_lights; // edi
-    int *verticeIdxs; // edx
+    int *aVertIdxs; // edx
     rdLight **lightIter2; // edi
     //unsigned int v24; // [esp+8h] [ebp-13Ch]
     SithSector **aSectorIter; // [esp+Ch] [ebp-138h]
@@ -154,27 +154,27 @@ void sithRender_RenderDebugLights()
             ++curCamera_lights;*/
         }
 
-        /*verticeIdxs = sectorIter->verticeIdxs;
+        /*aVertIdxs = sectorIter->aVertIdxs;
         for (int j = 0; j < sectorIter->numVertices; j++)
         {
-            int idx = *verticeIdxs;
+            int idx = *aVertIdxs;
             if ( sithWorld_g_pCurrentWorld->alloc_unk9c[idx] != sithRender_lastRenderTick )
             {
-                sithWorld_g_pCurrentWorld->verticesDynamicLight[idx] = 0.0;
+                sithWorld_g_pCurrentWorld->aVertDynamicLights[idx] = 0.0;
                 lightIter2 = tmpLights;
                 for (int i = 0; i < v24; i++)
                 {
                     int id = (*lightIter2)->id;
-                    flex_t distCalc = rdVector_Dist3(&rdCamera_g_pCurCamera->lightPositions[id], &sithWorld_g_pCurrentWorld->vertices[idx]);
+                    flex_t distCalc = rdVector_Dist3(&rdCamera_g_pCurCamera->lightPositions[id], &sithWorld_g_pCurrentWorld->aVertices[idx]);
                     if ( distCalc < (*lightIter2)->falloffMax )
-                        sithWorld_g_pCurrentWorld->verticesDynamicLight[idx] = (*lightIter2)->intensity - distCalc * rdCamera_g_pCurCamera->attenuationMax + sithWorld_g_pCurrentWorld->verticesDynamicLight[idx];
-                    if ( sithWorld_g_pCurrentWorld->verticesDynamicLight[idx] >= 1.0 )
+                        sithWorld_g_pCurrentWorld->aVertDynamicLights[idx] = (*lightIter2)->intensity - distCalc * rdCamera_g_pCurCamera->attenuationMax + sithWorld_g_pCurrentWorld->aVertDynamicLights[idx];
+                    if ( sithWorld_g_pCurrentWorld->aVertDynamicLights[idx] >= 1.0 )
                         break;
                     ++lightIter2;
                 }
                 sithWorld_g_pCurrentWorld->alloc_unk9c[idx] = sithRender_lastRenderTick;
             }
-            verticeIdxs++;
+            aVertIdxs++;
         }*/
     }
 }
@@ -206,7 +206,7 @@ int sithRender_Open()
     rdColormap_SetCurrent(sithWorld_g_pCurrentWorld->colormaps);
     rdColormap_SetIdentity(sithWorld_g_pCurrentWorld->colormaps);
 
-    sithRenderSky_Open(sithWorld_g_pCurrentWorld->horizontalPixelsPerRev, sithWorld_g_pCurrentWorld->horizontalDistance, sithWorld_g_pCurrentWorld->ceilingSky);
+    sithRenderSky_Open(sithWorld_g_pCurrentWorld->horizontalPixelsPerRev, sithWorld_g_pCurrentWorld->horizonDistance, sithWorld_g_pCurrentWorld->ceilingSkyHeight);
 
     sithRender_lightingIRMode = 0; 
     sithRender_bResetCameraAspect = 0;
@@ -320,22 +320,22 @@ void sithRender_Draw()
 #if 0
     for (int i = 0; i < sithWorld_g_pCurrentWorld->numThingsLoaded; i++)
     {
-        SithThing* v16 = &sithWorld_g_pCurrentWorld->things[i];
+        SithThing* v16 = &sithWorld_g_pCurrentWorld->aThings[i];
         if (v16->moveType == SITH_MT_PATH)
         {
             if (v16->trackParams.loadedFrames < 0) {
-                stdPlatform_Printf("OpenJKDF2: Track thing 0x%x %s has corrupted loadedFrames %x %x\n", i, v16->template_name, v16->trackParams.loadedFrames, v16->trackParams.sizeFrames);
+                stdPlatform_Printf("OpenJKDF2: Track thing 0x%x %s has corrupted loadedFrames %x %x\n", i, v16->aName, v16->trackParams.loadedFrames, v16->trackParams.sizeFrames);
             }
         }
     }
 
-    for (int i = 0; i < sithWorld_g_pCurrentWorld->numTemplatesLoaded; i++)
+    for (int i = 0; i < sithWorld_g_pCurrentWorld->numThingTemplates; i++)
     {
-        SithThing* v16 = &sithWorld_g_pCurrentWorld->templates[i];
+        SithThing* v16 = &sithWorld_g_pCurrentWorld->aThingTemplates[i];
         if (v16->moveType == SITH_MT_PATH)
         {
             if (v16->trackParams.loadedFrames < 0 || v16->trackParams.sizeFrames <= 0) {
-                stdPlatform_Printf("OpenJKDF2: Template track thing 0x%x %s has corrupted loadedFrames %x %x\n", i, v16->template_name, v16->trackParams.loadedFrames, v16->trackParams.sizeFrames);
+                stdPlatform_Printf("OpenJKDF2: Template track thing 0x%x %s has corrupted loadedFrames %x %x\n", i, v16->aName, v16->trackParams.loadedFrames, v16->trackParams.sizeFrames);
             }
         }
     }
@@ -353,7 +353,7 @@ void sithRender_Draw()
     rdSetTextureMode(sithRender_texMode);
     rdSetRenderOptions(rdGetRenterOptions() | 2);
 
-    // Somehow backface culling on models got unset...?
+    // Somehow backface culling on aModels got unset...?
 #ifdef QOL_IMPROVEMENTS
     rdSetRenderOptions(rdGetRenterOptions() | 1);
 #endif
@@ -432,7 +432,7 @@ void sithRender_Draw()
         rdVector3 camPos = sithCamera_g_pCurCamera->vec3_1;
         for (int i = 0; i < sithWorld_g_pCurrentWorld->numSectors; i++)
         {
-            SithSector* pSectorIter = &sithWorld_g_pCurrentWorld->sectors[i];
+            SithSector* pSectorIter = &sithWorld_g_pCurrentWorld->aSectors[i];
             if (pSectorIter == sithCamera_g_pCurCamera->sector) {
                 //continue;
             }
@@ -479,7 +479,7 @@ void sithRender_Draw()
         rdVector3 camPos = sithCamera_g_pCurCamera->vec3_1;
         for (int i = 0; i < sithWorld_g_pCurrentWorld->numSectors; i++)
         {
-            SithSector* pSectorIter = &sithWorld_g_pCurrentWorld->sectors[i];
+            SithSector* pSectorIter = &sithWorld_g_pCurrentWorld->aSectors[i];
             if (pSectorIter == sithCamera_g_pCurCamera->sector) {
                 //continue;
             }
@@ -487,7 +487,7 @@ void sithRender_Draw()
                 continue;
             }
 
-            // Only render sectors that are in front of the camera near plane
+            // Only render aSectors that are in front of the camera near plane
             /*flex_t dist = rdMath_DistancePointToPlane(&sithCamera_g_pCurCamera->vec3_1, &rdCamera_g_pCurCamera->view_matrix.uvec, &pSectorIter->center);
             if (dist + (pSectorIter->radius * 3.5) < 0.0) {
                 continue;
@@ -639,21 +639,21 @@ void sithRender_BuildVisibleSectorList(SithSector *sector, rdClipFrustum *frustu
     // Does not help much, but no visual harm either
 #ifdef QOL_IMPROVEMENTS
     if (sector->clipVisited == sithRender_lastRenderTick) {
-        sector->clipFrustum = rdCamera_g_pCurCamera->pClipFrustum;
+        sector->pClipFrustum = rdCamera_g_pCurCamera->pClipFrustum;
         return;
     }
 #endif
 
     if ( sector->renderTick == sithRender_lastRenderTick )
     {
-        sector->clipFrustum = rdCamera_g_pCurCamera->pClipFrustum;
+        sector->pClipFrustum = rdCamera_g_pCurCamera->pClipFrustum;
     }
     else
     {
         sector->renderTick = sithRender_lastRenderTick;
         // Added: Prevent crashing
         if (sithRender_g_numVisibleSectors >= SITH_MAX_VISIBLE_SECTORS) {
-            jk_printf("OpenJKDF2: Hit max visible sectors.\n");
+            jk_printf("OpenJKDF2: Hit max visible aSectors.\n");
             return;
         }
         // Added: Prevent crashing
@@ -663,7 +663,7 @@ void sithRender_BuildVisibleSectorList(SithSector *sector, rdClipFrustum *frustu
         }
         // Added: Prevent crashing
         if (sithRender_numThingSectors >= SITH_MAX_VISIBLE_SECTORS_2) {
-            jk_printf("OpenJKDF2: Hit max visible sectors (2).\n");
+            jk_printf("OpenJKDF2: Hit max visible aSectors (2).\n");
             return;
         }
 
@@ -676,8 +676,8 @@ void sithRender_BuildVisibleSectorList(SithSector *sector, rdClipFrustum *frustu
         }
         frustum = &sithRender_aSectorFrustrums[sithRender_numSecorFrustrums++];
         _memcpy(frustum, frustumArg, sizeof(rdClipFrustum));
-        thing = sector->thingsList;
-        sector->clipFrustum = frustum;
+        thing = sector->pFirstThingInSector;
+        sector->pClipFrustum = frustum;
         lightIdx = sithRender_numThingLights;
 
         // Added: safety
@@ -695,7 +695,7 @@ void sithRender_BuildVisibleSectorList(SithSector *sector, rdClipFrustum *frustu
 #if 0
             if (thing->type == SITH_THING_PLAYER)
             {
-                rdMatrix_TransformPoint34(&vertex_out, &thing->actorParams.lightOffset, &thing->lookOrientation);
+                rdMatrix_TransformPoint34(&vertex_out, &thing->actorParams.lightOffset, &thing->orient);
                 rdVector_Add3Acc(&vertex_out, &thing->position);
                 sithRender_aThingLights[sithRender_numThingLights].intensity = 1.0;//thing->actorParams.lightIntensity;
                 rdCamera_AddLight(rdCamera_g_pCurCamera, &sithRender_aThingLights[sithRender_numThingLights], &vertex_out);
@@ -703,8 +703,8 @@ void sithRender_BuildVisibleSectorList(SithSector *sector, rdClipFrustum *frustu
             }
 #endif
 
-            if ((thing->thingflags & SITH_TF_EMITLIGHT)
-                 && !(thing->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_DESTROYED)))
+            if ((thing->flags & SITH_TF_EMITLIGHT)
+                 && !(thing->flags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_DESTROYED)))
             {
                 if ( thing->light > 0.0 )
                 {
@@ -715,9 +715,9 @@ void sithRender_BuildVisibleSectorList(SithSector *sector, rdClipFrustum *frustu
 
                 if ( (thing->type == SITH_THING_ACTOR || thing->type == SITH_THING_PLAYER) && lightIdx < 0x20 )
                 {
-                    if ( (thing->actorParams.typeflags & SITH_AF_HEADLIGHT) != 0 && thing->actorParams.lightIntensity > 0.0 )
+                    if ( (thing->actorParams.flags & SITH_AF_HEADLIGHT) != 0 && thing->actorParams.lightIntensity > 0.0 )
                     {
-                        rdMatrix_TransformPoint34(&vertex_out, &thing->actorParams.lightOffset, &thing->lookOrientation);
+                        rdMatrix_TransformPoint34(&vertex_out, &thing->actorParams.lightOffset, &thing->orient);
                         rdVector_Add3Acc(&vertex_out, &thing->position);
                         sithRender_aThingLights[sithRender_numThingLights].intensity = thing->actorParams.lightIntensity;
                         rdCamera_AddLight(rdCamera_g_pCurCamera, &sithRender_aThingLights[sithRender_numThingLights], &vertex_out);
@@ -731,7 +731,7 @@ void sithRender_BuildVisibleSectorList(SithSector *sector, rdClipFrustum *frustu
                     }
                 }
             }
-            thing = thing->nextThing;
+            thing = thing->pNextThingInSector;
         }
         sithRender_aThingSectors[sithRender_numThingSectors++] = sector;
     }
@@ -781,7 +781,7 @@ void sithRender_BuildVisibleSectorList(SithSector *sector, rdClipFrustum *frustu
             v51 = NULL; // Added. TODO: does setting this to NULL cause issues?
         }
 
-        v20 = &sithWorld_g_pCurrentWorld->vertices[*adjoinSurface->surfaceInfo.face.vertexPosIdx];
+        v20 = &sithWorld_g_pCurrentWorld->aVertices[*adjoinSurface->surfaceInfo.face.vertexPosIdx];
         flex_t dist = rdMath_DistancePointToPlane(&sithCamera_g_pCurCamera->vec3_1, &adjoinSurface->surfaceInfo.face.normal, v20);
         flex_t adjoinDistAdd = adjoinIter->dist + adjoinIter->mirror->dist + prevAdjoinDistAdd;
 
@@ -789,7 +789,7 @@ void sithRender_BuildVisibleSectorList(SithSector *sector, rdClipFrustum *frustu
 #ifdef TARGET_TWL
         // adjoinDistAdd compare GREATLY reduces recursion issues 
         // TODO: Test against TODOA and verify if this is QOL-worthy
-        if (dist > SITHCAMERA_ZFAR /*|| dist < sector->clipFrustum->zNear*/) {
+        if (dist > SITHCAMERA_ZFAR /*|| dist < sector->pClipFrustum->zNear*/) {
             // Doesn't help, causes visual issues
             //adjoinIter->sector->clipVisited = sithRender_lastRenderTick;
 
@@ -835,7 +835,7 @@ void sithRender_BuildVisibleSectorList(SithSector *sector, rdClipFrustum *frustu
 
             bAdjoinIsTransparent |= bMirrorAdjoinIsTransparent;
 
-            // Added: When swimming, sometimes the camera dips below the water. Consider the adjoin transparent if we are very close to it.
+            // Added: When swimming, sometimes the camera dips below the water. Consider the pAdjoin transparent if we are very close to it.
             bAdjoinIsTransparent |= (dist < 0.05);
 #endif
 
@@ -846,19 +846,19 @@ void sithRender_BuildVisibleSectorList(SithSector *sector, rdClipFrustum *frustu
                     v25 = adjoinSurface->surfaceInfo.face.vertexPosIdx[i];
                     if ( sithWorld_g_pCurrentWorld->alloc_unk98[v25] != sithRender_lastRenderTick )
                     {
-                        rdMatrix_TransformPoint34(&sithWorld_g_pCurrentWorld->verticesTransformed[v25], &sithWorld_g_pCurrentWorld->vertices[v25], &rdCamera_g_pCurCamera->view_matrix);
+                        rdMatrix_TransformPoint34(&sithWorld_g_pCurrentWorld->aTransformedVertices[v25], &sithWorld_g_pCurrentWorld->aVertices[v25], &rdCamera_g_pCurCamera->view_matrix);
                         sithWorld_g_pCurrentWorld->alloc_unk98[v25] = sithRender_lastRenderTick;
                     }
                 }
                 adjoinSurface->field_4 = sithRender_lastRenderTick;
             }
 
-            sithRender_faceView.vertices = sithWorld_g_pCurrentWorld->verticesTransformed;
-            sithRender_faceView.vertexUVs = sithWorld_g_pCurrentWorld->vertexUVs;
-            sithRender_faceView.paDynamicLight = sithWorld_g_pCurrentWorld->verticesDynamicLight;
+            sithRender_faceView.aVertices = sithWorld_g_pCurrentWorld->aTransformedVertices;
+            sithRender_faceView.aTexVerticies = sithWorld_g_pCurrentWorld->aTexVerticies;
+            sithRender_faceView.paDynamicLight = sithWorld_g_pCurrentWorld->aVertDynamicLights;
             sithRender_faceView.numVertices = adjoinSurface->surfaceInfo.face.numVertices;
             sithRender_faceView.vertexPosIdx = adjoinSurface->surfaceInfo.face.vertexPosIdx;
-            meshinfo_out.vertices = sithRender_aClipVertices;
+            meshinfo_out.aVertices = sithRender_aClipVertices;
             sithRender_faceView.vertexUVIdx = adjoinSurface->surfaceInfo.face.vertexUVIdx;
 
             rdPrimit3_ClipFace(frustumArg, RD_GEOMETRY_WIREFRAME, RD_LIGHTMODE_NOTLIT, RD_TEXTUREMODE_AFFINE, &sithRender_faceView, &meshinfo_out, &adjoinSurface->surfaceInfo.face.clipIdk);
@@ -980,14 +980,14 @@ void sithRender_NoClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t pre
     // Does not help much, but no visual harm either
 #ifdef QOL_IMPROVEMENTS
     if (sector->clipVisited == sithRender_lastRenderTick || sector->renderTick == sithRender_lastRenderTick) {
-        sector->clipFrustum = rdCamera_g_pCurCamera->pClipFrustum;
+        sector->pClipFrustum = rdCamera_g_pCurCamera->pClipFrustum;
         return;
     }
 #endif
 
     if ( sector->renderTick == sithRender_lastRenderTick )
     {
-        sector->clipFrustum = rdCamera_g_pCurCamera->pClipFrustum;
+        sector->pClipFrustum = rdCamera_g_pCurCamera->pClipFrustum;
     }
     else
     {
@@ -998,7 +998,7 @@ void sithRender_NoClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t pre
 
         // Added: Prevent crashing
         if (sithRender_g_numVisibleSectors >= SITH_MAX_VISIBLE_SECTORS) {
-            jk_printf("OpenJKDF2: Hit max visible sectors.\n");
+            jk_printf("OpenJKDF2: Hit max visible aSectors.\n");
             return;
         }
 
@@ -1010,7 +1010,7 @@ void sithRender_NoClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t pre
 
         // Added: Prevent crashing
         if (sithRender_numThingSectors >= SITH_MAX_VISIBLE_SECTORS_2) {
-            jk_printf("OpenJKDF2: Hit max visible sectors (2).\n");
+            jk_printf("OpenJKDF2: Hit max visible aSectors (2).\n");
             return;
         }
 
@@ -1023,9 +1023,9 @@ void sithRender_NoClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t pre
         }
         frustum = &sithRender_aSectorFrustrums[sithRender_numSecorFrustrums++];
         _memcpy(frustum, frustumArg, sizeof(rdClipFrustum));
-        thing = sector->thingsList;
-        //sector->clipFrustum = frustum;
-        sector->clipFrustum = rdCamera_g_pCurCamera->pClipFrustum;
+        thing = sector->pFirstThingInSector;
+        //sector->pClipFrustum = frustum;
+        sector->pClipFrustum = rdCamera_g_pCurCamera->pClipFrustum;
         lightIdx = sithRender_numThingLights;
 
         // Added: safety
@@ -1043,7 +1043,7 @@ void sithRender_NoClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t pre
 #if 0
             if (thing->type == SITH_THING_PLAYER)
             {
-                rdMatrix_TransformPoint34(&vertex_out, &thing->actorParams.lightOffset, &thing->lookOrientation);
+                rdMatrix_TransformPoint34(&vertex_out, &thing->actorParams.lightOffset, &thing->orient);
                 rdVector_Add3Acc(&vertex_out, &thing->position);
                 sithRender_aThingLights[sithRender_numThingLights].intensity = 1.0;//thing->actorParams.lightIntensity;
                 rdCamera_AddLight(rdCamera_g_pCurCamera, &sithRender_aThingLights[sithRender_numThingLights], &vertex_out);
@@ -1051,8 +1051,8 @@ void sithRender_NoClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t pre
             }
 #endif
 
-            if ((thing->thingflags & SITH_TF_EMITLIGHT)
-                 && !(thing->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_DESTROYED)))
+            if ((thing->flags & SITH_TF_EMITLIGHT)
+                 && !(thing->flags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_DESTROYED)))
             {
                 if ( thing->light > 0.0 )
                 {
@@ -1063,9 +1063,9 @@ void sithRender_NoClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t pre
 
                 if ( (thing->type == SITH_THING_ACTOR || thing->type == SITH_THING_PLAYER) && lightIdx < 0x20 )
                 {
-                    if ( (thing->actorParams.typeflags & SITH_AF_HEADLIGHT) != 0 && thing->actorParams.lightIntensity > 0.0 )
+                    if ( (thing->actorParams.flags & SITH_AF_HEADLIGHT) != 0 && thing->actorParams.lightIntensity > 0.0 )
                     {
-                        rdMatrix_TransformPoint34(&vertex_out, &thing->actorParams.lightOffset, &thing->lookOrientation);
+                        rdMatrix_TransformPoint34(&vertex_out, &thing->actorParams.lightOffset, &thing->orient);
                         rdVector_Add3Acc(&vertex_out, &thing->position);
                         sithRender_aThingLights[sithRender_numThingLights].intensity = thing->actorParams.lightIntensity;
                         rdCamera_AddLight(rdCamera_g_pCurCamera, &sithRender_aThingLights[sithRender_numThingLights], &vertex_out);
@@ -1079,7 +1079,7 @@ void sithRender_NoClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t pre
                     }
                 }
             }
-            thing = thing->nextThing;
+            thing = thing->pNextThingInSector;
         }
         sithRender_aThingSectors[sithRender_numThingSectors++] = sector;
     }
@@ -1113,7 +1113,7 @@ void sithRender_NoClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t pre
 
         adjoinSurface = adjoinIter->surface;
 
-        v20 = &sithWorld_g_pCurrentWorld->vertices[*adjoinSurface->surfaceInfo.face.vertexPosIdx];
+        v20 = &sithWorld_g_pCurrentWorld->aVertices[*adjoinSurface->surfaceInfo.face.vertexPosIdx];
         flex_t dist = rdMath_DistancePointToPlane(&sithCamera_g_pCurCamera->vec3_1, &adjoinSurface->surfaceInfo.face.normal, v20);
         flex_t adjoinDistAdd = adjoinIter->dist + adjoinIter->mirror->dist + prevAdjoinDistAdd;
 
@@ -1121,7 +1121,7 @@ void sithRender_NoClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t pre
 #ifdef TARGET_TWL
         // adjoinDistAdd compare GREATLY reduces recursion issues 
         // TODO: Test against TODOA and verify if this is QOL-worthy
-        if (/*(adjoinDistAdd > 3.5) ||*/ (dist > SITHCAMERA_ZFAR) /*|| dist < sector->clipFrustum->zNear*/) {
+        if (/*(adjoinDistAdd > 3.5) ||*/ (dist > SITHCAMERA_ZFAR) /*|| dist < sector->pClipFrustum->zNear*/) {
             // Doesn't help, causes visual issues
             //adjoinIter->sector->clipVisited = sithRender_lastRenderTick;
 
@@ -1234,7 +1234,7 @@ void sithRender_KindaClipAssignFrustum(SithSector *sector, rdClipFrustum *frustu
 
     // Added: Prevent crashing
     if (sithRender_g_numVisibleSectors >= SITH_MAX_VISIBLE_SECTORS) {
-        jk_printf("OpenJKDF2: Hit max visible sectors.\n");
+        jk_printf("OpenJKDF2: Hit max visible aSectors.\n");
         return;
     }
 
@@ -1246,7 +1246,7 @@ void sithRender_KindaClipAssignFrustum(SithSector *sector, rdClipFrustum *frustu
 
     // Added: Prevent crashing
     if (sithRender_numThingSectors >= SITH_MAX_VISIBLE_SECTORS_2) {
-        jk_printf("OpenJKDF2: Hit max visible sectors (2).\n");
+        jk_printf("OpenJKDF2: Hit max visible aSectors (2).\n");
         return;
     }
 
@@ -1259,9 +1259,9 @@ void sithRender_KindaClipAssignFrustum(SithSector *sector, rdClipFrustum *frustu
     }
     frustum = &sithRender_aSectorFrustrums[sithRender_numSecorFrustrums++];
     _memcpy(frustum, frustumArg, sizeof(rdClipFrustum));
-    thing = sector->thingsList;
-    sector->clipFrustum = frustum;
-    //sector->clipFrustum = rdCamera_g_pCurCamera->pClipFrustum;
+    thing = sector->pFirstThingInSector;
+    sector->pClipFrustum = frustum;
+    //sector->pClipFrustum = rdCamera_g_pCurCamera->pClipFrustum;
     lightIdx = sithRender_numThingLights;
 
     // Added: safety
@@ -1275,8 +1275,8 @@ void sithRender_KindaClipAssignFrustum(SithSector *sector, rdClipFrustum *frustu
         if (++safeguard >= SITH_MAX_THINGS)
             break;
 
-        if ((thing->thingflags & SITH_TF_EMITLIGHT)
-             && !(thing->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_DESTROYED)))
+        if ((thing->flags & SITH_TF_EMITLIGHT)
+             && !(thing->flags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_DESTROYED)))
         {
             if ( thing->light > 0.0 )
             {
@@ -1287,9 +1287,9 @@ void sithRender_KindaClipAssignFrustum(SithSector *sector, rdClipFrustum *frustu
 
             if ( (thing->type == SITH_THING_ACTOR || thing->type == SITH_THING_PLAYER) && lightIdx < 0x20 )
             {
-                if ( (thing->actorParams.typeflags & SITH_AF_HEADLIGHT) != 0 && thing->actorParams.lightIntensity > 0.0 )
+                if ( (thing->actorParams.flags & SITH_AF_HEADLIGHT) != 0 && thing->actorParams.lightIntensity > 0.0 )
                 {
-                    rdMatrix_TransformPoint34(&vertex_out, &thing->actorParams.lightOffset, &thing->lookOrientation);
+                    rdMatrix_TransformPoint34(&vertex_out, &thing->actorParams.lightOffset, &thing->orient);
                     rdVector_Add3Acc(&vertex_out, &thing->position);
                     sithRender_aThingLights[sithRender_numThingLights].intensity = thing->actorParams.lightIntensity;
                     rdCamera_AddLight(rdCamera_g_pCurCamera, &sithRender_aThingLights[sithRender_numThingLights], &vertex_out);
@@ -1303,7 +1303,7 @@ void sithRender_KindaClipAssignFrustum(SithSector *sector, rdClipFrustum *frustu
                 }
             }
         }
-        thing = thing->nextThing;
+        thing = thing->pNextThingInSector;
     }
     sithRender_aThingSectors[sithRender_numThingSectors++] = sector;
 }
@@ -1341,7 +1341,7 @@ void sithRender_KindaClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t 
     {
         if (adjoinIter->sector->clipVisited == sithRender_lastRenderTick)
         {
-            //*adjoinIter->sector->clipFrustum = *rdCamera_g_pCurCamera->pClipFrustum;
+            //*adjoinIter->sector->pClipFrustum = *rdCamera_g_pCurCamera->pClipFrustum;
             continue;
         }
 
@@ -1353,7 +1353,7 @@ void sithRender_KindaClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t 
 
         adjoinSurface = adjoinIter->surface;
 
-        v20 = &sithWorld_g_pCurrentWorld->vertices[*adjoinSurface->surfaceInfo.face.vertexPosIdx];
+        v20 = &sithWorld_g_pCurrentWorld->aVertices[*adjoinSurface->surfaceInfo.face.vertexPosIdx];
         flex_t dist = rdMath_DistancePointToPlane(&sithCamera_g_pCurCamera->vec3_1, &adjoinSurface->surfaceInfo.face.normal, v20);
         flex_t adjoinDistAdd = adjoinIter->dist /*+ adjoinIter->mirror->dist*/ + prevAdjoinDistAdd;
 
@@ -1361,18 +1361,18 @@ void sithRender_KindaClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t 
 #ifdef TARGET_TWL
         // adjoinDistAdd compare GREATLY reduces recursion issues 
         // TODO: Test against TODOA and verify if this is QOL-worthy
-        if (/*(adjoinDistAdd > 3.5) ||*/ (dist > SITHCAMERA_ZFAR) /*|| dist < sector->clipFrustum->zNear*/) {
+        if (/*(adjoinDistAdd > 3.5) ||*/ (dist > SITHCAMERA_ZFAR) /*|| dist < sector->pClipFrustum->zNear*/) {
             // Doesn't help, causes visual issues
             //adjoinIter->sector->clipVisited = sithRender_lastRenderTick;
 
             // Assume the frustums have gone to shit
-            adjoinIter->sector->clipFrustum = rdCamera_g_pCurCamera->pClipFrustum;
+            adjoinIter->sector->pClipFrustum = rdCamera_g_pCurCamera->pClipFrustum;
             continue;
         }
         if ((sithRender_renderflags & 4) && adjoinDistAdd >= sithRender_f_82F4B0 && depth > 4) {
             // Assume the frustums have gone to shit
             *frustumArg = *rdCamera_g_pCurCamera->pClipFrustum;
-            adjoinIter->sector->clipFrustum = rdCamera_g_pCurCamera->pClipFrustum;
+            adjoinIter->sector->pClipFrustum = rdCamera_g_pCurCamera->pClipFrustum;
             continue;
         }
 #endif
@@ -1425,7 +1425,7 @@ void sithRender_KindaClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t 
             bAdjoinIsTransparent |= bMirrorAdjoinIsTransparent;
 
             // Added: When swimming, sometimes the camera dips below the water. 
-            // Consider the adjoin transparent if we are very close to it.
+            // Consider the pAdjoin transparent if we are very close to it.
             bAdjoinIsTransparent |= (dist < 0.01);
 #endif
 
@@ -1501,7 +1501,7 @@ void sithRender_KindaClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t 
                         v25 = adjoinSurface->surfaceInfo.face.vertexPosIdx[i];
                         if (LIKELY(sithWorld_g_pCurrentWorld->alloc_unk98[v25] != sithRender_lastRenderTick))
                         {
-                            rdMatrix_TransformPoint34(&sithWorld_g_pCurrentWorld->verticesTransformed[v25], &sithWorld_g_pCurrentWorld->vertices[v25], &rdCamera_g_pCurCamera->view_matrix);
+                            rdMatrix_TransformPoint34(&sithWorld_g_pCurrentWorld->aTransformedVertices[v25], &sithWorld_g_pCurrentWorld->aVertices[v25], &rdCamera_g_pCurCamera->view_matrix);
                             sithWorld_g_pCurrentWorld->alloc_unk98[v25] = sithRender_lastRenderTick;
                         }
                     }
@@ -1523,15 +1523,15 @@ void sithRender_KindaClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t 
                 // If we've visited before, grow the frustum
                 if (UNLIKELY(adjoinIter->sector->renderTick == sithRender_lastRenderTick))
                 {
-                    leftLimit = stdMath_Min(adjoinIter->sector->clipFrustum->farLeft, leftLimit);
-                    rightLimit = stdMath_Max(adjoinIter->sector->clipFrustum->right, rightLimit);
-                    bottomLimit = stdMath_Min(adjoinIter->sector->clipFrustum->bottom, bottomLimit);
-                    topLimit = stdMath_Max(adjoinIter->sector->clipFrustum->farTop, topLimit);
+                    leftLimit = stdMath_Min(adjoinIter->sector->pClipFrustum->farLeft, leftLimit);
+                    rightLimit = stdMath_Max(adjoinIter->sector->pClipFrustum->right, rightLimit);
+                    bottomLimit = stdMath_Min(adjoinIter->sector->pClipFrustum->bottom, bottomLimit);
+                    topLimit = stdMath_Max(adjoinIter->sector->pClipFrustum->farTop, topLimit);
                 }
 
                 for (int i = 0; i < adjoinSurface->surfaceInfo.face.numVertices; i++) {
                     v25 = adjoinSurface->surfaceInfo.face.vertexPosIdx[i];
-                    rdVector3* pVertIter = &sithWorld_g_pCurrentWorld->verticesTransformed[v25];
+                    rdVector3* pVertIter = &sithWorld_g_pCurrentWorld->aTransformedVertices[v25];
                     flex_t iterX = pVertIter->x;
                     flex_t iterY = pVertIter->y;
                     flex_t iterZ = pVertIter->z;
@@ -1560,7 +1560,7 @@ void sithRender_KindaClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t 
                     {
                         int lastClipVisited = adjoinIter->sector->clipVisited;
                         adjoinIter->sector->clipVisited = 0;
-                        sithRender_KindaClip(adjoinIter->sector, adjoinIter->sector->clipFrustum, adjoinDistAdd, depth+1);
+                        sithRender_KindaClip(adjoinIter->sector, adjoinIter->sector->pClipFrustum, adjoinDistAdd, depth+1);
                         adjoinIter->sector->clipVisited = sithRender_lastRenderTick;
                     }
                 }
@@ -1581,16 +1581,16 @@ void sithRender_KindaClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t 
                 // Assign the grown frustum and don't iterate deeper
                 if (UNLIKELY(adjoinIter->sector->renderTick == sithRender_lastRenderTick))
                 {
-                    rdClipFrustum* pFrustumPrior = adjoinIter->sector->clipFrustum;
+                    rdClipFrustum* pFrustumPrior = adjoinIter->sector->pClipFrustum;
                     v31->farTop   = stdMath_Max(v31->farTop, pFrustumPrior->farTop);
                     v31->bottom   = stdMath_Min(v31->bottom, pFrustumPrior->bottom);
                     v31->farLeft  = stdMath_Min(v31->farLeft, pFrustumPrior->farLeft);
                     v31->right    = stdMath_Max(v31->right, pFrustumPrior->right);
                     v31->nearTop  = stdMath_Max(v31->nearTop, pFrustumPrior->nearTop);
                     v31->nearLeft = stdMath_Min(v31->nearLeft, pFrustumPrior->nearLeft);
-                    //printf("     %f %f %f %f -> %f %f %f %f\n", (flex32_t)adjoinIter->sector->clipFrustum->farLeft, (flex32_t)adjoinIter->sector->clipFrustum->right, (flex32_t)adjoinIter->sector->clipFrustum->bottom, (flex32_t)adjoinIter->sector->clipFrustum->farTop, (flex32_t)v31->farLeft, (flex32_t)v31->right, (flex32_t)v31->bottom, (flex32_t)v31->farTop);
+                    //printf("     %f %f %f %f -> %f %f %f %f\n", (flex32_t)adjoinIter->sector->pClipFrustum->farLeft, (flex32_t)adjoinIter->sector->pClipFrustum->right, (flex32_t)adjoinIter->sector->pClipFrustum->bottom, (flex32_t)adjoinIter->sector->pClipFrustum->farTop, (flex32_t)v31->farLeft, (flex32_t)v31->right, (flex32_t)v31->bottom, (flex32_t)v31->farTop);
                     
-                    //*adjoinIter->sector->clipFrustum = *rdCamera_g_pCurCamera->pClipFrustum;
+                    //*adjoinIter->sector->pClipFrustum = *rdCamera_g_pCurCamera->pClipFrustum;
                     
                     BOOL hasChanged =  v31->farTop != pFrustumPrior->farTop ||
                         v31->bottom != pFrustumPrior->bottom ||
@@ -1603,21 +1603,21 @@ void sithRender_KindaClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t 
                     for (int i = 0; i < depth+1; i++) {
                         printf("    ");
                     }
-                    printf("- %d again (%d) %f %f %f %f -> %f %f %f %f, %s\n", adjoinIter->sector->id, sector->id, (flex32_t)adjoinIter->sector->clipFrustum->farLeft, (flex32_t)adjoinIter->sector->clipFrustum->right, (flex32_t)adjoinIter->sector->clipFrustum->bottom, (flex32_t)adjoinIter->sector->clipFrustum->farTop, (flex32_t)v31->farLeft, (flex32_t)v31->right, (flex32_t)v31->bottom, (flex32_t)v31->farTop, hasChanged ? "yes" : "no");
+                    printf("- %d again (%d) %f %f %f %f -> %f %f %f %f, %s\n", adjoinIter->sector->id, sector->id, (flex32_t)adjoinIter->sector->pClipFrustum->farLeft, (flex32_t)adjoinIter->sector->pClipFrustum->right, (flex32_t)adjoinIter->sector->pClipFrustum->bottom, (flex32_t)adjoinIter->sector->pClipFrustum->farTop, (flex32_t)v31->farLeft, (flex32_t)v31->right, (flex32_t)v31->bottom, (flex32_t)v31->farTop, hasChanged ? "yes" : "no");
 #endif
 
-                    *adjoinIter->sector->clipFrustum = *v31;
+                    *adjoinIter->sector->pClipFrustum = *v31;
                     if (!hasChanged && depth > 3) {
                         adjoinIter->sector->clipVisited = sithRender_lastRenderTick;
                     }
                     else {
                         //if (depth > 3) {
-                            *adjoinIter->sector->clipFrustum = *rdCamera_g_pCurCamera->pClipFrustum;
+                            *adjoinIter->sector->pClipFrustum = *rdCamera_g_pCurCamera->pClipFrustum;
                             //continue;
                         //}
                         //int lastClipVisited = adjoinIter->sector->clipVisited;
                         adjoinIter->sector->clipVisited = 0;
-                        sithRender_KindaClip(adjoinIter->sector, adjoinIter->sector->clipFrustum, adjoinDistAdd, depth+1);
+                        sithRender_KindaClip(adjoinIter->sector, adjoinIter->sector->pClipFrustum, adjoinDistAdd, depth+1);
                         //adjoinIter->sector->clipVisited = lastClipVisited;
                         adjoinIter->sector->clipVisited = sithRender_lastRenderTick;
                     }
@@ -1625,7 +1625,7 @@ void sithRender_KindaClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t 
                 }
                 
                 sithRender_KindaClipAssignFrustum(adjoinIter->sector, v31, depth+1, sector->id);
-                sithRender_KindaClip(adjoinIter->sector, adjoinIter->sector->clipFrustum, adjoinDistAdd, depth+1);
+                sithRender_KindaClip(adjoinIter->sector, adjoinIter->sector->pClipFrustum, adjoinDistAdd, depth+1);
             }
         }
     }
@@ -1687,7 +1687,7 @@ void sithRender_RenderSectors()
     unsigned int v52; // ecx
     flex_t *v53; // edx
     flex_d_t v54; // st7
-    int surfaceFlags; // eax
+    int flags; // eax
     int v57; // edx
     rdMaterial *v58; // ecx
     int v59; // ecx
@@ -1746,10 +1746,10 @@ void sithRender_RenderSectors()
     //printf("%x %x %x %x\n", rdroid_curVertexColorMode, sithRender_renderflags, rdroid_curAcceleration, sithRender_lightMode);
 #endif
 
-    vertices_uvs = sithWorld_g_pCurrentWorld->vertexUVs;
-    sithRender_faceView.vertices = sithWorld_g_pCurrentWorld->verticesTransformed;
-    sithRender_faceView.paDynamicLight = sithWorld_g_pCurrentWorld->verticesDynamicLight;
-    sithRender_faceView.vertexUVs = vertices_uvs;
+    vertices_uvs = sithWorld_g_pCurrentWorld->aTexVerticies;
+    sithRender_faceView.aVertices = sithWorld_g_pCurrentWorld->aTransformedVertices;
+    sithRender_faceView.paDynamicLight = sithWorld_g_pCurrentWorld->aVertDynamicLights;
+    sithRender_faceView.aTexVerticies = vertices_uvs;
     pFullCameraFrustum = rdCamera_g_pCurCamera->pClipFrustum;
 
     for (v72 = 0; v72 < sithRender_g_numVisibleSectors; v72++)
@@ -1762,7 +1762,7 @@ void sithRender_RenderSectors()
             continue;
         }
         level_idk->geoRenderTick = sithRender_lastRenderTick;
-        //level_idk->clipFrustum = rdCamera_g_pCurCamera->pClipFrustum;
+        //level_idk->pClipFrustum = rdCamera_g_pCurCamera->pClipFrustum;
 #endif
         if (UNLIKELY(sithRender_lightingIRMode))
         {
@@ -1783,7 +1783,7 @@ void sithRender_RenderSectors()
 #if defined(TARGET_TWL) || defined(SITHRENDER_SPHERE_TEST_SURFACES) || defined(EXPERIMENTAL_FIXED_POINT)
         BOOL noDistCulling = (level_idk != sithCamera_g_pCurCamera->sector);
 #endif
-        rdClipFrustum* pSectorFrustum = level_idk->clipFrustum;
+        rdClipFrustum* pSectorFrustum = level_idk->pClipFrustum;
 
         // Added: Removed the field_4 set?
         for (v75 = 0; v75 < level_idk->numSurfaces; /*v65->field_4 = sithRender_lastRenderTick,*/ ++v65, v75++)
@@ -1791,9 +1791,9 @@ void sithRender_RenderSectors()
             rdClipFrustum* pSurfaceFrustum = pSectorFrustum;
             if (UNLIKELY(!v65->surfaceInfo.face.geometryMode))
                 continue;
-            vertices_alloc = sithWorld_g_pCurrentWorld->vertices;
+            vertices_alloc = sithWorld_g_pCurrentWorld->aVertices;
 
-            BOOL bIsSkySurface = (v65->surfaceFlags & (SITH_SURFACE_CEILING_SKY|SITH_SURFACE_HORIZON_SKY));
+            BOOL bIsSkySurface = (v65->flags & (SITH_SURFACE_CEILING_SKY|SITH_SURFACE_HORIZON_SKY));
             flex_t dist = rdMath_DistancePointToPlane(&sithCamera_g_pCurCamera->vec3_1, &v65->surfaceInfo.face.normal, &vertices_alloc[*v65->surfaceInfo.face.vertexPosIdx]);
             if (UNLIKELY(dist <= 0.0))
                 continue;
@@ -1822,7 +1822,7 @@ void sithRender_RenderSectors()
             }
 
 #ifndef TARGET_TWL
-            if ( v65->adjoin && surfaceMat && ((v65->surfaceInfo.face.type & 2) != 0 || (v10 && (v10->header.texture_type & 8)) && (v10 && v10->texture_ptr && (v10->texture_ptr->alpha_en & 1))) ) // Added: nullptr checks for v10 and v10->texture_ptr
+            if ( v65->pAdjoin && surfaceMat && ((v65->surfaceInfo.face.type & 2) != 0 || (v10 && (v10->header.texture_type & 8)) && (v10 && v10->texture_ptr && (v10->texture_ptr->alpha_en & 1))) ) // Added: nullptr checks for v10 and v10->texture_ptr
             {
                 if (sithRender_numAlphaAdjoins < SITH_MAX_VISIBLE_ALPHA_SURFACES)
                 {
@@ -1877,14 +1877,14 @@ void sithRender_RenderSectors()
                     int idx = v65->surfaceInfo.face.vertexPosIdx[j];
                     if (LIKELY(sithWorld_g_pCurrentWorld->alloc_unk98[idx] != sithRender_lastRenderTick))
                     {
-                        rdMatrix_TransformPoint34(&sithWorld_g_pCurrentWorld->verticesTransformed[idx], &sithWorld_g_pCurrentWorld->vertices[idx], &rdCamera_g_pCurCamera->view_matrix);
+                        rdMatrix_TransformPoint34(&sithWorld_g_pCurrentWorld->aTransformedVertices[idx], &sithWorld_g_pCurrentWorld->aVertices[idx], &rdCamera_g_pCurCamera->view_matrix);
                         sithWorld_g_pCurrentWorld->alloc_unk98[idx] = sithRender_lastRenderTick;
                     }
                 }
                 v65->field_4 = sithRender_lastRenderTick;
             }
 
-            // Render with N-Gons instead of triangle strips if flag 0x8 is unset, or if it's sky vertices
+            // Render with N-Gons instead of triangle strips if flag 0x8 is unset, or if it's sky aVertices
             if (LIKELY((sithRender_renderflags & 8) == 0 || v65->surfaceInfo.face.numVertices <= 3 || bIsSkySurface || !v65->surfaceInfo.face.lightingMode))
             {
                 procEntry = rdCache_GetProcEntry();
@@ -1920,10 +1920,10 @@ void sithRender_RenderSectors()
                 if (UNLIKELY(texMode2 >= texMode))
                     texMode2 = texMode;
                 procEntry->textureMode = texMode2;
-                meshinfo_out.vertices = sithRender_aClipVertices;
+                meshinfo_out.aVertices = sithRender_aClipVertices;
                 meshinfo_out.paDynamicLight = procEntry->vertexIntensities;
                 sithRender_faceView.vertexPosIdx = v65->surfaceInfo.face.vertexPosIdx;
-                meshinfo_out.vertexUVs = procEntry->vertexUVs;
+                meshinfo_out.aTexVerticies = procEntry->aTexVerticies;
                 sithRender_faceView.numVertices = v65->surfaceInfo.face.numVertices;
                 texMode3 = texMode2;
                 sithRender_faceView.vertexUVIdx = v65->surfaceInfo.face.vertexUVIdx;
@@ -1965,7 +1965,7 @@ void sithRender_RenderSectors()
                 }
                 else 
                 {
-                    if ((v65->surfaceFlags & SITH_SURFACE_1000000) == 0) {
+                    if ((v65->flags & SITH_SURFACE_1000000) == 0) {
                         sithRender_faceView.paRedIntensities = (v65->surfaceInfo).intensities;
                         sithRender_faceView.paGreenIntensities = sithRender_faceView.paRedIntensities;
                         sithRender_faceView.paBlueIntensities = sithRender_faceView.paRedIntensities;
@@ -2033,7 +2033,7 @@ void sithRender_RenderSectors()
                 {
                     continue;
                 }
-                rdCamera_g_pCurCamera->fnProjectLst(procEntry->vertices, sithRender_aClipVertices, meshinfo_out.numVertices);
+                rdCamera_g_pCurCamera->fnProjectLst(procEntry->aVertices, sithRender_aClipVertices, meshinfo_out.numVertices);
 
                 if (UNLIKELY(sithRender_lightingIRMode))
                 {
@@ -2118,12 +2118,12 @@ void sithRender_RenderSectors()
                 }
 #endif
 
-                surfaceFlags = v65->surfaceFlags;
-                if (UNLIKELY(surfaceFlags & SITH_SURFACE_HORIZON_SKY))
+                flags = v65->flags;
+                if (UNLIKELY(flags & SITH_SURFACE_HORIZON_SKY))
                 {
                     sithRenderSky_HorizonFaceToPlane(procEntry, &v65->surfaceInfo, num_vertices);
                 }
-                else if (UNLIKELY(surfaceFlags & SITH_SURFACE_CEILING_SKY))
+                else if (UNLIKELY(flags & SITH_SURFACE_CEILING_SKY))
                 {
                     sithRenderSky_CeilingFaceToPlane(procEntry, &v65->surfaceInfo, sithRender_aClipVertices, num_vertices);
                 }
@@ -2187,9 +2187,9 @@ void sithRender_RenderSectors()
                         v79[1] = v65->surfaceInfo.face.vertexUVIdx[v71];
                         v79[2] = v65->surfaceInfo.face.vertexUVIdx[v18];
                     }
-                    meshinfo_out.vertices = sithRender_aClipVertices;
+                    meshinfo_out.aVertices = sithRender_aClipVertices;
                     sithRender_faceView.numVertices = 3;
-                    meshinfo_out.vertexUVs = v20->vertexUVs;
+                    meshinfo_out.aTexVerticies = v20->aTexVerticies;
                     sithRender_faceView.vertexPosIdx = v78;
                     meshinfo_out.paDynamicLight = v20->vertexIntensities;
                     sithRender_faceView.vertexUVIdx = v79;
@@ -2218,7 +2218,7 @@ void sithRender_RenderSectors()
                     else {
                         
 
-                        if ((v65->surfaceFlags & SITH_SURFACE_1000000) == 0) 
+                        if ((v65->flags & SITH_SURFACE_1000000) == 0) 
                         {
                             v80[0] = v65->surfaceInfo.intensities[v19];
                             v80[1] = v65->surfaceInfo.intensities[v71];
@@ -2259,16 +2259,16 @@ void sithRender_RenderSectors()
                                    &(v65->surfaceInfo).face.clipIdk);
                     }
 
-                    // Avoid projecting vertices if they're far away enough, skipping sky
-                    // vertices because they're important for aesthetics
+                    // Avoid projecting aVertices if they're far away enough, skipping sky
+                    // aVertices because they're important for aesthetics
 #if 0 //def EXPERIMENTAL_FIXED_POINT
                     skip_this_surface = 0;
-                    surfaceFlags = v65->surfaceFlags;
-                    if (!noDistCulling && !(surfaceFlags & (SITH_SURFACE_HORIZON_SKY | SITH_SURFACE_CEILING_SKY)))
+                    flags = v65->flags;
+                    if (!noDistCulling && !(flags & (SITH_SURFACE_HORIZON_SKY | SITH_SURFACE_CEILING_SKY)))
                     {
                         flex_t zfar = rdCamera_g_pCurCamera->pClipFrustum->zFar;
                         for (int i = 0; i < meshinfo_out.numVertices; i++) {
-                            //printf("%f\n", (float)v20->vertices[i].y);
+                            //printf("%f\n", (float)v20->aVertices[i].y);
                             flex_t verty = sithRender_aClipVertices[i].y;
                             if (verty > zfar || verty < 0.0) {
                                 skip_this_surface = 1;
@@ -2288,7 +2288,7 @@ void sithRender_RenderSectors()
                     if ( meshinfo_out.numVertices < 3u )
                         goto LABEL_92;
 
-                    rdCamera_g_pCurCamera->fnProjectLst(v20->vertices, sithRender_aClipVertices, meshinfo_out.numVertices);
+                    rdCamera_g_pCurCamera->fnProjectLst(v20->aVertices, sithRender_aClipVertices, meshinfo_out.numVertices);
 
                     if ( sithRender_lightingIRMode )
                     {
@@ -2398,18 +2398,18 @@ LABEL_150:
         // Surprisingly, this is a fairly minimal cost to the entire render, 3ms on landing terminal spawn
         rdSetProcFaceUserData(level_idk->id | 0x10000);
         int safeguard = 0;
-        for ( i = level_idk->thingsList; i; i = i->nextThing )
+        for ( i = level_idk->pFirstThingInSector; i; i = i->pNextThingInSector )
         {
             // Added: safeguards
             if (++safeguard >= SITH_MAX_THINGS) {
                 break;
             }
 
-            if (!(i->thingflags & SITH_TF_LEVELGEO)) {
+            if (!(i->flags & SITH_TF_LEVELGEO)) {
                 continue;
             }
 
-            if (i->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_DESTROYED)) {
+            if (i->flags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_DESTROYED)) {
                 continue;
             }
 
@@ -2417,36 +2417,36 @@ LABEL_150:
                 continue;
             }
 
-            if (i->rdthing.type != RD_THING_MODEL3) {
+            if (i->renderData.type != RD_THING_MODEL3) {
                 continue;
             }
 
-            rdMatrix_TransformPoint34(&i->screenPos, &i->position, &rdCamera_g_pCurCamera->view_matrix);
-            v63 = rdClip_SphereInFrustrum(level_idk->clipFrustum, &i->screenPos, i->rdthing.model3->radius);
+            rdMatrix_TransformPoint34(&i->transformedPos, &i->position, &rdCamera_g_pCurCamera->view_matrix);
+            v63 = rdClip_SphereInFrustrum(level_idk->pClipFrustum, &i->transformedPos, i->renderData.model3->radius);
 #ifdef SITHRENDER_SPHERE_TEST_SURFACES
             extern rdClipFrustum sithRender_absoluteMaxFrustum;
 
             if (UNLIKELY(v63 == SPHERE_CLIPPING_EDGE)) {
-                v63 = rdClip_SphereInFrustrum(&sithRender_absoluteMaxFrustum, &i->screenPos, i->rdthing.model3->radius);
+                v63 = rdClip_SphereInFrustrum(&sithRender_absoluteMaxFrustum, &i->transformedPos, i->renderData.model3->radius);
             }
 #endif
-            i->rdthing.clippingIdk = v63;
+            i->renderData.clippingIdk = v63;
             if (LIKELY(v63 == SPHERE_FULLY_OUTSIDE)) {
                 continue;
             }
 
             // REMOVED: This was bugged idk
             //if ( a2 >= 1.0 )
-            //    i->rdthing.desiredLightMode = RD_LIGHTMODE_FULLYLIT;
+            //    i->renderData.desiredLightMode = RD_LIGHTMODE_FULLYLIT;
             if ( a2 >= 1.0 )
-                i->rdthing.curLightMode = RD_LIGHTMODE_FULLYLIT;
+                i->renderData.curLightMode = RD_LIGHTMODE_FULLYLIT;
             else
-                i->rdthing.curLightMode = i->rdthing.desiredLightMode;
+                i->renderData.curLightMode = i->renderData.desiredLightMode;
 
             // MOTS added
 #ifdef JKM_LIGHTING
-            if ((i->archlightIdx != -1) && ((i->rdthing).type == RD_THING_MODEL3)) {
-                rdModel3* iVar22 = i->rdthing.model3;
+            if ((i->archlightIdx != -1) && ((i->renderData).type == RD_THING_MODEL3)) {
+                rdModel3* iVar22 = i->renderData.model3;
                 for (int k = 0; k < 4; k++) {
                     for (int j = 0; j < iVar22->geosets[k].numMeshes; j++) 
                     {
@@ -2463,7 +2463,7 @@ LABEL_150:
                 }
             }
             if ((i->archlightIdx == -1) && (rdGetVertexColorMode() == 1)) {
-                rdModel3* iVar13 = i->rdthing.model3;
+                rdModel3* iVar13 = i->renderData.model3;
                 for (int k = 0; k < 4; k++) {
                     for (int j = 0; j < iVar13->geosets[k].numMeshes; j++) 
                     {
@@ -2480,8 +2480,8 @@ LABEL_150:
 
             // MOTS added
 #ifdef JKM_LIGHTING
-            if (((i->archlightIdx != -1) && (i->rdthing.type == RD_THING_MODEL3)) && (rdGetVertexColorMode() == 0)) {
-                rdModel3* iVar14 = i->rdthing.model3;
+            if (((i->archlightIdx != -1) && (i->renderData.type == RD_THING_MODEL3)) && (rdGetVertexColorMode() == 0)) {
+                rdModel3* iVar14 = i->renderData.model3;
                 for (int k = 0; k < 4; k++) {
                     for (int j = 0; j < iVar14->geosets[k].numMeshes; j++) 
                     {
@@ -2513,11 +2513,11 @@ void sithRender_BuildVisibleSectorsThingList()
         {
             if ( i->sector->renderTick != sithRender_lastRenderTick && (i->flags & 1) != 0 )
             {
-                // Allow things to peek their light around corners w/o screwing with frustums
+                // Allow aThings to peek their light around corners w/o screwing with frustums
 #ifndef QOL_IMPROVEMENTS
-                i->sector->clipFrustum = sithRender_aVisibleSectors[j]->clipFrustum;
+                i->sector->pClipFrustum = sithRender_aVisibleSectors[j]->pClipFrustum;
 #else
-                i->sector->clipFrustum = NULL;
+                i->sector->pClipFrustum = NULL;
 #endif
                 sithRender_BuildSectorThingList(i->sector, 0.0, i->dist, 0);
             }
@@ -2544,7 +2544,7 @@ void sithRender_BuildSectorThingList(SithSector *sector, flex_t prev, flex_t dis
     if ( prev < 2.0 && sithRender_numThingLights < 0x20)
     {
         int safeguard = 0;
-        for ( i = sector->thingsList; i; i = i->nextThing )
+        for ( i = sector->pFirstThingInSector; i; i = i->pNextThingInSector )
         {
             // Added: safeguards
             if (++safeguard >= SITH_MAX_THINGS) {
@@ -2554,8 +2554,8 @@ void sithRender_BuildSectorThingList(SithSector *sector, flex_t prev, flex_t dis
             if ( sithRender_numThingLights >= 0x20 )
                 break;
 
-            if ((i->thingflags & SITH_TF_EMITLIGHT) 
-                && !(i->thingflags & (SITH_TF_DISABLED|SITH_TF_DESTROYED)))
+            if ((i->flags & SITH_TF_EMITLIGHT) 
+                && !(i->flags & (SITH_TF_DISABLED|SITH_TF_DESTROYED)))
             {
                 if ( i->light > 0.0 )
                 {
@@ -2567,9 +2567,9 @@ void sithRender_BuildSectorThingList(SithSector *sector, flex_t prev, flex_t dis
                 if ( (i->type == SITH_THING_ACTOR || i->type == SITH_THING_PLAYER) && sithRender_numThingLights < 0x20 )
                 {
                     // Actors all have a small amount of light
-                    if ( (i->actorParams.typeflags & SITH_AF_HEADLIGHT) && i->actorParams.lightIntensity > 0.0 )
+                    if ( (i->actorParams.flags & SITH_AF_HEADLIGHT) && i->actorParams.lightIntensity > 0.0 )
                     {
-                        rdMatrix_TransformPoint34(&vertex_out, &i->actorParams.lightOffset, &i->lookOrientation);
+                        rdMatrix_TransformPoint34(&vertex_out, &i->actorParams.lightOffset, &i->orient);
                         rdVector_Add3Acc(&vertex_out, &i->position);
                         
                         sithRender_aThingLights[sithRender_numThingLights].intensity = i->actorParams.lightIntensity;
@@ -2605,11 +2605,11 @@ void sithRender_BuildSectorThingList(SithSector *sector, flex_t prev, flex_t dis
             flex_t nextDist = j->mirror->dist + j->dist + dist + prev;
             if ( nextDist < 0.8 || nextDist < 2.0 ) // Bug?
             {
-                // Allow things to peek their light around corners w/o screwing with frustums
+                // Allow aThings to peek their light around corners w/o screwing with frustums
 #ifndef QOL_IMPROVEMENTS
-                j->sector->clipFrustum = sector->clipFrustum;
+                j->sector->pClipFrustum = sector->pClipFrustum;
 #else
-                j->sector->clipFrustum = NULL;
+                j->sector->pClipFrustum = NULL;
 #endif
                 sithRender_BuildSectorThingList(j->sector, nextDist, 0.0, ++depth);
 
@@ -2653,22 +2653,22 @@ void sithRender_BuildDynamicLights()
 
         for (int j = 0; j < sectorIter->numVertices; j++)
         {
-            int idx = sectorIter->verticeIdxs[j];
+            int idx = sectorIter->aVertIdxs[j];
             if ( sithWorld_g_pCurrentWorld->alloc_unk9c[idx] != sithRender_lastRenderTick )
             {
-                sithWorld_g_pCurrentWorld->verticesDynamicLight[idx] = 0.0;
+                sithWorld_g_pCurrentWorld->aVertDynamicLights[idx] = 0.0;
 
                 for (int i = 0; i < numSectorLights; i++)
                 {
                     int id = tmpLights[i]->id;
-                    flex_t distCalc = rdVector_Dist3(&rdCamera_g_pCurCamera->lightPositions[id], &sithWorld_g_pCurrentWorld->vertices[idx]);
+                    flex_t distCalc = rdVector_Dist3(&rdCamera_g_pCurCamera->lightPositions[id], &sithWorld_g_pCurrentWorld->aVertices[idx]);
 
                     // Light is within distance of the vertex
                     if ( distCalc < tmpLights[i]->falloffMax )
-                        sithWorld_g_pCurrentWorld->verticesDynamicLight[idx] += tmpLights[i]->intensity - distCalc * rdCamera_g_pCurCamera->attenuationMax;
+                        sithWorld_g_pCurrentWorld->aVertDynamicLights[idx] += tmpLights[i]->intensity - distCalc * rdCamera_g_pCurCamera->attenuationMax;
 
                     // This vertex is as lit as it can be, stop adding lights to it
-                    if ( sithWorld_g_pCurrentWorld->verticesDynamicLight[idx] >= 1.0 )
+                    if ( sithWorld_g_pCurrentWorld->aVertDynamicLights[idx] >= 1.0 )
                         break;
                 }
                 sithWorld_g_pCurrentWorld->alloc_unk9c[idx] = sithRender_lastRenderTick;
@@ -2719,30 +2719,30 @@ void sithRender_RenderThings()
             a2 = stdMath_Clamp(v2, 0.0, 1.0);
         }
         rdColormap_SetCurrent(v1->colormap);
-        thingIter = v1->thingsList;
+        thingIter = v1->pFirstThingInSector;
         v16 = v1->colormap == sithWorld_g_pCurrentWorld->colormaps;
 
         int safeguard = 0;
-        for (; thingIter; thingIter = thingIter->nextThing)
+        for (; thingIter; thingIter = thingIter->pNextThingInSector)
         {
             // Added: safeguards
             if (++safeguard >= SITH_MAX_THINGS) {
                 break;
             }
 
-            if ( (thingIter->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_DESTROYED)) == 0
-              && (thingIter->thingflags & SITH_TF_LEVELGEO) == 0
+            if ( (thingIter->flags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_DESTROYED)) == 0
+              && (thingIter->flags & SITH_TF_LEVELGEO) == 0
               && ((sithCamera_g_pCurCamera->cameraPerspective & 0xFC) != 0 || thingIter != sithCamera_g_pCurCamera->primaryFocus) )
             {
-                rdMatrix_TransformPoint34(&thingIter->screenPos, &thingIter->position, &rdCamera_g_pCurCamera->view_matrix);
+                rdMatrix_TransformPoint34(&thingIter->transformedPos, &thingIter->position, &rdCamera_g_pCurCamera->view_matrix);
                 
-                //printf("%f %f %f ; %f %f %f\n", thingIter->screenPos.x, thingIter->screenPos.y, thingIter->screenPos.z, thingIter->position.x, thingIter->position.y, thingIter->position.z);
+                //printf("%f %f %f ; %f %f %f\n", thingIter->transformedPos.x, thingIter->transformedPos.y, thingIter->transformedPos.z, thingIter->position.x, thingIter->position.y, thingIter->position.z);
                 
-                if ( rdroid_curAcceleration > 0 || thingIter->rdthing.type != RD_THING_SPRITE3 || sithRender_numSpritesToDraw < 8 )
+                if ( rdroid_curAcceleration > 0 || thingIter->renderData.type != RD_THING_SPRITE3 || sithRender_numSpritesToDraw < 8 )
                 {
-                    // Allow things to peek their light around corners w/o screwing with frustums
+                    // Allow aThings to peek their light around corners w/o screwing with frustums
 #ifdef QOL_IMPROVEMENTS
-                    if ( (thingIter->thingflags & SITH_TF_EMITLIGHT) != 0
+                    if ( (thingIter->flags & SITH_TF_EMITLIGHT) != 0
                       && thingIter->light > 0.0
                       && a2 <= stdMath_Clamp(thingIter->light, 0.0, 1.0) )
                     {
@@ -2753,56 +2753,56 @@ void sithRender_RenderThings()
                         rdCamera_SetAmbientLight(rdCamera_g_pCurCamera, a2);
                     }
 
-                    if (!v1->clipFrustum) {
+                    if (!v1->pClipFrustum) {
 #ifdef TARGET_TWL
                         // Preload model textures, if supported
-                        rdModel3_EnsureMaterialData(&thingIter->rdthing);
+                        rdModel3_EnsureMaterialData(&thingIter->renderData);
                         continue;
 #endif
-                        v1->clipFrustum = rdCamera_g_pCurCamera->pClipFrustum;
+                        v1->pClipFrustum = rdCamera_g_pCurCamera->pClipFrustum;
                     }
 #endif
                     clipRadius = 0.0f;
-                    switch ( thingIter->rdthing.type )
+                    switch ( thingIter->renderData.type )
                     {
                         case RD_THING_MODEL3:
-                            radius = thingIter->rdthing.model3->radius;
+                            radius = thingIter->renderData.model3->radius;
                             clipRadius = radius;
-                            clippingVal = rdClip_SphereInFrustrum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
+                            clippingVal = rdClip_SphereInFrustrum(v1->pClipFrustum, &thingIter->transformedPos, clipRadius);
                             break;
 
                         case RD_THING_SPRITE3:
-                            clipRadius = thingIter->rdthing.sprite3->radius;
+                            clipRadius = thingIter->renderData.sprite3->radius;
                             ++sithRender_numSpritesToDraw;
-                            clippingVal = rdClip_SphereInFrustrum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
+                            clippingVal = rdClip_SphereInFrustrum(v1->pClipFrustum, &thingIter->transformedPos, clipRadius);
                             break;
 
                         case RD_THING_PARTICLE:
-                            clipRadius = thingIter->rdthing.particlecloud->cloudRadius;
-                            clippingVal = rdClip_SphereInFrustrum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
+                            clipRadius = thingIter->renderData.particlecloud->cloudRadius;
+                            clippingVal = rdClip_SphereInFrustrum(v1->pClipFrustum, &thingIter->transformedPos, clipRadius);
                             break;
 
                         case RD_THING_POLYLINE:
-                            radius = thingIter->rdthing.polyline->length;
+                            radius = thingIter->renderData.polyline->length;
                             clipRadius = radius;
-                            clippingVal = rdClip_SphereInFrustrum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
+                            clippingVal = rdClip_SphereInFrustrum(v1->pClipFrustum, &thingIter->transformedPos, clipRadius);
                             break;
 
                         default:
-                            clippingVal = rdClip_SphereInFrustrum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
+                            clippingVal = rdClip_SphereInFrustrum(v1->pClipFrustum, &thingIter->transformedPos, clipRadius);
                             break;
                     }
-                    //printf("%f %f %f %d\n", (flex32_t)thingIter->screenPos.x, (flex32_t)thingIter->screenPos.y, (flex32_t)thingIter->screenPos.z, clippingVal);
-                    thingIter->rdthing.clippingIdk = clippingVal;
+                    //printf("%f %f %f %d\n", (flex32_t)thingIter->transformedPos.x, (flex32_t)thingIter->transformedPos.y, (flex32_t)thingIter->transformedPos.z, clippingVal);
+                    thingIter->renderData.clippingIdk = clippingVal;
                     if ( clippingVal == SPHERE_FULLY_OUTSIDE || sithRender_008d1668) // MoTS added: sithRender_008d1668
                         continue;
                     curWorld = sithWorld_g_pCurrentWorld;
 
-                    flex_t yval = thingIter->screenPos.y;
+                    flex_t yval = thingIter->transformedPos.y;
 
                     // MoTS added
                     if (sithCamera_g_pCurCamera->zoomScale != 1.0) {
-                        yval = sithCamera_g_pCurCamera->invZoomScale * (thingIter->screenPos).y;
+                        yval = sithCamera_g_pCurCamera->invZoomScale * (thingIter->transformedPos).y;
                     }
 
 #ifdef TARGET_TWL
@@ -2812,16 +2812,16 @@ void sithRender_RenderThings()
                     }
 #endif
 
-                    if ( thingIter->rdthing.type == RD_THING_MODEL3 )
+                    if ( thingIter->renderData.type == RD_THING_MODEL3 )
                     {
-                        model3 = thingIter->rdthing.model3;
+                        model3 = thingIter->renderData.model3;
 
                         switch ( model3->numGeosets )
                         {
                             case 1:
                                 break;
                             case 2:
-                                if ( yval < (flex_d_t)sithWorld_g_pCurrentWorld->lodDistance.y )
+                                if ( yval < (flex_d_t)sithWorld_g_pCurrentWorld->distancesLOD.y )
                                 {
                                     model3->geosetSelect = 0;
                                 }
@@ -2831,12 +2831,12 @@ void sithRender_RenderThings()
                                 }
                                 break;
                             case 3:
-                                if ( yval < (flex_d_t)sithWorld_g_pCurrentWorld->lodDistance.x )
+                                if ( yval < (flex_d_t)sithWorld_g_pCurrentWorld->distancesLOD.x )
                                 {
                                     model3->geosetSelect = 0;
                                     
                                 }
-                                else if ( yval >= (flex_d_t)sithWorld_g_pCurrentWorld->lodDistance.y )
+                                else if ( yval >= (flex_d_t)sithWorld_g_pCurrentWorld->distancesLOD.y )
                                 {
                                     model3->geosetSelect = 2;
                                 }
@@ -2847,13 +2847,13 @@ void sithRender_RenderThings()
 
                                 break;
                             default:
-                                if ( yval < (flex_d_t)sithWorld_g_pCurrentWorld->lodDistance.x )
+                                if ( yval < (flex_d_t)sithWorld_g_pCurrentWorld->distancesLOD.x )
                                 {
                                     model3->geosetSelect = 0;
                                 }
-                                else if ( yval < (flex_d_t)sithWorld_g_pCurrentWorld->lodDistance.y )
+                                else if ( yval < (flex_d_t)sithWorld_g_pCurrentWorld->distancesLOD.y )
                                     model3->geosetSelect = 1;
-                                else if ( yval >= (flex_d_t)sithWorld_g_pCurrentWorld->lodDistance.z )
+                                else if ( yval >= (flex_d_t)sithWorld_g_pCurrentWorld->distancesLOD.z )
                                     model3->geosetSelect = 3;
                                 else
                                     model3->geosetSelect = 2;
@@ -2861,40 +2861,40 @@ void sithRender_RenderThings()
                         }
                     }
                     
-                    texMode = thingIter->rdthing.desiredTexMode;
+                    texMode = thingIter->renderData.desiredTexMode;
 
                     // These texture optimizations are for the sw renderer
 #ifndef TARGET_TWL
                     if ( yval >= (flex_d_t)curWorld->perspectiveDistance )
                     {
-                        thingIter->rdthing.curTexMode = texMode > RD_TEXTUREMODE_AFFINE ? RD_TEXTUREMODE_AFFINE : texMode;
+                        thingIter->renderData.curTexMode = texMode > RD_TEXTUREMODE_AFFINE ? RD_TEXTUREMODE_AFFINE : texMode;
                     }
                     else
 #endif
                     {
                         texMode2 = RD_TEXTUREMODE_PERSPECTIVE;
                         if ( texMode <= RD_TEXTUREMODE_PERSPECTIVE)
-                            texMode2 = thingIter->rdthing.desiredTexMode;
-                        thingIter->rdthing.curTexMode = texMode2;
+                            texMode2 = thingIter->renderData.desiredTexMode;
+                        thingIter->renderData.curTexMode = texMode2;
                     }
 
                     // These texture optimizations are for the sw renderer
 #ifndef TARGET_TWL
                     if ( yval >= (flex_d_t)curWorld->perspectiveDistance )
                     {
-                        thingIter->rdthing.curTexMode = texMode > RD_TEXTUREMODE_AFFINE ? RD_TEXTUREMODE_AFFINE : texMode;
+                        thingIter->renderData.curTexMode = texMode > RD_TEXTUREMODE_AFFINE ? RD_TEXTUREMODE_AFFINE : texMode;
                     }
                     else
 #endif
                     {
                         if ( texMode > RD_TEXTUREMODE_PERSPECTIVE)
                             texMode = RD_TEXTUREMODE_PERSPECTIVE;
-                        thingIter->rdthing.curTexMode = texMode;
+                        thingIter->renderData.curTexMode = texMode;
                     }
 
                     // Moved this before culling
 #ifndef QOL_IMPROVEMENTS
-                    if ( (thingIter->thingflags & SITH_TF_EMITLIGHT) != 0
+                    if ( (thingIter->flags & SITH_TF_EMITLIGHT) != 0
                       && thingIter->light > 0.0
                       && a2 <= stdMath_Clamp(thingIter->light, 0.0, 1.0) )
                     {
@@ -2906,7 +2906,7 @@ void sithRender_RenderThings()
                     }
 #endif
 
-                    lightMode = thingIter->rdthing.desiredLightMode;
+                    lightMode = thingIter->renderData.desiredLightMode;
                     if ( a2 >= 1.0 )
                     {
                         if ( v16 )
@@ -2919,7 +2919,7 @@ void sithRender_RenderThings()
                                 lightMode = RD_LIGHTMODE_DIFFUSE;
                         }
                     }
-                    else if ( (thingIter->thingflags & SITH_TF_IGNOREGOURAUDDISTANCE) == 0 && yval >= (flex_d_t)sithWorld_g_pCurrentWorld->gouradDistance )
+                    else if ( (thingIter->flags & SITH_TF_IGNOREGOURAUDDISTANCE) == 0 && yval >= (flex_d_t)sithWorld_g_pCurrentWorld->gouradDistance )
                     {
                         if ( lightMode > RD_LIGHTMODE_DIFFUSE)
                             lightMode = RD_LIGHTMODE_DIFFUSE;
@@ -2929,8 +2929,8 @@ void sithRender_RenderThings()
                         if ( lightMode > RD_LIGHTMODE_GOURAUD)
                             lightMode = RD_LIGHTMODE_GOURAUD;
                     }
-                    thingIter->rdthing.curLightMode = lightMode;
-                    if (thingIter->thingflags & SITH_TF_80000000) {
+                    thingIter->renderData.curLightMode = lightMode;
+                    if (thingIter->flags & SITH_TF_80000000) {
                         lastDrawn = thingIter;
                         continue;
                     }
@@ -2973,9 +2973,9 @@ int sithRender_RenderThing(SithThing *pThing)
     // Added: Ensure the clipping frustum doesn't get mutated
     //rdClipFrustum* pFullCameraFrustum = rdCamera_g_pCurCamera->pClipFrustum;
 
-    if (!(pThing->thingflags & SITH_TF_INCAMFOV) && !(g_debugmodeFlags & DEBUGFLAG_NOCLIP)) // Added: don't send sighted stuff in noclip
+    if (!(pThing->flags & SITH_TF_INCAMFOV) && !(g_debugmodeFlags & DEBUGFLAG_NOCLIP)) // Added: don't send sighted stuff in noclip
     {
-        if (pThing->thingflags & SITH_TF_CAPTURED) {
+        if (pThing->flags & SITH_TF_CAPTURED) {
             sithCog_ThingSendMessage(pThing, 0, SITH_MESSAGE_SIGHTED);
         }
 
@@ -2983,15 +2983,15 @@ int sithRender_RenderThing(SithThing *pThing)
         {
             pThing->actor->flags &= ~SITHAI_MODE_SLEEPING;
         }
-        pThing->thingflags |= SITH_TF_INCAMFOV;
+        pThing->flags |= SITH_TF_INCAMFOV;
     }
 
-    pThing->lastRenderedTickIdx = jkPlayer_currentTickIdx;
-    pThing->lookOrientation.scale = pThing->position;
+    pThing->renderFrame = jkPlayer_currentTickIdx;
+    pThing->orient.scale = pThing->position;
 
 #ifdef TARGET_TWL
     int skip_this_thing = 0;
-    flex_t realDepth = pThing->screenPos.y - (pThing->rdthing.type == RD_THING_MODEL3 ? pThing->rdthing.model3->radius : (flex_t)0.0);
+    flex_t realDepth = pThing->transformedPos.y - (pThing->renderData.type == RD_THING_MODEL3 ? pThing->renderData.model3->radius : (flex_t)0.0);
     if (realDepth > 3.0) {
         skip_this_thing = 1;
     }
@@ -3001,29 +3001,29 @@ int sithRender_RenderThing(SithThing *pThing)
     if (!skip_this_thing) {
 #endif
 
-    // Clip things against their respective sector clipping bounds
+    // Clip aThings against their respective sector clipping bounds
 #if 0
     if (pThing->sector) {
-        rdCamera_g_pCurCamera->pClipFrustum = pThing->sector->clipFrustum;
+        rdCamera_g_pCurCamera->pClipFrustum = pThing->sector->pClipFrustum;
     }
 #endif
 
-    ret = rdThing_Draw(&pThing->rdthing, &pThing->lookOrientation);
-    rdVector_Zero3(&pThing->lookOrientation.scale);
-    if (sithRender_pExtraThingRenderFunc && (pThing->thingflags & SITH_TF_RENDERWEAPON)) {
+    ret = rdThing_Draw(&pThing->renderData, &pThing->orient);
+    rdVector_Zero3(&pThing->orient.scale);
+    if (sithRender_pExtraThingRenderFunc && (pThing->flags & SITH_TF_RENDERWEAPON)) {
         sithRender_pExtraThingRenderFunc(pThing);
     }
 #ifdef TARGET_TWL
     }
     else {
         // Preload model textures, if supported
-        rdModel3_EnsureMaterialData(&pThing->rdthing);
+        rdModel3_EnsureMaterialData(&pThing->renderData);
     }
 #endif
 
-    if (pThing->type == SITH_THING_EXPLOSION && (pThing->explosionParams.typeflags & SITHEXPLOSION_FLAG_FLASH_BLINDS_THINGS))
+    if (pThing->type == SITH_THING_EXPLOSION && (pThing->explosionParams.flags & SITHEXPLOSION_FLAG_FLASH_BLINDS_THINGS))
     {
-        flex_t cameraDist = stdMath_Dist3D1(pThing->screenPos.x, pThing->screenPos.y, pThing->screenPos.z);
+        flex_t cameraDist = stdMath_Dist3D1(pThing->transformedPos.x, pThing->transformedPos.y, pThing->transformedPos.z);
         uint32_t flashG = pThing->explosionParams.flashG;
         uint32_t flashR = pThing->explosionParams.flashR;
         uint32_t flashB = pThing->explosionParams.flashB;
@@ -3031,7 +3031,7 @@ int sithRender_RenderThing(SithThing *pThing)
         if ( flashMagnitude > 0.0 ) {
             sithPlayer_AddDyamicAdd((__int64)((flex_d_t)flashR * flashMagnitude - -0.5), (__int64)((flex_d_t)flashG * flashMagnitude - -0.5), (__int64)((flex_d_t)flashB * flashMagnitude - -0.5));
         }
-        pThing->explosionParams.typeflags &= ~SITHEXPLOSION_FLAG_FLASH_BLINDS_THINGS;
+        pThing->explosionParams.flags &= ~SITHEXPLOSION_FLAG_FLASH_BLINDS_THINGS;
     }
 
     // Added: Ensure the clipping frustum doesn't get mutated
@@ -3069,9 +3069,9 @@ void sithRender_RenderAlphaAdjoins()
     for (int i = 0; i < sithRender_numAlphaAdjoins; i++)
     {
         v0 = sithRender_aAlphaAdjoins[i];
-        v1 = v0->parent_sector;
+        v1 = v0->pSector;
         surfaceSector = v1;
-        rdClipFrustum* pSurfaceFrustum = v1->clipFrustum;
+        rdClipFrustum* pSurfaceFrustum = v1->pClipFrustum;
 
 #ifdef TARGET_TWL
         pSurfaceFrustum = pFullCameraFrustum;
@@ -3130,7 +3130,7 @@ void sithRender_RenderAlphaAdjoins()
                 int idx = v0->surfaceInfo.face.vertexPosIdx[j];
                 if (LIKELY(sithWorld_g_pCurrentWorld->alloc_unk98[idx] != sithRender_lastRenderTick))
                 {
-                    rdMatrix_TransformPoint34(&sithWorld_g_pCurrentWorld->verticesTransformed[idx], &sithWorld_g_pCurrentWorld->vertices[idx], &rdCamera_g_pCurCamera->view_matrix);
+                    rdMatrix_TransformPoint34(&sithWorld_g_pCurrentWorld->aTransformedVertices[idx], &sithWorld_g_pCurrentWorld->aVertices[idx], &rdCamera_g_pCurCamera->view_matrix);
                     sithWorld_g_pCurrentWorld->alloc_unk98[idx] = sithRender_lastRenderTick;
                 }
             }
@@ -3161,12 +3161,12 @@ void sithRender_RenderAlphaAdjoins()
             v9->textureMode = sithRender_texMode;
 
         sithRender_faceView.intensities = v0->surfaceInfo.intensities;
-        meshinfo_out.vertexUVs = v9->vertexUVs;
+        meshinfo_out.aTexVerticies = v9->aTexVerticies;
         meshinfo_out.paDynamicLight = v9->vertexIntensities;
         sithRender_faceView.numVertices = v0->surfaceInfo.face.numVertices;
         sithRender_faceView.vertexPosIdx = v0->surfaceInfo.face.vertexPosIdx;
         sithRender_faceView.vertexUVIdx = v0->surfaceInfo.face.vertexUVIdx;
-        meshinfo_out.vertices = sithRender_aClipVertices;
+        meshinfo_out.aVertices = sithRender_aClipVertices;
 
         // Added: Just in case
         if (!sithRender_faceView.vertexUVIdx && v9->geometryMode > RD_GEOMETRY_SOLID) {
@@ -3199,7 +3199,7 @@ void sithRender_RenderAlphaAdjoins()
         {
             continue;
         }
-        rdCamera_g_pCurCamera->fnProjectLst(v9->vertices, sithRender_aClipVertices, meshinfo_out.numVertices);
+        rdCamera_g_pCurCamera->fnProjectLst(v9->aVertices, sithRender_aClipVertices, meshinfo_out.numVertices);
         
         v9->ambientLight = stdMath_Clamp(surfaceSector->extraLight + sithRender_008d4098, 0.0, 1.0);
 

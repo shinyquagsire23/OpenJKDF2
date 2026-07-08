@@ -589,7 +589,7 @@ int jkEpisode_UpdateExtra(SithThing *pPlayerThing)
                 for (int binIdx = 0; binIdx < SITHBIN_NUMBINS; binIdx++) 
                 {
                     if (sithInventory_IsInventoryAvailable(pPlayerThing, binIdx) && (sithInventory_g_aTypes[binIdx].flags & 8) && sithInventory_g_aTypes[binIdx].cog) {
-                        sithCog_SendMessageEx(sithInventory_g_aTypes[binIdx].cog, SITH_MESSAGE_EXITBUBBLE, SENDERTYPE_THING, pPlayerThing->thingIdx, 0,-1,0,(flex_t)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
+                        sithCog_SendMessageEx(sithInventory_g_aTypes[binIdx].cog, SITH_MESSAGE_EXITBUBBLE, SENDERTYPE_THING, pPlayerThing->idx, 0,-1,0,(flex_t)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
                     }
                 }
             }
@@ -601,14 +601,14 @@ int jkEpisode_UpdateExtra(SithThing *pPlayerThing)
                 iVar4 = 0;
             }
             else {
-                uVar5 = pBubbleThing->thingIdx;
+                uVar5 = pBubbleThing->idx;
                 iVar4 = 3;
             }
 
             for (int binIdx = 0; binIdx < SITHBIN_NUMBINS; binIdx++) 
             {
                 if (sithInventory_IsInventoryAvailable(pPlayerThing, binIdx) && (sithInventory_g_aTypes[binIdx].flags & 8) && sithInventory_g_aTypes[binIdx].cog) {
-                    sithCog_SendMessageEx(sithInventory_g_aTypes[binIdx].cog, SITH_MESSAGE_ENTERBUBBLE, SENDERTYPE_THING, pPlayerThing->thingIdx, iVar4,uVar5,0,(flex_t)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
+                    sithCog_SendMessageEx(sithInventory_g_aTypes[binIdx].cog, SITH_MESSAGE_ENTERBUBBLE, SENDERTYPE_THING, pPlayerThing->idx, iVar4,uVar5,0,(flex_t)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
                 }
             }
         }
@@ -620,7 +620,7 @@ int jkEpisode_UpdateExtra(SithThing *pPlayerThing)
                 for (int binIdx = 0; binIdx < SITHBIN_NUMBINS; binIdx++) 
                 {
                     if (sithInventory_IsInventoryAvailable(pPlayerThing, binIdx) && (sithInventory_g_aTypes[binIdx].flags & 8) && sithInventory_g_aTypes[binIdx].cog) {
-                        sithCog_SendMessageEx(sithInventory_g_aTypes[binIdx].cog, SITH_MESSAGE_EXITBUBBLE, SENDERTYPE_THING, pPlayerThing->thingIdx, 0,-1,0,(flex_t)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
+                        sithCog_SendMessageEx(sithInventory_g_aTypes[binIdx].cog, SITH_MESSAGE_EXITBUBBLE, SENDERTYPE_THING, pPlayerThing->idx, 0,-1,0,(flex_t)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
                     }
                 }
 
@@ -631,14 +631,14 @@ int jkEpisode_UpdateExtra(SithThing *pPlayerThing)
                     iVar4 = 0;
                 }
                 else {
-                    uVar5 = pBubbleThing->thingIdx;
+                    uVar5 = pBubbleThing->idx;
                     iVar4 = 3;
                 }
 
                 for (int binIdx = 0; binIdx < SITHBIN_NUMBINS; binIdx++) 
                 {
                     if (sithInventory_IsInventoryAvailable(pPlayerThing, binIdx) && (sithInventory_g_aTypes[binIdx].flags & 8) && sithInventory_g_aTypes[binIdx].cog) {
-                        sithCog_SendMessageEx(sithInventory_g_aTypes[binIdx].cog, SITH_MESSAGE_ENTERBUBBLE, SENDERTYPE_THING, pPlayerThing->thingIdx, iVar4,uVar5,0,(flex_t)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
+                        sithCog_SendMessageEx(sithInventory_g_aTypes[binIdx].cog, SITH_MESSAGE_ENTERBUBBLE, SENDERTYPE_THING, pPlayerThing->idx, iVar4,uVar5,0,(flex_t)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
                     }
                 }
             }

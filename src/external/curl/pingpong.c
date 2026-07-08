@@ -160,7 +160,7 @@ void Curl_pp_setup(struct pingpong *pp)
  *
  * Send the formatted string as a command to a pingpong server. Note that
  * the string should not have any CRLF appended, as this function will
- * append the necessary things itself.
+ * append the necessary aThings itself.
  *
  * made to never block
  */
@@ -238,7 +238,7 @@ CURLcode Curl_pp_vsendf(struct Curl_easy *data,
  *
  * Send the formatted string as a command to a pingpong server. Note that
  * the string should not have any CRLF appended, as this function will
- * append the necessary things itself.
+ * append the necessary aThings itself.
  *
  * made to never block
  */

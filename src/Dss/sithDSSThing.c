@@ -22,33 +22,33 @@
 
 void sithDSSThing_Pos(SithThing *pThing, int sendto_id, int bSync)
 {
-    rdVector3 lookOrientation; // [esp+4h] [ebp-Ch] BYREF
+    rdVector3 orient; // [esp+4h] [ebp-Ch] BYREF
 
     NETMSG_START;
 
-    if ( pThing && pThing->type && pThing->sector && MOTS_ONLY_COND(!(pThing->physicsParams.physflags & SITH_PF_4000000)))
+    if ( pThing && pThing->type && pThing->sector && MOTS_ONLY_COND(!(pThing->physicsParams.flags & SITH_PF_4000000)))
     {
         SithSector* pSector = pThing->sector;
-        NETMSG_PUSHS32(pThing->thing_id);
+        NETMSG_PUSHS32(pThing->guid);
         NETMSG_PUSHU16(pThing->attach_flags);
         NETMSG_PUSHS16(pSector->id);
         NETMSG_PUSHVEC3(pThing->position);
-        rdMatrix_ExtractAngles34(&pThing->lookOrientation, &lookOrientation);
-        NETMSG_PUSHF32(lookOrientation.x);
-        NETMSG_PUSHF32(lookOrientation.y);
-        NETMSG_PUSHF32(lookOrientation.z);
+        rdMatrix_ExtractAngles34(&pThing->orient, &orient);
+        NETMSG_PUSHF32(orient.x);
+        NETMSG_PUSHF32(orient.y);
+        NETMSG_PUSHF32(orient.z);
 
         if ( pThing->moveType == SITH_MT_PHYSICS )
         {
-            NETMSG_PUSHU32(pThing->physicsParams.physflags);
+            NETMSG_PUSHU32(pThing->physicsParams.flags);
             NETMSG_PUSHVEC3(pThing->physicsParams.vel);
             if ( !pThing->attach_flags )
             {
-                NETMSG_PUSHVEC3(pThing->physicsParams.angVel);
+                NETMSG_PUSHVEC3(pThing->physicsParams.angularVelocity);
             }
         }
         if ( pThing->type == SITH_THING_PLAYER )
-            NETMSG_PUSHF32(pThing->actorParams.eyePYR.x);
+            NETMSG_PUSHF32(pThing->actorParams.headPYR.x);
 
         NETMSG_END(DSS_THINGPOS);
 
@@ -66,10 +66,10 @@ int sithDSSThing_ProcessPos(SithMessage *msg)
 
     NETMSG_IN_START(msg);
 
-    int thing_id = NETMSG_POPS32();
+    int guid = NETMSG_POPS32();
 
-    SithThing* pThing = sithThing_GetGuidThing(thing_id);
-    //printf("sithDSSThing_ProcessPos %x %x\n", thing_id, pThing->controlType);
+    SithThing* pThing = sithThing_GetGuidThing(guid);
+    //printf("sithDSSThing_ProcessPos %x %x\n", guid, pThing->controlType);
     if ( !pThing || pThing->type == SITH_THING_FREE || !pThing->sector )
         return 0;
     uint16_t attach_flags = NETMSG_POPU16();
@@ -86,19 +86,19 @@ int sithDSSThing_ProcessPos(SithMessage *msg)
     pos = NETMSG_POPVEC3();
     lookTmp = NETMSG_POPVEC3();
 
-    rdMatrix_BuildRotate34(&pThing->lookOrientation, &lookTmp);
+    rdMatrix_BuildRotate34(&pThing->orient, &lookTmp);
     if ( pThing->moveType == SITH_MT_PHYSICS )
     {
-        pThing->physicsParams.physflags = NETMSG_POPU32();
+        pThing->physicsParams.flags = NETMSG_POPU32();
 
         pThing->physicsParams.vel = NETMSG_POPVEC3();
         if ( attach_flags )
         {
-            rdVector_Zero3(&pThing->physicsParams.angVel);
+            rdVector_Zero3(&pThing->physicsParams.angularVelocity);
         }
         else
         {
-            pThing->physicsParams.angVel = NETMSG_POPVEC3();
+            pThing->physicsParams.angularVelocity = NETMSG_POPVEC3();
         }
         sithDSSThing_MoveToPos(pThing, &pos, pSector);
     }
@@ -138,19 +138,19 @@ void sithDSSThing_UpdateState(SithThing *pThing, int sendto_id, int mpFlags)
     }
 #endif
 
-    if (!pThing || !pThing->type || !pThing->sector || !sithThing_ValidateThingPointer(pThing) || MOTS_ONLY_FLAG(pThing->physicsParams.physflags & SITH_PF_4000000))
+    if (!pThing || !pThing->type || !pThing->sector || !sithThing_ValidateThingPointer(pThing) || MOTS_ONLY_FLAG(pThing->physicsParams.flags & SITH_PF_4000000))
         return;
 
-    NETMSG_PUSHS32(pThing->thing_id);
+    NETMSG_PUSHS32(pThing->guid);
     NETMSG_PUSHS32(pThing->jkFlags);
-    NETMSG_PUSHS32(pThing->lifeLeftMs);
+    NETMSG_PUSHS32(pThing->msecLifeLeft);
     NETMSG_PUSHS16(pThing->sector->id);
     NETMSG_PUSHS16(pThing->collide);
     NETMSG_PUSHVEC3(pThing->position);
-    NETMSG_PUSHS32(pThing->thingflags);
-    NETMSG_PUSHS32(pThing->rdthing.curGeoMode);
+    NETMSG_PUSHS32(pThing->flags);
+    NETMSG_PUSHS32(pThing->renderData.curGeoMode);
 
-    if ( pThing->animclass )
+    if ( pThing->pPuppetClass )
     {
         NETMSG_PUSHS16(pThing->puppet->field_0);
         NETMSG_PUSHS16(pThing->puppet->field_4);
@@ -161,14 +161,14 @@ void sithDSSThing_UpdateState(SithThing *pThing, int sendto_id, int mpFlags)
         case SITH_THING_ACTOR:
         case SITH_THING_CORPSE:
         case SITH_THING_PLAYER:
-            NETMSG_PUSHS32(pThing->actorParams.typeflags);
+            NETMSG_PUSHS32(pThing->actorParams.flags);
             break;
         case SITH_THING_WEAPON:
-            NETMSG_PUSHS32(pThing->weaponParams.typeflags);
+            NETMSG_PUSHS32(pThing->weaponParams.flags);
             break;
         case SITH_THING_ITEM:
-            NETMSG_PUSHS32(pThing->itemParams.typeflags);
-            if (pThing->itemParams.typeflags & SITH_ITEM_BACKPACK)
+            NETMSG_PUSHS32(pThing->itemParams.flags);
+            if (pThing->itemParams.flags & SITH_ITEM_BACKPACK)
             {
                 NETMSG_PUSHS16(pThing->itemParams.numBins);
                 for (int i = 0; i < pThing->itemParams.numBins; i++)
@@ -182,7 +182,7 @@ void sithDSSThing_UpdateState(SithThing *pThing, int sendto_id, int mpFlags)
             break;
     }
     if ( pThing->moveType == SITH_MT_PHYSICS )
-        NETMSG_PUSHS32(pThing->physicsParams.physflags);
+        NETMSG_PUSHS32(pThing->physicsParams.flags);
 
     NETMSG_END(DSS_SYNCTHING);
 
@@ -217,7 +217,7 @@ int sithDSSThing_ProcessStateUpdate(SithMessage *msg)
     if ( !pThing->sector )
         return 0;
     pThing->jkFlags = NETMSG_POPS32();
-    pThing->lifeLeftMs = NETMSG_POPS32();
+    pThing->msecLifeLeft = NETMSG_POPS32();
     SithSector* pSector = sithSector_GetPtrFromIdx(NETMSG_POPS16());
     if ( !pSector )
         return 0;
@@ -225,33 +225,33 @@ int sithDSSThing_ProcessStateUpdate(SithMessage *msg)
     pThing->position = NETMSG_POPVEC3();
     sithThing_SetSector(pThing, pSector, 0);
 
-    uint32_t thingflags = NETMSG_POPS32();
-    if ( pThing->type == SITH_THING_PLAYER && (pThing->thingflags & SITH_TF_DEAD) && !(thingflags & SITH_TF_DEAD) && MOTS_ONLY_COND(pThing != sithPlayer_g_pLocalPlayerThing))
+    uint32_t flags = NETMSG_POPS32();
+    if ( pThing->type == SITH_THING_PLAYER && (pThing->flags & SITH_TF_DEAD) && !(flags & SITH_TF_DEAD) && MOTS_ONLY_COND(pThing != sithPlayer_g_pLocalPlayerThing))
         sithPlayer_debug_loadauto(pThing);
     
     // Lol, anticheat?
-    if ( (pThing->thingflags & SITH_TF_INVULN) != 0 )
-        thingflags |= SITH_TF_INVULN;
+    if ( (pThing->flags & SITH_TF_INVULN) != 0 )
+        flags |= SITH_TF_INVULN;
     else
-        thingflags &= ~SITH_TF_INVULN;
+        flags &= ~SITH_TF_INVULN;
 
     // MoTS added
     if (Main_bMotsCompat)
     {
-        if ((pThing->thingflags & SITH_TF_DISABLED)
-            && !(thingflags & SITH_TF_DISABLED) 
+        if ((pThing->flags & SITH_TF_DISABLED)
+            && !(flags & SITH_TF_DISABLED) 
             && pThing->type == SITH_THING_ITEM 
             && sithNet_isMulti 
             && !sithNet_isServer
             && pThing->itemParams.respawnFactor != 0 
-            && pThing->itemParams.typeflags & SITH_ITEM_RESPAWN_MP) {
+            && pThing->itemParams.flags & SITH_ITEM_RESPAWN_MP) {
             sithCog_ThingSendMessage(pThing, pThing, SITH_MESSAGE_RESPAWN);
         }
     }
 
-    SithPuppetClass* pAnimclass = pThing->animclass;
-    pThing->thingflags = thingflags;
-    pThing->rdthing.curGeoMode = (rdGeoMode_t)NETMSG_POPS32();
+    SithPuppetClass* pAnimclass = pThing->pPuppetClass;
+    pThing->flags = flags;
+    pThing->renderData.curGeoMode = (rdGeoMode_t)NETMSG_POPS32();
     if ( pAnimclass )
     {
         sithPuppet_SetArmedMode(pThing, NETMSG_POPS16());
@@ -265,14 +265,14 @@ int sithDSSThing_ProcessStateUpdate(SithMessage *msg)
         case SITH_THING_ACTOR:
         case SITH_THING_CORPSE:
         case SITH_THING_PLAYER:
-            pThing->actorParams.typeflags = NETMSG_POPS32();
+            pThing->actorParams.flags = NETMSG_POPS32();
             break;
         case SITH_THING_WEAPON:
-            pThing->weaponParams.typeflags = NETMSG_POPS32();
+            pThing->weaponParams.flags = NETMSG_POPS32();
             break;
         case SITH_THING_ITEM:
-            pThing->itemParams.typeflags = NETMSG_POPS32();
-            if (pThing->itemParams.typeflags & SITH_ITEM_BACKPACK)
+            pThing->itemParams.flags = NETMSG_POPS32();
+            if (pThing->itemParams.flags & SITH_ITEM_BACKPACK)
             {
                 pThing->itemParams.numBins = NETMSG_POPS16();
                 for (int i = 0; i < pThing->itemParams.numBins; i++)
@@ -287,7 +287,7 @@ int sithDSSThing_ProcessStateUpdate(SithMessage *msg)
     }
 
     if ( pThing->moveType == SITH_MT_PHYSICS )
-        pThing->physicsParams.physflags = NETMSG_POPS32();
+        pThing->physicsParams.flags = NETMSG_POPS32();
 
     return 1;
 }
@@ -309,7 +309,7 @@ void sithDSSThing_PlaySound(SithThing *followThing, rdVector3 *pos, sithSound *s
     }
     else
     {
-        NETMSG_PUSHS32(followThing->thing_id);
+        NETMSG_PUSHS32(followThing->guid);
     }
     NETMSG_PUSHU32(refid);
     
@@ -363,7 +363,7 @@ void sithDSSThing_PlaySoundMode(SithThing *pThing, int16_t a2, int a3, flex32_t 
 {
     NETMSG_START;
 
-    NETMSG_PUSHS32(pThing->thing_id);
+    NETMSG_PUSHS32(pThing->guid);
     NETMSG_PUSHS32(a3);
     NETMSG_PUSHF32(a4);
     NETMSG_PUSHS16(a2);
@@ -400,7 +400,7 @@ void sithDSSThing_PlayKey(SithThing *pThing, rdKeyframe *pRdKeyframe, int a3, in
 {
     NETMSG_START;
 
-    NETMSG_PUSHS32(pThing->thing_id);
+    NETMSG_PUSHS32(pThing->guid);
     NETMSG_PUSHS32(pRdKeyframe->id);
     NETMSG_PUSHS16(a4);
     NETMSG_PUSHS32(a3);
@@ -418,7 +418,7 @@ int sithDSSThing_ProcessPlayKey(SithMessage *msg)
     SithThing* pThing = sithThing_GetGuidThing(NETMSG_POPS32());
     if ( pThing )
     {
-        if ( pThing->rdthing.puppet )
+        if ( pThing->renderData.puppet )
         {
             rdKeyframe* pKeyframe = sithKeyFrame_GetByIdx(NETMSG_POPS32());
             if ( pKeyframe )
@@ -427,14 +427,14 @@ int sithDSSThing_ProcessPlayKey(SithMessage *msg)
                 int arg2 = NETMSG_POPS32();
                 int arg3 = NETMSG_POPS32();
                 int v4 = sithPuppet_PlayKey(
-                         pThing->rdthing.puppet,
+                         pThing->renderData.puppet,
                          pKeyframe,
                          arg1,
                          arg1 + 2,
                          arg2,
                          0);
                 if ( v4 >= 0 )
-                    pThing->rdthing.puppet->tracks[v4].field_130 = arg3;
+                    pThing->renderData.puppet->tracks[v4].field_130 = arg3;
                 return 1;
             }
         }
@@ -450,7 +450,7 @@ void sithDSSThing_PlayKeyMode(SithThing *pThing, int16_t idx1, int idx2, int sen
 {
     NETMSG_START;
 
-    NETMSG_PUSHS32(pThing->thing_id);
+    NETMSG_PUSHS32(pThing->guid);
     NETMSG_PUSHS32(idx2);
     NETMSG_PUSHS16(idx1);
     
@@ -467,28 +467,28 @@ int sithDSSThing_ProcessPlayKeyMode(SithMessage *msg)
 
     if (!pThing )
         return 0;
-    if (!pThing->rdthing.puppet)
+    if (!pThing->renderData.puppet)
         return 0;
 
     int arg1 = NETMSG_POPS32();
     int v4 = sithPuppet_PlayMode(pThing, NETMSG_POPS16(), 0);
     if ( v4 >= 0 )
-        pThing->rdthing.puppet->tracks[v4].field_130 = arg1;
+        pThing->renderData.puppet->tracks[v4].field_130 = arg1;
     return 1;
 }
 
 void sithDSSThing_SetModel(SithThing *pThing, int sendtoId)
 {
-    if (!pThing || pThing->rdthing.type != RD_THING_MODEL3 )
+    if (!pThing || pThing->renderData.type != RD_THING_MODEL3 )
         return;
 
-    const char *pFname = pThing->rdthing.model3->filename;
+    const char *pFname = pThing->renderData.model3->filename;
     if (!pFname)
         return;
 
     NETMSG_START;
 
-    NETMSG_PUSHS32(pThing->thing_id);
+    NETMSG_PUSHS32(pThing->guid);
     NETMSG_PUSHSTR(pFname, 0x20);
 
     NETMSG_END(DSS_SETTHINGMODEL);
@@ -520,7 +520,7 @@ void sithDSSThing_StopKey(SithThing *pThing, int a2, flex32_t a3, int sendtoId, 
 {
     NETMSG_START;
 
-    NETMSG_PUSHS32(pThing->thing_id);
+    NETMSG_PUSHS32(pThing->guid);
     NETMSG_PUSHS32(a2);
     NETMSG_PUSHF32(a3);
 
@@ -537,7 +537,7 @@ int sithDSSThing_ProcessStopKey(SithMessage *msg)
     if ( !pThing )
         return 0;
 
-    rdPuppet* pPuppet = pThing->rdthing.puppet;
+    rdPuppet* pPuppet = pThing->renderData.puppet;
     if ( !pPuppet )
         return 0;
 
@@ -595,14 +595,14 @@ void sithDSSThing_Fire(SithThing *pWeapon, SithThing *pProjectile, rdVector3 *pF
 {
     NETMSG_START;
 
-    //printf("sithDSSThing_Fire %x %x (%f %f %f) (%f %f %f) %x %f %x %f\n", pWeapon ? pWeapon->thing_id : -1, pProjectile->thingIdx, pAimError->x, pAimError->y, pAimError->z, pFireOffset->x, pFireOffset->y, pFireOffset->z, anim, scale, scaleFlags, a9);
+    //printf("sithDSSThing_Fire %x %x (%f %f %f) (%f %f %f) %x %f %x %f\n", pWeapon ? pWeapon->guid : -1, pProjectile->idx, pAimError->x, pAimError->y, pAimError->z, pFireOffset->x, pFireOffset->y, pFireOffset->z, anim, scale, scaleFlags, a9);
 
-    NETMSG_PUSHS32(pWeapon->thing_id);
+    NETMSG_PUSHS32(pWeapon->guid);
     NETMSG_PUSHS16(scaleFlags);
     
     int16_t v12 = -1;
     if ( pProjectile ) {
-        NETMSG_PUSHS16(pProjectile->thingIdx);
+        NETMSG_PUSHS16(pProjectile->idx);
     }
     else {
         NETMSG_PUSHS16(-1);
@@ -644,7 +644,7 @@ int sithDSSThing_ProcessFire(SithMessage *msg)
     {
         int16_t scaleFlags = NETMSG_POPS16();
         int16_t templateIdx = NETMSG_POPS16();
-        SithThing* pTemplate = sithTemplate_GetTemplateByIndex(templateIdx);
+        SithThing* pCreateThingTemplate = sithTemplate_GetTemplateByIndex(templateIdx);
         sithSound* pSound = sithSound_GetFromIdx(NETMSG_POPS16());
         int anim = NETMSG_POPS16();
         rdVector3 aimError = NETMSG_POPVEC3();
@@ -655,7 +655,7 @@ int sithDSSThing_ProcessFire(SithMessage *msg)
         //printf("sithDSSThing_ProcessFire %x %x (%f %f %f) (%f %f %f) %x %f %x %f\n", idx, templateIdx, aimError.x, aimError.y, aimError.z, fireOffset.x, fireOffset.y, fireOffset.z, anim, scale, scaleFlags, a9);
         SithThing* pThing2 = sithWeapon_WeaponFireProjectile(
                       pThing,
-                      pTemplate,
+                      pCreateThingTemplate,
                       &fireOffset,
                       &aimError,
                       pSound,
@@ -666,8 +666,8 @@ int sithDSSThing_ProcessFire(SithMessage *msg)
                       0);
         if ( pThing2 )
         {
-            pThing2->thing_id = thingId;
-            pThing2->thingflags |= SITH_TF_INVULN;
+            pThing2->guid = thingId;
+            pThing2->flags |= SITH_TF_INVULN;
         }
         return 1;
     }
@@ -682,7 +682,7 @@ int sithDSSThing_ProcessMOTSNew2(SithMessage *msg)
     if ( pThing )
     {
         int16_t scaleFlags = NETMSG_POPS16();
-        SithThing* pTemplate = sithTemplate_GetTemplateByIndex(NETMSG_POPS16());
+        SithThing* pCreateThingTemplate = sithTemplate_GetTemplateByIndex(NETMSG_POPS16());
         sithSound* pSound = sithSound_GetFromIdx(NETMSG_POPS16());
         int anim = NETMSG_POPS16();
         rdVector3 aimError = NETMSG_POPVEC3();
@@ -693,7 +693,7 @@ int sithDSSThing_ProcessMOTSNew2(SithMessage *msg)
         int idk = NETMSG_POPS32();
         SithThing* pThing2 = sithWeapon_WeaponFireProjectile(
                       pThing,
-                      pTemplate,
+                      pCreateThingTemplate,
                       &fireOffset,
                       &aimError,
                       pSound,
@@ -704,8 +704,8 @@ int sithDSSThing_ProcessMOTSNew2(SithMessage *msg)
                       idk);
         if ( pThing2 )
         {
-            pThing2->thing_id = thingId;
-            pThing2->thingflags |= SITH_TF_INVULN;
+            pThing2->guid = thingId;
+            pThing2->flags |= SITH_TF_INVULN;
         }
         return 1;
     }
@@ -716,9 +716,9 @@ void sithDSSThing_Death(SithThing *sender, SithThing *receiver, char cause, int 
 {
     NETMSG_START;
     
-    NETMSG_PUSHS32(sender->thing_id);
+    NETMSG_PUSHS32(sender->guid);
     if ( receiver ) {
-        NETMSG_PUSHS32(receiver->thing_id);
+        NETMSG_PUSHS32(receiver->guid);
     }
     else {
         NETMSG_PUSHS32(-1);
@@ -762,9 +762,9 @@ void sithDSSThing_DamageThing(SithThing *pDamagedThing, SithThing *pDamagedBy, f
 {
     NETMSG_START;
 
-    NETMSG_PUSHS32(pDamagedThing->thing_id);
+    NETMSG_PUSHS32(pDamagedThing->guid);
     if ( pDamagedBy ) {
-        NETMSG_PUSHS32(pDamagedBy->thing_id);
+        NETMSG_PUSHS32(pDamagedBy->guid);
     }
     else{
         NETMSG_PUSHS32(-1);
@@ -779,7 +779,7 @@ void sithDSSThing_DamageThing(SithThing *pDamagedThing, SithThing *pDamagedBy, f
 
 int sithDSSThing_ProcessDamage(SithMessage *msg)
 {
-    if ( msg->netMsg.thingIdx != sithNet_serverNetId )
+    if ( msg->netMsg.idx != sithNet_serverNetId )
         return 0;
 
     NETMSG_IN_START(msg);
@@ -804,44 +804,44 @@ void sithDSSThing_FullDescription(SithThing *thing, int sendto_id, int mpFlags)
 {
     NETMSG_START;
 
-    NETMSG_PUSHS16(thing->thingIdx);
+    NETMSG_PUSHS16(thing->idx);
     NETMSG_PUSHS16(thing->type);
     if ( thing->type )
     {
-        NETMSG_PUSHS16(thing->templateBase->thingIdx);
+        NETMSG_PUSHS16(thing->pTemplate->idx);
         NETMSG_PUSHS32(thing->signature);
-        NETMSG_PUSHS32(thing->thing_id);
+        NETMSG_PUSHS32(thing->guid);
         NETMSG_PUSHVEC3(thing->position);
-        NETMSG_PUSHVEC3(thing->lookOrientation.rvec);
-        NETMSG_PUSHVEC3(thing->lookOrientation.lvec);
-        NETMSG_PUSHVEC3(thing->lookOrientation.uvec);
+        NETMSG_PUSHVEC3(thing->orient.rvec);
+        NETMSG_PUSHVEC3(thing->orient.lvec);
+        NETMSG_PUSHVEC3(thing->orient.uvec);
         if ( thing->sector ) {
             NETMSG_PUSHS16(thing->sector->id);
         }
         else {
             NETMSG_PUSHS16(-1);
         }
-        NETMSG_PUSHU32(thing->thingflags);
-        NETMSG_PUSHS32(thing->lifeLeftMs);
+        NETMSG_PUSHU32(thing->flags);
+        NETMSG_PUSHS32(thing->msecLifeLeft);
         NETMSG_PUSHS32(thing->timer);
-        NETMSG_PUSHS32(thing->pulse_end_ms);
-        NETMSG_PUSHS32(thing->pulse_ms);
-        NETMSG_PUSHF32(thing->userdata);
-        NETMSG_PUSHU8(thing->rdthing.curGeoMode);
+        NETMSG_PUSHS32(thing->msecNextPulseTime);
+        NETMSG_PUSHS32(thing->msecPulseInterval);
+        NETMSG_PUSHF32(thing->userval);
+        NETMSG_PUSHU8(thing->renderData.curGeoMode);
         NETMSG_PUSHS16(thing->collide);
         NETMSG_PUSHF32(thing->collideSize);
         NETMSG_PUSHF32(thing->light);
         NETMSG_PUSHU32(thing->jkFlags);
-        if ( (thing->thingflags & SITH_TF_CAPTURED) != 0 )
+        if ( (thing->flags & SITH_TF_CAPTURED) != 0 )
         {
-            if ( thing->class_cog ) {
-                NETMSG_PUSHS16(thing->class_cog->selfCog);
+            if ( thing->pCog ) {
+                NETMSG_PUSHS16(thing->pCog->selfCog);
             }
             else {
                 NETMSG_PUSHS16(-1);
             }
-            if ( thing->capture_cog ) {
-                NETMSG_PUSHS16(thing->capture_cog->selfCog);
+            if ( thing->pCaptureCog ) {
+                NETMSG_PUSHS16(thing->pCaptureCog->selfCog);
             }
             else {
                 NETMSG_PUSHS16(-1);
@@ -849,8 +849,8 @@ void sithDSSThing_FullDescription(SithThing *thing, int sendto_id, int mpFlags)
         }
 
         // MOTS added
-        if (sithComm_version == 0x7D6 && thing->rdthing.type == RD_THING_MODEL3) {
-            rdModel3* model = thing->rdthing.model3;
+        if (sithComm_version == 0x7D6 && thing->renderData.type == RD_THING_MODEL3) {
+            rdModel3* model = thing->renderData.model3;
             if (thing->unk && model) 
             {
                 NETMSG_PUSHS16(1);
@@ -864,17 +864,17 @@ void sithDSSThing_FullDescription(SithThing *thing, int sendto_id, int mpFlags)
                 NETMSG_PUSHS16(0);
             }
 
-            if (thing->rdthing.amputatedJoints) {
+            if (thing->renderData.amputatedJoints) {
 
                 int numJoints = 0;
                 for (int i = 0; i < model->numHierarchyNodes; i++) {
-                    if (thing->rdthing.amputatedJoints[i]) {
+                    if (thing->renderData.amputatedJoints[i]) {
                         numJoints++;
                     }
                 }
                 NETMSG_PUSHS16(numJoints);
                 for (int i = 0; i < model->numHierarchyNodes; i++) {
-                    if (thing->rdthing.amputatedJoints[i]) {
+                    if (thing->renderData.amputatedJoints[i]) {
                         NETMSG_PUSHS16(i);
                     }
                 }
@@ -889,26 +889,26 @@ void sithDSSThing_FullDescription(SithThing *thing, int sendto_id, int mpFlags)
             case SITH_THING_ACTOR:
             case SITH_THING_CORPSE:
             case SITH_THING_PLAYER:
-                NETMSG_PUSHU32(thing->actorParams.typeflags);
+                NETMSG_PUSHU32(thing->actorParams.flags);
                 NETMSG_PUSHF32(thing->actorParams.health);
                 NETMSG_PUSHF32(thing->actorParams.extraSpeed);
-                NETMSG_PUSHVEC3(thing->actorParams.eyePYR);
+                NETMSG_PUSHVEC3(thing->actorParams.headPYR);
                 
                 NETMSG_PUSHF32(thing->actorParams.timeLeftLengthChange);
                 NETMSG_PUSHF32(thing->actorParams.lightIntensity);
                 NETMSG_PUSHS32(thing->actorParams.field_1BC);
-                if ( thing->actorParams.playerinfo )
+                if ( thing->actorParams.pPlayer )
                 {
-                    NETMSG_PUSHS32(thing->actorParams.playerinfo - jkPlayer_playerInfos);
-                    NETMSG_PUSHS32(thing->actorParams.playerinfo->palEffectsIdx1);
-                    NETMSG_PUSHS32(thing->actorParams.playerinfo->palEffectsIdx2);
+                    NETMSG_PUSHS32(thing->actorParams.pPlayer - jkPlayer_playerInfos);
+                    NETMSG_PUSHS32(thing->actorParams.pPlayer->palEffectsIdx1);
+                    NETMSG_PUSHS32(thing->actorParams.pPlayer->palEffectsIdx2);
                 }
                 else
                 {
                     NETMSG_PUSHS32(-1);
                 }
                 if (sithComm_version == 0x7D6) {
-                    if (thing->actorParams.templateWeapon) {
+                    if (thing->actorParams.pWeaponTemplate) {
                         NETMSG_PUSHS16(1);
                     }
                     else {
@@ -917,21 +917,21 @@ void sithDSSThing_FullDescription(SithThing *thing, int sendto_id, int mpFlags)
                 }
                 break;
             case SITH_THING_WEAPON:
-                NETMSG_PUSHU32(thing->weaponParams.typeflags);
+                NETMSG_PUSHU32(thing->weaponParams.flags);
                 NETMSG_PUSHF32(thing->weaponParams.unk8);
-                NETMSG_PUSHS16(thing->weaponParams.numDeflectionBounces);
+                NETMSG_PUSHS16(thing->weaponParams.numRicochets);
                 break;
             case SITH_THING_EXPLOSION:
-                NETMSG_PUSHU32(thing->explosionParams.typeflags);
+                NETMSG_PUSHU32(thing->explosionParams.flags);
                 break;
             default:
                 break;
         }
         if ( thing->moveType == SITH_MT_PHYSICS )
         {
-            NETMSG_PUSHU32(thing->physicsParams.physflags);
+            NETMSG_PUSHU32(thing->physicsParams.flags);
             NETMSG_PUSHVEC3(thing->physicsParams.vel);
-            NETMSG_PUSHVEC3(thing->physicsParams.angVel);
+            NETMSG_PUSHVEC3(thing->physicsParams.angularVelocity);
         }
         else if ( thing->moveType == SITH_MT_PATH )
         {
@@ -967,7 +967,7 @@ void sithDSSThing_FullDescription(SithThing *thing, int sendto_id, int mpFlags)
 // MoTS altered
 int sithDSSThing_ProcessFullDescription(SithMessage *msg)
 {
-    int16_t thingIdx; // ebp
+    int16_t idx; // ebp
     int32_t v8; // ecx
     SithThing* thing;
     SithSector* v11;
@@ -979,75 +979,75 @@ int sithDSSThing_ProcessFullDescription(SithMessage *msg)
     if ( sithNet_isMulti && (g_submodeFlags & 8) == 0 )
         return 0;
 
-    thingIdx = NETMSG_POPS16();
-    if ( thingIdx >= sithWorld_g_pCurrentWorld->numThingsLoaded )
+    idx = NETMSG_POPS16();
+    if ( idx >= sithWorld_g_pCurrentWorld->numThingsLoaded )
         return 0;
 
-    if ( sithWorld_g_pCurrentWorld->things[thingIdx].type )
-        sithThing_RemoveThing(&sithWorld_g_pCurrentWorld->things[thingIdx]);
+    if ( sithWorld_g_pCurrentWorld->aThings[idx].type )
+        sithThing_RemoveThing(&sithWorld_g_pCurrentWorld->aThings[idx]);
 
     // Only bump the high-water mark; do NOT clobber the destination slot.
     // The original game (JK.EXE @ 0x004F46F0) keeps these as two separate locals:
-    // the packet's thingIdx is always the slot the thing is written to, while a
-    // throwaway temporary is used to raise numThings = max(numThings, thingIdx).
-    // An earlier decompile merged the two into `thingIdx`, so whenever
-    // numThings > thingIdx the received thing was written to things[numThings]
-    // instead of things[thingIdx]. A projectile spawned while a player is joining
+    // the packet's idx is always the slot the thing is written to, while a
+    // throwaway temporary is used to raise numThings = max(numThings, idx).
+    // An earlier decompile merged the two into `idx`, so whenever
+    // numThings > idx the received thing was written to aThings[numThings]
+    // instead of aThings[idx]. A projectile spawned while a player is joining
     // inflates numThings, which misroutes the FullDesc of every static thing still
-    // streaming through the join sync, corrupting the thing_id<->slot mapping and
-    // causing remote things to teleport.
-    if ( sithWorld_g_pCurrentWorld->numThings < thingIdx )
-        sithWorld_g_pCurrentWorld->numThings = thingIdx;
+    // streaming through the join sync, corrupting the guid<->slot mapping and
+    // causing remote aThings to teleport.
+    if ( sithWorld_g_pCurrentWorld->numThings < idx )
+        sithWorld_g_pCurrentWorld->numThings = idx;
 
     type = NETMSG_POPS16();
     if ( !type )
         return 1;
 
-    thing = &sithWorld_g_pCurrentWorld->things[thingIdx];
+    thing = &sithWorld_g_pCurrentWorld->aThings[idx];
     sithThing_Reset(thing);
     v8 = NETMSG_POPS16();
 
-    if ( v8 >= sithWorld_g_pCurrentWorld->numTemplatesLoaded )
+    if ( v8 >= sithWorld_g_pCurrentWorld->numThingTemplates )
         return 0;
 
-    sithThing_SetThingBasedOn(thing, &sithWorld_g_pCurrentWorld->templates[v8]);
+    sithThing_SetThingBasedOn(thing, &sithWorld_g_pCurrentWorld->aThingTemplates[v8]);
 
     thing->signature = NETMSG_POPS32();
-    thing->thing_id = NETMSG_POPS32();
+    thing->guid = NETMSG_POPS32();
     thing->type = type;
     //thing->controlType = type; // Added: why is this needed?
     thing->position = NETMSG_POPVEC3();
-    thing->lookOrientation.rvec = NETMSG_POPVEC3();
-    thing->lookOrientation.lvec = NETMSG_POPVEC3();
-    thing->lookOrientation.uvec = NETMSG_POPVEC3();
+    thing->orient.rvec = NETMSG_POPVEC3();
+    thing->orient.lvec = NETMSG_POPVEC3();
+    thing->orient.uvec = NETMSG_POPVEC3();
     int sectorIdx = NETMSG_POPS16();
     v11 = sithSector_GetPtrFromIdx(sectorIdx);
     if ( v11 )
         sithThing_SetSector(thing, v11, 1);
 
-    thing->thingflags = NETMSG_POPU32();
-    thing->lifeLeftMs = NETMSG_POPS32();
+    thing->flags = NETMSG_POPU32();
+    thing->msecLifeLeft = NETMSG_POPS32();
     thing->timer = NETMSG_POPS32();
-    thing->pulse_end_ms = NETMSG_POPS32();
-    thing->pulse_ms = NETMSG_POPS32();
-    thing->userdata = NETMSG_POPF32();
-    thing->rdthing.curGeoMode = (rdGeoMode_t)NETMSG_POPU8();
+    thing->msecNextPulseTime = NETMSG_POPS32();
+    thing->msecPulseInterval = NETMSG_POPS32();
+    thing->userval = NETMSG_POPF32();
+    thing->renderData.curGeoMode = (rdGeoMode_t)NETMSG_POPU8();
     thing->collide = NETMSG_POPS16();
     thing->collideSize = NETMSG_POPF32();
     thing->light = NETMSG_POPF32();
     thing->jkFlags = NETMSG_POPU32();
 
-    if ( thing->thingflags & SITH_TF_CAPTURED )
+    if ( thing->flags & SITH_TF_CAPTURED )
     {
-        thing->class_cog = sithCog_GetCogByIndex(NETMSG_POPS16());
-        thing->capture_cog = sithCog_GetCogByIndex(NETMSG_POPS16());
+        thing->pCog = sithCog_GetCogByIndex(NETMSG_POPS16());
+        thing->pCaptureCog = sithCog_GetCogByIndex(NETMSG_POPS16());
     }
 
     // MOTS added
-    if (sithComm_version == 0x7D6 && thing->rdthing.type == RD_THING_MODEL3) {
+    if (sithComm_version == 0x7D6 && thing->renderData.type == RD_THING_MODEL3) {
         thing->unk = NETMSG_POPS16();
 
-        rdModel3* model = thing->rdthing.model3;
+        rdModel3* model = thing->renderData.model3;
         if (thing->unk) {
             char tmp_model[32+1];
             NETMSG_POPSTR(tmp_model, 0x20);
@@ -1063,8 +1063,8 @@ int sithDSSThing_ProcessFullDescription(SithMessage *msg)
             for (int i = 0; i < numJoints; i++)
             {
                 int val = NETMSG_POPS16();
-                if (thing->rdthing.amputatedJoints && (uint32_t)val < model->numHierarchyNodes) {
-                    thing->rdthing.amputatedJoints[val] = 1;
+                if (thing->renderData.amputatedJoints && (uint32_t)val < model->numHierarchyNodes) {
+                    thing->renderData.amputatedJoints[val] = 1;
                 }
             }
         }
@@ -1076,10 +1076,10 @@ int sithDSSThing_ProcessFullDescription(SithMessage *msg)
         case SITH_THING_ACTOR:
         case SITH_THING_CORPSE:
         case SITH_THING_PLAYER:
-            thing->actorParams.typeflags = NETMSG_POPU32();
+            thing->actorParams.flags = NETMSG_POPU32();
             thing->actorParams.health = NETMSG_POPF32();
             thing->actorParams.extraSpeed = NETMSG_POPF32();
-            thing->actorParams.eyePYR = NETMSG_POPVEC3();
+            thing->actorParams.headPYR = NETMSG_POPVEC3();
             
             thing->actorParams.timeLeftLengthChange = NETMSG_POPF32();
             thing->actorParams.lightIntensity = NETMSG_POPF32();
@@ -1089,34 +1089,34 @@ int sithDSSThing_ProcessFullDescription(SithMessage *msg)
             
             if ( playerInfo_idx >= 0 && playerInfo_idx < 32 )
             {
-                thing->actorParams.playerinfo = &jkPlayer_playerInfos[playerInfo_idx];
-                thing->actorParams.playerinfo->palEffectsIdx1 = NETMSG_POPS32();
-                thing->actorParams.playerinfo->palEffectsIdx2 = NETMSG_POPS32();
+                thing->actorParams.pPlayer = &jkPlayer_playerInfos[playerInfo_idx];
+                thing->actorParams.pPlayer->palEffectsIdx1 = NETMSG_POPS32();
+                thing->actorParams.pPlayer->palEffectsIdx2 = NETMSG_POPS32();
             }
 
             // MOTS added
             if (sithComm_version == 0x7D6) {
                 if (!NETMSG_POPS16()) {
-                    thing->actorParams.templateWeapon = NULL;
+                    thing->actorParams.pWeaponTemplate = NULL;
                 }
             }
             break;
         case SITH_THING_WEAPON:
-            thing->weaponParams.typeflags = NETMSG_POPU32();
+            thing->weaponParams.flags = NETMSG_POPU32();
             thing->weaponParams.unk8 = NETMSG_POPF32();
-            thing->weaponParams.numDeflectionBounces = NETMSG_POPS16();
+            thing->weaponParams.numRicochets = NETMSG_POPS16();
             break;
         case SITH_THING_EXPLOSION:
-            thing->explosionParams.typeflags = NETMSG_POPU32();
+            thing->explosionParams.flags = NETMSG_POPU32();
             break;
         default:
             break;
     }
     if ( thing->moveType == SITH_MT_PHYSICS )
     {
-        thing->physicsParams.physflags = NETMSG_POPU32();
+        thing->physicsParams.flags = NETMSG_POPU32();
         thing->physicsParams.vel = NETMSG_POPVEC3();
-        thing->physicsParams.angVel = NETMSG_POPVEC3();
+        thing->physicsParams.angularVelocity = NETMSG_POPVEC3();
     }
     else if ( thing->moveType == SITH_MT_PATH )
     {
@@ -1143,7 +1143,7 @@ int sithDSSThing_ProcessFullDescription(SithMessage *msg)
         else if (!thing->trackParams.sizeFrames && thing->trackParams.loadedFrames < 0) {
             stdPlatform_Printf("OpenJKDF2: Serialized thing has underflowed trackParams.loadedFrames 0x%x, size 0x%x, recovering?\n", thing->trackParams.loadedFrames, thing->trackParams.sizeFrames);
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            stdPlatform_Printf("OpenJKDF2: Template ID %x, %s\n", v8, sithWorld_g_pCurrentWorld->templates[v8].template_name);
+            stdPlatform_Printf("OpenJKDF2: Template ID %x, %s\n", v8, sithWorld_g_pCurrentWorld->aThingTemplates[v8].aName);
 #endif
             thing->trackParams.loadedFrames = thing->trackParams.sizeFrames;
         }
@@ -1186,11 +1186,11 @@ void sithDSSThing_PathMove(SithThing *pThing, int16_t a2, flex32_t a3, int a4, i
     NETMSG_START;
 
     NETMSG_PUSHS32(a4);
-    NETMSG_PUSHS32(pThing->thing_id);
+    NETMSG_PUSHS32(pThing->guid);
     NETMSG_PUSHU32(jkPlayer_currentTickIdx);
     NETMSG_PUSHS16(pThing->sector->id);
     NETMSG_PUSHVEC3(pThing->position);
-    rdMatrix_ExtractAngles34(&pThing->lookOrientation, &out);
+    rdMatrix_ExtractAngles34(&pThing->orient, &out);
     NETMSG_PUSHVEC3(out);
     NETMSG_PUSHS16(a2);
     NETMSG_PUSHF32(a3);
@@ -1221,7 +1221,7 @@ int sithDSSThing_ProcessPathMove(SithMessage *msg)
         sithThing_SetSector(pThing, pSector, 0);
         rdVector3 lookAngles = NETMSG_POPVEC3();
         
-        rdMatrix_BuildRotate34(&pThing->lookOrientation, &lookAngles);
+        rdMatrix_BuildRotate34(&pThing->orient, &lookAngles);
         int arg9 = NETMSG_POPS16();
         flex32_t arg10 = NETMSG_POPF32();
 
@@ -1250,7 +1250,7 @@ void sithDSSThing_Attachment(SithThing *thing, int sendto_id, int mpFlags, int a
 {
     NETMSG_START;
     
-    NETMSG_PUSHS32(thing->thing_id);
+    NETMSG_PUSHS32(thing->guid);
     NETMSG_PUSHU16(thing->attach_flags);
 
     if (thing->attach_flags & SITH_ATTACH_SURFACE)
@@ -1260,10 +1260,10 @@ void sithDSSThing_Attachment(SithThing *thing, int sendto_id, int mpFlags, int a
     else if (thing->attach_flags & (SITH_ATTACH_THING|SITH_ATTACH_THINGFACE))
     {
         SithThing* v7 = (SithThing *)thing->attachedThing;
-        NETMSG_PUSHS32(v7->thing_id)
+        NETMSG_PUSHS32(v7->guid)
         if ( (thing->attach_flags & SITH_ATTACH_THINGFACE) != 0 )
         {
-            NETMSG_PUSHS16(((intptr_t)thing->attachedSufaceInfo - (intptr_t)v7->rdthing.model3->geosets[0].meshes->faces) / sizeof(sithSurfaceInfo));
+            NETMSG_PUSHS16(((intptr_t)thing->attachedSufaceInfo - (intptr_t)v7->renderData.model3->geosets[0].meshes->faces) / sizeof(sithSurfaceInfo));
         }
         else
         {
@@ -1305,8 +1305,8 @@ int sithDSSThing_ProcessAttachment(SithMessage *msg)
             sithThing_AttachThingToThingFace(
                 v1,
                 v9,
-                &v9->rdthing.model3->geosets[0].meshes->faces[NETMSG_POPS16()],
-                v9->rdthing.model3->geosets[0].meshes->vertices,
+                &v9->renderData.model3->geosets[0].meshes->faces[NETMSG_POPS16()],
+                v9->renderData.model3->geosets[0].meshes->aVertices,
                 1);
             v1->attach_flags = v3;
             return 1;
@@ -1336,12 +1336,12 @@ void sithDSSThing_Take(SithThing *pItemThing, SithThing *pActor, int mpFlags)
     SithThing *pItemThing2; // esi
     SithThing *pActor2; // edi
 
-    itemThingId = pItemThing->thing_id;
+    itemThingId = pItemThing->guid;
 
     if (!pActor) // MOTS added
         actorId = -1;
     else
-        actorId = pActor->thing_id;
+        actorId = pActor->guid;
 
     sithComm_netMsgTmp.pktData[0] = itemThingId;
     sithComm_netMsgTmp.pktData[1] = actorId;
@@ -1360,7 +1360,7 @@ void sithDSSThing_Take(SithThing *pItemThing, SithThing *pActor, int mpFlags)
         sithComm_netMsgTmp.netMsg.flag_maybe = 0;
         sithComm_netMsgTmp.netMsg.cogMsgId = DSS_DESTROYTHING;
         sithComm_netMsgTmp.netMsg.msg_size = 4;
-        sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sithComm_netMsgTmp.netMsg.thingIdx, 255, 1);
+        sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sithComm_netMsgTmp.netMsg.idx, 255, 1);
         return;
     }
     pActor2 = sithThing_GetGuidThing(sithComm_netMsgTmp.pktData[1]);
@@ -1371,7 +1371,7 @@ void sithDSSThing_Take(SithThing *pItemThing, SithThing *pActor, int mpFlags)
             sithItem_SetItemTaken(pItemThing2, pActor2, 1);
             return;
         }
-        if ( pItemThing2->type == SITH_THING_ITEM && (pItemThing2->thingflags & (SITH_TF_DISABLED|SITH_TF_DESTROYED)) == 0 )
+        if ( pItemThing2->type == SITH_THING_ITEM && (pItemThing2->flags & (SITH_TF_DISABLED|SITH_TF_DESTROYED)) == 0 )
         {
             sithComm_netMsgTmp.netMsg.cogMsgId = DSS_TAKEITEM2;
             sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 1, 1);
@@ -1392,7 +1392,7 @@ int sithDSSThing_ProcessTake(SithMessage *msg)
     v2 = sithThing_GetGuidThing(v1);
     if ( !v2 && sithNet_isServer )
     {
-        v6 = msg->netMsg.thingIdx;
+        v6 = msg->netMsg.idx;
         sithComm_netMsgTmp.pktData[0] = v1;
         sithComm_netMsgTmp.netMsg.flag_maybe = 0;
         sithComm_netMsgTmp.netMsg.cogMsgId = DSS_DESTROYTHING;
@@ -1408,7 +1408,7 @@ int sithDSSThing_ProcessTake(SithMessage *msg)
     {
         if ( msg->netMsg.cogMsgId == DSS_TAKEITEM1 )
         {
-            if ( v2->type != SITH_THING_ITEM || (v2->thingflags & (SITH_TF_DISABLED|SITH_TF_DESTROYED)) != 0 )
+            if ( v2->type != SITH_THING_ITEM || (v2->flags & (SITH_TF_DISABLED|SITH_TF_DESTROYED)) != 0 )
                 return 1;
             msg->netMsg.cogMsgId = DSS_TAKEITEM2;
             sithComm_SendMsgToPlayer(msg, -1, 1, 1);
@@ -1419,14 +1419,14 @@ int sithDSSThing_ProcessTake(SithMessage *msg)
     return 0;
 }
 
-void sithDSSThing_CreateThing(SithThing *pTemplate, SithThing *pThing, SithThing *pThing2, SithSector *pSector, rdVector3 *pPos, rdVector3 *pRot, int mpFlags, int bSync)
+void sithDSSThing_CreateThing(SithThing *pCreateThingTemplate, SithThing *pThing, SithThing *pThing2, SithSector *pSector, rdVector3 *pPos, rdVector3 *pRot, int mpFlags, int bSync)
 {
     NETMSG_START;
 
-    NETMSG_PUSHS16(pTemplate->thingIdx);
+    NETMSG_PUSHS16(pCreateThingTemplate->idx);
     if ( pThing2 )
     {
-        NETMSG_PUSHS32(pThing2->thing_id);
+        NETMSG_PUSHS32(pThing2->guid);
     }
     else
     {
@@ -1435,7 +1435,7 @@ void sithDSSThing_CreateThing(SithThing *pTemplate, SithThing *pThing, SithThing
         NETMSG_PUSHVEC3(*pPos);
         NETMSG_PUSHVEC3(*pRot);
     }
-    NETMSG_PUSHS32(pThing->thing_id);
+    NETMSG_PUSHS32(pThing->guid);
 
     NETMSG_END(DSS_CREATETHING);
     sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, mpFlags, bSync);
@@ -1472,8 +1472,8 @@ int sithDSSThing_ProcessCreateThing(SithMessage *msg)
 
         if ( pCreated )
         {
-            pCreated->thing_id = NETMSG_POPS32();
-            pCreated->thingflags |= SITH_TF_INVULN;
+            pCreated->guid = NETMSG_POPS32();
+            pCreated->flags |= SITH_TF_INVULN;
             return 1;
         }
     }
@@ -1554,7 +1554,7 @@ void sithDSSThing_MoveToPos(SithThing *pThing, rdVector3 *pPos, SithSector *pSec
 // MOTS added
 int sithDSSThing_ProcessMOTSNew1(SithMessage *msg)
 {
-    int thing_id;
+    int guid;
     SithThing *psVar1;
     SithThing *psVar2;
     SithSector *sector;
@@ -1574,9 +1574,9 @@ int sithDSSThing_ProcessMOTSNew1(SithMessage *msg)
     {
         return 0;
     }
-    thing_id = NETMSG_POPS32();
+    guid = NETMSG_POPS32();
     puVar4 = NETMSG_POPS32();
-    if (thing_id < 0)
+    if (guid < 0)
     {
         sector = sithSector_GetPtrFromIdx(puVar4);
         if (sector == NULL)
@@ -1595,12 +1595,12 @@ int sithDSSThing_ProcessMOTSNew1(SithMessage *msg)
         if (!rdVector_IsZero3(&local_54))
         {
             rdVector_Normalize3Acc(&local_54);
-            rdMatrix_BuildFromLook34(&psVar1->lookOrientation,&local_54);
+            rdMatrix_BuildFromLook34(&psVar1->orient,&local_54);
         }
     }
     else 
     {
-        psVar2 = sithThing_GetGuidThing(thing_id);
+        psVar2 = sithThing_GetGuidThing(guid);
         if (psVar2 == NULL)
         {
             return 0;
@@ -1613,8 +1613,8 @@ int sithDSSThing_ProcessMOTSNew1(SithMessage *msg)
     {
         return 0;
     }
-    psVar1->thing_id = uVar3;
-    psVar1->thingflags |= SITH_TF_INVULN;
+    psVar1->guid = uVar3;
+    psVar1->flags |= SITH_TF_INVULN;
     return 1;
 }
 
@@ -1626,7 +1626,7 @@ void sithDSSThing_SendMOTSNew1(SithThing* pThing1, SithThing* pThing2, SithThing
 
     NETMSG_START;
 
-    NETMSG_PUSHS16(pThing1->thingIdx);
+    NETMSG_PUSHS16(pThing1->idx);
 
     if (pThing3 == NULL)
     {
@@ -1637,12 +1637,12 @@ void sithDSSThing_SendMOTSNew1(SithThing* pThing1, SithThing* pThing2, SithThing
     }
     else 
     {
-        NETMSG_PUSHS32(pThing3->thing_id);
+        NETMSG_PUSHS32(pThing3->guid);
     }
 
-    SithThing* psVar1 = pThing2->prev_thing;
-    NETMSG_PUSHS32(pThing2->thing_id);
-    NETMSG_PUSHS32(psVar1->thing_id);
+    SithThing* psVar1 = pThing2->pParent;
+    NETMSG_PUSHS32(pThing2->guid);
+    NETMSG_PUSHS32(psVar1->guid);
 
     NETMSG_END(DSS_MOTS_NEW_1);
     sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, mpFlags, param_8);

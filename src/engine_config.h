@@ -331,7 +331,7 @@
 
 // Heap-allocate each cog's jkl-provided symbol init strings (numIdk * 32 bytes,
 // zeroed) instead of the fixed 4KB inline array (field_4BC, 128 * 32 chars).
-// They are filled while parsing the jkl cogs section, consumed exactly once by
+// They are filled while parsing the jkl aCogs section, consumed exactly once by
 // the level-load linking pass in sithCog_Open, then freed there. ~4KB saved per
 // placed cog. Kept RETRO-only until well-tested.
 #define COG_HEAP_INIT_ARGS
@@ -368,7 +368,7 @@
 // Other memory optimizations
 #define SITHAI_CRC32_INSTINCTS
 
-// Suggest which heaps to place things in 
+// Suggest which heaps to place aThings in 
 // (fast NWRAM, slow swap, etc)
 #define STDPLATFORM_HEAP_SUGGESTIONS
 

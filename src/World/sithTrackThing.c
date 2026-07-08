@@ -42,7 +42,7 @@ void sithTrackThing_Arrivedidk(SithThing *thing)
             thing->field_250 = 0;
             sithSoundClass_StopMode(thing, SITH_SC_MOVING);
             sithSoundClass_PlayModeFirst(thing, SITH_SC_STOPMOVE);
-            if ( (thing->thingflags & SITH_TF_CAPTURED) != 0 && (thing->thingflags & SITH_TF_INVULN) == 0 )
+            if ( (thing->flags & SITH_TF_CAPTURED) != 0 && (thing->flags & SITH_TF_INVULN) == 0 )
                 sithCog_ThingSendMessage(thing, 0, SITH_MESSAGE_ARRIVED);
             return;
         }
@@ -146,14 +146,14 @@ void sithTrackThing_Tick(SithThing *thing, flex_t deltaSeconds)
             }
         }
         thing->field_24C = a3;
-        rdVector_Zero3(&thing->lookOrientation.scale);
+        rdVector_Zero3(&thing->orient.scale);
         sithCollision_sub_4E77A0(thing, &rotMat);
         if ( thing->field_24C >= 1.0 )
         {
             if ( (thing->trackParams.flags & 0x10) == 0 )
             {
                 rdMatrix_BuildRotate34(&rotMat, &thing->trackParams.orientation);
-                rdVector_Zero3(&thing->lookOrientation.scale);
+                rdVector_Zero3(&thing->orient.scale);
                 sithCollision_sub_4E77A0(thing, &rotMat);
             }
             thing->trackParams.flags &= ~0x12;
@@ -210,7 +210,7 @@ void sithTrackThing_Tick(SithThing *thing, flex_t deltaSeconds)
 
 void sithTrackThing_BlockedIdk(SithThing* pThing)
 {
-    if ((pThing->thingflags & SITH_TF_CAPTURED) && !(pThing->thingflags & SITH_TF_INVULN))
+    if ((pThing->flags & SITH_TF_CAPTURED) && !(pThing->flags & SITH_TF_INVULN))
     {
         sithCog_ThingSendMessage(pThing, 0, SITH_MESSAGE_BLOCKED);
     }
@@ -254,7 +254,7 @@ void sithTrackThing_PrepareForOrient(SithThing *thing, rdVector3 *pGoalFrameRot,
     rdVector3 out;
     rdVector3 angles;
 
-    rdMatrix_ExtractAngles34(&thing->lookOrientation, &out);
+    rdMatrix_ExtractAngles34(&thing->orient, &out);
     rdVector_Sub3(&angles, pGoalFrameRot, &out);
     angles.x = stdMath_NormalizeAngleAcute(angles.x);
     angles.y = stdMath_NormalizeAngleAcute(angles.y);
@@ -269,7 +269,7 @@ void sithTrackThing_PrepareForOrient(SithThing *thing, rdVector3 *pGoalFrameRot,
 
     if ( !rdVector_IsZero3(&angles) )
     {
-        rdMatrix_Copy34(&thing->trackParams.moveFrameOrientation, &thing->lookOrientation);
+        rdMatrix_Copy34(&thing->trackParams.moveFrameOrientation, &thing->orient);
         thing->trackParams.field_54 = 1.0 / a3;
         rdVector_Zero3(&thing->trackParams.moveFrameOrientation.scale);
         rdVector_Copy3(&thing->trackParams.moveFrameDeltaAngles, &angles);
@@ -348,7 +348,7 @@ void sithTrackThing_Stop(SithThing *thing)
     thing->field_250 = 0;
     sithSoundClass_StopMode(thing, SITH_SC_MOVING);
     sithSoundClass_PlayModeFirst(thing, SITH_SC_STOPMOVE);
-    if ( (thing->thingflags & SITH_TF_CAPTURED) != 0 && (thing->thingflags & SITH_TF_INVULN) == 0 )
+    if ( (thing->flags & SITH_TF_CAPTURED) != 0 && (thing->flags & SITH_TF_INVULN) == 0 )
         sithCog_ThingSendMessage(thing, 0, SITH_MESSAGE_ARRIVED);
 }
 
@@ -376,7 +376,7 @@ void sithTrackThing_RotatePivot(SithThing *thing, rdVector3 *a2, rdVector3 *a3, 
     sithSoundClass_PlayModeFirst(thing, 5u);
     rdVector_Copy3(&thing->trackParams.field_58, a2);
     thing->curframe = -1;
-    rdMatrix_Copy34(&thing->trackParams.moveFrameOrientation, &thing->lookOrientation);
+    rdMatrix_Copy34(&thing->trackParams.moveFrameOrientation, &thing->orient);
     rdVector_Sub3(&thing->trackParams.moveFrameOrientation.scale, &thing->position, &thing->trackParams.field_58);
     rdVector_Copy3(&thing->trackParams.moveFrameDeltaAngles, a3);
     thing->field_24C = 0.0;
@@ -417,7 +417,7 @@ void sithTrackThing_Rotate(SithThing *trackThing, rdVector3 *rot)
     if ( largestAnglePercentage != 0.0 )
     {
         trackThing->trackParams.flags |= 0x42u;
-        rdMatrix_Copy34(&trackThing->trackParams.moveFrameOrientation, &trackThing->lookOrientation);
+        rdMatrix_Copy34(&trackThing->trackParams.moveFrameOrientation, &trackThing->orient);
         rdVector_Scale3(&trackThing->trackParams.moveFrameDeltaAngles, rot, largestAnglePercentage);
         trackThing->trackParams.field_54 = 1.0 / largestAnglePercentage;
         rdVector_Zero3(&trackThing->trackParams.moveFrameOrientation.scale);

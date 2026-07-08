@@ -10,7 +10,7 @@
 #define sithRenderSky_HorizonFaceToPlane_ADDR (0x004F2E30)
 #define sithRenderSky_CeilingFaceToPlane_ADDR (0x004F2F60)
 
-MATH_FUNC int sithRenderSky_Open(flex_t horizontalPixelsPerRev, flex_t horizontalDist, flex_t ceilingSky);
+MATH_FUNC int sithRenderSky_Open(flex_t horizontalPixelsPerRev, flex_t horizontalDist, flex_t ceilingSkyHeight);
 void sithRenderSky_Close();
 MATH_FUNC void sithRenderSky_Update();
 MATH_FUNC void sithRenderSky_HorizonFaceToPlane(rdProcEntry *pProcEntry, sithSurfaceInfo *pSurfaceInfo, uint32_t num_vertices);

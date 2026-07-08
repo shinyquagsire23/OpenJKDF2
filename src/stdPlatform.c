@@ -166,7 +166,7 @@ static size_t Linux_stdFileWrite(stdFile_t fhand, void* dst, size_t len)
 
 static const char* Linux_stdFileGets(stdFile_t fhand, char* dst, size_t len)
 {
-    // Drops static.jkl animclass parsing from 21.87s to 13.578s due to slow locks on getc
+    // Drops static.jkl pPuppetClass parsing from 21.87s to 13.578s due to slow locks on getc
 #ifdef TARGET_RETRO_HOMEBREW
     char tmp[128];
     const char* retval = dst;
@@ -657,7 +657,7 @@ __attribute__((naked)) int64_t __smull_helper(int32_t a, int32_t b) {
 // Dreamcast tracked allocator (ported from the DSi/TWL path, kept as its own
 // block for now).
 //
-// The engine churns many small allocations while streaming materials in and out;
+// The engine churns many small allocations while streaming aMaterials in and out;
 // routing them through a dlmalloc mspace gives block coalescing (to fight heap
 // fragmentation on the DC's 16 MiB) plus a small tracking header for debugging:
 // per-alloc size + pool marker, double-free detection, and optional guard bytes.

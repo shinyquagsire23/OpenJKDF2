@@ -154,10 +154,10 @@ int jkGame_Update()
         sithCamera_g_aCameras[0].rdCam.pClipFrustum->zNear = SITHCAMERA_ZNEAR_FIRSTPERSON;
 
         if (Main_bMotsCompat) {
-            if (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_SCOPEHUD) {
+            if (playerThings[playerThingIdx].actorThing->actorParams.flags & SITH_AF_SCOPEHUD) {
                 sithCamera_g_aCameras[0].rdCam.pClipFrustum->zNear = SITHCAMERA_ZNEAR;
             }
-            if ((playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_ARACHNID) != 0) {
+            if ((playerThings[playerThingIdx].actorThing->actorParams.flags & SITH_AF_ARACHNID) != 0) {
                 sithCamera_g_aCameras[0].rdCam.pClipFrustum->zNear = SITHCAMERA_ZNEAR;
             }
         }
@@ -220,7 +220,7 @@ int jkGame_Update()
     ++Video_dword_5528A0; // MOTS added
     if ( Main_bDispStats )
     {
-        v2 = sithWorld_g_pCurrentWorld->playerThing;
+        v2 = sithWorld_g_pCurrentWorld->pLocalPlayer;
         //++Video_dword_5528A0; // MOTS removed
         v3 = stdPlatform_GetTimeMsec();
         v0 = v3 - Video_lastTimeMsec;
@@ -280,16 +280,16 @@ int jkGame_Update()
 
     // MOTS added: scope/security cam overlays
     if (!Main_bMotsCompat) {
-        if ( (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_NOIDLECAMERA) == 0 ) {
+        if ( (playerThings[playerThingIdx].actorThing->actorParams.flags & SITH_AF_NOIDLECAMERA) == 0 ) {
             jkHud_Draw();
         }
     }
     else {
-        if (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_SCOPEHUD) {
+        if (playerThings[playerThingIdx].actorThing->actorParams.flags & SITH_AF_SCOPEHUD) {
             jkHudScope_Draw();
         }
-        if ((playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_ARACHNID) == 0) {
-            if ((playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_NOIDLECAMERA) == 0) {
+        if ((playerThings[playerThingIdx].actorThing->actorParams.flags & SITH_AF_ARACHNID) == 0) {
+            if ((playerThings[playerThingIdx].actorThing->actorParams.flags & SITH_AF_NOIDLECAMERA) == 0) {
                 jkHud_Draw();
             }
         }
@@ -368,7 +368,7 @@ int jkGame_Update()
     int bHasFieldLight = 0;
 
     if (sithWorld_g_pCurrentWorld) {
-        SithThing* pPlayer = sithWorld_g_pCurrentWorld->playerThing;
+        SithThing* pPlayer = sithWorld_g_pCurrentWorld->pLocalPlayer;
         if ( pPlayer->type == SITH_THING_PLAYER ) {
             healthNum = pPlayer->actorParams.health;
             shieldsNum = (int32_t)sithInventory_GetInventory(pPlayer, SITHBIN_SHIELDS);

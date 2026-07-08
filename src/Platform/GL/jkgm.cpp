@@ -133,7 +133,7 @@ bool loadPngImage(const char *name, int* outWidth, int* outHeight, int* outHasAl
     /* Set error handling if you are
      * using the setjmp/longjmp method
      * (this is the normal method of
-     * doing things with libpng).
+     * doing aThings with libpng).
      * REQUIRED unless you  set up
      * your own error handlers in
      * the png_create_read_struct()
@@ -369,7 +369,7 @@ static std::string jkgm_hash_to_str(uint8_t *p) {
     return std::string(tmp);
 }
 
-const fs::path jkgm_materials_path{ "jkgm/materials/" };
+const fs::path jkgm_materials_path{ "jkgm/aMaterials/" };
 
 void jkgm_populate_cache()
 {
@@ -386,7 +386,7 @@ void jkgm_populate_cache()
         }
         const auto dir_iter_str = fs_entry.path().filename().string();
 
-        std::string base_path = "jkgm/materials/" + dir_iter_str + "/";
+        std::string base_path = "jkgm/aMaterials/" + dir_iter_str + "/";
         std::string metadata_path = base_path + "metadata.json";
 
         try
@@ -395,7 +395,7 @@ void jkgm_populate_cache()
             nlohmann::json jkgm_metadata;
             i >> jkgm_metadata;
        
-            for (auto it : jkgm_metadata["materials"])
+            for (auto it : jkgm_metadata["aMaterials"])
             {
                 jkgm_cache_entry_t entry;
                 entry.emissive_tex = "";

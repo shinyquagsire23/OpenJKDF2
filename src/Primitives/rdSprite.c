@@ -68,8 +68,8 @@ int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *materi
                    sprite->face.vertexPosIdx[i] = i;
                    sprite->face.vertexUVIdx[i] = i;
                 }
-                sprite->vertexUVs = (rdVector2 *)RDROID_ALLOC(sizeof(rdVector2) * sprite->face.numVertices);
-                if ( !sprite->vertexUVs )
+                sprite->aTexVerticies = (rdVector2 *)RDROID_ALLOC(sizeof(rdVector2) * sprite->face.numVertices);
+                if ( !sprite->aTexVerticies )
                     return 0;
                 
                 // Odd quirk: This requires the material be actually loaded
@@ -81,14 +81,14 @@ int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *materi
                 int32_t width = v24 ? v24->format.width : 1; // Added: nullptr check and fallback
                 int32_t height = v24 ? v24->format.height : 1; // Added: nullptr check and fallback
 
-                sprite->vertexUVs[0].x = 0.5;
-                sprite->vertexUVs[0].y = (flex_d_t)height - 0.5;
-                sprite->vertexUVs[1].x = (flex_d_t)width - 0.5;
-                sprite->vertexUVs[1].y = (flex_d_t)height - 0.5;
-                sprite->vertexUVs[2].x = (flex_d_t)width - 0.5;
-                sprite->vertexUVs[2].y = 0.5;
-                sprite->vertexUVs[3].x = 0.5;
-                sprite->vertexUVs[3].y = 0.5;
+                sprite->aTexVerticies[0].x = 0.5;
+                sprite->aTexVerticies[0].y = (flex_d_t)height - 0.5;
+                sprite->aTexVerticies[1].x = (flex_d_t)width - 0.5;
+                sprite->aTexVerticies[1].y = (flex_d_t)height - 0.5;
+                sprite->aTexVerticies[2].x = (flex_d_t)width - 0.5;
+                sprite->aTexVerticies[2].y = 0.5;
+                sprite->aTexVerticies[3].x = 0.5;
+                sprite->aTexVerticies[3].y = 0.5;
             }
             sprite->halfWidth = sprite->width * 0.5;
             sprite->halfHeight = sprite->height * 0.5;
@@ -113,10 +113,10 @@ void rdSprite_Free(rdSprite *sprite)
 
 void rdSprite_FreeEntry(rdSprite *sprite)
 {
-    if (sprite->vertexUVs)
+    if (sprite->aTexVerticies)
     {
-        RDROID_FREE(sprite->vertexUVs);
-        sprite->vertexUVs = 0;
+        RDROID_FREE(sprite->aTexVerticies);
+        sprite->aTexVerticies = 0;
     }
     if (sprite->face.vertexPosIdx)
     {
@@ -133,7 +133,7 @@ void rdSprite_FreeEntry(rdSprite *sprite)
 int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
 {
     rdProcEntry *procEntry;
-    rdVector2 *vertexUVs;
+    rdVector2 *aTexVerticies;
     int geometryMode;
     int textureMode;
     int clipResult;
@@ -158,13 +158,13 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     mesh_in.numVertices = sprite->face.numVertices;
     mesh_in.vertexPosIdx = sprite->face.vertexPosIdx;
     mesh_in.vertexUVIdx = sprite->face.vertexUVIdx;
-    mesh_in.vertices = rdSprite_inVerts;
+    mesh_in.aVertices = rdSprite_inVerts;
     mesh_in.paDynamicLight = 0;
-    mesh_in.vertexUVs = sprite->vertexUVs;
+    mesh_in.aTexVerticies = sprite->aTexVerticies;
     mesh_in.intensities = 0;
-    mesh_out.vertices = rdSprite_tmpVerts;
-    mesh_out.verticesOrig = procEntry->vertices;
-    mesh_out.vertexUVs = procEntry->vertexUVs;
+    mesh_out.aVertices = rdSprite_tmpVerts;
+    mesh_out.verticesOrig = procEntry->aVertices;
+    mesh_out.aTexVerticies = procEntry->aTexVerticies;
     mesh_out.paDynamicLight = procEntry->vertexIntensities;
     rdSprite_inVerts[0].x = sprite->offset.x - sprite->halfWidth + vertex_out.x;
     rdSprite_inVerts[1].y = sprite->offset.y + vertex_out.y;
@@ -243,7 +243,7 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     if ( mesh_out.numVertices < 3u )
         return 0;
 
-    rdCamera_g_pCurCamera->fnProjectLst(mesh_out.verticesOrig, mesh_out.vertices, mesh_out.numVertices);
+    rdCamera_g_pCurCamera->fnProjectLst(mesh_out.verticesOrig, mesh_out.aVertices, mesh_out.numVertices);
 
     if ( rdroid_g_curRenderOptions & 2 )
         procEntry->ambientLight = rdCamera_g_pCurCamera->ambientLight;

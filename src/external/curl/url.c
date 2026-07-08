@@ -133,7 +133,7 @@ static void conn_free(struct Curl_easy *data, struct connectdata *conn);
 
 /* Some parts of the code (e.g. chunked encoding) assume this buffer has at
  * more than just a few bytes to play with. Don't let it become too small or
- * bad things will happen.
+ * bad aThings will happen.
  */
 #if READBUFFER_SIZE < READBUFFER_MIN
 # error READBUFFER_SIZE is too small
@@ -3326,7 +3326,7 @@ static void reuse_conn(struct Curl_easy *data,
 #endif
 
   /* Finding a connection for reuse in the cache matches, among other
-   * things on the "remote-relevant" hostname. This is not necessarily
+   * aThings on the "remote-relevant" hostname. This is not necessarily
    * the authority of the URL, e.g. conn->host. For example:
    * - we use a proxy (not tunneling). we want to send all requests
    *   that use the same proxy on this connection.

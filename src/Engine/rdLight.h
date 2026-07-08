@@ -31,8 +31,8 @@ MATH_FUNC flex_t rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *
 #ifdef JKM_LIGHTING
     rdVector3 *localLightDirs, 
 #endif
-    int numLights, rdVector3 *verticesEnd, rdVector3 *vertices, flex_t *vertices_i_end, flex_t *vertices_i, int numVertices, flex_t scalar);
-MATH_FUNC flex_t rdLight_CalcFaceIntensity(rdLight **meshLights, rdVector3 *localLightPoses, int numLights, rdFace *face, rdVector3 *faceNormal, rdVector3 *vertices, flex_t a7);
+    int numLights, rdVector3 *verticesEnd, rdVector3 *aVertices, flex_t *vertices_i_end, flex_t *vertices_i, int numVertices, flex_t scalar);
+MATH_FUNC flex_t rdLight_CalcFaceIntensity(rdLight **meshLights, rdVector3 *localLightPoses, int numLights, rdFace *face, rdVector3 *faceNormal, rdVector3 *aVertices, flex_t a7);
 
 MATH_FUNC void rdLight_CalcDistVertexIntensities();
 MATH_FUNC void rdLight_CalcDistFaceIntensity();

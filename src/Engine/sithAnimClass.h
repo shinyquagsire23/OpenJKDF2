@@ -10,12 +10,12 @@
 #define sithAnimClass_Free_ADDR (0x04E5530)
 
 int sithAnimClass_Load(SithWorld *world, int a2);
-int sithAnimClass_LoadPupEntry(SithPuppetClass *animclass, char *fpath);
+int sithAnimClass_LoadPupEntry(SithPuppetClass *pPuppetClass, char *fpath);
 SithPuppetClass* sithAnimClass_LoadEntry(char *a1);
 int sithAnimClass_New(SithWorld *world, int num);
 void sithAnimClass_Free(SithWorld *world);
 
-//static int (*sithAnimClass_LoadPupEntry)(SithPuppetClass *animclass, char *jkl_fname) = (void*)sithAnimClass_LoadPupEntry_ADDR;
+//static int (*sithAnimClass_LoadPupEntry)(SithPuppetClass *pPuppetClass, char *jkl_fname) = (void*)sithAnimClass_LoadPupEntry_ADDR;
 //static int (*_sithAnimClass_Load)(SithWorld* jkl, int b) = (void*)sithAnimClass_Load_ADDR;
 //static void (*sithAnimClass_Free)(SithWorld* world) = (void*)sithAnimClass_Free_ADDR;
 

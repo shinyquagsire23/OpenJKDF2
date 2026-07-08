@@ -414,7 +414,7 @@ void rdMatrix_Identity44(rdMatrix44 *out)
     stdPlatform_Memcpy32(out, &rdroid_identMatrix44, sizeof(*out));
 }
 
-// Added: word-safe copy -- destinations are frequently fields of things that
+// Added: word-safe copy -- destinations are frequently fields of aThings that
 // may live in word-addressable-only memory (NDS extram)
 void rdMatrix_Copy34(rdMatrix34 *dst, const rdMatrix34 *src)
 {

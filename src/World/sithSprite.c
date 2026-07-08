@@ -13,7 +13,7 @@ int sithSprite_Startup()
     sithSprite_pHashtable = stdHashtbl_New(128);
     if (sithSprite_pHashtable)
         return 1;
-    stdPrintf(pSithHS->errorPrint, ".\\World\\sithSprite.c", 63, "Failed to allocate memory for sprites.\n", 0, 0, 0, 0);
+    stdPrintf(pSithHS->errorPrint, ".\\World\\sithSprite.c", 63, "Failed to allocate memory for aSprites.\n", 0, 0, 0, 0);
     return 0;
 }
 
@@ -34,7 +34,7 @@ int sithSprite_ReadStaticSpritesListText(SithWorld *world, int a2)
         return 0;
 
     stdConffile_ReadArgs();
-    if ( _memcmp(stdConffile_g_entry.args[0].value, "world", 6u) || _memcmp(stdConffile_g_entry.args[1].value, "sprites", 8u) )
+    if ( _memcmp(stdConffile_g_entry.args[0].value, "world", 6u) || _memcmp(stdConffile_g_entry.args[1].value, "aSprites", 8u) )
         return 0;
     sprites_amt = _atoi(stdConffile_g_entry.args[2].value);
     if ( !sprites_amt )
@@ -42,7 +42,7 @@ int sithSprite_ReadStaticSpritesListText(SithWorld *world, int a2)
 
     if ( !sithSprite_AllocWorldSprites(world, sprites_amt) )
     {
-        stdPrintf(pSithHS->errorPrint, ".\\World\\sithSprite.c", 163, "Memory error while reading sprites, line %d.\n", stdConffile_linenum, 0, 0, 0);
+        stdPrintf(pSithHS->errorPrint, ".\\World\\sithSprite.c", 163, "Memory error while reading aSprites, line %d.\n", stdConffile_linenum, 0, 0, 0);
         return 0;
     }
     
@@ -59,7 +59,7 @@ int sithSprite_ReadStaticSpritesListText(SithWorld *world, int a2)
                     pSithHS->errorPrint,
                     ".\\World\\sithSprite.c",
                     159,
-                    "Parse error while reading sprites, line %d.\n",
+                    "Parse error while reading aSprites, line %d.\n",
                     stdConffile_linenum);
                 stdPrintf(
                     pSithHS->errorPrint,
@@ -82,18 +82,18 @@ int sithSprite_ReadStaticSpritesListText(SithWorld *world, int a2)
 
 void sithSprite_FreeWorldSprites(SithWorld *world)
 {
-    if (!world->numSprites)
+    if (!world->sizeSprites)
         return;
 
-    for (int idx = 0; idx < world->numSpritesLoaded; idx++)
+    for (int idx = 0; idx < world->numSprites; idx++)
     {
-        stdHashtbl_Remove(sithSprite_pHashtable, world->sprites[idx].path);
-        rdSprite_FreeEntry(&world->sprites[idx]);
+        stdHashtbl_Remove(sithSprite_pHashtable, world->aSprites[idx].path);
+        rdSprite_FreeEntry(&world->aSprites[idx]);
     }
-    SITH_FREE(world->sprites);
-    world->sprites = 0;
-    world->numSpritesLoaded = 0;
+    SITH_FREE(world->aSprites);
+    world->aSprites = 0;
     world->numSprites = 0;
+    world->sizeSprites = 0;
 }
 
 rdSprite* sithSprite_Load(char *fpath)
@@ -107,10 +107,10 @@ rdSprite* sithSprite_Load(char *fpath)
     result = (rdSprite *)stdHashtbl_Find(sithSprite_pHashtable, fpath);
     if ( !result )
     {
-        uint32_t idx = world->numSpritesLoaded;
-        if ( idx < world->numSprites )
+        uint32_t idx = world->numSprites;
+        if ( idx < world->sizeSprites )
         {
-            sprite = &world->sprites[idx];
+            sprite = &world->aSprites[idx];
             _sprintf(spriteFpath, "%s%c%s", "misc\\spr", '\\', fpath);
             if ( stdConffile_Open(spriteFpath) )
             {
@@ -137,7 +137,7 @@ rdSprite* sithSprite_Load(char *fpath)
                         if ( rdSprite_NewEntry(sprite, fpath, type_id, mat, width, height, geometryMode, lightMode, textureMode, extralight, &off) )
                         {
                             stdHashtbl_Add(sithSprite_pHashtable, sprite->path, sprite);
-                            ++world->numSpritesLoaded;
+                            ++world->numSprites;
                             return sprite;
                         }
                         else {
@@ -163,7 +163,7 @@ rdSprite* sithSprite_Load(char *fpath)
             }
         }
         else { // Added
-            jk_printf("OpenJKDF2: Failed allocate sprite `%s`! numSpritesLoaded < numSprites -> %x < %x failed\n", fpath, world->numSpritesLoaded, world->numSprites);
+            jk_printf("OpenJKDF2: Failed allocate sprite `%s`! numSprites < sizeSprites -> %x < %x failed\n", fpath, world->numSprites, world->sizeSprites);
         }
     }
     return result;
@@ -171,14 +171,14 @@ rdSprite* sithSprite_Load(char *fpath)
 
 int sithSprite_AllocWorldSprites(SithWorld *world, int num)
 {
-    rdSprite *sprites; // edi
+    rdSprite *aSprites; // edi
 
-    sprites = (rdSprite *)SITH_ALLOC(sizeof(rdSprite) * num);
-    world->sprites = sprites;
-    if ( !sprites )
+    aSprites = (rdSprite *)SITH_ALLOC(sizeof(rdSprite) * num);
+    world->aSprites = aSprites;
+    if ( !aSprites )
         return 0;
-    world->numSprites = num;
-    world->numSpritesLoaded = 0;
-    _memset(sprites, 0, sizeof(rdSprite) * num);
+    world->sizeSprites = num;
+    world->numSprites = 0;
+    _memset(aSprites, 0, sizeof(rdSprite) * num);
     return 1;
 }

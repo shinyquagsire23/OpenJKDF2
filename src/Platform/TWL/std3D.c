@@ -1094,7 +1094,7 @@ void std3D_DrawRenderListReal()
             }
             lightLevel = stdMath_Max(stdMath_Max(lastVertLightLevel, lastLastVertLightLevel), vertLightLevel);
 
-            // Roll back 2 vertices and cut the strip if we have to swap light levels
+            // Roll back 2 aVertices and cut the strip if we have to swap light levels
             if (k > 2 && numVerticesInTri >= 2 && lastLightLevel != lightLevel) {
                 GFX_PAL_FORMAT = paletteAddrs[lightLevel];
                 lastLightLevel = lightLevel;
@@ -1254,10 +1254,10 @@ void std3D_AddRenderListLines(rdLine* lines, uint32_t num_lines) {}
 
 //#define flextov16(n) (floattov16((float)n))
 
-int std3D_AddRenderListVertices(D3DVERTEX *vertices, int count)
+int std3D_AddRenderListVertices(D3DVERTEX *aVertices, int count)
 {
     // HACK: Avoid copies
-    tmpD3DVertices = vertices;
+    tmpD3DVertices = aVertices;
 #if 0
     if (GL_tmpVerticesAmt + count >= STD3D_MAX_VERTICES)
     {
@@ -1266,7 +1266,7 @@ int std3D_AddRenderListVertices(D3DVERTEX *vertices, int count)
     
     for (int i = 0; i < count; i++)
     {
-        D3DVERTEX* v = &vertices[i];
+        D3DVERTEX* v = &aVertices[i];
         TWLVERTEX* t = &GL_tmpVertices[GL_tmpVerticesAmt+i];
 
         flex_t twl_z = v->z;//(float)v->z;

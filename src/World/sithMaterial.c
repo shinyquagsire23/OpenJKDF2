@@ -38,26 +38,26 @@ void sithMaterial_FreeWorldMaterials(SithWorld *world)
     int v2; // edi
     void *v3; // eax
 
-    if (!world->numMaterials)
+    if (!world->sizeMaterials)
         return;
 
     v1 = 0;
-    if ( world->numMaterialsLoaded )
+    if ( world->numMaterials )
     {
         v2 = 0;
         do
         {
-            stdHashtbl_Remove(sithMaterial_pHashtable, world->materials[v2].mat_fpath);
-            rdMaterial_FreeEntry(&world->materials[v2]);
+            stdHashtbl_Remove(sithMaterial_pHashtable, world->aMaterials[v2].mat_fpath);
+            rdMaterial_FreeEntry(&world->aMaterials[v2]);
             ++v1;
             ++v2;
         }
-        while ( v1 < world->numMaterialsLoaded );
+        while ( v1 < world->numMaterials );
     }
-    SITH_FREE(world->materials);
+    SITH_FREE(world->aMaterials);
     v3 = world->materials2;
-    world->materials = 0;
-    world->numMaterialsLoaded = 0;
+    world->aMaterials = 0;
+    world->numMaterials = 0;
     SITH_FREE(v3);
     world->materials2 = 0;
 }
@@ -81,7 +81,7 @@ int sithMaterial_ReadMaterialsListText(SithWorld *world, int a2)
     if ( result )
     {
         sithWorld_UpdateLoadProgress(5.0);
-        if ( _sscanf(stdConffile_g_aLine, " world materials %d", &a2) == 1 )
+        if ( _sscanf(stdConffile_g_aLine, " world aMaterials %d", &a2) == 1 )
         {
             // Added: needed for JKE?
             a2 *= 2;
@@ -154,11 +154,11 @@ rdMaterial* sithMaterial_Load(const char *a1, int create_ddraw_surface, int gpu_
         result = (rdMaterial *)stdHashtbl_Find(sithMaterial_pHashtable, a1);
         if ( result )
             return result;
-        v6 = v4->numMaterialsLoaded;
-        if ( v6 >= v4->numMaterials )
+        v6 = v4->numMaterials;
+        if ( v6 >= v4->sizeMaterials )
             return 0;
         v7 = "mat;3do\\mat";
-        v8 = &v4->materials[v6];
+        v8 = &v4->aMaterials[v6];
         do
         {
             v7 = stdString_CopyBetweenDelimiter(v7, mat_fpath, 128, ";");
@@ -179,14 +179,14 @@ LABEL_10:
         {
             stdHashtbl_Add(sithMaterial_pHashtable, v8->mat_fpath, v8);
             v10 = v4->level_type_maybe;
-            v11 = v4->numMaterialsLoaded;
+            v11 = v4->numMaterials;
             v8->id = v11;
             if ( (v10 & 1) != 0 )
             {
                 v12 = v11 | 0x8000;
                 v8->id = v12;
             }
-            v4->numMaterialsLoaded = v11 + 1;
+            v4->numMaterials = v11 + 1;
             return v8;
         }
         if ( !_strcmp(a1, "dflt.mat") )
@@ -207,8 +207,8 @@ rdMaterial* sithMaterial_GetMaterialByIndex(int idx)
         idx &= 0x7FFF;
     }
 
-    if ( world && idx >= 0 && idx < world->numMaterialsLoaded )
-        result = &world->materials[idx];
+    if ( world && idx >= 0 && idx < world->numMaterials )
+        result = &world->aMaterials[idx];
     else
         result = NULL;
 
@@ -241,17 +241,17 @@ rdVector2* sithMaterial_AllocWorldMaterials(SithWorld *world, int num)
     { TWL_EXTRAM_SUGGEST(pSithHS); // Added: all writers into this array are word-safe (see rdMaterial.c)
     v2 = (rdMaterial *)SITH_ALLOC(sizeof(rdMaterial) * num);
     TWL_EXTRAM_RESTORE(pSithHS); }
-    world->materials = v2;
+    world->aMaterials = v2;
     if ( !v2 )
         return 0;
 
-    world->numMaterials = num;
+    world->sizeMaterials = num;
     if ( !sithMaterial_pHashtable )
     {
         sithMaterial_pHashtable = stdHashtbl_New(1024);
         if ( !sithMaterial_pHashtable )
         {
-            SITH_FREE(world->materials);
+            SITH_FREE(world->aMaterials);
             return 0;
         }
     }
@@ -268,7 +268,7 @@ void sithMaterial_UnloadAll()
     rdMaterial *i; // esi
 
     v0 = 0;
-    for ( i = sithWorld_g_pCurrentWorld->materials; v0 < sithWorld_g_pCurrentWorld->numMaterialsLoaded; ++v0 )
+    for ( i = sithWorld_g_pCurrentWorld->aMaterials; v0 < sithWorld_g_pCurrentWorld->numMaterials; ++v0 )
     {
         rdMaterial_ResetCacheInfo(i++);
     }

@@ -236,8 +236,8 @@ int sithUpdate()
 {
 #if 0
     if (sithWorld_g_pCurrentWorld) {
-        for (int i = 0; i < sithWorld_g_pCurrentWorld->numKeyframesLoaded; i++) {
-            rdKeyframe* keyframe = &sithWorld_g_pCurrentWorld->keyframes[i];
+        for (int i = 0; i < sithWorld_g_pCurrentWorld->numKeyframes; i++) {
+            rdKeyframe* keyframe = &sithWorld_g_pCurrentWorld->aKeyframes[i];
             if (keyframe->id != i) {
                 stdPlatform_Printf("BAD KEYFRAME!! %d -> %d\n", i, keyframe->id);
             }
@@ -300,8 +300,8 @@ int sithUpdate()
     else
     {
         // TODO REMOVE
-        //sithWorld_g_pCurrentWorld->playerThing->physicsParams.physflags |= SITH_PF_FLY;
-        //sithWorld_g_pCurrentWorld->playerThing->physicsParams.physflags &= ~SITH_PF_USEGRAVITY;
+        //sithWorld_g_pCurrentWorld->pLocalPlayer->physicsParams.flags |= SITH_PF_FLY;
+        //sithWorld_g_pCurrentWorld->pLocalPlayer->physicsParams.flags &= ~SITH_PF_USEGRAVITY;
         
         ++jkPlayer_currentTickIdx;
         sithAdvanceRenderTick();
@@ -521,13 +521,13 @@ void sithOpenPostProcess()
     sithCog_BroadcastMessage(SITH_MESSAGE_STARTUP, 0, 0, 0, 0);
     for (uint32_t v2 = 0; v2 < sithWorld_g_pCurrentWorld->numThingsLoaded; v2++)
     {
-        v3 = &sithWorld_g_pCurrentWorld->things[v2];
-        v4 = v3->class_cog;
+        v3 = &sithWorld_g_pCurrentWorld->aThings[v2];
+        v4 = v3->pCog;
         if (Main_bMotsCompat && !v3->type) continue; // MOTS added
 
         if ( v4 )
         {
-            sithCog_SendMessage(v4, SITH_MESSAGE_CREATED, SENDERTYPE_THING, v3->thingIdx, 0, 0, 0);
+            sithCog_SendMessage(v4, SITH_MESSAGE_CREATED, SENDERTYPE_THING, v3->idx, 0, 0, 0);
         }
         if ( v3->type == SITH_THING_ACTOR )
         {

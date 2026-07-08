@@ -66,11 +66,11 @@ int sithIntersect_IsSphereInSector(const rdVector3 *pos, flex_t radius, SithSect
     for (int i = 0; i < sector->numSurfaces; i++)
     {
         SithSurface* surface = &sector->surfaces[i];
-        SithSurfaceAdjoin* adjoin = surface->adjoin;
-        if ( (surface->surfaceFlags & SITH_SURFACE_HAS_COLLISION)
-            || (adjoin && adjoin->flags & SITHSURF_ADJOIN_ALLOW_MOVEMENT) )
+        SithSurfaceAdjoin* pAdjoin = surface->pAdjoin;
+        if ( (surface->flags & SITH_SURFACE_HAS_COLLISION)
+            || (pAdjoin && pAdjoin->flags & SITHSURF_ADJOIN_ALLOW_MOVEMENT) )
         {
-            v7 = sithWorld_g_pCurrentWorld->vertices;
+            v7 = sithWorld_g_pCurrentWorld->aVertices;
             v8 = stdMath_ClipNearZero(rdMath_DistancePointToPlane(pos, &surface->surfaceInfo.face.normal, &v7[*surface->surfaceInfo.face.vertexPosIdx]));
             if ( v8 < radius )
                 return 0;
@@ -159,7 +159,7 @@ int sithIntersect_CheckSphereThingIntersection(SithThing *pThing, const rdVector
         rdVector3 tmpVec;
         rdVector_Zero3(&tmpVec); // Added
 
-        int iVar11 = sithIntersect_TreeIntersection(v11->rdthing.model3->hierarchyNodes, &posVec, &dirVec, a4, range, v11, &tmp, &tmpVec, raycastFlags);
+        int iVar11 = sithIntersect_TreeIntersection(v11->renderData.model3->hierarchyNodes, &posVec, &dirVec, a4, range, v11, &tmp, &tmpVec, raycastFlags);
         if (iVar11 == 0) {
             return 0;
         }
@@ -176,13 +176,13 @@ int sithIntersect_CheckSphereThingIntersection(SithThing *pThing, const rdVector
         return 1;
     }
 
-    rdVector_Copy3(&v11->lookOrientation.scale, &v11->position);
-    a2a = &v11->lookOrientation;
-    rdMatrix_InvertOrtho34(&out, &v11->lookOrientation);
+    rdVector_Copy3(&v11->orient.scale, &v11->position);
+    a2a = &v11->orient;
+    rdMatrix_InvertOrtho34(&out, &v11->orient);
     rdMatrix_TransformPoint34Acc(&posVec, &out);
     rdMatrix_TransformVector34Acc(&dirVec, &out);
     v26 = a11;
-    v27 = v11->rdthing.model3->geosets;
+    v27 = v11->renderData.model3->geosets;
     v28 = 0;
     v30 = 0;
     //printf("aaaaa %f %f %f\n", dirVec.x, dirVec.y, dirVec.z);
@@ -226,12 +226,12 @@ int sithIntersect_TreeIntersection(rdHierarchyNode *paNodes,rdVector3 *pPoseVec,
     uVar3 = paNodes->meshIdx;
     ret = 0;
     if (uVar3 != 0xffffffff) {
-        rdMatrix_Copy34(&local_60, &v11->lookOrientation);
+        rdMatrix_Copy34(&local_60, &v11->orient);
         rdVector_Copy3(&local_60.scale, &v11->position);
-        rdModel3_GetMeshMatrix(&v11->rdthing, &local_60, uVar3, &local_30);
+        rdModel3_GetMeshMatrix(&v11->renderData, &local_60, uVar3, &local_30);
         rdVector_Copy3(&local_6c, &local_30.scale);
-        prVar1 = v11->rdthing.model3;
-        uVar3 = (v11->rdthing).geosetSelect;
+        prVar1 = v11->renderData.model3;
+        uVar3 = (v11->renderData).geosetSelect;
         if (uVar3 == 0xffffffff) {
             uVar3 = prVar1->geosetSelect;
         }
@@ -249,7 +249,7 @@ int sithIntersect_TreeIntersection(rdHierarchyNode *paNodes,rdVector3 *pPoseVec,
         uint32_t local_70_2 = 0;
         do
         {
-            if (((v11->rdthing).amputatedJoints[pChildNode->idx] == 0) &&
+            if (((v11->renderData).amputatedJoints[pChildNode->idx] == 0) &&
                (iVar2 = sithIntersect_TreeIntersection(pChildNode, pPoseVec, pDirVec, a4, range, v11, pOut, pOutVec, raycastFlags),
                iVar2 != 0)) {
                 ret = 1;
@@ -279,7 +279,7 @@ int sithIntersect_CheckSphereMeshIntersection(rdVector3 *pStartPos, rdVector3 *p
     v25 = 1.0;
     for (v26 = 0; v26 < pMesh->numFaces; v26++)
     {
-        v11 = sithIntersect_CheckSphereFaceIntersectionEx(pStartPos, pRayDirection, moveDistance, radius, &pMesh->faces[v26], pMesh->vertices, pSphereHitDist, &pushVel, 0);
+        v11 = sithIntersect_CheckSphereFaceIntersectionEx(pStartPos, pRayDirection, moveDistance, radius, &pMesh->faces[v26], pMesh->aVertices, pSphereHitDist, &pushVel, 0);
         if ( v11
           && (*pSphereHitDist < (flex_d_t)moveDistance
            || v24 != SITHCOLLISION_THINGADJOINCROSS && v11 == SITHCOLLISION_THINGADJOINCROSS
@@ -368,7 +368,7 @@ LABEL_11:
 }
 
 // ChatGPT says:
-// int checkIntersectionWithFace(rdVector3 *intersectionPoint, flex_t radius, rdFace *pFace, rdVector3 *vertices, int *intersectionType)
+// int checkIntersectionWithFace(rdVector3 *intersectionPoint, flex_t radius, rdFace *pFace, rdVector3 *aVertices, int *intersectionType)
 int sithIntersect_TestSphereFaceHit(rdVector3 *a1, flex_t radius, rdFace *pFace, rdVector3 *a4, int *a5)
 {
     flex_d_t v10; // st7

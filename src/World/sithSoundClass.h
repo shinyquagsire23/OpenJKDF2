@@ -158,7 +158,7 @@ void sithSoundClass_FreeWorldSoundClasses(SithWorld *world);
 MATH_FUNC sithPlayingSound* sithSoundClass_PlayModeRandom(SithThing *thing, uint32_t a2);
 sithPlayingSound* sithSoundClass_PlayModeEntry(SithThing *thing, sithSoundClassEntry *entry, flex_t a3);
 void sithSoundClass_StopSound(SithThing *thing, sithSound *sound);
-int sithSoundClass_SetThingClass(SithThing *thing, sithSoundClass *soundclass);
+int sithSoundClass_SetThingClass(SithThing *thing, sithSoundClass *pSoundClass);
 
 //static void (*sithSoundClass_Shutdown)() = (void*)sithSoundClass_Shutdown_ADDR;
 //static int (*sithSoundClass_Startup)() = (void*)sithSoundClass_Startup_ADDR;

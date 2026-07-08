@@ -86,7 +86,7 @@ int sithOverlayMap_Draw(rdCanvas *canvas)
     rdSetGeometryMode(2);
     rdSetLightingMode(1);
     sithOverlayMap_inst.world = sithWorld_g_pCurrentWorld;
-    v2 = sithWorld_g_pCurrentWorld->playerThing;
+    v2 = sithWorld_g_pCurrentWorld->pLocalPlayer;
     v3 = canvas->half_screen_width;
     sithOverlayMap_pCanvas = canvas;
     sithOverlayMap_pLocalPlayer = v2;
@@ -103,7 +103,7 @@ int sithOverlayMap_Draw(rdCanvas *canvas)
 
     if ( sithNet_isMulti && (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 )
     {
-        v8 = sithOverlayMap_inst.config.aTeamColors[sithOverlayMap_pLocalPlayer->actorParams.playerinfo->teamNum];
+        v8 = sithOverlayMap_inst.config.aTeamColors[sithOverlayMap_pLocalPlayer->actorParams.pPlayer->teamNum];
         v9 = v8;
     }
     else
@@ -221,7 +221,7 @@ int sithOverlayMap_DrawSector(SithSector *pSector)
     {
         while ( 1 )
         {
-            if ( (v4->surfaceFlags & SITH_SURFACE_FLOOR) != 0 )
+            if ( (v4->flags & SITH_SURFACE_FLOOR) != 0 )
             {
                 v5 = v4->surfaceInfo.face.numVertices;
                 v6 = 0;
@@ -249,8 +249,8 @@ LABEL_29:
             if ( v10 )
             {
                 v44 = 1;
-                a1a = sithOverlayMap_inst.world->vertices[v8];
-                v35 = sithOverlayMap_inst.world->vertices[v9];
+                a1a = sithOverlayMap_inst.world->aVertices[v8];
+                v35 = sithOverlayMap_inst.world->aVertices[v9];
                 rdVector_Sub3Acc(&a1a, &sithOverlayMap_pLocalPlayer->position);
                 rdVector_Sub3Acc(&v35, &sithOverlayMap_pLocalPlayer->position);
                 if ( sithOverlayMap_inst.config.bRotateOverlayMap )
@@ -340,9 +340,9 @@ LABEL_30:
 
     if ( (g_mapModeFlags & (SITHMAPMODE_SHOWALLTHINGS | SITHMAPMODE_SHOWACTORS | SITHMAPMODE_SHOWPLAYERS)) != 0 )
     {
-        for ( i = v2->thingsList; i; i = i->nextThing )
+        for ( i = v2->pFirstThingInSector; i; i = i->pNextThingInSector )
         {
-            if ( i != sithWorld_g_pCurrentWorld->cameraFocus && (i->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_DESTROYED)) == 0 )
+            if ( i != sithWorld_g_pCurrentWorld->pCameraFocusThing && (i->flags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_DESTROYED)) == 0 )
             {
                 v27 = (g_mapModeFlags & SITHMAPMODE_SHOWALLTHINGS) != 0;
                 v28 = i->type;
@@ -352,7 +352,7 @@ LABEL_30:
                         v27 = 1;
                     if ( sithNet_isMulti && (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 )
                     {
-                        circleColor = sithOverlayMap_inst.config.aTeamColors[i->actorParams.playerinfo->teamNum];
+                        circleColor = sithOverlayMap_inst.config.aTeamColors[i->actorParams.pPlayer->teamNum];
                         a6_ = circleColor;
                     }
                     else
@@ -403,7 +403,7 @@ LABEL_30:
                     v32 = i->type;
                     if ( v32 == SITH_THING_ACTOR || v32 == SITH_THING_PLAYER )
                     {
-                        rdVector_Scale3(&v35, &i->lookOrientation.lvec, i->moveSize + i->moveSize);
+                        rdVector_Scale3(&v35, &i->orient.lvec, i->moveSize + i->moveSize);
                         rdVector_Add3Acc(&v35, &i->position);
                         rdVector_Sub3(&a1a, &v35, &sithOverlayMap_pLocalPlayer->position);
                         if ( sithOverlayMap_inst.config.bRotateOverlayMap )
@@ -423,7 +423,7 @@ LABEL_30:
 
 int sithOverlayMap_CanDrawSurfaceEdge(SithSurface *a1, int a2, int a3)
 {
-    SithSector *parent_sector; // eax
+    SithSector *pSector; // eax
     unsigned int sector_numSurfaces; // edx
     SithSurface *sector_paSurfaces; // ecx
     SithSurface* v6; // ebx
@@ -447,11 +447,11 @@ int sithOverlayMap_CanDrawSurfaceEdge(SithSurface *a1, int a2, int a3)
     unsigned int v25; // [esp+1Ch] [ebp-8h]
     SithSurfaceAdjoin *v26; // [esp+28h] [ebp+4h]
 
-    parent_sector = a1->parent_sector;
-    v24 = parent_sector;
+    pSector = a1->pSector;
+    v24 = pSector;
     v20 = 0;
-    sector_numSurfaces = parent_sector->numSurfaces;
-    sector_paSurfaces = parent_sector->surfaces;
+    sector_numSurfaces = pSector->numSurfaces;
+    sector_paSurfaces = pSector->surfaces;
     sector_paSurfaces_ = sector_paSurfaces;
     sector_numSurfaces_ = sector_numSurfaces;
     if ( sector_numSurfaces )
@@ -459,7 +459,7 @@ int sithOverlayMap_CanDrawSurfaceEdge(SithSurface *a1, int a2, int a3)
         v6 = &sector_paSurfaces[0];
         while ( 1 )
         {
-            if ( sector_paSurfaces != a1 && !v6->adjoin )
+            if ( sector_paSurfaces != a1 && !v6->pAdjoin )
             {
                 v7 = v6->surfaceInfo.face.numVertices;
                 v8 = 0;
@@ -474,7 +474,7 @@ LABEL_11:
             ++v20;
             if ( !v11 )
             {
-                parent_sector = v24;
+                pSector = v24;
                 goto LABEL_13;
             }
         }
@@ -493,12 +493,12 @@ LABEL_11:
                 goto LABEL_11;
             }
         }
-        result = (sector_paSurfaces_->surfaceFlags & SITH_SURFACE_FLOOR) == 0;
+        result = (sector_paSurfaces_->flags & SITH_SURFACE_FLOOR) == 0;
     }
     else
     {
 LABEL_13:
-        v26 = parent_sector->adjoins;
+        v26 = pSector->adjoins;
         if ( v26 )
         {
             while ( 1 )
@@ -517,7 +517,7 @@ LABEL_24:
             v14 = &v12->surfaces[0];
             while ( 1 )
             {
-                if (v14->surfaceFlags & SITH_SURFACE_FLOOR)
+                if (v14->flags & SITH_SURFACE_FLOOR)
                 {
                     v15 = v14->surfaceInfo.face.numVertices;
                     v16 = 0;

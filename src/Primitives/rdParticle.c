@@ -41,11 +41,11 @@ int rdParticle_NewEntry(rdParticle *particle, int numVertices, flex_t size, rdMa
 
     if (allocateVertices)
     {
-        particle->vertices = (rdVector3 *)RDROID_ALLOC(sizeof(rdVector3) * numVertices);
+        particle->aVertices = (rdVector3 *)RDROID_ALLOC(sizeof(rdVector3) * numVertices);
         particle->vertexCel = (int *)RDROID_ALLOC(sizeof(int) * particle->numVertices);
-        if (particle->vertices && particle->vertexCel)
+        if (particle->aVertices && particle->vertexCel)
         {
-            _memset(particle->vertices, 0, sizeof(rdVector3) * particle->numVertices);
+            _memset(particle->aVertices, 0, sizeof(rdVector3) * particle->numVertices);
             _memset(particle->vertexCel, 0xFF, sizeof(int) * particle->numVertices);
             return 1;
         }
@@ -54,7 +54,7 @@ int rdParticle_NewEntry(rdParticle *particle, int numVertices, flex_t size, rdMa
     }
     else
     {
-        particle->vertices = 0;
+        particle->aVertices = 0;
         particle->vertexCel = 0;
         return 1;
     }
@@ -70,7 +70,7 @@ rdParticle* rdParticle_Duplicate(rdParticle *particle)
     if (clonedPart)
     {
         rdParticle_NewEntry(clonedPart, particle->numVertices, particle->diameter, particle->material, particle->lightingMode, 1);
-        _memcpy(clonedPart->vertices, particle->vertices, sizeof(rdVector3) * particle->numVertices);
+        _memcpy(clonedPart->aVertices, particle->aVertices, sizeof(rdVector3) * particle->numVertices);
         _memcpy(clonedPart->vertexCel, particle->vertexCel, sizeof(int) * particle->numVertices);
     }
 
@@ -91,12 +91,12 @@ void rdParticle_FreeEntry(rdParticle *particle)
 {
     if (particle->hasVertices)
     {
-        if (!particle->vertices)
+        if (!particle->aVertices)
             return;
-        RDROID_FREE(particle->vertices);
+        RDROID_FREE(particle->aVertices);
         RDROID_FREE(particle->vertexCel);
     }
-    particle->vertices = NULL;
+    particle->aVertices = NULL;
     particle->vertexCel = NULL;
 }
 
@@ -204,14 +204,14 @@ int rdParticle_LoadEntry(char *fpath, rdParticle *pParticle)
         goto done_close;
 
     uint32_t numVertices;
-    if ( _sscanf(stdConffile_g_aLine, " vertices %d", &numVertices) == 1
+    if ( _sscanf(stdConffile_g_aLine, " aVertices %d", &numVertices) == 1
       && numVertices <= 0x100 )
     {
         pParticle->numVertices = numVertices;
         v13 = (rdVector3 *)RDROID_ALLOC(sizeof(rdVector3) * numVertices);
-        pParticle->vertices = v13;
+        pParticle->aVertices = v13;
         pParticle->vertexCel = (int*)RDROID_ALLOC(sizeof(int) * numVertices);
-        v16 = pParticle->vertices;
+        v16 = pParticle->aVertices;
         if ( v16 && pParticle->vertexCel)
         {
             v17 = pParticle->vertexCel;
@@ -283,9 +283,9 @@ int rdParticle_Write(char *writePath, rdParticle *particle, char *madeBy)
                 v3,
                 "  %3d: %10.6f %10.6f %10.6f %d\n",
                 v4,
-                particle->vertices[v6].x,
-                particle->vertices[v6].y,
-                particle->vertices[v6].z,
+                particle->aVertices[v6].x,
+                particle->aVertices[v6].y,
+                particle->aVertices[v6].z,
                 particle->vertexCel[v4]);
             ++v4;
             ++v6;
@@ -359,7 +359,7 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
         }
         if ( v35 >= particle->lightingMode )
             v35 = particle->lightingMode;
-        rdMatrix_TransformPointList34(&out, particle->vertices, &aParticleVertices[0], particle->numVertices);
+        rdMatrix_TransformPointList34(&out, particle->aVertices, &aParticleVertices[0], particle->numVertices);
         v32 = 0;
         if ( !particle->numVertices )
             return 1;
@@ -405,7 +405,7 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
             v27 = v26;
             if ( v26 >= 3 )
             {
-                rdCamera_g_pCurCamera->fnProjectLst(v5->vertices, aParticleVerticesTmp, v26);
+                rdCamera_g_pCurCamera->fnProjectLst(v5->aVertices, aParticleVerticesTmp, v26);
                 v5->lightingMode = v35;
                 v29 = particle->vertexCel;
                 v5->material = particle->material;

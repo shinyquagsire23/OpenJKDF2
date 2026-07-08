@@ -184,7 +184,7 @@ int rdSetMipDistances(rdVector4 *dists)
         once = 0;
     }
     if (!once) {
-        origLod = sithWorld_g_pCurrentWorld->lodDistance;
+        origLod = sithWorld_g_pCurrentWorld->distancesLOD;
         origGourad = sithWorld_g_pCurrentWorld->gouradDistance;
         origPerspective = sithWorld_g_pCurrentWorld->perspectiveDistance;
         once = 1;
@@ -201,10 +201,10 @@ int rdSetMipDistances(rdVector4 *dists)
     rdroid_aMipDistances.w *= scale_factor;
 
     if (sithWorld_g_pCurrentWorld) {
-        sithWorld_g_pCurrentWorld->lodDistance.x = origLod.x * scale_factor;
-        sithWorld_g_pCurrentWorld->lodDistance.y = origLod.y * scale_factor;
-        sithWorld_g_pCurrentWorld->lodDistance.z = origLod.z * scale_factor;
-        sithWorld_g_pCurrentWorld->lodDistance.w = origLod.w * scale_factor;
+        sithWorld_g_pCurrentWorld->distancesLOD.x = origLod.x * scale_factor;
+        sithWorld_g_pCurrentWorld->distancesLOD.y = origLod.y * scale_factor;
+        sithWorld_g_pCurrentWorld->distancesLOD.z = origLod.z * scale_factor;
+        sithWorld_g_pCurrentWorld->distancesLOD.w = origLod.w * scale_factor;
         sithWorld_g_pCurrentWorld->gouradDistance = origGourad * scale_factor;
         sithWorld_g_pCurrentWorld->perspectiveDistance = origPerspective * scale_factor;
     }

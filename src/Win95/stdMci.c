@@ -150,7 +150,7 @@ flex_d_t stdMci_GetTrackLength(int track)
 // unusable in practice -- the GD drive can't serve data-sector reads while
 // playing audio (any read stops playback, and reads racing a PLAY command
 // return garbage that permanently poisons KOS's iso9660 sector cache), and this
-// engine streams materials/sounds from disc constantly. See the ADPCM streaming
+// engine streams aMaterials/sounds from disc constantly. See the ADPCM streaming
 // implementation below instead.
 
 int stdMci_dcFrom = 0;

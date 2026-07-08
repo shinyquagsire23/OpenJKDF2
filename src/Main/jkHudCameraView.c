@@ -196,7 +196,7 @@ void jkHudCameraView_Draw(void)
     return;
 #endif
     if (!jkHudCameraView_bOpened) return;
-    if (sithWorld_g_pCurrentWorld->playerThing->type != SITH_THING_PLAYER) return;
+    if (sithWorld_g_pCurrentWorld->pLocalPlayer->type != SITH_THING_PLAYER) return;
 
     jkHudMotsBitmap* pBmIter = jkHudCameraView_aBitmaps;
 

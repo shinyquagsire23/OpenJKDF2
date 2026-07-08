@@ -738,8 +738,8 @@ void sithSoundMixer_TickSectorSound()
         }
     }*/
 
-    lastSectorFadingOutSound = sithSoundMixer_pCurSector->sectorSound;
-    if ( sithSoundMixer_pCurSector->sectorSoundVol == 0.0 )
+    lastSectorFadingOutSound = sithSoundMixer_pCurSector->hAmbientSound;
+    if ( sithSoundMixer_pCurSector->ambientSoundVolume == 0.0 )
         lastSectorFadingOutSound = NULL;
     v3 = sithSoundMixer_hCurAmbientChannel;
     if (!lastSectorFadingOutSound && sithSoundMixer_hCurAmbientChannel)
@@ -775,13 +775,13 @@ void sithSoundMixer_TickSectorSound()
         sithSoundMixer_hCurAmbientChannel = sithSoundMixer_StopSectorSound(lastSectorFadingOutSound);
 
         if (sithSoundMixer_hCurAmbientChannel)
-            sithSoundMixer_FadeVolume(sithSoundMixer_hCurAmbientChannel, sithSoundMixer_pCurSector->sectorSoundVol, 0.5);
+            sithSoundMixer_FadeVolume(sithSoundMixer_hCurAmbientChannel, sithSoundMixer_pCurSector->ambientSoundVolume, 0.5);
         return;
     }
 
     if (sithSoundMixer_hCurAmbientChannel->sound == lastSectorFadingOutSound)
     {
-        v13 = stdMath_Clamp(sithSoundMixer_pCurSector->sectorSoundVol, 0.0, 1.5);
+        v13 = stdMath_Clamp(sithSoundMixer_pCurSector->ambientSoundVolume, 0.0, 1.5);
         v14 = v13 - sithSoundMixer_hCurAmbientChannel->vol_2;
         if ( v14 == 0.0 )
             return;
@@ -812,7 +812,7 @@ void sithSoundMixer_TickSectorSound()
         sithSoundMixer_hCurAmbientChannel = v3;
         if (!v3)
             return;
-        v13 = stdMath_Clamp(sithSoundMixer_pCurSector->sectorSoundVol, 0.0, 1.5);
+        v13 = stdMath_Clamp(sithSoundMixer_pCurSector->ambientSoundVolume, 0.0, 1.5);
         v31 = v13 - v3->vol_2;
         if (v31 == 0.0)
             return;
@@ -843,7 +843,7 @@ void sithSoundMixer_Update(flex_t deltaSecs)
     if ( (sithCamera_g_pCurCamera->cameraPerspective & 0xFC) != 0 )
         sithSoundMixer_pFocusedThing = 0;
     else
-        sithSoundMixer_pFocusedThing = sithWorld_g_pCurrentWorld->cameraFocus;
+        sithSoundMixer_pFocusedThing = sithWorld_g_pCurrentWorld->pCameraFocusThing;
 
     // This was inlined, TODO check Jones3D and see if it had a name
     sithSoundMixer_TickSectorSound();
@@ -1188,8 +1188,8 @@ void sithSoundMixer_UpdatePlayingSoundPosition(sithPlayingSound *sound)
 
 void sithSoundMixer_SetSectorAmbientSound(SithSector *sector, sithSound *sound, flex_t vol)
 {
-    sector->sectorSound = sound;
-    sector->sectorSoundVol = vol;
+    sector->hAmbientSound = sound;
+    sector->ambientSoundVolume = vol;
     if ( sithSoundMixer_pCurSector == sector )
         sithSoundMixer_pCurSector = 0;
 }

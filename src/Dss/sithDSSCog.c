@@ -22,14 +22,14 @@ int sithDSSCog_SendMessage(sithCog *a1, int a2, int a3, int a4, int a5, int a6, 
     NETMSG_PUSHU8(a5);
 
     if ( a3 == 3 && (v13 = sithThing_GetThingByIndex(a4)) != 0 ) {
-        NETMSG_PUSHS32(v13->thing_id);
+        NETMSG_PUSHS32(v13->guid);
     }
     else {
         NETMSG_PUSHS32(a4);
     }
 
     if ( a5 == 3 && (v14 = sithThing_GetThingByIndex(a6)) != 0 ) {
-        NETMSG_PUSHS32(v14->thing_id);
+        NETMSG_PUSHS32(v14->guid);
     }
     else {
         NETMSG_PUSHS32(a6);
@@ -80,13 +80,13 @@ int sithDSSCog_ProcessMessage(SithMessage *in_netMsg)
     {
         v6 = sithThing_GetGuidThing(senderIdx);
         if ( v6 )
-            senderIdx = v6->thingIdx;
+            senderIdx = v6->idx;
     }
     if ( sourceType == SENDERTYPE_THING )
     {
         v7 = sithThing_GetGuidThing(sourceIndex);
         if ( v7 )
-            sourceIndex = v7->thingIdx;
+            sourceIndex = v7->idx;
     }
     msgid = NETMSG_POPS16() & 0xFF;
     param0 = NETMSG_POPF32();
@@ -102,7 +102,7 @@ int sithDSSCog_ProcessMessage(SithMessage *in_netMsg)
     if ( senderType == SENDERTYPE_THING )
     {
         v12 = sithThing_GetThingByIndex(senderIdx);
-        if ( !v12 || (v12->thingflags & SITH_TF_CAPTURED) == 0 )
+        if ( !v12 || (v12->flags & SITH_TF_CAPTURED) == 0 )
             return 1;
     }
     sithCog_SendMessageEx(cog, msgid, senderType, senderIdx, sourceType, sourceIndex, linkId, param0, param1, param2, param3);

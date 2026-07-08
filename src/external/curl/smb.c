@@ -232,7 +232,7 @@ static void request_state(struct Curl_easy *data,
   req->state = newstate;
 }
 
-/* this should setup things in the connection, not in the easy
+/* this should setup aThings in the connection, not in the easy
    handle */
 static CURLcode smb_setup_connection(struct Curl_easy *data,
                                      struct connectdata *conn)

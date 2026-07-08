@@ -1211,27 +1211,27 @@ int jkDev_CmdNoclip(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     SithThing *v0; // ecx
     wchar_t *v3; // eax
 
-    if (!sithWorld_g_pCurrentWorld || !sithWorld_g_pCurrentWorld->playerThing) {
+    if (!sithWorld_g_pCurrentWorld || !sithWorld_g_pCurrentWorld->pLocalPlayer) {
         sithConsole_PrintString("No world.");
         return 0;
     }
 
-    v0 = sithWorld_g_pCurrentWorld->playerThing;
+    v0 = sithWorld_g_pCurrentWorld->pLocalPlayer;
 
     if ( v0->moveType == SITH_MT_PHYSICS )
     {
         if ((g_debugmodeFlags & DEBUGFLAG_NOCLIP))
         {
-            v0->physicsParams.physflags &= ~SITH_PF_FLY;
-            v0->physicsParams.physflags |= SITH_PF_USEGRAVITY;
+            v0->physicsParams.flags &= ~SITH_PF_FLY;
+            v0->physicsParams.flags |= SITH_PF_USEGRAVITY;
             g_debugmodeFlags &= ~DEBUGFLAG_NOCLIP;
             sithPlayer_bNoClippingRend = 0;
             sithConsole_PrintString("Noclip OFF");
         }
         else
         {
-            v0->physicsParams.physflags &= ~SITH_PF_USEGRAVITY;
-            v0->physicsParams.physflags |= SITH_PF_FLY;
+            v0->physicsParams.flags &= ~SITH_PF_USEGRAVITY;
+            v0->physicsParams.flags |= SITH_PF_FLY;
             g_debugmodeFlags |= DEBUGFLAG_NOCLIP;
             sithConsole_PrintString("Noclip ON");
         }

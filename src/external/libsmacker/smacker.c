@@ -1490,7 +1490,7 @@ char smk_seek_keyframe(smk s, uint32_t f)
 	/* rewind (or fast forward!) exactly to f */
 	s->cur_frame = f;
 
-	/* roll back to previous keyframe in stream, or 0 if no keyframes exist */
+	/* roll back to previous keyframe in stream, or 0 if no aKeyframes exist */
 	while (s->cur_frame > 0 && !(s->keyframe[s->cur_frame]))
 	{
 		s->cur_frame --;
@@ -1517,7 +1517,7 @@ char smk_seek_keyframe_ahead(smk s, uint32_t f)
 	/* rewind (or fast forward!) exactly to f */
 	s->cur_frame = f;
 
-	/* roll back to previous keyframe in stream, or 0 if no keyframes exist */
+	/* roll back to previous keyframe in stream, or 0 if no aKeyframes exist */
 	while (s->cur_frame > 0 && !(s->keyframe[s->cur_frame]))
 	{
 		s->cur_frame++;

@@ -132,10 +132,10 @@ int sithCommand_DebugMode(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         case 5u:
             if ( !sithWorld_g_pCurrentWorld )
                 goto LABEL_24;
-            v4 = sithWorld_g_pCurrentWorld->playerThing;
+            v4 = sithWorld_g_pCurrentWorld->pLocalPlayer;
             if ( !v4 || v4->type != SITH_THING_PLAYER )
                 goto LABEL_24;
-            v2 = (int*)&v4->actorParams.typeflags;
+            v2 = (int*)&v4->actorParams.flags;
             v3 = 8;
 LABEL_13:
             if ( pArgStr )
@@ -247,9 +247,9 @@ int sithCommand_CogTrace(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         if ( pArgStr )
         {
             v3 = _atoi(pArgStr);
-            if ( v3 < sithWorld_g_pCurrentWorld->numCogsLoaded )
+            if ( v3 < sithWorld_g_pCurrentWorld->numCogs )
             {
-                v4 = &sithWorld_g_pCurrentWorld->cogs[v3];
+                v4 = &sithWorld_g_pCurrentWorld->aCogs[v3];
                 if ( (v4->flags & SITH_COG_DEBUG) != 0 )
                 {
                     sithConsole_PrintString("Cog trace disabled.");
@@ -294,9 +294,9 @@ int sithCommand_CogPause(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         if ( pArgStr )
         {
             v3 = _atoi(pArgStr);
-            if ( v3 < sithWorld_g_pCurrentWorld->numCogsLoaded )
+            if ( v3 < sithWorld_g_pCurrentWorld->numCogs )
             {
-                v4 = &sithWorld_g_pCurrentWorld->cogs[v3];
+                v4 = &sithWorld_g_pCurrentWorld->aCogs[v3];
                 if ( (v4->flags & SITH_COG_DISABLED) != 0 )
                 {
                     sithConsole_PrintString("Cog enabled.");
@@ -338,10 +338,10 @@ int sithCommand_CogList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     if ( sithWorld_g_pCurrentWorld )
     {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-        _sprintf(std_g_genBuffer, "World cogs = %d.", sithWorld_g_pCurrentWorld->numCogsLoaded);
+        _sprintf(std_g_genBuffer, "World aCogs = %d.", sithWorld_g_pCurrentWorld->numCogs);
         sithConsole_PrintString(std_g_genBuffer);
         v3 = 0;
-        for ( i = sithWorld_g_pCurrentWorld->cogs; v3 < sithWorld_g_pCurrentWorld->numCogsLoaded; ++i )
+        for ( i = sithWorld_g_pCurrentWorld->aCogs; v3 < sithWorld_g_pCurrentWorld->numCogs; ++i )
         {
             _sprintf(std_g_genBuffer, "%d: %-16s %-16s ", v3, i->cogscript_fpath, i->cogscript->cog_fpath);
             if ( (i->flags & SITH_COG_DISABLED) != 0 )
@@ -368,20 +368,20 @@ int sithCommand_Fly(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     SithThing *v0; // ecx
     wchar_t *v3; // eax
 
-    if ( sithWorld_g_pCurrentWorld && (v0 = sithWorld_g_pCurrentWorld->playerThing) != 0 )
+    if ( sithWorld_g_pCurrentWorld && (v0 = sithWorld_g_pCurrentWorld->pLocalPlayer) != 0 )
     {
         if ( v0->moveType == SITH_MT_PHYSICS )
         {
-            if (v0->physicsParams.physflags & SITH_PF_FLY)
+            if (v0->physicsParams.flags & SITH_PF_FLY)
             {
-                v0->physicsParams.physflags &= ~SITH_PF_FLY;
-                v0->physicsParams.physflags |= SITH_PF_USEGRAVITY;
+                v0->physicsParams.flags &= ~SITH_PF_FLY;
+                v0->physicsParams.flags |= SITH_PF_USEGRAVITY;
                 v3 = sithStrTable_GetUniStringWithFallback("FLYING_OFF");
             }
             else
             {
-                v0->physicsParams.physflags &= ~SITH_PF_USEGRAVITY;
-                v0->physicsParams.physflags |= SITH_PF_FLY;
+                v0->physicsParams.flags &= ~SITH_PF_USEGRAVITY;
+                v0->physicsParams.flags |= SITH_PF_FLY;
                 v3 = sithStrTable_GetUniStringWithFallback("FLYING_ON");
             }
             sithConsole_PrintWString(v3);
@@ -442,7 +442,7 @@ int sithCommand_Memory(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     sithConsole_PrintString(std_g_genBuffer);
     _sprintf(std_g_genBuffer, "Total Memory Used:   %8d bytes.", worldAllocatedAmt[4] + worldAllocatedAmt[5] + worldAllocatedAmt[3] + worldAllocatedAmt[2] + worldAllocatedAmt[1] + worldAllocatedAmt[11] + worldAllocatedAmt[10] + worldAllocatedAmt[0]);
     sithConsole_PrintString(std_g_genBuffer);
-    sithConsole_PrintString("(Total does not include sounds & cogs)"); 
+    sithConsole_PrintString("(Total does not include sounds & aCogs)"); 
     
     return 1;
 }
@@ -493,11 +493,11 @@ int sithCommand_Coords(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     signed int result; // eax
     rdVector3 a2; // [esp+38h] [ebp-Ch] BYREF
 
-    if ( sithWorld_g_pCurrentWorld && (player = sithWorld_g_pCurrentWorld->playerThing) != 0 )
+    if ( sithWorld_g_pCurrentWorld && (player = sithWorld_g_pCurrentWorld->pLocalPlayer) != 0 )
     {
         if ( player->sector )
         {
-            rdMatrix_ExtractAngles34(&player->lookOrientation, &a2);
+            rdMatrix_ExtractAngles34(&player->orient, &a2);
             _sprintf(
                 std_g_genBuffer,
                 "Pos: (%.2f, %.2f, %.2f) PYR: (%.2f, %.2f, %.2f) Sector: %d.",
@@ -536,7 +536,7 @@ int sithCommand_Warp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     rdVector3 a3a; // [esp+1Ch] [ebp-3Ch] BYREF
     rdMatrix34 a; // [esp+28h] [ebp-30h] BYREF
 
-    if ( !sithWorld_g_pCurrentWorld || (v3 = sithWorld_g_pCurrentWorld->playerThing) == 0 )
+    if ( !sithWorld_g_pCurrentWorld || (v3 = sithWorld_g_pCurrentWorld->pLocalPlayer) == 0 )
     {
         sithConsole_PrintString("No world.");
         return 0;
@@ -561,7 +561,7 @@ int sithCommand_Warp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     else
         rdMatrix_Identity34(&a);
 
-    v6 = sithWorld_g_pCurrentWorld->sectors;
+    v6 = sithWorld_g_pCurrentWorld->aSectors;
     for ( i = 0; i < sithWorld_g_pCurrentWorld->numSectors; ++v6 )
     {
         if ( sithIntersect_IsSphereInSector(&a1, 0.0, v6) )
@@ -593,7 +593,7 @@ int sithCommand_Activate(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     // Added: fixed a nullptr dereference
     if (!pArgStr) return 0;
 
-    if ( sithWorld_g_pCurrentWorld && (v2 = sithWorld_g_pCurrentWorld->playerThing) != 0 )
+    if ( sithWorld_g_pCurrentWorld && (v2 = sithWorld_g_pCurrentWorld->pLocalPlayer) != 0 )
     {
         if ( _sscanf(pArgStr, "%d", &tmp) >= 1
           && tmp >= 0
@@ -606,7 +606,7 @@ int sithCommand_Activate(stdDebugConsoleCmd *pCmd, const char *pArgStr)
                 SENDERTYPE_0,
                 tmp,
                 SENDERTYPE_THING,
-                v2->thingIdx,
+                v2->idx,
                 0);
             return 1;
         }
@@ -733,10 +733,10 @@ int sithCommand_MatList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     }
 
     // Allocate array: [matIdx, numFaces, totalBytes, bytesPerFace] per material
-    int (*matInfo)[4] = (int(*)[4])SITH_ALLOC(pWorld->numMaterials * sizeof(int[4]));
+    int (*matInfo)[4] = (int(*)[4])SITH_ALLOC(pWorld->sizeMaterials * sizeof(int[4]));
 
     // Initialize
-    for (int i = 0; i < pWorld->numMaterials; i++)
+    for (int i = 0; i < pWorld->sizeMaterials; i++)
     {
         matInfo[i][0] = i;
         matInfo[i][1] = 0;
@@ -748,13 +748,13 @@ int sithCommand_MatList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         rdMaterial *mat = pWorld->surfaces[i].surfaceInfo.face.material;
         if ( mat )
         {
-            int matIdx = (int)(mat - pWorld->materials);
+            int matIdx = (int)(mat - pWorld->aMaterials);
             matInfo[matIdx][1]++;
         }
     }
 
     // Calculate memory per material
-    for (int i = 0; i < pWorld->numMaterials; i++)
+    for (int i = 0; i < pWorld->sizeMaterials; i++)
     {
         if ( matInfo[i][1] == 0 )
         {
@@ -763,21 +763,21 @@ int sithCommand_MatList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         }
         else
         {
-            uint32_t memSize = sithMaterial_GetMemorySize(&pWorld->materials[i]);
+            uint32_t memSize = sithMaterial_GetMemorySize(&pWorld->aMaterials[i]);
             matInfo[i][3] = memSize;
             matInfo[i][2] = memSize / matInfo[i][1];
         }
     }
 
     // Sort by total bytes descending
-    _qsort(matInfo, pWorld->numMaterials, sizeof(int[4]), sithCommand_CompareMatInfos);
+    _qsort(matInfo, pWorld->sizeMaterials, sizeof(int[4]), sithCommand_CompareMatInfos);
 
-    for (int i = 0; i < pWorld->numMaterials; i++)
+    for (int i = 0; i < pWorld->sizeMaterials; i++)
     {
         if ( matInfo[i][2] != 0 )
         {
             _sprintf(std_g_genBuffer, "%-16s  %d faces, %d bytes, %d bytes/face",
-                     pWorld->materials[matInfo[i][0]].mat_fpath,
+                     pWorld->aMaterials[matInfo[i][0]].mat_fpath,
                      matInfo[i][1], matInfo[i][3], matInfo[i][2]);
             sithConsole_PrintString(std_g_genBuffer);
         }
@@ -812,13 +812,13 @@ int sithCommand_CmdThingNpc(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             return 1;
         }
         
-        SithThing* pTemplate = sithTemplate_GetTemplate(pArgIter);
-        if (!pTemplate) {
+        SithThing* pCreateThingTemplate = sithTemplate_GetTemplate(pArgIter);
+        if (!pCreateThingTemplate) {
             sithConsole_PrintString("No template by that name.");
         }
-        else if (pTemplate && sithWorld_g_pCurrentWorld && sithPlayer_g_pLocalPlayerThing) {
-            //SithThing* pSpawned = sithThing_CreateThing(pTemplate, sithPlayer_g_pLocalPlayerThing);
-            SithThing* pSpawned = sithPlayerActions_SpawnThingAtLookAt(sithPlayer_g_pLocalPlayerThing, pTemplate);
+        else if (pCreateThingTemplate && sithWorld_g_pCurrentWorld && sithPlayer_g_pLocalPlayerThing) {
+            //SithThing* pSpawned = sithThing_CreateThing(pCreateThingTemplate, sithPlayer_g_pLocalPlayerThing);
+            SithThing* pSpawned = sithPlayerActions_SpawnThingAtLookAt(sithPlayer_g_pLocalPlayerThing, pCreateThingTemplate);
         }
         else {
             sithConsole_PrintString("No world.");

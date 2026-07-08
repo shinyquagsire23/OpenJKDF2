@@ -87,9 +87,9 @@ struct io_ctx {
 };
 
 static int
-read_cb(void *userdata, uint8_t *buf, uintptr_t len, uintptr_t *out_n)
+read_cb(void *userval, uint8_t *buf, uintptr_t len, uintptr_t *out_n)
 {
-  struct io_ctx *io_ctx = userdata;
+  struct io_ctx *io_ctx = userval;
   CURLcode result;
   int ret = 0;
   ssize_t nread = Curl_conn_cf_recv(io_ctx->cf->next, io_ctx->data,
@@ -106,9 +106,9 @@ read_cb(void *userdata, uint8_t *buf, uintptr_t len, uintptr_t *out_n)
 }
 
 static int
-write_cb(void *userdata, const uint8_t *buf, uintptr_t len, uintptr_t *out_n)
+write_cb(void *userval, const uint8_t *buf, uintptr_t len, uintptr_t *out_n)
 {
-  struct io_ctx *io_ctx = userdata;
+  struct io_ctx *io_ctx = userval;
   CURLcode result;
   int ret = 0;
   ssize_t nwritten = Curl_conn_cf_send(io_ctx->cf->next, io_ctx->data,
@@ -321,7 +321,7 @@ cr_send(struct Curl_cfilter *cf, struct Curl_easy *data,
 /* A server certificate verify callback for rustls that always returns
    RUSTLS_RESULT_OK, or in other words disable certificate verification. */
 static enum rustls_result
-cr_verify_none(void *userdata UNUSED_PARAM,
+cr_verify_none(void *userval UNUSED_PARAM,
                const rustls_verify_server_cert_params *params UNUSED_PARAM)
 {
   return RUSTLS_RESULT_OK;

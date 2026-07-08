@@ -717,7 +717,7 @@ gtls_connect_step1(struct Curl_cfilter *cf, struct Curl_easy *data)
   }
 
   /* This might be a reconnect, so we check for a session ID in the cache
-     to speed up things */
+     to speed up aThings */
   if(conn_config->sessionid) {
     void *ssl_sessionid;
     size_t ssl_idsize;

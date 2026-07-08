@@ -42,29 +42,29 @@ rdParticle* sithParticle_Load(const char *a1)
     char v6[128]; // [esp+Ch] [ebp-80h] BYREF
 
     v1 = sithWorld_g_pLastLoadedWorld;
-    if ( !sithWorld_g_pLastLoadedWorld->particles )
+    if ( !sithWorld_g_pLastLoadedWorld->aParticles )
     {
         v2 = (rdParticle *)SITH_ALLOC(SITHPARTICLE_MAX_PARTICLES * sizeof(rdParticle));
-        v1->particles = v2;
+        v1->aParticles = v2;
         if ( v2 )
         {
-            v1->numParticles = SITHPARTICLE_MAX_PARTICLES;
-            v1->numParticlesLoaded = 0;
+            v1->sizeParticles = SITHPARTICLE_MAX_PARTICLES;
+            v1->numParticles = 0;
             _memset(v2, 0, SITHPARTICLE_MAX_PARTICLES * sizeof(rdParticle));
         }
     }
     result = (rdParticle *)stdHashtbl_Find(sithParticle_alloc, a1);
     if ( !result )
     {
-        v4 = v1->numParticlesLoaded;
-        if ( v4 < v1->numParticles )
+        v4 = v1->numParticles;
+        if ( v4 < v1->sizeParticles )
         {
-            v5 = &v1->particles[v4];
+            v5 = &v1->aParticles[v4];
             _sprintf(v6, "%s%c%s", "misc\\par", '\\', a1);
             if ( rdParticle_LoadEntry(v6, v5) )
             {
                 stdHashtbl_Add(sithParticle_alloc, v5->name, v5);
-                ++v1->numParticlesLoaded;
+                ++v1->numParticles;
                 result = v5;
             }
         }
@@ -76,17 +76,17 @@ rdParticle* sithParticle_Load(const char *a1)
     return result;
 }
 
-int sithParticle_AllocWorldParticles(SithWorld *world, int numParticles)
+int sithParticle_AllocWorldParticles(SithWorld *world, int sizeParticles)
 {
     rdParticle *newParticle; // edi
 
-    newParticle = (rdParticle *)SITH_ALLOC(sizeof(rdParticle) * numParticles);
-    world->particles = newParticle;
+    newParticle = (rdParticle *)SITH_ALLOC(sizeof(rdParticle) * sizeParticles);
+    world->aParticles = newParticle;
     if ( !newParticle )
         return 0;
-    world->numParticles = numParticles;
-    world->numParticlesLoaded = 0;
-    _memset(newParticle, 0, sizeof(rdParticle) * numParticles);
+    world->sizeParticles = sizeParticles;
+    world->numParticles = 0;
+    _memset(newParticle, 0, sizeof(rdParticle) * sizeParticles);
     return 1;
 }
 
@@ -95,7 +95,7 @@ int sithParticle_ParseArg(StdConffileArg *arg, SithThing *thing, int param)
     switch (param)
     {
         case THINGPARAM_TYPEFLAGS:
-            if ( _sscanf(arg->value, "%x", &thing->particleParams.typeFlags) == 1 )
+            if ( _sscanf(arg->value, "%x", &thing->particleParams.flags) == 1 )
                 return 1;
             return 0;
 
@@ -120,11 +120,11 @@ int sithParticle_ParseArg(StdConffileArg *arg, SithThing *thing, int param)
             return 1;
 
         case THINGPARAM_ELEMENTSIZE:
-            thing->particleParams.elementSize = _atof(arg->value);
+            thing->particleParams.size = _atof(arg->value);
             return 1;
 
         case THINGPARAM_MINSIZE:
-            thing->particleParams.minSize = _atof(arg->value);
+            thing->particleParams.minRadius = _atof(arg->value);
             return 1;
 
         case THINGPARAM_PITCHRANGE:
@@ -143,7 +143,7 @@ int sithParticle_ParseArg(StdConffileArg *arg, SithThing *thing, int param)
 void sithParticle_Update(SithThing *particle, flex_t deltaMs)
 {
     flex_d_t v2; // st7
-    char typeFlags; // al
+    char flags; // al
     unsigned int i; // edi
     rdParticle *v5; // eax
     int v6; // ebp
@@ -160,14 +160,14 @@ void sithParticle_Update(SithThing *particle, flex_t deltaMs)
     flex_t deltaMsa; // [esp+4Ch] [ebp+8h]
 
     v2 = deltaMs + particle->particleParams.field_2C;
-    typeFlags = particle->particleParams.typeFlags;
+    flags = particle->particleParams.flags;
     particle->particleParams.field_2C = v2;
-    if ( (typeFlags & SITHPARTICLE_FLAG_RANDOM_CEL_CHANGE) != 0 )
+    if ( (flags & SITHPARTICLE_FLAG_RANDOM_CEL_CHANGE) != 0 )
     {
         i = 0;
-        v5 = particle->rdthing.particlecloud;
+        v5 = particle->renderData.particlecloud;
         v6 = particle->particleParams.material->num_texinfo;
-        v16 = v2 * 1000.0 / (flex_d_t)(unsigned int)particle->lifeLeftMs * deltaMs;
+        v16 = v2 * 1000.0 / (flex_d_t)(unsigned int)particle->msecLifeLeft * deltaMs;
         if ( v5->numVertices )
         {
             do
@@ -177,17 +177,17 @@ void sithParticle_Update(SithThing *particle, flex_t deltaMs)
                 {
                     if ( (flex_d_t)v7 * v16 > _frand() )
                     {
-                        v8 = &particle->rdthing.particlecloud->vertexCel[i];
+                        v8 = &particle->renderData.particlecloud->vertexCel[i];
                         ++*v8;
                     }
                 }
-                v5 = particle->rdthing.particlecloud;
+                v5 = particle->renderData.particlecloud;
                 ++i;
             }
             while ( i < v5->numVertices );
         }
     }
-    if ( (particle->particleParams.typeFlags & SITHPARTICLE_FLAG_OUTWARD_EXPANDING) != 0 )
+    if ( (particle->particleParams.flags & SITHPARTICLE_FLAG_OUTWARD_EXPANDING) != 0 )
     {
         if ( particle->particleParams.field_28 < 0.01)
         {
@@ -209,8 +209,8 @@ void sithParticle_Update(SithThing *particle, flex_t deltaMs)
         a2a.y = v11;
         a2a.x = v11;
         rdMatrix_BuildScale34(&a1a, &a2a);
-        rdMatrix_PostMultiply34(&particle->lookOrientation, &a1a);
-        particle->rdthing.particlecloud->cloudRadius = particle->rdthing.particlecloud->cloudRadius * deltaMsa;
+        rdMatrix_PostMultiply34(&particle->orient, &a1a);
+        particle->renderData.particlecloud->cloudRadius = particle->renderData.particlecloud->cloudRadius * deltaMsa;
     }
 }
 
@@ -240,10 +240,10 @@ void sithParticle_Initalize(SithThing *thing)
     flex_t thinga; // [esp+34h] [ebp+4h]
 
     v1 = 2;
-    v3 = &thing->rdthing;
-    if ( thing->rdthing.type == RD_THING_PARTICLE )
+    v3 = &thing->renderData;
+    if ( thing->renderData.type == RD_THING_PARTICLE )
     {
-        v4 = rdParticle_Duplicate(thing->rdthing.particlecloud);
+        v4 = rdParticle_Duplicate(thing->renderData.particlecloud);
         rdThing_SetParticleCloud(v3, v4);
         v5 = v4->numVertices;
         thing->particleParams.material = v4->material;
@@ -254,10 +254,10 @@ void sithParticle_Initalize(SithThing *thing)
     {
         v6 = thing->particleParams.material;
         v7 = v6->num_texinfo;
-        if ( (thing->particleParams.typeFlags & SITHPARTICLE_FLAG_EMIT_LIGHT) != 0 )
+        if ( (thing->particleParams.flags & SITHPARTICLE_FLAG_EMIT_LIGHT) != 0 )
             v1 = 0;
 
-        v8 = rdParticle_New(thing->particleParams.count, thing->particleParams.elementSize, v6, v1, 1);
+        v8 = rdParticle_New(thing->particleParams.count, thing->particleParams.size, v6, v1, 1);
         if ( v8 )
         {
             rdThing_SetParticleCloud(v3, v8);
@@ -269,12 +269,12 @@ void sithParticle_Initalize(SithThing *thing)
                 v21 = 720.0;
             else
                 v21 = thing->particleParams.yawRange + thing->particleParams.yawRange;
-            v9 = thing->particleParams.range - thing->particleParams.minSize;
+            v9 = thing->particleParams.range - thing->particleParams.minRadius;
             v22 = v9;
             if ( v9 <= 0.0 )
                 v22 = 0.0;
             v10 = 0;
-            if ( thing->rdthing.particlecloud->numVertices )
+            if ( thing->renderData.particlecloud->numVertices )
             {
                 v11 = 0;
                 do
@@ -282,21 +282,21 @@ void sithParticle_Initalize(SithThing *thing)
                     v23.x = (_frand() - 0.5) * v20;
                     v23.z = 0.0;
                     v23.y = (_frand() - 0.5) * v21;
-                    thinga = _frand() * v22 + thing->particleParams.minSize;
-                    rdVector_Rotate3(&thing->rdthing.particlecloud->vertices[v11], &rdroid_yVector3, &v23);
-                    v13 = thing->rdthing.particlecloud;
-                    v14 = v13->vertices;
+                    thinga = _frand() * v22 + thing->particleParams.minRadius;
+                    rdVector_Rotate3(&thing->renderData.particlecloud->aVertices[v11], &rdroid_yVector3, &v23);
+                    v13 = thing->renderData.particlecloud;
+                    v14 = v13->aVertices;
                     v15 = v14[v11].x;
                     v16 = &v14[v11];
                     v16->x = v15 * thinga;
                     v16->y = v16->y * thinga;
                     v16->z = v16->z * thinga;
-                    if ( v7 > 1 && (thing->particleParams.typeFlags & SITHPARTICLE_FLAG_RANDOM_START_CEL) != 0 )
+                    if ( v7 > 1 && (thing->particleParams.flags & SITHPARTICLE_FLAG_RANDOM_START_CEL) != 0 )
                     {
                         v17 = (int)(_frand() * (flex_d_t)v7);
                         if ( v17 >= v7 - 1 )
                             v17 = v7 - 1;
-                        v13 = thing->rdthing.particlecloud;
+                        v13 = thing->renderData.particlecloud;
                         v13->vertexCel[v10] = v17;
                     }
                     else
@@ -308,7 +308,7 @@ void sithParticle_Initalize(SithThing *thing)
                 }
                 while ( v10 < v13->numVertices );
             }
-            v18 = thing->rdthing.particlecloud;
+            v18 = thing->renderData.particlecloud;
             v19 = thing->particleParams.range;
             thing->particleParams.field_28 = 1.0;
             v18->cloudRadius = v19;
@@ -321,7 +321,7 @@ void sithParticle_DestroyParticle(SithThing *particle)
     unsigned int v1;
     rdParticle* particlePrim;
 
-    if (!(particle->particleParams.typeFlags & SITHPARTICLE_FLAG_FADE_OUT_OVER_TIME))
+    if (!(particle->particleParams.flags & SITHPARTICLE_FLAG_FADE_OUT_OVER_TIME))
     {
         sithThing_DestroyThing(particle);
         return;
@@ -332,12 +332,12 @@ void sithParticle_DestroyParticle(SithThing *particle)
     if ( !v1 )
         v1 = 1;
 
-    particlePrim = particle->rdthing.particlecloud;
+    particlePrim = particle->renderData.particlecloud;
 
     if (v1 < particlePrim->numVertices)
     {
         particlePrim->numVertices -= v1;
-        particle->lifeLeftMs = (int)(_frand() * 100.0) + 1;
+        particle->msecLifeLeft = (int)(_frand() * 100.0) + 1;
     }
     else
     {
@@ -347,25 +347,25 @@ void sithParticle_DestroyParticle(SithThing *particle)
 
 void sithParticle_Free(SithThing *thing)
 {
-    if (thing->rdthing.particlecloud)
+    if (thing->renderData.particlecloud)
     {
-        rdParticle_Free(thing->rdthing.particlecloud);
-        thing->rdthing.particlecloud = 0;
+        rdParticle_Free(thing->renderData.particlecloud);
+        thing->renderData.particlecloud = 0;
     }
 }
 
 void sithParticle_FreeWorldParticles(SithWorld *world)
 {
-    if (!world->numParticlesLoaded) return;
+    if (!world->numParticles) return;
 
-    for (int i = 0; i < world->numParticlesLoaded; i++)
+    for (int i = 0; i < world->numParticles; i++)
     {
-        stdHashtbl_Remove(sithParticle_alloc, world->particles[i].name);
-        rdParticle_FreeEntry(&world->particles[i]);
+        stdHashtbl_Remove(sithParticle_alloc, world->aParticles[i].name);
+        rdParticle_FreeEntry(&world->aParticles[i]);
     }
     
-    SITH_FREE(world->particles);
-    world->particles = 0;
+    SITH_FREE(world->aParticles);
+    world->aParticles = 0;
+    world->sizeParticles = 0;
     world->numParticles = 0;
-    world->numParticlesLoaded = 0;
 }

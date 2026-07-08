@@ -34,13 +34,13 @@ void sithPlayer_Startup(int idx)
     v1 = &jkPlayer_playerInfos[idx];
     v1->flags = jkPlayer_playerInfos[idx].flags & ~1u;
     v1->net_id = 0;
-    v2 = jkPlayer_playerInfos[idx].playerThing;
+    v2 = jkPlayer_playerInfos[idx].pLocalPlayer;
     if ( v2 )
     {
         if ( sithWorld_g_pCurrentWorld )
         {
-            sithThing_SetThingModel(v2, v2->templateBase->rdthing.model3);
-            jkPlayer_playerInfos[idx].playerThing->thingflags |= SITH_TF_DISABLED;
+            sithThing_SetThingModel(v2, v2->pTemplate->renderData.model3);
+            jkPlayer_playerInfos[idx].pLocalPlayer->flags |= SITH_TF_DISABLED;
         }
     }
 }
@@ -69,7 +69,7 @@ void sithPlayer_PlacePlayers(SithWorld *world)
     int v7; // edi
     void *v8; // eax
 
-    v1 = world->things;
+    v1 = world->aThings;
     v2 = world->numThings;
     v3 = 0;
     if ( v2 >= 0 )
@@ -79,11 +79,11 @@ void sithPlayer_PlacePlayers(SithWorld *world)
         {
             if ( v1->type == SITH_THING_PLAYER && v3 < JKPLAYER_NUM_INFOS )
             {
-                playerInfo->playerThing = v1;
-                v1->thingflags |= SITH_TF_INVULN;
-                v1->actorParams.playerinfo = playerInfo;
+                playerInfo->pLocalPlayer = v1;
+                v1->flags |= SITH_TF_INVULN;
+                v1->actorParams.pPlayer = playerInfo;
                 playerInfo->flags |= 2;
-                rdMatrix_Copy34(&playerInfo->spawnPosOrient, &v1->lookOrientation);
+                rdMatrix_Copy34(&playerInfo->spawnPosOrient, &v1->orient);
                 rdVector_Copy3(&playerInfo->spawnPosOrient.scale, &v1->position);
                 playerInfo->pSpawnSector = v1->sector;
                 playerInfo++;
@@ -97,7 +97,7 @@ void sithPlayer_PlacePlayers(SithWorld *world)
     jkPlayer_maxPlayers = v3;
     for (int i = jkPlayer_maxPlayers; i < JKPLAYER_NUM_INFOS; i++)
     {
-        jkPlayer_playerInfos[i].playerThing = 0;
+        jkPlayer_playerInfos[i].pLocalPlayer = 0;
         jkPlayer_playerInfos[i].pSpawnSector = 0;
     }
 }
@@ -148,7 +148,7 @@ int sithPlayer_GetThingPlayerNum(SithThing *player)
     i = 0;
     while (i < jkPlayer_maxPlayers)
     {
-        if ((jkPlayer_playerInfos[i].flags & 1) && jkPlayer_playerInfos[i].playerThing == player)
+        if ((jkPlayer_playerInfos[i].flags & 1) && jkPlayer_playerInfos[i].pLocalPlayer == player)
             return i;
 
         i++;
@@ -162,12 +162,12 @@ void sithPlayer_SetLocalPlayer(int idx)
 
     playerThingIdx = idx;
     sithPlayer_g_pLocalPlayer = &jkPlayer_playerInfos[idx];
-    sithPlayer_g_pLocalPlayerThing = jkPlayer_playerInfos[idx].playerThing;
+    sithPlayer_g_pLocalPlayerThing = jkPlayer_playerInfos[idx].pLocalPlayer;
 
-    sithWorld_g_pCurrentWorld->playerThing = sithPlayer_g_pLocalPlayerThing;
-    sithWorld_g_pCurrentWorld->cameraFocus = sithPlayer_g_pLocalPlayerThing;
+    sithWorld_g_pCurrentWorld->pLocalPlayer = sithPlayer_g_pLocalPlayerThing;
+    sithWorld_g_pCurrentWorld->pCameraFocusThing = sithPlayer_g_pLocalPlayerThing;
 
-    sithPlayer_g_pLocalPlayerThing->thingflags &= ~SITH_TF_INVULN;
+    sithPlayer_g_pLocalPlayerThing->flags &= ~SITH_TF_INVULN;
 
     // Added: idk why this is needed?
     //sithPlayer_g_pLocalPlayerThing->controlType = SITH_CT_10;
@@ -180,10 +180,10 @@ void sithPlayer_SetLocalPlayer(int idx)
 
     for (v6 = 0; v6 < jkPlayer_maxPlayers; v6++)
     {
-        if (jkPlayer_playerInfos[v6].playerThing)
+        if (jkPlayer_playerInfos[v6].pLocalPlayer)
         {
             if ( v6 != idx )
-                jkPlayer_playerInfos[v6].playerThing->thingflags |= SITH_TF_INVULN;
+                jkPlayer_playerInfos[v6].pLocalPlayer->flags |= SITH_TF_INVULN;
         }
     }
 }
@@ -208,7 +208,7 @@ void sithPlayer_Update(SithPlayer *playerInfo, flex_t a2)
     v2 = (__int64)(a2 * 256.0 - -0.5);
     if ( playerInfo == sithPlayer_g_pLocalPlayer )
     {
-        v3 = playerInfo->playerThing;
+        v3 = playerInfo->pLocalPlayer;
         pPalEffect = stdPalEffects_GetEffectPointer(playerInfo->palEffectsIdx1);
         if ( pPalEffect->tint.x != 0.0 )
         {
@@ -238,22 +238,22 @@ void sithPlayer_Update(SithPlayer *playerInfo, flex_t a2)
         sithInventory_SendFire(v3);
         if ( !v3->attach_flags )
         {
-            v14 = v3->actorParams.typeflags;
+            v14 = v3->actorParams.flags;
             if ( (v14 & SITH_AF_FALLKILLED) == 0 && v3->moveType == SITH_MT_PHYSICS && v3->physicsParams.vel.z < -3.0 )
             {
                 if ( v3->sector )
                 {
                     if ( (v3->sector->flags & SITH_SECTOR_FALLDEATH) != 0 && !(g_debugmodeFlags & DEBUGFLAG_NOCLIP)) // Added: noclip
                     {
-                        v3->thingflags |= SITH_TF_DEAD;
-                        v3->actorParams.typeflags |= SITH_AF_FALLKILLED;
+                        v3->flags |= SITH_TF_DEAD;
+                        v3->actorParams.flags |= SITH_AF_FALLKILLED;
                         sithCamera_SetCameraFocus(&sithCamera_g_aCameras[1], v3, 0);
                         sithCamera_SetCurrentCamera(&sithCamera_g_aCameras[1]);
                     }
                 }
             }
         }
-        if ( (v3->actorParams.typeflags & SITH_AF_FALLKILLED) != 0 )
+        if ( (v3->actorParams.flags & SITH_AF_FALLKILLED) != 0 )
         {
             pPalEffect->fade -= a2 * 0.7;
             if (pPalEffect->fade <= 0.0)
@@ -278,7 +278,7 @@ void sithPlayer_debug_loadauto(SithThing *player)
     }
     sithSoundMixer_ResumeMusic(1);
     player->type = SITH_THING_PLAYER;
-    player->lifeLeftMs = 0;
+    player->msecLifeLeft = 0;
 }
 
 void sithPlayer_SetScreenTint(flex_t tintR, flex_t tintG, flex_t tintB)
@@ -287,10 +287,10 @@ void sithPlayer_SetScreenTint(flex_t tintR, flex_t tintG, flex_t tintB)
     stdPalEffect *pPalEffects; // ecx
     flex_d_t v8; // st7
 
-    focusThing = sithWorld_g_pCurrentWorld->cameraFocus;
+    focusThing = sithWorld_g_pCurrentWorld->pCameraFocusThing;
     if ( (focusThing->type & 0xA) != 0 ) // ???
     {
-        pPalEffects = stdPalEffects_GetEffectPointer(focusThing->actorParams.playerinfo->palEffectsIdx2);
+        pPalEffects = stdPalEffects_GetEffectPointer(focusThing->actorParams.pPlayer->palEffectsIdx2);
 
         pPalEffects->tint.x = stdMath_Clamp(tintR, 0.0, 1.0);
         pPalEffects->tint.y = stdMath_Clamp(tintG, 0.0, 1.0);
@@ -334,9 +334,9 @@ int sithPlayer_sub_4C9060(SithThing *thing1, SithThing *thing2)
     if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 && thing1 != thing2 && thing1->type == SITH_THING_PLAYER && thing2->type == SITH_THING_PLAYER )
     {
         // Yes, these are assigns not ==
-        if ( v2 = thing1->actorParams.playerinfo )
+        if ( v2 = thing1->actorParams.pPlayer )
         {
-            if ( v3 = thing2->actorParams.playerinfo )
+            if ( v3 = thing2->actorParams.pPlayer )
             {
                 if ( v4 = v2->teamNum )
                 {
@@ -357,20 +357,20 @@ void sithPlayer_KillPlayer(SithThing *thing)
     SithPlayer *v1; // edi
     char v4[128]; // [esp+8h] [ebp-80h] BYREF
 
-    v1 = thing->actorParams.playerinfo;
+    v1 = thing->actorParams.pPlayer;
 
     if ( thing == sithPlayer_g_pLocalPlayerThing)
         sithDSSThing_Death(thing, thing, 1, -1, 255);
 
-    if ( (thing->thingflags & SITH_TF_CAPTURED) == 0
-      || (sithCog_ThingSendMessage(thing, thing, SITH_MESSAGE_KILLED), (thing->thingflags & SITH_TF_DESTROYED) == 0) )
+    if ( (thing->flags & SITH_TF_CAPTURED) == 0
+      || (sithCog_ThingSendMessage(thing, thing, SITH_MESSAGE_KILLED), (thing->flags & SITH_TF_DESTROYED) == 0) )
     {
         sithSoundClass_StopSound(thing, 0);
         sithThing_DetachAttachedThings(thing);
         sithActor_SetHeadPYR(thing, &rdroid_zeroVector3);
-        thing->physicsParams.physflags &= ~(SITH_PF_CROUCHING|SITH_PF_800|SITH_PF_100);
-        thing->physicsParams.physflags |= (SITH_PF_ALIGNSURFACE|SITH_PF_USEGRAVITY);
-        thing->actorParams.typeflags &= ~SITH_AF_BLEEDS;
+        thing->physicsParams.flags &= ~(SITH_PF_CROUCHING|SITH_PF_800|SITH_PF_100);
+        thing->physicsParams.flags |= (SITH_PF_ALIGNSURFACE|SITH_PF_USEGRAVITY);
+        thing->actorParams.flags &= ~SITH_AF_BLEEDS;
         sithPhysics_ResetThingMovement(thing);
         sithWeapon_SyncPuppet(thing);
         if ( sithNet_isMulti )
@@ -386,11 +386,11 @@ void sithPlayer_PlayerKilledAction(SithThing *player, SithThing *killedBy)
 {
     SithPlayer *v5; // edi
 
-    v5 = player->actorParams.playerinfo;
-    player->physicsParams.physflags &= ~(SITH_PF_800|SITH_PF_100);
-    player->physicsParams.physflags |= SITH_PF_ALIGNSURFACE|SITH_PF_USEGRAVITY;
-    player->thingflags |= SITH_TF_DEAD;
-    player->actorParams.typeflags &= ~SITH_AF_BLEEDS;
+    v5 = player->actorParams.pPlayer;
+    player->physicsParams.flags &= ~(SITH_PF_800|SITH_PF_100);
+    player->physicsParams.flags |= SITH_PF_ALIGNSURFACE|SITH_PF_USEGRAVITY;
+    player->flags |= SITH_TF_DEAD;
+    player->actorParams.flags &= ~SITH_AF_BLEEDS;
     sithPhysics_ResetThingMovement(player);
     sithWeapon_SyncPuppet(player);
     sithInventory_BroadcastKilledMessage(player, killedBy);
@@ -410,7 +410,7 @@ int sithPlayer_GetThingPlayerNumByIndex(int a1)
     result = 0;
     if ( jkPlayer_maxPlayers <= 0 )
         return -1;
-    for ( i = &jkPlayer_playerInfos[0]; (i->flags & 1) == 0 || i->playerThing->thingIdx != a1; i++ )
+    for ( i = &jkPlayer_playerInfos[0]; (i->flags & 1) == 0 || i->pLocalPlayer->idx != a1; i++ )
     {
         if ( ++result >= jkPlayer_maxPlayers )
             return -1;
@@ -447,8 +447,8 @@ void sithPlayer_Reset(unsigned int idx)
         pPlayerInfo->net_id = 0;
         pPlayerInfo->player_name[0] = 0;
         pPlayerInfo->multi_name[0] = 0;
-        if ( pPlayerInfo->playerThing && sithWorld_g_pCurrentWorld )
-            sithInventory_InitInventory(pPlayerInfo->playerThing);
+        if ( pPlayerInfo->pLocalPlayer && sithWorld_g_pCurrentWorld )
+            sithInventory_InitInventory(pPlayerInfo->pLocalPlayer);
         if ( pPlayerInfo == sithPlayer_g_pLocalPlayer )
         {
             stdPalEffects_FlushAllEffects();
@@ -461,13 +461,13 @@ void sithPlayer_Reset(unsigned int idx)
 
 int sithPlayer_ShowPlayer(int idx, int netId)
 {
-    if ( !jkPlayer_playerInfos[idx].playerThing )
+    if ( !jkPlayer_playerInfos[idx].pLocalPlayer )
         return 0;
     jkPlayer_playerInfos[idx].flags |= 5;
     jkPlayer_playerInfos[idx].net_id = netId;
-    jkPlayer_playerInfos[idx].playerThing->thingflags &= ~SITH_TF_DISABLED;
+    jkPlayer_playerInfos[idx].pLocalPlayer->flags &= ~SITH_TF_DISABLED;
 
-    //jkPlayer_playerInfos[idx].playerThing->controlType = SITH_CT_10; // TODO: WHY IS THIS NEEDED?
+    //jkPlayer_playerInfos[idx].pLocalPlayer->controlType = SITH_CT_10; // TODO: WHY IS THIS NEEDED?
 
     return 1;
 }
@@ -481,7 +481,7 @@ void sithPlayer_NewPlayer(SithThing *player)
     stdPalEffect *v6; // eax
     int v9; // edi
 
-    v1 = player->rdthing.puppet;
+    v1 = player->renderData.puppet;
     if ( v1 )
     {
         if ( player->puppet )
@@ -491,15 +491,15 @@ void sithPlayer_NewPlayer(SithThing *player)
                 sithPuppet_StopKey(v1, v3, 0.0);
         }
     }
-    if ( !sithNet_isMulti || (player->thingflags & SITH_TF_INVULN) == 0 )
+    if ( !sithNet_isMulti || (player->flags & SITH_TF_INVULN) == 0 )
     {
-        v4 = player->templateBase;
-        player->actorParams.msUnderwater = 0; // MOTS added
+        v4 = player->pTemplate;
+        player->actorParams.endurance = 0; // MOTS added
         player->actorParams.health = v4->actorParams.health;
-        if ( (v4->physicsParams.physflags & SITH_PF_800) != 0 )
+        if ( (v4->physicsParams.flags & SITH_PF_800) != 0 )
         {
-            player->physicsParams.physflags &= ~(SITH_PF_100|SITH_PF_ALIGNSURFACE);
-            player->physicsParams.physflags |= SITH_PF_800;
+            player->physicsParams.flags &= ~(SITH_PF_100|SITH_PF_ALIGNSURFACE);
+            player->physicsParams.flags |= SITH_PF_800;
         }
         sithActor_SetHeadPYR(player, &rdroid_zeroVector3);
         if ( player == sithPlayer_g_pLocalPlayerThing )
@@ -511,9 +511,9 @@ void sithPlayer_NewPlayer(SithThing *player)
             stdPalEffects_ResetEffect(v6);
         }
 
-        player->thingflags &= ~(SITH_TF_DEAD|SITH_TF_DESTROYED);
-        player->actorParams.typeflags &= ~SITH_AF_FALLKILLED;
-        player->lifeLeftMs = 0;
+        player->flags &= ~(SITH_TF_DEAD|SITH_TF_DESTROYED);
+        player->actorParams.flags &= ~SITH_AF_FALLKILLED;
+        player->msecLifeLeft = 0;
         if ( !sithNet_isMulti || player == sithPlayer_g_pLocalPlayerThing )
         {
             v9 = sithMulti_GetSpawnIdx(player);
@@ -526,23 +526,23 @@ void sithPlayer_NewPlayer(SithThing *player)
             sithCamera_Update(sithCamera_g_pCurCamera);
             sithPhysics_ResetThingMovement(player);
             sithWeapon_SyncPuppet(player);
-            sithCog_BroadcastMessage(SITH_MESSAGE_NEWPLAYER, SENDERTYPE_THING, player->thingIdx, SENDERTYPE_THING, player->thingIdx);
+            sithCog_BroadcastMessage(SITH_MESSAGE_NEWPLAYER, SENDERTYPE_THING, player->idx, SENDERTYPE_THING, player->idx);
             if ( sithMessage_g_outputstream )
                 sithDSSThing_UpdateState(player, -1, 255);
         }
     }
 }
 
-uint32_t sithPlayer_GetPlayerNum(int thingIdx)
+uint32_t sithPlayer_GetPlayerNum(int idx)
 {
-    if ( !thingIdx )
+    if ( !idx )
         return -1;
 
     if ( !jkPlayer_maxPlayers )
         return -1;
     for ( uint32_t i = 0; i < jkPlayer_maxPlayers; ++i )
     {
-        if (jkPlayer_playerInfos[i].net_id == thingIdx)
+        if (jkPlayer_playerInfos[i].net_id == idx)
             return i;
     }
     return -1;

@@ -17,7 +17,7 @@
 int sithParticle_Startup();
 void sithParticle_Shutdown();
 rdParticle* sithParticle_Load(const char *a1);
-int sithParticle_AllocWorldParticles(SithWorld *world, int numParticles);
+int sithParticle_AllocWorldParticles(SithWorld *world, int sizeParticles);
 int sithParticle_ParseArg(StdConffileArg *arg, SithThing *thing, int param);
 MATH_FUNC void sithParticle_Update(SithThing *particle, flex_t deltaMs);
 MATH_FUNC void sithParticle_Initalize(SithThing *thing);

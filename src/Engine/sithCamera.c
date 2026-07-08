@@ -131,7 +131,7 @@ void sithCamera_ResetAllCameras()
     SithThing *v0; // eax
     rdVector3 rot; // [esp+Ch] [ebp-Ch] BYREF
 
-    v0 = sithWorld_g_pCurrentWorld->cameraFocus;
+    v0 = sithWorld_g_pCurrentWorld->pCameraFocusThing;
     sithCamera_g_stateFlags &= ~1u;
     sithCamera_g_aCameras[0].primaryFocus = v0;
     sithCamera_g_aCameras[1].primaryFocus = v0;
@@ -153,7 +153,7 @@ void sithCamera_ResetAllCameras()
         rdCamera_SetCurrent(&sithCamera_g_aCameras[0].rdCam);
         if ( sithCamera_g_aCameras[0].cameraPerspective == 32 )
         {
-            rdMatrix_Copy34(&sithCamera_idleCamOrient, &sithCamera_g_pCurCamera->primaryFocus->lookOrientation);
+            rdMatrix_Copy34(&sithCamera_idleCamOrient, &sithCamera_g_pCurCamera->primaryFocus->orient);
             rot.x = 0.0;
             rot.z = 0.0;
             rot.y = -45.0;
@@ -232,16 +232,16 @@ void sithCamera_Update(SithCamera *cam)
             rdCamera_SetMipmapScalar(cam->invZoomScale);
 #endif
 
-            rdMatrix_Copy34(&cam->viewMat, &focusThing->lookOrientation);
-            if ( focusThing->moveType == SITH_MT_PATH && focusThing->rdthing.hierarchyNodeMatrices)
+            rdMatrix_Copy34(&cam->viewMat, &focusThing->orient);
+            if ( focusThing->moveType == SITH_MT_PATH && focusThing->renderData.hierarchyNodeMatrices)
             {
-                rdMatrix_Copy34(&cam->viewMat, focusThing->rdthing.hierarchyNodeMatrices);
+                rdMatrix_Copy34(&cam->viewMat, focusThing->renderData.hierarchyNodeMatrices);
             }
             else
             {
                 if ( focusThing->type == SITH_THING_ACTOR || focusThing->type == SITH_THING_PLAYER )
                 {
-                    rdVector_Copy3(&v76, &focusThing->actorParams.eyePYR);
+                    rdVector_Copy3(&v76, &focusThing->actorParams.headPYR);
                 }
                 else
                 {
@@ -250,7 +250,7 @@ void sithCamera_Update(SithCamera *cam)
 
                 if ( focusThing->moveType == SITH_MT_PHYSICS )
                 {
-                    v76.z = rdMath_clampf(5.0 * rdVector_Dot3(&focusThing->lookOrientation.rvec, &focusThing->physicsParams.vel), -8.0, 8.0); 
+                    v76.z = rdMath_clampf(5.0 * rdVector_Dot3(&focusThing->orient.rvec, &focusThing->physicsParams.vel), -8.0, 8.0); 
                 }
 
                 // MOTS added: hmm??
@@ -278,7 +278,7 @@ void sithCamera_Update(SithCamera *cam)
         case 4:
             if ( focusThing->type == SITH_THING_ACTOR || focusThing->type == SITH_THING_PLAYER )
             {
-                rdVector_Copy3(&v76, &focusThing->actorParams.eyePYR);
+                rdVector_Copy3(&v76, &focusThing->actorParams.headPYR);
             }
             else
             {
@@ -291,7 +291,7 @@ void sithCamera_Update(SithCamera *cam)
                 rdVector_Add3Acc(&v76, &sithCamera_g_vecCameraAngleOffset);
             }
 
-            rdMatrix_Copy34(&out, &focusThing->lookOrientation);
+            rdMatrix_Copy34(&out, &focusThing->orient);
             rdMatrix_PreRotate34(&out, &v76);
             rdMatrix_PostTranslate34(&out, &focusThing->position);
             if ( focusThing->type == SITH_THING_ACTOR || focusThing->type == SITH_THING_PLAYER )
@@ -546,7 +546,7 @@ int sithCamera_SetCurrentCamera(SithCamera *camera)
     rdCamera_SetCurrent(&camera->rdCam);
     if ( camera->cameraPerspective == 32 )
     {
-        rdMatrix_Copy34(&sithCamera_idleCamOrient, &sithCamera_g_pCurCamera->primaryFocus->lookOrientation);
+        rdMatrix_Copy34(&sithCamera_idleCamOrient, &sithCamera_g_pCurCamera->primaryFocus->orient);
         rot.x = 0.0;
         rot.y = -45.0;
         rot.z = 0.0;
@@ -579,7 +579,7 @@ SithSector* sithCamera_SearchSectorInRadius(SithThing *a3, SithSector *a2, rdVec
     {
         if ( (i->hitType & SITHCOLLISION_ADJOINCROSS) != 0 )
         {
-            v9 = i->surface->adjoin->sector;
+            v9 = i->surface->pAdjoin->sector;
         }
         else if ( (i->hitType & SITHCOLLISION_THING) == 0 || (i->receiver->type != SITH_THING_ITEM) && i->distance != 0.0 && i->receiver->type != SITH_THING_WEAPON )
         {

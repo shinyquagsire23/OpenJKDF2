@@ -32,7 +32,7 @@ typedef struct rdSprite
     flex_t halfWidth;
     flex_t halfHeight;
     rdFace face;
-    rdVector2* vertexUVs;
+    rdVector2* aTexVerticies;
     rdVector3 offset;
 } rdSprite;
 

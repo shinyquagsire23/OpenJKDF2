@@ -289,7 +289,7 @@ char *curl_version(void)
 /* data for curl_version_info
 
    Keep the list sorted alphabetically. It is also written so that each
-   protocol line has its own #if line to make things easier on the eye.
+   protocol line has its own #if line to make aThings easier on the eye.
  */
 
 static const char * const protocols[] = {

@@ -131,7 +131,7 @@ int stdComm_Recv(SithMessage *msg)
     {
         if ( !ret )
         {
-            pMsg->netMsg.thingIdx = playerId;
+            pMsg->netMsg.idx = playerId;
             pMsg->netMsg.msg_size = msgBytes - 4;
             pMsg->netMsg.timeMs = sithTime_g_msecGameTime;
             return 1;

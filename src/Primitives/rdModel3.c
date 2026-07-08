@@ -1,6 +1,6 @@
 #include "rdModel3.h"
 
-// Added: on TWL, the big cold model payload arrays (vertices/UVs/normals/faces/
+// Added: on TWL, the big cold model payload arrays (aVertices/UVs/normals/faces/
 // index pools -- word-safe writes only, parsed once) go to the slot-2 extram
 // heap. Not enabled on DC: these are read in per-frame transform loops and DC
 // VRAM CPU reads are uncached.
@@ -48,7 +48,7 @@ void rdModel3_ClearFrameCounters()
 
 int rdModel3_NewEntry(rdModel3 *model)
 {
-    stdPlatform_Memzero32(model, sizeof(rdModel3)); // Added: word-safe (models array may be in extram)
+    stdPlatform_Memzero32(model, sizeof(rdModel3)); // Added: word-safe (aModels array may be in extram)
     stdString_SafeStrCopy(model->filename, "UNKNOWN", 32);
     model->geosetSelect = 0;
     return 0;
@@ -142,21 +142,21 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
 
     if ( _sscanf(stdConffile_g_aLine, " section: %s", std_g_genBuffer) != 1
       || !stdConffile_ReadLine()
-      || _sscanf(stdConffile_g_aLine, " materials %d", &model->numMaterials) != 1 ) {
+      || _sscanf(stdConffile_g_aLine, " aMaterials %d", &model->sizeMaterials) != 1 ) {
 
-        rdModel3_HelpDebug("OpenJKDF2: %s: Failed to parse section or materials\n", __func__); // Added
+        rdModel3_HelpDebug("OpenJKDF2: %s: Failed to parse section or aMaterials\n", __func__); // Added
         return 0;
     }
 
-    if ( model->numMaterials)
+    if ( model->sizeMaterials)
     {
-        model->materials = (rdMaterial **)RDROID_ALLOC(sizeof(rdMaterial*) * model->numMaterials);
-        if (!model->materials) {
-            rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate materials\n", __func__); // Added
+        model->aMaterials = (rdMaterial **)RDROID_ALLOC(sizeof(rdMaterial*) * model->sizeMaterials);
+        if (!model->aMaterials) {
+            rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate aMaterials\n", __func__); // Added
             return 0;
         }
     }
-    for (int i = 0; i < model->numMaterials; i++)
+    for (int i = 0; i < model->sizeMaterials; i++)
     {
         if (!stdConffile_ReadLine())
             goto fail;
@@ -164,9 +164,9 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
         if ( _sscanf(stdConffile_g_aLine, " %d: %s", &geoset_num, std_g_genBuffer) != 2 )
             goto fail;
 
-        model->materials[i] = rdMaterial_Load(std_g_genBuffer, 0, 0);
+        model->aMaterials[i] = rdMaterial_Load(std_g_genBuffer, 0, 0);
 
-        if ( !model->materials[i] ) {
+        if ( !model->aMaterials[i] ) {
             rdModel3_HelpDebug("OpenJKDF2: %s: Failed to load material %s\n", __func__, std_g_genBuffer); // Added
             goto fail;
         }
@@ -265,10 +265,10 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
               || !stdConffile_ReadLine()
               || _sscanf(stdConffile_g_aLine, " texturemode %d", &mesh->textureMode) != 1
               || !stdConffile_ReadLine()
-              || _sscanf(stdConffile_g_aLine, " vertices %d", &mesh->numVertices) != 1
+              || _sscanf(stdConffile_g_aLine, " aVertices %d", &mesh->numVertices) != 1
               || mesh->numVertices > 0x200 )
             {
-                rdModel3_HelpDebug("OpenJKDF2: %s: Failed to parse radius, render modes, vertices %s\n", __func__, stdConffile_g_aLine); // Added
+                rdModel3_HelpDebug("OpenJKDF2: %s: Failed to parse radius, render modes, aVertices %s\n", __func__, stdConffile_g_aLine); // Added
                 goto fail;
             }
             mesh->radius = radius; // FLEXTODO
@@ -277,16 +277,16 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
             pSithHS->suggestHeap(HEAP_FAST);
 #endif
 
-            mesh->vertices = 0;
+            mesh->aVertices = 0;
             mesh->vertices_i = 0;
             mesh->vertices_unk = 0;
             if ( mesh->numVertices)
             {
                 { RDMODEL3_EXTRAM_SUGGEST();
-                mesh->vertices = (rdVector3 *)RDROID_ALLOC(sizeof(rdVector3) * mesh->numVertices);
+                mesh->aVertices = (rdVector3 *)RDROID_ALLOC(sizeof(rdVector3) * mesh->numVertices);
                 RDMODEL3_EXTRAM_RESTORE(); }
-                if ( !mesh->vertices ){
-                    rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate vertices\n", __func__); // Added
+                if ( !mesh->aVertices ){
+                    rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate aVertices\n", __func__); // Added
                     goto fail;
                 }
                 { RDMODEL3_EXTRAM_SUGGEST();
@@ -320,27 +320,27 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
                     goto fail;
                 }
 
-                mesh->vertices[vertex_num].x = v_x; // FLEXTODO
-                mesh->vertices[vertex_num].y = v_y; // FLEXTODO
-                mesh->vertices[vertex_num].z = v_z; // FLEXTODO
+                mesh->aVertices[vertex_num].x = v_x; // FLEXTODO
+                mesh->aVertices[vertex_num].y = v_y; // FLEXTODO
+                mesh->aVertices[vertex_num].z = v_z; // FLEXTODO
                 mesh->vertices_i[vertex_num] = v_i; // FLEXTODO
             }
 
             if ( !stdConffile_ReadLine()
-              || _sscanf(stdConffile_g_aLine, " texture vertices %d", &mesh->numUVs) != 1
+              || _sscanf(stdConffile_g_aLine, " texture aVertices %d", &mesh->numUVs) != 1
               || mesh->numUVs > 0x300 )
             {
-                rdModel3_HelpDebug("OpenJKDF2: %s: Failed to parse texture vertices %s\n", __func__, stdConffile_g_aLine); // Added
+                rdModel3_HelpDebug("OpenJKDF2: %s: Failed to parse texture aVertices %s\n", __func__, stdConffile_g_aLine); // Added
                 goto fail;
             }
             
-            mesh->vertexUVs = 0;
+            mesh->aTexVerticies = 0;
             if ( mesh->numUVs )
             {
                 { RDMODEL3_EXTRAM_SUGGEST();
-                mesh->vertexUVs = (rdVector2 *)RDROID_ALLOC(sizeof(rdVector2) * mesh->numUVs);
+                mesh->aTexVerticies = (rdVector2 *)RDROID_ALLOC(sizeof(rdVector2) * mesh->numUVs);
                 RDMODEL3_EXTRAM_RESTORE(); }
-                if ( !mesh->vertexUVs ) {
+                if ( !mesh->aTexVerticies ) {
                     rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate vertex UVs\n", __func__); // Added
                     goto fail;
                 }
@@ -352,8 +352,8 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
                             goto fail;
                         }
 
-                        mesh->vertexUVs[v25].x = v_u;
-                        mesh->vertexUVs[v25].y = v_v;
+                        mesh->aTexVerticies[v25].x = v_u;
+                        mesh->aTexVerticies[v25].y = v_v;
                 }
             }
 
@@ -426,14 +426,14 @@ int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
                 tmpTxt = _strtok(0, " \t");
                 v36 = _atoi(tmpTxt);
                 face->num = j;
-                // Added: model->numMaterials bounds
-                if (v36 > model->numMaterials) {
-                    v36 = model->numMaterials-1;
+                // Added: model->sizeMaterials bounds
+                if (v36 > model->sizeMaterials) {
+                    v36 = model->sizeMaterials-1;
                 }
                 else if (v36 < 0 && v36 != -1) {
                     v36 = 0;
                 }
-                face->material = (v36 == -1 || !model->numMaterials) ? 0 : model->materials[v36]; // Added: model->numMaterials check
+                face->material = (v36 == -1 || !model->sizeMaterials) ? 0 : model->aMaterials[v36]; // Added: model->sizeMaterials check
                 rdMaterial_EnsureMetadata(face->material); // Added: we don't need VBuffers yet
                 tmpTxt = _strtok(0, " \t");
                 if ( _sscanf(tmpTxt, "%x", &face->type) != 1 )
@@ -721,10 +721,10 @@ int rdModel3_Write(char *fout, rdModel3 *model, char *createdfrom)
     rdroid_g_pHS->filePrintf(fd, "###############\n");
     rdroid_g_pHS->filePrintf(fd, "SECTION: MODELRESOURCE\n\n");
     rdroid_g_pHS->filePrintf(fd, "# Materials list\n");
-    rdroid_g_pHS->filePrintf(fd, "MATERIALS %d\n\n", model->numMaterials);
-    for (int i = 0; i < model->numMaterials; i++)
+    rdroid_g_pHS->filePrintf(fd, "MATERIALS %d\n\n", model->sizeMaterials);
+    for (int i = 0; i < model->sizeMaterials; i++)
     {
-            rdroid_g_pHS->filePrintf(fd, "%10d:%15s\n", i, model->materials[i]->mat_fpath);
+            rdroid_g_pHS->filePrintf(fd, "%10d:%15s\n", i, model->aMaterials[i]->mat_fpath);
     }
     rdroid_g_pHS->filePrintf(fd, "\n\n");
     rdroid_g_pHS->filePrintf(fd, "###############\n");
@@ -758,7 +758,7 @@ int rdModel3_Write(char *fout, rdModel3 *model, char *createdfrom)
             rdroid_g_pHS->filePrintf(fd, "# num:     x:         y:         z:         i: \n");
             for (int vertexNum = 0; vertexNum < geoset->meshes[meshNum].numVertices; vertexNum++)
             {
-                rdVector3* vertex = &geoset->meshes[meshNum].vertices[vertexNum];
+                rdVector3* vertex = &geoset->meshes[meshNum].aVertices[vertexNum];
                 rdroid_g_pHS->filePrintf(
                     fd,
                     "  %3d: %10.6f %10.6f %10.6f %10.6f\n",
@@ -772,7 +772,7 @@ int rdModel3_Write(char *fout, rdModel3 *model, char *createdfrom)
             rdroid_g_pHS->filePrintf(fd, "TEXTURE VERTICES %d\n\n", geoset->meshes[meshNum].numVertices);
             for (int vertexNum = 0; vertexNum < geoset->meshes[meshNum].numUVs; vertexNum++)
             {
-                rdVector2* uv = &geoset->meshes[meshNum].vertexUVs[vertexNum];
+                rdVector2* uv = &geoset->meshes[meshNum].aTexVerticies[vertexNum];
                 rdroid_g_pHS->filePrintf(fd, "  %3d: %10.6f %10.6f\n", vertexNum, uv->x, uv->y);
             }
             rdroid_g_pHS->filePrintf(fd, "\n\n");
@@ -796,12 +796,12 @@ int rdModel3_Write(char *fout, rdModel3 *model, char *createdfrom)
             for (int faceNum = 0; faceNum < geoset->meshes[meshNum].numFaces; faceNum++)
             {
                 int materialIdx = -1;
-                for (int j = 0; j < model->numMaterials; j++)
+                for (int j = 0; j < model->sizeMaterials; j++)
                 {
                     if (!face->material)
                         break;
 
-                    if ( face->material == model->materials[j] )
+                    if ( face->material == model->aMaterials[j] )
                         materialIdx = j;
                 }
 
@@ -930,11 +930,11 @@ void rdModel3_FreeEntry(rdModel3 *model)
         {
             rdMesh* mesh = &geoset->meshes[meshNum];
             
-            if (mesh->vertices)
-                RDROID_FREE(mesh->vertices);
+            if (mesh->aVertices)
+                RDROID_FREE(mesh->aVertices);
             
-            if (mesh->vertexUVs)
-                RDROID_FREE(mesh->vertexUVs);
+            if (mesh->aTexVerticies)
+                RDROID_FREE(mesh->aTexVerticies);
             
             if ( mesh->faces )
             {
@@ -969,15 +969,15 @@ void rdModel3_FreeEntry(rdModel3 *model)
     if ( model->hierarchyNodes )
         RDROID_FREE(model->hierarchyNodes);
 
-    if ( model->numMaterials )
+    if ( model->sizeMaterials )
     {
-        for (int i = 0; i < model->numMaterials; i++)
+        for (int i = 0; i < model->sizeMaterials; i++)
         {
-            rdMaterial_Free(model->materials[i]);
+            rdMaterial_Free(model->aMaterials[i]);
         }
     }
-    if (model->materials )
-        RDROID_FREE(model->materials);
+    if (model->aMaterials )
+        RDROID_FREE(model->aMaterials);
 }
 
 void rdModel3_FreeEntryGeometryOnly(rdModel3 *model)
@@ -992,11 +992,11 @@ void rdModel3_FreeEntryGeometryOnly(rdModel3 *model)
         {
             rdMesh* mesh = &geoset->meshes[meshNum];
             
-            if (mesh->vertices)
-                RDROID_FREE(mesh->vertices);
+            if (mesh->aVertices)
+                RDROID_FREE(mesh->aVertices);
             
-            if (mesh->vertexUVs)
-                RDROID_FREE(mesh->vertexUVs);
+            if (mesh->aTexVerticies)
+                RDROID_FREE(mesh->aTexVerticies);
             
             if ( mesh->faces )
             {
@@ -1031,8 +1031,8 @@ void rdModel3_FreeEntryGeometryOnly(rdModel3 *model)
     if ( model->hierarchyNodes )
         RDROID_FREE(model->hierarchyNodes);
 
-    if (model->materials )
-        RDROID_FREE(model->materials);
+    if (model->aMaterials )
+        RDROID_FREE(model->aMaterials);
 }
 
 #if 0
@@ -1122,7 +1122,7 @@ void rdModel3_CalcRadii(rdModel3 *model)
         maxDist = 0.0;
         for (int j = 0; j < mesh->numVertices; j++)
         {
-            rdVector3* vtx = &mesh->vertices[j];
+            rdVector3* vtx = &mesh->aVertices[j];
             flex_t dist = rdVector_Len3(vtx);
             if ( dist > maxDist )
             {
@@ -1161,7 +1161,7 @@ void rdModel3_BuildExpandedRadius(rdModel3 *model, rdHierarchyNode *node, const 
         rdMesh* mesh = &model->geosets[0].meshes[node->meshIdx];
         for (int i = 0; i < mesh->numVertices; i++)
         {
-            rdVector3* vtx = &mesh->vertices[i];
+            rdVector3* vtx = &mesh->aVertices[i];
             rdMatrix_TransformPoint34(&vertex_out, vtx, &out);
             flex_t dist = rdVector_Len3(&vertex_out);
             if ( dist > rdModel3_fRadius )
@@ -1201,17 +1201,17 @@ void rdModel3_CalcFaceNormals(rdModel3 *model)
                         idx2 = face->numVertices - 1;
                     idx3 = ((idx1 + 1) % face->numVertices);
                     if ( !rdMath_PointsCollinear(
-                              &mesh->vertices[face->vertexPosIdx[idx1]],
-                              &mesh->vertices[face->vertexPosIdx[idx3]],
-                              &mesh->vertices[face->vertexPosIdx[idx2]]))
+                              &mesh->aVertices[face->vertexPosIdx[idx1]],
+                              &mesh->aVertices[face->vertexPosIdx[idx3]],
+                              &mesh->aVertices[face->vertexPosIdx[idx2]]))
                         break;
                 }
                 if ( idx1 < face->numVertices )
                     rdMath_CalcSurfaceNormal(
                         &face->normal,
-                        &mesh->vertices[face->vertexPosIdx[idx1]],
-                        &mesh->vertices[face->vertexPosIdx[idx3]],
-                        &mesh->vertices[face->vertexPosIdx[idx2]]);
+                        &mesh->aVertices[face->vertexPosIdx[idx1]],
+                        &mesh->aVertices[face->vertexPosIdx[idx3]],
+                        &mesh->aVertices[face->vertexPosIdx[idx2]]);
             }
         }
     } 
@@ -1270,11 +1270,11 @@ void rdModel3_CalcVertexNormals(rdModel3 *model)
                 {
                     if ( v13 == 1.0 )
                     {
-                        v19 = &mesh->vertices[faceRoot->vertexPosIdx[faceRoot->numVertices - 1]];
+                        v19 = &mesh->aVertices[faceRoot->vertexPosIdx[faceRoot->numVertices - 1]];
                         v22 = faceRoot->vertexPosIdx[1 % faceRoot->numVertices];
-                        mesh->vertexNormals[vtxNum].y = (mesh->vertices->y - mesh->vertices[v22].y) + (mesh->vertices->y - v19->y);
-                        mesh->vertexNormals[vtxNum].z = (mesh->vertices->z - mesh->vertices[v22].z) + (mesh->vertices->z - v19->z);
-                        mesh->vertexNormals[vtxNum].x = (mesh->vertices->x - mesh->vertices[v22].x) + (mesh->vertices->x - v19->x);
+                        mesh->vertexNormals[vtxNum].y = (mesh->aVertices->y - mesh->aVertices[v22].y) + (mesh->aVertices->y - v19->y);
+                        mesh->vertexNormals[vtxNum].z = (mesh->aVertices->z - mesh->aVertices[v22].z) + (mesh->aVertices->z - v19->z);
+                        mesh->vertexNormals[vtxNum].x = (mesh->aVertices->x - mesh->aVertices[v22].x) + (mesh->aVertices->x - v19->x);
                     }
                     else
                     {
@@ -1508,7 +1508,7 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
     }
 
     rdMatrix_Multiply34(&out, &rdCamera_g_pCurCamera->view_matrix, mat);
-    rdMatrix_TransformPointList34(&out, pCurMesh->vertices, aView, pCurMesh->numVertices);
+    rdMatrix_TransformPointList34(&out, pCurMesh->aVertices, aView, pCurMesh->numVertices);
     rdMatrix_InvertOrtho34(&matInv, mat);
     
     rdModel3_geometryMode = pCurMesh->geometryMode;
@@ -1537,10 +1537,10 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
         rdModel3_textureMode = curTextureMode;
 
     vertexSrc.paDynamicLight = pCurMesh->vertices_unk;
-    vertexSrc.vertices = aView;
-    vertexSrc.vertexUVs = pCurMesh->vertexUVs;
+    vertexSrc.aVertices = aView;
+    vertexSrc.aTexVerticies = pCurMesh->aTexVerticies;
     vertexSrc.intensities = 0;
-    vertexDst.vertices = aFaceVerts;
+    vertexDst.aVertices = aFaceVerts;
 
     if (rdModel3_lightingMode == RD_LIGHTMODE_FULLYLIT)
     {
@@ -1619,7 +1619,7 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
 #endif
             rdModel3_numMeshLights,
             pCurMesh->vertexNormals,
-            pCurMesh->vertices,
+            pCurMesh->aVertices,
             pCurMesh->vertices_i,
             pCurMesh->vertices_unk,
             pCurMesh->numVertices,
@@ -1647,9 +1647,9 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
     for (int i = 0; i < meshIn->numFaces; i++)
     {
         int flags = 0;
-        flex_t normalCheck = (localCamera.y - pCurMesh->vertices[*face->vertexPosIdx].y) * face->normal.y
-           + (localCamera.x - pCurMesh->vertices[*face->vertexPosIdx].x) * face->normal.x
-           + (localCamera.z - pCurMesh->vertices[*face->vertexPosIdx].z) * face->normal.z;
+        flex_t normalCheck = (localCamera.y - pCurMesh->aVertices[*face->vertexPosIdx].y) * face->normal.y
+           + (localCamera.x - pCurMesh->aVertices[*face->vertexPosIdx].x) * face->normal.x
+           + (localCamera.z - pCurMesh->aVertices[*face->vertexPosIdx].z) * face->normal.z;
         
         // Allow rendering faces facing away from camera if they're double-sided,
         // or we aren't doing backface culling
@@ -1713,8 +1713,8 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
     procEntry->geometryMode = geometryMode;
     procEntry->lightingMode = lightingMode;
     procEntry->textureMode = textureMode;
-    vertexDst.verticesOrig = procEntry->vertices;
-    vertexDst.vertexUVs = procEntry->vertexUVs;
+    vertexDst.verticesOrig = procEntry->aVertices;
+    vertexDst.aTexVerticies = procEntry->aTexVerticies;
     vertexDst.paDynamicLight = procEntry->vertexIntensities;
     vertexSrc.numVertices = face->numVertices;
     vertexSrc.vertexPosIdx = face->vertexPosIdx;
@@ -1755,7 +1755,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
                       rdModel3_numMeshLights,
                       face,
                       &faceNormal,
-                      pCurMesh->vertices,
+                      pCurMesh->aVertices,
                       rdCamera_g_pCurCamera->attenuationMin);
         }
         else
@@ -1766,11 +1766,11 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
                       rdModel3_numMeshLights,
                       face,
                       &face->normal,
-                      pCurMesh->vertices,
+                      pCurMesh->aVertices,
                       rdCamera_g_pCurCamera->attenuationMin);
         }
     }
-    rdCamera_g_pCurCamera->fnProjectLst(vertexDst.verticesOrig, vertexDst.vertices, vertexDst.numVertices);
+    rdCamera_g_pCurCamera->fnProjectLst(vertexDst.verticesOrig, vertexDst.aVertices, vertexDst.numVertices);
     if ( rdroid_g_curRenderOptions & 2 )
         procEntry->ambientLight = rdCamera_g_pCurCamera->ambientLight;
     else
@@ -1867,12 +1867,12 @@ void rdModel3_EnsureMaterialData(rdThing *pRdThing) {
         return;
     }
     pModel3 = pRdThing->model3;
-    if (!pModel3 || !pModel3->materials) {
+    if (!pModel3 || !pModel3->aMaterials) {
         return;
     }
 
-    for (int i = 0; i < pModel3->numMaterials; i++)
+    for (int i = 0; i < pModel3->sizeMaterials; i++)
     {
-        rdMaterial_EnsureData(pModel3->materials[i]);
+        rdMaterial_EnsureData(pModel3->aMaterials[i]);
     }
 }

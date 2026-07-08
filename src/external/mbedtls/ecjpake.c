@@ -243,7 +243,7 @@ static int ecjpake_hash(const mbedtls_md_type_t md_type,
     const size_t id_len = strlen(id);
     unsigned char hash[MBEDTLS_HASH_MAX_SIZE];
 
-    /* Write things to temporary buffer */
+    /* Write aThings to temporary buffer */
     MBEDTLS_MPI_CHK(ecjpake_write_len_point(&p, end, grp, pf, G));
     MBEDTLS_MPI_CHK(ecjpake_write_len_point(&p, end, grp, pf, V));
     MBEDTLS_MPI_CHK(ecjpake_write_len_point(&p, end, grp, pf, X));
@@ -718,7 +718,7 @@ int mbedtls_ecjpake_write_round_two(mbedtls_ecjpake_context *ctx,
     MBEDTLS_MPI_CHK(mbedtls_ecp_mul(&ctx->grp, &Xm, &xm, &G, f_rng, p_rng));
 
     /*
-     * Now write things out
+     * Now write aThings out
      *
      * struct {
      *     ECParameters curve_params;   // only server writing its message

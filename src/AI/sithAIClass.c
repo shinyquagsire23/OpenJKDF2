@@ -32,60 +32,60 @@ int sithAIClass_AllocWorldAIClasses(SithWorld *world, int a2)
     { TWL_EXTRAM_SUGGEST(pSithHS); // Added: parsed once, word-width fields (fpath is debug-only)
     result = (intptr_t)SITH_ALLOC(sizeof(SithAIClass) * a2);
     TWL_EXTRAM_RESTORE(pSithHS); }
-    world->aiclasses = (SithAIClass *)result;
+    world->aAIClasses = (SithAIClass *)result;
     if (result)
     {
         stdPlatform_Memzero32((void *)result, sizeof(SithAIClass) * a2); // Added: word-safe
-        world->numAIClasses = a2;
-        world->numAIClassesLoaded = 0;
+        world->sizeAIClasses = a2;
+        world->numAIClasses = 0;
         result = 1;
     }
     else
     {
+        world->sizeAIClasses = 0;
         world->numAIClasses = 0;
-        world->numAIClassesLoaded = 0;
     }
     return result;
 }
 
 int sithAIClass_ReadStaticAIClassesListText(SithWorld *world, int a2)
 {
-    int numAIClasses; // ebx
-    SithAIClass *aiclasses; // eax
+    int sizeAIClasses; // ebx
+    SithAIClass *aAIClasses; // eax
 
     if (a2) {
         return 0;
     }
     stdConffile_ReadArgs();
-    if (_strcmp(stdConffile_g_entry.args[0].value, "world") || _strcmp(stdConffile_g_entry.args[1].value, "aiclasses")) {
+    if (_strcmp(stdConffile_g_entry.args[0].value, "world") || _strcmp(stdConffile_g_entry.args[1].value, "aAIClasses")) {
         return 0;
     }
-    numAIClasses = _atoi(stdConffile_g_entry.args[2].value);
-    if (!numAIClasses) {
+    sizeAIClasses = _atoi(stdConffile_g_entry.args[2].value);
+    if (!sizeAIClasses) {
         return 1;
     }
     { TWL_EXTRAM_SUGGEST(pSithHS); // Added: parsed once, word-width fields (fpath is debug-only)
-    aiclasses = (SithAIClass *)SITH_ALLOC(sizeof(SithAIClass) * numAIClasses);
+    aAIClasses = (SithAIClass *)SITH_ALLOC(sizeof(SithAIClass) * sizeAIClasses);
     TWL_EXTRAM_RESTORE(pSithHS); }
-    world->aiclasses = aiclasses;
-    if (!aiclasses)
+    world->aAIClasses = aAIClasses;
+    if (!aAIClasses)
     {
+        world->sizeAIClasses = 0;
         world->numAIClasses = 0;
-        world->numAIClassesLoaded = 0;
-        stdPrintf(pSithHS->errorPrint, ".\\Ai\\sithAIClass.c", 176, "Memory error while reading aiclasses, line %d.\n", stdConffile_linenum);
+        stdPrintf(pSithHS->errorPrint, ".\\Ai\\sithAIClass.c", 176, "Memory error while reading aAIClasses, line %d.\n", stdConffile_linenum);
         return 0;
     }
     
-    stdPlatform_Memzero32(aiclasses, sizeof(SithAIClass) * numAIClasses); // Added: word-safe
-    world->numAIClassesLoaded = 0;
-    world->numAIClasses = numAIClasses;
+    stdPlatform_Memzero32(aAIClasses, sizeof(SithAIClass) * sizeAIClasses); // Added: word-safe
+    world->numAIClasses = 0;
+    world->sizeAIClasses = sizeAIClasses;
     if ( stdConffile_ReadArgs() )
     {
         while ( _strcmp(stdConffile_g_entry.args[0].value, "end") )
         {
             if ( !sithAIClass_Load(stdConffile_g_entry.args[1].value) )
             {
-                stdPrintf(pSithHS->errorPrint, ".\\Ai\\sithAIClass.c", 172, "Parse error while reading aiclasses, line %d.\n", stdConffile_linenum);
+                stdPrintf(pSithHS->errorPrint, ".\\Ai\\sithAIClass.c", 172, "Parse error while reading aAIClasses, line %d.\n", stdConffile_linenum);
                 return 0;
             }
             if ( !stdConffile_ReadArgs() )
@@ -104,7 +104,7 @@ SithAIClass* sithAIClass_Load(char *fpath)
     char fullpath[128]; // [esp+10h] [ebp-80h] BYREF
 
     world = sithWorld_g_pLastLoadedWorld;
-    if ( !sithWorld_g_pLastLoadedWorld->aiclasses )
+    if ( !sithWorld_g_pLastLoadedWorld->aAIClasses )
         return 0;
 
     result = (SithAIClass *)stdHashtbl_Find(sithAIClass_g_pHashtable, fpath);
@@ -113,11 +113,11 @@ SithAIClass* sithAIClass_Load(char *fpath)
 
     _sprintf(fullpath, "%s%c%s", "misc\\ai", 92, fpath);
 
-    numLoaded = world->numAIClassesLoaded;
-    if ( numLoaded >= world->numAIClasses )
+    numLoaded = world->numAIClasses;
+    if ( numLoaded >= world->sizeAIClasses )
         return 0;
 
-    aiclass = &world->aiclasses[numLoaded];
+    aiclass = &world->aAIClasses[numLoaded];
 
     stdPlatform_Memzero32(aiclass, sizeof(SithAIClass)); // Added: word-safe
 
@@ -136,7 +136,7 @@ SithAIClass* sithAIClass_Load(char *fpath)
 #else
         stdHashtbl_Add(sithAIClass_g_pHashtable, fpath, aiclass);
 #endif
-        aiclass->index = world->numAIClassesLoaded++;
+        aiclass->index = world->numAIClasses++;
         
         return aiclass;
     }
@@ -253,19 +253,19 @@ int sithAIClass_LoadEntry(char *fpath, SithAIClass *aiclass)
 
 void sithAIClass_FreeWorldAIClasses(SithWorld *world)
 {
-    if (world->aiclasses)
+    if (world->aAIClasses)
     {
-        for (uint32_t i = 0; i < world->numAIClassesLoaded; i++)
+        for (uint32_t i = 0; i < world->numAIClasses; i++)
         {
 #ifdef STDHASHTABLE_CRC32_KEYS
-            stdHashtbl_FreeKeyCrc32(sithAIClass_g_pHashtable, world->aiclasses[i].fpathcrc);
+            stdHashtbl_FreeKeyCrc32(sithAIClass_g_pHashtable, world->aAIClasses[i].fpathcrc);
 #else
-            stdHashtbl_Remove(sithAIClass_g_pHashtable, world->aiclasses[i].fpath);
+            stdHashtbl_Remove(sithAIClass_g_pHashtable, world->aAIClasses[i].fpath);
 #endif
         }
-        SITH_FREE(world->aiclasses);
-        world->aiclasses = 0;
+        SITH_FREE(world->aAIClasses);
+        world->aAIClasses = 0;
     }
+    world->sizeAIClasses = 0;
     world->numAIClasses = 0;
-    world->numAIClassesLoaded = 0;
 }

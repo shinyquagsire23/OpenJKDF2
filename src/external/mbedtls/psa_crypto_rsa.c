@@ -50,7 +50,7 @@
  * that are not a multiple of 8) well. For example, there is only
  * mbedtls_rsa_get_len(), which returns a number of bytes, and no
  * way to return the exact bit size of a key.
- * To keep things simple, reject non-byte-aligned key sizes. */
+ * To keep aThings simple, reject non-byte-aligned key sizes. */
 static psa_status_t psa_check_rsa_key_byte_aligned(
     const mbedtls_rsa_context *rsa)
 {

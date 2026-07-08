@@ -50,7 +50,7 @@ void sithWeapon_DamageWeapon(SithThing *weapon, SithThing* a2, flex_t timeLeft);
 MATH_FUNC int sithWeapon_ThingCollisionHandler(SithThing *physicsThing, SithThing *collidedThing, SithCollision *a4, int a5);
 MATH_FUNC int sithWeapon_SurfaceCollisionHandler(SithThing *thing, SithSurface *surface, SithCollision *a3);
 void sithWeapon_DestroyWeapon(SithThing *weapon);
-void sithWeapon_CreateWeaponExplosion(SithThing *weapon, SithThing *explodeTemplate);
+void sithWeapon_CreateWeaponExplosion(SithThing *weapon, SithThing *pExplosionTemplate);
 void sithWeapon_StartupEntry();
 void sithWeapon_ShutdownEntry();
 int sithWeapon_SelectWeapon(SithThing *player, int binIdx, int a3);

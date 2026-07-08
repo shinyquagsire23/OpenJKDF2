@@ -1277,7 +1277,7 @@ int cert_stuff(struct Curl_easy *data,
     int cert_use_result;
 
     if(key_passwd) {
-      /* set the password in the callback userdata */
+      /* set the password in the callback userval */
       SSL_CTX_set_default_passwd_cb_userdata(ctx, key_passwd);
       /* Set passwd callback: */
       SSL_CTX_set_default_passwd_cb(ctx, passwd_callback);

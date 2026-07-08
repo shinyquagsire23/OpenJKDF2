@@ -486,7 +486,7 @@ struct Cookie *
 Curl_cookie_add(struct Curl_easy *data,
                 /*
                  * The 'data' pointer here may be NULL at times, and thus
-                 * must only be used very carefully for things that can deal
+                 * must only be used very carefully for aThings that can deal
                  * with data being NULL. Such as infof() and similar
                  */
                 struct CookieInfo *c,

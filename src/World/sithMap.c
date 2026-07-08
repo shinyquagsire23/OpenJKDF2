@@ -50,7 +50,7 @@ void sithMap_DrawCircle(rdCamera *camera, rdMatrix34 *viewMat)
     rdSetLightingMode(1);
     sithMap_pCurCamera = camera;
     sithMap_pCurWorld = sithWorld_g_pCurrentWorld;
-    sithMap_pPlayerThing = sithWorld_g_pCurrentWorld->playerThing;
+    sithMap_pPlayerThing = sithWorld_g_pCurrentWorld->pLocalPlayer;
     rdMatrix_Multiply34(&sithMap_camera, &camera->view_matrix, viewMat);
     rdMatrix_InvertOrtho34(&sithMap_invMatrix, &sithMap_camera);
     v2 = sithMap_pPlayerThing;
@@ -80,7 +80,7 @@ LABEL_10:
     }
 LABEL_11:
     if ( sithNet_isMulti && (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 )
-        color = sithMap_ctx.teamColors[v2->actorParams.playerinfo->teamNum];
+        color = sithMap_ctx.teamColors[v2->actorParams.pPlayer->teamNum];
     else
         color = sithMap_ctx.playerColor;
     rdMatrix_TransformPoint34(&vertex_out, &v2->position, &sithMap_camera);
@@ -181,7 +181,7 @@ int sithMap_Draw(SithSector *sector)
         {
             if ( surfaceIter->surfaceInfo.face.geometryMode )
             {
-                v7 = v4->vertices;
+                v7 = v4->aVertices;
                 if ( (sithMap_flt_84DEAC - v7[*surfaceIter->surfaceInfo.face.vertexPosIdx].z) * surfaceIter->surfaceInfo.face.normal.z
                    + (sithMap_flt_84DEA8 - v7[*surfaceIter->surfaceInfo.face.vertexPosIdx].y) * surfaceIter->surfaceInfo.face.normal.y
                    + (sithMap_invMatrix.scale.x - v7[*surfaceIter->surfaceInfo.face.vertexPosIdx].x) * surfaceIter->surfaceInfo.face.normal.x > 0.0 )
@@ -199,7 +199,7 @@ int sithMap_Draw(SithSector *sector)
                                 v11 = v10;
                                 if ( sithWorld_g_pCurrentWorld->alloc_unk98[v10] != v5 )
                                 {
-                                    rdMatrix_TransformPoint34(&v4->verticesTransformed[v10], &v4->vertices[v10], &sithMap_camera);
+                                    rdMatrix_TransformPoint34(&v4->aTransformedVertices[v10], &v4->aVertices[v10], &sithMap_camera);
                                     v4 = sithMap_pCurWorld;
                                     v5 = sithRender_lastRenderTick;
                                     sithMap_pCurWorld->alloc_unk98[v11] = sithRender_lastRenderTick;
@@ -223,8 +223,8 @@ int sithMap_Draw(SithSector *sector)
                             v17 = v15[(v14 + 1) % v13];
                             if ( sithMap_IsSurfaceDrawable(a1, v16, v17) )
                             {
-                                point1 = sithMap_pCurWorld->verticesTransformed[v16];
-                                point2 = sithMap_pCurWorld->verticesTransformed[v17];
+                                point1 = sithMap_pCurWorld->aTransformedVertices[v16];
+                                point2 = sithMap_pCurWorld->aTransformedVertices[v17];
                                 if ( rdClip_Line3Project(sithMap_pCurCamera->pClipFrustum, &point1, &point2, &out1, &out2) )
                                 {
                                     sithMap_pCurCamera->fnProject(&v46, &point1);
@@ -282,9 +282,9 @@ LABEL_22:
     }
     if (g_mapModeFlags & (SITHMAPMODE_SHOWALLTHINGS | SITHMAPMODE_SHOWACTORS | SITHMAPMODE_SHOWPLAYERS))
     {
-        for ( i = v1->thingsList; i; i = i->nextThing )
+        for ( i = v1->pFirstThingInSector; i; i = i->pNextThingInSector )
         {
-            if ( i != sithWorld_g_pCurrentWorld->cameraFocus && (i->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_DESTROYED)) == 0 )
+            if ( i != sithWorld_g_pCurrentWorld->pCameraFocusThing && (i->flags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_DESTROYED)) == 0 )
             {
                 int v37 = (g_mapModeFlags & SITHMAPMODE_SHOWALLTHINGS) != 0;
                 switch ( i->type )
@@ -293,7 +293,7 @@ LABEL_22:
                         if (g_mapModeFlags & (SITHMAPMODE_SHOWACTORS | SITHMAPMODE_SHOWPLAYERS))
                             v37 = 1;
                         if ( sithNet_isMulti && (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 )
-                            circleColor = sithMap_ctx.teamColors[i->actorParams.playerinfo->teamNum];
+                            circleColor = sithMap_ctx.teamColors[i->actorParams.pPlayer->teamNum];
                         else
                             circleColor = sithMap_ctx.playerColor & 0xFF;
                         break;
@@ -353,7 +353,7 @@ int sithMap_IsSurfaceDrawable(SithSurface *pSurface, int idx, int idx2)
     SithSector *v25; // [esp+1Ch] [ebp-4h]
     unsigned int v26; // [esp+1Ch] [ebp-4h]
 
-    v3 = pSurface->parent_sector;
+    v3 = pSurface->pSector;
     v25 = v3;
     v20 = 0;
     v4 = v3->numSurfaces;
@@ -365,7 +365,7 @@ int sithMap_IsSurfaceDrawable(SithSurface *pSurface, int idx, int idx2)
         surfaceIter = v5;
         while ( 1 )
         {
-            if ( v5 != pSurface && !surfaceIter->adjoin )
+            if ( v5 != pSurface && !surfaceIter->pAdjoin )
             {
                 v7 = surfaceIter->surfaceInfo.face.numVertices;
                 v8 = 0;

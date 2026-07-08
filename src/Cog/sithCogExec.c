@@ -543,8 +543,8 @@ sithCog* sithCogExec_PopCog(sithCog *ctx)
         world = sithWorld_g_pStaticWorld;
         cogIdx &= ~0x8000;
     }
-    if ( world && cogIdx >= 0 && (uint32_t )cogIdx < world->numCogsLoaded )
-        return &world->cogs[cogIdx];
+    if ( world && cogIdx >= 0 && (uint32_t )cogIdx < world->numCogs )
+        return &world->aCogs[cogIdx];
 
     return NULL;
 } 
@@ -591,10 +591,10 @@ SithThing* sithCogExec_PopThing(sithCog *ctx)
     
     if ( world && idx >= 0 && idx <= world->numThings ) // TODO is this correct...? vs world->numThingsLoaded
     {
-        if (world->things[idx].type == SITH_THING_FREE)
+        if (world->aThings[idx].type == SITH_THING_FREE)
             return NULL;
 
-        return &world->things[idx];
+        return &world->aThings[idx];
     }
 
     return NULL;
@@ -743,7 +743,7 @@ SithSector* sithCogExec_PopSector(sithCog *ctx)
     
     if ( world && idx >= 0 && idx < world->numSectors )
     {
-        return &world->sectors[idx];
+        return &world->aSectors[idx];
     }
 
     return NULL;
@@ -844,9 +844,9 @@ rdMaterial* sithCogExec_PopMaterial(sithCog *ctx)
         idx &= ~0x8000; // ?
     }
     
-    if ( world && idx >= 0 && idx < world->numMaterialsLoaded )
+    if ( world && idx >= 0 && idx < world->numMaterials )
     {
-        return &world->materials[idx];
+        return &world->aMaterials[idx];
     }
 
     return NULL;
@@ -898,9 +898,9 @@ rdModel3* sithCogExec_PopModel3(sithCog *ctx)
         idx &= ~0x8000; // ?
     }
     
-    if ( world && idx >= 0 && idx < world->numModelsLoaded )
+    if ( world && idx >= 0 && idx < world->numModels )
     {
-        return &world->models[idx];
+        return &world->aModels[idx];
     }
 
     return NULL;
@@ -952,8 +952,8 @@ rdKeyframe* sithCogExec_PopKeyframe(sithCog *ctx)
         idx &= ~0x8000; // ?
     }
 
-    if ( world && idx >= 0 && idx < world->numKeyframesLoaded )
-        return &world->keyframes[idx];
+    if ( world && idx >= 0 && idx < world->numKeyframes )
+        return &world->aKeyframes[idx];
 
     return NULL;
 }
@@ -998,8 +998,8 @@ SithAIClass* sithCogExec_PopAIClass(sithCog *ctx)
     if (idx == -1)
         return NULL;
     
-    if ( world && idx >= 0 && idx < world->numAIClassesLoaded )
-        return &world->aiclasses[idx];
+    if ( world && idx >= 0 && idx < world->numAIClasses )
+        return &world->aAIClasses[idx];
 
     return NULL;
 }

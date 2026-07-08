@@ -339,9 +339,9 @@ void jkCog_SetInvis(sithCog *pCog)
     v1 = sithCogExec_PopInt(pCog);
     v2 = sithCogExec_PopThing(pCog);
     if ( v1 <= 0 )
-        v2->rdthing.curGeoMode = v2->rdthing.desiredGeoMode;
+        v2->renderData.curGeoMode = v2->renderData.desiredGeoMode;
     else
-        v2->rdthing.curGeoMode = RD_GEOMETRY_VERTEX;
+        v2->renderData.curGeoMode = RD_GEOMETRY_VERTEX;
     if ( COG_SHOULD_SYNC(pCog) )
     {
         sithThing_SyncThing(v2, SITHTHING_SYNC_STATE);
@@ -358,12 +358,12 @@ void jkCog_SetInvulnerable(sithCog *pCog)
 
     v1 = sithCogExec_PopInt(pCog);
     v2 = sithCogExec_PopThing(pCog);
-    v3 = v2->actorParams.typeflags;
+    v3 = v2->actorParams.flags;
     if ( v1 <= 0 )
         v4 = v3 & ~8u;
     else
         v4 = v3 | 8;
-    v2->actorParams.typeflags = v4;
+    v2->actorParams.flags = v4;
     if ( COG_SHOULD_SYNC(pCog) )
     {
         sithThing_SyncThing(v2, SITHTHING_SYNC_STATE);
@@ -700,7 +700,7 @@ void jkCog_StringConcatPlayerName(sithCog *pCog)
     {
         if ( v1->type == SITH_THING_PLAYER )
         {
-            v2 = v1->actorParams.playerinfo;
+            v2 = v1->actorParams.pPlayer;
             if ( v2 )
             {
                 finalLen = _wcslen(v2->player_name) + _wcslen(jkCog_jkstring);
@@ -895,7 +895,7 @@ void jkCog_BeginCutscene(sithCog *ctx)
 {
     jkGuiMultiplayer_mpcInfo.pCutsceneCog = ctx;
     if (sithPlayer_g_pLocalPlayerThing) {
-        sithPlayer_g_pLocalPlayerThing->actorParams.typeflags |= SITH_AF_NOIDLECAMERA;
+        sithPlayer_g_pLocalPlayerThing->actorParams.flags |= SITH_AF_NOIDLECAMERA;
     }
 }
 
@@ -904,7 +904,7 @@ void jkCog_EndCutscene(sithCog *ctx)
 {
     jkGuiMultiplayer_mpcInfo.pCutsceneCog = NULL;
     if (sithPlayer_g_pLocalPlayerThing) {
-        sithPlayer_g_pLocalPlayerThing->actorParams.typeflags &= ~SITH_AF_NOIDLECAMERA;
+        sithPlayer_g_pLocalPlayerThing->actorParams.flags &= ~SITH_AF_NOIDLECAMERA;
     }
 }
 
@@ -989,7 +989,7 @@ void jkCog_ThingInBubble(sithCog *ctx)
     SithThing* pThing = sithCogExec_PopThing(ctx);
     int iVar1 = jkEpisode_GetBubbleInfo(pThing, NULL, &pThingOut, NULL);
     if (iVar1 != 0) {
-        sithCogExec_PushInt(ctx,pThingOut->thingIdx);
+        sithCogExec_PushInt(ctx,pThingOut->idx);
         return;
     }
     sithCogExec_PushInt(ctx,-1);
@@ -1004,7 +1004,7 @@ void jkCog_GetFirstBubble(sithCog *ctx)
         jkCog_bubbleIdx = jkCog_bubbleIdx + 1;
     }
     if (jkCog_bubbleIdx < 0x40) {
-        sithCogExec_PushInt(ctx,(jkPlayer_aBubbleInfo[jkCog_bubbleIdx].pThing)->thingIdx);
+        sithCogExec_PushInt(ctx,(jkPlayer_aBubbleInfo[jkCog_bubbleIdx].pThing)->idx);
         return;
     }
     sithCogExec_PushInt(ctx,-1);
@@ -1018,7 +1018,7 @@ void jkCog_GetNextBubble(sithCog *ctx)
         jkCog_bubbleIdx = jkCog_bubbleIdx + 1;
     }
     if (jkCog_bubbleIdx < 0x40) {
-        sithCogExec_PushInt(ctx,(jkPlayer_aBubbleInfo[jkCog_bubbleIdx].pThing)->thingIdx);
+        sithCogExec_PushInt(ctx,(jkPlayer_aBubbleInfo[jkCog_bubbleIdx].pThing)->idx);
         return;
     }
     sithCogExec_PushInt(ctx,-1);
@@ -1216,7 +1216,7 @@ void jkCogExt_GetThingAttachThing(sithCog* ctx)
         if (pThing->attach_flags == SITH_ATTACH_THINGFACE) {
             SithThing* pAttached = pThing->attachedThing;
             if (pAttached) {
-                retval = pAttached->thingIdx;
+                retval = pAttached->idx;
             }
         }
     }
@@ -1360,7 +1360,7 @@ void jkCogExt_IsAdjoin(sithCog* ctx)
 {
     SithSurface* pSurface = sithCogExec_PopSurface(ctx);
     int retval = 0;
-    if (pSurface && pSurface->adjoin) {
+    if (pSurface && pSurface->pAdjoin) {
         retval = 1;
     }
 

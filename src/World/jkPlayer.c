@@ -352,15 +352,15 @@ void jkPlayer_InitSaber()
         jkPlayerInfo* playerInfoJk = &playerThings[i];
         SithPlayer* playerInfo = &jkPlayer_playerInfos[i];
 
-        playerInfoJk->actorThing = playerInfo->playerThing;
-        if (playerInfo->playerThing) // Added
-            playerInfo->playerThing->playerInfo = playerInfoJk;
+        playerInfoJk->actorThing = playerInfo->pLocalPlayer;
+        if (playerInfo->pLocalPlayer) // Added
+            playerInfo->pLocalPlayer->playerInfo = playerInfoJk;
         playerInfoJk->maxTwinkles = 8;
         playerInfoJk->twinkleSpawnRate = 16;
         playerInfoJk->bHasSuperWeapon = 0;
         playerInfoJk->bHasSuperShields = 0;
-        if (playerInfo->playerThing) // Added
-            playerInfo->playerThing->thingflags |= SITH_TF_RENDERWEAPON;
+        if (playerInfo->pLocalPlayer) // Added
+            playerInfo->pLocalPlayer->flags |= SITH_TF_RENDERWEAPON;
         playerInfoJk->bHasForceSurge = 0;
         
         // MOTS added
@@ -386,13 +386,13 @@ void jkPlayer_InitThings()
         jkPlayerInfo* playerInfoJk = &playerThings[i];
         SithPlayer* playerInfo = &jkPlayer_playerInfos[i];
 
-        playerInfoJk->actorThing = playerInfo->playerThing;
+        playerInfoJk->actorThing = playerInfo->pLocalPlayer;
 
         // Added: Possible nullptr deref in co-op? wtf is this loop doing anyhow
-        if (playerInfo->playerThing)
+        if (playerInfo->pLocalPlayer)
         {
-            playerInfo->playerThing->playerInfo = playerInfoJk;
-            playerInfo->playerThing->thingflags |= SITH_TF_RENDERWEAPON;
+            playerInfo->pLocalPlayer->playerInfo = playerInfoJk;
+            playerInfo->pLocalPlayer->flags |= SITH_TF_RENDERWEAPON;
         }
     }
 
@@ -403,15 +403,15 @@ void jkPlayer_InitThings()
 #ifdef QOL_IMPROVEMENTS
     for (int i = 0; i < sithWorld_g_pCurrentWorld->numThingsLoaded; i++)
     {
-        SithThing* thingIter = &sithWorld_g_pCurrentWorld->things[i];
+        SithThing* thingIter = &sithWorld_g_pCurrentWorld->aThings[i];
 
         if (thingIter->type == SITH_THING_ACTOR 
-            && thingIter->actorParams.typeflags & SITH_AF_BOSS 
+            && thingIter->actorParams.flags & SITH_AF_BOSS 
             && thingIter->playerInfo )
         {
             thingIter->playerInfo->actorThing = thingIter;
             thingIter->playerInfo->rd_thing.model3 = 0;
-            thingIter->thingflags |= SITH_TF_RENDERWEAPON;
+            thingIter->flags |= SITH_TF_RENDERWEAPON;
 
             jkPlayer_numOtherThings++;
             num++;
@@ -423,10 +423,10 @@ void jkPlayer_InitThings()
     jkPlayerInfo* playerInfoIter = &jkPlayer_otherThings[jkPlayer_numOtherThings];
     for (int i = 0; i < sithWorld_g_pCurrentWorld->numThingsLoaded; i++)
     {
-        SithThing* thingIter = &sithWorld_g_pCurrentWorld->things[i];
+        SithThing* thingIter = &sithWorld_g_pCurrentWorld->aThings[i];
 
         if (thingIter->type == SITH_THING_ACTOR 
-            && thingIter->actorParams.typeflags & SITH_AF_BOSS 
+            && thingIter->actorParams.flags & SITH_AF_BOSS 
             && playerInfoIter < &jkPlayer_otherThings[NUM_JKPLAYER_THINGS] // off by one?
             && !thingIter->playerInfo // Added: skip already initted
             ) 
@@ -434,7 +434,7 @@ void jkPlayer_InitThings()
             playerInfoIter->actorThing = thingIter;
             thingIter->playerInfo = playerInfoIter;
             playerInfoIter->rd_thing.model3 = 0;
-            thingIter->thingflags |= SITH_TF_RENDERWEAPON;
+            thingIter->flags |= SITH_TF_RENDERWEAPON;
 
             // MOTS added: weird hack?
             if (Main_bMotsCompat && !playerInfoIter->polylineThing.polyline) {
@@ -863,7 +863,7 @@ void jkPlayer_DrawPov()
         rdPuppet_UpdateTracks(playerThings[playerThingIdx].povModel.puppet, sithTime_g_frameTimeFlex);
     }
 
-    if ( !(sithCamera_g_pCurCamera->cameraPerspective & 0xFC) && sithCamera_g_pCurCamera->primaryFocus == sithWorld_g_pCurrentWorld->cameraFocus )
+    if ( !(sithCamera_g_pCurCamera->cameraPerspective & 0xFC) && sithCamera_g_pCurCamera->primaryFocus == sithWorld_g_pCurrentWorld->pCameraFocusThing )
     {
         SithThing* player = playerThings[playerThingIdx].actorThing;
 
@@ -886,7 +886,7 @@ void jkPlayer_DrawPov()
         // TODO is this a macro/func?
         flex_t angleSin, angleCos;
         stdMath_SinCos(jkPlayer_waggleAngle, &angleSin, &angleCos);
-        flex_t velNorm = rdVector_Len3(&player->physicsParams.vel) / player->physicsParams.maxVel; // MOTS altered: uses 1.538462 for something (performance hack?)
+        flex_t velNorm = rdVector_Len3(&player->physicsParams.vel) / player->physicsParams.maxVelocity; // MOTS altered: uses 1.538462 for something (performance hack?)
         if (angleCos > 0) // verify?
             angleCos = -angleCos;
 #ifdef QOL_IMPROVEMENTS
@@ -983,7 +983,7 @@ void jkPlayer_renderSaberWeaponMesh(SithThing *thing)
     jkPlayerInfo* playerInfo = thing->playerInfo;
     if (!playerInfo) {
         // Added: hackfix for weird blades?
-        if (thing->actorParams.typeflags & SITH_AF_BOSS ) {
+        if (thing->actorParams.flags & SITH_AF_BOSS ) {
             jk_printf("OpenJKDF2: Boss w/o a blade? Fixing... %p\n", thing);
 
             jkPlayer_FUN_00404fe0(thing);
@@ -996,53 +996,53 @@ void jkPlayer_renderSaberWeaponMesh(SithThing *thing)
         return;
     }
 
-    if (!thing->animclass)
+    if (!thing->pPuppetClass)
         return;
 
-    int primary_mesh = thing->animclass->bodypart_to_joint[JOINTTYPE_PRIMARYWEAP];
-    int secondary_mesh = thing->animclass->bodypart_to_joint[JOINTTYPE_SECONDARYWEAP];
+    int primary_mesh = thing->pPuppetClass->bodypart_to_joint[JOINTTYPE_PRIMARYWEAP];
+    int secondary_mesh = thing->pPuppetClass->bodypart_to_joint[JOINTTYPE_SECONDARYWEAP];
 
     // Attempt to find a proper secondary weapon hand
-    if (thing->jkFlags & JKFLAG_DUALSABERS && primary_mesh == secondary_mesh && thing->rdthing.model3) {
-        for (int i = 0; i < thing->rdthing.model3->numHierarchyNodes; i++)
+    if (thing->jkFlags & JKFLAG_DUALSABERS && primary_mesh == secondary_mesh && thing->renderData.model3) {
+        for (int i = 0; i < thing->renderData.model3->numHierarchyNodes; i++)
         {
-            int l = _strlen(thing->rdthing.model3->hierarchyNodes[i].name);
+            int l = _strlen(thing->renderData.model3->hierarchyNodes[i].name);
             if (l < 5) continue;
 
-            if (!__strcmpi(thing->rdthing.model3->hierarchyNodes[i].name + (l - 5), "lhand")) {
+            if (!__strcmpi(thing->renderData.model3->hierarchyNodes[i].name + (l - 5), "lhand")) {
                 secondary_mesh = i;
                 break;
             }
         }
 
         if (primary_mesh != secondary_mesh) {
-            thing->animclass->bodypart_to_joint[JOINTTYPE_SECONDARYWEAP] = secondary_mesh;
+            thing->pPuppetClass->bodypart_to_joint[JOINTTYPE_SECONDARYWEAP] = secondary_mesh;
         }
     }
 
-    rdMatrix34* primaryMat = &thing->rdthing.hierarchyNodeMatrices[primary_mesh];
-    rdMatrix34* secondaryMat = &thing->rdthing.hierarchyNodeMatrices[secondary_mesh];
+    rdMatrix34* primaryMat = &thing->renderData.hierarchyNodeMatrices[primary_mesh];
+    rdMatrix34* secondaryMat = &thing->renderData.hierarchyNodeMatrices[secondary_mesh];
 
     if (thing->jkFlags & JKFLAG_PERSUASION)
     {
         if ( sithPlayer_g_pLocalPlayer->iteminfo[SITHBIN_F_SEEING].state & SITHINVENTORY_ITEM_ACTIVATED )
         {
-            rdGeoMode_t oldGeoMode = thing->rdthing.curGeoMode;
+            rdGeoMode_t oldGeoMode = thing->renderData.curGeoMode;
 #ifdef TARGET_TWL
             // Added: Don't draw them twice wtf
-            if (thing->rdthing.curGeoMode != thing->rdthing.desiredGeoMode) {
+            if (thing->renderData.curGeoMode != thing->renderData.desiredGeoMode) {
 #endif
-            thing->rdthing.curGeoMode = thing->rdthing.desiredGeoMode;
-            rdVector_Copy3(&thing->lookOrientation.scale, &thing->position);
-            rdThing_Draw(&thing->rdthing, &thing->lookOrientation);
+            thing->renderData.curGeoMode = thing->renderData.desiredGeoMode;
+            rdVector_Copy3(&thing->orient.scale, &thing->position);
+            rdThing_Draw(&thing->renderData, &thing->orient);
 #ifdef TARGET_TWL
             }
 #endif
 
-            thing->lookOrientation.scale.x = 0.0;
-            thing->lookOrientation.scale.y = 0.0;
-            thing->lookOrientation.scale.z = 0.0;
-            thing->rdthing.curGeoMode = oldGeoMode;
+            thing->orient.scale.x = 0.0;
+            thing->orient.scale.y = 0.0;
+            thing->orient.scale.z = 0.0;
+            thing->renderData.curGeoMode = oldGeoMode;
 
             if (playerInfo->rd_thing.model3)
                 rdThing_Draw(&playerInfo->rd_thing, primaryMat);
@@ -1060,7 +1060,7 @@ void jkPlayer_renderSaberWeaponMesh(SithThing *thing)
             jkPlayer_renderSaberTwinkle(thing);
         }
     }
-    else if ( thing->rdthing.curGeoMode > RD_GEOMETRY_NONE)
+    else if ( thing->renderData.curGeoMode > RD_GEOMETRY_NONE)
     {
         if (playerInfo->rd_thing.model3)
             rdThing_Draw(&playerInfo->rd_thing, primaryMat);
@@ -1097,9 +1097,9 @@ void jkPlayer_renderSaberTwinkle(SithThing *player)
     {
         if ( sithTime_g_msecGameTime > playerInfo->nextTwinkleSpawnMs )
         {
-            rdThing* rdthing = &playerInfo->actorThing->rdthing;
+            rdThing* renderData = &playerInfo->actorThing->renderData;
             playerInfo->nextTwinkleSpawnMs += 40;
-            rdModel3* model = rdthing->model3;
+            rdModel3* model = renderData->model3;
             
             // Added: Changed both of these from `_frand() * max` to `_rand() % max`
             // to prevent an off-by-one heap buffer overflow.
@@ -1109,8 +1109,8 @@ void jkPlayer_renderSaberTwinkle(SithThing *player)
             {
                 uint32_t vtxIdx = (_rand() % model->geosets[0].meshes[meshIdx].numVertices);
 
-                rdModel3_GetMeshMatrix(rdthing, &playerInfo->actorThing->lookOrientation, meshIdx, &matTmp);
-                rdMatrix_TransformPoint34(&vTmp, &model->geosets[0].meshes[meshIdx].vertices[vtxIdx], &matTmp);
+                rdModel3_GetMeshMatrix(renderData, &playerInfo->actorThing->orient, meshIdx, &matTmp);
+                rdMatrix_TransformPoint34(&vTmp, &model->geosets[0].meshes[meshIdx].aVertices[vtxIdx], &matTmp);
 
                 sithThing_CreateThingAtPos(sithTemplate_GetTemplate("+twinkle"), &vTmp, &matTmp, player->sector, 0);
 
@@ -1192,14 +1192,14 @@ int jkPlayer_VerifyCharName(char *name)
     return jkPlayer_VerifyWcharName(tmp);
 }
 
-void jkPlayer_SetMpcInfo(wchar_t *name, char *model, char *soundclass, char *sidemat, char *tipmat)
+void jkPlayer_SetMpcInfo(wchar_t *name, char *model, char *pSoundClass, char *sidemat, char *tipmat)
 {
     jkPlayer_mpcInfoSet = 1;
     
     // TODO macro these
     _strncpy(jkPlayer_model, model, 0x1Fu);
     jkPlayer_model[31] = 0;
-    _strncpy(jkPlayer_soundClass, soundclass, 0x1Fu);
+    _strncpy(jkPlayer_soundClass, pSoundClass, 0x1Fu);
     jkPlayer_soundClass[31] = 0;
     _strncpy(jkPlayer_sideMat, sidemat, 0x1Fu);
     jkPlayer_sideMat[31] = 0;
@@ -1215,7 +1215,7 @@ void jkPlayer_SetPlayerName(wchar_t *name)
     jkPlayer_name[31] = 0;
 }
 
-int jkPlayer_GetMpcInfo(wchar_t *name, char *model, char *soundclass, char *sidemat, char *tipmat)
+int jkPlayer_GetMpcInfo(wchar_t *name, char *model, char *pSoundClass, char *sidemat, char *tipmat)
 {
     _wcsncpy(name, jkPlayer_name, 0x1Fu);
     name[31] = 0;
@@ -1225,8 +1225,8 @@ int jkPlayer_GetMpcInfo(wchar_t *name, char *model, char *soundclass, char *side
 
     _strncpy(model, jkPlayer_model, 0x1Fu);
     model[31] = 0;
-    _strncpy(soundclass, jkPlayer_soundClass, 0x1Fu);
-    soundclass[31] = 0;
+    _strncpy(pSoundClass, jkPlayer_soundClass, 0x1Fu);
+    pSoundClass[31] = 0;
     _strncpy(sidemat, jkPlayer_sideMat, 0x1Fu);
     sidemat[31] = 0;
     _strncpy(tipmat, jkPlayer_tipMat, 0x1Fu);
@@ -1326,7 +1326,7 @@ int jkPlayer_MPCParse(jkPlayerMpcInfo *info, SithPlayer* unk, wchar_t *fname, wc
       && stdConffile_ReadLine()
       && _sscanf(stdConffile_g_aLine, "model: %s", jkPlayer_model) == 1
       && stdConffile_ReadLine()
-      && _sscanf(stdConffile_g_aLine, "soundclass: %s", jkPlayer_soundClass) == 1
+      && _sscanf(stdConffile_g_aLine, "pSoundClass: %s", jkPlayer_soundClass) == 1
       && stdConffile_ReadLine()
       && _sscanf(stdConffile_g_aLine, "sidemat: %s", jkPlayer_sideMat) == 1
       && stdConffile_ReadLine()
@@ -1390,7 +1390,7 @@ int jkPlayer_MPCWrite(SithPlayer* unk, wchar_t *mpcName, wchar_t *playerName)
 
     stdConffile_Printf("version %d\n", 1);
     if ( stdConffile_Printf("model: %s\n", jkPlayer_model)
-      && stdConffile_Printf("soundclass: %s\n", jkPlayer_soundClass)
+      && stdConffile_Printf("pSoundClass: %s\n", jkPlayer_soundClass)
       && stdConffile_Printf("sidemat: %s\n", jkPlayer_sideMat)
       && stdConffile_Printf("tipmat: %s\n", jkPlayer_tipMat))
     {
@@ -2092,10 +2092,10 @@ jkPlayerInfo* jkPlayer_FUN_00404fe0(SithThing *pPlayerThing)
             continue;
 
         jkPlayer_aMotsInfos[iVar3].actorThing = pPlayerThing;
-        jkPlayer_aMotsInfos[iVar3].thing_id = pPlayerThing->thing_id;
+        jkPlayer_aMotsInfos[iVar3].guid = pPlayerThing->guid;
         jkPlayer_aMotsInfos[iVar3].rd_thing.model3 = NULL;
 
-        pPlayerThing->thingflags |= SITH_TF_RENDERWEAPON;
+        pPlayerThing->flags |= SITH_TF_RENDERWEAPON;
         pPlayerThing->playerInfo = &jkPlayer_aMotsInfos[iVar3];
         
         return pPlayerThing->playerInfo;

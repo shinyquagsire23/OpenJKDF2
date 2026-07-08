@@ -6,7 +6,7 @@
 
 #include <SDL.h>
 
-void my_audio_callback(void *userdata, Uint8 *stream, int len);
+void my_audio_callback(void *userval, Uint8 *stream, int len);
 void smush_audio_callback(const uint8_t* data, size_t len);
 
 #define AUDIO_QUEUE_DEPTH (64)
@@ -60,7 +60,7 @@ int main(int argc, char** argv)
     spec_want.channels = 2;
     spec_want.samples = 1024;
     spec_want.callback = my_audio_callback; 
-    spec_want.userdata = NULL;
+    spec_want.userval = NULL;
     SDL_AudioDeviceID* dev = SDL_OpenAudioDevice(NULL, 0, &spec_want, &spec_have, 0); // SDL_AUDIO_ALLOW_FORMAT_CHANGE
 
     audio_pos = NULL;
@@ -156,7 +156,7 @@ void smush_audio_callback(const uint8_t* data, size_t len)
     audio_queue_write_idx = audio_queue_write_idx % AUDIO_QUEUE_DEPTH;
 }
 
-void my_audio_callback(void *userdata, Uint8 *stream, int len) 
+void my_audio_callback(void *userval, Uint8 *stream, int len) 
 {
     if (audio_len <= 0) {
         if (audio_buf) {

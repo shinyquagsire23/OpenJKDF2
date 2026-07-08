@@ -91,7 +91,7 @@ int sithDSSThing_ProcessAttachment(SithMessage *msg);
 void sithDSSThing_Take(SithThing *pItemThing, SithThing *pActor, int mpFlags);
 int sithDSSThing_ProcessTake(SithMessage *msg);
 
-void sithDSSThing_CreateThing(SithThing *pTemplate, SithThing *pThing, SithThing *pThing2, SithSector *pSector, rdVector3 *pPos, rdVector3 *pRot, int mpFlags, int bSync);
+void sithDSSThing_CreateThing(SithThing *pCreateThingTemplate, SithThing *pThing, SithThing *pThing2, SithSector *pSector, rdVector3 *pPos, rdVector3 *pRot, int mpFlags, int bSync);
 int sithDSSThing_ProcessCreateThing(SithMessage *msg);
 
 void sithDSSThing_DestroyThing(int idx, int sendtoId);

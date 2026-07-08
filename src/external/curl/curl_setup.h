@@ -140,7 +140,7 @@
 
 /*
  * Tru64 needs _REENTRANT set for a few function prototypes and
- * things to appear in the system header files. Unixware needs it
+ * aThings to appear in the system header files. Unixware needs it
  * to build proper reentrant code. Others may also need it.
  */
 

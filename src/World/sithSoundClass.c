@@ -135,7 +135,7 @@ int sithSoundClass_Startup()
     }
     else
     {
-        stdPrintf(pSithHS->errorPrint, ".\\World\\sithSoundClass.c", 214, "Could not allocate hashtable for soundclasses.\n", 0, 0, 0, 0);
+        stdPrintf(pSithHS->errorPrint, ".\\World\\sithSoundClass.c", 214, "Could not allocate hashtable for aSoundClasses.\n", 0, 0, 0, 0);
         return 0;
     }
 }
@@ -158,7 +158,7 @@ int sithSoundClass_ReadSoundClassesListText(SithWorld *world, int a2)
 {
     int num_soundclasses; // ebx
     signed int result; // eax
-    sithSoundClass *soundclasses; // edi
+    sithSoundClass *aSoundClasses; // edi
     char *v6; // ebp
     int idx; // eax
     sithSoundClass *current_soundclass; // esi
@@ -169,7 +169,7 @@ int sithSoundClass_ReadSoundClassesListText(SithWorld *world, int a2)
         return 0;
 
     stdConffile_ReadArgs();
-    if ( _strcmp(stdConffile_g_entry.args[0].value, "world") || _strcmp(stdConffile_g_entry.args[1].value, "soundclasses") ) {
+    if ( _strcmp(stdConffile_g_entry.args[0].value, "world") || _strcmp(stdConffile_g_entry.args[1].value, "aSoundClasses") ) {
         jk_printf("OpenJKDF2: sithSoundClass_ReadSoundClassesListText failed first strcmp");
         return 0;
     }
@@ -178,21 +178,21 @@ int sithSoundClass_ReadSoundClassesListText(SithWorld *world, int a2)
 
     // Added
     if ( num_soundclasses <= 0 ) {
-        jk_printf("OpenJKDF2: num soundclasses <= 0");
+        jk_printf("OpenJKDF2: num aSoundClasses <= 0");
         return 1;
     }
     if ( sithNet_isMulti ) {
         num_soundclasses += 32;
     }
     { TWL_EXTRAM_SUGGEST(pSithHS); // Added: word-width fields, parsed once
-    soundclasses = (sithSoundClass *)SITH_ALLOC(sizeof(sithSoundClass) * num_soundclasses);
+    aSoundClasses = (sithSoundClass *)SITH_ALLOC(sizeof(sithSoundClass) * num_soundclasses);
     TWL_EXTRAM_RESTORE(pSithHS); }
-    world->soundclasses = soundclasses;
-    if ( soundclasses )
+    world->aSoundClasses = aSoundClasses;
+    if ( aSoundClasses )
     {
-        world->numSoundClasses = num_soundclasses;
-        world->numSoundClassesLoaded = 0;
-        stdPlatform_Memzero32(soundclasses, sizeof(sithSoundClass) * num_soundclasses); // Added: word-safe
+        world->sizeSoundClasses = num_soundclasses;
+        world->numSoundClasses = 0;
+        stdPlatform_Memzero32(aSoundClasses, sizeof(sithSoundClass) * num_soundclasses); // Added: word-safe
     }
     else
     {
@@ -204,15 +204,15 @@ int sithSoundClass_ReadSoundClassesListText(SithWorld *world, int a2)
         if ( !_strcmp(stdConffile_g_entry.args[0].value, "end") )
             break;
         v6 = stdConffile_g_entry.args[1].value;
-        if ( _strcmp(stdConffile_g_entry.args[1].value, "none") && sithWorld_g_pLastLoadedWorld->soundclasses)
+        if ( _strcmp(stdConffile_g_entry.args[1].value, "none") && sithWorld_g_pLastLoadedWorld->aSoundClasses)
         {
             _sprintf(soundclass_fname, "%s%c%s", "misc\\snd", 92, stdConffile_g_entry.args[1].value);
             if ( !stdHashtbl_Find(sithSoundClass_pHashtblModes, v6) )
             {
-                idx = sithWorld_g_pLastLoadedWorld->numSoundClassesLoaded;
-                if ( idx != sithWorld_g_pLastLoadedWorld->numSoundClasses )
+                idx = sithWorld_g_pLastLoadedWorld->numSoundClasses;
+                if ( idx != sithWorld_g_pLastLoadedWorld->sizeSoundClasses )
                 {
-                    current_soundclass = &sithWorld_g_pLastLoadedWorld->soundclasses[idx];
+                    current_soundclass = &sithWorld_g_pLastLoadedWorld->aSoundClasses[idx];
 #ifdef STDHASHTABLE_CRC32_KEYS
                     current_soundclass->nameCrc = stdCrc32(v6, strlen(v6));
 #endif
@@ -222,7 +222,7 @@ int sithSoundClass_ReadSoundClassesListText(SithWorld *world, int a2)
                     if ( sithSoundClass_LoadEntry(current_soundclass, soundclass_fname) )
                     {
                         v10 = sithSoundClass_pHashtblModes;
-                        ++sithWorld_g_pLastLoadedWorld->numSoundClassesLoaded;
+                        ++sithWorld_g_pLastLoadedWorld->numSoundClasses;
 #ifdef SITH_DEBUG_STRUCT_NAMES
                         stdHashtbl_Add(v10, current_soundclass->snd_fname, current_soundclass); // this is load-bearing
 #else
@@ -236,7 +236,7 @@ int sithSoundClass_ReadSoundClassesListText(SithWorld *world, int a2)
     return 1;
 
 failed:
-    stdPrintf(pSithHS->errorPrint, ".\\World\\sithSoundClass.c", 321, "Memory error while reading soundclasses, line %d.\n", stdConffile_linenum);
+    stdPrintf(pSithHS->errorPrint, ".\\World\\sithSoundClass.c", 321, "Memory error while reading aSoundClasses, line %d.\n", stdConffile_linenum);
     return 0;
 }
 
@@ -250,16 +250,16 @@ sithSoundClass* sithSoundClass_Load(char *fpath)
     char v6[128]; // [esp+10h] [ebp-80h] BYREF
 
     v1 = sithWorld_g_pLastLoadedWorld;
-    if ( !_strcmp(fpath, "none") || !sithWorld_g_pLastLoadedWorld->soundclasses )
+    if ( !_strcmp(fpath, "none") || !sithWorld_g_pLastLoadedWorld->aSoundClasses )
         return 0;
     _sprintf(v6, "%s%c%s", "misc\\snd", '\\', fpath);
     result = (sithSoundClass *)stdHashtbl_Find(sithSoundClass_pHashtblModes, fpath);
     if ( result )
         return result;
-    v3 = v1->numSoundClassesLoaded;
-    if ( v3 == v1->numSoundClasses )
+    v3 = v1->numSoundClasses;
+    if ( v3 == v1->sizeSoundClasses )
         return 0;
-    v4 = &v1->soundclasses[v3];
+    v4 = &v1->aSoundClasses[v3];
 #ifdef STDHASHTABLE_CRC32_KEYS
     v4->nameCrc = stdCrc32(fpath, strlen(fpath));
 #endif
@@ -269,7 +269,7 @@ sithSoundClass* sithSoundClass_Load(char *fpath)
     if ( !sithSoundClass_LoadEntry(v4, v6) )
         return 0;
     v5 = sithSoundClass_pHashtblModes;
-    ++v1->numSoundClassesLoaded;
+    ++v1->numSoundClasses;
 #ifdef SITH_DEBUG_STRUCT_NAMES
     stdHashtbl_Add(v5, v4->snd_fname, v4); // this is a load-bearing ifdef
 #else
@@ -361,11 +361,11 @@ int sithSoundClass_LoadEntry(sithSoundClass *soundClass, char *fpath)
 
 void sithSoundClass_PlayModeFirst(SithThing *thing, unsigned int soundclass_id)
 {
-    sithSoundClass *soundclass; // eax
+    sithSoundClass *pSoundClass; // eax
     sithSoundClassEntry *v3; // eax
 
-    soundclass = thing->soundclass;
-    if ( soundclass && soundclass_id < SITH_SC_MAX )
+    pSoundClass = thing->pSoundClass;
+    if ( pSoundClass && soundclass_id < SITH_SC_MAX )
     {
 #ifdef QOL_IMPROVEMENTS
         if (IS_ANNOYING_SOUND(soundclass_id))
@@ -377,7 +377,7 @@ void sithSoundClass_PlayModeFirst(SithThing *thing, unsigned int soundclass_id)
         }
 #endif
 
-        v3 = soundclass->entries[soundclass_id];
+        v3 = pSoundClass->entries[soundclass_id];
         if ( v3 )
             sithSoundClass_PlayModeEntry(thing, v3, 1.0);
     }
@@ -390,7 +390,7 @@ sithPlayingSound* sithSoundClass_PlayMode(SithThing *thing, int sc_id, flex_t a3
     uint32_t v6; // eax
     int v7; // eax
 
-    if (!thing->soundclass) return NULL;
+    if (!thing->pSoundClass) return NULL;
 
     if ( (unsigned int)sc_id < SITH_SC_MAX )
     {
@@ -405,7 +405,7 @@ sithPlayingSound* sithSoundClass_PlayMode(SithThing *thing, int sc_id, flex_t a3
         }
 #endif
 
-        v4 = thing->soundclass->entries[sc_id];
+        v4 = thing->pSoundClass->entries[sc_id];
         if ( v4 )
         {
             v5 = v4->listIdx;
@@ -435,7 +435,7 @@ void sithSoundClass_PlayModeFirstEx(SithThing *thing, int sc_id, flex_t a3)
 {
     sithSoundClassEntry *entry; // eax
 
-    if ( thing->soundclass && (unsigned int)sc_id < SITH_SC_MAX )
+    if ( thing->pSoundClass && (unsigned int)sc_id < SITH_SC_MAX )
     {
         // Try to prevent sound spam at the source
 #ifdef QOL_IMPROVEMENTS
@@ -448,7 +448,7 @@ void sithSoundClass_PlayModeFirstEx(SithThing *thing, int sc_id, flex_t a3)
         }
 #endif
 
-        entry = thing->soundclass->entries[sc_id];
+        entry = thing->pSoundClass->entries[sc_id];
         if ( entry )
             sithSoundClass_PlayModeEntry(thing, entry, a3);
     }
@@ -458,9 +458,9 @@ void sithSoundClass_StopMode(SithThing *thing, unsigned int sc_id)
 {
     sithSoundClassEntry *v3; // eax
 
-    if ( thing->soundclass && sc_id < SITH_SC_MAX )
+    if ( thing->pSoundClass && sc_id < SITH_SC_MAX )
     {
-        v3 = thing->soundclass->entries[sc_id];
+        v3 = thing->pSoundClass->entries[sc_id];
         if ( v3 )
             sithSoundClass_StopSound(thing, v3->sound);
     }
@@ -474,12 +474,12 @@ void sithSoundClass_FreeWorldSoundClasses(SithWorld *world)
     sithSoundClassEntry *v6; // esi
     int v8; // [esp+8h] [ebp-4h]
 
-    if (!world->numSoundClasses)
+    if (!world->sizeSoundClasses)
         return;
 
-    for (v8 = 0; v8 < world->numSoundClassesLoaded; v8++)
+    for (v8 = 0; v8 < world->numSoundClasses; v8++)
     {
-        v2 = &world->soundclasses[v8];
+        v2 = &world->aSoundClasses[v8];
 #ifdef STDHASHTABLE_CRC32_KEYS
         stdHashtbl_FreeKeyCrc32(sithSoundClass_pHashtblModes, v2->nameCrc);
 #else
@@ -503,10 +503,10 @@ void sithSoundClass_FreeWorldSoundClasses(SithWorld *world)
             ++v3;
         }
     }
-    SITH_FREE(world->soundclasses);
-    world->soundclasses = 0;
+    SITH_FREE(world->aSoundClasses);
+    world->aSoundClasses = 0;
+    world->sizeSoundClasses = 0;
     world->numSoundClasses = 0;
-    world->numSoundClassesLoaded = 0;
 }
 
 sithPlayingSound* sithSoundClass_PlayModeRandom(SithThing *thing, uint32_t a2)
@@ -514,7 +514,7 @@ sithPlayingSound* sithSoundClass_PlayModeRandom(SithThing *thing, uint32_t a2)
     sithSoundClassEntry *v3; // esi
     uint32_t v5; // rax
 
-    if (!thing->soundclass) return NULL;
+    if (!thing->pSoundClass) return NULL;
 
     if ( a2 < SITH_SC_MAX )
     {
@@ -529,7 +529,7 @@ sithPlayingSound* sithSoundClass_PlayModeRandom(SithThing *thing, uint32_t a2)
         }
 #endif
 
-        v3 = thing->soundclass->entries[a2];
+        v3 = thing->pSoundClass->entries[a2];
         if ( v3 )
         {
             if ( v3->listIdx > 1u )
@@ -603,10 +603,10 @@ void sithSoundClass_StopSound(SithThing *thing, sithSound *sound)
         thing->actorParams.field_1BC = 0;
 }
 
-int sithSoundClass_SetThingClass(SithThing *thing, sithSoundClass *soundclass)
+int sithSoundClass_SetThingClass(SithThing *thing, sithSoundClass *pSoundClass)
 {
-    if ( thing->soundclass == soundclass )
+    if ( thing->pSoundClass == pSoundClass )
         return 0;
-    thing->soundclass = soundclass;
+    thing->pSoundClass = pSoundClass;
     return 1;
 }

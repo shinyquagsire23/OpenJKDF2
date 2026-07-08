@@ -60,7 +60,7 @@ void sithPlayer_SetInvItemAvailable(int binIdx, int bCarries);
 void sithPlayer_Reset(unsigned int idx);
 int sithPlayer_ShowPlayer(int idx, int netId);
 void sithPlayer_NewPlayer(SithThing *player);
-uint32_t sithPlayer_GetPlayerNum(int thingIdx);
+uint32_t sithPlayer_GetPlayerNum(int idx);
 int sithPlayer_GetPlayerNumByName(wchar_t *pwStr);
 
 //static void (*sithPlayer_NewPlayer)(SithThing *player) = (void*)sithPlayer_NewPlayer_ADDR;

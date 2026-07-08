@@ -42,7 +42,7 @@ SithSector* sithSector_FindSectorAtPos(SithWorld *pWorld, rdVector3 *pos);
 //static void (*sithSector_FreeWorldSectors)(SithWorld* world) = (void*)sithSector_FreeWorldSectors_ADDR;
 
 //static signed int (*sithSector_AddEntry)(SithSector *sector, rdVector3 *a2, int a3, flex_t a4, SithThing *a5) = (void*)sithSector_AddEntry_ADDR;
-//static int (*sithSector_SetSkyParams)(flex_t horizontalPixelsPerRev, flex_t horizontalDist, flex_t ceilingSky) = (void*)sithSector_SetSkyParams_ADDR;
+//static int (*sithSector_SetSkyParams)(flex_t horizontalPixelsPerRev, flex_t horizontalDist, flex_t ceilingSkyHeight) = (void*)sithSector_SetSkyParams_ADDR;
 //static void (*sithSector_UpdateSky)() = (void*)sithSector_UpdateSky_ADDR;
 //static void (*sithSector_sub_4F2E30)(rdProcEntry *a1, sithSurfaceInfo* a2, int num_vertices) = (void*)sithSector_sub_4F2E30_ADDR;
 //static void (*sithSector_sub_4F2F60)(rdProcEntry *a1, sithSurfaceInfo *a2, rdVector3 *a3, unsigned int a4) = (void*)sithSector_sub_4F2F60_ADDR;

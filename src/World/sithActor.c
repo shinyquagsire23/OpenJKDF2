@@ -43,11 +43,11 @@ void sithActor_Update(SithThing *thing, int deltaMs)
     // Added
     if (!thing) return;
 
-    if ( (thing->actorParams.typeflags & SITH_AF_BREATHEUNDERWATER) == 0 && (thing->thingflags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) == 0 )
+    if ( (thing->actorParams.flags & SITH_AF_BREATHEUNDERWATER) == 0 && (thing->flags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) == 0 )
     {
-        if ( (thing->physicsParams.physflags & SITH_PF_ONWATERSURFACE) != 0 || (thing->sector && thing->sector->flags & SITH_SECTOR_UNDERWATER) == 0 ) // Added: Sector check
+        if ( (thing->physicsParams.flags & SITH_PF_ONWATERSURFACE) != 0 || (thing->sector && thing->sector->flags & SITH_SECTOR_UNDERWATER) == 0 ) // Added: Sector check
         {
-            v3 = thing->actorParams.msUnderwater;
+            v3 = thing->actorParams.endurance;
             if ( v3 )
             {
                 if ( v3 <= 18000 )
@@ -59,17 +59,17 @@ void sithActor_Update(SithThing *thing, int deltaMs)
                 {
                     sithSoundClass_PlayModeRandom(thing, SITH_SC_GASP);
                 }
-                thing->actorParams.msUnderwater = 0;
+                thing->actorParams.endurance = 0;
             }
         }
         else
         {
-            v2 = deltaMs + thing->actorParams.msUnderwater;
-            thing->actorParams.msUnderwater = v2;
+            v2 = deltaMs + thing->actorParams.endurance;
+            thing->actorParams.endurance = v2;
             if ( v2 > 20000 )
             {
                 sithThing_DamageThing(thing, thing, 10.0, SITH_DAMAGE_DROWN);
-                thing->actorParams.msUnderwater -= 2000;
+                thing->actorParams.endurance -= 2000;
             }
         }
     }
@@ -83,12 +83,12 @@ flex_t sithActor_DamageActor(SithThing *sender, SithThing *receiver, flex_t amou
     SithThing *v7; // eax
     flex_t fR; // [esp+0h] [ebp-1Ch]
 
-    if ( sithNet_isMulti && (sender->thingflags & SITH_TF_INVULN) != 0 )
+    if ( sithNet_isMulti && (sender->flags & SITH_TF_INVULN) != 0 )
     {
         receiver_ = receiver;
         goto LABEL_32;
     }
-    if ( (sender->actorParams.typeflags & SITH_AF_INVULNERABLE) != 0 && flags != 0x40 )
+    if ( (sender->actorParams.flags & SITH_AF_INVULNERABLE) != 0 && flags != 0x40 )
         return 0.0;
     if ( sender->actorParams.health <= 0.0 )
         return amount;
@@ -98,7 +98,7 @@ flex_t sithActor_DamageActor(SithThing *sender, SithThing *receiver, flex_t amou
         v6 = sithInventory_BroadcastMessage(
                  sender,
                  SENDERTYPE_THING,
-                 receiver->thingIdx,
+                 receiver->idx,
                  SITH_MESSAGE_DAMAGED,
                  0x10,
                  amount,
@@ -121,7 +121,7 @@ flex_t sithActor_DamageActor(SithThing *sender, SithThing *receiver, flex_t amou
           && flags != 0x20
           && flags != 0x40
           && v7->type == SITH_THING_ACTOR
-          && (v7->actorParams.typeflags & SITH_AF_FULLDAMAGE) == 0
+          && (v7->actorParams.flags & SITH_AF_FULLDAMAGE) == 0
           && sender->type == SITH_THING_ACTOR )
         {
             damageMult = 0.1;
@@ -154,7 +154,7 @@ flex_t sithActor_DamageActor(SithThing *sender, SithThing *receiver, flex_t amou
     if ( sender->actorParams.health >= 1.0 )
     {
 LABEL_32:
-        if ( sender->animclass && sender != receiver_ && amount * 0.05 > _frand() )
+        if ( sender->pPuppetClass && sender != receiver_ && amount * 0.05 > _frand() )
             sithPuppet_PlayMode(sender, SITH_ANIM_HIT, 0);
         sithActor_PlayDamageSoundFx(sender, amount, flags);
         return amount;
@@ -211,11 +211,11 @@ void sithActor_KillActor(SithThing *thing, SithThing *a3, int a4)
     SithThing *v8; // eax
     uint32_t v10; // edx
 
-    if (thing->thingflags & SITH_TF_DEAD) return;
+    if (thing->flags & SITH_TF_DEAD) return;
 
 
     thing->actorParams.health = 0.0;
-    if ( (thing->thingflags & SITH_TF_CAPTURED) == 0 || (sithCog_ThingSendMessage(thing, a3, SITH_MESSAGE_KILLED), (thing->thingflags & SITH_TF_DESTROYED) == 0) )
+    if ( (thing->flags & SITH_TF_CAPTURED) == 0 || (sithCog_ThingSendMessage(thing, a3, SITH_MESSAGE_KILLED), (thing->flags & SITH_TF_DESTROYED) == 0) )
     {
         sithSoundClass_StopSound(thing, 0);
 
@@ -229,7 +229,7 @@ void sithActor_KillActor(SithThing *thing, SithThing *a3, int a4)
             {
                 sithSoundClass_PlayModeRandom(thing, SITH_SC_SPLATTERED);
             }
-            else if ( (thing->thingflags & SITH_TF_WATER) != 0 )
+            else if ( (thing->flags & SITH_TF_WATER) != 0 )
             {
                 sithSoundClass_PlayModeRandom(thing, SITH_SC_DEATHUNDER);
             }
@@ -253,12 +253,12 @@ void sithActor_KillActor(SithThing *thing, SithThing *a3, int a4)
 
         // MOTS added: quiet death
         if (!Main_bMotsCompat || a4 != 12345678) {
-            if ( thing == sithWorld_g_pCurrentWorld->cameraFocus )
+            if ( thing == sithWorld_g_pCurrentWorld->pCameraFocusThing )
                 sithCamera_SetCurrentCamera(&sithCamera_g_aCameras[5]);
 
             // MOTS added: quiet death
             if (!Main_bMotsCompat || a4 != 12345678) {
-                if ( thing->animclass )
+                if ( thing->pPuppetClass )
                 {
                     sithPuppet_ResetTrack(thing);
                     if ( thing->actorParams.health >= -10.0 )
@@ -269,15 +269,15 @@ void sithActor_KillActor(SithThing *thing, SithThing *a3, int a4)
             }
         }
 
-        thing->physicsParams.physflags &= ~SITH_PF_CROUCHING;
+        thing->physicsParams.flags &= ~SITH_PF_CROUCHING;
         if ( thing->type != SITH_THING_PLAYER )
         {
-            int old_typeflags = thing->actorParams.typeflags;
+            int old_typeflags = thing->actorParams.flags;
 
             // MOTS added: quiet death
-            if ((!Main_bMotsCompat || a4 != 12345678) && (old_typeflags & SITH_AF_EXPLODE_WHEN_KILLED) && thing->actorParams.templateExplode)
+            if ((!Main_bMotsCompat || a4 != 12345678) && (old_typeflags & SITH_AF_EXPLODE_WHEN_KILLED) && thing->actorParams.pExplodeTemplate)
             {
-                sithThing_CreateThingAtPos(thing->actorParams.templateExplode, &thing->position, &thing->lookOrientation, thing->sector, 0);
+                sithThing_CreateThingAtPos(thing->actorParams.pExplodeTemplate, &thing->position, &thing->orient, thing->sector, 0);
                 sithThing_DestroyThing(thing);
             }
             else
@@ -288,13 +288,13 @@ void sithActor_KillActor(SithThing *thing, SithThing *a3, int a4)
                 else if (Main_bMotsCompat) {
                     thing->physicsParams.buoyancy = 0.01; // MOTS added
                 }
-                if (thing->physicsParams.physflags & SITH_PF_FLY)
+                if (thing->physicsParams.flags & SITH_PF_FLY)
                 {
                     sithActor_DestroyActor(thing);
                 }
                 else
                 {
-                    thing->lifeLeftMs = 1000;
+                    thing->msecLifeLeft = 1000;
                 }
             }
         }
@@ -310,7 +310,7 @@ int sithActor_SurfaceCollisionHandler(SithThing *thing, SithSurface *surface, Si
     return ret;
 }
 
-void sithActor_SetHeadPYR(SithThing *actor, const rdVector3 *eyePYR)
+void sithActor_SetHeadPYR(SithThing *actor, const rdVector3 *headPYR)
 {
     SithPuppetClass *pAnimClass; // eax
     rdVector3 *v4; // ebx
@@ -325,18 +325,18 @@ void sithActor_SetHeadPYR(SithThing *actor, const rdVector3 *eyePYR)
     int v13; // ecx
     int v14; // ecx
 
-    actor->actorParams.typeflags &= ~SITH_AF_VIEWCENTRED;
-    actor->actorParams.eyePYR = *eyePYR;
-    pAnimClass = actor->animclass;
-    if (!pAnimClass || actor->rdthing.type != RD_THING_MODEL3) return;
+    actor->actorParams.flags &= ~SITH_AF_VIEWCENTRED;
+    actor->actorParams.headPYR = *headPYR;
+    pAnimClass = actor->pPuppetClass;
+    if (!pAnimClass || actor->renderData.type != RD_THING_MODEL3) return;
 
 
-    v4 = actor->rdthing.hierarchyNodes2;
+    v4 = actor->renderData.hierarchyNodes2;
     if (v4)
     {
         torsoIdx = pAnimClass->bodypart_to_joint[JOINTTYPE_TORSO];
         primaryWeapJointIdx = pAnimClass->bodypart_to_joint[JOINTTYPE_PRIMARYWEAPJOINT];
-        v7 = actor->rdthing.model3->numHierarchyNodes;
+        v7 = actor->renderData.model3->numHierarchyNodes;
         neckIdx = pAnimClass->bodypart_to_joint[JOINTTYPE_NECK];
         v9 = pAnimClass->bodypart_to_joint[JOINTTYPE_SECONDARYWEAPJOINT];
         v10 = v7 - 1;
@@ -349,7 +349,7 @@ void sithActor_SetHeadPYR(SithThing *actor, const rdVector3 *eyePYR)
             v11 = neckIdx <= v10;
         }
         if ( v11 ) {
-            v4[neckIdx].x = eyePYR->x * 0.5;
+            v4[neckIdx].x = headPYR->x * 0.5;
         }
         if ( torsoIdx < 0 ) {
             v12 = 0;
@@ -358,7 +358,7 @@ void sithActor_SetHeadPYR(SithThing *actor, const rdVector3 *eyePYR)
             v12 = torsoIdx <= v10;
         }
         if ( v12 ) {
-            v4[torsoIdx].x = eyePYR->x * 0.5;
+            v4[torsoIdx].x = headPYR->x * 0.5;
         }
         if ( primaryWeapJointIdx < 0 ) {
             v13 = 0;
@@ -367,7 +367,7 @@ void sithActor_SetHeadPYR(SithThing *actor, const rdVector3 *eyePYR)
             v13 = primaryWeapJointIdx <= v10;
         }
         if ( v13 ) {
-            v4[primaryWeapJointIdx].x = eyePYR->x * 0.3;
+            v4[primaryWeapJointIdx].x = headPYR->x * 0.3;
         }
         if ( v9 < 0 ) {
             v14 = 0;
@@ -376,7 +376,7 @@ void sithActor_SetHeadPYR(SithThing *actor, const rdVector3 *eyePYR)
             v14 = v9 <= v10;
         }
         if ( v14 ) {
-            v4[v9].x = eyePYR->x * 0.3;
+            v4[v9].x = headPYR->x * 0.3;
         }
     }
 }
@@ -400,15 +400,15 @@ int sithActor_ActorCollisionHandler(SithThing *thing, SithThing *thing2, SithCol
 
 void sithActor_UpdateAimJoints(SithThing* pThing)
 {
-    SithPuppetClass* pAnimClass = pThing->animclass;
+    SithPuppetClass* pAnimClass = pThing->pPuppetClass;
     if (pAnimClass)
     {
         int pitch_idx = pAnimClass->bodypart_to_joint[JOINTTYPE_TURRETPITCH];
         int yaw_idx = pAnimClass->bodypart_to_joint[JOINTTYPE_TURRETYAW];
         if (pitch_idx >= 0)
-            pThing->rdthing.hierarchyNodes2[pitch_idx].x = pThing->actorParams.eyePYR.x;
+            pThing->renderData.hierarchyNodes2[pitch_idx].x = pThing->actorParams.headPYR.x;
         if (yaw_idx >= 0)
-            pThing->rdthing.hierarchyNodes2[yaw_idx].y = pThing->actorParams.eyePYR.y;
+            pThing->renderData.hierarchyNodes2[yaw_idx].y = pThing->actorParams.headPYR.y;
     }
 }
 
@@ -426,10 +426,10 @@ int sithActor_thing_anim_blocked(SithThing *a1, SithThing *thing2, SithCollision
     rdVector_Sub3(&a1a, &a1->position, &thing2->position);
     rdVector_Copy3(&vAngs, &a1->physicsParams.vel);
     rdVector_Normalize3Acc(&a1a);
-    rdMatrix_Copy34(&out, &thing2->lookOrientation);
+    rdMatrix_Copy34(&out, &thing2->orient);
 
     if ( thing2->type == SITH_THING_ACTOR || thing2->type == SITH_THING_PLAYER )
-        rdMatrix_PreRotate34(&out, &thing2->actorParams.eyePYR);
+        rdMatrix_PreRotate34(&out, &thing2->actorParams.headPYR);
 
     rdVector_Copy3(&v18, &out.lvec);
     rdVector_Normalize3Acc(&v18);
@@ -446,42 +446,42 @@ int sithActor_thing_anim_blocked(SithThing *a1, SithThing *thing2, SithCollision
         vAngs.y = (_frand() - 0.5) * 90.0;
         rdVector_Rotate3Acc(&a1->physicsParams.vel, &vAngs);
     }
-    rdVector_Normalize3(&a1->lookOrientation.lvec, &a1->physicsParams.vel);
-    a1->lookOrientation.rvec.x = (a1->lookOrientation.lvec.y * 1.0) - (a1->lookOrientation.lvec.z * 0.0);
-    a1->lookOrientation.rvec.y = (a1->lookOrientation.lvec.z * 0.0) - (a1->lookOrientation.lvec.x * 1.0);
-    a1->lookOrientation.rvec.z = (a1->lookOrientation.lvec.x * 0.0) - (a1->lookOrientation.lvec.y * 0.0);
-    rdVector_Normalize3Acc(&a1->lookOrientation.rvec);
-    a1->lookOrientation.uvec.x = a1->lookOrientation.rvec.y * a1->lookOrientation.lvec.z - a1->lookOrientation.rvec.z * a1->lookOrientation.lvec.y;
-    a1->lookOrientation.uvec.y = a1->lookOrientation.rvec.z * a1->lookOrientation.lvec.x - a1->lookOrientation.lvec.z * a1->lookOrientation.rvec.x;
-    a1->lookOrientation.uvec.z = a1->lookOrientation.lvec.y * a1->lookOrientation.rvec.x - a1->lookOrientation.rvec.y * a1->lookOrientation.lvec.x;
+    rdVector_Normalize3(&a1->orient.lvec, &a1->physicsParams.vel);
+    a1->orient.rvec.x = (a1->orient.lvec.y * 1.0) - (a1->orient.lvec.z * 0.0);
+    a1->orient.rvec.y = (a1->orient.lvec.z * 0.0) - (a1->orient.lvec.x * 1.0);
+    a1->orient.rvec.z = (a1->orient.lvec.x * 0.0) - (a1->orient.lvec.y * 0.0);
+    rdVector_Normalize3Acc(&a1->orient.rvec);
+    a1->orient.uvec.x = a1->orient.rvec.y * a1->orient.lvec.z - a1->orient.rvec.z * a1->orient.lvec.y;
+    a1->orient.uvec.y = a1->orient.rvec.z * a1->orient.lvec.x - a1->orient.lvec.z * a1->orient.rvec.x;
+    a1->orient.uvec.z = a1->orient.lvec.y * a1->orient.rvec.x - a1->orient.rvec.y * a1->orient.lvec.x;
     sithSoundClass_PlayModeRandom(a1, SITH_SC_DEFLECTED);
-    if ( thing2->lookOrientation.uvec.x * a1a.x + thing2->lookOrientation.uvec.y * a1a.y + thing2->lookOrientation.uvec.z * a1a.z <= 0.0 )
+    if ( thing2->orient.uvec.x * a1a.x + thing2->orient.uvec.y * a1a.y + thing2->orient.uvec.z * a1a.z <= 0.0 )
         sithPuppet_PlayMode(thing2, SITH_ANIM_BLOCK2, 0);
     else
         sithPuppet_PlayMode(thing2, SITH_ANIM_BLOCK, 0);
-    a1->actorParams.typeflags &= ~SITH_AF_CANROTATEHEAD;
-    a1->prev_thing = thing2;
-    a1->child_signature = thing2->signature;
+    a1->actorParams.flags &= ~SITH_AF_CANROTATEHEAD;
+    a1->pParent = thing2;
+    a1->parentSignature = thing2->signature;
     sithCog_ThingSendMessage(thing2, 0, SITH_MESSAGE_BLOCKED);
     return 1;
 }
 
 void sithActor_DestroyActor(SithThing *thing)
 {
-    thing->thingflags |= SITH_TF_DEAD;
+    thing->flags |= SITH_TF_DEAD;
     sithThing_DetachAttachedThings(thing);
     thing->type = SITH_THING_CORPSE;
-    thing->physicsParams.physflags &= ~(SITH_PF_FLY|SITH_PF_800|SITH_PF_100|SITH_PF_WALLSTICK);
-    thing->physicsParams.physflags |= (SITH_PF_FLOORSTICK|SITH_PF_ALIGNSURFACE|SITH_PF_USEGRAVITY);
-    thing->lifeLeftMs = jkPlayer_bKeepCorpses ? -1 : 20000; // Added
+    thing->physicsParams.flags &= ~(SITH_PF_FLY|SITH_PF_800|SITH_PF_100|SITH_PF_WALLSTICK);
+    thing->physicsParams.flags |= (SITH_PF_FLOORSTICK|SITH_PF_ALIGNSURFACE|SITH_PF_USEGRAVITY);
+    thing->msecLifeLeft = jkPlayer_bKeepCorpses ? -1 : 20000; // Added
     sithPhysics_FindFloor(thing, 0);
 }
 
 void sithActor_DestroyCorpse(SithThing *corpse)
 {
     // Added: retain corpses option
-    if (jkPlayer_bKeepCorpses || corpse->lastRenderedTickIdx + 1 == jkPlayer_currentTickIdx ) {
-        corpse->lifeLeftMs = 3000;
+    if (jkPlayer_bKeepCorpses || corpse->renderFrame + 1 == jkPlayer_currentTickIdx ) {
+        corpse->msecLifeLeft = 3000;
     }
     else {
         sithThing_DestroyThing(corpse);
@@ -508,7 +508,7 @@ int sithActor_ParseArg(StdConffileArg *arg, SithThing *thing, unsigned int param
         case THINGPARAM_TYPEFLAGS:
             if ( _sscanf(arg->value, "%x", &tmpInt) != 1 )
                 goto LABEL_38;
-            thing->actorParams.typeflags = tmpInt;
+            thing->actorParams.flags = tmpInt;
             return 1;
         case THINGPARAM_HEALTH:
             tmp = _atof(arg->value);
@@ -533,7 +533,7 @@ int sithActor_ParseArg(StdConffileArg *arg, SithThing *thing, unsigned int param
             if ( v11 < 0.0 )
                 return 0;
             result = 1;
-            thing->actorParams.maxRotThrust = v11;
+            thing->actorParams.maxRotVelocity = v11;
             return result;
         case THINGPARAM_JUMPSPEED:
             v12 = _atof(arg->value);
@@ -543,13 +543,13 @@ int sithActor_ParseArg(StdConffileArg *arg, SithThing *thing, unsigned int param
             thing->actorParams.jumpSpeed = v12;
             return result;
         case THINGPARAM_WEAPON:
-            thing->actorParams.templateWeapon = sithTemplate_GetTemplate(arg->value);
+            thing->actorParams.pWeaponTemplate = sithTemplate_GetTemplate(arg->value);
             return 1;
         case THINGPARAM_WEAPON2:
             thing->actorParams.templateWeapon2 = sithTemplate_GetTemplate(arg->value);
             return 1;
         case THINGPARAM_EXPLODE:
-            thing->actorParams.templateExplode = sithTemplate_GetTemplate(arg->value);
+            thing->actorParams.pExplodeTemplate = sithTemplate_GetTemplate(arg->value);
             return 1;
         case THINGPARAM_MAXHEALTH:
             v9 = _atof(arg->value);
@@ -604,14 +604,14 @@ int sithActor_ParseArg(StdConffileArg *arg, SithThing *thing, unsigned int param
             thing->actorParams.lightOffset.x = vx;
             thing->actorParams.lightOffset.y = vy;
             thing->actorParams.lightOffset.z = vz;
-            thing->thingflags |= SITH_TF_EMITLIGHT;
+            thing->flags |= SITH_TF_EMITLIGHT;
             result = 1;
             break;
         case THINGPARAM_LIGHTINTENSITY:
             if ( _sscanf(arg->value, "%f", &tmp) != 1 )
                 return 0;
             thing->actorParams.lightIntensity = tmp;
-            thing->thingflags |= SITH_TF_EMITLIGHT;
+            thing->flags |= SITH_TF_EMITLIGHT;
             return 1;
         case THINGPARAM_ERROR:
             v19 = _atof(arg->value);

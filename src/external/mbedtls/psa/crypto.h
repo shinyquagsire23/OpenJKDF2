@@ -31,7 +31,7 @@
 #include <stddef.h>
 
 #ifdef __DOXYGEN_ONLY__
-/* This __DOXYGEN_ONLY__ block contains mock definitions for things that
+/* This __DOXYGEN_ONLY__ block contains mock definitions for aThings that
  * must be defined in the crypto_platform.h header. These mock definitions
  * are present in this file as a convenience to generate pretty-printed
  * documentation that includes those definitions. */

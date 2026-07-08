@@ -12,7 +12,7 @@ void rdPrimit3_ClearFrameCounters()
 {
 }
 
-void rdPrimit3_ClipFace(const rdClipFrustum* NO_ALIAS clipFrustum, rdGeoMode_t geoMode, signed int lightMode, int texMode, rdMeshinfo *idxInfo, rdMeshinfo *mesh_out, rdVector2 *idkIn)
+void rdPrimit3_ClipFace(const rdClipFrustum* NO_ALIAS pClipFrustum, rdGeoMode_t geoMode, signed int lightMode, int texMode, rdMeshinfo *idxInfo, rdMeshinfo *mesh_out, rdVector2 *idkIn)
 {
 #ifdef TARGET_TWL
     //rdPrimit3_NoClipFace(geoMode, lightMode, texMode, (rdMeshinfo*)idxInfo, mesh_out, idkIn);
@@ -132,8 +132,8 @@ void rdPrimit3_ClipFace(const rdClipFrustum* NO_ALIAS clipFrustum, rdGeoMode_t g
             idxInfob = idxInfo->numVertices;
             if ( idxInfob )
             {
-                v18 = v15->vertices;
-                v19 = mesh_out->vertices;
+                v18 = v15->aVertices;
+                v19 = mesh_out->aVertices;
                 v20 = v15->vertexPosIdx;
                 do
                 {
@@ -151,10 +151,10 @@ void rdPrimit3_ClipFace(const rdClipFrustum* NO_ALIAS clipFrustum, rdGeoMode_t g
             v86 = v17;
             if (rdCamera_g_pCurCamera->projectType == rdCameraProjectType_Perspective)
 LABEL_26:
-                v16->numVertices = rdClip_Face3S(clipFrustum, v16->vertices, v86);
+                v16->numVertices = rdClip_Face3S(pClipFrustum, v16->aVertices, v86);
             else
 LABEL_27:
-                v16->numVertices = rdClip_Face3SOrtho(clipFrustum, v16->vertices, v86);
+                v16->numVertices = rdClip_Face3SOrtho(pClipFrustum, v16->aVertices, v86);
             break;
         case RD_GEOMETRY_VERTEX:
         case RD_GEOMETRY_WIREFRAME:
@@ -164,8 +164,8 @@ LABEL_27:
             idxInfoa = idxInfo->numVertices;
             if ( idxInfoa )
             {
-                v10 = v7->vertices;
-                v11 = mesh_out->vertices;
+                v10 = v7->aVertices;
+                v11 = mesh_out->aVertices;
                 v12 = v7->vertexPosIdx;
                 do
                 {
@@ -181,9 +181,9 @@ LABEL_27:
                 v8 = mesh_out;
             }
             if (rdCamera_g_pCurCamera->projectType == rdCameraProjectType_Perspective)
-                v8->numVertices = rdClip_Face3W(clipFrustum, v8->vertices, v9);
+                v8->numVertices = rdClip_Face3W(pClipFrustum, v8->aVertices, v9);
             else
-                v8->numVertices = rdClip_Face3WOrtho(clipFrustum, v8->vertices, v9);
+                v8->numVertices = rdClip_Face3WOrtho(pClipFrustum, v8->aVertices, v9);
             break;
         case RD_GEOMETRY_SOLID:
             switch ( lightMode )
@@ -196,8 +196,8 @@ LABEL_27:
                     idxInfoc = idxInfo->numVertices;
                     if ( !idxInfoc )
                         goto LABEL_25;
-                    v25 = v23->vertices;
-                    v26 = mesh_out->vertices;
+                    v25 = v23->aVertices;
+                    v26 = mesh_out->aVertices;
                     v27 = v23->vertexPosIdx;
                     do
                     {
@@ -213,7 +213,7 @@ LABEL_27:
                     v86 = idxInfoc;
                     if ( rdCamera_g_pCurCamera->projectType != rdCameraProjectType_Perspective)
                         goto LABEL_27;
-                    mesh_out->numVertices = rdClip_Face3S(clipFrustum, mesh_out->vertices, idxInfoc);
+                    mesh_out->numVertices = rdClip_Face3S(pClipFrustum, mesh_out->aVertices, idxInfoc);
                     break;
                 case RD_LIGHTMODE_DIFFUSE:
                     v30 = idxInfo;
@@ -222,8 +222,8 @@ LABEL_27:
                     idxInfod = idxInfo->numVertices;
                     if ( idxInfod )
                     {
-                        v31 = v30->vertices;
-                        v32 = mesh_out->vertices;
+                        v31 = v30->aVertices;
+                        v32 = mesh_out->aVertices;
                         v33 = v30->vertexPosIdx;
                         do
                         {
@@ -253,10 +253,10 @@ LABEL_25:
                     {
                         if ( v39 )
                         {
-                            a3a = v36->vertices;
+                            a3a = v36->aVertices;
                             v40 = v36->vertexPosIdx;
                             v87 = v36->paDynamicLight;
-                            v41 = mesh_out->vertices;
+                            v41 = mesh_out->aVertices;
                             flex_t* intenseIter = v38;
                             a7a = v39;
                             flex_t* lightIter = mesh_out->paDynamicLight;
@@ -290,10 +290,10 @@ LABEL_25:
                     }
                     else if ( v39 )
                     {
-                        v46 = mesh_out->vertices;
+                        v46 = mesh_out->aVertices;
                         v47 = v36->vertexPosIdx;
                         v48 = v36->paDynamicLight;
-                        a3b = v36->vertices;
+                        a3b = v36->aVertices;
                         a2b = (char *)((char *)mesh_out->paDynamicLight - (char *)v47);
                         a7b = v39;
                         do
@@ -324,11 +324,11 @@ LABEL_25:
                         v39 = idxInfoe;
                     }
                     v84 = (flex_t*)v37->paDynamicLight;
-                    v82 = v37->vertices;
+                    v82 = v37->aVertices;
                     if (rdCamera_g_pCurCamera->projectType == rdCameraProjectType_Perspective)
-                        v37->numVertices = rdClip_Face3GS(clipFrustum, v82, v84, v39);
+                        v37->numVertices = rdClip_Face3GS(pClipFrustum, v82, v84, v39);
                     else
-                        v37->numVertices = rdClip_Face3GSOrtho(clipFrustum, v82, v84, v39);
+                        v37->numVertices = rdClip_Face3GSOrtho(pClipFrustum, v82, v84, v39);
                     break;
                 default:
                     return;
@@ -345,10 +345,10 @@ LABEL_25:
                     if ( idxInfog )
                     {
                         v73 = idxInfo->vertexUVIdx;
-                        v74 = idxInfo->vertexUVs;
-                        a3e = idxInfo->vertices;
-                        v75 = mesh_out->vertexUVs;
-                        v76 = mesh_out->vertices;
+                        v74 = idxInfo->aTexVerticies;
+                        a3e = idxInfo->aVertices;
+                        v75 = mesh_out->aTexVerticies;
+                        v76 = mesh_out->aVertices;
                         v77 = (char *)((char *)idxInfo->vertexPosIdx - (char *)v73);
                         v97 = v77;
                         a2e = v72;
@@ -370,12 +370,12 @@ LABEL_25:
                         v71 = mesh_out;
                         v72 = idxInfog;
                     }
-                    v85 = v71->vertexUVs;
-                    v83 = v71->vertices;
+                    v85 = v71->aTexVerticies;
+                    v83 = v71->aVertices;
                     if (rdCamera_g_pCurCamera->projectType == rdCameraProjectType_Perspective)
-                        v71->numVertices = rdClip_Face3GT(clipFrustum, v83, v85, v72);
+                        v71->numVertices = rdClip_Face3GT(pClipFrustum, v83, v85, v72);
                     else
-                        v71->numVertices = rdClip_Face3TOrtho(clipFrustum, v83, v85, v72);
+                        v71->numVertices = rdClip_Face3TOrtho(pClipFrustum, v83, v85, v72);
                 }
                 else if ( lightMode == RD_LIGHTMODE_GOURAUD)
                 {
@@ -388,11 +388,11 @@ LABEL_25:
                     {
                         if ( v55 )
                         {
-                            v56 = mesh_out->vertices;
-                            a3c = v52->vertices;
-                            v92 = v52->vertexUVs;
+                            v56 = mesh_out->aVertices;
+                            a3c = v52->aVertices;
+                            v92 = v52->aTexVerticies;
                             v88 = v52->paDynamicLight;
-                            v58 = mesh_out->vertexUVs;
+                            v58 = mesh_out->aTexVerticies;
                             //printf("%x %x\n", v52->vertexUVIdx, &v52->vertexUVIdx);
                             for (int i = 0; i < idxInfo->numVertices; i++)
                             {
@@ -425,11 +425,11 @@ LABEL_25:
                     }
                     else if ( v55 )
                     {
-                        v64 = mesh_out->vertices;
-                        a3d = v52->vertices;
+                        v64 = mesh_out->aVertices;
+                        a3d = v52->aVertices;
                         v89 = v52->paDynamicLight;
-                        v65 = mesh_out->vertexUVs;
-                        v93 = v52->vertexUVs;
+                        v65 = mesh_out->aTexVerticies;
+                        v93 = v52->aTexVerticies;
                         for (int i = 0; i < idxInfo->numVertices; i++)
                         {
                             v66 = v52->vertexPosIdx[i];
@@ -462,9 +462,9 @@ LABEL_25:
                         v55 = idxInfof;
                     }
                     if (rdCamera_g_pCurCamera->projectType == rdCameraProjectType_Perspective)
-                        v53->numVertices = rdClip_Face3T(clipFrustum, v53->vertices, v53->vertexUVs, v53->paDynamicLight, v55);
+                        v53->numVertices = rdClip_Face3T(pClipFrustum, v53->aVertices, v53->aTexVerticies, v53->paDynamicLight, v55);
                     else
-                        v53->numVertices = rdClip_Face3GTOrtho(clipFrustum, v53->vertices, v53->vertexUVs, v53->paDynamicLight, v55);
+                        v53->numVertices = rdClip_Face3GTOrtho(pClipFrustum, v53->aVertices, v53->aTexVerticies, v53->paDynamicLight, v55);
                 }
             }
             break;
@@ -577,9 +577,9 @@ void rdPrimit3_NoClipFace(rdGeoMode_t geoMode, signed int lightMode, int texMode
             vertexSrcb = _vertexSrc->numVertices;
             if ( !vertexSrcb )
                 goto LABEL_19;
-            v14 = v13->vertices;
+            v14 = v13->aVertices;
             v15 = v13->vertexPosIdx;
-            v16 = _vertexDst->vertices;
+            v16 = _vertexDst->aVertices;
             do
             {
                 v17 = *v15;
@@ -599,8 +599,8 @@ void rdPrimit3_NoClipFace(rdGeoMode_t geoMode, signed int lightMode, int texMode
             vertexSrca = _vertexSrc->numVertices;
             if ( vertexSrca )
             {
-                v8 = v6->vertices;
-                v9 = _vertexDst->vertices;
+                v8 = v6->aVertices;
+                v9 = _vertexDst->aVertices;
                 v10 = v6->vertexPosIdx;
                 do
                 {
@@ -630,9 +630,9 @@ LABEL_19:
                     vertexSrcc = _vertexSrc->numVertices;
                     if ( !vertexSrcc )
                         goto LABEL_19;
-                    v20 = v19->vertices;
+                    v20 = v19->aVertices;
                     v21 = v19->vertexPosIdx;
-                    v22 = _vertexDst->vertices;
+                    v22 = _vertexDst->aVertices;
                     do
                     {
                         v23 = *v21;
@@ -651,9 +651,9 @@ LABEL_19:
                     vertexSrcd = _vertexSrc->numVertices;
                     if ( vertexSrcd )
                     {
-                        v26 = v25->vertices;
+                        v26 = v25->aVertices;
                         v27 = v25->vertexPosIdx;
-                        v28 = _vertexDst->vertices;
+                        v28 = _vertexDst->aVertices;
                         do
                         {
                             v29 = *v27;
@@ -678,8 +678,8 @@ LABEL_19:
                         if ( v34 )
                         {
                             v35 = v31->vertexPosIdx;
-                            pVertices = v31->vertices;
-                            v36 = _vertexDst->vertices;
+                            pVertices = v31->aVertices;
+                            v36 = _vertexDst->aVertices;
                             geometryModea = v31->paDynamicLight;
                             flex_t* lightIter = _vertexDst->paDynamicLight;
                             clipIdka = v34;
@@ -707,8 +707,8 @@ LABEL_19:
                     }
                     else if ( v34 )
                     {
-                        v40 = _vertexDst->vertices;
-                        pVertices_ = v31->vertices;
+                        v40 = _vertexDst->aVertices;
+                        pVertices_ = v31->aVertices;
                         paPosIdx = v31->vertexPosIdx;
                         geometryModeb = v31->paDynamicLight;
                         flex_t* lightIter = _vertexDst->paDynamicLight;
@@ -761,13 +761,13 @@ LABEL_19:
                 {
                     if ( v49 )
                     {
-                        v50 = v46->vertexUVs;
+                        v50 = v46->aTexVerticies;
                         v51 = v46->vertexPosIdx;
-                        lightingModec = v46->vertices;
-                        v52 = _vertexDst->vertices;
+                        lightingModec = v46->aVertices;
+                        v52 = _vertexDst->aVertices;
                         int* uvIter = v46->vertexUVIdx;
                         geometryModec = v46->paDynamicLight;
-                        v53 = _vertexDst->vertexUVs;
+                        v53 = _vertexDst->aTexVerticies;
                         v79 = vertexSrcf;
                         flex_t* lightIter = _vertexDst->paDynamicLight;
                         do
@@ -800,12 +800,12 @@ LABEL_19:
                 }
                 else if ( v49 )
                 {
-                    v56 = v46->vertexUVs;
+                    v56 = v46->aTexVerticies;
                     v57 = v46->vertexPosIdx;
-                    v58 = _vertexDst->vertices;
-                    lightingModed = v46->vertices;
+                    v58 = _vertexDst->aVertices;
+                    lightingModed = v46->aVertices;
                     geometryModed = v46->paDynamicLight;
-                    v59 = _vertexDst->vertexUVs;
+                    v59 = _vertexDst->aTexVerticies;
                     flex_t* lightIter = _vertexDst->paDynamicLight;
                     v80 = vertexSrcf;
                     int* uvIter = v46->vertexUVIdx;
@@ -848,10 +848,10 @@ LABEL_19:
             if ( vertexSrcg )
             {
                 v66 = _vertexSrc->vertexUVIdx;
-                v67 = _vertexSrc->vertexUVs;
-                lightingModee = _vertexSrc->vertices;
-                v68 = _vertexDst->vertexUVs;
-                v69 = _vertexDst->vertices;
+                v67 = _vertexSrc->aTexVerticies;
+                lightingModee = _vertexSrc->aVertices;
+                v68 = _vertexDst->aTexVerticies;
+                v69 = _vertexDst->aVertices;
                 int* idxIter = _vertexSrc->vertexPosIdx;
                 geometryModee = v65;
                 while ( 1 )
@@ -957,9 +957,9 @@ void rdPrimit3_NoClipFaceRGB
     case 0:
         uVar21 = _vertexSrc->numVertices;
         if (uVar21 != 0) {
-            prVar3 = _vertexSrc->vertices;
+            prVar3 = _vertexSrc->aVertices;
             piVar14 = _vertexSrc->vertexPosIdx;
-            prVar18 = _vertexDst->vertices;
+            prVar18 = _vertexDst->aVertices;
             uVar20 = uVar21;
             do {
                 iVar19 = *piVar14;
@@ -979,9 +979,9 @@ void rdPrimit3_NoClipFaceRGB
     case 2:
         uVar21 = _vertexSrc->numVertices;
         if (uVar21 != 0) {
-            prVar3 = _vertexSrc->vertices;
+            prVar3 = _vertexSrc->aVertices;
             piVar14 = _vertexSrc->vertexPosIdx;
-            prVar18 = _vertexDst->vertices;
+            prVar18 = _vertexDst->aVertices;
             uVar20 = uVar21;
             do {
                 iVar19 = *piVar14;
@@ -1003,9 +1003,9 @@ void rdPrimit3_NoClipFaceRGB
         case 1:
             uVar21 = _vertexSrc->numVertices;
             if (uVar21 != 0) {
-                prVar3 = _vertexSrc->vertices;
+                prVar3 = _vertexSrc->aVertices;
                 piVar14 = _vertexSrc->vertexPosIdx;
-                prVar18 = _vertexDst->vertices;
+                prVar18 = _vertexDst->aVertices;
                 uVar20 = uVar21;
                 do {
                     iVar19 = *piVar14;
@@ -1023,9 +1023,9 @@ void rdPrimit3_NoClipFaceRGB
         case 2:
             uVar21 = _vertexSrc->numVertices;
             if (uVar21 != 0) {
-                prVar3 = _vertexSrc->vertices;
+                prVar3 = _vertexSrc->aVertices;
                 piVar14 = _vertexSrc->vertexPosIdx;
-                prVar18 = _vertexDst->vertices;
+                prVar18 = _vertexDst->aVertices;
                 uVar20 = uVar21;
                 do {
                     iVar19 = *piVar14;
@@ -1041,11 +1041,11 @@ void rdPrimit3_NoClipFaceRGB
             break;
         case 3:
             if (_vertexSrc->numVertices != 0x0) {
-                prVar3 = _vertexSrc->vertices;
+                prVar3 = _vertexSrc->aVertices;
                 pfVar4 = _vertexSrc->paRedIntensities;
                 pfVar5 = _vertexDst->paGreenIntensities;
                 pfVar6 = _vertexDst->paRedIntensities;
-                prVar18 = _vertexDst->vertices;
+                prVar18 = _vertexDst->aVertices;
                 pfVar7 = _vertexSrc->paGreenIntensities;
                 piVar14 = _vertexSrc->vertexPosIdx;
                 pfVar8 = _vertexSrc->paDynamicLight;
@@ -1105,9 +1105,9 @@ void rdPrimit3_NoClipFaceRGB
                 {
                     int vtxIdx = _vertexSrc->vertexPosIdx[i];
                     int uvIdx = _vertexSrc->vertexUVIdx[i];
-                    _vertexDst->vertices[i] = _vertexSrc->vertices[vtxIdx];
-                    _vertexDst->vertexUVs[i] = _vertexSrc->vertexUVs[uvIdx];
-                    rdVector_Add2Acc(&_vertexDst->vertexUVs[i], idkIn);
+                    _vertexDst->aVertices[i] = _vertexSrc->aVertices[vtxIdx];
+                    _vertexDst->aTexVerticies[i] = _vertexSrc->aTexVerticies[uvIdx];
+                    rdVector_Add2Acc(&_vertexDst->aTexVerticies[i], idkIn);
                 }
 
                 _vertexDst->numVertices = _vertexSrc->numVertices;
@@ -1117,9 +1117,9 @@ void rdPrimit3_NoClipFaceRGB
                 {
                     int vtxIdx = _vertexSrc->vertexPosIdx[i];
                     int uvIdx = _vertexSrc->vertexUVIdx[i];
-                    _vertexDst->vertices[i] = _vertexSrc->vertices[vtxIdx];
-                    _vertexDst->vertexUVs[i] = _vertexSrc->vertexUVs[uvIdx];
-                    rdVector_Add2Acc(&_vertexDst->vertexUVs[i], idkIn);
+                    _vertexDst->aVertices[i] = _vertexSrc->aVertices[vtxIdx];
+                    _vertexDst->aTexVerticies[i] = _vertexSrc->aTexVerticies[uvIdx];
+                    rdVector_Add2Acc(&_vertexDst->aTexVerticies[i], idkIn);
                     _vertexDst->paRedIntensities[i] = stdMath_Clamp(_vertexSrc->paRedIntensities[vtxIdx] + _vertexSrc->paDynamicLight[vtxIdx], 0.0, 1.0);
                     _vertexDst->paGreenIntensities[i] = stdMath_Clamp(_vertexSrc->paGreenIntensities[vtxIdx] + _vertexSrc->paDynamicLight[vtxIdx], 0.0, 1.0);
                     _vertexDst->paBlueIntensities[i] = stdMath_Clamp(_vertexSrc->paBlueIntensities[vtxIdx] + _vertexSrc->paDynamicLight[vtxIdx], 0.0, 1.0);
@@ -1141,7 +1141,7 @@ LAB_0044d6ad:
 
 void
 rdPrimit3_ClipFaceRGB
-          (rdClipFrustum *clipFrustum,rdGeoMode_t geoMode,int lightMode,int texMode,
+          (rdClipFrustum *pClipFrustum,rdGeoMode_t geoMode,int lightMode,int texMode,
           rdMeshinfo *idxInfo,rdMeshinfo *mesh_out,rdVector2 *idkIn)
 {
     rdVector3 *prVar1;
@@ -1172,9 +1172,9 @@ rdPrimit3_ClipFaceRGB
     case 0:
         uVar15 = idxInfo->numVertices;
         if (uVar15 != 0) {
-            prVar3 = idxInfo->vertices;
+            prVar3 = idxInfo->aVertices;
             piVar17 = idxInfo->vertexPosIdx;
-            prVar19 = mesh_out->vertices;
+            prVar19 = mesh_out->aVertices;
             uVar21 = uVar15;
             do {
                 iVar20 = *piVar17;
@@ -1193,9 +1193,9 @@ rdPrimit3_ClipFaceRGB
     case 2:
         uVar15 = idxInfo->numVertices;
         if (uVar15 != 0) {
-            prVar3 = idxInfo->vertices;
+            prVar3 = idxInfo->aVertices;
             piVar17 = idxInfo->vertexPosIdx;
-            prVar19 = mesh_out->vertices;
+            prVar19 = mesh_out->aVertices;
             uVar21 = uVar15;
             do {
                 iVar20 = *piVar17;
@@ -1209,11 +1209,11 @@ rdPrimit3_ClipFaceRGB
             } while (uVar21 != 0);
         }
         if (rdCamera_g_pCurCamera->projectType != rdCameraProjectType_Perspective) {
-            uVar15 = rdClip_Face3WOrtho(clipFrustum,mesh_out->vertices,idxInfo->numVertices);
+            uVar15 = rdClip_Face3WOrtho(pClipFrustum,mesh_out->aVertices,idxInfo->numVertices);
             mesh_out->numVertices = uVar15;
             return;
         }
-        uVar15 = rdClip_Face3W(clipFrustum,mesh_out->vertices,idxInfo->numVertices);
+        uVar15 = rdClip_Face3W(pClipFrustum,mesh_out->aVertices,idxInfo->numVertices);
         mesh_out->numVertices = uVar15;
         return;
     case 3:
@@ -1222,9 +1222,9 @@ rdPrimit3_ClipFaceRGB
         case 1:
             uVar15 = idxInfo->numVertices;
             if (uVar15 != 0) {
-                prVar3 = idxInfo->vertices;
+                prVar3 = idxInfo->aVertices;
                 piVar17 = idxInfo->vertexPosIdx;
-                prVar19 = mesh_out->vertices;
+                prVar19 = mesh_out->aVertices;
                 uVar21 = uVar15;
                 do {
                     iVar20 = *piVar17;
@@ -1237,7 +1237,7 @@ rdPrimit3_ClipFaceRGB
                     prVar19 = prVar19 + 1;
                 } while (uVar21 != 0);
                 if (rdCamera_g_pCurCamera->projectType == rdCameraProjectType_Perspective) {
-                    uVar15 = rdClip_Face3S(clipFrustum,mesh_out->vertices,idxInfo->numVertices);
+                    uVar15 = rdClip_Face3S(pClipFrustum,mesh_out->aVertices,idxInfo->numVertices);
                     mesh_out->numVertices = uVar15;
                     return;
                 }
@@ -1247,9 +1247,9 @@ rdPrimit3_ClipFaceRGB
         case 2:
             uVar15 = idxInfo->numVertices;
             if (uVar15 != 0) {
-                prVar3 = idxInfo->vertices;
+                prVar3 = idxInfo->aVertices;
                 piVar17 = idxInfo->vertexPosIdx;
-                prVar19 = mesh_out->vertices;
+                prVar19 = mesh_out->aVertices;
                 uVar21 = uVar15;
                 do {
                     iVar20 = *piVar17;
@@ -1265,10 +1265,10 @@ rdPrimit3_ClipFaceRGB
             break;
         case 3:
             if (idxInfo->numVertices != 0x0) {
-                prVar3 = idxInfo->vertices;
+                prVar3 = idxInfo->aVertices;
                 pfVar5 = idxInfo->paRedIntensities;
                 pfVar6 = idxInfo->paDynamicLight;
-                prVar19 = mesh_out->vertices;
+                prVar19 = mesh_out->aVertices;
                 pfVar7 = idxInfo->paGreenIntensities;
                 piVar17 = idxInfo->vertexPosIdx;
                 pfVar8 = idxInfo->paBlueIntensities;
@@ -1313,7 +1313,7 @@ rdPrimit3_ClipFaceRGB
                     idkIn_ -= 1;
                 } while (idkIn_ != 0x0);
             }
-            uVar15 = rdClip_Face3GSRGB(clipFrustum,mesh_out->vertices,
+            uVar15 = rdClip_Face3GSRGB(pClipFrustum,mesh_out->aVertices,
                                        mesh_out->paRedIntensities,mesh_out->paGreenIntensities,
                                        mesh_out->paBlueIntensities,idxInfo->numVertices);
             mesh_out->numVertices = uVar15;
@@ -1327,13 +1327,13 @@ rdPrimit3_ClipFaceRGB
         if (-1 < lightMode) {
             if (lightMode < 3) {
                 if (idxInfo->numVertices != 0) {
-                    prVar3 = idxInfo->vertices;
+                    prVar3 = idxInfo->aVertices;
                     piVar17 = idxInfo->vertexUVIdx;
-                    rdVector2* prVar4 = idxInfo->vertexUVs;
+                    rdVector2* prVar4 = idxInfo->aTexVerticies;
                     piVar9 = idxInfo->vertexPosIdx;
-                    prVar16 = mesh_out->vertexUVs;
+                    prVar16 = mesh_out->aTexVerticies;
                     piVar18 = piVar17;
-                    prVar19 = mesh_out->vertices;
+                    prVar19 = mesh_out->aVertices;
                     local_10 = idxInfo->numVertices;
                     do {
                         prVar1 = prVar3 + *piVar9;
@@ -1357,28 +1357,28 @@ rdPrimit3_ClipFaceRGB
                 {
                     int vtxIdx = idxInfo->vertexPosIdx[i];
                     int uvIdx = idxInfo->vertexUVIdx[i];
-                    mesh_out->vertices[i] = idxInfo->vertices[vtxIdx];
-                    mesh_out->vertexUVs[i] = idxInfo->vertexUVs[uvIdx];
-                    rdVector_Add2Acc(&mesh_out->vertexUVs[i], idkIn);
+                    mesh_out->aVertices[i] = idxInfo->aVertices[vtxIdx];
+                    mesh_out->aTexVerticies[i] = idxInfo->aTexVerticies[uvIdx];
+                    rdVector_Add2Acc(&mesh_out->aTexVerticies[i], idkIn);
                     //mesh_out->paRedIntensities[i] = idxInfo->paRedIntensities[i] + idxInfo->paDynamicLight[vtxIdx];
                     //mesh_out->paGreenIntensities[i] = idxInfo->paGreenIntensities[i] + idxInfo->paDynamicLight[vtxIdx];
                     //mesh_out->paBlueIntensities[i] = idxInfo->paBlueIntensities[i] + idxInfo->paDynamicLight[vtxIdx];
                 }
 #endif
                 if (rdCamera_g_pCurCamera->projectType == rdCameraProjectType_Perspective) {
-                    uVar15 = rdClip_Face3GT(clipFrustum,mesh_out->vertices,
-                                           mesh_out->vertexUVs,idxInfo->numVertices);
+                    uVar15 = rdClip_Face3GT(pClipFrustum,mesh_out->aVertices,
+                                           mesh_out->aTexVerticies,idxInfo->numVertices);
                     mesh_out->numVertices = uVar15;
                     return;
                 }
-                uVar15 = rdClip_Face3TOrtho(clipFrustum,mesh_out->vertices,
-                                            mesh_out->vertexUVs,idxInfo->numVertices);
+                uVar15 = rdClip_Face3TOrtho(pClipFrustum,mesh_out->aVertices,
+                                            mesh_out->aTexVerticies,idxInfo->numVertices);
                 mesh_out->numVertices = uVar15;
             }
             else if (lightMode == 3) {
                 if (idxInfo->numVertices != 0) {
-                    prVar3 = idxInfo->vertices;
-                    rdVector2* prVar4 = idxInfo->vertexUVs;
+                    prVar3 = idxInfo->aVertices;
+                    rdVector2* prVar4 = idxInfo->aTexVerticies;
                     pfVar5 = idxInfo->paDynamicLight;
                     piVar17 = idxInfo->vertexPosIdx;
                     pfVar6 = idxInfo->paRedIntensities;
@@ -1387,8 +1387,8 @@ rdPrimit3_ClipFaceRGB
                     piVar9 = idxInfo->vertexUVIdx;
 
                     pfVar10 = mesh_out->paRedIntensities;
-                    local_18 = mesh_out->vertices;
-                    prVar16 = mesh_out->vertexUVs;
+                    local_18 = mesh_out->aVertices;
+                    prVar16 = mesh_out->aTexVerticies;
                     pfVar11 = mesh_out->paGreenIntensities;
                     local_10 = idxInfo->numVertices;
 
@@ -1442,8 +1442,8 @@ rdPrimit3_ClipFaceRGB
                         piVar9++;
                     } while (local_10 != 0);
                 }
-                uVar15 = rdClip_Face3GTRGB(clipFrustum,mesh_out->vertices,
-                                           mesh_out->vertexUVs,
+                uVar15 = rdClip_Face3GTRGB(pClipFrustum,mesh_out->aVertices,
+                                           mesh_out->aTexVerticies,
                                            mesh_out->paRedIntensities,
                                            mesh_out->paGreenIntensities,
                                            mesh_out->paBlueIntensities,
@@ -1454,9 +1454,9 @@ rdPrimit3_ClipFaceRGB
                 {
                     int vtxIdx = idxInfo->vertexPosIdx[i];
                     int uvIdx = idxInfo->vertexUVIdx[i];
-                    mesh_out->vertices[i] = idxInfo->vertices[vtxIdx];
-                    mesh_out->vertexUVs[i] = idxInfo->vertexUVs[uvIdx];
-                    rdVector_Add2Acc(&mesh_out->vertexUVs[i], idkIn);
+                    mesh_out->aVertices[i] = idxInfo->aVertices[vtxIdx];
+                    mesh_out->aTexVerticies[i] = idxInfo->aTexVerticies[uvIdx];
+                    rdVector_Add2Acc(&mesh_out->aTexVerticies[i], idkIn);
                     mesh_out->paRedIntensities[i] = 1.0;//idxInfo->paRedIntensities[vtxIdx] + idxInfo->paDynamicLight[vtxIdx];
                     mesh_out->paGreenIntensities[i] = 0.0;//idxInfo->paGreenIntensities[vtxIdx] + idxInfo->paDynamicLight[vtxIdx];
                     mesh_out->paBlueIntensities[i] = 1.0;//idxInfo->paBlueIntensities[vtxIdx] + idxInfo->paDynamicLight[vtxIdx];
@@ -1471,19 +1471,19 @@ switchD_0044c964_caseD_5:
         return;
     }
     if (iVar20 == 1) {
-        uVar15 = rdClip_Face3S(clipFrustum,mesh_out->vertices,uVar15);
+        uVar15 = rdClip_Face3S(pClipFrustum,mesh_out->aVertices,uVar15);
         mesh_out->numVertices = uVar15;
         return;
     }
 LAB_0044cb44:
-    uVar15 = rdClip_Face3SOrtho(clipFrustum,mesh_out->vertices,uVar15);
+    uVar15 = rdClip_Face3SOrtho(pClipFrustum,mesh_out->aVertices,uVar15);
     mesh_out->numVertices = uVar15;
     return;
 }
 
 
 void rdPrimit3_ClipFaceRGBLevel
-               (const rdClipFrustum* NO_ALIAS clipFrustum,rdGeoMode_t geoMode,int lightMode,int texMode,
+               (const rdClipFrustum* NO_ALIAS pClipFrustum,rdGeoMode_t geoMode,int lightMode,int texMode,
                rdMeshinfo *idxInfo,rdMeshinfo *mesh_out,rdVector2 *idkIn)
 {
     rdVector3 *prVar1;
@@ -1513,9 +1513,9 @@ void rdPrimit3_ClipFaceRGBLevel
     case 0:
         uVar16 = idxInfo->numVertices;
         if (uVar16 != 0) {
-            prVar7 = idxInfo->vertices;
+            prVar7 = idxInfo->aVertices;
             piVar18 = idxInfo->vertexPosIdx;
-            prVar20 = mesh_out->vertices;
+            prVar20 = mesh_out->aVertices;
             uVar22 = uVar16;
             do {
                 iVar15 = *piVar18;
@@ -1532,9 +1532,9 @@ void rdPrimit3_ClipFaceRGBLevel
     case 2:
         uVar16 = idxInfo->numVertices;
         if (uVar16 != 0) {
-            prVar7 = idxInfo->vertices;
+            prVar7 = idxInfo->aVertices;
             piVar18 = idxInfo->vertexPosIdx;
-            prVar20 = mesh_out->vertices;
+            prVar20 = mesh_out->aVertices;
             uVar22 = uVar16;
             do {
                 iVar15 = *piVar18;
@@ -1546,11 +1546,11 @@ void rdPrimit3_ClipFaceRGBLevel
             } while (uVar22 != 0);
         }
         if (rdCamera_g_pCurCamera->projectType != rdCameraProjectType_Perspective) {
-            uVar16 = rdClip_Face3WOrtho(clipFrustum,mesh_out->vertices,uVar16);
+            uVar16 = rdClip_Face3WOrtho(pClipFrustum,mesh_out->aVertices,uVar16);
             mesh_out->numVertices = uVar16;
             return;
         }
-        uVar16 = rdClip_Face3W(clipFrustum,mesh_out->vertices,uVar16);
+        uVar16 = rdClip_Face3W(pClipFrustum,mesh_out->aVertices,uVar16);
         mesh_out->numVertices = uVar16;
         return;
     case 3:
@@ -1559,9 +1559,9 @@ void rdPrimit3_ClipFaceRGBLevel
         case 1:
             uVar16 = idxInfo->numVertices;
             if (uVar16 != 0) {
-                prVar7 = idxInfo->vertices;
+                prVar7 = idxInfo->aVertices;
                 piVar18 = idxInfo->vertexPosIdx;
-                prVar20 = mesh_out->vertices;
+                prVar20 = mesh_out->aVertices;
                 uVar22 = uVar16;
                 do {
                     iVar15 = *piVar18;
@@ -1572,7 +1572,7 @@ void rdPrimit3_ClipFaceRGBLevel
                     prVar20++;
                 } while (uVar22 != 0);
                 if (rdCamera_g_pCurCamera->projectType == rdCameraProjectType_Perspective) {
-                    uVar16 = rdClip_Face3S(clipFrustum,mesh_out->vertices,uVar16);
+                    uVar16 = rdClip_Face3S(pClipFrustum,mesh_out->aVertices,uVar16);
                     mesh_out->numVertices = uVar16;
                     return;
                 }
@@ -1582,9 +1582,9 @@ void rdPrimit3_ClipFaceRGBLevel
         case 2:
             uVar16 = idxInfo->numVertices;
             if (uVar16 != 0) {
-                prVar7 = idxInfo->vertices;
+                prVar7 = idxInfo->aVertices;
                 piVar18 = idxInfo->vertexPosIdx;
-                prVar20 = mesh_out->vertices;
+                prVar20 = mesh_out->aVertices;
                 uVar22 = uVar16;
                 do {
                     iVar15 = *piVar18;
@@ -1598,10 +1598,10 @@ void rdPrimit3_ClipFaceRGBLevel
             break;
         case 3:
             if (idxInfo->numVertices != 0x0) {
-                prVar7 = idxInfo->vertices;
+                prVar7 = idxInfo->aVertices;
                 piVar18 = idxInfo->vertexPosIdx;
                 pfVar9 = idxInfo->paDynamicLight;
-                prVar20 = mesh_out->vertices;
+                prVar20 = mesh_out->aVertices;
 
                 flex_t* redIter = mesh_out->paRedIntensities;
                 flex_t* greenIter = mesh_out->paGreenIntensities;
@@ -1625,7 +1625,7 @@ void rdPrimit3_ClipFaceRGBLevel
                     idxIter++;
                 }
             }
-            uVar14 = rdClip_Face3GSRGB(clipFrustum,mesh_out->vertices,
+            uVar14 = rdClip_Face3GSRGB(pClipFrustum,mesh_out->aVertices,
                                        mesh_out->paRedIntensities,mesh_out->paGreenIntensities,
                                        mesh_out->paBlueIntensities, idxInfo->numVertices);
             mesh_out->numVertices = uVar14;
@@ -1639,13 +1639,13 @@ void rdPrimit3_ClipFaceRGBLevel
         if (-1 < lightMode) {
             if (lightMode < 3) {
                 if (idxInfo->numVertices != 0) {
-                    prVar7 = idxInfo->vertices;
+                    prVar7 = idxInfo->aVertices;
                     piVar18 = idxInfo->vertexUVIdx;
-                    prVar5 = idxInfo->vertexUVs;
+                    prVar5 = idxInfo->aTexVerticies;
                     piVar24 = idxInfo->vertexPosIdx;
-                    prVar17 = mesh_out->vertexUVs;
+                    prVar17 = mesh_out->aTexVerticies;
                     piVar19 = piVar18;
-                    prVar20 = mesh_out->vertices;
+                    prVar20 = mesh_out->aVertices;
                     local_8 = idxInfo->numVertices;
                     do {
                         prVar1 = prVar7 + *piVar24;
@@ -1661,26 +1661,26 @@ void rdPrimit3_ClipFaceRGBLevel
                     } while (local_8 != 0);
                 }
                 if (rdCamera_g_pCurCamera->projectType == rdCameraProjectType_Perspective) {
-                    uVar16 = rdClip_Face3GT(clipFrustum,mesh_out->vertices,
-                                           mesh_out->vertexUVs,idxInfo->numVertices);
+                    uVar16 = rdClip_Face3GT(pClipFrustum,mesh_out->aVertices,
+                                           mesh_out->aTexVerticies,idxInfo->numVertices);
                     mesh_out->numVertices = uVar16;
                     return;
                 }
                 else {
-                    uVar16 = rdClip_Face3TOrtho(clipFrustum,mesh_out->vertices,
-                                            mesh_out->vertexUVs,idxInfo->numVertices);
+                    uVar16 = rdClip_Face3TOrtho(pClipFrustum,mesh_out->aVertices,
+                                            mesh_out->aTexVerticies,idxInfo->numVertices);
                     mesh_out->numVertices = uVar16;
                 }
             }
             else if (lightMode == 3) {
                 if (idxInfo->numVertices != 0) {
-                    prVar5 = idxInfo->vertexUVs;
-                    local_10 = mesh_out->vertices;
+                    prVar5 = idxInfo->aTexVerticies;
+                    local_10 = mesh_out->aVertices;
                     piVar18 = idxInfo->vertexUVIdx;
-                    prVar7 = idxInfo->vertices;
+                    prVar7 = idxInfo->aVertices;
                     piVar24 = idxInfo->vertexPosIdx;
                     pfVar9 = idxInfo->paDynamicLight;
-                    prVar17 = mesh_out->vertexUVs;
+                    prVar17 = mesh_out->aTexVerticies;
 
                     flex_t* redIter = mesh_out->paRedIntensities;
                     flex_t* greenIter = mesh_out->paGreenIntensities;
@@ -1712,9 +1712,9 @@ void rdPrimit3_ClipFaceRGBLevel
 
                     } while (local_8 != 0);
                 }
-                uVar16 = rdClip_Face3GTRGB(clipFrustum,
-                                           mesh_out->vertices,
-                                           mesh_out->vertexUVs,
+                uVar16 = rdClip_Face3GTRGB(pClipFrustum,
+                                           mesh_out->aVertices,
+                                           mesh_out->aTexVerticies,
                                            mesh_out->paRedIntensities,
                                            mesh_out->paGreenIntensities,
                                            mesh_out->paBlueIntensities,
@@ -1726,9 +1726,9 @@ void rdPrimit3_ClipFaceRGBLevel
                 {
                     int vtxIdx = idxInfo->vertexPosIdx[i];
                     int uvIdx = idxInfo->vertexUVIdx[i];
-                    mesh_out->vertices[i] = idxInfo->vertices[vtxIdx];
-                    mesh_out->vertexUVs[i] = idxInfo->vertexUVs[uvIdx];
-                    rdVector_Add2Acc(&mesh_out->vertexUVs[i], idkIn);
+                    mesh_out->aVertices[i] = idxInfo->aVertices[vtxIdx];
+                    mesh_out->aTexVerticies[i] = idxInfo->aTexVerticies[uvIdx];
+                    rdVector_Add2Acc(&mesh_out->aTexVerticies[i], idkIn);
                     mesh_out->paRedIntensities[i] = idxInfo->paRedIntensities[i] + idxInfo->paDynamicLight[vtxIdx];
                     mesh_out->paGreenIntensities[i] = idxInfo->paGreenIntensities[i] + idxInfo->paDynamicLight[vtxIdx];
                     mesh_out->paBlueIntensities[i] = idxInfo->paBlueIntensities[i] + idxInfo->paDynamicLight[vtxIdx];
@@ -1741,12 +1741,12 @@ void rdPrimit3_ClipFaceRGBLevel
         return;
     }
     if (iVar15 == 1) {
-        uVar16 = rdClip_Face3S(clipFrustum,mesh_out->vertices,uVar16);
+        uVar16 = rdClip_Face3S(pClipFrustum,mesh_out->aVertices,uVar16);
         mesh_out->numVertices = uVar16;
         return;
     }
 LAB_0044c4b4:
-    uVar16 = rdClip_Face3SOrtho(clipFrustum,mesh_out->vertices,uVar16);
+    uVar16 = rdClip_Face3SOrtho(pClipFrustum,mesh_out->aVertices,uVar16);
     mesh_out->numVertices = uVar16;
     return;
 }

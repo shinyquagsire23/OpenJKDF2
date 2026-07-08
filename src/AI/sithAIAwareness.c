@@ -99,7 +99,7 @@ int sithAIAwareness_Update(int32_t a, SithEventParams* b)
         {
             if ( i->thing )
             {
-                if ( (i->thing->thingflags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) == 0 )
+                if ( (i->thing->flags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) == 0 )
                 {
                     SithSector* v6 = i->thing->sector;
                     if ( v6 )
@@ -147,7 +147,7 @@ void sithAIAwareness_ProcessEvent(sithSectorEntry *pSectorEntry, SithSector *pSe
 
                 rdVector3 adjoinUnk;
 #ifndef OPTIMIZE_AWAY_UNUSED_FIELDS
-                adjoinUnk = i->field_1C; // Maybe this was the adjoin center...?
+                adjoinUnk = i->field_1C; // Maybe this was the pAdjoin center...?
 #endif
                 sithAIAwareness_ProcessEvent(pSectorEntry, i->sector, pPos1, &adjoinUnk, a6, a6a, pThing);
             }

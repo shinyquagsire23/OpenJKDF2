@@ -6,18 +6,18 @@
 #include "World/sithSector.h"
 #include "jk.h"
 
-int sithRenderSky_Open(flex_t horizontalPixelsPerRev, flex_t horizontalDist, flex_t ceilingSky)
+int sithRenderSky_Open(flex_t horizontalPixelsPerRev, flex_t horizontalDist, flex_t ceilingSkyHeight)
 {
     sithSector_horizontalPixelsPerRev_idk = horizontalPixelsPerRev * 0.0027777778;
     sithSector_horizontalDist = horizontalDist;
-    sithSector_ceilingSky = ceilingSky;
+    sithSector_ceilingSky = ceilingSkyHeight;
     sithSector_zMaxVec.x = 0.0;
     sithSector_zMaxVec.y = 0.0;
-    sithSector_zMaxVec.z = ceilingSky;
+    sithSector_zMaxVec.z = ceilingSkyHeight;
     sithSector_horizontalPixelsPerRev = horizontalPixelsPerRev;
     sithSector_zMinVec.x = 0.0;
     sithSector_zMinVec.y = 0.0;
-    sithSector_zMinVec.z = -ceilingSky;
+    sithSector_zMinVec.z = -ceilingSkyHeight;
     return 1;
 }
 
@@ -45,8 +45,8 @@ void sithRenderSky_HorizonFaceToPlane(rdProcEntry *pProcEntry, sithSurfaceInfo *
     pProcEntry->lightingMode = sithRender_lightMode > RD_LIGHTMODE_FULLYLIT ? RD_LIGHTMODE_FULLYLIT : sithRender_lightMode;
     pProcEntry->textureMode = sithRender_texMode > RD_TEXTUREMODE_AFFINE ? RD_TEXTUREMODE_AFFINE : sithRender_texMode;
     
-    pVertUV = pProcEntry->vertexUVs;
-    pVertXYZ = pProcEntry->vertices;
+    pVertUV = pProcEntry->aTexVerticies;
+    pVertXYZ = pProcEntry->aVertices;
 
     while ( num_vertices )
     {
@@ -71,7 +71,7 @@ void sithRenderSky_HorizonFaceToPlane(rdProcEntry *pProcEntry, sithSurfaceInfo *
 
         pVertUV->x = tmp1 * sithSector_flt_8553C8 - tmp2 * sithSector_flt_8553F4 + sithSector_flt_8553B8;
         pVertUV->y = tmp2 * sithSector_flt_8553C8 + tmp1 * sithSector_flt_8553F4 + sithSector_flt_8553C4;
-        rdVector_Add2Acc(pVertUV, &sithWorld_g_pCurrentWorld->horizontalSkyOffs);
+        rdVector_Add2Acc(pVertUV, &sithWorld_g_pCurrentWorld->horizonSkyOffset);
         rdVector_Add2Acc(pVertUV, &pSurfaceInfo->face.clipIdk);
 
         ++pVertXYZ;
@@ -101,7 +101,7 @@ void sithRenderSky_CeilingFaceToPlane(rdProcEntry *pProcEntry, sithSurfaceInfo *
     //float invMatHeight = 1.0f / (float)pSurfaceInfo->face.material->texinfos[0]->texture_ptr->texture_struct[0]->format.height;
 #endif
 
-    // TODO: Clamp vertices to horizon? Would be easier to just have a skybox tbh
+    // TODO: Clamp aVertices to horizon? Would be easier to just have a skybox tbh
 #ifdef QOL_IMPROVEMENTS
     //BOOL bHitTestFailed = false;
 #endif
@@ -124,7 +124,7 @@ void sithRenderSky_CeilingFaceToPlane(rdProcEntry *pProcEntry, sithSurfaceInfo *
 #endif
         }
         rdVector_Scale3Acc(&a1a, tmp);
-        pVertUV = &pProcEntry->vertexUVs[i];
+        pVertUV = &pProcEntry->aTexVerticies[i];
         rdVector_Add3Acc(&a1a, &sithCamera_g_pCurCamera->vec3_1);
         rdVector_Scale2(pVertUV, (rdVector2*)&a1a, 16.0);
 
@@ -133,21 +133,21 @@ void sithRenderSky_CeilingFaceToPlane(rdProcEntry *pProcEntry, sithSurfaceInfo *
         //pVertUV->y *= invMatHeight;
 #endif
 
-        rdVector_Add2Acc(pVertUV, &sithWorld_g_pCurrentWorld->ceilingSkyOffs);
+        rdVector_Add2Acc(pVertUV, &sithWorld_g_pCurrentWorld->ceilingSkyOffset);
         rdVector_Add2Acc(pVertUV, &pSurfaceInfo->face.clipIdk);
         rdMatrix_TransformPoint34(&vertex_out, &a1a, &sithCamera_g_pCurCamera->rdCam.view_matrix);
 
 #ifdef TARGET_TWL
-        flex_t prev_z = pProcEntry->vertices[i].y;
+        flex_t prev_z = pProcEntry->aVertices[i].y;
         vertex_out.y *= 0.15;
-        pProcEntry->vertices[i].y = vertex_out.y;
-        pProcEntry->vertices[i].y = stdMath_Clamp(pProcEntry->vertices[i].y, 0.0f, rdCamera_g_pCurCamera->pClipFrustum->zFar - 0.1);
-        pProcEntry->vertices[i].x /= prev_z;
-        pProcEntry->vertices[i].x *= pProcEntry->vertices[i].y;
-        pProcEntry->vertices[i].z /= prev_z;
-        pProcEntry->vertices[i].z *= pProcEntry->vertices[i].y;
+        pProcEntry->aVertices[i].y = vertex_out.y;
+        pProcEntry->aVertices[i].y = stdMath_Clamp(pProcEntry->aVertices[i].y, 0.0f, rdCamera_g_pCurCamera->pClipFrustum->zFar - 0.1);
+        pProcEntry->aVertices[i].x /= prev_z;
+        pProcEntry->aVertices[i].x *= pProcEntry->aVertices[i].y;
+        pProcEntry->aVertices[i].z /= prev_z;
+        pProcEntry->aVertices[i].z *= pProcEntry->aVertices[i].y;
 #else
-        pProcEntry->vertices[i].z = vertex_out.y;
+        pProcEntry->aVertices[i].z = vertex_out.y;
 #endif
         // TODO: There's a bug where facing a vertical wall of sky starts dividing strangely
     }

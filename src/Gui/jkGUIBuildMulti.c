@@ -505,7 +505,7 @@ int jkGuiBuildMulti_ShowEditCharacter(BOOL bIdk)
 LABEL_16:
     jkGuiBuildMulti_numModels = 0;
     jkGuiBuildMulti_bSabersLoaded = 1;
-    if ( stdConffile_Open("misc\\models.dat") )
+    if ( stdConffile_Open("misc\\aModels.dat") )
     {
         stdConffile_ReadLine();
         if ( _sscanf(stdConffile_g_aLine, "nummodels: %d", &jkGuiBuildMulti_numModels) == 1 )
@@ -974,7 +974,7 @@ int jkGuiBuildMulti_Show()
     jkGuiBuildMulti_menuEditCharacter_buttons[7].bIsSmolDirty = 1;
 #endif
 
-    // MoTS added: Need to move things around for Personality
+    // MoTS added: Need to move aThings around for Personality
     if (!Main_bMotsCompat) {
         jkGuiBuildMulti_menuEditCharacter_buttons[10].bIsVisible = 0;
         jkGuiBuildMulti_menuEditCharacter_buttons[11].bIsVisible = 0;

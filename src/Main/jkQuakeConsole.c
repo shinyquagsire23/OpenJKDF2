@@ -380,11 +380,11 @@ int jkQuakeConsole_AutocompleteTemplates()
     int bPrintOnce = 0;
 
 #ifdef SITH_DEBUG_STRUCT_NAMES
-    if (sithWorld_g_pStaticWorld && sithWorld_g_pStaticWorld->templates) 
+    if (sithWorld_g_pStaticWorld && sithWorld_g_pStaticWorld->aThingTemplates) 
     {
-        for (int i = 0; i < sithWorld_g_pStaticWorld->numTemplatesLoaded; i++)
+        for (int i = 0; i < sithWorld_g_pStaticWorld->numThingTemplates; i++)
         {
-            char* pName = sithWorld_g_pStaticWorld->templates[i].template_name;
+            char* pName = sithWorld_g_pStaticWorld->aThingTemplates[i].aName;
             if (!strncmp(jkQuakeConsole_pTabPos, pName, strlen(jkQuakeConsole_pTabPos))) {
                 bPrintOnce = 1;
 
@@ -395,11 +395,11 @@ int jkQuakeConsole_AutocompleteTemplates()
         }
     }
     
-    if (!sithWorld_g_pCurrentWorld || !sithWorld_g_pCurrentWorld->templates) return bPrintOnce;
+    if (!sithWorld_g_pCurrentWorld || !sithWorld_g_pCurrentWorld->aThingTemplates) return bPrintOnce;
     
-    for (int i = 0; i < sithWorld_g_pCurrentWorld->numTemplatesLoaded; i++)
+    for (int i = 0; i < sithWorld_g_pCurrentWorld->numThingTemplates; i++)
     {
-        char* pName = sithWorld_g_pCurrentWorld->templates[i].template_name;
+        char* pName = sithWorld_g_pCurrentWorld->aThingTemplates[i].aName;
         if (!strncmp(jkQuakeConsole_pTabPos, pName, strlen(jkQuakeConsole_pTabPos))) {
             bPrintOnce = 1;
 

@@ -427,18 +427,18 @@ int sithGamesave_SaveCurrentWorld(int mpFlags)
         return 0;
     for (uint32_t i = 0; i < sithWorld_g_pCurrentWorld->numThingsLoaded; i++)
     {
-        SithThing* v4 = &sithWorld_g_pCurrentWorld->things[i];
+        SithThing* v4 = &sithWorld_g_pCurrentWorld->aThings[i];
         if ( sithThing_CanSync(v4) )
         {
             sithDSSThing_FullDescription(v4, 0, mpFlags);
-            if ( v4->rdthing.puppet )
+            if ( v4->renderData.puppet )
                 sithDSS_PuppetStatus(v4, 0, mpFlags);
         }
     }
 
     for (uint32_t i = 0; i < sithWorld_g_pCurrentWorld->numThingsLoaded; i++)
     {
-        SithThing* v7 = &sithWorld_g_pCurrentWorld->things[i];
+        SithThing* v7 = &sithWorld_g_pCurrentWorld->aThings[i];
         if (sithThing_CanSync(v7))
         {
             if ( v7->attach_flags )
@@ -459,16 +459,16 @@ int sithGamesave_SaveCurrentWorld(int mpFlags)
         }
     }
 
-    for (uint32_t i = 0; i < sithWorld_g_pCurrentWorld->numCogsLoaded; i++)
+    for (uint32_t i = 0; i < sithWorld_g_pCurrentWorld->numCogs; i++)
     {
-        sithDSSCog_SyncCogState(&sithWorld_g_pCurrentWorld->cogs[i], 0, mpFlags);
+        sithDSSCog_SyncCogState(&sithWorld_g_pCurrentWorld->aCogs[i], 0, mpFlags);
     }
 
     if ( sithWorld_g_pStaticWorld )
     {
-        for (uint32_t i = 0; i < sithWorld_g_pStaticWorld->numCogsLoaded; i++)
+        for (uint32_t i = 0; i < sithWorld_g_pStaticWorld->numCogs; i++)
         {
-            sithDSSCog_SyncCogState(&sithWorld_g_pStaticWorld->cogs[i], 0, mpFlags);
+            sithDSSCog_SyncCogState(&sithWorld_g_pStaticWorld->aCogs[i], 0, mpFlags);
         }
     }
 
@@ -479,7 +479,7 @@ int sithGamesave_SaveCurrentWorld(int mpFlags)
 
     for (uint32_t i = 0; i < sithWorld_g_pCurrentWorld->numSectors; i++)
     {
-        sithDSS_SectorStatus(&sithWorld_g_pCurrentWorld->sectors[i], 0, mpFlags);
+        sithDSS_SectorStatus(&sithWorld_g_pCurrentWorld->aSectors[i], 0, mpFlags);
     }
 
     for (v19 = 0; v19 < SITHBIN_NUMBINS; v19++) // TODO define this maximum
@@ -512,7 +512,7 @@ int sithGamesave_Save(char *saveFname, int a2, int a3, wchar_t *saveName)
 
     if ( (g_submodeFlags & 1) != 0 )
         return 0;
-    if ( (sithPlayer_g_pLocalPlayerThing->thingflags & SITH_TF_DEAD) != 0 )
+    if ( (sithPlayer_g_pLocalPlayerThing->flags & SITH_TF_DEAD) != 0 )
         return 0;
 
     // Added: multiple versions
@@ -608,7 +608,7 @@ int sithGamesave_Process()
         sithGamesave_state = SITH_GS_NONE;
         return 1;
     }
-    if ( (sithPlayer_g_pLocalPlayerThing->thingflags & SITH_TF_DEAD) == 0 && stdConffile_OpenWriteBypass(sithGamesave_aCurFilename) )
+    if ( (sithPlayer_g_pLocalPlayerThing->flags & SITH_TF_DEAD) == 0 && stdConffile_OpenWriteBypass(sithGamesave_aCurFilename) )
     {
         int multiplayerFlagsSave = sithMessage_g_outputstream;
         sithMessage_g_outputstream = 4;

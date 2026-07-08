@@ -254,9 +254,9 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
             anim_entry->vel.x = velx; // FLEXTODO
             anim_entry->vel.y = vely; // FLEXTODO
             anim_entry->vel.z = velz; // FLEXTODO
-            anim_entry->angVel.x = angVelx; // FLEXTODO
-            anim_entry->angVel.y = angVely; // FLEXTODO
-            anim_entry->angVel.z = angVelz; // FLEXTODO
+            anim_entry->angularVelocity.x = angVelx; // FLEXTODO
+            anim_entry->angularVelocity.y = angVely; // FLEXTODO
+            anim_entry->angularVelocity.z = angVelz; // FLEXTODO
             anim_entry++;
         }
     }
@@ -355,9 +355,9 @@ int rdKeyframe_Write(char *out_fpath, rdKeyframe *keyframe, char *creation_metho
                 animEntry_iter->vel.x,
                 animEntry_iter->vel.y,
                 animEntry_iter->vel.z,
-                animEntry_iter->angVel.x,
-                animEntry_iter->angVel.y,
-                animEntry_iter->angVel.z);
+                animEntry_iter->angularVelocity.x,
+                animEntry_iter->angularVelocity.y,
+                animEntry_iter->angularVelocity.z);
             ++animEntry_iter;
         }
         rdroid_g_pHS->filePrintf(fd, "\n");

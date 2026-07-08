@@ -69,7 +69,7 @@ static void std3D_DrawRenderListReal(void); // eager per-batch emitter
 // pass at EndScene.
 //
 // This stays small because the engine already renders alpha *surfaces* in their own
-// pass (sithRender_RenderAlphaAdjoins); only the transparent *things* (sprites,
+// pass (sithRender_RenderAlphaAdjoins); only the transparent *aThings* (aSprites,
 // blaster impacts, effects) interleaved into RenderThings actually need buffering.
 // Overflow silently drops tris -- bump this if heavy particle scenes flicker.
 // #2 test: set to 1 to bypass the whole TR/defer path -- translucent tris go
@@ -255,7 +255,7 @@ int std3D_StartScene()
     // Advance the global frame counter every frame. The material LRU
     // (rdMaterial_EnsureData/EnsureMetadata) gates its per-frame load budget and
     // its "load once per frame" check on this; it starts at 1 and the guard
-    // `std3D_frameCount != 1` means materials never load until it moves past 1.
+    // `std3D_frameCount != 1` means aMaterials never load until it moves past 1.
     ++std3D_frameCount;
 
     // Lazily re-establish after a soft Shutdown (GUI transitions clear bHasInitted).
@@ -316,7 +316,7 @@ static void std3D_SubmitMenuOverlay()
     const float u1 = 640.0f / MENU_TEX_W;
     const float v1 = 480.0f / MENU_TEX_H;
     // The punch-through list still depth-tests (GREATER) against the opaque world
-    // even with DEPTHCMP_ALWAYS set -- the PVR ignores ALWAYS for PT. World vertices
+    // even with DEPTHCMP_ALWAYS set -- the PVR ignores ALWAYS for PT. World aVertices
     // carry z = 1/w (1/z_camera), which gets large for geometry near the camera (the
     // first-person weapon especially), so z=10 still loses to it. Park the overlay at
     // a huge uniform z so it wins GREATER against everything. Uniform z across all 4
@@ -449,11 +449,11 @@ void std3D_ResetRenderList()
 
 int std3D_RenderListVerticesFinish() { return 0; }
 
-int std3D_AddRenderListVertices(D3DVERTEX* vertices, int count)
+int std3D_AddRenderListVertices(D3DVERTEX* aVertices, int count)
 {
     if (Main_bHeadless) return 1;
     // Point at rdCache's buffer -- no copy, no size cap (always succeeds).
-    GL_tmpVertices    = vertices;
+    GL_tmpVertices    = aVertices;
     GL_tmpVerticesAmt = (size_t)count;
     return 1;
 }
@@ -890,7 +890,7 @@ void std3D_UpdateFrameCount(rdDDrawSurface* pTexture)
 
 // Free the VRAM texture backing a surface, release its cache slot, and unlink it
 // from the LRU list. Called by rdMaterial's unload path (rdMaterial.c) -- without
-// this the PVR texture heap leaks as maps stream materials and eventually corrupts.
+// this the PVR texture heap leaks as maps stream aMaterials and eventually corrupts.
 void std3D_PurgeSurfaceRefs(rdDDrawSurface* texture)
 {
     if (!texture) return;
@@ -961,7 +961,7 @@ void std3D_Screenshot(const char* pFpath) {}
 // (index 0 transparent); the 0x400 flag routes them to the TR pass, where
 // MODULATEALPHA + the transparent index-0 gives a proper cutout.
 int std3D_HasAlpha()             { return 1; }
-// Report modulated-alpha support so rdCache keeps translucent materials' vertex
+// Report modulated-alpha support so rdCache keeps translucent aMaterials' vertex
 // alpha (~90/255) instead of forcing them opaque (rdCache.c:391). Those tris get
 // flag 0x600 and are routed to the PVR TR list with alpha blending.
 int std3D_HasModulateAlpha()     { return 1; }

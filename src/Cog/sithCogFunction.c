@@ -282,7 +282,7 @@ void sithCogFunction_LoadTemplate(sithCog *ctx)
 
     v1 = sithCogExec_PopString(ctx);
     if ( v1 && (v2 = sithTemplate_GetTemplate(v1)) != 0 )
-        sithCogExec_PushInt(ctx, v2->thingIdx);
+        sithCogExec_PushInt(ctx, v2->idx);
     else
         sithCogExec_PushInt(ctx, -1);
 }
@@ -667,8 +667,8 @@ void sithCogFunction_GetThingTemplateCount(sithCog *ctx)
         template_count = 0;
         for (int i = 0; i < v1->numThings; i++ )
         {
-            SithThing* thing = &v1->things[i];
-            if ( thing->type && thing->type != SITH_THING_CORPSE && thing->templateBase == v2 )
+            SithThing* thing = &v1->aThings[i];
+            if ( thing->type && thing->type != SITH_THING_CORPSE && thing->pTemplate == v2 )
                 ++template_count;
         }
         sithCogExec_PushInt(ctx, template_count);
@@ -677,12 +677,12 @@ void sithCogFunction_GetThingTemplateCount(sithCog *ctx)
 
 void sithCogFunction_GetGravity(sithCog *ctx)
 {
-    sithCogExec_PushFlex(ctx, sithWorld_g_pCurrentWorld->worldGravity);
+    sithCogExec_PushFlex(ctx, sithWorld_g_pCurrentWorld->gravity);
 }
 
 void sithCogFunction_SetGravity(sithCog *ctx)
 {
-    sithWorld_g_pCurrentWorld->worldGravity = sithCogExec_PopFlex(ctx);
+    sithWorld_g_pCurrentWorld->gravity = sithCogExec_PopFlex(ctx);
 }
 
 void sithCogFunction_ReturnEx(sithCog *ctx)
@@ -788,7 +788,7 @@ void sithCogFunction_SetInvFlags(sithCog *ctx)
     if (Main_bMotsCompat && binIdx < SITHBIN_ENERGY) {
         binIdx = sithInventory_SelectWeaponFollowing(binIdx);
     }
-    if ( player && player->type == SITH_THING_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS )
+    if ( player && player->type == SITH_THING_PLAYER && player->actorParams.pPlayer && binIdx < SITHBIN_NUMBINS )
         sithInventory_SetInventoryFlags(player, binIdx, flags);
 }
 
@@ -842,7 +842,7 @@ void sithCogFunction_GetPrimaryFocus(sithCog *ctx)
 #endif
 
     if ( camIdx > -1 && camIdx < 7 && (v2 = sithCamera_GetPrimaryFocus(&sithCamera_g_aCameras[camIdx])) != 0 )
-        sithCogExec_PushInt(ctx, v2->thingIdx);
+        sithCogExec_PushInt(ctx, v2->idx);
     else
         sithCogExec_PushInt(ctx, -1);
 }
@@ -861,7 +861,7 @@ void sithCogFunction_GetSecondaryFocus(sithCog *ctx)
 #endif
     
     if ( camIdx > -1 && camIdx < 7 && (v2 = sithCamera_GetSecondaryFocus(&sithCamera_g_aCameras[camIdx])) != 0 )
-        sithCogExec_PushInt(ctx, v2->thingIdx);
+        sithCogExec_PushInt(ctx, v2->idx);
     else
         sithCogExec_PushInt(ctx, -1);
 }
@@ -1127,13 +1127,13 @@ void sithCogFunction_AddDynamicAdd(sithCog *ctx)
     int b; // edi
     int g; // ebx
     int r; // ebp
-    SithThing *playerThing; // eax
+    SithThing *pLocalPlayer; // eax
 
     b = sithCogExec_PopInt(ctx);
     g = sithCogExec_PopInt(ctx);
     r = sithCogExec_PopInt(ctx);
-    playerThing = sithCogExec_PopThing(ctx);
-    if ( playerThing && playerThing->type == SITH_THING_PLAYER && playerThing == sithPlayer_g_pLocalPlayerThing )
+    pLocalPlayer = sithCogExec_PopThing(ctx);
+    if ( pLocalPlayer && pLocalPlayer->type == SITH_THING_PLAYER && pLocalPlayer == sithPlayer_g_pLocalPlayerThing )
         sithPlayer_AddDyamicAdd(r, g, b);
 }
 
@@ -1159,7 +1159,7 @@ void sithCogFunction_FireProjectileInternal(sithCog *ctx, int extra)
     if (sender) {
         projectileTemplate = sithWeapon_FireProjectile(sender,projectileTemplate,fireSound,mode,&fireOffset,&aimError,scale,(int16_t)scaleFlags,autoaimFov,autoaimMaxDist,extra);
         if (projectileTemplate) {
-            sithCogExec_PushInt(ctx,projectileTemplate->thingIdx);
+            sithCogExec_PushInt(ctx,projectileTemplate->idx);
             return;
         }
     }
@@ -1190,7 +1190,7 @@ void sithCogFunction_FireProjectileLocal(sithCog *ctx)
 
 void sithCogFunction_SendTrigger(sithCog *ctx)
 {
-    SithPlayer* playerinfo;
+    SithPlayer* pPlayer;
 
     cog_flex_t arg3 = sithCogExec_PopFlex(ctx);
     cog_flex_t arg2 = sithCogExec_PopFlex(ctx);
@@ -1203,19 +1203,19 @@ void sithCogFunction_SendTrigger(sithCog *ctx)
     {
         if ( sourceThing->type == SITH_THING_PLAYER )
         {
-            playerinfo = sourceThing->actorParams.playerinfo;
-            if ( playerinfo )
+            pPlayer = sourceThing->actorParams.pPlayer;
+            if ( pPlayer )
             {
-                if ( playerinfo->flags & 1 )
+                if ( pPlayer->flags & 1 )
                 {
                     if ( sourceThing == sithPlayer_g_pLocalPlayerThing )
-                        sithCog_BroadcastMessageEx(SITH_MESSAGE_TRIGGER, SENDERTYPE_THING, sithPlayer_g_pLocalPlayerThing->thingIdx, 0, sourceType, arg0, arg1, arg2, arg3);
+                        sithCog_BroadcastMessageEx(SITH_MESSAGE_TRIGGER, SENDERTYPE_THING, sithPlayer_g_pLocalPlayerThing->idx, 0, sourceType, arg0, arg1, arg2, arg3);
                     else
                         sithDSSCog_SendMessage(
                             0,
                             SITH_MESSAGE_TRIGGER,
                             SENDERTYPE_THING,
-                            sithPlayer_g_pLocalPlayerThing->thingIdx,
+                            sithPlayer_g_pLocalPlayerThing->idx,
                             0,
                             sourceType,
                             0,
@@ -1223,7 +1223,7 @@ void sithCogFunction_SendTrigger(sithCog *ctx)
                             arg1,
                             arg2,
                             arg3,
-                            playerinfo->net_id);
+                            pPlayer->net_id);
                 }
             }
         }
@@ -1234,7 +1234,7 @@ void sithCogFunction_SendTrigger(sithCog *ctx)
             0,
             SITH_MESSAGE_TRIGGER,
             SENDERTYPE_THING,
-            sithPlayer_g_pLocalPlayerThing->thingIdx,
+            sithPlayer_g_pLocalPlayerThing->idx,
             0,
             sourceType,
             0,
@@ -1243,7 +1243,7 @@ void sithCogFunction_SendTrigger(sithCog *ctx)
             arg2,
             arg3,
             -1);
-        sithCog_BroadcastMessageEx(SITH_MESSAGE_TRIGGER, SENDERTYPE_THING, sithPlayer_g_pLocalPlayerThing->thingIdx, 0, sourceType, arg0, arg1, arg2, arg3);
+        sithCog_BroadcastMessageEx(SITH_MESSAGE_TRIGGER, SENDERTYPE_THING, sithPlayer_g_pLocalPlayerThing->idx, 0, sourceType, arg0, arg1, arg2, arg3);
     }
 }
 
@@ -1737,9 +1737,9 @@ void sithCogFunction_SendMessageExRadius(sithCog *ctx)
         local_28 = local_28 + 1;
         do 
         {
-            sender = &sithWorld_g_pCurrentWorld->things[iVar5_idx];
+            sender = &sithWorld_g_pCurrentWorld->aThings[iVar5_idx];
             if (((((uVar4 & 1 << (sender->type & 0x1f)) != 0) 
-                && ((sender->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_DESTROYED)) == 0))
+                && ((sender->flags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_DESTROYED)) == 0))
                 && ((sender->type != 10 || ((uVar4 & 0x400) != 0)))) 
                 && (fVar3 = (sender->position).x - local_1c.x, fVar1 = (sender->position).y - local_1c.y,
                     fVar2 = (sender->position).z - local_1c.z,

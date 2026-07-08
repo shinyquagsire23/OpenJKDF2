@@ -23,7 +23,7 @@ typedef struct rdParticle
     char name[32];
     int lightingMode;
     uint32_t numVertices;
-    rdVector3* vertices;
+    rdVector3* aVertices;
     int* vertexCel;
     flex_t diameter;
     flex_t radius;

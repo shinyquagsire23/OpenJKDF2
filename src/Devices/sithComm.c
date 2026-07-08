@@ -130,7 +130,7 @@ int sithComm_SendMsgToPlayer(SithMessage *msg, int a2, int mpFlags, int a4)
     if (!multiplayerFlags)
         return 1;
     curMs = sithTime_g_msecGameTime;
-    msg->netMsg.thingIdx = playerThingIdx;
+    msg->netMsg.idx = playerThingIdx;
     msg->netMsg.timeMs = curMs;
     if ( (multiplayerFlags & 1) != 0 )
     {
@@ -247,9 +247,9 @@ int sithMessage_ProcessMessages()
     while ( stdComm_Recv(&sithComm_netMsgTmp) == 1 )
     {
         ++v13;
-        if ( sithComm_netMsgTmp.netMsg.thingIdx )
+        if ( sithComm_netMsgTmp.netMsg.idx )
         {
-            v1 = sithPlayer_GetPlayerNum(sithComm_netMsgTmp.netMsg.thingIdx);
+            v1 = sithPlayer_GetPlayerNum(sithComm_netMsgTmp.netMsg.idx);
             v2 = sithComm_netMsgTmp.netMsg.cogMsgId;
             if ( v1 >= 0 )
             {
@@ -259,19 +259,19 @@ LABEL_14:
                 {
                     sithComm_MsgTmpBuf2.netMsg.msgId = 0;
                     *(uint16_t*)sithComm_MsgTmpBuf2.pktData = sithComm_netMsgTmp.netMsg.msgId;
-                    sithComm_MsgTmpBuf2.netMsg.field_C = sithComm_netMsgTmp.netMsg.thingIdx;
+                    sithComm_MsgTmpBuf2.netMsg.field_C = sithComm_netMsgTmp.netMsg.idx;
                     sithComm_MsgTmpBuf2.netMsg.cogMsgId = DSS_RESET;
                     sithComm_MsgTmpBuf2.netMsg.msg_size = 2;
-                    stdComm_SendToPlayer(&sithComm_MsgTmpBuf2, sithComm_netMsgTmp.netMsg.thingIdx);
+                    stdComm_SendToPlayer(&sithComm_MsgTmpBuf2, sithComm_netMsgTmp.netMsg.idx);
                     
                     int i = 0;
                     v4 = (uint16_t)sithComm_netMsgTmp.netMsg.msgId;
-                    while ( sithComm_netMsgTmp.netMsg.thingIdx != sithComm_aMsgPairs[i].thingIdx || (uint16_t)sithComm_netMsgTmp.netMsg.msgId != sithComm_aMsgPairs[i].msgId )
+                    while ( sithComm_netMsgTmp.netMsg.idx != sithComm_aMsgPairs[i].idx || (uint16_t)sithComm_netMsgTmp.netMsg.msgId != sithComm_aMsgPairs[i].msgId )
                     {
                         i++;
                         if ( i >= 128 )
                         {
-                            sithComm_aMsgPairs[sithComm_dword_847E84].thingIdx = sithComm_netMsgTmp.netMsg.thingIdx;
+                            sithComm_aMsgPairs[sithComm_dword_847E84].idx = sithComm_netMsgTmp.netMsg.idx;
                             sithComm_aMsgPairs[sithComm_dword_847E84].msgId = v4;
                             sithComm_dword_847E84++;
                             if ( sithComm_dword_847E84 >= 0x80 )
@@ -301,7 +301,7 @@ LABEL_22:
                 goto LABEL_14;
             }
             if ( sithNet_isServer )
-                sithMulti_QuitPlayer(sithComm_netMsgTmp.netMsg.thingIdx);
+                sithMulti_QuitPlayer(sithComm_netMsgTmp.netMsg.idx);
         }
 LABEL_25:
         if ( sithMessage_bStopProcessMessages )
@@ -394,7 +394,7 @@ int sithComm_cogMsg_Reset(SithMessage *msg)
     NETMSG_IN_START(msg);
 
     v1 = NETMSG_POPS16();
-    playerIdx = sithPlayer_GetPlayerNum(msg->netMsg.thingIdx);
+    playerIdx = sithPlayer_GetPlayerNum(msg->netMsg.idx);
     foundIdx = 0;
 #ifdef SITHCOMM_HEAP_MSGBUF
     if ( !sithComm_MsgTmpBuf ) // Added: no tracked messages to ack

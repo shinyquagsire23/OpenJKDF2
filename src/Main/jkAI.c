@@ -72,10 +72,10 @@ int jkAI_SaberFighting(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithA
     v9 = actor->pDistractor;
     if ( !v9 )
         return 0;
-    if ( (v9->thingflags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) == 0 )
+    if ( (v9->flags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) == 0 )
     {
         // MoTS Added: SITH_AF_FREEZE_MOVEMENT
-        if ( (v7->actorParams.typeflags & SITH_AF_COMBO_FREEZE) == 0 )
+        if ( (v7->actorParams.flags & SITH_AF_COMBO_FREEZE) == 0 )
         {
             if ( v8->polyline.length < (flex_d_t)v8->length )
             {
@@ -89,8 +89,8 @@ int jkAI_SaberFighting(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithA
                 sithAI_sub_4EAD60(actor);
                 v12 = actor->field_1F4;
                 if ( v12 == 3
-                  && ((actor->thing->actorParams.typeflags & SITH_TF_NOIMPACTDAMAGE) != 0
-                   || (v13 = actor->pDistractor) != 0 && v13->actorParams.typeflags & SITHAI_MODE_UNK80) )
+                  && ((actor->thing->actorParams.flags & SITH_TF_NOIMPACTDAMAGE) != 0
+                   || (v13 = actor->pDistractor) != 0 && v13->actorParams.flags & SITHAI_MODE_UNK80) )
                 {
                     actor->attackDistance = 0.0;
                 }
@@ -101,9 +101,9 @@ int jkAI_SaberFighting(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithA
                     if ( actor->field_1F4 || aiclass->argsAsFloat[0] != 0.0 && aiclass->argsAsFloat[0] > _frand() )
                     {
 LABEL_27:
-                        if ( (actor->thing->actorParams.typeflags & SITHAI_MODE_DISABLED) == 0 )
+                        if ( (actor->thing->actorParams.flags & SITHAI_MODE_DISABLED) == 0 )
                         {
-                            actor->thing->actorParams.typeflags |= SITHAI_MODE_DISABLED;
+                            actor->thing->actorParams.flags |= SITHAI_MODE_DISABLED;
                             return 0;
                         }
                         return 0;
@@ -160,9 +160,9 @@ LABEL_27:
                     a3a = aiclass->argsAsFloat[1];
                 }
                 v21 = actor->thing;
-                if ( (actor->thing->actorParams.typeflags & SITHAI_MODE_DISABLED) != 0 )
+                if ( (actor->thing->actorParams.flags & SITHAI_MODE_DISABLED) != 0 )
                 {
-                    v21->actorParams.typeflags &= ~SITHAI_MODE_DISABLED;
+                    v21->actorParams.flags &= ~SITHAI_MODE_DISABLED;
                 }
                 actor->flags |= SITHAI_MODE_TARGETVISIBLE;
                 sithSoundClass_PlayModeFirst(v21, v17_lo + SITH_SC_FIRE1);
@@ -208,7 +208,7 @@ int jkAI_SpecialAttack(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithA
             }
             else
             {
-                v9 = actor->thing->rdthing.puppet;
+                v9 = actor->thing->renderData.puppet;
                 if ( v9 )
                     sithPuppet_StopKey(v9, (__int64)instinct->param0, 0.5);
                 jkSaber_Disable(actor->thing);
@@ -227,9 +227,9 @@ int jkAI_SpecialAttack(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithA
                     {
                         sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_RESERVED1);
                         v13 = actor->thing;
-                        if ( (actor->thing->actorParams.typeflags & SITHAI_MODE_DISABLED) != 0 )
+                        if ( (actor->thing->actorParams.flags & SITHAI_MODE_DISABLED) != 0 )
                         {
-                            v13->actorParams.typeflags &= ~SITHAI_MODE_DISABLED;
+                            v13->actorParams.flags &= ~SITHAI_MODE_DISABLED;
                         }
                         aiclassa = sithPuppet_PlayMode(v13, aiclass->argsAsInt[5], 0);
                         if ( aiclassa >= 0 )
@@ -252,7 +252,7 @@ int jkAI_SpecialAttack(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithA
         return 0;
     sithThing_DamageThing(extra, actor->thing, aiclass->argsAsFloat[7], SITH_DAMAGE_SABER);
     sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_RESERVED2);
-    v5 = actor->thing->rdthing.puppet;
+    v5 = actor->thing->renderData.puppet;
     if ( v5 )
         sithPuppet_StopKey(v5, (__int64)instinct->param0, 0.5);
     jkSaber_Disable(actor->thing);
@@ -319,7 +319,7 @@ LABEL_25:
     if ( v6 )
     {
         v13 = (flex_t)v14;
-        v12 = (flex_t)(unsigned int)actor->pDistractor->thingIdx;
+        v12 = (flex_t)(unsigned int)actor->pDistractor->idx;
         sithCog_ThingSendMessageEx(actor->thing, 0, SITH_MESSAGE_USER0, v12, v13, 0.0, 0.0);
         instinct->nextUpdate = sithTime_g_msecGameTime + aiclass->argsAsInt[v6 + 9];
     }

@@ -11,8 +11,8 @@
 // Un-inlined: Clear track node flags with bounds check (added in Grim Fandango).
 static void rdPuppet_ClearTrackNodes(rdPuppet *puppet, int trackNum)
 {
-    if (puppet->rdthing->model3->numHierarchyNodes < 0x40)
-        _memset(puppet->tracks[trackNum].nodes, 0, sizeof(uint32_t) * puppet->rdthing->model3->numHierarchyNodes);
+    if (puppet->renderData->model3->numHierarchyNodes < 0x40)
+        _memset(puppet->tracks[trackNum].nodes, 0, sizeof(uint32_t) * puppet->renderData->model3->numHierarchyNodes);
     else
         _memset(puppet->tracks[trackNum].nodes, 0, sizeof(puppet->tracks[trackNum].nodes));
 }
@@ -28,7 +28,7 @@ rdPuppet* rdPuppet_New(rdThing *thing)
     _memset(puppet, 0, sizeof(rdPuppet));
 
     puppet->paused = 0;
-    puppet->rdthing = thing;
+    puppet->renderData = thing;
 
     for (int i = 0; i < RDPUPPET_MAX_TRACKS; i++)
     {
@@ -36,7 +36,7 @@ rdPuppet* rdPuppet_New(rdThing *thing)
         puppet->tracks[i].field_124 = 0.0;
         if ( puppet->tracks[i].callback )
         {
-            puppet->tracks[i].callback(puppet->rdthing->parentSithThing, i, 0);
+            puppet->tracks[i].callback(puppet->renderData->parentSithThing, i, 0);
         }
         puppet->tracks[i].field_4 = 0;
         puppet->tracks[i].keyframe = NULL;
@@ -282,7 +282,7 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
                 if (v25 & 2)
                 {
                     rdVector_Copy3(&tmp1, &v24->orientation);
-                    rdVector_ScaleAdd3Acc(&tmp1, &v24->angVel, v23);
+                    rdVector_ScaleAdd3Acc(&tmp1, &v24->angularVelocity, v23);
                 }
                 else
                 {
@@ -375,7 +375,7 @@ accumulate_finalize:
 int rdPuppet_RemoveTrack(rdPuppet *puppet, int trackNum)
 {
     if ( puppet->tracks[trackNum].callback )
-        puppet->tracks[trackNum].callback(puppet->rdthing->parentSithThing, trackNum, 0);
+        puppet->tracks[trackNum].callback(puppet->renderData->parentSithThing, trackNum, 0);
     puppet->tracks[trackNum].status = 0;
     puppet->tracks[trackNum].keyframe = 0;
     puppet->tracks[trackNum].callback = 0;
@@ -421,7 +421,7 @@ int rdPuppet_UpdateTracks(rdPuppet *puppet, flex_t deltaSeconds)
         {
             track->playSpeed -= track->fadeSpeed * deltaSeconds;
             
-            //if (puppet->rdthing->parentSithThing == sithPlayer_g_pLocalPlayerThing)
+            //if (puppet->renderData->parentSithThing == sithPlayer_g_pLocalPlayerThing)
             //    stdPlatform_Printf("%u %f %f %f %f %u\n", v2, track->playSpeed, track->fadeSpeed, deltaSeconds, track->field_124, track->keyframe->numFrames);
             
             if ( track->playSpeed <= 0.0 ) // verified
@@ -553,7 +553,7 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, flex_t deltaSecondsKi
         else
         {
             v21 = stdMath_Floor(v22 / v6 + 0.5);
-            size_t v11 = sizeof(uint32_t) * puppet->rdthing->model3->numHierarchyNodes;
+            size_t v11 = sizeof(uint32_t) * puppet->renderData->model3->numHierarchyNodes;
             puppet->tracks[trackNum].field_120 -= (flex_d_t)puppet->tracks[trackNum].keyframe->numFrames * v21;
             
             rdPuppet_ClearTrackNodes(puppet, trackNum);
@@ -572,7 +572,7 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, flex_t deltaSecondsKi
                         break;
                     if ( v4->markers.marker_float[v13] > (flex_d_t)puppet->tracks[trackNum].field_124 || puppet->tracks[trackNum].field_124 == 0.0 )
                     {
-                        puppet->tracks[trackNum].callback(puppet->rdthing->parentSithThing, trackNum, v4->markers.marker_int[v13]);
+                        puppet->tracks[trackNum].callback(puppet->renderData->parentSithThing, trackNum, v4->markers.marker_int[v13]);
                     }
                 }
             }
@@ -583,7 +583,7 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, flex_t deltaSecondsKi
                     if ( v4->markers.marker_float[v17] > (flex_d_t)puppet->tracks[trackNum].field_124
                       || v4->markers.marker_float[v17] <= (flex_d_t)puppet->tracks[trackNum].field_120 )
                     {
-                        puppet->tracks[trackNum].callback(puppet->rdthing->parentSithThing, trackNum, v4->markers.marker_int[v17]);
+                        puppet->tracks[trackNum].callback(puppet->renderData->parentSithThing, trackNum, v4->markers.marker_int[v17]);
                     }
                 }
             }
@@ -591,7 +591,7 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, flex_t deltaSecondsKi
             {
                 for (uint32_t v15 = 0; v15 < v4->numMarkers; v15++)
                 {
-                    puppet->tracks[trackNum].callback(puppet->rdthing->parentSithThing, trackNum, v4->markers.marker_int[v15]);
+                    puppet->tracks[trackNum].callback(puppet->renderData->parentSithThing, trackNum, v4->markers.marker_int[v15]);
                 }
             }
         }
@@ -656,10 +656,10 @@ void rdPuppet_ResetTrack(rdPuppet *puppet, int trackNum)
     v2->status = 3;
 }
 
-int rdPuppet_NewEntry(rdPuppet *puppet, rdThing *rdthing)
+int rdPuppet_NewEntry(rdPuppet *puppet, rdThing *renderData)
 {
     puppet->paused = 0;
-    puppet->rdthing = rdthing;
+    puppet->renderData = renderData;
     for (int i = 0; i < RDPUPPET_MAX_TRACKS; i++)
     {
         puppet->tracks[i].field_120 = 0.0;

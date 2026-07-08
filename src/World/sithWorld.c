@@ -83,19 +83,19 @@ int sithWorld_Startup()
     sithWorld_RegisterTextSectionParser("georesource", sithWorld_ReadGeoresourceText);
     sithWorld_RegisterTextSectionParser("copyright", sithWorld_ReadCopyrightText);
     sithWorld_RegisterTextSectionParser("header", sithWorld_ReadHeaderText);
-    sithWorld_RegisterTextSectionParser("sectors", sithSector_ReadSectorsListText);
-    sithWorld_RegisterTextSectionParser("models", sithModel_ReadStaticModelsListText);
-    sithWorld_RegisterTextSectionParser("sprites", sithSprite_ReadStaticSpritesListText);
-    sithWorld_RegisterTextSectionParser("things", sithThing_ReadStaticThingsListText);
-    sithWorld_RegisterTextSectionParser("templates", sithTemplate_ReadThingTemplatesListText);
-    sithWorld_RegisterTextSectionParser("materials", sithMaterial_ReadMaterialsListText);
+    sithWorld_RegisterTextSectionParser("aSectors", sithSector_ReadSectorsListText);
+    sithWorld_RegisterTextSectionParser("aModels", sithModel_ReadStaticModelsListText);
+    sithWorld_RegisterTextSectionParser("aSprites", sithSprite_ReadStaticSpritesListText);
+    sithWorld_RegisterTextSectionParser("aThings", sithThing_ReadStaticThingsListText);
+    sithWorld_RegisterTextSectionParser("aThingTemplates", sithTemplate_ReadThingTemplatesListText);
+    sithWorld_RegisterTextSectionParser("aMaterials", sithMaterial_ReadMaterialsListText);
     sithWorld_RegisterTextSectionParser("sounds", sithSound_ReadSoundsListText);
-    sithWorld_RegisterTextSectionParser("cogs", sithCog_ReadCogsListText);
+    sithWorld_RegisterTextSectionParser("aCogs", sithCog_ReadCogsListText);
     sithWorld_RegisterTextSectionParser("cogscripts", sithCog_ReadCogScriptsListText);
-    sithWorld_RegisterTextSectionParser("keyframes", sithKeyFrame_Load);
-    sithWorld_RegisterTextSectionParser("animclass", sithAnimClass_Load);
+    sithWorld_RegisterTextSectionParser("aKeyframes", sithKeyFrame_Load);
+    sithWorld_RegisterTextSectionParser("pPuppetClass", sithAnimClass_Load);
     sithWorld_RegisterTextSectionParser("aiclass", sithAIClass_ReadStaticAIClassesListText);
-    sithWorld_RegisterTextSectionParser("soundclass", sithSoundClass_ReadSoundClassesListText);
+    sithWorld_RegisterTextSectionParser("pSoundClass", sithSoundClass_ReadSoundClassesListText);
 #ifdef JKM_LIGHTING
     sithWorld_RegisterTextSectionParser("archlighting", sithArchLighting_ParseSection); // MOTS added
 #endif
@@ -281,14 +281,14 @@ int sithWorld_LoadPostProcess(SithWorld *pWorld)
             { TWL_EXTRAM_SUGGEST(pSithHS); // Added: per-frame arrays; word writes only
             v4 = (rdVector3 *)SITH_ALLOC(sizeof(rdVector3) * v3);
             TWL_EXTRAM_RESTORE(pSithHS); }
-            pWorld->verticesTransformed = v4;
+            pWorld->aTransformedVertices = v4;
             if ( !v4 )
                 return 0;
 
             { TWL_EXTRAM_SUGGEST(pSithHS); // Added
             v5 = (flex_t *)SITH_ALLOC(sizeof(flex_t) * pWorld->numVertices);
             TWL_EXTRAM_RESTORE(pSithHS); }
-            pWorld->verticesDynamicLight = v5;
+            pWorld->aVertDynamicLights = v5;
             if ( !v5 )
                 return 0;
             stdPlatform_Memzero32(v5, sizeof(flex_t) * pWorld->numVertices); // Added: word-safe
@@ -310,20 +310,20 @@ int sithWorld_LoadPostProcess(SithWorld *pWorld)
             _memset(v7, 0, sizeof(int) * pWorld->numVertices);
             for (int i = 0; i < pWorld->numSurfaces; i++)
             {
-                adjoinIter = pWorld->surfaces[i].adjoin;
+                adjoinIter = pWorld->surfaces[i].pAdjoin;
                 if ( adjoinIter )
                 {
                     adjoinIterMirror = adjoinIter->mirror;
                     if ( adjoinIterMirror )
-                        adjoinIter->sector = adjoinIterMirror->surface->parent_sector;
-                    if ( v1 && (v12 = pWorld->surfaces[i].parent_sector, v2 == pWorld->surfaces[i].parent_sector) )
+                        adjoinIter->sector = adjoinIterMirror->surface->pSector;
+                    if ( v1 && (v12 = pWorld->surfaces[i].pSector, v2 == pWorld->surfaces[i].pSector) )
                     {
                         v1->next = adjoinIter;
                     }
                     else
                     {
-                        v12 = pWorld->surfaces[i].parent_sector;
-                        pWorld->surfaces[i].parent_sector->adjoins = adjoinIter;
+                        v12 = pWorld->surfaces[i].pSector;
+                        pWorld->surfaces[i].pSector->adjoins = adjoinIter;
                     }
                     v1 = adjoinIter;
                     v2 = v12;
@@ -332,10 +332,10 @@ int sithWorld_LoadPostProcess(SithWorld *pWorld)
             sithPlayer_PlacePlayers(pWorld);
             for (int i = 0; i < pWorld->numThingsLoaded; i++)
             {
-                v16 = &pWorld->things[i];
+                v16 = &pWorld->aThings[i];
                 if ( v16->type
                   && v16->moveType == SITH_MT_PHYSICS
-                  && (v16->physicsParams.physflags & (SITH_PF_WALLSTICK|SITH_PF_FLOORSTICK)))
+                  && (v16->physicsParams.flags & (SITH_PF_WALLSTICK|SITH_PF_FLOORSTICK)))
                 {
                     sithPhysics_FindFloor(v16, 1);
                 }
@@ -372,44 +372,44 @@ void sithWorld_FreeEntry(SithWorld *pWorld)
         pWorld->colormaps = 0;
         pWorld->numColormaps = 0;
     }
-    if ( pWorld->things )
+    if ( pWorld->aThings )
         sithThing_FreeWorldThings(pWorld);
-    if ( pWorld->sectors )
+    if ( pWorld->aSectors )
         sithSector_FreeWorldSectors(pWorld);
-    if ( pWorld->models )
+    if ( pWorld->aModels )
         sithModel_FreeWorldModels(pWorld);
-    if ( pWorld->sprites )
+    if ( pWorld->aSprites )
         sithSprite_FreeWorldSprites(pWorld);
-    if ( pWorld->particles )
+    if ( pWorld->aParticles )
         sithParticle_FreeWorldParticles(pWorld);
-    if ( pWorld->keyframes )
+    if ( pWorld->aKeyframes )
         sithKeyFrame_Free(pWorld);
-    if ( pWorld->templates )
+    if ( pWorld->aThingTemplates )
         sithTemplate_FreeWorldTemplates(pWorld);
-    if ( pWorld->vertices )
+    if ( pWorld->aVertices )
     {
-        SITH_FREE(pWorld->vertices);
-        pWorld->vertices = 0;
+        SITH_FREE(pWorld->aVertices);
+        pWorld->aVertices = 0;
     }
-    if ( pWorld->verticesTransformed )
+    if ( pWorld->aTransformedVertices )
     {
-        SITH_FREE(pWorld->verticesTransformed);
-        pWorld->verticesTransformed = 0;
+        SITH_FREE(pWorld->aTransformedVertices);
+        pWorld->aTransformedVertices = 0;
     }
-    if ( pWorld->verticesDynamicLight )
+    if ( pWorld->aVertDynamicLights )
     {
-        SITH_FREE(pWorld->verticesDynamicLight);
-        pWorld->verticesDynamicLight = 0;
+        SITH_FREE(pWorld->aVertDynamicLights);
+        pWorld->aVertDynamicLights = 0;
     }
     if ( pWorld->alloc_unk9c )
     {
         SITH_FREE(pWorld->alloc_unk9c);
         pWorld->alloc_unk9c = 0;
     }
-    if ( pWorld->vertexUVs )
+    if ( pWorld->aTexVerticies )
     {
-        SITH_FREE(pWorld->vertexUVs);
-        pWorld->vertexUVs = 0;
+        SITH_FREE(pWorld->aTexVerticies);
+        pWorld->aTexVerticies = 0;
     }
     if ( pWorld->surfaces )
         sithSurface_FreeWorldSurfaces(pWorld);
@@ -418,17 +418,17 @@ void sithWorld_FreeEntry(SithWorld *pWorld)
         SITH_FREE(pWorld->alloc_unk98);
         pWorld->alloc_unk98 = 0;
     }
-    if ( pWorld->materials )
+    if ( pWorld->aMaterials )
         sithMaterial_FreeWorldMaterials(pWorld);
     if ( pWorld->sounds )
         sithSound_FreeWorldSounds(pWorld);
-    if ( pWorld->cogs || pWorld->cogScripts )
+    if ( pWorld->aCogs || pWorld->aCogScripts )
         sithCog_FreeWorldCogs(pWorld);
-    if ( pWorld->animclasses )
+    if ( pWorld->aPuppetClasses )
         sithAnimClass_Free(pWorld);
-    if ( pWorld->aiclasses )
+    if ( pWorld->aAIClasses )
         sithAIClass_FreeWorldAIClasses(pWorld);
-    if ( pWorld->soundclasses )
+    if ( pWorld->aSoundClasses )
         sithSoundClass_FreeWorldSoundClasses(pWorld);
 
 #ifdef JKM_LIGHTING
@@ -478,15 +478,15 @@ int sithWorld_ReadHeaderText(SithWorld *pWorld, int junk)
     if ( !stdConffile_ReadLine() )
         return 0;
     _sscanf(stdConffile_g_aLine, "world gravity %f", &tmp);
-    pWorld->worldGravity = tmp; // FLEXTODO
+    pWorld->gravity = tmp; // FLEXTODO
     if ( !stdConffile_ReadLine() )
         return 0;
     _sscanf(stdConffile_g_aLine, "ceiling sky z %f", &tmp);
-    pWorld->ceilingSky = tmp; // FLEXTODO
+    pWorld->ceilingSkyHeight = tmp; // FLEXTODO
     if ( !stdConffile_ReadLine() )
         return 0;
     _sscanf(stdConffile_g_aLine, "horizon distance %f", &tmp);
-    pWorld->horizontalDistance = tmp; // FLEXTODO
+    pWorld->horizonDistance = tmp; // FLEXTODO
     if ( !stdConffile_ReadLine() )
         return 0;
     _sscanf(stdConffile_g_aLine, "horizon pixels per rev %f", &tmp);
@@ -494,13 +494,13 @@ int sithWorld_ReadHeaderText(SithWorld *pWorld, int junk)
     if ( !stdConffile_ReadLine() )
         return 0;
     _sscanf(stdConffile_g_aLine, "horizon sky offset %f %f", &tmp, &tmp2);
-    pWorld->horizontalSkyOffs.x = tmp; // FLEXTODO
-    pWorld->horizontalSkyOffs.y = tmp2; // FLEXTODO
+    pWorld->horizonSkyOffset.x = tmp; // FLEXTODO
+    pWorld->horizonSkyOffset.y = tmp2; // FLEXTODO
     if ( !stdConffile_ReadLine() )
         return 0;
     _sscanf(stdConffile_g_aLine, "ceiling sky offset %f %f", &tmp, &tmp2);
-    pWorld->ceilingSkyOffs.x = tmp; // FLEXTODO
-    pWorld->ceilingSkyOffs.y = tmp2; // FLEXTODO
+    pWorld->ceilingSkyOffset.x = tmp; // FLEXTODO
+    pWorld->ceilingSkyOffset.y = tmp2; // FLEXTODO
     if ( !stdConffile_ReadLine() )
         return 0;
     _sscanf(
@@ -517,10 +517,10 @@ int sithWorld_ReadHeaderText(SithWorld *pWorld, int junk)
     if ( !stdConffile_ReadLine() )
         return 0;
     _sscanf(stdConffile_g_aLine, "lod distances %f %f %f %f", &tmp, &tmp2, &tmp3, &tmp4);
-    pWorld->lodDistance.x = tmp; // FLEXTODO
-    pWorld->lodDistance.y = tmp2; // FLEXTODO
-    pWorld->lodDistance.z = tmp3; // FLEXTODO
-    pWorld->lodDistance.w = tmp4; // FLEXTODO
+    pWorld->distancesLOD.x = tmp; // FLEXTODO
+    pWorld->distancesLOD.y = tmp2; // FLEXTODO
+    pWorld->distancesLOD.z = tmp3; // FLEXTODO
+    pWorld->distancesLOD.w = tmp4; // FLEXTODO
     if ( !stdConffile_ReadLine() )
         return 0;
     _sscanf(stdConffile_g_aLine, "perspective distance %f", &tmp);
@@ -610,22 +610,22 @@ int sithWorld_GetTextSectionParserIndex(char *a1)
 
 int sithWorld_ValidateWorld(SithWorld *pWorld)
 {
-    if ( !pWorld->things && pWorld->numThingsLoaded )
+    if ( !pWorld->aThings && pWorld->numThingsLoaded )
     {
-        stdPrintf(pSithHS->errorPrint, ".\\World\\sithWorld.c", 1245, "Problem with things array, should not be NULL.\n", 0, 0, 0, 0);
+        stdPrintf(pSithHS->errorPrint, ".\\World\\sithWorld.c", 1245, "Problem with aThings array, should not be NULL.\n", 0, 0, 0, 0);
         return 0;
     }
-    if ( !pWorld->sprites && pWorld->numSpritesLoaded )
+    if ( !pWorld->aSprites && pWorld->numSprites )
     {
         stdPrintf(pSithHS->errorPrint, ".\\World\\sithWorld.c", 1251, "Problem with spriates array, should not be NULL.\n", 0, 0, 0, 0);
         return 0;
     }
-    if ( !pWorld->models && pWorld->numModelsLoaded )
+    if ( !pWorld->aModels && pWorld->numModels )
     {
-        stdPrintf(pSithHS->errorPrint, ".\\World\\sithWorld.c", 1257, "Problem with models array, should not be NULL.\n", 0, 0, 0, 0);
+        stdPrintf(pSithHS->errorPrint, ".\\World\\sithWorld.c", 1257, "Problem with aModels array, should not be NULL.\n", 0, 0, 0, 0);
         return 0;
     }
-    if ( !pWorld->sectors || !pWorld->surfaces || !pWorld->vertices )
+    if ( !pWorld->aSectors || !pWorld->surfaces || !pWorld->aVertices )
     {
         stdPrintf(pSithHS->errorPrint, ".\\World\\sithWorld.c", 1263, "A required geometry section is missing from the level file.\n", 0, 0, 0, 0);
         return 0;
@@ -643,26 +643,26 @@ uint32_t sithWorld_CalcWorldChecksum(SithWorld *pWorld, uint32_t seed)
     uint32_t hash = seed;
 
     // Hash all world cogscript __VM bytecode__ (*not* text)
-    for (int i = 0; i < pWorld->numCogScriptsLoaded; i++)
+    for (int i = 0; i < pWorld->numCogScripts; i++)
     {
-        hash = util_Weirdchecksum((uint8_t *)pWorld->cogScripts[i].script_program, pWorld->cogScripts[i].codeSize, hash);
+        hash = util_Weirdchecksum((uint8_t *)pWorld->aCogScripts[i].script_program, pWorld->aCogScripts[i].codeSize, hash);
     }
 
-    // Hash all world vertices
-    hash = util_Weirdchecksum((uint8_t *)pWorld->vertices, 12 * pWorld->numVertices, hash);
+    // Hash all world aVertices
+    hash = util_Weirdchecksum((uint8_t *)pWorld->aVertices, 12 * pWorld->numVertices, hash);
 
-    // Hash all thing templates
-    for (int i = 0; i < pWorld->numTemplatesLoaded; i++)
+    // Hash all thing aThingTemplates
+    for (int i = 0; i < pWorld->numThingTemplates; i++)
     {
-        hash = sithThing_CalcThingChecksum(&pWorld->templates[i], hash);
+        hash = sithThing_CalcThingChecksum(&pWorld->aThingTemplates[i], hash);
     }
     
     // Hash static COG __VM bytecode__ (*not* text)
     if (sithWorld_g_pStaticWorld )
     {
-        for (int i = 0; i < sithWorld_g_pStaticWorld->numCogScriptsLoaded; i++)
+        for (int i = 0; i < sithWorld_g_pStaticWorld->numCogScripts; i++)
         {
-            hash = util_Weirdchecksum((uint8_t *)sithWorld_g_pStaticWorld->cogScripts[i].script_program, sithWorld_g_pStaticWorld->cogScripts[i].codeSize, hash);
+            hash = util_Weirdchecksum((uint8_t *)sithWorld_g_pStaticWorld->aCogScripts[i].script_program, sithWorld_g_pStaticWorld->aCogScripts[i].codeSize, hash);
         }
     }
 
@@ -742,22 +742,22 @@ int sithWorld_ReadGeoresourceText(SithWorld *pWorld, int a2)
         return 0;
     }
 
-    if (_sscanf(stdConffile_g_aLine, " world vertices %d", &numVertices) != 1 )
+    if (_sscanf(stdConffile_g_aLine, " world aVertices %d", &numVertices) != 1 )
     {
         return 0;
     }
 
 #ifdef TARGET_TWL
-    // Added: static world vertices are parsed once (word stores) then read-only;
+    // Added: static world aVertices are parsed once (word stores) then read-only;
     // extram-safe on TWL. Per-frame arrays (transformed/dynamic light) stay in
     // sysram -- they are written every frame.
     int prevSuggest = pSithHS->suggestHeap(HEAP_WORD_ADDRESSABLE);
 #endif
-    pWorld->vertices = (rdVector3 *)SITH_ALLOC(sizeof(rdVector3) * numVertices);
+    pWorld->aVertices = (rdVector3 *)SITH_ALLOC(sizeof(rdVector3) * numVertices);
 #ifdef TARGET_TWL
     pSithHS->suggestHeap(prevSuggest);
 #endif
-    if (!pWorld->vertices)
+    if (!pWorld->aVertices)
     {
         return 0;
     }
@@ -774,9 +774,9 @@ int sithWorld_ReadGeoresourceText(SithWorld *pWorld, int a2)
             return 0;
         }
 
-        pWorld->vertices[i].x = v_x;
-        pWorld->vertices[i].y = v_y;
-        pWorld->vertices[i].z = v_z;
+        pWorld->aVertices[i].x = v_x;
+        pWorld->aVertices[i].y = v_y;
+        pWorld->aVertices[i].z = v_z;
     }
 
     pWorld->numVertices = numVertices;
@@ -785,19 +785,19 @@ int sithWorld_ReadGeoresourceText(SithWorld *pWorld, int a2)
         return 0;
     }
 
-    if (_sscanf(stdConffile_g_aLine, " world texture vertices %d", &textureVertices) != 1)
+    if (_sscanf(stdConffile_g_aLine, " world texture aVertices %d", &textureVertices) != 1)
     {
         return 0;
     }
 
 #ifdef TARGET_TWL
-    int prevSuggestUV = pSithHS->suggestHeap(HEAP_WORD_ADDRESSABLE); // Added: see vertices
+    int prevSuggestUV = pSithHS->suggestHeap(HEAP_WORD_ADDRESSABLE); // Added: see aVertices
 #endif
-    pWorld->vertexUVs = (rdVector2 *)SITH_ALLOC(sizeof(rdVector2) * textureVertices);
+    pWorld->aTexVerticies = (rdVector2 *)SITH_ALLOC(sizeof(rdVector2) * textureVertices);
 #ifdef TARGET_TWL
     pSithHS->suggestHeap(prevSuggestUV);
 #endif
-    if (!pWorld->vertexUVs)
+    if (!pWorld->aTexVerticies)
     {
         return 0;
     }
@@ -810,8 +810,8 @@ int sithWorld_ReadGeoresourceText(SithWorld *pWorld, int a2)
             return 0;
         }
 
-        pWorld->vertexUVs[i].x = v_u;
-        pWorld->vertexUVs[i].y = v_v;
+        pWorld->aTexVerticies[i].x = v_u;
+        pWorld->aTexVerticies[i].y = v_v;
     }
 
     return sithSurface_ReadSurfacesListText(pWorld) != 0;
@@ -824,11 +824,11 @@ void sithWorld_ResetRenderState(SithWorld *pWorld)
 
     for (int i = 0; i < pWorld->numSectors; i++)
     {
-        SithSector* sector = &pWorld->sectors[i];
+        SithSector* sector = &pWorld->aSectors[i];
         
-        for (int j = 0; j < pWorld->sectors[i].numSurfaces; j++)
+        for (int j = 0; j < pWorld->aSectors[i].numSurfaces; j++)
         {
-            SithSurface* surface = &pWorld->sectors[i].surfaces[j];
+            SithSurface* surface = &pWorld->aSectors[i].surfaces[j];
             surface->field_4 = 0;
         }
         sector->renderTick = 0;
@@ -847,15 +847,15 @@ void sithWorld_Free()
 
 void sithWorld_ResetGeoresource(SithWorld *pWorld)
 {
-    for (int i = 0; i < pWorld->numMaterialsLoaded; i++)
+    for (int i = 0; i < pWorld->numMaterials; i++)
     {
-        pWorld->materials[i].celIdx = 0;;
+        pWorld->aMaterials[i].celIdx = 0;;
     }
 
     for (int i = 0; i < pWorld->numSectors; i++)
     {
-        rdVector_Zero3(&pWorld->sectors[i].thrust);
-        rdVector_Zero3(&pWorld->sectors[i].tint);
+        rdVector_Zero3(&pWorld->aSectors[i].thrust);
+        rdVector_Zero3(&pWorld->aSectors[i].tint);
     }
     sithPlayer_ResetPalEffects();
 }
@@ -865,15 +865,15 @@ void sithWorld_GetMemoryUsage(SithWorld *pWorld, int *outAllocated, int *outQuan
 {
     _memset(outAllocated, 0, sizeof(int) * 0x11);
     _memset(outQuantity, 0, sizeof(int) * 0x11);
-    outQuantity[0] = pWorld->numMaterialsLoaded;
-    for (int i = 0; i < pWorld->numMaterialsLoaded; i++)
+    outQuantity[0] = pWorld->numMaterials;
+    for (int i = 0; i < pWorld->numMaterials; i++)
     {
-        outAllocated[0] += sithMaterial_GetMemorySize(&pWorld->materials[i]);
+        outAllocated[0] += sithMaterial_GetMemorySize(&pWorld->aMaterials[i]);
     }
     outQuantity[1] = pWorld->numVertices;
     outAllocated[1] = 0x34 * pWorld->numVertices;               // TODO: what is this size?
-    outQuantity[2] = pWorld->numVertexUVs;
-    outAllocated[2] = sizeof(rdVector2) * pWorld->numVertexUVs;
+    outQuantity[2] = pWorld->numTexVertices;
+    outAllocated[2] = sizeof(rdVector2) * pWorld->numTexVertices;
     outQuantity[3] = pWorld->numSurfaces;
     for (int i = 0; i < pWorld->numSurfaces; i++)
     {
@@ -884,48 +884,48 @@ void sithWorld_GetMemoryUsage(SithWorld *pWorld, int *outAllocated, int *outQuan
     outQuantity[5] = pWorld->numSectors;
     for (int i = 0; i < pWorld->numSectors; i++)
     {
-        outAllocated[5] += sizeof(flex_t) * pWorld->sectors[i].numVertices + sizeof(SithSector); // TODO bug?
+        outAllocated[5] += sizeof(flex_t) * pWorld->aSectors[i].numVertices + sizeof(SithSector); // TODO bug?
     }
     outQuantity[6] = pWorld->numSoundsLoaded;
     for (int i = 0; i < pWorld->numSoundsLoaded; i++)
     {
         outAllocated[6] += pWorld->sounds[i].bufferBytes + sizeof(sithSound);
     }
-    outQuantity[8] = pWorld->numCogScriptsLoaded;
-    for (int i = 0; i < pWorld->numCogScriptsLoaded; i++)
+    outQuantity[8] = pWorld->numCogScripts;
+    for (int i = 0; i < pWorld->numCogScripts; i++)
     {
-        outAllocated[8] += 4 * (7 * pWorld->cogScripts[i].pSymbolTable->entry_cnt + pWorld->cogScripts[i].numIdk) + 0x1DD0; // TODO verify struct sizes here...
+        outAllocated[8] += 4 * (7 * pWorld->aCogScripts[i].pSymbolTable->entry_cnt + pWorld->aCogScripts[i].numIdk) + 0x1DD0; // TODO verify struct sizes here...
     }
-    outQuantity[7] = pWorld->numCogsLoaded;
-    for (int i = 0; i < pWorld->numCogsLoaded; i++)
+    outQuantity[7] = pWorld->numCogs;
+    for (int i = 0; i < pWorld->numCogs; i++)
     {
-        outAllocated[7] += 28 * pWorld->cogs[i].pSymbolTable->entry_cnt + 0x14DC; // TODO verify struct sizes
+        outAllocated[7] += 28 * pWorld->aCogs[i].pSymbolTable->entry_cnt + 0x14DC; // TODO verify struct sizes
     }
-    outQuantity[10] = pWorld->numModelsLoaded;
-    for (int i = 0; i < pWorld->numModelsLoaded; i++)
+    outQuantity[10] = pWorld->numModels;
+    for (int i = 0; i < pWorld->numModels; i++)
     {
-        outAllocated[10] += sithModel_GetModelMemUsage(&pWorld->models[i]);
+        outAllocated[10] += sithModel_GetModelMemUsage(&pWorld->aModels[i]);
     }
-    outQuantity[11] = pWorld->numKeyframesLoaded;
-    for (int i = 0; i < pWorld->numKeyframesLoaded; i++)
+    outQuantity[11] = pWorld->numKeyframes;
+    for (int i = 0; i < pWorld->numKeyframes; i++)
     {
-        outAllocated[11] += sizeof(rdJoint) * (pWorld->keyframes[i].numJoints2 + 3);
-        for (int j = 0; j < pWorld->keyframes[i].numJoints2; j++)
+        outAllocated[11] += sizeof(rdJoint) * (pWorld->aKeyframes[i].numJoints2 + 3);
+        for (int j = 0; j < pWorld->aKeyframes[i].numJoints2; j++)
         {
-            outAllocated[11] += sizeof(rdAnimEntry) * pWorld->keyframes[i].paJoints[j].numAnimEntries;
+            outAllocated[11] += sizeof(rdAnimEntry) * pWorld->aKeyframes[i].paJoints[j].numAnimEntries;
         }
     }
-    outQuantity[12] = pWorld->numAnimClassesLoaded;
-    outAllocated[12] = sizeof(SithPuppetClass) * pWorld->numAnimClassesLoaded;
-    outQuantity[13] = pWorld->numSpritesLoaded;
-    outAllocated[13] = sizeof(rdSprite) * pWorld->numSpritesLoaded;
-    for (int i = 0; i < pWorld->numSpritesLoaded; i++)
+    outQuantity[12] = pWorld->numPuppetClasses;
+    outAllocated[12] = sizeof(SithPuppetClass) * pWorld->numPuppetClasses;
+    outQuantity[13] = pWorld->numSprites;
+    outAllocated[13] = sizeof(rdSprite) * pWorld->numSprites;
+    for (int i = 0; i < pWorld->numSprites; i++)
     {
-        outAllocated[13] += sizeof(rdTri) * pWorld->sprites[i].face.numVertices;
+        outAllocated[13] += sizeof(rdTri) * pWorld->aSprites[i].face.numVertices;
     }
-    outQuantity[14] = pWorld->numTemplatesLoaded;
+    outQuantity[14] = pWorld->numThingTemplates;
     outQuantity[15] = pWorld->numThingsLoaded;
-    outAllocated[14] = sizeof(SithThing) * pWorld->numTemplatesLoaded;
+    outAllocated[14] = sizeof(SithThing) * pWorld->numThingTemplates;
     outAllocated[15] = sizeof(SithThing) * pWorld->numThingsLoaded;
 }
 

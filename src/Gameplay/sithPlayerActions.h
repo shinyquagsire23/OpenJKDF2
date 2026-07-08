@@ -12,7 +12,7 @@ void sithPlayerActions_Activate(SithThing *thing);
 void sithPlayerActions_MoveToPlayerPosition(SithThing *thing, int idx);
 
 // Added
-SithThing* sithPlayerActions_SpawnThingAtLookAt(SithThing *pPlayerThing, SithThing* pTemplate);
+SithThing* sithPlayerActions_SpawnThingAtLookAt(SithThing *pPlayerThing, SithThing* pCreateThingTemplate);
 
 //static void (*sithPlayerActions_Remove)(SithThing *thing) = (void*)sithPlayerActions_Remove_ADDR;
 //static void (*sithPlayerActions_Activate)(SithThing*) = (void*)sithPlayerActions_Activate_ADDR;

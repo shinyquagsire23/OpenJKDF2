@@ -132,7 +132,7 @@ void jkSaber_UpdateLength(SithThing *thing)
     printf(" len=%f %f\n", playerInfo->polyline.length, thing->actorParams.timeLeftLengthChange);
 #endif
 
-    if (thing->thingflags & SITH_TF_DEAD || thing->type == SITH_THING_CORPSE)
+    if (thing->flags & SITH_TF_DEAD || thing->type == SITH_THING_CORPSE)
     {
         thing->jkFlags |= JKFLAG_SABERRETRACT;
     }
@@ -187,13 +187,13 @@ void jkSaber_UpdateLength(SithThing *thing)
         thing->jkFlags &= ~JKFLAG_SABERFORCEON;
     }
 
-    if ( thing->animclass->bodypart_to_joint[JOINTTYPE_PRIMARYWEAP] >= 0 )
+    if ( thing->pPuppetClass->bodypart_to_joint[JOINTTYPE_PRIMARYWEAP] >= 0 )
     {
-        jkSaber_UpdateCollision(thing, thing->animclass->bodypart_to_joint[JOINTTYPE_PRIMARYWEAP], 0); // MOTS added: last arg
+        jkSaber_UpdateCollision(thing, thing->pPuppetClass->bodypart_to_joint[JOINTTYPE_PRIMARYWEAP], 0); // MOTS added: last arg
         if ( thing->jkFlags & JKFLAG_DUALSABERS )
         {
-            if ( thing->animclass->bodypart_to_joint[JOINTTYPE_SECONDARYWEAP] >= 0 )
-                jkSaber_UpdateCollision(thing, thing->animclass->bodypart_to_joint[JOINTTYPE_SECONDARYWEAP], 1); // MOTS added: last arg
+            if ( thing->pPuppetClass->bodypart_to_joint[JOINTTYPE_SECONDARYWEAP] >= 0 )
+                jkSaber_UpdateCollision(thing, thing->pPuppetClass->bodypart_to_joint[JOINTTYPE_SECONDARYWEAP], 1); // MOTS added: last arg
         }
     }
 }
@@ -226,7 +226,7 @@ void  jkSaber_UpdateCollision2(SithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
 
         if (searchResult->hitType & SITHCOLLISION_ADJOINCROSS)
         {
-            pSectorIter = searchResult->surface->adjoin->sector;
+            pSectorIter = searchResult->surface->pAdjoin->sector;
         }
         else if (searchResult->hitType & SITHCOLLISION_THING) 
         {
@@ -239,7 +239,7 @@ void  jkSaber_UpdateCollision2(SithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
             {
                 continue;
             }
-            if (resultThing->actorParams.typeflags & SITH_AF_DROID 
+            if (resultThing->actorParams.flags & SITH_AF_DROID 
                 || resultThing->type != SITH_THING_ACTOR && resultThing->type != SITH_THING_PLAYER )
             {
                 jkSaber_SpawnSparks(playerInfo, &local_54, pSectorIter, SPARKTYPE_WALL);
@@ -263,7 +263,7 @@ void  jkSaber_UpdateCollision2(SithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
 
             if ( resultThing->type != SITH_THING_ACTOR 
                  && resultThing->type != SITH_THING_PLAYER 
-                 || !(resultThing->actorParams.typeflags & SITH_AF_BLEEDS) )
+                 || !(resultThing->actorParams.flags & SITH_AF_BLEEDS) )
             {
                 jkSaber_SpawnSparks(playerInfo, &local_54, pSectorIter, SPARKTYPE_BLOOD);
 
@@ -275,9 +275,9 @@ void  jkSaber_UpdateCollision2(SithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
             // TODO is this a vector func?
             rdVector_Sub3(&local_3c, &local_54, &resultThing->position);
             rdVector_Normalize3Acc(&local_3c);
-            rdMatrix_Copy34(&tmpMat, &resultThing->lookOrientation);
+            rdMatrix_Copy34(&tmpMat, &resultThing->orient);
             if ( resultThing->type == SITH_THING_ACTOR || resultThing->type == SITH_THING_PLAYER )
-                rdMatrix_PreRotate34(&tmpMat, &resultThing->actorParams.eyePYR);
+                rdMatrix_PreRotate34(&tmpMat, &resultThing->actorParams.headPYR);
                 
             // TODO: is this a vector func?
             rdVector3 v52 = tmpMat.lvec;
@@ -285,7 +285,7 @@ void  jkSaber_UpdateCollision2(SithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
             if ( rdVector_Dot3(&v52, &local_3c) >= resultThing->actorParams.fov
               && (_frand() < resultThing->actorParams.chance) )
             {
-                if (!(pPlayerThing->actorParams.typeflags & SITH_AF_INVISIBLE)) // verify
+                if (!(pPlayerThing->actorParams.flags & SITH_AF_INVISIBLE)) // verify
                 {
                     sithSoundClass_PlayModeRandom(pPlayerThing, SITH_SC_DEFLECTED);
 
@@ -353,13 +353,13 @@ void jkSaber_UpdateCollision(SithThing *player, int joint, int bSecondary)
 
     playerInfo = player->playerInfo;
 
-    rdMatrix_Copy34(&matrix, &player->lookOrientation);
+    rdMatrix_Copy34(&matrix, &player->orient);
     rdVector_Copy3(&matrix.scale, &player->position);
     if ( jkSmack_GetCurrentGuiState() == 6 ) {
-        rdPuppet_BuildJointMatrices(&player->rdthing, &matrix);
+        rdPuppet_BuildJointMatrices(&player->renderData, &matrix);
     }
 
-    if ( !rdModel3_GetMeshMatrix(&player->rdthing, &matrix, joint, &jointMat) )
+    if ( !rdModel3_GetMeshMatrix(&player->renderData, &matrix, joint, &jointMat) )
         return;
 
     rdVector_Copy3(&player->actorParams.saberBladePos, &jointMat.scale);
@@ -431,7 +431,7 @@ void jkSaber_UpdateCollision(SithThing *player, int joint, int bSecondary)
 
 void jkSaber_SpawnSparks(jkPlayerInfo *pPlayerInfo, rdVector3 *pPos, SithSector *psector, int sparkType)
 {
-    SithThing *pTemplate; // eax
+    SithThing *pCreateThingTemplate; // eax
     SithThing *pSpawned; // eax
 
     if ( sithTime_g_msecGameTime < pPlayerInfo->lastSparkSpawnMs + 200 )
@@ -439,24 +439,24 @@ void jkSaber_SpawnSparks(jkPlayerInfo *pPlayerInfo, rdVector3 *pPos, SithSector 
 
     if ( sparkType == SPARKTYPE_BLOOD )
     {
-        pTemplate = pPlayerInfo->blood_sparks;
+        pCreateThingTemplate = pPlayerInfo->blood_sparks;
     }
     else if ( sparkType == SPARKTYPE_SABER )
     {
-        pTemplate = pPlayerInfo->saber_sparks;
+        pCreateThingTemplate = pPlayerInfo->saber_sparks;
     }
     else // SPARKTYPE_WALL
     {
-        pTemplate = pPlayerInfo->wall_sparks;
+        pCreateThingTemplate = pPlayerInfo->wall_sparks;
     }
-    if ( pTemplate )
+    if ( pCreateThingTemplate )
     {
-        pSpawned = sithThing_CreateThingAtPos(pTemplate, pPos, &rdroid_identMatrix34, psector, 0);
+        pSpawned = sithThing_CreateThingAtPos(pCreateThingTemplate, pPos, &rdroid_identMatrix34, psector, 0);
         if ( pSpawned )
         {
-            pSpawned->prev_thing = pPlayerInfo->actorThing;
+            pSpawned->pParent = pPlayerInfo->actorThing;
             pPlayerInfo->lastSparkSpawnMs = sithTime_g_msecGameTime;
-            pSpawned->child_signature = pPlayerInfo->actorThing->signature;
+            pSpawned->parentSignature = pPlayerInfo->actorThing->signature;
         }
     }
 }

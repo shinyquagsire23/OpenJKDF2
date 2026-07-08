@@ -13,15 +13,15 @@
 
 int sithItem_PlayerCollisionHandler(SithThing *a1, SithThing *a2, SithCollision *a4, int a5)
 {
-    if ( !sithNet_isMulti || (!(a2->thingflags & SITH_TF_INVULN)) )
+    if ( !sithNet_isMulti || (!(a2->flags & SITH_TF_INVULN)) )
     {
         // MOTS added
-        if (Main_bMotsCompat && (a2->actorParams.typeflags & (THING_TYPEFLAGS_40000 | THING_TYPEFLAGS_8000000))) return 0;
+        if (Main_bMotsCompat && (a2->actorParams.flags & (THING_TYPEFLAGS_40000 | THING_TYPEFLAGS_8000000))) return 0;
 
-        if ( sithCollision_HasLOS(a2, a1, 0) && a1->itemParams.respawnTime < sithTime_g_msecGameTime )
+        if ( sithCollision_HasLOS(a2, a1, 0) && a1->itemParams.msecLastTouchTime < sithTime_g_msecGameTime )
         {
             sithCog_ThingSendMessage(a1, a2, SITH_MESSAGE_TOUCHED);
-            a1->itemParams.respawnTime = sithTime_g_msecGameTime + 500;
+            a1->itemParams.msecLastTouchTime = sithTime_g_msecGameTime + 500;
         }
     }
 
@@ -45,7 +45,7 @@ void sithItem_SetItemTaken(SithThing *item, SithThing *actor, int a3)
         if (Main_bMotsCompat) {
             if (item->collide == SITH_COLLIDE_SPHERE) {
                 item->collide = SITH_COLLIDE_NONE;
-                item->thingflags = item->thingflags | SITH_TF_10;
+                item->flags = item->flags | SITH_TF_10;
                 return;
             }
         }
@@ -57,20 +57,20 @@ void sithItem_SetItemTaken(SithThing *item, SithThing *actor, int a3)
         sithCog_ThingSendMessage(item, actor, SITH_MESSAGE_TAKEN);
     }
 
-    if ( (item->itemParams.typeflags & SITH_ITEM_RESPAWN_SP && !sithNet_isMulti) 
-         || (item->itemParams.typeflags & SITH_ITEM_RESPAWN_MP && sithNet_isMulti) )
+    if ( (item->itemParams.flags & SITH_ITEM_RESPAWN_SP && !sithNet_isMulti) 
+         || (item->itemParams.flags & SITH_ITEM_RESPAWN_MP && sithNet_isMulti) )
     {
-        item->thingflags |= SITH_TF_DISABLED;
+        item->flags |= SITH_TF_DISABLED;
 
         // MOTS added
 #ifdef JKM_PARAMS
         if (Main_bMotsCompat) {
             if (item->collide == SITH_COLLIDE_NONE) {
                 item->collide = SITH_COLLIDE_SPHERE;
-                item->thingflags &= ~SITH_TF_10;
-                item->thingflags |= SITH_TF_DISABLED;
+                item->flags &= ~SITH_TF_10;
+                item->flags |= SITH_TF_DISABLED;
             }
-            flex_t val = item->itemParams.respawn;
+            flex_t val = item->itemParams.secRespawnInterval;
             if (item->itemParams.respawnFactor != 1.0 && sithNet_isMulti) {
                 for (int i = 0; i < jkPlayer_maxPlayers; i++) {
                     if ((jkPlayer_playerInfos[i].flags & 1) && (i != playerThingIdx)) {
@@ -79,12 +79,12 @@ void sithItem_SetItemTaken(SithThing *item, SithThing *actor, int a3)
                 }
             }
 
-            item->lifeLeftMs = (int)(val * 1000.0 * (_frand() + 0.75));
+            item->msecLifeLeft = (int)(val * 1000.0 * (_frand() + 0.75));
         }
         else 
 #endif
         {
-            item->lifeLeftMs = (int)(item->itemParams.respawn * 1000.0);
+            item->msecLifeLeft = (int)(item->itemParams.secRespawnInterval * 1000.0);
         }
     }
     else
@@ -97,17 +97,17 @@ void sithItem_DestroyItem(SithThing *item)
 {
     if ( sithNet_isMulti && !sithNet_isServer )
     {
-        item->lifeLeftMs = 0;
+        item->msecLifeLeft = 0;
         return;
     }
 
     // TODO verify this, it was kinda weird
     if ( !item->itemParams.sector
-         || !sithNet_isMulti && !(item->itemParams.typeflags & SITH_ITEM_RESPAWN_SP)
-         || sithNet_isMulti && !(item->itemParams.typeflags & SITH_ITEM_RESPAWN_MP))
+         || !sithNet_isMulti && !(item->itemParams.flags & SITH_ITEM_RESPAWN_SP)
+         || sithNet_isMulti && !(item->itemParams.flags & SITH_ITEM_RESPAWN_MP))
     {
-        if ( item->lastRenderedTickIdx + 1 == jkPlayer_currentTickIdx )
-            item->lifeLeftMs = 3000;
+        if ( item->renderFrame + 1 == jkPlayer_currentTickIdx )
+            item->msecLifeLeft = 3000;
         else
             sithThing_DestroyThing(item);
     }
@@ -115,14 +115,14 @@ void sithItem_DestroyItem(SithThing *item)
     {
         rdVector_Zero3(&item->physicsParams.vel);
         sithThing_ExitSector(item);
-        sithThing_SetPositionAndOrient(item, &item->itemParams.position, &item->lookOrientation);
+        sithThing_SetPositionAndOrient(item, &item->itemParams.position, &item->orient);
         sithThing_SetSector(item, item->itemParams.sector, 1);
-        item->lifeLeftMs = 0;
-        item->thingflags = item->thingflags & ~SITH_TF_DISABLED;
+        item->msecLifeLeft = 0;
+        item->flags = item->flags & ~SITH_TF_DISABLED;
         if (Main_bMotsCompat) {
             if (item->collide == SITH_COLLIDE_NONE) {
                 item->collide = SITH_COLLIDE_SPHERE;
-                item->thingflags &= ~SITH_TF_10;
+                item->flags &= ~SITH_TF_10;
                 return;
             }
         }
@@ -144,13 +144,13 @@ int sithItem_ParseArg(StdConffileArg *arg, SithThing *thing, int paramIdx)
         int tmp;
         if ( _sscanf(arg->value, "%x", &tmp) == 1 )
         {
-            thing->itemParams.typeflags = tmp;
+            thing->itemParams.flags = tmp;
             return 1;
         }
     }
     else if ( paramIdx == THINGPARAM_RESPAWN )
     {
-        thing->itemParams.respawn = _atof(arg->value);
+        thing->itemParams.secRespawnInterval = _atof(arg->value);
         return 1;
     }
 #ifdef JKM_PARAMS

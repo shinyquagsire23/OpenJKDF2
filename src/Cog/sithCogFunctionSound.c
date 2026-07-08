@@ -289,7 +289,7 @@ void sithCogFunctionSound_PlaySoundClass(sithCog *ctx)
     int soundClassId = sithCogExec_PopInt(ctx);
     SithThing* pThing = sithCogExec_PopThing(ctx);
 
-    if ( pThing && pThing->soundclass && (pPlayingSound = sithSoundClass_PlayModeRandom(pThing, soundClassId)) != 0 )
+    if ( pThing && pThing->pSoundClass && (pPlayingSound = sithSoundClass_PlayModeRandom(pThing, soundClassId)) != 0 )
     {
         sithCogExec_PushInt(ctx, pPlayingSound->refid);
         if (COG_SHOULD_SYNC(ctx))

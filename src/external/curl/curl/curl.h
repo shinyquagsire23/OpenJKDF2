@@ -50,7 +50,7 @@
 #endif
 
 #include "curlver.h"         /* libcurl version defines   */
-#include "system.h"          /* determine things run-time */
+#include "system.h"          /* determine aThings run-time */
 
 /*
  * Define CURL_WIN32 when build target is Win32 API
@@ -283,7 +283,7 @@ typedef size_t (*curl_write_callback)(char *buffer,
 
 /* This callback will be called when a new resolver request is made */
 typedef int (*curl_resolver_start_callback)(void *resolver_state,
-                                            void *reserved, void *userdata);
+                                            void *reserved, void *userval);
 
 /* enumeration of file types */
 typedef enum {
@@ -400,7 +400,7 @@ typedef size_t (*curl_read_callback)(char *buffer,
                                       void *instream);
 
 typedef int (*curl_trailer_callback)(struct curl_slist **list,
-                                      void *userdata);
+                                      void *userval);
 
 typedef enum {
   CURLSOCKTYPE_IPCXN,  /* socket created for a specific IP connection */
@@ -1490,7 +1490,7 @@ typedef enum {
      The function must match the curl_ssl_ctx_callback prototype. */
   CURLOPT(CURLOPT_SSL_CTX_FUNCTION, CURLOPTTYPE_FUNCTIONPOINT, 108),
 
-  /* Set the userdata for the ssl context callback function's third
+  /* Set the userval for the ssl context callback function's third
      argument */
   CURLOPT(CURLOPT_SSL_CTX_DATA, CURLOPTTYPE_CBPOINT, 109),
 
@@ -2200,7 +2200,7 @@ typedef enum {
   /* CA cache timeout */
   CURLOPT(CURLOPT_CA_CACHE_TIMEOUT, CURLOPTTYPE_LONG, 321),
 
-  /* Can leak things, gonna exit() soon */
+  /* Can leak aThings, gonna exit() soon */
   CURLOPT(CURLOPT_QUICK_EXIT, CURLOPTTYPE_LONG, 322),
 
   CURLOPT_LASTENTRY /* the last unused */

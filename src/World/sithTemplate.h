@@ -17,7 +17,7 @@
 
 int sithTemplate_Startup();
 void sithTemplate_Shutdown();
-int sithTemplate_AllocWorldTemplates(SithWorld *world, unsigned int numTemplates);
+int sithTemplate_AllocWorldTemplates(SithWorld *world, unsigned int sizeThingTemplates);
 SithThing* sithTemplate_GetTemplateByIndex(int idx);
 int sithTemplate_ReadThingTemplatesListText(SithWorld *world, int a2);
 int sithTemplate_OldNew(char *fpath);

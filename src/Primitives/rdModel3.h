@@ -101,8 +101,8 @@ typedef struct rdModel3
     int id;
     rdGeoset geosets[4];
     uint32_t numGeosets;
-    rdMaterial** materials;
-    uint32_t numMaterials;
+    rdMaterial** aMaterials;
+    uint32_t sizeMaterials;
     uint32_t geosetSelect;
     uint32_t numHierarchyNodes;
     rdHierarchyNode* hierarchyNodes;
@@ -124,8 +124,8 @@ typedef struct rdMesh
     int geometryMode;
     int lightingMode;
     int textureMode;
-    rdVector3* vertices;
-    rdVector2* vertexUVs;
+    rdVector3* aVertices;
+    rdVector2* aTexVerticies;
     flex_t* vertices_i;
     flex_t* vertices_unk;
 #ifdef JKM_LIGHTING
@@ -161,8 +161,8 @@ typedef struct rdMesh
     int geometryMode;
     int lightingMode;
     int textureMode;
-    rdVector3* vertices;
-    rdVector2* vertexUVs;
+    rdVector3* aVertices;
+    rdVector2* aTexVerticies;
     flex_t* vertices_i;
     flex_t* vertices_unk;
     flex_t* paRedIntensities;

@@ -1551,7 +1551,7 @@ static CURLcode imap_done(struct Curl_easy *data, CURLcode status,
  * imap_perform()
  *
  * This is the actual DO function for IMAP. Fetch or append a message, or do
- * other things according to the options previously setup.
+ * other aThings according to the options previously setup.
  */
 static CURLcode imap_perform(struct Curl_easy *data, bool *connected,
                              bool *dophase_done)

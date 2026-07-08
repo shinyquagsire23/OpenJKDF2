@@ -32,7 +32,7 @@ int sithSector_ReadSectorsListText(SithWorld *world, int tmp)
     unsigned int alloc_size; // ebx
     SithSector *v6; // eax
     unsigned int v7; // ecx
-    SithSector *sectors; // esi
+    SithSector *aSectors; // esi
     int v13; // edi
     unsigned int v15; // eax
     void *v16; // ecx
@@ -53,7 +53,7 @@ int sithSector_ReadSectorsListText(SithWorld *world, int tmp)
 
     if ( tmp )
         return 0;
-    if ( !stdConffile_ReadLine() || _sscanf(stdConffile_g_aLine, " world sectors %d", &sectors_amt) != 1 )
+    if ( !stdConffile_ReadLine() || _sscanf(stdConffile_g_aLine, " world aSectors %d", &sectors_amt) != 1 )
         return 0;
 
 #ifdef STDPLATFORM_HEAP_SUGGESTIONS
@@ -61,29 +61,29 @@ int sithSector_ReadSectorsListText(SithWorld *world, int tmp)
 #endif
     alloc_size = sizeof(SithSector) * sectors_amt;
     { TWL_EXTRAM_SUGGEST(pSithHS); // Added: word-width fields/writes (audited)
-    world->sectors = (SithSector *)SITH_ALLOC(sizeof(SithSector) * sectors_amt);
+    world->aSectors = (SithSector *)SITH_ALLOC(sizeof(SithSector) * sectors_amt);
     TWL_EXTRAM_RESTORE(pSithHS); }
 #ifdef STDPLATFORM_HEAP_SUGGESTIONS
     pSithHS->suggestHeap(prevSuggest);
 #endif
-    if ( world->sectors )
+    if ( world->aSectors )
     {
-        stdPlatform_Memzero32(world->sectors, alloc_size); // Added: word-safe
-        v6 = world->sectors;
+        stdPlatform_Memzero32(world->aSectors, alloc_size); // Added: word-safe
+        v6 = world->aSectors;
         v7 = 0;
         for ( world->numSectors = sectors_amt; v7 < sectors_amt; ++v7 )
         {
             v6->id = v7;
             v6->numVertices = 0;
-            v6->verticeIdxs = 0;
+            v6->aVertIdxs = 0;
             v6->numSurfaces = 0;
             v6->surfaces = 0;
-            v6->thingsList = 0;
+            v6->pFirstThingInSector = 0;
             ++v6;
         }
     }
-    sectors = world->sectors;
-    if ( !sectors )
+    aSectors = world->aSectors;
+    if ( !aSectors )
         return 0;
     v21 = 0;
     if ( sectors_amt )
@@ -94,31 +94,31 @@ int sithSector_ReadSectorsListText(SithWorld *world, int tmp)
                 break;
             if ( !stdConffile_ReadLine() )
                 break;
-            if ( _sscanf(stdConffile_g_aLine, " flags %x", &sectors->flags) != 1 )
+            if ( _sscanf(stdConffile_g_aLine, " flags %x", &aSectors->flags) != 1 )
                 break;
             if ( !stdConffile_ReadLine() )
                 break;
             if ( _sscanf(stdConffile_g_aLine, " ambient light %f", &tmpf1) != 1 )
                 break;
-            sectors->ambientLight = tmpf1; // FLEXTODO
+            aSectors->ambientLight = tmpf1; // FLEXTODO
             if ( !stdConffile_ReadLine() )
                 break;
             if ( _sscanf(stdConffile_g_aLine, " extra light %f", &tmpf1) != 1 )
                 break;
-            sectors->extraLight = tmpf1; // FLEXTODO
+            aSectors->extraLight = tmpf1; // FLEXTODO
             if ( !stdConffile_ReadLine() )
                 break;
             if ( _sscanf(stdConffile_g_aLine, " colormap %d", &tmp) != 1 )
                 break;
-            sectors->colormap = &world->colormaps[tmp];
+            aSectors->colormap = &world->colormaps[tmp];
             if ( !stdConffile_ReadLine()
               || _sscanf(stdConffile_g_aLine, " tint %f %f %f", &tmpf1, &tmpf2, &tmpf3) == 3 && !stdConffile_ReadLine() )
             {
                 break;
             }
-            sectors->tint.x = tmpf1; // FLEXTODO
-            sectors->tint.y = tmpf2; // FLEXTODO
-            sectors->tint.z = tmpf3; // FLEXTODO
+            aSectors->tint.x = tmpf1; // FLEXTODO
+            aSectors->tint.y = tmpf2; // FLEXTODO
+            aSectors->tint.z = tmpf3; // FLEXTODO
             if ( _sscanf(
                      stdConffile_g_aLine,
                      " boundbox %f %f %f %f %f %f ",
@@ -129,12 +129,12 @@ int sithSector_ReadSectorsListText(SithWorld *world, int tmp)
                      &tmpf5,
                      &tmpf6) != 6 )
                 break;
-            sectors->boundingbox_onecorner.x = tmpf1; // FLEXTODO
-            sectors->boundingbox_onecorner.y = tmpf2; // FLEXTODO
-            sectors->boundingbox_onecorner.z = tmpf3; // FLEXTODO
-            sectors->boundingbox_othercorner.x = tmpf4; // FLEXTODO
-            sectors->boundingbox_othercorner.y = tmpf5; // FLEXTODO
-            sectors->boundingbox_othercorner.z = tmpf6; // FLEXTODO
+            aSectors->boundingbox_onecorner.x = tmpf1; // FLEXTODO
+            aSectors->boundingbox_onecorner.y = tmpf2; // FLEXTODO
+            aSectors->boundingbox_onecorner.z = tmpf3; // FLEXTODO
+            aSectors->boundingbox_othercorner.x = tmpf4; // FLEXTODO
+            aSectors->boundingbox_othercorner.y = tmpf5; // FLEXTODO
+            aSectors->boundingbox_othercorner.z = tmpf6; // FLEXTODO
             if ( !stdConffile_ReadLine() )
                 break;
             if ( _sscanf(
@@ -147,41 +147,41 @@ int sithSector_ReadSectorsListText(SithWorld *world, int tmp)
                      &tmpf5,
                      &tmpf6) == 6 )
             {
-                sectors->collidebox_onecorner.x = tmpf1; // FLEXTODO
-                sectors->collidebox_onecorner.y = tmpf2; // FLEXTODO
-                sectors->collidebox_onecorner.z = tmpf3; // FLEXTODO
-                sectors->collidebox_othercorner.x = tmpf4; // FLEXTODO
-                sectors->collidebox_othercorner.y = tmpf5; // FLEXTODO
-                sectors->collidebox_othercorner.z = tmpf6; // FLEXTODO
-                sectors->flags |= SITH_SECTOR_HASCOLLIDEBOX;
+                aSectors->collidebox_onecorner.x = tmpf1; // FLEXTODO
+                aSectors->collidebox_onecorner.y = tmpf2; // FLEXTODO
+                aSectors->collidebox_onecorner.z = tmpf3; // FLEXTODO
+                aSectors->collidebox_othercorner.x = tmpf4; // FLEXTODO
+                aSectors->collidebox_othercorner.y = tmpf5; // FLEXTODO
+                aSectors->collidebox_othercorner.z = tmpf6; // FLEXTODO
+                aSectors->flags |= SITH_SECTOR_HASCOLLIDEBOX;
                 if ( !stdConffile_ReadLine() )
                     break;
             }
             if ( _sscanf(stdConffile_g_aLine, "sound %s %f", sound_fname, &tmpf1) == 2 )
             {
-                sectors->sectorSoundVol = tmpf1; // FLEXTODO
-                sectors->sectorSound = sithSound_Load(sound_fname, 0);
+                aSectors->ambientSoundVolume = tmpf1; // FLEXTODO
+                aSectors->hAmbientSound = sithSound_Load(sound_fname, 0);
                 if ( !stdConffile_ReadLine() )
                     break;
             }
             if ( _sscanf(stdConffile_g_aLine, " center %f %f %f", &tmpf1, &tmpf2, &tmpf3) != 3 )
                 break;
-            sectors->center.x = tmpf1; // FLEXTODO
-            sectors->center.y = tmpf2; // FLEXTODO
-            sectors->center.z = tmpf3; // FLEXTODO
+            aSectors->center.x = tmpf1; // FLEXTODO
+            aSectors->center.y = tmpf2; // FLEXTODO
+            aSectors->center.z = tmpf3; // FLEXTODO
             if ( !stdConffile_ReadLine() )
                 break;
             if ( _sscanf(stdConffile_g_aLine, " radius %f", &tmpf1) != 1 )
                 break;
-            sectors->radius = tmpf1; // FLEXTODO
+            aSectors->radius = tmpf1; // FLEXTODO
             if ( !stdConffile_ReadLine() )
                 break;
-            if ( _sscanf(stdConffile_g_aLine, " vertices %d", &num_vertices) != 1 )
+            if ( _sscanf(stdConffile_g_aLine, " aVertices %d", &num_vertices) != 1 )
                 break;
             { TWL_EXTRAM_SUGGEST(pSithHS); // Added: word-width fields/writes (audited)
-            sectors->verticeIdxs = (int32_t *)SITH_ALLOC(sizeof(int32_t) * num_vertices);
+            aSectors->aVertIdxs = (int32_t *)SITH_ALLOC(sizeof(int32_t) * num_vertices);
             TWL_EXTRAM_RESTORE(pSithHS); }
-            if ( !sectors->verticeIdxs )
+            if ( !aSectors->aVertIdxs )
                 break;
 
             for (v13 = 0; v13 < num_vertices; v13++)
@@ -190,20 +190,20 @@ int sithSector_ReadSectorsListText(SithWorld *world, int tmp)
                     return 0;
                 if (_sscanf(stdConffile_g_aLine, " %d: %d", &junk, &vtx_idx) != 2)
                     return 0;
-                sectors->verticeIdxs[v13] = vtx_idx;
+                aSectors->aVertIdxs[v13] = vtx_idx;
             }
 
-            sectors->numVertices = num_vertices;
+            aSectors->numVertices = num_vertices;
             if ( !stdConffile_ReadLine() || _sscanf(stdConffile_g_aLine, " surfaces %d %d", &amount_1, &amount_2) != 2 )
                 return 0;
-            sectors->numSurfaces = amount_2;
+            aSectors->numSurfaces = amount_2;
 
-            sectors->surfaces = &world->surfaces[amount_1];
+            aSectors->surfaces = &world->surfaces[amount_1];
             for (v15 = 0; v15 < amount_2; v15++)
             {
-                sectors->surfaces[v15].parent_sector = sectors;
+                aSectors->surfaces[v15].pSector = aSectors;
             }
-            ++sectors;
+            ++aSectors;
             if ( ++v21 >= sectors_amt )
                 return 1;
         }
@@ -214,7 +214,7 @@ int sithSector_ReadSectorsListText(SithWorld *world, int tmp)
 
 int sithSector_GetIdxFromPtr(SithSector *sector)
 {
-    return sector && sector->id == sector - sithWorld_g_pCurrentWorld->sectors && sector->id < (unsigned int)sithWorld_g_pCurrentWorld->numSectors;
+    return sector && sector->id == sector - sithWorld_g_pCurrentWorld->aSectors && sector->id < (unsigned int)sithWorld_g_pCurrentWorld->numSectors;
 }
 
 void sithSector_ShowSectorAdjoins(SithSector *sector)
@@ -241,21 +241,21 @@ int sithSector_GetSectorThingCount(SithSector *sector)
     SithThing *i; // ecx
 
     result = 0;
-    for ( i = sector->thingsList; i; ++result )
-        i = i->nextThing;
+    for ( i = sector->pFirstThingInSector; i; ++result )
+        i = i->pNextThingInSector;
     return result;
 }
 
 int sithSector_AllocWorldSectors(SithWorld *world, int num)
 {
-    SithSector *sectors;
+    SithSector *aSectors;
     { TWL_EXTRAM_SUGGEST(pSithHS); // Added: word-width fields/writes (audited)
-    sectors = (SithSector *)SITH_ALLOC(num * sizeof(SithSector));
+    aSectors = (SithSector *)SITH_ALLOC(num * sizeof(SithSector));
     TWL_EXTRAM_RESTORE(pSithHS); }
-    world->sectors = sectors;
-    if ( !sectors )
+    world->aSectors = aSectors;
+    if ( !aSectors )
         return 0;
-    stdPlatform_Memzero32(sectors, num * sizeof(SithSector)); // Added: word-safe
+    stdPlatform_Memzero32(aSectors, num * sizeof(SithSector)); // Added: word-safe
     world->numSectors = num;
     return 1;
 }
@@ -272,18 +272,18 @@ void sithSector_NewEntry(SithSector *sector, int idx)
     sector->numVertices = 0;
     sector->numSurfaces = 0;
     sector->adjoins = NULL;
-    sector->thingsList = NULL;
+    sector->pFirstThingInSector = NULL;
 }
 
 void sithSector_FreeWorldSectors(SithWorld *world)
 {
     for (uint32_t i = 0; i < world->numSectors; i++)
     {
-        if ( world->sectors[i].verticeIdxs )
-            SITH_FREE(world->sectors[i].verticeIdxs);
+        if ( world->aSectors[i].aVertIdxs )
+            SITH_FREE(world->aSectors[i].aVertIdxs);
     }
-    SITH_FREE(world->sectors);
-    world->sectors = 0;
+    SITH_FREE(world->aSectors);
+    world->aSectors = 0;
     world->numSectors = 0;
 }
 
@@ -293,7 +293,7 @@ int sithSector_GetSectorPlayerCount(SithSector *sector)
     SithThing *i; // ecx
 
     result = 0;
-    for ( i = sector->thingsList; i; i = i->nextThing )
+    for ( i = sector->pFirstThingInSector; i; i = i->pNextThingInSector )
     {
         if ( i->type == SITH_THING_PLAYER )
             ++result;
@@ -306,7 +306,7 @@ SithSector* sithSector_GetPtrFromIdx(int idx)
     SithSector *result; // eax
 
     if ( sithWorld_g_pCurrentWorld && idx >= 0 && idx < sithWorld_g_pCurrentWorld->numSectors )
-        result = &sithWorld_g_pCurrentWorld->sectors[idx];
+        result = &sithWorld_g_pCurrentWorld->aSectors[idx];
     else
         result = 0;
     return result;
@@ -365,7 +365,7 @@ SithSector* sithSector_FindSectorAtPos(SithWorld *pWorld, rdVector3 *pos)
 
     v2 = 0;
     v3 = pWorld->numSectors;
-    v4 = pWorld->sectors;
+    v4 = pWorld->aSectors;
     if ( !v3 )
         return 0;
     while ( 1 )

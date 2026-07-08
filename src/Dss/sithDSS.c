@@ -101,7 +101,7 @@ void sithDSS_SurfaceStatus(SithSurface *surface, int sendto_id, int mpFlags)
     NETMSG_START;
 
     NETMSG_PUSHS16(surface->index);
-    NETMSG_PUSHU32(surface->surfaceFlags);
+    NETMSG_PUSHU32(surface->flags);
     if ( surface->surfaceInfo.face.material ) {
         NETMSG_PUSHS32(surface->surfaceInfo.face.material->id);
     }
@@ -115,9 +115,9 @@ void sithDSS_SurfaceStatus(SithSurface *surface, int sendto_id, int mpFlags)
     NETMSG_PUSHU32(surface->surfaceInfo.face.geometryMode);
     NETMSG_PUSHU32(surface->surfaceInfo.face.lightingMode);
     NETMSG_PUSHU32(surface->surfaceInfo.face.textureMode);
-    if ( surface->adjoin )
+    if ( surface->pAdjoin )
     {
-        NETMSG_PUSHU32(surface->adjoin->flags);
+        NETMSG_PUSHU32(surface->pAdjoin->flags);
     }
     
     NETMSG_END(DSS_SURFACESTATUS);
@@ -139,7 +139,7 @@ int sithDSS_ProcessSurfaceStatus(SithMessage *msg)
 
     surface = &sithWorld_g_pCurrentWorld->surfaces[v1];
 
-    surface->surfaceFlags = NETMSG_POPU32();
+    surface->flags = NETMSG_POPU32();
     surface->surfaceInfo.face.material = sithMaterial_GetMaterialByIndex(NETMSG_POPS32());
 
     v4 = NETMSG_POPS16();
@@ -155,8 +155,8 @@ int sithDSS_ProcessSurfaceStatus(SithMessage *msg)
     surface->surfaceInfo.face.lightingMode = (rdLightMode_t)NETMSG_POPU32();
     surface->surfaceInfo.face.textureMode = (rdTexMode_t)NETMSG_POPU32();
 
-    if ( surface->adjoin )
-        surface->adjoin->flags = NETMSG_POPU32();
+    if ( surface->pAdjoin )
+        surface->pAdjoin->flags = NETMSG_POPU32();
 
     return 1;
 }
@@ -194,7 +194,7 @@ int sithDSS_ProcessSectorStatus(SithMessage *msg)
     idx = NETMSG_POPS16();
     if ( idx >= sithWorld_g_pCurrentWorld->numSectors )
         return 0;
-    sector = &sithWorld_g_pCurrentWorld->sectors[idx];
+    sector = &sithWorld_g_pCurrentWorld->aSectors[idx];
     //sector->id = idx; // Not in original?
 
     colormapIdx = NETMSG_POPS16();
@@ -288,12 +288,12 @@ void sithDSS_AIStatus(SithAIControlBlock *actor, int sendto_id, int idx)
 {    
     NETMSG_START;
 
-    NETMSG_PUSHS16(actor->thing->thingIdx);
-    NETMSG_PUSHS16((int16_t)(((intptr_t)actor->pAIClass - (intptr_t)sithWorld_g_pCurrentWorld->aiclasses) / sizeof(SithAIClass)));
+    NETMSG_PUSHS16(actor->thing->idx);
+    NETMSG_PUSHS16((int16_t)(((intptr_t)actor->pAIClass - (intptr_t)sithWorld_g_pCurrentWorld->aAIClasses) / sizeof(SithAIClass)));
     NETMSG_PUSHU32(actor->flags);
     NETMSG_PUSHU32(actor->nextUpdate);
     if ( actor->pMoveThing ) {
-        NETMSG_PUSHS16(actor->pMoveThing->thingIdx);
+        NETMSG_PUSHS16(actor->pMoveThing->idx);
     }
     else {
         NETMSG_PUSHS16(-1);
@@ -302,7 +302,7 @@ void sithDSS_AIStatus(SithAIControlBlock *actor, int sendto_id, int idx)
     NETMSG_PUSHVEC3(actor->field_23C);
     NETMSG_PUSHU32(actor->field_248);
     if ( actor->pDistractor ) {
-        NETMSG_PUSHS16(actor->pDistractor->thingIdx);
+        NETMSG_PUSHS16(actor->pDistractor->idx);
     }
     else {
         NETMSG_PUSHS16(-1);
@@ -323,14 +323,14 @@ void sithDSS_AIStatus(SithAIControlBlock *actor, int sendto_id, int idx)
     if (actor->flags & SITHAI_MODE_FLEEING)
     {
         if ( actor->pFleeThing) {
-            NETMSG_PUSHS16(actor->pFleeThing->thingIdx);
+            NETMSG_PUSHS16(actor->pFleeThing->idx);
         }
         else {
             NETMSG_PUSHS16(-1);
         }
     }
     NETMSG_PUSHVEC3(actor->position);
-    NETMSG_PUSHVEC3(actor->lookOrientation);
+    NETMSG_PUSHVEC3(actor->orient);
     for (int i = 0; i < actor->numAIClassEntries; i++)
     {
         NETMSG_PUSHU32(actor->instincts[i].nextUpdate);
@@ -369,11 +369,11 @@ int sithDSS_ProcessAIStatus(SithMessage *msg)
         return 0;
     
     int16_t idx = NETMSG_POPS16();
-    if ( idx >= sithWorld_g_pCurrentWorld->numAIClassesLoaded )
+    if ( idx >= sithWorld_g_pCurrentWorld->numAIClasses )
         return 0;
 
-    actor->pAIClass = &sithWorld_g_pCurrentWorld->aiclasses[idx];
-    actor->numAIClassEntries = sithWorld_g_pCurrentWorld->aiclasses[idx].numEntries;
+    actor->pAIClass = &sithWorld_g_pCurrentWorld->aAIClasses[idx];
+    actor->numAIClassEntries = sithWorld_g_pCurrentWorld->aAIClasses[idx].numEntries;
     actor->flags = NETMSG_POPU32();
     actor->nextUpdate = NETMSG_POPU32();
     actor->pMoveThing = sithThing_GetThingByIndex(NETMSG_POPS16());
@@ -404,7 +404,7 @@ int sithDSS_ProcessAIStatus(SithMessage *msg)
         actor->pFleeThing = sithThing_GetThingByIndex(NETMSG_POPS16());
     }
     actor->position = NETMSG_POPVEC3();
-    actor->lookOrientation = NETMSG_POPVEC3();
+    actor->orient = NETMSG_POPVEC3();
 
     for (int i = 0; i < actor->numAIClassEntries; i++)
     {
@@ -445,12 +445,12 @@ void sithDSS_Inventory(SithThing *thing, int binIdx, int sendto_id, int mpFlags)
 {
     if ( thing->type == SITH_THING_PLAYER || thing->type == SITH_THING_ACTOR )
     {
-        SithPlayer* v5 = thing->actorParams.playerinfo;
+        SithPlayer* v5 = thing->actorParams.pPlayer;
         if ( v5 )
         {
             NETMSG_START;
         
-            NETMSG_PUSHS16(thing->thingIdx);
+            NETMSG_PUSHS16(thing->idx);
             NETMSG_PUSHS16(binIdx);
             NETMSG_PUSHF32(v5->iteminfo[binIdx].ammoAmt);
             NETMSG_PUSHU32(v5->iteminfo[binIdx].state);
@@ -468,7 +468,7 @@ void sithDSS_Inventory(SithThing *thing, int binIdx, int sendto_id, int mpFlags)
 
 int sithDSS_ProcessInventory(SithMessage *msg)
 {
-    int thingIdx; // edx
+    int idx; // edx
     SithThing *thing; // ecx
     SithPlayer *playerInfo; // edx
     int binIdx; // ecx
@@ -476,17 +476,17 @@ int sithDSS_ProcessInventory(SithMessage *msg)
     
     NETMSG_IN_START(msg);
 
-    thingIdx = NETMSG_POPS16();
-    if ( thingIdx < 0 )
+    idx = NETMSG_POPS16();
+    if ( idx < 0 )
         return 0;
-    if ( thingIdx >= sithWorld_g_pCurrentWorld->numThingsLoaded )
+    if ( idx >= sithWorld_g_pCurrentWorld->numThingsLoaded )
         return 0;
 
-    thing = &sithWorld_g_pCurrentWorld->things[thingIdx];
+    thing = &sithWorld_g_pCurrentWorld->aThings[idx];
     if ( thing->type != SITH_THING_ACTOR && thing->type != SITH_THING_PLAYER )
         return 0;
 
-    playerInfo = thing->actorParams.playerinfo;
+    playerInfo = thing->actorParams.pPlayer;
     if ( !playerInfo )
         return 0;
 
@@ -518,7 +518,7 @@ void sithDSS_AnimStatus(rdSurface *surface, int sendto_id, int mpFlags)
     NETMSG_PUSHU32(surface->flags);
     if (surface->flags & 0xC0000)
     {
-        NETMSG_PUSHS32(surface->parent_thing->thingIdx);
+        NETMSG_PUSHS32(surface->parent_thing->idx);
         NETMSG_PUSHU32(surface->signature);
     }
     if (surface->flags & 0x20000)
@@ -581,8 +581,8 @@ int sithDSS_ProcessAnimStatus(SithMessage *msg)
     if (rdsurface->flags & 0xC0000)
     {
         rdsurface->parent_thing = sithThing_GetThingByIndex(NETMSG_POPS32());
-        if ( rdsurface->parent_thing && rdsurface->parent_thing->rdthing.type == RD_THING_SPRITE3 )
-            rdsurface->material = rdsurface->parent_thing->rdthing.sprite3->face.material;
+        if ( rdsurface->parent_thing && rdsurface->parent_thing->renderData.type == RD_THING_SPRITE3 )
+            rdsurface->material = rdsurface->parent_thing->renderData.sprite3->face.material;
         rdsurface->signature = NETMSG_POPU32();
     }
 
@@ -752,14 +752,14 @@ void sithDSS_SyncCameras(int sendto_id, int mpFlags)
     for (int i = 0; i < 7; i++) // TODO define this maximum
     {
         if ( sithCamera_g_aCameras[i].primaryFocus ) {
-            NETMSG_PUSHS32(sithCamera_g_aCameras[i].primaryFocus->thingIdx);
+            NETMSG_PUSHS32(sithCamera_g_aCameras[i].primaryFocus->idx);
         }
         else {
             NETMSG_PUSHS32(-1);
         }
 
         if ( sithCamera_g_aCameras[i].secondaryFocus ) {
-            NETMSG_PUSHS32(sithCamera_g_aCameras[i].secondaryFocus->thingIdx);
+            NETMSG_PUSHS32(sithCamera_g_aCameras[i].secondaryFocus->idx);
         }
         else {
             NETMSG_PUSHS32(-1);
@@ -988,9 +988,9 @@ void sithDSS_PuppetStatus(SithThing *thing, int sendto_id, int mpFlags)
 {
     NETMSG_START;
 
-    rdPuppet* puppet = thing->rdthing.puppet;
+    rdPuppet* puppet = thing->renderData.puppet;
 
-    NETMSG_PUSHS32(thing->thingIdx);
+    NETMSG_PUSHS32(thing->idx);
     for (int i = 0; i < 4; i++)
     {           
         NETMSG_PUSHU32(puppet->tracks[i].status);
@@ -1030,17 +1030,17 @@ int sithDSS_ProcessPuppetStatus(SithMessage *msg)
     if ( !thing )
         return 0;
 
-    if ( !thing->animclass )
+    if ( !thing->pPuppetClass )
         return 0;
 
     if ( !thing->puppet )
         return 0;
 
-    rdpuppet = thing->rdthing.puppet;
+    rdpuppet = thing->renderData.puppet;
     if ( !rdpuppet )
         return 0;
 
-    rdPuppet_NewEntry(rdpuppet, &thing->rdthing);
+    rdPuppet_NewEntry(rdpuppet, &thing->renderData);
 
     for (int i = 0; i < 4; i++)
     {

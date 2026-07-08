@@ -1792,7 +1792,7 @@ struct UserDefined {
 /* Here follows boolean settings that define how to behave during
    this session. They are STATIC, set by libcurl users or at least initially
    and they don't change during operations. */
-  BIT(quick_exit);       /* set 1L when it is okay to leak things (like
+  BIT(quick_exit);       /* set 1L when it is okay to leak aThings (like
                             threads), as we're about to exit() anyway and
                             don't want lengthy cleanups to delay termination,
                             e.g. after a DNS timeout */
