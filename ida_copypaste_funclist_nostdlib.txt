@@ -1209,15 +1209,15 @@ rdModel3_RegisterLoader	.text	00443DA0	00000010	00000000	00000004	R	.	.	.	.	.	T	
 rdModel3_RegisterUnloader	.text	00443DB0	00000010	00000000	00000004	R	.	.	.	.	.	.	.
 rdModel3_ClearFrameCounters	.text	00443DC0	0000000B			R	.	.	.	.	.	.	.
 rdModel3_NewEntry	.text	00443DD0	0000002C	00000008	00000004	R	.	.	.	.	.	T	.
-rdModel3_New	.text	00443E00	00000075	00000004	00000004	R	.	.	.	.	.	T	.
-rdModel3_Load	.text	00443E80	00000CDB	00000094	00000008	R	.	.	.	.	.	T	.
+rdModel3_Load	.text	00443E00	00000075	00000004	00000004	R	.	.	.	.	.	T	.
+rdModel3_LoadEntry	.text	00443E80	00000CDB	00000094	00000008	R	.	.	.	.	.	T	.
 rdModel3_LoadPostProcess	.text	00444B60	00000022	00000004	00000004	R	.	.	.	.	.	T	.
-rdModel3_WriteText	.text	00444B90	0000082B	00000078	0000000C	R	.	.	.	.	B	T	.
+rdModel3_Write	.text	00444B90	0000082B	00000078	0000000C	R	.	.	.	.	B	T	.
 rdModel3_Free	.text	004453C0	00000030	00000004	00000004	R	.	.	.	.	.	T	.
 rdModel3_FreeEntry	.text	004453F0	0000016C	00000018	00000004	R	.	.	.	.	.	T	.
 rdModel3_FreeEntryGeometryOnly	.text	00445560	0000014B	00000018	00000004	R	.	.	.	.	.	T	.
 rdModel3_Validate	.text	004456B0	00000097	00000018	00000004	R	.	.	.	.	.	T	.
-rdModel3_CalcBoundingBoxes	.text	00445750	000000BA	00000008	00000004	R	.	.	.	.	.	T	.
+rdModel3_CalcRadii	.text	00445750	000000BA	00000008	00000004	R	.	.	.	.	.	T	.
 rdModel3_BuildExpandedRadius	.text	00445810	0000015D	000000B8	0000000C	R	.	.	.	.	.	T	.
 rdModel3_CalcFaceNormals	.text	00445970	00000159	00000018	00000004	R	.	.	.	.	.	T	.
 rdModel3_CalcVertexNormals	.text	00445AD0	0000025A	00000048	00000004	R	.	.	.	.	.	T	.

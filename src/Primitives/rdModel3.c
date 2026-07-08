@@ -54,7 +54,7 @@ int rdModel3_NewEntry(rdModel3 *model)
     return 0;
 }
 
-rdModel3* rdModel3_New(char *path)
+rdModel3* rdModel3_Load(char *path)
 {
     rdModel3 *model;
 
@@ -63,7 +63,7 @@ rdModel3* rdModel3_New(char *path)
     model = (rdModel3 *)RDROID_ALLOC(sizeof(rdModel3));
     if ( model )
     {
-        if ( rdModel3_Load(path, model) )
+        if ( rdModel3_LoadEntry(path, model) )
             return model;
         rdModel3_Free(model);
     }
@@ -73,7 +73,7 @@ rdModel3* rdModel3_New(char *path)
 #define rdModel3_HelpDebug(s, ...) (s)
 
 // MOTS altered (RGB lights?)
-int rdModel3_Load(char *model_fpath, rdModel3 *model)
+int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model)
 {
     rdMesh *mesh; // ebx
     int vertex_num; // edi
@@ -675,7 +675,7 @@ fail:
 // from editor?
 void rdModel3_LoadPostProcess(rdModel3 *model)
 {
-    rdModel3_CalcBoundingBoxes(model);
+    rdModel3_CalcRadii(model);
     rdModel3_CalcFaceNormals(model);
     rdModel3_CalcVertexNormals(model);
     rdModel3_CalcNumParents(model); // MOTS added
@@ -702,7 +702,7 @@ void rdModel3_CalcNumParents(rdModel3* pModel)
 }
 
 // from editors?
-int rdModel3_WriteText(char *fout, rdModel3 *model, char *createdfrom)
+int rdModel3_Write(char *fout, rdModel3 *model, char *createdfrom)
 {
     rdGeoset* geoset;
     int siblingIdx;
@@ -1112,7 +1112,7 @@ rdModel3* rdModel3_Validate(rdModel3 *model)
     return model;
 }
 
-void rdModel3_CalcBoundingBoxes(rdModel3 *model)
+void rdModel3_CalcRadii(rdModel3 *model)
 {
     flex_t maxDist;
 

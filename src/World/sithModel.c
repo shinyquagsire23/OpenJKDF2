@@ -98,10 +98,10 @@ rdModel3* sithModel_Load(const char *model_3do_fname, int unk)
     model = &sithWorld_pLoading->models[sithWorld_pLoading->numModelsLoaded];
 
     _sprintf(model_fpath, "%s%c%s", "3do", '\\', model_3do_fname);
-    if ( !rdModel3_Load(model_fpath, model) )
+    if ( !rdModel3_LoadEntry(model_fpath, model) )
     {
         if ( !unk ) {
-            stdPlatform_Printf("OpenJKDF2: %s: rdModel3_Load failed for `%s`, loading dflt.3do!\n", __func__, model_3do_fname); // Added
+            stdPlatform_Printf("OpenJKDF2: %s: rdModel3_LoadEntry failed for `%s`, loading dflt.3do!\n", __func__, model_3do_fname); // Added
             return sithModel_Load("dflt.3do", 1);
         }
         return 0;

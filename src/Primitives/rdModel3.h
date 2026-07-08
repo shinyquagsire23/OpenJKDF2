@@ -17,15 +17,15 @@ extern "C" {
 #define rdModel3_RegisterUnloader_ADDR (0x00443DB0)
 #define rdModel3_ClearFrameCounters_ADDR (0x00443DC0)
 #define rdModel3_NewEntry_ADDR (0x00443DD0)
-#define rdModel3_New_ADDR (0x00443E00)
-#define rdModel3_Load_ADDR (0x00443E80)
+#define rdModel3_Load_ADDR (0x00443E00)
+#define rdModel3_LoadEntry_ADDR (0x00443E80)
 #define rdModel3_LoadPostProcess_ADDR (0x00444B60)
-#define rdModel3_WriteText_ADDR (0x00444B90)
+#define rdModel3_Write_ADDR (0x00444B90)
 #define rdModel3_Free_ADDR (0x004453C0)
 #define rdModel3_FreeEntry_ADDR (0x004453F0)
 #define rdModel3_FreeEntryGeometryOnly_ADDR (0x00445560)
 #define rdModel3_Validate_ADDR (0x004456B0)
-#define rdModel3_CalcBoundingBoxes_ADDR (0x00445750)
+#define rdModel3_CalcRadii_ADDR (0x00445750)
 #define rdModel3_BuildExpandedRadius_ADDR (0x00445810)
 #define rdModel3_CalcFaceNormals_ADDR (0x00445970)
 #define rdModel3_CalcVertexNormals_ADDR (0x00445AD0)
@@ -192,15 +192,15 @@ model3Loader_t rdModel3_RegisterLoader(model3Loader_t loader);
 model3Unloader_t rdModel3_RegisterUnloader(model3Unloader_t unloader);
 void rdModel3_ClearFrameCounters();
 int rdModel3_NewEntry(rdModel3 *model);
-rdModel3* rdModel3_New(char *path);
-int rdModel3_Load(char *model_fpath, rdModel3 *model);
+rdModel3* rdModel3_Load(char *path);
+int rdModel3_LoadEntry(char *model_fpath, rdModel3 *model);
 void rdModel3_LoadPostProcess(rdModel3 *model);
-int rdModel3_WriteText(char *fout, rdModel3 *model, char *createdfrom);
+int rdModel3_Write(char *fout, rdModel3 *model, char *createdfrom);
 void rdModel3_Free(rdModel3 *model);
 void rdModel3_FreeEntry(rdModel3 *model);
 void rdModel3_FreeEntryGeometryOnly(rdModel3 *model);
 rdModel3* rdModel3_Validate(rdModel3 *model);
-MATH_FUNC void rdModel3_CalcBoundingBoxes(rdModel3 *model);
+MATH_FUNC void rdModel3_CalcRadii(rdModel3 *model);
 MATH_FUNC void rdModel3_BuildExpandedRadius(rdModel3 *model, rdHierarchyNode *node, const rdMatrix34 *matrix);
 MATH_FUNC void rdModel3_CalcFaceNormals(rdModel3 *model);
 MATH_FUNC void rdModel3_CalcVertexNormals(rdModel3 *model);

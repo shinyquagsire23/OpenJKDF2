@@ -1723,15 +1723,15 @@ void do_hooks()
     hook_function(rdModel3_RegisterUnloader_ADDR, rdModel3_RegisterUnloader);
     hook_function(rdModel3_ClearFrameCounters_ADDR, rdModel3_ClearFrameCounters);
     hook_function(rdModel3_NewEntry_ADDR, rdModel3_NewEntry);
-    hook_function(rdModel3_New_ADDR, rdModel3_New);
     hook_function(rdModel3_Load_ADDR, rdModel3_Load);
+    hook_function(rdModel3_LoadEntry_ADDR, rdModel3_LoadEntry);
     hook_function(rdModel3_LoadPostProcess_ADDR, rdModel3_LoadPostProcess);
-    hook_function(rdModel3_WriteText_ADDR, rdModel3_WriteText);
+    hook_function(rdModel3_Write_ADDR, rdModel3_Write);
     hook_function(rdModel3_Free_ADDR, rdModel3_Free);
     hook_function(rdModel3_FreeEntry_ADDR, rdModel3_FreeEntry);
     hook_function(rdModel3_FreeEntryGeometryOnly_ADDR, rdModel3_FreeEntryGeometryOnly);
     hook_function(rdModel3_Validate_ADDR, rdModel3_Validate);
-    hook_function(rdModel3_CalcBoundingBoxes_ADDR, rdModel3_CalcBoundingBoxes);
+    hook_function(rdModel3_CalcRadii_ADDR, rdModel3_CalcRadii);
     hook_function(rdModel3_BuildExpandedRadius_ADDR, rdModel3_BuildExpandedRadius);
     hook_function(rdModel3_CalcFaceNormals_ADDR, rdModel3_CalcFaceNormals);
     //hook_function(rdModel3_CalcVertexNormals_ADDR, rdModel3_CalcVertexNormals);

@@ -223,7 +223,7 @@ int sithRender_Open()
     // Added: Light debug
     lightDebugThing = rdThing_New(NULL);
     if (!lightDebugThing_model3)
-        lightDebugThing_model3 = rdModel3_New("3d0\\lamp.3do");
+        lightDebugThing_model3 = rdModel3_Load("3d0\\lamp.3do");
     rdThing_SetModel3(lightDebugThing, lightDebugThing_model3);
     rdMatrix_Identity34(&lightDebugThing_mat);
 #endif

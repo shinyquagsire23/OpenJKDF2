@@ -291,7 +291,7 @@ rdModel3* jkGuiBuildMulti_ModelLoader(const char *pCharFpath, int unused)
     __snprintf(fpath, 128, "%s%c%s", "3do", '\\', pCharFpath); // ADDED: sprintf -> snprintf
     pModel = (rdModel3 *)JK_ALLOC(sizeof(rdModel3));
     memset(pModel, 0, sizeof(rdModel3));
-    return rdModel3_Load(fpath, pModel) != 0 ? pModel : NULL;
+    return rdModel3_LoadEntry(fpath, pModel) != 0 ? pModel : NULL;
 }
 
 rdMaterial* jkGuiBuildMulti_MatLoader(const char *pMatFname, int a, int b)
@@ -347,7 +347,7 @@ void jkGuiBuildMulti_ThingInit(char *pModelFpath)
     int32_t tmp = jkGuiBuildMulti_bRendering; // Added
     jkGuiBuildMulti_bRendering = 1; // Added
 
-    jkGuiBuildMulti_model = rdModel3_New(pModelFpath);
+    jkGuiBuildMulti_model = rdModel3_Load(pModelFpath);
     jkGuiBuildMulti_thing = rdThing_New(0);
     rdThing_SetModel3(jkGuiBuildMulti_thing, jkGuiBuildMulti_model);
     jkGuiBuildMulti_thing->puppet = rdPuppet_New(jkGuiBuildMulti_thing);
@@ -683,7 +683,7 @@ int jkGuiBuildMulti_DisplayModel()
     jkGuiBuildMulti_fnMatLoader = rdMaterial_RegisterLoader(jkGuiBuildMulti_MatLoader);
     jkGuiBuildMulti_fnModelLoader = rdModel3_RegisterLoader(jkGuiBuildMulti_ModelLoader);
     jkGuiBuildMulti_fnKeyframeLoader = rdKeyframe_RegisterLoader(jkGuiBuildMulti_KeyframeLoader);
-    jkGuiBuildMulti_pModelGun = rdModel3_New("bryg.3do");
+    jkGuiBuildMulti_pModelGun = rdModel3_Load("bryg.3do");
     jkGuiBuildMulti_pThingGun = rdThing_New(0);
     int32_t ret = rdThing_SetModel3(jkGuiBuildMulti_pThingGun, jkGuiBuildMulti_pModelGun);
 
