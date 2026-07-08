@@ -940,11 +940,11 @@ int sithControl_HandlePlayer(sithThing *player, flex_t deltaSecs)
         sithControl_FreeCam(player);
         sithControl_ReadFunctionMap(INPUT_FUNC_MAP, &input_read);
         if ( (input_read & 1) != 0 )
-            sithOverlayMap_ToggleMapDrawn();
+            sithOverlayMap_ToggleMap();
         if ( sithControl_ReadFunctionMap(INPUT_FUNC_INCREASE, &input_read) )
-            sithOverlayMap_FuncIncrease();
+            sithOverlayMap_ZoomIn();
         if ( sithControl_ReadFunctionMap(INPUT_FUNC_DECREASE, &input_read) )
-            sithOverlayMap_FuncDecrease();
+            sithOverlayMap_ZoomOut();
         goto debug_controls;
     }
 
@@ -1028,11 +1028,11 @@ LABEL_39:
 
                 sithControl_ReadFunctionMap(INPUT_FUNC_MAP, &input_read);
                 if ( (input_read & 1) != 0 )
-                    sithOverlayMap_ToggleMapDrawn();
+                    sithOverlayMap_ToggleMap();
                 if ( sithControl_ReadFunctionMap(INPUT_FUNC_INCREASE, &input_read) )
-                    sithOverlayMap_FuncIncrease();
+                    sithOverlayMap_ZoomIn();
                 if ( sithControl_ReadFunctionMap(INPUT_FUNC_DECREASE, &input_read) )
-                    sithOverlayMap_FuncDecrease();
+                    sithOverlayMap_ZoomOut();
             }
         }
         return 0;

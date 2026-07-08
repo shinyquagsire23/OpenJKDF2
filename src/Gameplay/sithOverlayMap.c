@@ -19,7 +19,7 @@ int sithOverlayMap_Startup(const sithMapViewConfig *config)
     return 1;
 }
 
-int sithOverlayMap_Shutdown()
+int sithOverlayMap_Close()
 {
     if (sithOverlayMap_bInitted)
     {
@@ -29,12 +29,12 @@ int sithOverlayMap_Shutdown()
     return 0;
 }
 
-void sithOverlayMap_ToggleMapDrawn()
+void sithOverlayMap_ToggleMap()
 {
     sithOverlayMap_bShowMap = !sithOverlayMap_bShowMap;
 }
 
-void sithOverlayMap_FuncIncrease()
+void sithOverlayMap_ZoomIn()
 {
     flex_d_t v0; // st7
 
@@ -49,7 +49,7 @@ void sithOverlayMap_FuncIncrease()
     }
 }
 
-void sithOverlayMap_FuncDecrease()
+void sithOverlayMap_ZoomOut()
 {
     flex_d_t v0; // st7
 
@@ -64,7 +64,7 @@ void sithOverlayMap_FuncDecrease()
     }
 }
 
-int sithOverlayMap_Render1(rdCanvas *canvas)
+int sithOverlayMap_Draw(rdCanvas *canvas)
 {
     int result; // eax
     sithThing *v2; // ecx
@@ -99,7 +99,7 @@ int sithOverlayMap_Render1(rdCanvas *canvas)
     a3.z = 0.0;
     rdMatrix_BuildRotate34(&sithOverlayMap_matrix, &a3);
 
-    sithOverlayMap_Render2(sithOverlayMap_pPlayer->sector);
+    sithOverlayMap_DrawSectors(sithOverlayMap_pPlayer->sector);
 
     if ( sithNet_isMulti && (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 )
     {
@@ -143,7 +143,7 @@ int sithOverlayMap_Render1(rdCanvas *canvas)
     return result;
 }
 
-void sithOverlayMap_Render2(sithSector *sector)
+void sithOverlayMap_DrawSectors(sithSector *sector)
 {
     signed int v2; // eax
     sithAdjoin *i; // esi
@@ -155,17 +155,17 @@ void sithOverlayMap_Render2(sithSector *sector)
         if ( (sector->flags & SITH_SECTOR_AUTOMAPHIDE) != 0 )
             v2 = 1;
         else
-            v2 = sithOverlayMap_Render3(sector);
+            v2 = sithOverlayMap_DrawSector(sector);
 
         if ( v2 )
         {
             for ( i = sector->adjoins; i; i = i->next )
-                sithOverlayMap_Render2(i->sector);
+                sithOverlayMap_DrawSectors(i->sector);
         }
     }
 }
 
-int sithOverlayMap_Render3(sithSector *pSector)
+int sithOverlayMap_DrawSector(sithSector *pSector)
 {
     sithSector *v2; // esi
     int v3; // ecx
@@ -245,7 +245,7 @@ LABEL_29:
             v37 = v6 + 1;
             v8 = v7[v6];
             v9 = v7[(v6 + 1) % v5];
-            v10 = sithOverlayMap_Render4(v4, v8, v9);
+            v10 = sithOverlayMap_CanDrawSurfaceEdge(v4, v8, v9);
             if ( v10 )
             {
                 v44 = 1;
@@ -421,7 +421,7 @@ LABEL_30:
     return result;
 }
 
-int sithOverlayMap_Render4(sithSurface *a1, int a2, int a3)
+int sithOverlayMap_CanDrawSurfaceEdge(sithSurface *a1, int a2, int a3)
 {
     sithSector *parent_sector; // eax
     unsigned int sector_numSurfaces; // edx

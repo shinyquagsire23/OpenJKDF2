@@ -2427,14 +2427,14 @@ void do_hooks()
     
     // sithMapView
     hook_function(sithOverlayMap_Startup_ADDR, sithOverlayMap_Startup);
-    hook_function(sithOverlayMap_Shutdown_ADDR, sithOverlayMap_Shutdown);
-    hook_function(sithOverlayMap_ToggleMapDrawn_ADDR, sithOverlayMap_ToggleMapDrawn);
-    hook_function(sithOverlayMap_FuncIncrease_ADDR, sithOverlayMap_FuncIncrease);
-    hook_function(sithOverlayMap_FuncDecrease_ADDR, sithOverlayMap_FuncDecrease);
-    // sithOverlayMap_Render1
-    // sithOverlayMap_Render2
-    // sithOverlayMap_Render3
-    hook_function(sithOverlayMap_Render4_ADDR, sithOverlayMap_Render4);
+    hook_function(sithOverlayMap_Close_ADDR, sithOverlayMap_Close);
+    hook_function(sithOverlayMap_ToggleMap_ADDR, sithOverlayMap_ToggleMap);
+    hook_function(sithOverlayMap_ZoomIn_ADDR, sithOverlayMap_ZoomIn);
+    hook_function(sithOverlayMap_ZoomOut_ADDR, sithOverlayMap_ZoomOut);
+    // sithOverlayMap_Draw
+    // sithOverlayMap_DrawSectors
+    // sithOverlayMap_DrawSector
+    hook_function(sithOverlayMap_CanDrawSurfaceEdge_ADDR, sithOverlayMap_CanDrawSurfaceEdge);
     
     // sithMaterial
     hook_function(sithMaterial_Startup_ADDR, sithMaterial_Startup);

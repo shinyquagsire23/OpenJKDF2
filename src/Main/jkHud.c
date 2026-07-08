@@ -206,7 +206,7 @@ void jkHud_Close()
     }
     if ( !Main_bNoHUD )
     {
-        sithOverlayMap_Shutdown();
+        sithOverlayMap_Close();
 
         for (int i = 0; i < 8; i++)
         {
@@ -452,7 +452,7 @@ void jkHud_Draw()
     stdDisplay_VBufferLock(pOverlayBuffer);
 #endif
 
-    sithOverlayMap_Render1(pOverlayCanvas);
+    sithOverlayMap_Draw(pOverlayCanvas);
     if ( Video_modeStruct.b3DAccel )
         stdDisplay_VBufferUnlock(Video_pMenuBuffer);
 
@@ -1028,7 +1028,7 @@ void jkHud_DrawGPU()
     stdDisplay_VBufferLock(pOverlayBuffer);
 #endif
 
-    sithOverlayMap_Render1(pOverlayCanvas);
+    sithOverlayMap_Draw(pOverlayCanvas);
     if ( Video_modeStruct.b3DAccel )
         stdDisplay_VBufferUnlock(Video_pMenuBuffer);
 
