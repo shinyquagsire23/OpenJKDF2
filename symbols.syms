@@ -260,8 +260,8 @@ sithOverlayMap_inst 0x00835880 sithMapView
 sithOverlayMap_bMapVisible 0x008358C4 int
 sithOverlayMap_bOpened 0x008358C8 int
 
-sithSoundClass_hashtable 0x00847F1C stdHashTable*
-sithSoundClass_nameToKeyHashtable 0x00847F20 stdHashTable*
+sithSoundClass_pHashtblModes 0x00847F1C stdHashTable*
+sithSoundClass_pHashTable 0x00847F20 stdHashTable*
 
 sithTemplate_pMasterFile 0x8BBC60 void*
 sithTemplate_pHashtable 0x008BBC64 stdHashTable*

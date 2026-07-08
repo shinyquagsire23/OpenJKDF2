@@ -123,13 +123,13 @@ static const char* sithSoundClass_aKeys[SITH_SC_MAX] = {
 
 int sithSoundClass_Startup()
 {
-    sithSoundClass_hashtable = stdHashtbl_New(64);
-    sithSoundClass_nameToKeyHashtable = stdHashtbl_New(192);
-    if ( sithSoundClass_hashtable && sithSoundClass_nameToKeyHashtable )
+    sithSoundClass_pHashtblModes = stdHashtbl_New(64);
+    sithSoundClass_pHashTable = stdHashtbl_New(192);
+    if ( sithSoundClass_pHashtblModes && sithSoundClass_pHashTable )
     {
         for (int i = 1; i < SITH_SC_MAX; i++)
         {
-            stdHashtbl_Add(sithSoundClass_nameToKeyHashtable, sithSoundClass_aKeys[i], (void *)(intptr_t)i);
+            stdHashtbl_Add(sithSoundClass_pHashTable, sithSoundClass_aKeys[i], (void *)(intptr_t)i);
         }
         return 1;
     }
@@ -142,15 +142,15 @@ int sithSoundClass_Startup()
 
 void sithSoundClass_Shutdown()
 {
-    if ( sithSoundClass_hashtable )
+    if ( sithSoundClass_pHashtblModes )
     {
-        stdHashtbl_Free(sithSoundClass_hashtable);
-        sithSoundClass_hashtable = 0;
+        stdHashtbl_Free(sithSoundClass_pHashtblModes);
+        sithSoundClass_pHashtblModes = 0;
     }
-    if ( sithSoundClass_nameToKeyHashtable )
+    if ( sithSoundClass_pHashTable )
     {
-        stdHashtbl_Free(sithSoundClass_nameToKeyHashtable);
-        sithSoundClass_nameToKeyHashtable = 0;
+        stdHashtbl_Free(sithSoundClass_pHashTable);
+        sithSoundClass_pHashTable = 0;
     }
 }
 
@@ -207,7 +207,7 @@ int sithSoundClass_ReadSoundClassesListText(sithWorld *world, int a2)
         if ( _strcmp(stdConffile_entry.args[1].value, "none") && sithWorld_g_pLastLoadedWorld->soundclasses)
         {
             _sprintf(soundclass_fname, "%s%c%s", "misc\\snd", 92, stdConffile_entry.args[1].value);
-            if ( !stdHashtbl_Find(sithSoundClass_hashtable, v6) )
+            if ( !stdHashtbl_Find(sithSoundClass_pHashtblModes, v6) )
             {
                 idx = sithWorld_g_pLastLoadedWorld->numSoundClassesLoaded;
                 if ( idx != sithWorld_g_pLastLoadedWorld->numSoundClasses )
@@ -221,7 +221,7 @@ int sithSoundClass_ReadSoundClassesListText(sithWorld *world, int a2)
 #endif
                     if ( sithSoundClass_LoadEntry(current_soundclass, soundclass_fname) )
                     {
-                        v10 = sithSoundClass_hashtable;
+                        v10 = sithSoundClass_pHashtblModes;
                         ++sithWorld_g_pLastLoadedWorld->numSoundClassesLoaded;
 #ifdef SITH_DEBUG_STRUCT_NAMES
                         stdHashtbl_Add(v10, current_soundclass->snd_fname, current_soundclass); // this is load-bearing
@@ -253,7 +253,7 @@ sithSoundClass* sithSoundClass_Load(char *fpath)
     if ( !_strcmp(fpath, "none") || !sithWorld_g_pLastLoadedWorld->soundclasses )
         return 0;
     _sprintf(v6, "%s%c%s", "misc\\snd", '\\', fpath);
-    result = (sithSoundClass *)stdHashtbl_Find(sithSoundClass_hashtable, fpath);
+    result = (sithSoundClass *)stdHashtbl_Find(sithSoundClass_pHashtblModes, fpath);
     if ( result )
         return result;
     v3 = v1->numSoundClassesLoaded;
@@ -268,7 +268,7 @@ sithSoundClass* sithSoundClass_Load(char *fpath)
 #endif
     if ( !sithSoundClass_LoadEntry(v4, v6) )
         return 0;
-    v5 = sithSoundClass_hashtable;
+    v5 = sithSoundClass_pHashtblModes;
     ++v1->numSoundClassesLoaded;
 #ifdef SITH_DEBUG_STRUCT_NAMES
     stdHashtbl_Add(v5, v4->snd_fname, v4); // this is a load-bearing ifdef
@@ -297,7 +297,7 @@ int sithSoundClass_LoadEntry(sithSoundClass *soundClass, char *fpath)
             continue;
         }
 
-        soundIdx = (uint32_t)((intptr_t)stdHashtbl_Find(sithSoundClass_nameToKeyHashtable, (const char*)(intptr_t)stdConffile_entry.args[0].value) & 0xFFFFFFFF);
+        soundIdx = (uint32_t)((intptr_t)stdHashtbl_Find(sithSoundClass_pHashTable, (const char*)(intptr_t)stdConffile_entry.args[0].value) & 0xFFFFFFFF);
         if (soundIdx < 0 || soundIdx >= SITH_SC_MAX) {
             continue;
         }
@@ -481,9 +481,9 @@ void sithSoundClass_FreeWorldSoundClasses(sithWorld *world)
     {
         v2 = &world->soundclasses[v8];
 #ifdef STDHASHTABLE_CRC32_KEYS
-        stdHashtbl_FreeKeyCrc32(sithSoundClass_hashtable, v2->nameCrc);
+        stdHashtbl_FreeKeyCrc32(sithSoundClass_pHashtblModes, v2->nameCrc);
 #else
-        stdHashtbl_Remove(sithSoundClass_hashtable, v2->snd_fname);
+        stdHashtbl_Remove(sithSoundClass_pHashtblModes, v2->snd_fname);
 #endif
         v3 = v2->entries;
         for (int i = 0; i < SITH_SC_MAX; i++)
