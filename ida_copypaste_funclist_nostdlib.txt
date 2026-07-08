@@ -2542,8 +2542,8 @@ sithAIAwareness_sub_4F2C30	.text	004F2C30	000000F8	00000010	0000001C	R	.	.	.	.	.
 sithRenderSky_Open	.text	004F2D30	00000087	00000000	0000000C	R	.	.	.	.	.	T	.
 sithRenderSky_Close	.text	004F2DC0	00000001			R	.	.	.	.	.	.	.
 sithRenderSky_Update	.text	004F2DD0	00000060			R	.	.	.	.	.	T	.
-sithRenderSky_TransformHorizontal	.text	004F2E30	00000123	00000014	0000000C	R	.	.	.	.	.	T	.
-sithRenderSky_TransformVertical	.text	004F2F60	000001B7	00000034	00000010	R	.	.	.	.	.	T	.
+sithRenderSky_HorizonFaceToPlane	.text	004F2E30	00000123	00000014	0000000C	R	.	.	.	.	.	T	.
+sithRenderSky_CeilingFaceToPlane	.text	004F2F60	000001B7	00000034	00000010	R	.	.	.	.	.	T	.
 sithDSSThing_SendPos	.text	004F3120	0000014F	00000010	0000000C	R	.	.	.	.	.	T	.
 sithDSSThing_ProcessPos	.text	004F3270	000001A2	00000028	00000004	R	.	.	.	.	.	T	.
 sithDSSThing_SendSyncThing	.text	004F3420	0000018F	00000004	0000000C	R	.	.	.	.	.	T	.

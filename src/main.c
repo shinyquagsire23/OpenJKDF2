@@ -1982,10 +1982,10 @@ void do_hooks()
     hook_function(sithPlayer_sub_4C93B0_ADDR, sithPlayer_SetBinItemActive);
     hook_function(sithPlayer_sub_4C93F0_ADDR, sithPlayer_GetBinItemActive);
     hook_function(sithPlayer_idk2_ADDR, sithPlayer_GetBinItemAvailable);
-    hook_function(sithRenderSky_TransformHorizontal_ADDR, sithRenderSky_TransformHorizontal);
+    hook_function(sithRenderSky_HorizonFaceToPlane_ADDR, sithRenderSky_HorizonFaceToPlane);
     hook_function(sithPhysics_ThingSetLook_ADDR, sithPhysics_ThingSetLook);
     hook_function(sithPhysics_ThingApplyForce_ADDR, sithPhysics_ThingApplyForce);
-    hook_function(sithRenderSky_TransformVertical_ADDR, sithRenderSky_TransformVertical);
+    hook_function(sithRenderSky_CeilingFaceToPlane_ADDR, sithRenderSky_CeilingFaceToPlane);
     hook_function(sithAIAwareness_AddEntry_ADDR, sithAIAwareness_AddEntry);
     hook_function(sithAIAwareness_Tick_ADDR, sithAIAwareness_Tick);
     hook_function(sithAIAwareness_sub_4F2C30_ADDR, sithAIAwareness_sub_4F2C30);

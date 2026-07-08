@@ -34,7 +34,7 @@ void sithRenderSky_Update()
 }
 
 // As seen in: Return Home to Sulon
-void sithRenderSky_TransformHorizontal(rdProcEntry *pProcEntry, sithSurfaceInfo *pSurfaceInfo, uint32_t num_vertices)
+void sithRenderSky_HorizonFaceToPlane(rdProcEntry *pProcEntry, sithSurfaceInfo *pSurfaceInfo, uint32_t num_vertices)
 {
     rdVector2 *pVertUV;
     rdVector3 *pVertXYZ;
@@ -81,7 +81,7 @@ void sithRenderSky_TransformHorizontal(rdProcEntry *pProcEntry, sithSurfaceInfo 
 }
 
 // As seen in: Canyon Oasis, Droidworks' `Pulley`
-void sithRenderSky_TransformVertical(rdProcEntry *pProcEntry, sithSurfaceInfo *pSurfaceInfo, rdVector3 *pUntransformedVerts, uint32_t num_vertices)
+void sithRenderSky_CeilingFaceToPlane(rdProcEntry *pProcEntry, sithSurfaceInfo *pSurfaceInfo, rdVector3 *pUntransformedVerts, uint32_t num_vertices)
 {
     rdVector2 *pVertUV;
     rdVector3 a1a;

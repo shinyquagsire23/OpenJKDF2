@@ -2121,11 +2121,11 @@ void sithRender_RenderLevelGeometry()
                 surfaceFlags = v65->surfaceFlags;
                 if (UNLIKELY(surfaceFlags & SITH_SURFACE_HORIZON_SKY))
                 {
-                    sithRenderSky_TransformHorizontal(procEntry, &v65->surfaceInfo, num_vertices);
+                    sithRenderSky_HorizonFaceToPlane(procEntry, &v65->surfaceInfo, num_vertices);
                 }
                 else if (UNLIKELY(surfaceFlags & SITH_SURFACE_CEILING_SKY))
                 {
-                    sithRenderSky_TransformVertical(procEntry, &v65->surfaceInfo, sithRender_aVerticesTmp, num_vertices);
+                    sithRenderSky_CeilingFaceToPlane(procEntry, &v65->surfaceInfo, sithRender_aVerticesTmp, num_vertices);
                 }
                 v57 = v65->surfaceInfo.face.type;
                 procEntry->wallCel = v65->surfaceInfo.face.wallCel;
