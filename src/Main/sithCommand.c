@@ -597,11 +597,11 @@ int sithCommand_Activate(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     {
         if ( _sscanf(pArgStr, "%d", &tmp) >= 1
           && tmp >= 0
-          && sithInventory_aDescriptors[tmp].cog
+          && sithInventory_g_aTypes[tmp].cog
           && sithInventory_IsInventoryAvailable(v2, tmp) )
         {
             sithCog_SendMessage(
-                sithInventory_aDescriptors[tmp].cog,
+                sithInventory_g_aTypes[tmp].cog,
                 SITH_MESSAGE_ACTIVATE,
                 SENDERTYPE_0,
                 tmp,

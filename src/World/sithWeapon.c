@@ -1090,7 +1090,7 @@ int sithWeapon_AutoSelect(sithThing *player, int weapIdx)
     a1a = -1.0;
     for (int i = 0; i < SITHBIN_NUMBINS; i++)
     {
-        sithItemDescriptor* desc =  &sithInventory_aDescriptors[i];
+        sithItemDescriptor* desc =  &sithInventory_g_aTypes[i];
         if (desc->flags & ITEMINFO_WEAPON)
         {
             if (desc->cog)
@@ -1442,9 +1442,9 @@ flex_t sithWeapon_GetPriority(sithThing *player, int binIdx, int mode)
     sithCog *cog; // eax
 
     result = -1.0;
-    if ( (sithInventory_aDescriptors[binIdx].flags & ITEMINFO_WEAPON) != 0 )
+    if ( (sithInventory_g_aTypes[binIdx].flags & ITEMINFO_WEAPON) != 0 )
     {
-        cog = sithInventory_aDescriptors[binIdx].cog;
+        cog = sithInventory_g_aTypes[binIdx].cog;
         if ( cog )
             result = sithCog_SendMessageEx(cog, SITH_MESSAGE_AUTOSELECT, SENDERTYPE_SYSTEM, mode, SENDERTYPE_THING, player->thingIdx, 0, 0.0, 0.0, 0.0, 0.0);
     }

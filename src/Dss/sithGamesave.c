@@ -408,7 +408,7 @@ int sithGamesave_SerializeInventoryOnly(int mpFlags)
         return 0;
     for (int v19 = 0; v19 < SITHBIN_NUMBINS; v19++)
     {
-        if ( (sithInventory_aDescriptors[v19].flags & ITEMINFO_VALID) != 0 )
+        if ( (sithInventory_g_aTypes[v19].flags & ITEMINFO_VALID) != 0 )
             sithDSS_Inventory(sithPlayer_pLocalPlayerThing, v19, 0, mpFlags);
     }
     return 1;
@@ -484,7 +484,7 @@ int sithGamesave_SaveCurrentWorld(int mpFlags)
 
     for (v19 = 0; v19 < SITHBIN_NUMBINS; v19++) // TODO define this maximum
     {
-        if ( (sithInventory_aDescriptors[v19].flags & ITEMINFO_VALID) != 0 )
+        if ( (sithInventory_g_aTypes[v19].flags & ITEMINFO_VALID) != 0 )
             sithDSS_Inventory(sithPlayer_pLocalPlayerThing, v19, 0, mpFlags);
     }
 

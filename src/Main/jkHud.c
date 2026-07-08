@@ -405,7 +405,7 @@ void jkHud_Draw()
                         &std_genBuffer[_strlen(std_genBuffer)],
                         1024 - _strlen(std_genBuffer),
                         " item: %s,",
-                        sithInventory_aDescriptors[v2].fpath);
+                        sithInventory_g_aTypes[v2].fpath);
                 if ( playerThing->type == SITH_THING_PLAYER )
                 {
                     v3 = playerThing->actorParams.playerinfo->curPower;
@@ -414,7 +414,7 @@ void jkHud_Draw()
                             &std_genBuffer[_strlen(std_genBuffer)],
                             1024 - _strlen(std_genBuffer),
                             " force: %s,",
-                            sithInventory_aDescriptors[v3].fpath);
+                            sithInventory_g_aTypes[v3].fpath);
                 }
             }
         }

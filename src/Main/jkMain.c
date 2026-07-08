@@ -927,7 +927,7 @@ int jkMain_sub_403470(char *a1)
 {
     int result; // eax
 
-    sithInventory_549FA0 = 1;
+    sithInventory_g_bInitInventory = 1;
     _strncpy(jkMain_aLevelJklFname, a1, 0x7Fu);
     result = 0;
     jkMain_aLevelJklFname[127] = 0;
@@ -943,7 +943,7 @@ int jkMain_LoadFile(char *a1)
 {
     if (jkRes_LoadCD(1))
     {
-        sithInventory_549FA0 = 1;
+        sithInventory_g_bInitInventory = 1;
         jkRes_LoadGob(a1);
         if ( jkEpisode_mLoad.paEntries )
         {
@@ -1274,7 +1274,7 @@ void jkMain_do_guistate6()
 
 int jkMain_sub_4034D0(char *a1, char *a2, char *a3, wchar_t *a4)
 {
-    sithInventory_549FA0 = 0;
+    sithInventory_g_bInitInventory = 0;
     _strncpy(jkMain_aLevelJklFname, a2, 0x7Fu);
     jkMain_aLevelJklFname[127] = 0;
     _strncpy(jkMain_strIdk, a1, 0x7Fu);

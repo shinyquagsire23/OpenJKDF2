@@ -505,7 +505,7 @@ int sithDSS_ProcessInventory(sithCogMsg *msg)
     //printf("%x %f\n", binIdx, iteminfo->ammoAmt);
 
     // Added: idk if this is necessary
-    sithInventory_aDescriptors[binIdx].flags |= ITEMINFO_VALID;
+    sithInventory_g_aTypes[binIdx].flags |= ITEMINFO_VALID;
 
     return 1;
 }
@@ -882,9 +882,9 @@ void sithDSS_SyncGameState(int sendto_id, int mpFlags)
         NETMSG_PUSHU32(sithInventory_powerKeybinds[i].idk);
     }
 
-    NETMSG_PUSHU32(sithInventory_bUnk);
+    NETMSG_PUSHU32(sithInventory_g_bSendDeactivateMessage);
     NETMSG_PUSHU32(sithInventory_bUnkPower);
-    NETMSG_PUSHU32(sithInventory_549FA0);
+    NETMSG_PUSHU32(sithInventory_g_bInitInventory);
     NETMSG_PUSHU32(sithInventory_8339EC);
     NETMSG_PUSHU32(sithInventory_bRendIsHidden);
     NETMSG_PUSHU32(sithInventory_8339F4);
@@ -950,9 +950,9 @@ int sithDSS_ProcessSyncGameState(sithCogMsg *msg)
         sithInventory_powerKeybinds[i].idk = NETMSG_POPU32();
     }
 
-    sithInventory_bUnk = NETMSG_POPU32();
+    sithInventory_g_bSendDeactivateMessage = NETMSG_POPU32();
     sithInventory_bUnkPower = NETMSG_POPU32();
-    sithInventory_549FA0 = NETMSG_POPU32();
+    sithInventory_g_bInitInventory = NETMSG_POPU32();
     sithInventory_8339EC = NETMSG_POPU32();
     sithInventory_bRendIsHidden = NETMSG_POPU32();
     sithInventory_8339F4 = NETMSG_POPU32();

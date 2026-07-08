@@ -2139,7 +2139,7 @@ int jkPlayer_SetAmmoMaximums(int classIdx)
                     do {
                         iVar1 = (int)pfVar2[-1];
                         if ((-1 < iVar1) && (iVar1 < 200)) {
-                            sithInventory_aDescriptors[iVar1].ammoMax = *pfVar2;
+                            sithInventory_g_aTypes[iVar1].ammoMax = *pfVar2;
                         }
                         pfVar2 = pfVar2 + 2;
                     } while (pfVar2 < &jkPlayer_aMultiParams[61]);

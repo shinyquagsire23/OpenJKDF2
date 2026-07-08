@@ -774,7 +774,7 @@ int jkHudInv_InitItems()
 
     sithInventory_KeybindInit();
     v1 = 0;
-    v2 = sithInventory_aDescriptors;
+    v2 = sithInventory_g_aTypes;
     jkHudInv_numItems = 0;
     for (int i = 0; i < SITHBIN_NUMBINS; i++)
     {
@@ -794,7 +794,7 @@ int jkHudInv_InitItems()
         }
         v3 = jkHudInv_aItems;
         v4 = 0;
-        v5 = sithInventory_aDescriptors;
+        v5 = sithInventory_g_aTypes;
         for (int i = 0; i < SITHBIN_NUMBINS; i++)
         {
             if ( (v5->flags & ITEMINFO_POWER) != 0 )
@@ -884,15 +884,15 @@ void jkHudInv_LoadItemRes()
 #endif
         for (int j = 0; j < SITHBIN_NUMBINS; j++)
         {
-            if ( (sithInventory_aDescriptors[j].flags & (ITEMINFO_POWER|ITEMINFO_ITEM)) != 0 )
+            if ( (sithInventory_g_aTypes[j].flags & (ITEMINFO_POWER|ITEMINFO_ITEM)) != 0 )
             {
-                if ( sithInventory_aDescriptors[j].hudBitmap )
-                    stdBitmap_Free(sithInventory_aDescriptors[j].hudBitmap);
-                sithInventory_aDescriptors[j].hudBitmap = NULL;
+                if ( sithInventory_g_aTypes[j].hudBitmap )
+                    stdBitmap_Free(sithInventory_g_aTypes[j].hudBitmap);
+                sithInventory_g_aTypes[j].hudBitmap = NULL;
                 // TODO ehh
-                stdString_snprintf(a1, 32, "ui\\bm\\ic%.5s%d.bm", sithInventory_aDescriptors[j].fpath, v0);
+                stdString_snprintf(a1, 32, "ui\\bm\\ic%.5s%d.bm", sithInventory_g_aTypes[j].fpath, v0);
                 v4 = stdBitmap_Load(a1, 0, 0);
-                sithInventory_aDescriptors[j].hudBitmap = v4;
+                sithInventory_g_aTypes[j].hudBitmap = v4;
 #ifndef RDMATERIAL_MINIMIZE_STRUCTS
                 stdBitmap_ConvertColorFormat(&Video_format.format, v4);
 #endif
@@ -1009,10 +1009,10 @@ int jkHudInv_Shutdown()
 
     for (int i = 0; i < 100; i++)
     {
-        if ( (sithInventory_aDescriptors[i].flags & 0xA) != 0 && sithInventory_aDescriptors[i].hudBitmap )
+        if ( (sithInventory_g_aTypes[i].flags & 0xA) != 0 && sithInventory_g_aTypes[i].hudBitmap )
         {
-            stdBitmap_Free(sithInventory_aDescriptors[i].hudBitmap);
-            sithInventory_aDescriptors[i].hudBitmap = NULL;
+            stdBitmap_Free(sithInventory_g_aTypes[i].hudBitmap);
+            sithInventory_g_aTypes[i].hudBitmap = NULL;
         }
     }
     return 1;
@@ -1023,6 +1023,6 @@ void jkHudInv_FixAmmoMaximums()
 {
     for (int i = 0; i < SITHBIN_NUMBINS; i++)
     {
-        sithInventory_aDescriptors[i].ammoMax = jkHud_aBinMaxAmt[i];
+        sithInventory_g_aTypes[i].ammoMax = jkHud_aBinMaxAmt[i];
     }
 }
