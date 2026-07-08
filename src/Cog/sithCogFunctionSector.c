@@ -57,13 +57,13 @@ void sithCogFunctionSector_SetSectorAdjoins(sithCog *ctx)
         {
             if ( (sector->flags & 0x80) == 0 )
                 return;
-            sithSector_SetAdjoins(sector);
+            sithSector_ShowSectorAdjoins(sector);
         }
         else
         {
             if ( (sector->flags & 0x80) != 0 )
                 return;
-            sithSector_UnsetAdjoins(sector);
+            sithSector_HideSectorAdjoins(sector);
         }
         if ( COG_SHOULD_SYNC(ctx) )
         {
@@ -232,7 +232,7 @@ void sithCogFunctionSector_GetThingCount(sithCog *ctx)
     sithSector* sector = sithCogExec_PopSector(ctx);
     if ( sector )
     {
-        sithCogExec_PushInt(ctx, sithSector_GetThingsCount(sector));
+        sithCogExec_PushInt(ctx, sithSector_GetSectorThingCount(sector));
     }
     else
     {
@@ -248,7 +248,7 @@ void sithCogFunctionSector_GetPlayerCount(sithCog *ctx)
     v1 = sithCogExec_PopSector(ctx);
     if ( v1 )
     {
-        v2 = sithSector_GetNumPlayers(v1);
+        v2 = sithSector_GetSectorPlayerCount(v1);
         sithCogExec_PushInt(ctx, v2);
     }
     else
@@ -350,7 +350,7 @@ void sithCogFunctionSector_FindSectorAtPos(sithCog *ctx)
     rdVector3 tmp;
     
     sithCogExec_PopVector3(ctx,&tmp);
-    sithSector* pSector = sithSector_sub_4F8D00(sithWorld_pCurrentWorld,&tmp);
+    sithSector* pSector = sithSector_FindSectorAtPos(sithWorld_pCurrentWorld,&tmp);
     if (pSector) {
         sithCogExec_PushInt(ctx, pSector->id);
         return;

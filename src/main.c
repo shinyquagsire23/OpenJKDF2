@@ -1975,9 +1975,9 @@ void do_hooks()
     hook_function(sithPhysics_UpdateThingPhysics_ADDR, sithPhysics_UpdateThingPhysics);
     hook_function(sithPhysics_UpdatePlayerPhysics_ADDR, sithPhysics_UpdatePlayerPhysics);
     hook_function(sithRenderSky_Update_ADDR, sithRenderSky_Update);
-    hook_function(sithSector_New_ADDR, sithSector_New);
+    hook_function(sithSector_AllocWorldSectors_ADDR, sithSector_AllocWorldSectors);
     hook_function(sithSector_NewEntry_ADDR, sithSector_NewEntry);
-    hook_function(sithSector_Free_ADDR, sithSector_Free);
+    hook_function(sithSector_FreeWorldSectors_ADDR, sithSector_FreeWorldSectors);
     hook_function(sithPlayer_Open_ADDR, sithPlayer_Open);
     hook_function(sithPlayer_sub_4C93B0_ADDR, sithPlayer_SetBinItemActive);
     hook_function(sithPlayer_sub_4C93F0_ADDR, sithPlayer_GetBinItemActive);

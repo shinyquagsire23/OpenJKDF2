@@ -212,12 +212,12 @@ int sithDSS_ProcessSectorStatus(sithCogMsg *msg)
             goto LABEL_11;
 LABEL_9:
         if ( (sector->flags & SITH_SECTOR_ADJOINS_SET) == 0 )
-            sithSector_SetAdjoins(sector);
+            sithSector_ShowSectorAdjoins(sector);
     }
     else {
         if (oldSectorFlags & SITH_SECTOR_ADJOINS_SET)
             goto LABEL_9;
-        sithSector_UnsetAdjoins(sector);
+        sithSector_HideSectorAdjoins(sector);
     }
 LABEL_11:
 
@@ -267,7 +267,7 @@ int sithDSS_ProcessSectorFlags(sithCogMsg *msg)
         {
             if (!(oldFlags & SITH_SECTOR_ADJOINS_SET))
             {
-                sithSector_UnsetAdjoins(pSector);
+                sithSector_HideSectorAdjoins(pSector);
                 return 1;
             }
         }
@@ -277,7 +277,7 @@ int sithDSS_ProcessSectorFlags(sithCogMsg *msg)
         }
 
         if (!(pSector->flags & SITH_SECTOR_ADJOINS_SET))
-            sithSector_SetAdjoins(pSector);
+            sithSector_ShowSectorAdjoins(pSector);
 
         return 1;
     }

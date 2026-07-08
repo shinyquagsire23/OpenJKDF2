@@ -27,7 +27,7 @@
 #include "Dss/sithDSS.h"
 
 // MOTS altered
-int sithSector_Load(sithWorld *world, int tmp)
+int sithSector_ReadSectorsListText(sithWorld *world, int tmp)
 {
     unsigned int alloc_size; // ebx
     sithSector *v6; // eax
@@ -217,7 +217,7 @@ int sithSector_GetIdxFromPtr(sithSector *sector)
     return sector && sector->id == sector - sithWorld_pCurrentWorld->sectors && sector->id < (unsigned int)sithWorld_pCurrentWorld->numSectors;
 }
 
-void sithSector_SetAdjoins(sithSector *sector)
+void sithSector_ShowSectorAdjoins(sithSector *sector)
 {
     sithAdjoin *i; // esi
 
@@ -226,7 +226,7 @@ void sithSector_SetAdjoins(sithSector *sector)
     sector->flags &= ~SITH_SECTOR_ADJOINS_SET;
 }
 
-void sithSector_UnsetAdjoins(sithSector *sector)
+void sithSector_HideSectorAdjoins(sithSector *sector)
 {
     sithAdjoin *i; // esi
 
@@ -235,7 +235,7 @@ void sithSector_UnsetAdjoins(sithSector *sector)
     sector->flags |= SITH_SECTOR_ADJOINS_SET;
 }
 
-int sithSector_GetThingsCount(sithSector *sector)
+int sithSector_GetSectorThingCount(sithSector *sector)
 {
     int result; // eax
     sithThing *i; // ecx
@@ -246,7 +246,7 @@ int sithSector_GetThingsCount(sithSector *sector)
     return result;
 }
 
-int sithSector_New(sithWorld *world, int num)
+int sithSector_AllocWorldSectors(sithWorld *world, int num)
 {
     sithSector *sectors;
     { TWL_EXTRAM_SUGGEST(pSithHS); // Added: word-width fields/writes (audited)
@@ -275,7 +275,7 @@ void sithSector_NewEntry(sithSector *sector, int idx)
     sector->thingsList = NULL;
 }
 
-void sithSector_Free(sithWorld *world)
+void sithSector_FreeWorldSectors(sithWorld *world)
 {
     for (uint32_t i = 0; i < world->numSectors; i++)
     {
@@ -287,7 +287,7 @@ void sithSector_Free(sithWorld *world)
     world->numSectors = 0;
 }
 
-int sithSector_GetNumPlayers(sithSector *sector)
+int sithSector_GetSectorPlayerCount(sithSector *sector)
 {
     int result; // eax
     sithThing *i; // ecx
@@ -342,7 +342,7 @@ void sithSector_SyncSector(sithSector *pSector, int a2)
     }
 }
 
-void sithSector_Sync()
+void sithSector_SyncSectors()
 {
     uint32_t i; // esi
 
@@ -356,7 +356,7 @@ void sithSector_Sync()
     sithSector_numSync = 0;
 }
 
-sithSector* sithSector_sub_4F8D00(sithWorld *pWorld, rdVector3 *pos)
+sithSector* sithSector_FindSectorAtPos(sithWorld *pWorld, rdVector3 *pos)
 {
     int v2; // ebx
     unsigned int v3; // ebp

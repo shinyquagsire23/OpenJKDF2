@@ -1266,7 +1266,7 @@ void sithMulti_HandleTimeLimit(int deltaMs)
 
     sithThing_Sync();
     sithSurface_Sync();
-    sithSector_Sync();
+    sithSector_SyncSectors();
     if ( sithMulti_leaveJoinType && sithTime_curMs > sithMulti_leaveJoinWaitMs )
     {
         if ( sithMulti_leaveJoinType == 1 )
