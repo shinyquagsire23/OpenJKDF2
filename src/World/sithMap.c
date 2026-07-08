@@ -85,7 +85,7 @@ LABEL_11:
         color = sithMap_ctx.playerColor;
     rdMatrix_TransformPoint34(&vertex_out, &v2->position, &sithMap_camera);
     a2a = sithMap_pPlayerThing->moveSize + sithMap_pPlayerThing->moveSize;
-    rdPrimit3_DrawCircle(&vertex_out, a2a, 20.0, color, -1);
+    rdPrimit3_DrawClippedCircle(&vertex_out, a2a, 20.0, color, -1);
 }
 
 void sithMap_sub_4EC4D0(sithSector *sector)
@@ -320,7 +320,7 @@ LABEL_22:
                 {
                     rdMatrix_TransformPoint34(&vertex_out, &i->position, &sithMap_camera);
                     xOffs = i->moveSize + i->moveSize;
-                    rdPrimit3_DrawCircle(&vertex_out, xOffs, 20.0, (uint8_t)circleColor, -1);
+                    rdPrimit3_DrawClippedCircle(&vertex_out, xOffs, 20.0, (uint8_t)circleColor, -1);
                 }
             }
         }

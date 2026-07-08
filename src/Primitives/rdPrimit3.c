@@ -899,7 +899,7 @@ int rdPrimit3_GetScreenCoord(rdVector3 *vec, rdScreenPoint *screenpt)
     return 1;
 }
 
-void rdPrimit3_DrawCircle(rdVector3 *pVecPos, flex_t xOffs, flex_t radius, int color16, int mask)
+void rdPrimit3_DrawClippedCircle(rdVector3 *pVecPos, flex_t xOffs, flex_t radius, int color16, int mask)
 {
     flex_t v5; // [esp+0h] [ebp-40h]
     rdVector3 vertex_out; // [esp+10h] [ebp-30h] BYREF
