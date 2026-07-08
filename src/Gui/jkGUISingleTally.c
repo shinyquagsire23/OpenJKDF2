@@ -46,13 +46,13 @@ int jkGuiSingleTally_Show()
     jkGuiSingleTally_buttons[0].wstr = jkPlayer_playerShortName;
     stdString_snprintf(std_genBuffer, 1024, "RANK_%d_%c", jkPlayer_GetJediRank(), (jkPlayer_CalcAlignment(0) >= 0.0) ? 'L' : 'D');
     jkGuiSingleTally_buttons[1].wstr = jkStrings_GetUniStringWithFallback(std_genBuffer);
-    if ( (int)sithPlayer_GetBinAmt(SITHBIN_MAXSECRETS) <= 0 )
+    if ( (int)sithPlayer_GetInvItemAmount(SITHBIN_MAXSECRETS) <= 0 )
     {
         jk_snwprintf(v14, 0x20u, L"%ls %ls", jkStrings_GetUniStringWithFallback("GUI_SECRETS_FOUND"), jkStrings_GetUniStringWithFallback("GUI_NO_SECRETS"));
     }
     else
     {
-        jk_snwprintf(v14, 0x20u, L"%ls %d/%d", jkStrings_GetUniStringWithFallback("GUI_SECRETS_FOUND"), (int)sithPlayer_GetBinAmt(SITHBIN_SECRETS), (int)sithPlayer_GetBinAmt(SITHBIN_MAXSECRETS));
+        jk_snwprintf(v14, 0x20u, L"%ls %d/%d", jkStrings_GetUniStringWithFallback("GUI_SECRETS_FOUND"), (int)sithPlayer_GetInvItemAmount(SITHBIN_SECRETS), (int)sithPlayer_GetInvItemAmount(SITHBIN_MAXSECRETS));
     }
     jkGuiSingleTally_buttons[2].wstr = v14;
     jkGuiSingleTally_buttons[3].wstr = jkStrings_GetUniStringWithFallback("GUI_STARS_EARNED");
@@ -103,7 +103,7 @@ void jkGuiSingleTally_ForceStarsRender(jkGuiElement *element, jkGuiMenu *menu, s
     int v4; // esi
     stdVBuffer *v5; // ebp
 
-    v3 = (__int64)sithPlayer_GetBinAmt(SITHBIN_NEW_STARS);
+    v3 = (__int64)sithPlayer_GetInvItemAmount(SITHBIN_NEW_STARS);
     if ( v3 > 0 )
     {
         v4 = 0;

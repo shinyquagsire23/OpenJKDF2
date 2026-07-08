@@ -748,7 +748,7 @@ int sithDSSThing_ProcessDeath(sithCogMsg *msg)
         {
             if ( cause == 1 )
             {
-                sithPlayer_HandleSentDeathPkt(pSender);
+                sithPlayer_KillPlayer(pSender);
                 return 1;
             }
             sithActor_KillActor(pSender, pReceiver, 0);

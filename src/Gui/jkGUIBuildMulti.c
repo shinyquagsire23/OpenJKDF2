@@ -1307,8 +1307,8 @@ LABEL_16:
         }
     }
     while ( v7 );
-    sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS, (flex_d_t)jkPlayer_GetJediRank() * 3.0);
-    sithPlayer_SetBinAmt(SITHBIN_NEW_STARS, 0.0);
+    sithPlayer_SetInvItemAmount(SITHBIN_SPEND_STARS, (flex_d_t)jkPlayer_GetJediRank() * 3.0);
+    sithPlayer_SetInvItemAmount(SITHBIN_NEW_STARS, 0.0);
     if (Main_bMotsCompat) {
         if (jkGuiBuildMulti_pNewCharacterElements[5].selectedTextEntry == 0) {
             jkPlayer_personality = 1;

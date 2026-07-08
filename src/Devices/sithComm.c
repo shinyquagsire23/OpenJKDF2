@@ -249,7 +249,7 @@ int sithMessage_ProcessMessages()
         ++v13;
         if ( sithComm_netMsgTmp.netMsg.thingIdx )
         {
-            v1 = sithPlayer_ThingIdxToPlayerIdx(sithComm_netMsgTmp.netMsg.thingIdx);
+            v1 = sithPlayer_GetPlayerNum(sithComm_netMsgTmp.netMsg.thingIdx);
             v2 = sithComm_netMsgTmp.netMsg.cogMsgId;
             if ( v1 >= 0 )
             {
@@ -394,7 +394,7 @@ int sithComm_cogMsg_Reset(sithCogMsg *msg)
     NETMSG_IN_START(msg);
 
     v1 = NETMSG_POPS16();
-    playerIdx = sithPlayer_ThingIdxToPlayerIdx(msg->netMsg.thingIdx);
+    playerIdx = sithPlayer_GetPlayerNum(msg->netMsg.thingIdx);
     foundIdx = 0;
 #ifdef SITHCOMM_HEAP_MSGBUF
     if ( !sithComm_MsgTmpBuf ) // Added: no tracked messages to ack

@@ -537,7 +537,7 @@ void sithOpenPostProcess()
 
     if ( sithNet_isMulti )
     {
-        sithPlayer_debug_ToNextCheckpoint(sithPlayer_pLocalPlayerThing);
+        sithPlayer_NewPlayer(sithPlayer_pLocalPlayerThing);
         sithMulti_SendWelcome(stdComm_dplayIdSelf, playerThingIdx, -1);
         sithMulti_SendWelcome(stdComm_dplayIdSelf, playerThingIdx, -1);
         sithTime_Startup();

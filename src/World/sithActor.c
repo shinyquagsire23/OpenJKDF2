@@ -249,7 +249,7 @@ void sithActor_KillActor(sithThing *thing, sithThing *a3, int a4)
             sithAIAwareness_CreateTransmittingEvent(thing->sector, &thing->position, 0, 5.0, a3);
         }
         if ( thing->type == SITH_THING_PLAYER )
-            sithPlayer_sub_4C9150(thing, a3);
+            sithPlayer_PlayerKilledAction(thing, a3);
 
         // MOTS added: quiet death
         if (!Main_bMotsCompat || a4 != 12345678) {

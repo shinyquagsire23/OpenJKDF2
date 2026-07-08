@@ -482,7 +482,7 @@ void jkPlayer_CreateConf(wchar_t *name)
     sithControl_DefaultInit();
     jkHudInv_InputInit();
     jkPlayer_SetRank(0);
-    sithPlayer_SetBinAmt(SITHBIN_CHOICE, 0.0);
+    sithPlayer_SetInvItemAmount(SITHBIN_CHOICE, 0.0);
     sithWeapon_InitDefaults();
     jkGame_SetDefaultSettings();
     stdString_SafeWStrCopy(jkPlayer_playerShortName, name, 32);
@@ -1236,12 +1236,12 @@ int jkPlayer_GetMpcInfo(wchar_t *name, char *model, char *soundclass, char *side
 
 void jkPlayer_SetChoice(signed int amt)
 {
-    sithPlayer_SetBinAmt(SITHBIN_CHOICE, (flex_t)amt); // FLEXTODO
+    sithPlayer_SetInvItemAmount(SITHBIN_CHOICE, (flex_t)amt); // FLEXTODO
 }
 
 int jkPlayer_GetChoice()
 {
-    return (int)sithPlayer_GetBinAmt(SITHBIN_CHOICE);
+    return (int)sithPlayer_GetInvItemAmount(SITHBIN_CHOICE);
 }
 
 //MOTS altered
@@ -1256,8 +1256,8 @@ flex_t jkPlayer_CalcAlignment(int isMp)
 
     if (!isMp)
     {
-        flex_t pedsKilled = sithPlayer_GetBinAmt(SITHBIN_PEDS_KILLED);
-        flex_t totalPeds = sithPlayer_GetBinAmt(SITHBIN_PEDS_TOTAL);
+        flex_t pedsKilled = sithPlayer_GetInvItemAmount(SITHBIN_PEDS_KILLED);
+        flex_t totalPeds = sithPlayer_GetInvItemAmount(SITHBIN_PEDS_TOTAL);
 
         if (totalPeds <= 0.0) // Prevent div 0
             alignment -= -20.0;
@@ -1273,7 +1273,7 @@ flex_t jkPlayer_CalcAlignment(int isMp)
     if ( alignment < -100.0 )
         alignment = -100.0;
 
-    sithPlayer_SetBinAmt(SITHBIN_ALIGNMENT, alignment);
+    sithPlayer_SetInvItemAmount(SITHBIN_ALIGNMENT, alignment);
 
     return alignment;
 }
@@ -1285,14 +1285,14 @@ void jkPlayer_MpcInitBins(sithPlayerInfo* unk)
 
     jkPlayer_MPCParse(&info, unk, jkPlayer_playerShortName, jkPlayer_name, 1);
     jkPlayer_InitForceBins();
-    if ( (unsigned int)(__int64)sithPlayer_GetBinAmt(SITHBIN_CHOICE) != 1 && (unsigned int)(__int64)sithPlayer_GetBinAmt(SITHBIN_CHOICE) != 2 )
+    if ( (unsigned int)(__int64)sithPlayer_GetInvItemAmount(SITHBIN_CHOICE) != 1 && (unsigned int)(__int64)sithPlayer_GetInvItemAmount(SITHBIN_CHOICE) != 2 )
     {
         alignment = jkPlayer_CalcStarsAlign();
         if ( alignment > 100.0 )
             alignment = 100.0;
         if ( alignment < -100.0 )
             alignment = -100.0;
-        sithPlayer_SetBinAmt(SITHBIN_ALIGNMENT, alignment);
+        sithPlayer_SetInvItemAmount(SITHBIN_ALIGNMENT, alignment);
     }
 }
 
@@ -1418,12 +1418,12 @@ int jkPlayer_MPCBinWrite()
     v0 = SITHBIN_FP_START;
     while ( 1 )
     {
-        if ( !stdConffile_Printf("bin: %d value: %f\n", v0, sithPlayer_GetBinAmt(v0)) )
+        if ( !stdConffile_Printf("bin: %d value: %f\n", v0, sithPlayer_GetInvItemAmount(v0)) )
             break;
 
         if ( ++v0 > SITHBIN_FP_END )
         {
-            return stdConffile_Printf("spendable stars: %f\n", sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS));
+            return stdConffile_Printf("spendable stars: %f\n", sithPlayer_GetInvItemAmount(SITHBIN_SPEND_STARS));
         }
     }
 
@@ -1442,14 +1442,14 @@ int jkPlayer_MPCBinRead()
         if ( !stdConffile_ReadLine() || _sscanf(stdConffile_aLine, "bin: %d value: %f\n", &v3, &a2) != 2 )
             return 0;
 
-        sithPlayer_SetBinAmt(i, a2);
-        sithPlayer_SetBinCarries(i, 1);
+        sithPlayer_SetInvItemAmount(i, a2);
+        sithPlayer_SetInvItemAvailable(i, 1);
     }
 
     if ( !stdConffile_ReadLine() || _sscanf(stdConffile_aLine, "spendable stars: %f\n", &a2) != 1 )
         return 0;
 
-    sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS, a2);
+    sithPlayer_SetInvItemAmount(SITHBIN_SPEND_STARS, a2);
     return 1;
 }
 
@@ -1459,7 +1459,7 @@ void jkPlayer_InitForceBins()
     {
         if ( i != SITHBIN_JEDI_RANK )
         {
-            if ( sithPlayer_GetBinAmt(i) > 0.0 && jkPlayer_playerInfos[playerThingIdx].iteminfo[i].state & ITEMSTATE_CARRIES)
+            if ( sithPlayer_GetInvItemAmount(i) > 0.0 && jkPlayer_playerInfos[playerThingIdx].iteminfo[i].state & ITEMSTATE_CARRIES)
             {
                 jkPlayer_playerInfos[playerThingIdx].iteminfo[i].state |= ITEMSTATE_AVAILABLE;
             }
@@ -1478,14 +1478,14 @@ int jkPlayer_GetAlignment()
     int bHasDarkPowers = 0;
     for (int i = SITHBIN_F_THROW; i <= SITHBIN_F_DESTRUCTION; ++i )
     {
-        if ( sithPlayer_GetBinAmt(i) > 0.0 )
+        if ( sithPlayer_GetInvItemAmount(i) > 0.0 )
             bHasDarkPowers = 1;
     }
 
     int bHasLightPowers = 0;
     for (int j = SITHBIN_F_HEALING; j <= SITHBIN_F_ABSORB; ++j )
     {
-        if ( sithPlayer_GetBinAmt(j) > 0.0 )
+        if ( sithPlayer_GetInvItemAmount(j) > 0.0 )
             bHasLightPowers = 1;
     }
 
@@ -1503,11 +1503,11 @@ int jkPlayer_GetAlignment()
     }
     if ( !bHasDarkPowers )
     {
-        if ( (unsigned int)(__int64)sithPlayer_GetBinAmt(SITHBIN_CHOICE) == 1 )
+        if ( (unsigned int)(__int64)sithPlayer_GetInvItemAmount(SITHBIN_CHOICE) == 1 )
         {
             v4 = 100.0;
         }
-        else if ( (unsigned int)(__int64)sithPlayer_GetBinAmt(SITHBIN_CHOICE) == 2 )
+        else if ( (unsigned int)(__int64)sithPlayer_GetInvItemAmount(SITHBIN_CHOICE) == 2 )
         {
             v4 = -100.0;
         }
@@ -1579,7 +1579,7 @@ void jkPlayer_ResetPowers()
     for (int i = SITHBIN_FP_START; i <= SITHBIN_FP_END; ++i )
     {
         if ( i != SITHBIN_JEDI_RANK )
-            sithPlayer_SetBinAmt(i, 0.0);
+            sithPlayer_SetInvItemAmount(i, 0.0);
     }
 }
 
@@ -1757,16 +1757,16 @@ void jkPlayer_FixStars()
     if (Main_bMotsCompat) return;
 
     v0 = 3 * jkPlayer_GetJediRank();
-    v1 = (__int64)sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS);
+    v1 = (__int64)sithPlayer_GetInvItemAmount(SITHBIN_SPEND_STARS);
     for ( i = SITHBIN_FP_START; i <= SITHBIN_FP_END; ++i )
     {
         if ( i != SITHBIN_JEDI_RANK && i != SITHBIN_F_PROTECTION && i != SITHBIN_F_DEADLYSIGHT )
-            v1 += (__int64)sithPlayer_GetBinAmt(i);
+            v1 += (__int64)sithPlayer_GetInvItemAmount(i);
     }
     if ( v0 > v1 )
     {
         a2 = (flex_t)(v0 - v1); // FLEXTODO
-        sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS, a2);
+        sithPlayer_SetInvItemAmount(SITHBIN_SPEND_STARS, a2);
         return;
     }
     if ( v0 < v1 )
@@ -1777,91 +1777,91 @@ void jkPlayer_FixStars()
             while ( 1 )
             {
                 // TODO un-inline whatever this is
-                v4 = (__int64)sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS);
+                v4 = (__int64)sithPlayer_GetInvItemAmount(SITHBIN_SPEND_STARS);
                 if ( (int)v4 > 0 )
                     break;
-                v5 = (__int64)sithPlayer_GetBinAmt(SITHBIN_F_DESTRUCTION);
+                v5 = (__int64)sithPlayer_GetInvItemAmount(SITHBIN_F_DESTRUCTION);
                 if ( (int)v5 > 0 )
                 {
                     a2b = (flex_t)(v5 - 1); // FLEXTODO
-                    sithPlayer_SetBinAmt(SITHBIN_F_DESTRUCTION, a2b);
+                    sithPlayer_SetInvItemAmount(SITHBIN_F_DESTRUCTION, a2b);
                     goto LABEL_37;
                 }
-                v6 = (__int64)sithPlayer_GetBinAmt(SITHBIN_F_ABSORB);
+                v6 = (__int64)sithPlayer_GetInvItemAmount(SITHBIN_F_ABSORB);
                 if ( (int)v6 > 0 )
                 {
                     a2c = (flex_t)(v6 - 1); // FLEXTODO
-                    sithPlayer_SetBinAmt(SITHBIN_F_ABSORB, a2c);
+                    sithPlayer_SetInvItemAmount(SITHBIN_F_ABSORB, a2c);
                     goto LABEL_37;
                 }
-                v7 = (__int64)sithPlayer_GetBinAmt(SITHBIN_F_LIGHTNING);
+                v7 = (__int64)sithPlayer_GetInvItemAmount(SITHBIN_F_LIGHTNING);
                 if ( (int)v7 > 0 )
                 {
                     a2d = (flex_t)(v7 - 1); // FLEXTODO
-                    sithPlayer_SetBinAmt(SITHBIN_F_LIGHTNING, a2d);
+                    sithPlayer_SetInvItemAmount(SITHBIN_F_LIGHTNING, a2d);
                     goto LABEL_37;
                 }
-                v8 = (__int64)sithPlayer_GetBinAmt(SITHBIN_F_BLINDING);
+                v8 = (__int64)sithPlayer_GetInvItemAmount(SITHBIN_F_BLINDING);
                 if ( (int)v8 > 0 )
                 {
                     a2e = (flex_t)(v8 - 1); // FLEXTODO
-                    sithPlayer_SetBinAmt(SITHBIN_F_BLINDING, a2e);
+                    sithPlayer_SetInvItemAmount(SITHBIN_F_BLINDING, a2e);
                     goto LABEL_37;
                 }
-                v9 = (__int64)sithPlayer_GetBinAmt(SITHBIN_F_GRIP);
+                v9 = (__int64)sithPlayer_GetInvItemAmount(SITHBIN_F_GRIP);
                 if ( (int)v9 > 0 )
                 {
                     a2f = (flex_t)(v9 - 1); // FLEXTODO
-                    sithPlayer_SetBinAmt(SITHBIN_F_GRIP, a2f);
+                    sithPlayer_SetInvItemAmount(SITHBIN_F_GRIP, a2f);
                     goto LABEL_37;
                 }
-                v10 = (__int64)sithPlayer_GetBinAmt(SITHBIN_F_PERSUASION);
+                v10 = (__int64)sithPlayer_GetInvItemAmount(SITHBIN_F_PERSUASION);
                 if ( (int)v10 > 0 )
                 {
                     a2g = (flex_t)(v10 - 1); // FLEXTODO
-                    sithPlayer_SetBinAmt(SITHBIN_F_PERSUASION, a2g);
+                    sithPlayer_SetInvItemAmount(SITHBIN_F_PERSUASION, a2g);
                     goto LABEL_37;
                 }
-                v11 = (__int64)sithPlayer_GetBinAmt(SITHBIN_F_THROW);
+                v11 = (__int64)sithPlayer_GetInvItemAmount(SITHBIN_F_THROW);
                 if ( (int)v11 > 0 )
                 {
                     a2h = (flex_t)(v11 - 1); // FLEXTODO
-                    sithPlayer_SetBinAmt(SITHBIN_F_THROW, a2h);
+                    sithPlayer_SetInvItemAmount(SITHBIN_F_THROW, a2h);
                     goto LABEL_37;
                 }
-                v12 = (__int64)sithPlayer_GetBinAmt(SITHBIN_F_HEALING);
+                v12 = (__int64)sithPlayer_GetInvItemAmount(SITHBIN_F_HEALING);
                 if ( (int)v12 > 0 )
                 {
                     a2i = (flex_t)(v12 - 1); // FLEXTODO
-                    sithPlayer_SetBinAmt(SITHBIN_F_HEALING, a2i);
+                    sithPlayer_SetInvItemAmount(SITHBIN_F_HEALING, a2i);
                     goto LABEL_37;
                 }
-                v13 = (__int64)sithPlayer_GetBinAmt(SITHBIN_F_PULL);
+                v13 = (__int64)sithPlayer_GetInvItemAmount(SITHBIN_F_PULL);
                 if ( (int)v13 > 0 )
                 {
                     a2j = (flex_t)(v13 - 1); // FLEXTODO
-                    sithPlayer_SetBinAmt(SITHBIN_F_PULL, a2j);
+                    sithPlayer_SetInvItemAmount(SITHBIN_F_PULL, a2j);
                     goto LABEL_37;
                 }
-                v14 = (__int64)sithPlayer_GetBinAmt(SITHBIN_F_SEEING);
+                v14 = (__int64)sithPlayer_GetInvItemAmount(SITHBIN_F_SEEING);
                 if ( (int)v14 > 0 )
                 {
                     a2k = (flex_t)(v14 - 1); // FLEXTODO
-                    sithPlayer_SetBinAmt(SITHBIN_F_SEEING, a2k);
+                    sithPlayer_SetInvItemAmount(SITHBIN_F_SEEING, a2k);
                     goto LABEL_37;
                 }
-                v15 = (__int64)sithPlayer_GetBinAmt(SITHBIN_F_SPEED);
+                v15 = (__int64)sithPlayer_GetInvItemAmount(SITHBIN_F_SPEED);
                 if ( (int)v15 > 0 )
                 {
                     a2l = (flex_t)(v15 - 1); // FLEXTODO
-                    sithPlayer_SetBinAmt(SITHBIN_F_SPEED, a2l);
+                    sithPlayer_SetInvItemAmount(SITHBIN_F_SPEED, a2l);
                     goto LABEL_37;
                 }
-                v16 = (__int64)sithPlayer_GetBinAmt(SITHBIN_F_JUMP);
+                v16 = (__int64)sithPlayer_GetInvItemAmount(SITHBIN_F_JUMP);
                 if ( (int)v16 > 0 )
                 {
                     a2m = (flex_t)(v16 - 1); // FLEXTODO
-                    sithPlayer_SetBinAmt(SITHBIN_F_JUMP, a2m);
+                    sithPlayer_SetInvItemAmount(SITHBIN_F_JUMP, a2m);
                     goto LABEL_37;
                 }
 LABEL_38:
@@ -1869,7 +1869,7 @@ LABEL_38:
                     return;
             }
             a2a = (flex_t)(v4 - 1); // FLEXTODO
-            sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS, a2a);
+            sithPlayer_SetInvItemAmount(SITHBIN_SPEND_STARS, a2a);
 LABEL_37:
             --v3;
             goto LABEL_38;
@@ -1886,13 +1886,13 @@ flex_t jkPlayer_CalcStarsAlign()
 
     for (int i = SITHBIN_F_THROW; i <= SITHBIN_F_DESTRUCTION; ++i )
     {
-        flex_t amt = sithPlayer_GetBinAmt(i);
+        flex_t amt = sithPlayer_GetInvItemAmount(i);
         alignment -= amt * 6.25;
     }
     
     for (int j = SITHBIN_F_HEALING; j <= SITHBIN_F_ABSORB; ++j )
     {
-        flex_t amt = sithPlayer_GetBinAmt(j);
+        flex_t amt = sithPlayer_GetInvItemAmount(j);
         alignment -= amt * -6.25;
     }
     
@@ -1909,28 +1909,28 @@ int jkPlayer_SetProtectionDeadlysight()
     int hasNoDarkside = 1;
     for (int i = SITHBIN_F_THROW; i <= SITHBIN_F_DESTRUCTION; ++i )
     {
-        if (sithPlayer_GetBinAmt(i) > 0.0)
+        if (sithPlayer_GetInvItemAmount(i) > 0.0)
             hasNoDarkside = 0;
     }
 
     int hasFullDarkside = 1;
     for (int j = SITHBIN_F_THROW; j <= SITHBIN_F_DESTRUCTION; ++j )
     {
-        if (sithPlayer_GetBinAmt(j) < 4.0)
+        if (sithPlayer_GetInvItemAmount(j) < 4.0)
             hasFullDarkside = 0;
     }
 
     int hasNoLightside = 1;
     for (int k = SITHBIN_F_HEALING; k <= SITHBIN_F_ABSORB; ++k )
     {
-        if (sithPlayer_GetBinAmt(k) > 0.0)
+        if (sithPlayer_GetInvItemAmount(k) > 0.0)
             hasNoLightside = 0;
     }
 
     int hasFullLightside = 1;
     for (int l = SITHBIN_F_HEALING; l <= SITHBIN_F_ABSORB; ++l )
     {
-        if (sithPlayer_GetBinAmt(l) < 4.0)
+        if (sithPlayer_GetInvItemAmount(l) < 4.0)
             hasFullLightside = 0;
     }
 
@@ -1938,7 +1938,7 @@ int jkPlayer_SetProtectionDeadlysight()
     for (int m = SITHBIN_FP_START; m <= SITHBIN_F_PULL; ++m )
     {
         if (m == SITHBIN_JEDI_RANK) continue;
-        if (sithPlayer_GetBinAmt(m) > 0.0)
+        if (sithPlayer_GetInvItemAmount(m) > 0.0)
             hasNoNeutral = 0;
     }
 
@@ -1946,24 +1946,24 @@ int jkPlayer_SetProtectionDeadlysight()
     {
         if ( hasFullLightside && hasNoDarkside && hasNoNeutral )
         {
-            sithPlayer_SetBinAmt(SITHBIN_F_PROTECTION, 4.0);
-            sithPlayer_SetBinCarries(SITHBIN_F_PROTECTION, 1);
-            sithPlayer_SetBinAmt(SITHBIN_F_DEADLYSIGHT, 0.0);
-            sithPlayer_SetBinCarries(SITHBIN_F_DEADLYSIGHT, 0);
+            sithPlayer_SetInvItemAmount(SITHBIN_F_PROTECTION, 4.0);
+            sithPlayer_SetInvItemAvailable(SITHBIN_F_PROTECTION, 1);
+            sithPlayer_SetInvItemAmount(SITHBIN_F_DEADLYSIGHT, 0.0);
+            sithPlayer_SetInvItemAvailable(SITHBIN_F_DEADLYSIGHT, 0);
             return 1;
         }
         if ( hasFullDarkside && hasNoLightside && hasNoNeutral )
         {
-            sithPlayer_SetBinAmt(SITHBIN_F_DEADLYSIGHT, 4.0);
-            sithPlayer_SetBinCarries(SITHBIN_F_DEADLYSIGHT, 1);
-            sithPlayer_SetBinAmt(SITHBIN_F_PROTECTION, 0.0);
-            sithPlayer_SetBinCarries(SITHBIN_F_PROTECTION, 0);
+            sithPlayer_SetInvItemAmount(SITHBIN_F_DEADLYSIGHT, 4.0);
+            sithPlayer_SetInvItemAvailable(SITHBIN_F_DEADLYSIGHT, 1);
+            sithPlayer_SetInvItemAmount(SITHBIN_F_PROTECTION, 0.0);
+            sithPlayer_SetInvItemAvailable(SITHBIN_F_PROTECTION, 0);
             return 2;
         }
-        sithPlayer_SetBinAmt(SITHBIN_F_PROTECTION, 0.0);
-        sithPlayer_SetBinCarries(SITHBIN_F_PROTECTION, 0);
-        sithPlayer_SetBinAmt(SITHBIN_F_DEADLYSIGHT, 0.0);
-        sithPlayer_SetBinCarries(SITHBIN_F_DEADLYSIGHT, 0);
+        sithPlayer_SetInvItemAmount(SITHBIN_F_PROTECTION, 0.0);
+        sithPlayer_SetInvItemAvailable(SITHBIN_F_PROTECTION, 0);
+        sithPlayer_SetInvItemAmount(SITHBIN_F_DEADLYSIGHT, 0.0);
+        sithPlayer_SetInvItemAvailable(SITHBIN_F_DEADLYSIGHT, 0);
     }
     return 0;
 }
@@ -1983,24 +1983,24 @@ void jkPlayer_DisallowOtherSide(int rank)
         if ( align >= 0.0 )
         {
             for (int i = SITHBIN_F_THROW; i < SITHBIN_F_DESTRUCTION; i++)
-                sithPlayer_SetBinCarries(i, 1);
+                sithPlayer_SetInvItemAvailable(i, 1);
             for (int k = SITHBIN_F_HEALING; k <= SITHBIN_F_ABSORB; ++k )
-                sithPlayer_SetBinCarries(k, 1);
+                sithPlayer_SetInvItemAvailable(k, 1);
         }
         else
         {
             for (int i = SITHBIN_F_THROW; i < SITHBIN_F_DESTRUCTION; i++)
-                sithPlayer_SetBinCarries(i, 1);
+                sithPlayer_SetInvItemAvailable(i, 1);
             for (int l = SITHBIN_F_HEALING; l <= SITHBIN_F_ABSORB; ++l )
-                sithPlayer_SetBinCarries(l, 0);
+                sithPlayer_SetInvItemAvailable(l, 0);
         }
     }
     else
     {
         for (int m = SITHBIN_F_THROW; m <= SITHBIN_F_DESTRUCTION; ++m )
-            sithPlayer_SetBinCarries(m, 0);
+            sithPlayer_SetInvItemAvailable(m, 0);
         for (int n = SITHBIN_F_HEALING; n <= SITHBIN_F_ABSORB; ++n )
-            sithPlayer_SetBinCarries(n, 1);
+            sithPlayer_SetInvItemAvailable(n, 1);
     }
 }
 
@@ -2032,12 +2032,12 @@ int jkPlayer_ReadOptionsConf()
 
 int jkPlayer_GetJediRank()
 {
-    return (int)(__int64)(sithPlayer_GetBinAmt(SITHBIN_JEDI_RANK));
+    return (int)(__int64)(sithPlayer_GetInvItemAmount(SITHBIN_JEDI_RANK));
 }
 
 void jkPlayer_SetRank(int rank)
 {
-    sithPlayer_SetBinAmt(SITHBIN_JEDI_RANK, (flex_t)rank); // FLEXTODO
+    sithPlayer_SetInvItemAmount(SITHBIN_JEDI_RANK, (flex_t)rank); // FLEXTODO
 }
 
 // MOTS added
@@ -2163,14 +2163,14 @@ void jkPlayer_idkEndLevel(void)
 {
     if (!Main_bMotsCompat) return;
 
-    int lVar3 = (int)sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS);
-    int lVar4 = (int)sithPlayer_GetBinAmt(SITHBIN_NEW_STARS);
-    int lVar5 = (int)sithPlayer_GetBinAmt(SITHBIN_F_DEFENSE);
+    int lVar3 = (int)sithPlayer_GetInvItemAmount(SITHBIN_SPEND_STARS);
+    int lVar4 = (int)sithPlayer_GetInvItemAmount(SITHBIN_NEW_STARS);
+    int lVar5 = (int)sithPlayer_GetInvItemAmount(SITHBIN_F_DEFENSE);
     int local_4 = lVar3 + lVar4 + (lVar5 * 2);
 
     for (int iVar1 = SITHBIN_F_DEFENSE; iVar1 <= SITHBIN_FP_END; iVar1++) {
         if ((iVar1 != SITHBIN_JEDI_RANK) && (iVar1 != SITHBIN_F_DEFENSE)) {
-            lVar3 = (int)sithPlayer_GetBinAmt(iVar1);
+            lVar3 = (int)sithPlayer_GetInvItemAmount(iVar1);
             local_4 = local_4 + lVar3;
         }
     }
@@ -2183,7 +2183,7 @@ void jkPlayer_idkEndLevel(void)
         local_4 = 8;
     }
 
-    sithPlayer_SetBinAmt(SITHBIN_JEDI_RANK,(flex_t)local_4); // FLEXTODO
+    sithPlayer_SetInvItemAmount(SITHBIN_JEDI_RANK,(flex_t)local_4); // FLEXTODO
 }
 
 // MOTS added
@@ -2213,40 +2213,40 @@ int jkPlayer_SyncForcePowers(int rank,int bIsMulti)
 
     if (bIsMulti == 0) 
     {
-        sithPlayer_SetBinAmt(SITHBIN_F_DEFENSE,0.0);
+        sithPlayer_SetInvItemAmount(SITHBIN_F_DEFENSE,0.0);
         if (((0 < rank) &&
-            (fVar9 = sithPlayer_GetBinAmt(SITHBIN_F_JUMP), fVar9 < 1.0)) &&
-           (fVar9 = sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS), 0.0 < fVar9)) 
+            (fVar9 = sithPlayer_GetInvItemAmount(SITHBIN_F_JUMP), fVar9 < 1.0)) &&
+           (fVar9 = sithPlayer_GetInvItemAmount(SITHBIN_SPEND_STARS), 0.0 < fVar9)) 
         {
-            sithPlayer_SetBinAmt(SITHBIN_F_JUMP,1.0);
-            fVar9 = sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS);
-            sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS,(flex_t)(fVar9 - 1.0)); // FLEXTODO
+            sithPlayer_SetInvItemAmount(SITHBIN_F_JUMP,1.0);
+            fVar9 = sithPlayer_GetInvItemAmount(SITHBIN_SPEND_STARS);
+            sithPlayer_SetInvItemAmount(SITHBIN_SPEND_STARS,(flex_t)(fVar9 - 1.0)); // FLEXTODO
         }
 
         if (((1 < rank) &&
-            (fVar9 = sithPlayer_GetBinAmt(SITHBIN_F_PULL), fVar9 < 1.0)) &&
-           (fVar9 = sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS), 0.0 < fVar9)) 
+            (fVar9 = sithPlayer_GetInvItemAmount(SITHBIN_F_PULL), fVar9 < 1.0)) &&
+           (fVar9 = sithPlayer_GetInvItemAmount(SITHBIN_SPEND_STARS), 0.0 < fVar9)) 
         {
-            sithPlayer_SetBinAmt(SITHBIN_F_PULL,1.0);
-            fVar9 = sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS);
-            sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS,(flex_t)(fVar9 - 1.0)); // FLEXTODO
+            sithPlayer_SetInvItemAmount(SITHBIN_F_PULL,1.0);
+            fVar9 = sithPlayer_GetInvItemAmount(SITHBIN_SPEND_STARS);
+            sithPlayer_SetInvItemAmount(SITHBIN_SPEND_STARS,(flex_t)(fVar9 - 1.0)); // FLEXTODO
         }
 
-        if (((3 < rank) && (fVar9 = sithPlayer_GetBinAmt(SITHBIN_F_SEEING), fVar9 < 1.0)) &&
-           (fVar9 = sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS), 0.0 < fVar9)) 
+        if (((3 < rank) && (fVar9 = sithPlayer_GetInvItemAmount(SITHBIN_F_SEEING), fVar9 < 1.0)) &&
+           (fVar9 = sithPlayer_GetInvItemAmount(SITHBIN_SPEND_STARS), 0.0 < fVar9)) 
         {
-            sithPlayer_SetBinAmt(SITHBIN_F_SEEING,1.0);
-            fVar9 = sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS);
-            sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS,(flex_t)(fVar9 - 1.0)); // FLEXTODO
+            sithPlayer_SetInvItemAmount(SITHBIN_F_SEEING,1.0);
+            fVar9 = sithPlayer_GetInvItemAmount(SITHBIN_SPEND_STARS);
+            sithPlayer_SetInvItemAmount(SITHBIN_SPEND_STARS,(flex_t)(fVar9 - 1.0)); // FLEXTODO
         }
 
         iVar3 = rank;
-        if (((4 < rank) && (fVar9 = sithPlayer_GetBinAmt(SITHBIN_F_PERSUASION), fVar9 < 1.0)) &&
-           (fVar9 = sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS), 0.0 < fVar9)) 
+        if (((4 < rank) && (fVar9 = sithPlayer_GetInvItemAmount(SITHBIN_F_PERSUASION), fVar9 < 1.0)) &&
+           (fVar9 = sithPlayer_GetInvItemAmount(SITHBIN_SPEND_STARS), 0.0 < fVar9)) 
         {
-            sithPlayer_SetBinAmt(SITHBIN_F_PERSUASION,1.0);
-            fVar9 = sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS);
-            sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS,(flex_t)(fVar9 - 1.0)); // FLEXTODO
+            sithPlayer_SetInvItemAmount(SITHBIN_F_PERSUASION,1.0);
+            fVar9 = sithPlayer_GetInvItemAmount(SITHBIN_SPEND_STARS);
+            sithPlayer_SetInvItemAmount(SITHBIN_SPEND_STARS,(flex_t)(fVar9 - 1.0)); // FLEXTODO
         }
     }
     else 
@@ -2262,9 +2262,9 @@ int jkPlayer_SyncForcePowers(int rank,int bIsMulti)
             pfVar4 = pfVar4 + 1;
         } while (pfVar4 < &jkPlayer_aMultiParams[0x8C]);
 
-        fVar9 = sithPlayer_GetBinAmt(SITHBIN_F_DEFENSE);
+        fVar9 = sithPlayer_GetInvItemAmount(SITHBIN_F_DEFENSE);
         if (fVar9 < jkPlayer_aMultiParams[119]) {
-            sithPlayer_SetBinAmt(SITHBIN_F_DEFENSE,jkPlayer_aMultiParams[119]);
+            sithPlayer_SetInvItemAmount(SITHBIN_F_DEFENSE,jkPlayer_aMultiParams[119]);
         }
         iVar5 = SITHBIN_F_DEFENSE;
         pfVar4 = jkPlayer_aMultiParams + 0x77;
@@ -2272,9 +2272,9 @@ int jkPlayer_SyncForcePowers(int rank,int bIsMulti)
         do {
             if ((pfVar4 != jkPlayer_aMultiParams + 0x78) && (pfVar4 != jkPlayer_aMultiParams + 0x77)
                ) {
-                fVar9 = sithPlayer_GetBinAmt(iVar5);
+                fVar9 = sithPlayer_GetInvItemAmount(iVar5);
                 if (fVar9 < *pfVar4) {
-                    sithPlayer_SetBinAmt(iVar5,*pfVar4);
+                    sithPlayer_SetInvItemAmount(iVar5,*pfVar4);
                 }
             }
             pfVar4 = pfVar4 + 1;
@@ -2282,12 +2282,12 @@ int jkPlayer_SyncForcePowers(int rank,int bIsMulti)
         } while (pfVar4 < &jkPlayer_aMultiParams[0x8C]);
     }
 
-    iVar5 = (int)sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS) + (int)sithPlayer_GetBinAmt(SITHBIN_F_DEFENSE) * 2;
+    iVar5 = (int)sithPlayer_GetInvItemAmount(SITHBIN_SPEND_STARS) + (int)sithPlayer_GetInvItemAmount(SITHBIN_F_DEFENSE) * 2;
     iVar6 = SITHBIN_F_DEFENSE;
     do 
     {
         if ((iVar6 != SITHBIN_JEDI_RANK) && (iVar6 != SITHBIN_F_DEFENSE)) {
-            iVar5 += (int)sithPlayer_GetBinAmt(iVar6);
+            iVar5 += (int)sithPlayer_GetInvItemAmount(iVar6);
         }
         iVar6 = iVar6 + 1;
     } while (iVar6 < SITHBIN_BACTATANK);
@@ -2298,17 +2298,17 @@ int jkPlayer_SyncForcePowers(int rank,int bIsMulti)
     {
         if (iVar3 < iVar5) {
             iVar5 = iVar5 - iVar3;
-            iVar3 = (int)sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS);
+            iVar3 = (int)sithPlayer_GetInvItemAmount(SITHBIN_SPEND_STARS);
             if (iVar3 < iVar5) {
                 iVar5 = iVar5 - iVar3;
-                sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS,0.0);
+                sithPlayer_SetInvItemAmount(SITHBIN_SPEND_STARS,0.0);
                 if (0 < iVar5) {
                     do {
-                        fVar9 = sithPlayer_GetBinAmt(SITHBIN_F_DEFENSE);
+                        fVar9 = sithPlayer_GetInvItemAmount(SITHBIN_F_DEFENSE);
                         if (fVar9 <= jkPlayer_aMultiParams[119]) break;
                         iVar5 = iVar5 + -2;
-                        fVar9 = sithPlayer_GetBinAmt(SITHBIN_F_DEFENSE);
-                        sithPlayer_SetBinAmt(SITHBIN_F_DEFENSE,(flex_t)(fVar9 - 1.0)); // FLEXTODO
+                        fVar9 = sithPlayer_GetInvItemAmount(SITHBIN_F_DEFENSE);
+                        sithPlayer_SetInvItemAmount(SITHBIN_F_DEFENSE,(flex_t)(fVar9 - 1.0)); // FLEXTODO
                     } while (0 < iVar5);
 
                     if (0 < iVar5) {
@@ -2318,10 +2318,10 @@ int jkPlayer_SyncForcePowers(int rank,int bIsMulti)
                             if ((pfVar4 != jkPlayer_aMultiParams + 0x78) &&
                                (pfVar4 != jkPlayer_aMultiParams + 0x77)) {
                                 while ((0 < iVar5 &&
-                                       (fVar9 = sithPlayer_GetBinAmt(iVar3),
+                                       (fVar9 = sithPlayer_GetInvItemAmount(iVar3),
                                        *pfVar4 < fVar9))) {
-                                    fVar9 = sithPlayer_GetBinAmt(iVar3);
-                                    sithPlayer_SetBinAmt(iVar3,(flex_t)(fVar9 - 1.0)); // FLEXTODO
+                                    fVar9 = sithPlayer_GetInvItemAmount(iVar3);
+                                    sithPlayer_SetInvItemAmount(iVar3,(flex_t)(fVar9 - 1.0)); // FLEXTODO
                                     iVar5 = iVar5 + -1;
                                     if (iVar5 == 0) goto LAB_0040747a;
                                 }
@@ -2337,7 +2337,7 @@ LAB_0040747a:
                 bIsMulti = -iVar5;
             }
             else {
-                sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS,(flex_t)(iVar3 - iVar5)); // FLEXTODO
+                sithPlayer_SetInvItemAmount(SITHBIN_SPEND_STARS,(flex_t)(iVar3 - iVar5)); // FLEXTODO
                 bIsMulti = 0;
             }
         }
@@ -2354,7 +2354,7 @@ LAB_004074a0:
     }
 
     if ((0 < rank) ||
-       (fVar9 = sithPlayer_GetBinAmt(SITHBIN_F_DEFENSE), 
+       (fVar9 = sithPlayer_GetInvItemAmount(SITHBIN_F_DEFENSE), 
        0.0 < fVar9)) 
     {
         jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_DEFENSE].state |= ITEMSTATE_CARRIES;
@@ -2363,7 +2363,7 @@ LAB_004074a0:
     local_c = jkPlayer_aMotsFpBins + 0x18;
     do 
     {
-        if (jkPlayer_aMotsFpBins[(int)sithPlayer_GetBinAmt(SITHBIN_F_DEFENSE) + 0x44] < local_4) {
+        if (jkPlayer_aMotsFpBins[(int)sithPlayer_GetInvItemAmount(SITHBIN_F_DEFENSE) + 0x44] < local_4) {
             local_8 = 0;
         }
         else {
@@ -2374,7 +2374,7 @@ LAB_004074a0:
         piVar2 = local_c;
         do {
             if ((*piVar2 != 0) &&
-               (fVar9 = sithPlayer_GetBinAmt(*piVar2), 0.0 < fVar9)) {
+               (fVar9 = sithPlayer_GetInvItemAmount(*piVar2), 0.0 < fVar9)) {
                 iVar3 = iVar3 + 1;
             }
             iVar6 = playerThingIdx;
@@ -2400,8 +2400,8 @@ LAB_004074a0:
                 if (iVar3 <= local_8) break;
                 iVar6 = *piVar2;
                 if ((iVar6 != 0) && (jkPlayer_aMultiParams[iVar6 + 100] < 1.0)) {
-                    bIsMulti = bIsMulti + (int)sithPlayer_GetBinAmt(iVar6);
-                    sithPlayer_SetBinAmt(iVar6,0.0);
+                    bIsMulti = bIsMulti + (int)sithPlayer_GetInvItemAmount(iVar6);
+                    sithPlayer_SetInvItemAmount(iVar6,0.0);
                 }
                 iVar5 = iVar5 + 1;
                 piVar2 = piVar2 + 1;
@@ -2412,7 +2412,7 @@ LAB_004074a0:
             do {
                 iVar5 = *piVar2;
                 if ((iVar5 != 0) &&
-                   (fVar9 = sithPlayer_GetBinAmt(iVar5), 0.0 < fVar9)) {
+                   (fVar9 = sithPlayer_GetInvItemAmount(iVar5), 0.0 < fVar9)) {
                     jkPlayer_playerInfos[playerThingIdx].iteminfo[iVar5].state |= ITEMSTATE_CARRIES;
                 }
                 piVar2 = piVar2 + 1;

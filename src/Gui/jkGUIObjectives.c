@@ -119,8 +119,8 @@ int jkGuiObjectives_Show()
                 v2->str = v3;
         }
     }
-    v4 = (__int64)sithPlayer_GetBinAmt(SITHBIN_SECRETS);
-    v5 = sithPlayer_GetBinAmt(SITHBIN_MAXSECRETS);
+    v4 = (__int64)sithPlayer_GetInvItemAmount(SITHBIN_SECRETS);
+    v5 = sithPlayer_GetInvItemAmount(SITHBIN_MAXSECRETS);
     if ( (int)(__int64)v5 <= 0 )
     {
         v9 = jkStrings_GetUniStringWithFallback("GUI_NO_SECRETS");

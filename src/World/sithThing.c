@@ -257,7 +257,7 @@ void sithThing_TickAll(flex_t deltaSeconds, int deltaMs)
             switch ( pThingIter->type )
             {
                 case SITH_THING_PLAYER:
-                    sithPlayer_Tick(pThingIter->actorParams.playerinfo, deltaSeconds);
+                    sithPlayer_Update(pThingIter->actorParams.playerinfo, deltaSeconds);
                 case SITH_THING_ACTOR:
                     sithActor_Update(pThingIter, deltaMs);
                     break;

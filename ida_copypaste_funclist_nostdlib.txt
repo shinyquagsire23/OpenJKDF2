@@ -1812,30 +1812,30 @@ sithRender_RenderAlphaSurfaces	.text	004C8220	000003D6	00000014	00000000	R	.	.	.
 sithRender_SetRenderWeaponHandle	.text	004C8600	0000000F	00000000	00000004	R	.	.	.	.	.	T	.
 sithPlayer_Open	.text	004C8610	00000001	00000000	00000000	R	.	.	.	.	.	.	.
 sithPlayer_Close	.text	004C8620	00000042			R	.	.	.	.	.	.	.
-sithPlayer_NewEntry	.text	004C8670	000000D6	00000010	00000004	R	.	.	.	.	.	T	.
+sithPlayer_PlacePlayers	.text	004C8670	000000D6	00000010	00000004	R	.	.	.	.	.	T	.
 sithPlayer_Startup	.text	004C8750	00000068	00000004	00000004	R	.	.	.	.	.	T	.
-sithPlayer_sub_4C87C0	.text	004C87C0	0000004E	00000000	00000008	R	.	.	.	.	.	T	.
-sithPlayer_idk	.text	004C8810	000000B3	00000008	00000004	R	.	.	.	.	.	T	.
+sithPlayer_ShowPlayer	.text	004C87C0	0000004E	00000000	00000008	R	.	.	.	.	.	T	.
+sithPlayer_SetLocalPlayer	.text	004C8810	000000B3	00000008	00000004	R	.	.	.	.	.	T	.
 sithPlayer_ResetPalEffects	.text	004C88D0	00000032			R	.	.	.	.	.	T	.
-sithPlayer_sub_4C8910	.text	004C8910	000000B9	00000004	00000004	R	.	.	.	.	.	T	.
-sithPlayer_Tick	.text	004C89D0	0000023C	00000004	00000008	R	.	.	.	.	.	T	.
+sithPlayer_Reset	.text	004C8910	000000B9	00000004	00000004	R	.	.	.	.	.	T	.
+sithPlayer_Update	.text	004C89D0	0000023C	00000004	00000008	R	.	.	.	.	.	T	.
 sithPlayer_AddDynamicTint	.text	004C8C10	000000BF	00000000	0000000C	R	.	.	.	.	.	T	.
 sithPlayer_AddDyamicAdd	.text	004C8CD0	00000060	00000000	0000000C	R	.	.	.	.	.	T	.
 sithPlayer_SetScreenTint	.text	004C8D30	000000DC	00000000	0000000C	R	.	.	.	.	.	T	.
 sithPlayer_debug_loadauto	.text	004C8E10	000000A9	00000084	00000004	R	.	.	.	.	.	T	.
-sithPlayer_debug_ToNextCheckpoint	.text	004C8EC0	0000019F	00000008	00000004	R	.	.	.	.	.	T	.
+sithPlayer_NewPlayer	.text	004C8EC0	0000019F	00000008	00000004	R	.	.	.	.	.	T	.
 sithPlayer_sub_4C9060	.text	004C9060	0000005E	00000004	00000008	R	.	.	.	.	.	T	.
-sithPlayer_FindPlayerByName	.text	004C90C0	0000005B	00000010	00000004	R	.	.	.	.	.	T	.
-sithPlayer_ThingIdxToPlayerIdx	.text	004C9120	0000002E	00000004	00000004	R	.	.	.	.	.	T	.
-sithPlayer_sub_4C9150	.text	004C9150	00000086	0000000C	00000008	R	.	.	.	.	.	T	.
-sithPlayer_HandleSentDeathPkt	.text	004C91E0	00000161	00000088	00000004	R	.	.	.	.	.	T	.
-sithPlayer_GetBinAmt	.text	004C9350	00000025	00000000	00000004	R	.	.	.	.	.	T	.
-sithPlayer_SetBinAmt	.text	004C9380	00000029	00000000	00000008	R	.	.	.	.	.	T	.
+sithPlayer_GetPlayerNumByName	.text	004C90C0	0000005B	00000010	00000004	R	.	.	.	.	.	T	.
+sithPlayer_GetPlayerNum	.text	004C9120	0000002E	00000004	00000004	R	.	.	.	.	.	T	.
+sithPlayer_PlayerKilledAction	.text	004C9150	00000086	0000000C	00000008	R	.	.	.	.	.	T	.
+sithPlayer_KillPlayer	.text	004C91E0	00000161	00000088	00000004	R	.	.	.	.	.	T	.
+sithPlayer_GetInvItemAmount	.text	004C9350	00000025	00000000	00000004	R	.	.	.	.	.	T	.
+sithPlayer_SetInvItemAmount	.text	004C9380	00000029	00000000	00000008	R	.	.	.	.	.	T	.
 sithPlayer_sub_4C93B0	.text	004C93B0	0000003D	00000000	00000008	R	.	.	.	.	.	.	.
 sithPlayer_sub_4C93F0	.text	004C93F0	0000002C	00000000	00000004	R	.	.	.	.	.	.	.
-sithPlayer_GetNum	.text	004C9420	0000004E	00000008	00000004	R	.	.	.	.	.	T	.
-sithPlayer_GetNumidk	.text	004C9470	0000004A	0000000C	00000004	R	.	.	.	.	.	.	.
-sithPlayer_SetBinCarries	.text	004C94C0	0000003D	00000000	00000008	R	.	.	.	.	.	T	.
+sithPlayer_GetThingPlayerNum	.text	004C9420	0000004E	00000008	00000004	R	.	.	.	.	.	T	.
+sithPlayer_GetThingPlayerNumByIndex	.text	004C9470	0000004A	0000000C	00000004	R	.	.	.	.	.	.	.
+sithPlayer_SetInvItemAvailable	.text	004C94C0	0000003D	00000000	00000008	R	.	.	.	.	.	T	.
 sithPlayer_idk2	.text	004C9500	0000002C	00000000	00000004	R	.	.	.	.	.	.	.
 stdComm_Startup	.text	004C9530	0000001C			R	.	.	.	.	.	.	.
 stdComm_Shutdown	.text	004C9550	00000019			R	.	.	.	.	.	T	.

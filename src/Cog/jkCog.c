@@ -435,7 +435,7 @@ void jkCog_PrintUniString(sithCog *ctx)
 
     v3 = v2;
     if ( v2 >= 0 )
-        v3 = sithPlayer_GetNumidk(v2);
+        v3 = sithPlayer_GetThingPlayerNumByIndex(v2);
     stdString_snprintf(key, 64, "COG_%05d", v1);
 
     // Added: Allow openjkdf2_i8n.uni to override everything
@@ -846,9 +846,9 @@ void jkCog_StringOutput(sithCog *ctx)
     v1 = sithCogExec_PopInt(ctx);
     v2 = sithCogExec_PopInt(ctx);
     if ( v1 >= 0 )
-        v1 = sithPlayer_GetNumidk(v1);
+        v1 = sithPlayer_GetThingPlayerNumByIndex(v1);
     if ( v2 >= 0 )
-        v2 = sithPlayer_GetNumidk(v2);
+        v2 = sithPlayer_GetThingPlayerNumByIndex(v2);
     stdString_WcharToChar(v5, jkCog_jkstring, 127);
     v5[127] = 0;
     if ( v2 >= 0 )

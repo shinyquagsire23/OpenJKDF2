@@ -677,7 +677,7 @@ int sithCommand_PingPlayer(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     {
         stdString_CharToWchar(v4, pArgStr, 31);
         v4[31] = 0;
-        v2 = sithPlayer_FindPlayerByName(v4);
+        v2 = sithPlayer_GetPlayerNumByName(v4);
         if ( v2 < 0 )
         {
             _sprintf(std_genBuffer, "Player %s not found", (const char *)v4);

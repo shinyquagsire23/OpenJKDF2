@@ -1981,7 +1981,7 @@ void do_hooks()
     hook_function(sithPlayer_Open_ADDR, sithPlayer_Open);
     hook_function(sithPlayer_sub_4C93B0_ADDR, sithPlayer_SetBinItemActive);
     hook_function(sithPlayer_sub_4C93F0_ADDR, sithPlayer_GetBinItemActive);
-    hook_function(sithPlayer_idk2_ADDR, sithPlayer_GetBinItemAvailable);
+    hook_function(sithPlayer_idk2_ADDR, sithPlayer_IsInvItemAvailable);
     hook_function(sithRenderSky_HorizonFaceToPlane_ADDR, sithRenderSky_HorizonFaceToPlane);
     hook_function(sithPhysics_SetThingLook_ADDR, sithPhysics_SetThingLook);
     hook_function(sithPhysics_ApplyForce_ADDR, sithPhysics_ApplyForce);
@@ -2174,15 +2174,15 @@ void do_hooks()
 
     // sithPlayer
     hook_function(sithPlayer_Startup_ADDR, sithPlayer_Startup);
-    hook_function(sithPlayer_GetBinAmt_ADDR, sithPlayer_GetBinAmt);
-    hook_function(sithPlayer_SetBinAmt_ADDR, sithPlayer_SetBinAmt);
+    hook_function(sithPlayer_GetInvItemAmount_ADDR, sithPlayer_GetInvItemAmount);
+    hook_function(sithPlayer_SetInvItemAmount_ADDR, sithPlayer_SetInvItemAmount);
     hook_function(sithPlayer_ResetPalEffects_ADDR, sithPlayer_ResetPalEffects);
-    hook_function(sithPlayer_idk_ADDR, sithPlayer_idk);
+    hook_function(sithPlayer_SetLocalPlayer_ADDR, sithPlayer_SetLocalPlayer);
     hook_function(sithPlayer_AddDynamicTint_ADDR, sithPlayer_AddDynamicTint);
-    hook_function(sithPlayer_HandleSentDeathPkt_ADDR, sithPlayer_HandleSentDeathPkt);
-    hook_function(sithPlayer_sub_4C9150_ADDR, sithPlayer_sub_4C9150);
+    hook_function(sithPlayer_KillPlayer_ADDR, sithPlayer_KillPlayer);
+    hook_function(sithPlayer_PlayerKilledAction_ADDR, sithPlayer_PlayerKilledAction);
     hook_function(sithPlayer_AddDyamicAdd_ADDR, sithPlayer_AddDyamicAdd);
-    hook_function(sithPlayer_GetNumidk_ADDR, sithPlayer_GetNumidk);
+    hook_function(sithPlayer_GetThingPlayerNumByIndex_ADDR, sithPlayer_GetThingPlayerNumByIndex);
 
     // sithPhysics
     hook_function(sithPhysics_FindFloor_ADDR, sithPhysics_FindFloor);

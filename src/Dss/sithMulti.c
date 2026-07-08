@@ -128,7 +128,7 @@ int sithMulti_StartupServer()
     sithNet_multiplayer_timelimit = sithMulti_multiplayerTimelimit;
     for (uint32_t i = 0; i < 32; ++i )
     {
-        sithPlayer_sub_4C8910(i);
+        sithPlayer_Reset(i);
         sithPlayer_Startup(i);
     }
     sithNet_teamScore[0] = 0;
@@ -136,8 +136,8 @@ int sithMulti_StartupServer()
     sithNet_teamScore[2] = 0;
     sithNet_teamScore[3] = 0;
     sithNet_teamScore[4] = 0;
-    sithPlayer_sub_4C87C0(0, stdComm_dplayIdSelf);
-    sithPlayer_idk(0);
+    sithPlayer_ShowPlayer(0, stdComm_dplayIdSelf);
+    sithPlayer_SetLocalPlayer(0);
     sithPlayer_ResetPalEffects();
 
     // Added: dedicated server
@@ -161,7 +161,7 @@ int sithMulti_StartupClient()
     sithNet_isMulti = 1;
     for (uint32_t i = 0; i < 32; ++i )
     {
-        sithPlayer_sub_4C8910(i);
+        sithPlayer_Reset(i);
         sithPlayer_Startup(i);
     }
     sithNet_teamScore[0] = 0;
@@ -593,7 +593,7 @@ int sithMulti_ProcessWelcome(sithCogMsg *msg)
     {
         if ( (jkPlayer_playerInfos[v1].flags & 1) == 0 )
         {
-            sithPlayer_sub_4C87C0(v1, v2);
+            sithPlayer_ShowPlayer(v1, v2);
             v8 = sithStrTable_GetUniStringWithFallback("%s_HAS_JOINED_THE_GAME");
             jk_snwprintf(a1a, 0x80u, v8, jkPlayer_playerInfos[v1].player_name);
             sithConsole_PrintWString(a1a);
@@ -625,8 +625,8 @@ int sithMulti_ProcessWelcome(sithCogMsg *msg)
     }
     g_submodeFlags &= ~8u;
     sithThing_sub_4CCE60();
-    sithPlayer_sub_4C87C0(v1, v2);
-    sithPlayer_idk(v1); // sets playerThingIdx and info
+    sithPlayer_ShowPlayer(v1, v2);
+    sithPlayer_SetLocalPlayer(v1); // sets playerThingIdx and info
     sithPlayer_ResetPalEffects();
     sithEvent_RegisterTask(2, sithMulti_CheckPlayers, sithNet_tickrate, 1);
     sithMessage_StopProcessMessages();
@@ -691,7 +691,7 @@ int sithMulti_ProcessQuit(sithCogMsg *msg)
     }
     else
     {
-        v3 = sithPlayer_ThingIdxToPlayerIdx(msg->pktData[0]);
+        v3 = sithPlayer_GetPlayerNum(msg->pktData[0]);
         v4 = v3;
         if ( v3 >= 0 )
         {
@@ -1149,7 +1149,7 @@ int sithMulti_ProcessJoinRequest(sithCogMsg *msg)
         if ( v7 != DirectPlay_numPlayers )
         {
             sithMulti_verbosePrintf("aaaaaa %x\n", sithMulti_requestConnectIdx);
-            sithPlayer_sub_4C8910(sithMulti_requestConnectIdx);
+            sithPlayer_Reset(sithMulti_requestConnectIdx);
 
             NETMSG_POPWSTR(jkPlayer_playerInfos[sithMulti_requestConnectIdx].player_name, 0x10);
             NETMSG_POPWSTR(jkPlayer_playerInfos[sithMulti_requestConnectIdx].multi_name, 0x20);
@@ -1479,7 +1479,7 @@ int sithMulti_map_init_related()
 
     for (uint32_t i = 0; i < 0x20; i++)
     {
-        sithPlayer_sub_4C8910(i);
+        sithPlayer_Reset(i);
         sithPlayer_Startup(i);
     }
 
@@ -1489,8 +1489,8 @@ int sithMulti_map_init_related()
     sithNet_teamScore[3] = 0;
     sithNet_teamScore[4] = 0;
 
-    sithPlayer_sub_4C87C0(0, stdComm_dplayIdSelf);
-    sithPlayer_idk(0);
+    sithPlayer_ShowPlayer(0, stdComm_dplayIdSelf);
+    sithPlayer_SetLocalPlayer(0);
     sithPlayer_ResetPalEffects();
 
     stdComm_DoReceive();
@@ -1504,7 +1504,7 @@ int sithMulti_ResetNetState()
 
     for (uint32_t i = 0; i < 0x20; i++)
     {
-        sithPlayer_sub_4C8910(i);
+        sithPlayer_Reset(i);
         sithPlayer_Startup(i);
     }
 

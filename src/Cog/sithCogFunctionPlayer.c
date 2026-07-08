@@ -146,7 +146,7 @@ void sithCogFunctionPlayer_GetPlayerNum(sithCog *ctx)
     sithThing* player = sithCogExec_PopThing(ctx);
     if (player 
         && player->type == SITH_THING_PLAYER 
-        && (playerIdx = sithPlayer_GetNum(player), playerIdx != -1))
+        && (playerIdx = sithPlayer_GetThingPlayerNum(player), playerIdx != -1))
         sithCogExec_PushInt(ctx, playerIdx);
     else
         sithCogExec_PushInt(ctx, -1);

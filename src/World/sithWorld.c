@@ -329,7 +329,7 @@ int sithWorld_NewEntry(sithWorld *pWorld)
                     v2 = v12;
                 }
             }
-            sithPlayer_NewEntry(pWorld);
+            sithPlayer_PlacePlayers(pWorld);
             for (int i = 0; i < pWorld->numThingsLoaded; i++)
             {
                 v16 = &pWorld->things[i];
@@ -679,7 +679,7 @@ int sithWorld_Initialize()
     {
         sithPlayer_Startup(i);
     }
-    sithPlayer_idk(0);
+    sithPlayer_SetLocalPlayer(0);
     sithPlayer_ResetPalEffects();
     return 1;
 }

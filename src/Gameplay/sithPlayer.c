@@ -60,7 +60,7 @@ void sithPlayer_Close()
     sithPlayer_pLocalPlayer = 0;
 }
 
-void sithPlayer_NewEntry(sithWorld *world)
+void sithPlayer_PlacePlayers(sithWorld *world)
 {
     sithThing *v1; // eax
     int v2; // ecx
@@ -107,7 +107,7 @@ int sithPlayer_GetBinItemActive(int binIdx)
     return (jkPlayer_playerInfos[playerThingIdx].iteminfo[binIdx].state & 4) >> 2;
 }
 
-int sithPlayer_GetBinItemAvailable(int binIdx)
+int sithPlayer_IsInvItemAvailable(int binIdx)
 {
     return (jkPlayer_playerInfos[playerThingIdx].iteminfo[binIdx].state & 8) >> 3;
 }
@@ -120,7 +120,7 @@ void sithPlayer_SetBinItemActive(int binIdx, int active)
         jkPlayer_playerInfos[playerThingIdx].iteminfo[binIdx].state &= ~4;
 }
 
-flex_t sithPlayer_GetBinAmt(int idx)
+flex_t sithPlayer_GetInvItemAmount(int idx)
 {
     //if (idx)
     //    jk_printf("Get %u: %f\n", idx, jkPlayer_playerInfos[playerThingIdx].iteminfo[idx].ammoAmt);
@@ -128,12 +128,12 @@ flex_t sithPlayer_GetBinAmt(int idx)
     return jkPlayer_playerInfos[playerThingIdx].iteminfo[idx].ammoAmt;
 }
 
-void sithPlayer_SetBinAmt(int idx, flex_t amt)
+void sithPlayer_SetInvItemAmount(int idx, flex_t amt)
 {
     jkPlayer_playerInfos[playerThingIdx].iteminfo[idx].ammoAmt = amt;
 }
 
-int sithPlayer_GetNum(sithThing *player)
+int sithPlayer_GetThingPlayerNum(sithThing *player)
 {
     int i;
 
@@ -156,7 +156,7 @@ int sithPlayer_GetNum(sithThing *player)
     return -1;
 }
 
-void sithPlayer_idk(int idx)
+void sithPlayer_SetLocalPlayer(int idx)
 {
     unsigned int v6; // eax
 
@@ -195,7 +195,7 @@ void sithPlayer_ResetPalEffects()
     sithPlayer_pLocalPlayer->palEffectsIdx2 = stdPalEffects_NewRequest(2);
 }
 
-void sithPlayer_Tick(sithPlayerInfo *playerInfo, flex_t a2)
+void sithPlayer_Update(sithPlayerInfo *playerInfo, flex_t a2)
 {
     int v2; // edi
     sithThing *v3; // esi
@@ -257,7 +257,7 @@ void sithPlayer_Tick(sithPlayerInfo *playerInfo, flex_t a2)
         {
             pPalEffect->fade -= a2 * 0.7;
             if (pPalEffect->fade <= 0.0)
-                sithPlayer_HandleSentDeathPkt(v3);
+                sithPlayer_KillPlayer(v3);
         }
     }
 }
@@ -268,7 +268,7 @@ void sithPlayer_debug_loadauto(sithThing *player)
 
     if ( (g_submodeFlags & 1) != 0 || (g_debugmodeFlags & DEBUGFLAG_IN_EDITOR) != 0 )
     {
-        sithPlayer_debug_ToNextCheckpoint(player);
+        sithPlayer_NewPlayer(player);
     }
     else if ( !sithGamesave_Restore(sithGamesave_autosave_fname, 0, 0) )
     {
@@ -352,7 +352,7 @@ int sithPlayer_sub_4C9060(sithThing *thing1, sithThing *thing2)
     return 0;
 }
 
-void sithPlayer_HandleSentDeathPkt(sithThing *thing)
+void sithPlayer_KillPlayer(sithThing *thing)
 {
     sithPlayerInfo *v1; // edi
     char v4[128]; // [esp+8h] [ebp-80h] BYREF
@@ -382,7 +382,7 @@ void sithPlayer_HandleSentDeathPkt(sithThing *thing)
     }
 }
 
-void sithPlayer_sub_4C9150(sithThing *player, sithThing *killedBy)
+void sithPlayer_PlayerKilledAction(sithThing *player, sithThing *killedBy)
 {
     sithPlayerInfo *v5; // edi
 
@@ -400,7 +400,7 @@ void sithPlayer_sub_4C9150(sithThing *player, sithThing *killedBy)
         sithControl_death_msgtimer = sithTime_curMs + 3000;
 }
 
-int sithPlayer_GetNumidk(int a1)
+int sithPlayer_GetThingPlayerNumByIndex(int a1)
 {
     int result; // eax
     sithPlayerInfo* i;
@@ -418,7 +418,7 @@ int sithPlayer_GetNumidk(int a1)
     return result;
 }
 
-void sithPlayer_SetBinCarries(int binIdx, int bCarries)
+void sithPlayer_SetInvItemAvailable(int binIdx, int bCarries)
 {
     sithItemInfo *v2; // eax
     int v3; // ecx
@@ -431,7 +431,7 @@ void sithPlayer_SetBinCarries(int binIdx, int bCarries)
         v2->state = v3 & ~8u;
 }
 
-void sithPlayer_sub_4C8910(unsigned int idx)
+void sithPlayer_Reset(unsigned int idx)
 {
     sithPlayerInfo *pPlayerInfo;
 
@@ -459,7 +459,7 @@ void sithPlayer_sub_4C8910(unsigned int idx)
     }
 }
 
-int sithPlayer_sub_4C87C0(int idx, int netId)
+int sithPlayer_ShowPlayer(int idx, int netId)
 {
     if ( !jkPlayer_playerInfos[idx].playerThing )
         return 0;
@@ -473,7 +473,7 @@ int sithPlayer_sub_4C87C0(int idx, int netId)
 }
 
 // MOTS altered
-void sithPlayer_debug_ToNextCheckpoint(sithThing *player)
+void sithPlayer_NewPlayer(sithThing *player)
 {
     rdPuppet *v1; // ecx
     int v3; // eax
@@ -533,7 +533,7 @@ void sithPlayer_debug_ToNextCheckpoint(sithThing *player)
     }
 }
 
-uint32_t sithPlayer_ThingIdxToPlayerIdx(int thingIdx)
+uint32_t sithPlayer_GetPlayerNum(int thingIdx)
 {
     if ( !thingIdx )
         return -1;
@@ -548,7 +548,7 @@ uint32_t sithPlayer_ThingIdxToPlayerIdx(int thingIdx)
     return -1;
 }
 
-int sithPlayer_FindPlayerByName(wchar_t *pwStr)
+int sithPlayer_GetPlayerNumByName(wchar_t *pwStr)
 {
     int v1; // edi
     sithPlayerInfo *i; // esi

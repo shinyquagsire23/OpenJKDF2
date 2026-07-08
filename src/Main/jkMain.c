@@ -462,7 +462,7 @@ void jkMain_EndLevelScreenShow(int a1, int a2)
     if (!Main_bMotsCompat) {
         if ( jkEpisode_mLoad.type != JK_EPISODE_SINGLEPLAYER && jkSmack_gameMode == 2
           || jkGuiSingleTally_Show() != -1
-          && (sithPlayer_GetBinAmt(SITHBIN_NEW_STARS) <= 0.0 && sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS) <= 0.0
+          && (sithPlayer_GetInvItemAmount(SITHBIN_NEW_STARS) <= 0.0 && sithPlayer_GetInvItemAmount(SITHBIN_SPEND_STARS) <= 0.0
            || jkGuiForce_Show(1, 0.0, jkMain_dword_552B98, 0, 0, 1) != -1) )
         {
             jkMain_StartNextLevelInEpisode(0, 1);
@@ -473,7 +473,7 @@ void jkMain_EndLevelScreenShow(int a1, int a2)
     { 
         // MOTS added
         if (jkGuiSingleTally_Show() != -1) {
-            if (sithPlayer_GetBinAmt(SITHBIN_NEW_STARS) <= 0.0 && sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS) <= 0.0) {
+            if (sithPlayer_GetInvItemAmount(SITHBIN_NEW_STARS) <= 0.0 && sithPlayer_GetInvItemAmount(SITHBIN_SPEND_STARS) <= 0.0) {
                 jkMain_StartNextLevelInEpisode(0, 1);
                 return;
             }
@@ -661,7 +661,7 @@ LABEL_28:
         }
 
         if (Main_bMotsCompat) {
-            sithPlayer_SetBinAmt(SITHBIN_NEW_STARS, 0);
+            sithPlayer_SetInvItemAmount(SITHBIN_NEW_STARS, 0);
             if (jkMain_motsIdk[0] != 0) {
                 stdString_SafeStrCopy(jkMain_aLevelJklFnameMots, jkMain_aLevelJklFname,128);
                 stdString_SafeStrCopy(jkMain_aLevelJklFname,jkMain_motsIdk,128);

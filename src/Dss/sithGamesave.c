@@ -373,7 +373,7 @@ skip_free_things:
     }
 
     sithThing_sub_4CCE60();
-    sithPlayer_idk(0);
+    sithPlayer_SetLocalPlayer(0);
     if ( sithGamesave_func3 )
         sithGamesave_func3();
 
@@ -599,7 +599,7 @@ int sithGamesave_Process()
             return sithGamesave_currentState - SITH_GS_LOAD_DEBUG_NEXTCHECKPOINT;
         if ( sithGamesave_RestoreFile(sithGamesave_fpath) )
         {
-            sithPlayer_debug_ToNextCheckpoint(sithPlayer_pLocalPlayerThing);
+            sithPlayer_NewPlayer(sithPlayer_pLocalPlayerThing);
             sithGamesave_currentState = SITH_GS_NONE;
             return 1;
         }
