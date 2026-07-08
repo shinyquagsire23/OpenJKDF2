@@ -15,223 +15,223 @@ const rdVector3 rdroid_xVector3 = {1.0,0.0,0.0};
 const rdVector3 rdroid_yVector3 = {0.0,1.0,0.0};
 const rdVector3 rdroid_zVector3 = {0.0,0.0,1.0};
 
-rdVector2* rdVector_Set2(rdVector2* v, flex_t x, flex_t y)
+rdVector2* rdVector_Set2(rdVector2* dest, flex_t x, flex_t y)
 {
-    v->x = x;
-    v->y = y;
-    return v;
+    dest->x = x;
+    dest->y = y;
+    return dest;
 }
 
-rdVector3* rdVector_Set3(rdVector3* v, flex_t x, flex_t y, flex_t z)
+rdVector3* rdVector_Set3(rdVector3* dest, flex_t x, flex_t y, flex_t z)
 {
-    v->x = x;
-    v->y = y;
-    v->z = z;
-    return v;
+    dest->x = x;
+    dest->y = y;
+    dest->z = z;
+    return dest;
 }
 
-rdVector4* rdVector_Set4(rdVector4* v, flex_t x, flex_t y, flex_t z, flex_t w)
+rdVector4* rdVector_Set4(rdVector4* dest, flex_t x, flex_t y, flex_t z, flex_t w)
 {
-    v->x = x;
-    v->y = y;
-    v->z = z;
-    v->w = w;
-    return v;
+    dest->x = x;
+    dest->y = y;
+    dest->z = z;
+    dest->w = w;
+    return dest;
 }
 
-void rdVector_Copy2(rdVector2* v1, const rdVector2* v2)
+void rdVector_Copy2(rdVector2* dest, const rdVector2* src)
 {
-    v1->x = v2->x;
-    v1->y = v2->y;
+    dest->x = src->x;
+    dest->y = src->y;
 }
 
-void rdVector_Copy3(rdVector3* v1, const rdVector3* v2)
+void rdVector_Copy3(rdVector3* dest, const rdVector3* src)
 {
-    v1->x = v2->x;
-    v1->y = v2->y;
-    v1->z = v2->z;
+    dest->x = src->x;
+    dest->y = src->y;
+    dest->z = src->z;
 }
 
-void rdVector_Copy4(rdVector4* v1, const rdVector4* v2)
+void rdVector_Copy4(rdVector4* dest, const rdVector4* src)
 {
-    v1->x = v2->x;
-    v1->y = v2->y;
-    v1->z = v2->z;
-    v1->w = v2->w;
+    dest->x = src->x;
+    dest->y = src->y;
+    dest->z = src->z;
+    dest->w = src->w;
 }
 
-rdVector2* rdVector_Neg2(rdVector2* v1, const rdVector2* v2)
+rdVector2* rdVector_Neg2(rdVector2* dest, const rdVector2* src)
 {
-    v1->x = -v2->x;
-    v1->y = -v2->y;
-    return v1;
+    dest->x = -src->x;
+    dest->y = -src->y;
+    return dest;
 }
 
-rdVector3* rdVector_Neg3(rdVector3* v1, const rdVector3* v2)
+rdVector3* rdVector_Neg3(rdVector3* dest, const rdVector3* src)
 {
-    v1->x = -v2->x;
-    v1->y = -v2->y;
-    v1->z = -v2->z;
-    return v1;
+    dest->x = -src->x;
+    dest->y = -src->y;
+    dest->z = -src->z;
+    return dest;
 }
 
-rdVector4* rdVector_Neg4(rdVector4* v1, const rdVector4* v2)
+rdVector4* rdVector_Neg4(rdVector4* dest, const rdVector4* src)
 {
-    v1->x = -v2->x;
-    v1->y = -v2->y;
-    v1->z = -v2->z;
-    v1->w = -v2->w;
-    return v1;
+    dest->x = -src->x;
+    dest->y = -src->y;
+    dest->z = -src->z;
+    dest->w = -src->w;
+    return dest;
 }
 
-rdVector2* rdVector_Neg2Acc(rdVector2* v1)
+rdVector2* rdVector_Neg2Acc(rdVector2* a)
 {
-    v1->x = -v1->x;
-    v1->y = -v1->y;
-    return v1;
+    a->x = -a->x;
+    a->y = -a->y;
+    return a;
 }
 
-rdVector3* rdVector_Neg3Acc(rdVector3* v1)
+rdVector3* rdVector_Neg3Acc(rdVector3* a)
 {
-    v1->x = -v1->x;
-    v1->y = -v1->y;
-    v1->z = -v1->z;
-    return v1;
+    a->x = -a->x;
+    a->y = -a->y;
+    a->z = -a->z;
+    return a;
 }
 
-rdVector4* rdVector_Neg4Acc(rdVector4* v1)
+rdVector4* rdVector_Neg4Acc(rdVector4* a)
 {
-    v1->x = -v1->x;
-    v1->y = -v1->y;
-    v1->z = -v1->z;
-    v1->w = -v1->w;
-    return v1;
+    a->x = -a->x;
+    a->y = -a->y;
+    a->z = -a->z;
+    a->w = -a->w;
+    return a;
 }
 
-rdVector2* rdVector_Add2(rdVector2* v1, const rdVector2* v2, const rdVector2* v3)
+rdVector2* rdVector_Add2(rdVector2* c, const rdVector2* a, const rdVector2* b)
 {
-    v1->x = v2->x + v3->x;
-    v1->y = v2->y + v3->y;
-    return v1;
+    c->x = a->x + b->x;
+    c->y = a->y + b->y;
+    return c;
 }
 
-rdVector3* rdVector_Add3(rdVector3* v1, const rdVector3* v2, const rdVector3* v3)
+rdVector3* rdVector_Add3(rdVector3* c, const rdVector3* a, const rdVector3* b)
 {
-    v1->x = v2->x + v3->x;
-    v1->y = v2->y + v3->y;
-    v1->z = v2->z + v3->z;
-    return v1;
+    c->x = a->x + b->x;
+    c->y = a->y + b->y;
+    c->z = a->z + b->z;
+    return c;
 }
 
-rdVector4* rdVector_Add4(rdVector4* v1, const rdVector4* v2, const rdVector4* v3)
+rdVector4* rdVector_Add4(rdVector4* c, const rdVector4* a, const rdVector4* b)
 {
-    v1->x = v2->x + v3->x;
-    v1->y = v2->y + v3->y;
-    v1->z = v2->z + v3->z;
-    v1->w = v2->w + v3->w;
-    return v1;
+    c->x = a->x + b->x;
+    c->y = a->y + b->y;
+    c->z = a->z + b->z;
+    c->w = a->w + b->w;
+    return c;
 }
 
-rdVector2* rdVector_Add2Acc(rdVector2* v1, const rdVector2* v2)
+rdVector2* rdVector_Add2Acc(rdVector2* a, const rdVector2* b)
 {
-    v1->x = v2->x + v1->x;
-    v1->y = v2->y + v1->y;
-    return v1;
+    a->x = b->x + a->x;
+    a->y = b->y + a->y;
+    return a;
 }
 
-rdVector3* rdVector_Add3Acc(rdVector3* v1, const rdVector3* v2)
+rdVector3* rdVector_Add3Acc(rdVector3* a, const rdVector3* b)
 {
-    v1->x = v2->x + v1->x;
-    v1->y = v2->y + v1->y;
-    v1->z = v2->z + v1->z;
-    return v1;
+    a->x = b->x + a->x;
+    a->y = b->y + a->y;
+    a->z = b->z + a->z;
+    return a;
 }
 
-rdVector4* rdVector_Add4Acc(rdVector4* v1, const rdVector4* v2)
+rdVector4* rdVector_Add4Acc(rdVector4* a, const rdVector4* b)
 {
-    v1->x = v2->x + v1->x;
-    v1->y = v2->y + v1->y;
-    v1->z = v2->z + v1->z;
-    v1->w = v2->w + v1->w;
-    return v1;
+    a->x = b->x + a->x;
+    a->y = b->y + a->y;
+    a->z = b->z + a->z;
+    a->w = b->w + a->w;
+    return a;
 }
 
 
-rdVector2* rdVector_Sub2(rdVector2* v1, const rdVector2* v2, const rdVector2* v3)
+rdVector2* rdVector_Sub2(rdVector2* c, const rdVector2* a, const rdVector2* b)
 {
-    v1->x = v2->x - v3->x;
-    v1->y = v2->y - v3->y;
-    return v1;
+    c->x = a->x - b->x;
+    c->y = a->y - b->y;
+    return c;
 }
 
-rdVector3* rdVector_Sub3(rdVector3* v1, const rdVector3* v2, const rdVector3* v3)
+rdVector3* rdVector_Sub3(rdVector3* c, const rdVector3* a, const rdVector3* b)
 {
-    v1->x = v2->x - v3->x;
-    v1->y = v2->y - v3->y;
-    v1->z = v2->z - v3->z;
-    return v1;
+    c->x = a->x - b->x;
+    c->y = a->y - b->y;
+    c->z = a->z - b->z;
+    return c;
 }
 
-rdVector4* rdVector_Sub4(rdVector4* v1, const rdVector4* v2, const rdVector4* v3)
+rdVector4* rdVector_Sub4(rdVector4* c, const rdVector4* a, const rdVector4* b)
 {
-    v1->x = v2->x - v3->x;
-    v1->y = v2->y - v3->y;
-    v1->z = v2->z - v3->z;
-    v1->w = v2->w - v3->w;
-    return v1;
+    c->x = a->x - b->x;
+    c->y = a->y - b->y;
+    c->z = a->z - b->z;
+    c->w = a->w - b->w;
+    return c;
 }
 
-rdVector2* rdVector_Sub2Acc(rdVector2* v1, const rdVector2* v2)
+rdVector2* rdVector_Sub2Acc(rdVector2* a, const rdVector2* b)
 {
-    v1->x = -v2->x + v1->x;
-    v1->y = -v2->y + v1->y;
-    return v1;
+    a->x = -b->x + a->x;
+    a->y = -b->y + a->y;
+    return a;
 }
 
-rdVector3* rdVector_Sub3Acc(rdVector3* v1, const rdVector3* v2)
+rdVector3* rdVector_Sub3Acc(rdVector3* a, const rdVector3* b)
 {
-    v1->x = -v2->x + v1->x;
-    v1->y = -v2->y + v1->y;
-    v1->z = -v2->z + v1->z;
-    return v1;
+    a->x = -b->x + a->x;
+    a->y = -b->y + a->y;
+    a->z = -b->z + a->z;
+    return a;
 }
 
-rdVector4* rdVector_Sub4Acc(rdVector4* v1, const rdVector4* v2)
+rdVector4* rdVector_Sub4Acc(rdVector4* a, const rdVector4* b)
 {
-    v1->x = -v2->x + v1->x;
-    v1->y = -v2->y + v1->y;
-    v1->z = -v2->z + v1->z;
-    v1->w = -v2->w + v1->w;
-    return v1;
+    a->x = -b->x + a->x;
+    a->y = -b->y + a->y;
+    a->z = -b->z + a->z;
+    a->w = -b->w + a->w;
+    return a;
 }
 
-flex_t rdVector_Dot2(const rdVector2* v1, const rdVector2* v2)
+flex_t rdVector_Dot2(const rdVector2* a, const rdVector2* b)
 {
-    return (v1->x * v2->x) + (v1->y * v2->y);
+    return (a->x * b->x) + (a->y * b->y);
 }
 
-flex_t rdVector_Dot3(const rdVector3* v1, const rdVector3* v2)
+flex_t rdVector_Dot3(const rdVector3* a, const rdVector3* b)
 {
-    return (v1->x * v2->x) + (v1->y * v2->y) + (v1->z * v2->z);
+    return (a->x * b->x) + (a->y * b->y) + (a->z * b->z);
 }
 
-flex_t rdVector_Dot4(const rdVector4* v1, const rdVector4* v2)
+flex_t rdVector_Dot4(const rdVector4* a, const rdVector4* b)
 {
-    return (v1->x * v2->x) + (v1->y * v2->y) + (v1->z * v2->z) + (v1->w * v2->w);
+    return (a->x * b->x) + (a->y * b->y) + (a->z * b->z) + (a->w * b->w);
 }
 
-void rdVector_Cross3(rdVector3 *v1, const rdVector3 *v2, const rdVector3 *v3)
+void rdVector_Cross3(rdVector3 *dest, const rdVector3 *v1, const rdVector3 *v2)
 {
-    v1->x = (v3->z * v2->y) - (v2->z * v3->y);
-    v1->y = (v2->z * v3->x) - (v3->z * v2->x);
-    v1->z = (v3->y * v2->x) - (v2->y * v3->x);
+    dest->x = (v2->z * v1->y) - (v1->z * v2->y);
+    dest->y = (v1->z * v2->x) - (v2->z * v1->x);
+    dest->z = (v2->y * v1->x) - (v1->y * v2->x);
 }
 
-void rdVector_Cross3Acc(rdVector3 *v1, const rdVector3 *v2)
+void rdVector_Cross3Acc(rdVector3 *dest, const rdVector3 *v2)
 {
-    v1->x = (v2->z * v1->y) - (v1->z * v2->y);
-    v1->y = (v1->z * v2->x) - (v2->z * v1->x);
-    v1->z = (v2->y * v1->x) - (v1->y * v2->x);
+    dest->x = (v2->z * dest->y) - (dest->z * v2->y);
+    dest->y = (dest->z * v2->x) - (v2->z * dest->x);
+    dest->z = (v2->y * dest->x) - (dest->y * v2->x);
 }
 
 flex_t rdVector_Len2(const rdVector2* v)
@@ -239,38 +239,38 @@ flex_t rdVector_Len2(const rdVector2* v)
     return stdMath_Sqrt(rdVector_Dot2(v,v));
 }
 
-flex_t rdVector_Len3(const rdVector3* v)
+flex_t rdVector_Len3(const rdVector3* vec)
 {
 #if defined(TARGET_TWL) && defined(EXPERIMENTAL_FIXED_POINT)
-    int64_t val = ((int64_t)v->x.to_raw()*v->x.to_raw())+((int64_t)v->y.to_raw()*v->y.to_raw())+((int64_t)v->z.to_raw()*v->z.to_raw());
+    int64_t val = ((int64_t)vec->x.to_raw()*vec->x.to_raw())+((int64_t)vec->y.to_raw()*vec->y.to_raw())+((int64_t)vec->z.to_raw()*vec->z.to_raw());
     return sqrt64fixed_mine_2(val);
 #else
-    return stdMath_Sqrt(rdVector_Dot3(v,v));
+    return stdMath_Sqrt(rdVector_Dot3(vec,vec));
 #endif
 }
 
-flex_t rdVector_Len4(const rdVector4* v)
+flex_t rdVector_Len4(const rdVector4* a)
 {
-    return stdMath_Sqrt(rdVector_Dot4(v,v));
+    return stdMath_Sqrt(rdVector_Dot4(a,a));
 }
 
-flex_t rdVector_Normalize2(rdVector2 *v1, const rdVector2 *v2)
+flex_t rdVector_Normalize2(rdVector2 *dest, const rdVector2 *src)
 {
-    flex_t len = rdVector_Len2(v2);
+    flex_t len = rdVector_Len2(src);
     if (len == 0.0)
     {
-        v1->x = v2->x;
-        v1->y = v2->y;
+        dest->x = src->x;
+        dest->y = src->y;
     }
     else
     {
-        v1->x = v2->x / len;
-        v1->y = v2->y / len;
+        dest->x = src->x / len;
+        dest->y = src->y / len;
     }
     return len;
 }
 
-flex_t rdVector_Normalize3(rdVector3 *v1, const rdVector3 *v2)
+flex_t rdVector_Normalize3(rdVector3 *dest, const rdVector3 *src)
 {
 #if defined(TARGET_TWL) && defined(EXPERIMENTAL_FIXED_POINT)
 #if 0
@@ -285,19 +285,19 @@ flex_t rdVector_Normalize3(rdVector3 *v1, const rdVector3 *v2)
     num_sqrts += 1;
 #endif
 
-    flex_t len = sqrt64fixed_mine_2(((int64_t)v2->x.to_raw()*v2->x.to_raw())+((int64_t)v2->y.to_raw()*v2->y.to_raw())+((int64_t)v2->z.to_raw()*v2->z.to_raw()));
+    flex_t len = sqrt64fixed_mine_2(((int64_t)src->x.to_raw()*src->x.to_raw())+((int64_t)src->y.to_raw()*src->y.to_raw())+((int64_t)src->z.to_raw()*src->z.to_raw()));
     //flex_t len = rdVector_Len3(v2);
     if (len == 0.0)
     {
-        v1->x = v2->x;
-        v1->y = v2->y;
-        v1->z = v2->z;
+        dest->x = src->x;
+        dest->y = src->y;
+        dest->z = src->z;
     }
     else
     {
-        v1->x = divflex_mine(v2->x, len);
-        v1->y = divflex_mine(v2->y, len);
-        v1->z = divflex_mine(v2->z, len);
+        dest->x = divflex_mine(src->x, len);
+        dest->y = divflex_mine(src->y, len);
+        dest->z = divflex_mine(src->z, len);
 
         //v1->x = f32toflex(divf32_mine(flextof32(v2->x), flextof32(len)));
         //v1->y = f32toflex(divf32_mine(flextof32(v2->y), flextof32(len)));
@@ -305,18 +305,18 @@ flex_t rdVector_Normalize3(rdVector3 *v1, const rdVector3 *v2)
     }
     return len;
 #else
-    flex_t len = rdVector_Len3(v2);
+    flex_t len = rdVector_Len3(src);
     if (len == 0.0)
     {
-        v1->x = v2->x;
-        v1->y = v2->y;
-        v1->z = v2->z;
+        dest->x = src->x;
+        dest->y = src->y;
+        dest->z = src->z;
     }
     else
     {
-        v1->x = v2->x / len;
-        v1->y = v2->y / len;
-        v1->z = v2->z / len;
+        dest->x = src->x / len;
+        dest->y = src->y / len;
+        dest->z = src->z / len;
     }
     return len;
 #endif
@@ -373,69 +373,69 @@ flex_t rdVector_Normalize3Quick(rdVector3 *v1, const rdVector3 *v2)
     return len;
 }
 
-flex_t rdVector_Normalize4(rdVector4 *v1, const rdVector4 *v2)
+flex_t rdVector_Normalize4(rdVector4 *dest, const rdVector4 *src)
 {
-    flex_t len = rdVector_Len4(v2);
+    flex_t len = rdVector_Len4(src);
     if (len == 0.0)
     {
-        v1->x = v2->x;
-        v1->y = v2->y;
-        v1->z = v2->z;
-        v1->w = v2->w;
+        dest->x = src->x;
+        dest->y = src->y;
+        dest->z = src->z;
+        dest->w = src->w;
     }
     else
     {
-        v1->x = v2->x / len;
-        v1->y = v2->y / len;
-        v1->z = v2->z / len;
-        v1->w = v2->w / len;
+        dest->x = src->x / len;
+        dest->y = src->y / len;
+        dest->z = src->z / len;
+        dest->w = src->w / len;
     }
     return len;
 }
 
-flex_t rdVector_Normalize2Acc(rdVector2 *v1)
+flex_t rdVector_Normalize2Acc(rdVector2 *vec)
 {
-    flex_t len = rdVector_Len2(v1);
+    flex_t len = rdVector_Len2(vec);
     if (len == 0.0)
     {
-        v1->x = v1->x;
-        v1->y = v1->y;
+        vec->x = vec->x;
+        vec->y = vec->y;
     }
     else
     {
-        v1->x = v1->x / len;
-        v1->y = v1->y / len;
+        vec->x = vec->x / len;
+        vec->y = vec->y / len;
     }
     return len;
 }
 
-flex_t rdVector_Normalize3Acc(rdVector3 *v1)
+flex_t rdVector_Normalize3Acc(rdVector3 *vec)
 {
-    flex_t len = rdVector_Len3(v1);
+    flex_t len = rdVector_Len3(vec);
     if (len == 0.0)
     {
-        v1->x = v1->x;
-        v1->y = v1->y;
-        v1->z = v1->z;
+        vec->x = vec->x;
+        vec->y = vec->y;
+        vec->z = vec->z;
     }
     else
     {
-        v1->x = v1->x / len;
-        v1->y = v1->y / len;
-        v1->z = v1->z / len;
+        vec->x = vec->x / len;
+        vec->y = vec->y / len;
+        vec->z = vec->z / len;
     }
     return len;
 }
 
-flex_t rdVector_Normalize3QuickAcc(rdVector3 *v1)
+flex_t rdVector_Normalize3QuickAcc(rdVector3 *src)
 {
     flex_t series_1;
     flex_t series_2;
     flex_t series_3;
 
-    flex_t x_pos = (v1->x >= 0.0) ? v1->x : -v1->x;
-    flex_t y_pos = (v1->y >= 0.0) ? v1->y : -v1->y;
-    flex_t z_pos = (v1->z >= 0.0) ? v1->z : -v1->z;
+    flex_t x_pos = (src->x >= 0.0) ? src->x : -src->x;
+    flex_t y_pos = (src->y >= 0.0) ? src->y : -src->y;
+    flex_t z_pos = (src->z >= 0.0) ? src->z : -src->z;
 
     series_1 = x_pos;
     series_2 = z_pos;
@@ -476,142 +476,142 @@ flex_t rdVector_Normalize3QuickAcc(rdVector3 *v1)
         len = 0.00000001;
     }
     flex_t len_recip = 1.0 / len;
-    v1->x = v1->x * len_recip;
-    v1->y = v1->y * len_recip;
-    v1->z = v1->z * len_recip;
+    src->x = src->x * len_recip;
+    src->y = src->y * len_recip;
+    src->z = src->z * len_recip;
     return len;
 }
 
-flex_t rdVector_Normalize4Acc(rdVector4 *v1)
+flex_t rdVector_Normalize4Acc(rdVector4 *vec)
 {
-    flex_t len = rdVector_Len4(v1);
+    flex_t len = rdVector_Len4(vec);
     if (len == 0.0)
     {
-        v1->x = v1->x;
-        v1->y = v1->y;
-        v1->z = v1->z;
-        v1->w = v1->w;
+        vec->x = vec->x;
+        vec->y = vec->y;
+        vec->z = vec->z;
+        vec->w = vec->w;
     }
     else
     {
-        v1->x = v1->x / len;
-        v1->y = v1->y / len;
-        v1->z = v1->z / len;
-        v1->w = v1->w / len;
+        vec->x = vec->x / len;
+        vec->y = vec->y / len;
+        vec->z = vec->z / len;
+        vec->w = vec->w / len;
     }
     return len;
 }
 
-rdVector2* rdVector_Scale2(rdVector2 *v1, const rdVector2 *v2, flex_t scale)
+rdVector2* rdVector_Scale2(rdVector2 *dest, const rdVector2 *src, flex_t scalar)
 {
-    v1->x = v2->x * scale;
-    v1->y = v2->y * scale;
-    return v1;
+    dest->x = src->x * scalar;
+    dest->y = src->y * scalar;
+    return dest;
 }
 
-rdVector3* rdVector_Scale3(rdVector3 *v1, const rdVector3 *v2, flex_t scale)
+rdVector3* rdVector_Scale3(rdVector3 *dest, const rdVector3 *src, flex_t scalar)
 {
-    v1->x = v2->x * scale;
-    v1->y = v2->y * scale;
-    v1->z = v2->z * scale;
-    return v1;
+    dest->x = src->x * scalar;
+    dest->y = src->y * scalar;
+    dest->z = src->z * scalar;
+    return dest;
 }
 
-rdVector4* rdVector_Scale4(rdVector4 *v1, const rdVector4 *v2, flex_t scale)
+rdVector4* rdVector_Scale4(rdVector4 *dest, const rdVector4 *src, flex_t scalar)
 {
-    v1->x = v2->x * scale;
-    v1->y = v2->y * scale;
-    v1->z = v2->z * scale;
-    v1->w = v2->w * scale;
-    return v1;
+    dest->x = src->x * scalar;
+    dest->y = src->y * scalar;
+    dest->z = src->z * scalar;
+    dest->w = src->w * scalar;
+    return dest;
 }
 
-rdVector2* rdVector_Scale2Acc(rdVector2 *v1, flex_t scale)
+rdVector2* rdVector_Scale2Acc(rdVector2 *v, flex_t scalar)
 {
-    v1->x = v1->x * scale;
-    v1->y = v1->y * scale;
-    return v1;
+    v->x = v->x * scalar;
+    v->y = v->y * scalar;
+    return v;
 }
 
-rdVector3* rdVector_Scale3Acc(rdVector3 *v1, flex_t scale)
+rdVector3* rdVector_Scale3Acc(rdVector3 *v, flex_t scalar)
 {
-    v1->x = v1->x * scale;
-    v1->y = v1->y * scale;
-    v1->z = v1->z * scale;
-    return v1;
+    v->x = v->x * scalar;
+    v->y = v->y * scalar;
+    v->z = v->z * scalar;
+    return v;
 }
 
-rdVector4* rdVector_Scale4Acc(rdVector4 *v1, flex_t scale)
+rdVector4* rdVector_Scale4Acc(rdVector4 *v, flex_t scalar)
 {
-    v1->x = v1->x * scale;
-    v1->y = v1->y * scale;
-    v1->z = v1->z * scale;
-    v1->w = v1->w * scale;
-    return v1;
+    v->x = v->x * scalar;
+    v->y = v->y * scalar;
+    v->z = v->z * scalar;
+    v->w = v->w * scalar;
+    return v;
 }
 
-rdVector2* rdVector_InvScale2(rdVector2 *v1, const rdVector2 *v2, flex_t scale)
+rdVector2* rdVector_InvScale2(rdVector2 *dest, const rdVector2 *src, flex_t scalar)
 {
-    v1->x = v2->x / scale;
-    v1->y = v2->y / scale;
-    return v1;
+    dest->x = src->x / scalar;
+    dest->y = src->y / scalar;
+    return dest;
 }
 
-rdVector3* rdVector_InvScale3(rdVector3 *v1, const rdVector3 *v2, flex_t scale)
+rdVector3* rdVector_InvScale3(rdVector3 *dest, const rdVector3 *src, flex_t scalar)
 {
-    v1->x = v2->x / scale;
-    v1->y = v2->y / scale;
-    v1->z = v2->z / scale;
-    return v1;
+    dest->x = src->x / scalar;
+    dest->y = src->y / scalar;
+    dest->z = src->z / scalar;
+    return dest;
 }
 
-rdVector4* rdVector_InvScale4(rdVector4 *v1, const rdVector4 *v2, flex_t scale)
+rdVector4* rdVector_InvScale4(rdVector4 *dest, const rdVector4 *src, flex_t scalar)
 {
-    v1->x = v2->x / scale;
-    v1->y = v2->y / scale;
-    v1->z = v2->z / scale;
-    v1->w = v2->w / scale;
-    return v1;
+    dest->x = src->x / scalar;
+    dest->y = src->y / scalar;
+    dest->z = src->z / scalar;
+    dest->w = src->w / scalar;
+    return dest;
 }
 
-rdVector2* rdVector_InvScale2Acc(rdVector2 *v1, flex_t scale)
+rdVector2* rdVector_InvScale2Acc(rdVector2 *v, flex_t scalar)
 {
-    v1->x = v1->x / scale;
-    v1->y = v1->y / scale;
-    return v1;
+    v->x = v->x / scalar;
+    v->y = v->y / scalar;
+    return v;
 }
 
-rdVector3* rdVector_InvScale3Acc(rdVector3 *v1, flex_t scale)
+rdVector3* rdVector_InvScale3Acc(rdVector3 *v, flex_t scalar)
 {
-    v1->x = v1->x / scale;
-    v1->y = v1->y / scale;
-    v1->z = v1->z / scale;
-    return v1;
+    v->x = v->x / scalar;
+    v->y = v->y / scalar;
+    v->z = v->z / scalar;
+    return v;
 }
 
-rdVector4* rdVector_InvScale4Acc(rdVector4 *v1, flex_t scale)
+rdVector4* rdVector_InvScale4Acc(rdVector4 *v, flex_t scalar)
 {
-    v1->x = v1->x / scale;
-    v1->y = v1->y / scale;
-    v1->z = v1->z / scale;
-    v1->w = v1->w / scale;
-    return v1;
+    v->x = v->x / scalar;
+    v->y = v->y / scalar;
+    v->z = v->z / scalar;
+    v->w = v->w / scalar;
+    return v;
 }
 
-void rdVector_Rotate3(rdVector3 *out, const rdVector3 *in, const rdVector3 *vAngs)
+void rdVector_Rotate3(rdVector3 *vec, const rdVector3 *pivot, const rdVector3 *pyr)
 {
     rdMatrix34 tmp;
 
-    rdMatrix_BuildRotate34(&tmp, vAngs);
-    rdMatrix_TransformVector34(out, in, &tmp);
+    rdMatrix_BuildRotate34(&tmp, pyr);
+    rdMatrix_TransformVector34(vec, pivot, &tmp);
 }
 
-void rdVector_Rotate3Acc(rdVector3 *out, const rdVector3 *vAngs)
+void rdVector_Rotate3Acc(rdVector3 *vec, const rdVector3 *pyr)
 {
     rdMatrix34 tmp;
 
-    rdMatrix_BuildRotate34(&tmp, vAngs);
-    rdMatrix_TransformVector34Acc(out, &tmp);
+    rdMatrix_BuildRotate34(&tmp, pyr);
+    rdMatrix_TransformVector34Acc(vec, &tmp);
 }
 
 void rdVector_ExtractAngle(const rdVector3 *v1, rdVector3 *out)
@@ -622,11 +622,11 @@ void rdVector_ExtractAngle(const rdVector3 *v1, rdVector3 *out)
 }
 
 // Added
-flex_t rdVector_Dist3(const rdVector3 *v1, const rdVector3 *v2)
+flex_t rdVector_Dist3(const rdVector3 *a, const rdVector3 *b)
 {
     rdVector3 tmp;
     
-    rdVector_Sub3(&tmp, v1, v2);
+    rdVector_Sub3(&tmp, a, b);
     return rdVector_Len3(&tmp);
 }
 
@@ -639,12 +639,12 @@ flex_t rdVector_DistSquared3(const rdVector3 *v1, const rdVector3 *v2)
     return rdVector_Dot3(&tmp,&tmp);
 }
 
-rdVector3* rdVector_ScaleAdd3Acc(rdVector3 *v1, const rdVector3 *v2, flex_t scale)
+rdVector3* rdVector_ScaleAdd3Acc(rdVector3 *dest, const rdVector3 *src, flex_t scalar)
 {
-    v1->x += v2->x * scale;
-    v1->y += v2->y * scale;
-    v1->z += v2->z * scale;
-    return v1;
+    dest->x += src->x * scalar;
+    dest->y += src->y * scalar;
+    dest->z += src->z * scalar;
+    return dest;
 }
 
 void rdVector_Zero3(rdVector3 *v)

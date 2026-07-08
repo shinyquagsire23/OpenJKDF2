@@ -143,23 +143,23 @@ int sithOverlayMap_Draw(rdCanvas *pCanvas)
     return result;
 }
 
-void sithOverlayMap_DrawSectors(SithSector *sector)
+void sithOverlayMap_DrawSectors(SithSector *pSector)
 {
     signed int v2; // eax
     SithSurfaceAdjoin *i; // esi
 
-    if ( sector->renderTick != sithRender_lastRenderTick
-        && (sector->flags & SITH_SECTOR_SEEN || g_mapModeFlags & SITHMAPMODE_SHOWALLSECTORS))
+    if ( pSector->renderTick != sithRender_lastRenderTick
+        && (pSector->flags & SITH_SECTOR_SEEN || g_mapModeFlags & SITHMAPMODE_SHOWALLSECTORS))
     {
-        sector->renderTick = sithRender_lastRenderTick;
-        if ( (sector->flags & SITH_SECTOR_HIDEONMAP) != 0 )
+        pSector->renderTick = sithRender_lastRenderTick;
+        if ( (pSector->flags & SITH_SECTOR_HIDEONMAP) != 0 )
             v2 = 1;
         else
-            v2 = sithOverlayMap_DrawSector(sector);
+            v2 = sithOverlayMap_DrawSector(pSector);
 
         if ( v2 )
         {
-            for ( i = sector->adjoins; i; i = i->next )
+            for ( i = pSector->adjoins; i; i = i->next )
                 sithOverlayMap_DrawSectors(i->sector);
         }
     }
@@ -421,7 +421,7 @@ LABEL_30:
     return result;
 }
 
-int sithOverlayMap_CanDrawSurfaceEdge(SithSurface *a1, int a2, int a3)
+int sithOverlayMap_CanDrawSurfaceEdge(SithSurface *pSurface, int vertIdx, int nextVertIdx)
 {
     SithSector *pSector; // eax
     unsigned int sector_numSurfaces; // edx
@@ -447,7 +447,7 @@ int sithOverlayMap_CanDrawSurfaceEdge(SithSurface *a1, int a2, int a3)
     unsigned int v25; // [esp+1Ch] [ebp-8h]
     SithSurfaceAdjoin *v26; // [esp+28h] [ebp+4h]
 
-    pSector = a1->pSector;
+    pSector = pSurface->pSector;
     v24 = pSector;
     v20 = 0;
     sector_numSurfaces = pSector->numSurfaces;
@@ -459,7 +459,7 @@ int sithOverlayMap_CanDrawSurfaceEdge(SithSurface *a1, int a2, int a3)
         v6 = &sector_paSurfaces[0];
         while ( 1 )
         {
-            if ( sector_paSurfaces != a1 && !v6->pAdjoin )
+            if ( sector_paSurfaces != pSurface && !v6->pAdjoin )
             {
                 v7 = v6->surfaceInfo.face.numVertices;
                 v8 = 0;
@@ -482,7 +482,7 @@ LABEL_11:
         while ( 1 )
         {
             v10 = v8 + 1;
-            if ( *v9 == a3 && v6->surfaceInfo.face.vertexPosIdx[(v8 + 1) % v7] == a2 )
+            if ( *v9 == nextVertIdx && v6->surfaceInfo.face.vertexPosIdx[(v8 + 1) % v7] == vertIdx )
                 break;
             ++v8;
             ++v9;
@@ -533,7 +533,7 @@ LABEL_23:
             while ( 1 )
             {
                 v18 = v16 + 1;
-                if ( *v17 == a3 && v14->surfaceInfo.face.vertexPosIdx[(v16 + 1) % v15] == a2 )
+                if ( *v17 == nextVertIdx && v14->surfaceInfo.face.vertexPosIdx[(v16 + 1) % v15] == vertIdx )
                     break;
                 ++v16;
                 ++v17;

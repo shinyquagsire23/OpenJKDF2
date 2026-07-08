@@ -60,7 +60,7 @@ void sithPlayer_Close()
     sithPlayer_g_pLocalPlayer = 0;
 }
 
-void sithPlayer_PlacePlayers(SithWorld *world)
+void sithPlayer_PlacePlayers(SithWorld *pWorld)
 {
     SithThing *v1; // eax
     int v2; // ecx
@@ -69,8 +69,8 @@ void sithPlayer_PlacePlayers(SithWorld *world)
     int v7; // edi
     void *v8; // eax
 
-    v1 = world->aThings;
-    v2 = world->numThings;
+    v1 = pWorld->aThings;
+    v2 = pWorld->numThings;
     v3 = 0;
     if ( v2 >= 0 )
     {
@@ -107,9 +107,9 @@ int sithPlayer_GetBinItemActive(int binIdx)
     return (jkPlayer_playerInfos[playerThingIdx].aItems[binIdx].state & 4) >> 2;
 }
 
-int sithPlayer_IsInvItemAvailable(int binIdx)
+int sithPlayer_IsInvItemAvailable(int binIndex)
 {
-    return (jkPlayer_playerInfos[playerThingIdx].aItems[binIdx].state & 8) >> 3;
+    return (jkPlayer_playerInfos[playerThingIdx].aItems[binIndex].state & 8) >> 3;
 }
 
 void sithPlayer_SetBinItemActive(int binIdx, int bEnabled)
@@ -120,24 +120,24 @@ void sithPlayer_SetBinItemActive(int binIdx, int bEnabled)
         jkPlayer_playerInfos[playerThingIdx].aItems[binIdx].state &= ~4;
 }
 
-flex_t sithPlayer_GetInvItemAmount(int idx)
+flex_t sithPlayer_GetInvItemAmount(int binIndex)
 {
     //if (idx)
     //    jk_printf("Get %u: %f\n", idx, jkPlayer_playerInfos[playerThingIdx].aItems[idx].amount);
 
-    return jkPlayer_playerInfos[playerThingIdx].aItems[idx].amount;
+    return jkPlayer_playerInfos[playerThingIdx].aItems[binIndex].amount;
 }
 
-void sithPlayer_SetInvItemAmount(int idx, flex_t amt)
+void sithPlayer_SetInvItemAmount(int binIndex, flex_t amount)
 {
-    jkPlayer_playerInfos[playerThingIdx].aItems[idx].amount = amt;
+    jkPlayer_playerInfos[playerThingIdx].aItems[binIndex].amount = amount;
 }
 
-int sithPlayer_GetThingPlayerNum(SithThing *player)
+int sithPlayer_GetThingPlayerNum(SithThing *pThing)
 {
     int i;
 
-    if ( !player || player->type != SITH_THING_PLAYER )
+    if ( !pThing || pThing->type != SITH_THING_PLAYER )
         return -1;
     if ( !sithNet_isMulti )
         return 0;
@@ -148,7 +148,7 @@ int sithPlayer_GetThingPlayerNum(SithThing *player)
     i = 0;
     while (i < jkPlayer_maxPlayers)
     {
-        if ((jkPlayer_playerInfos[i].flags & 1) && jkPlayer_playerInfos[i].pLocalPlayer == player)
+        if ((jkPlayer_playerInfos[i].flags & 1) && jkPlayer_playerInfos[i].pLocalPlayer == pThing)
             return i;
 
         i++;
@@ -156,13 +156,13 @@ int sithPlayer_GetThingPlayerNum(SithThing *player)
     return -1;
 }
 
-void sithPlayer_SetLocalPlayer(int idx)
+void sithPlayer_SetLocalPlayer(int playerNum)
 {
     unsigned int v6; // eax
 
-    playerThingIdx = idx;
-    sithPlayer_g_pLocalPlayer = &jkPlayer_playerInfos[idx];
-    sithPlayer_g_pLocalPlayerThing = jkPlayer_playerInfos[idx].pLocalPlayer;
+    playerThingIdx = playerNum;
+    sithPlayer_g_pLocalPlayer = &jkPlayer_playerInfos[playerNum];
+    sithPlayer_g_pLocalPlayerThing = jkPlayer_playerInfos[playerNum].pLocalPlayer;
 
     sithWorld_g_pCurrentWorld->pLocalPlayer = sithPlayer_g_pLocalPlayerThing;
     sithWorld_g_pCurrentWorld->pCameraFocusThing = sithPlayer_g_pLocalPlayerThing;
@@ -182,7 +182,7 @@ void sithPlayer_SetLocalPlayer(int idx)
     {
         if (jkPlayer_playerInfos[v6].pLocalPlayer)
         {
-            if ( v6 != idx )
+            if ( v6 != playerNum )
                 jkPlayer_playerInfos[v6].pLocalPlayer->flags |= SITH_TF_INVULN;
         }
     }
@@ -195,7 +195,7 @@ void sithPlayer_ResetPalEffects()
     sithPlayer_g_pLocalPlayer->palEffectsIdx2 = stdPalEffects_NewRequest(2);
 }
 
-void sithPlayer_Update(SithPlayer *playerInfo, flex_t a2)
+void sithPlayer_Update(SithPlayer *pPlayer, flex_t secDeltaTime)
 {
     int v2; // edi
     SithThing *v3; // esi
@@ -204,12 +204,12 @@ void sithPlayer_Update(SithPlayer *playerInfo, flex_t a2)
     int v14; // ecx
     flex_t v20; // [esp+0h] [ebp-4h]
 
-    v20 = a2 * 0.4;
-    v2 = (__int64)(a2 * 256.0 - -0.5);
-    if ( playerInfo == sithPlayer_g_pLocalPlayer )
+    v20 = secDeltaTime * 0.4;
+    v2 = (__int64)(secDeltaTime * 256.0 - -0.5);
+    if ( pPlayer == sithPlayer_g_pLocalPlayer )
     {
-        v3 = playerInfo->pLocalPlayer;
-        pPalEffect = stdPalEffects_GetEffectPointer(playerInfo->palEffectsIdx1);
+        v3 = pPlayer->pLocalPlayer;
+        pPalEffect = stdPalEffects_GetEffectPointer(pPlayer->palEffectsIdx1);
         if ( pPalEffect->tint.x != 0.0 )
         {
             pPalEffect->tint.x = stdMath_Clamp(pPalEffect->tint.x - v20, 0.0, 1.0);
@@ -255,7 +255,7 @@ void sithPlayer_Update(SithPlayer *playerInfo, flex_t a2)
         }
         if ( (v3->actorParams.flags & SITH_AF_FALLKILLED) != 0 )
         {
-            pPalEffect->fade -= a2 * 0.7;
+            pPalEffect->fade -= secDeltaTime * 0.7;
             if (pPalEffect->fade <= 0.0)
                 sithPlayer_KillPlayer(v3);
         }
@@ -352,55 +352,55 @@ int sithPlayer_sub_4C9060(SithThing *thing1, SithThing *thing2)
     return 0;
 }
 
-void sithPlayer_KillPlayer(SithThing *thing)
+void sithPlayer_KillPlayer(SithThing *pPlayerThing)
 {
     SithPlayer *v1; // edi
     char v4[128]; // [esp+8h] [ebp-80h] BYREF
 
-    v1 = thing->actorParams.pPlayer;
+    v1 = pPlayerThing->actorParams.pPlayer;
 
-    if ( thing == sithPlayer_g_pLocalPlayerThing)
-        sithDSSThing_Death(thing, thing, 1, -1, 255);
+    if ( pPlayerThing == sithPlayer_g_pLocalPlayerThing)
+        sithDSSThing_Death(pPlayerThing, pPlayerThing, 1, -1, 255);
 
-    if ( (thing->flags & SITH_TF_CAPTURED) == 0
-      || (sithCog_ThingSendMessage(thing, thing, SITH_MESSAGE_KILLED), (thing->flags & SITH_TF_DESTROYED) == 0) )
+    if ( (pPlayerThing->flags & SITH_TF_CAPTURED) == 0
+      || (sithCog_ThingSendMessage(pPlayerThing, pPlayerThing, SITH_MESSAGE_KILLED), (pPlayerThing->flags & SITH_TF_DESTROYED) == 0) )
     {
-        sithSoundClass_StopSound(thing, 0);
-        sithThing_DetachAttachedThings(thing);
-        sithActor_SetHeadPYR(thing, &rdroid_zeroVector3);
-        thing->physicsParams.flags &= ~(SITH_PF_CROUCHING|SITH_PF_800|SITH_PF_100);
-        thing->physicsParams.flags |= (SITH_PF_ALIGNSURFACE|SITH_PF_USEGRAVITY);
-        thing->actorParams.flags &= ~SITH_AF_BLEEDS;
-        sithPhysics_ResetThingMovement(thing);
-        sithWeapon_SyncPuppet(thing);
+        sithSoundClass_StopSound(pPlayerThing, 0);
+        sithThing_DetachAttachedThings(pPlayerThing);
+        sithActor_SetHeadPYR(pPlayerThing, &rdroid_zeroVector3);
+        pPlayerThing->physicsParams.flags &= ~(SITH_PF_CROUCHING|SITH_PF_800|SITH_PF_100);
+        pPlayerThing->physicsParams.flags |= (SITH_PF_ALIGNSURFACE|SITH_PF_USEGRAVITY);
+        pPlayerThing->actorParams.flags &= ~SITH_AF_BLEEDS;
+        sithPhysics_ResetThingMovement(pPlayerThing);
+        sithWeapon_SyncPuppet(pPlayerThing);
         if ( sithNet_isMulti )
-            sithMulti_ProcessKilledPlayer(v1, thing, thing);
-        if ( thing == sithPlayer_g_pLocalPlayerThing )
+            sithMulti_ProcessKilledPlayer(v1, pPlayerThing, pPlayerThing);
+        if ( pPlayerThing == sithPlayer_g_pLocalPlayerThing )
         {
-            sithPlayer_debug_loadauto(thing);
+            sithPlayer_debug_loadauto(pPlayerThing);
         }
     }
 }
 
-void sithPlayer_PlayerKilledAction(SithThing *player, SithThing *killedBy)
+void sithPlayer_PlayerKilledAction(SithThing *pPlayerThing, SithThing *pSrcThing)
 {
     SithPlayer *v5; // edi
 
-    v5 = player->actorParams.pPlayer;
-    player->physicsParams.flags &= ~(SITH_PF_800|SITH_PF_100);
-    player->physicsParams.flags |= SITH_PF_ALIGNSURFACE|SITH_PF_USEGRAVITY;
-    player->flags |= SITH_TF_DEAD;
-    player->actorParams.flags &= ~SITH_AF_BLEEDS;
-    sithPhysics_ResetThingMovement(player);
-    sithWeapon_SyncPuppet(player);
-    sithInventory_BroadcastKilledMessage(player, killedBy);
+    v5 = pPlayerThing->actorParams.pPlayer;
+    pPlayerThing->physicsParams.flags &= ~(SITH_PF_800|SITH_PF_100);
+    pPlayerThing->physicsParams.flags |= SITH_PF_ALIGNSURFACE|SITH_PF_USEGRAVITY;
+    pPlayerThing->flags |= SITH_TF_DEAD;
+    pPlayerThing->actorParams.flags &= ~SITH_AF_BLEEDS;
+    sithPhysics_ResetThingMovement(pPlayerThing);
+    sithWeapon_SyncPuppet(pPlayerThing);
+    sithInventory_BroadcastKilledMessage(pPlayerThing, pSrcThing);
     if ( sithNet_isMulti )
-        sithMulti_ProcessKilledPlayer(v5, player, killedBy);
-    if ( player == sithPlayer_g_pLocalPlayerThing )
+        sithMulti_ProcessKilledPlayer(v5, pPlayerThing, pSrcThing);
+    if ( pPlayerThing == sithPlayer_g_pLocalPlayerThing )
         sithControl_death_msgtimer = sithTime_g_msecGameTime + 3000;
 }
 
-int sithPlayer_GetThingPlayerNumByIndex(int a1)
+int sithPlayer_GetThingPlayerNumByIndex(int thingIdx)
 {
     int result; // eax
     SithPlayer* i;
@@ -410,7 +410,7 @@ int sithPlayer_GetThingPlayerNumByIndex(int a1)
     result = 0;
     if ( jkPlayer_maxPlayers <= 0 )
         return -1;
-    for ( i = &jkPlayer_playerInfos[0]; (i->flags & 1) == 0 || i->pLocalPlayer->idx != a1; i++ )
+    for ( i = &jkPlayer_playerInfos[0]; (i->flags & 1) == 0 || i->pLocalPlayer->idx != thingIdx; i++ )
     {
         if ( ++result >= jkPlayer_maxPlayers )
             return -1;
@@ -418,25 +418,25 @@ int sithPlayer_GetThingPlayerNumByIndex(int a1)
     return result;
 }
 
-void sithPlayer_SetInvItemAvailable(int binIdx, int bCarries)
+void sithPlayer_SetInvItemAvailable(int binIndex, int bAvailable)
 {
     SithInventoryItem *v2; // eax
     int v3; // ecx
 
-    v2 = &jkPlayer_playerInfos[playerThingIdx].aItems[binIdx];
+    v2 = &jkPlayer_playerInfos[playerThingIdx].aItems[binIndex];
     v3 = v2->state;
-    if ( bCarries )
+    if ( bAvailable )
         v2->state = v3 | 8;
     else
         v2->state = v3 & ~8u;
 }
 
-void sithPlayer_Reset(unsigned int idx)
+void sithPlayer_Reset(unsigned int playerNum)
 {
     SithPlayer *pPlayerInfo;
 
-    pPlayerInfo = &jkPlayer_playerInfos[idx];
-    if ( idx < 0x20 )
+    pPlayerInfo = &jkPlayer_playerInfos[playerNum];
+    if ( playerNum < 0x20 )
     {
         pPlayerInfo->numKills = 0;
         pPlayerInfo->numKilled = 0;
@@ -459,13 +459,13 @@ void sithPlayer_Reset(unsigned int idx)
     }
 }
 
-int sithPlayer_ShowPlayer(int idx, int netId)
+int sithPlayer_ShowPlayer(int playerNum, int id)
 {
-    if ( !jkPlayer_playerInfos[idx].pLocalPlayer )
+    if ( !jkPlayer_playerInfos[playerNum].pLocalPlayer )
         return 0;
-    jkPlayer_playerInfos[idx].flags |= 5;
-    jkPlayer_playerInfos[idx].playerNetId = netId;
-    jkPlayer_playerInfos[idx].pLocalPlayer->flags &= ~SITH_TF_DISABLED;
+    jkPlayer_playerInfos[playerNum].flags |= 5;
+    jkPlayer_playerInfos[playerNum].playerNetId = id;
+    jkPlayer_playerInfos[playerNum].pLocalPlayer->flags &= ~SITH_TF_DISABLED;
 
     //jkPlayer_playerInfos[idx].pLocalPlayer->controlType = SITH_CT_10; // TODO: WHY IS THIS NEEDED?
 
@@ -473,7 +473,7 @@ int sithPlayer_ShowPlayer(int idx, int netId)
 }
 
 // MOTS altered
-void sithPlayer_NewPlayer(SithThing *player)
+void sithPlayer_NewPlayer(SithThing *pPlayer)
 {
     rdPuppet *v1; // ecx
     int v3; // eax
@@ -481,84 +481,84 @@ void sithPlayer_NewPlayer(SithThing *player)
     stdPalEffect *v6; // eax
     int v9; // edi
 
-    v1 = player->renderData.puppet;
+    v1 = pPlayer->renderData.puppet;
     if ( v1 )
     {
-        if ( player->puppet )
+        if ( pPlayer->puppet )
         {
-            v3 = player->puppet->field_18;
+            v3 = pPlayer->puppet->field_18;
             if ( v3 >= 0 )
                 sithPuppet_StopKey(v1, v3, 0.0);
         }
     }
-    if ( !sithNet_isMulti || (player->flags & SITH_TF_INVULN) == 0 )
+    if ( !sithNet_isMulti || (pPlayer->flags & SITH_TF_INVULN) == 0 )
     {
-        v4 = player->pTemplate;
-        player->actorParams.endurance = 0; // MOTS added
-        player->actorParams.health = v4->actorParams.health;
+        v4 = pPlayer->pTemplate;
+        pPlayer->actorParams.endurance = 0; // MOTS added
+        pPlayer->actorParams.health = v4->actorParams.health;
         if ( (v4->physicsParams.flags & SITH_PF_800) != 0 )
         {
-            player->physicsParams.flags &= ~(SITH_PF_100|SITH_PF_ALIGNSURFACE);
-            player->physicsParams.flags |= SITH_PF_800;
+            pPlayer->physicsParams.flags &= ~(SITH_PF_100|SITH_PF_ALIGNSURFACE);
+            pPlayer->physicsParams.flags |= SITH_PF_800;
         }
-        sithActor_SetHeadPYR(player, &rdroid_zeroVector3);
-        if ( player == sithPlayer_g_pLocalPlayerThing )
+        sithActor_SetHeadPYR(pPlayer, &rdroid_zeroVector3);
+        if ( pPlayer == sithPlayer_g_pLocalPlayerThing )
         {
-            sithCamera_SetCameraFocus(sithCamera_g_aCameras, player, 0);
-            sithCamera_SetCameraFocus(&sithCamera_g_aCameras[1], player, 0);
+            sithCamera_SetCameraFocus(sithCamera_g_aCameras, pPlayer, 0);
+            sithCamera_SetCameraFocus(&sithCamera_g_aCameras[1], pPlayer, 0);
             sithCamera_SetCurrentToCycleCamera();
             v6 = stdPalEffects_GetEffectPointer(sithPlayer_g_pLocalPlayer->palEffectsIdx1);
             stdPalEffects_ResetEffect(v6);
         }
 
-        player->flags &= ~(SITH_TF_DEAD|SITH_TF_DESTROYED);
-        player->actorParams.flags &= ~SITH_AF_FALLKILLED;
-        player->msecLifeLeft = 0;
-        if ( !sithNet_isMulti || player == sithPlayer_g_pLocalPlayerThing )
+        pPlayer->flags &= ~(SITH_TF_DEAD|SITH_TF_DESTROYED);
+        pPlayer->actorParams.flags &= ~SITH_AF_FALLKILLED;
+        pPlayer->msecLifeLeft = 0;
+        if ( !sithNet_isMulti || pPlayer == sithPlayer_g_pLocalPlayerThing )
         {
-            v9 = sithMulti_GetSpawnIdx(player);
-            sithThing_ExitSector(player);
+            v9 = sithMulti_GetSpawnIdx(pPlayer);
+            sithThing_ExitSector(pPlayer);
             sithThing_SetPositionAndOrient(
-                player,
+                pPlayer,
                 &jkPlayer_playerInfos[v9].orient.scale,
                 &jkPlayer_playerInfos[v9].orient);
-            sithThing_EnterSector(player, jkPlayer_playerInfos[v9].pInSector, 1, 0);
+            sithThing_EnterSector(pPlayer, jkPlayer_playerInfos[v9].pInSector, 1, 0);
             sithCamera_Update(sithCamera_g_pCurCamera);
-            sithPhysics_ResetThingMovement(player);
-            sithWeapon_SyncPuppet(player);
-            sithCog_BroadcastMessage(SITH_MESSAGE_NEWPLAYER, SENDERTYPE_THING, player->idx, SENDERTYPE_THING, player->idx);
+            sithPhysics_ResetThingMovement(pPlayer);
+            sithWeapon_SyncPuppet(pPlayer);
+            sithCog_BroadcastMessage(SITH_MESSAGE_NEWPLAYER, SENDERTYPE_THING, pPlayer->idx, SENDERTYPE_THING, pPlayer->idx);
             if ( sithMessage_g_outputstream )
-                sithDSSThing_UpdateState(player, -1, 255);
+                sithDSSThing_UpdateState(pPlayer, -1, 255);
         }
     }
 }
 
-uint32_t sithPlayer_GetPlayerNum(int idx)
+uint32_t sithPlayer_GetPlayerNum(int playerId)
 {
-    if ( !idx )
+    if ( !playerId )
         return -1;
 
     if ( !jkPlayer_maxPlayers )
         return -1;
     for ( uint32_t i = 0; i < jkPlayer_maxPlayers; ++i )
     {
-        if (jkPlayer_playerInfos[i].playerNetId == idx)
+        if (jkPlayer_playerInfos[i].playerNetId == playerId)
             return i;
     }
     return -1;
 }
 
-int sithPlayer_GetPlayerNumByName(wchar_t *pwStr)
+int sithPlayer_GetPlayerNumByName(wchar_t *pwName)
 {
     int v1; // edi
     SithPlayer *i; // esi
 
-    if ( !pwStr )
+    if ( !pwName )
         return -1;
     v1 = 0;
     if ( !jkPlayer_maxPlayers )
         return -1;
-    for ( i = jkPlayer_playerInfos; (i->flags & 1) == 0 || __wcsicmp(i->player_name, pwStr); ++i )
+    for ( i = jkPlayer_playerInfos; (i->flags & 1) == 0 || __wcsicmp(i->player_name, pwName); ++i )
     {
         if ( ++v1 >= (unsigned int)jkPlayer_maxPlayers )
             return -1;

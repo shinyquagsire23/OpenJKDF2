@@ -15,51 +15,51 @@ const rdMatrix44 rdroid_identMatrix44 = {{1.0, 0.0, 0.0, 0.0},
                                          {0.0, 0.0, 1.0, 0.0}, 
                                          {0.0, 0.0, 0.0, 1.0}};
 
-void rdMatrix_Build34(rdMatrix34* NO_ALIAS out, const rdVector3* NO_ALIAS rot, const rdVector3* NO_ALIAS pos)
+void rdMatrix_Build34(rdMatrix34* NO_ALIAS res, const rdVector3* NO_ALIAS pyr, const rdVector3* NO_ALIAS pos)
 {
     flex_t x_rad_sin, x_rad_cos;
     flex_t y_rad_sin, y_rad_cos;
     flex_t z_rad_sin, z_rad_cos;
 
-    stdMath_SinCos(rot->x, &x_rad_sin, &x_rad_cos);
-    stdMath_SinCos(rot->y, &y_rad_sin, &y_rad_cos);
-    stdMath_SinCos(rot->z, &z_rad_sin, &z_rad_cos);
-    out->rvec.x = -(z_rad_sin * y_rad_sin) * x_rad_sin + (z_rad_cos * y_rad_cos);
-    out->rvec.y = ((z_rad_sin * y_rad_cos) * x_rad_sin) + (z_rad_cos * y_rad_sin);
-    out->rvec.z = -z_rad_sin * x_rad_cos;
-    out->lvec.x = -y_rad_sin * x_rad_cos;
-    out->lvec.y = (y_rad_cos * x_rad_cos);
-    out->lvec.z = x_rad_sin;
-    out->uvec.x = ((z_rad_cos * y_rad_sin) * x_rad_sin) + (z_rad_sin * y_rad_cos);
-    out->uvec.y = -x_rad_sin * (y_rad_cos * z_rad_cos) + (y_rad_sin*z_rad_sin);
-    out->uvec.z = z_rad_cos * x_rad_cos;
-    out->scale.x = pos->x;
-    out->scale.y = pos->y;
-    out->scale.z = pos->z;
+    stdMath_SinCos(pyr->x, &x_rad_sin, &x_rad_cos);
+    stdMath_SinCos(pyr->y, &y_rad_sin, &y_rad_cos);
+    stdMath_SinCos(pyr->z, &z_rad_sin, &z_rad_cos);
+    res->rvec.x = -(z_rad_sin * y_rad_sin) * x_rad_sin + (z_rad_cos * y_rad_cos);
+    res->rvec.y = ((z_rad_sin * y_rad_cos) * x_rad_sin) + (z_rad_cos * y_rad_sin);
+    res->rvec.z = -z_rad_sin * x_rad_cos;
+    res->lvec.x = -y_rad_sin * x_rad_cos;
+    res->lvec.y = (y_rad_cos * x_rad_cos);
+    res->lvec.z = x_rad_sin;
+    res->uvec.x = ((z_rad_cos * y_rad_sin) * x_rad_sin) + (z_rad_sin * y_rad_cos);
+    res->uvec.y = -x_rad_sin * (y_rad_cos * z_rad_cos) + (y_rad_sin*z_rad_sin);
+    res->uvec.z = z_rad_cos * x_rad_cos;
+    res->scale.x = pos->x;
+    res->scale.y = pos->y;
+    res->scale.z = pos->z;
 }
 
-void rdMatrix_BuildFromLook34(rdMatrix34* NO_ALIAS out, const rdVector3* NO_ALIAS lookAt)
+void rdMatrix_BuildFromLook34(rdMatrix34* NO_ALIAS mat, const rdVector3* NO_ALIAS look)
 {
-    rdVector_Copy3(&out->lvec, lookAt);
+    rdVector_Copy3(&mat->lvec, look);
 
-    out->rvec.x = (out->lvec.y * 1.0) - (out->lvec.z * 0.0);
-    out->rvec.y = (out->lvec.z * 0.0) - (out->lvec.x * 1.0);
-    out->rvec.z = (out->lvec.x * 0.0) - (out->lvec.y * 0.0);
-    if (rdVector_Normalize3Acc(&out->rvec) == 0.0)
+    mat->rvec.x = (mat->lvec.y * 1.0) - (mat->lvec.z * 0.0);
+    mat->rvec.y = (mat->lvec.z * 0.0) - (mat->lvec.x * 1.0);
+    mat->rvec.z = (mat->lvec.x * 0.0) - (mat->lvec.y * 0.0);
+    if (rdVector_Normalize3Acc(&mat->rvec) == 0.0)
     {
-        out->uvec.x = (out->lvec.z * 0.0) - (out->lvec.y * 0.0);
-        out->uvec.y = (out->lvec.x * 0.0) - (out->lvec.z * 1.0);
-        out->uvec.z = (out->lvec.y * 1.0) - (out->lvec.x * 0.0);
-        rdVector_Normalize3Acc(&out->uvec);
-        out->rvec.x = out->uvec.z * out->lvec.y - out->uvec.y * out->lvec.z;
-        out->rvec.y = (out->uvec.x * out->lvec.z) - (out->uvec.z * out->lvec.x);
-        out->rvec.z = (out->uvec.y * out->lvec.x) - (out->uvec.x * out->lvec.y);
+        mat->uvec.x = (mat->lvec.z * 0.0) - (mat->lvec.y * 0.0);
+        mat->uvec.y = (mat->lvec.x * 0.0) - (mat->lvec.z * 1.0);
+        mat->uvec.z = (mat->lvec.y * 1.0) - (mat->lvec.x * 0.0);
+        rdVector_Normalize3Acc(&mat->uvec);
+        mat->rvec.x = mat->uvec.z * mat->lvec.y - mat->uvec.y * mat->lvec.z;
+        mat->rvec.y = (mat->uvec.x * mat->lvec.z) - (mat->uvec.z * mat->lvec.x);
+        mat->rvec.z = (mat->uvec.y * mat->lvec.x) - (mat->uvec.x * mat->lvec.y);
     }
     else
     {
-        out->uvec.x = (out->lvec.z * out->rvec.y) - (out->rvec.z * out->lvec.y);
-        out->uvec.y = (out->rvec.z * out->lvec.x) - (out->lvec.z * out->rvec.x);
-        out->uvec.z = (out->lvec.y * out->rvec.x) - (out->lvec.x * out->rvec.y);
+        mat->uvec.x = (mat->lvec.z * mat->rvec.y) - (mat->rvec.z * mat->lvec.y);
+        mat->uvec.y = (mat->rvec.z * mat->lvec.x) - (mat->lvec.z * mat->rvec.x);
+        mat->uvec.z = (mat->lvec.y * mat->rvec.x) - (mat->lvec.x * mat->rvec.y);
     }
 }
 
@@ -71,20 +71,20 @@ void rdMatrix_BuildCamera34(rdMatrix34 *out, const rdVector3 *rot, const rdVecto
     rdMatrix_Build34(out, &a, &b);
 }
 
-void rdMatrix_InvertOrtho34(rdMatrix34 *out, const rdMatrix34 *in)
+void rdMatrix_InvertOrtho34(rdMatrix34 *dest, const rdMatrix34 *src)
 {
-    out->rvec.y = in->lvec.x;
-    out->lvec.z = in->uvec.y;
-    out->uvec.x = in->rvec.z;
-    out->rvec.z = in->uvec.x;
-    out->rvec.x = in->rvec.x;
-    out->lvec.x = in->rvec.y;
-    out->lvec.y = in->lvec.y;
-    out->uvec.y = in->lvec.z;
-    out->uvec.z = in->uvec.z;
-    out->scale.x = -((in->rvec.y * in->scale.y) + (in->rvec.z * in->scale.z) + (in->rvec.x * in->scale.x));
-    out->scale.y = -(in->lvec.x * in->scale.x + in->lvec.z * in->scale.z + in->lvec.y * in->scale.y);
-    out->scale.z = -((in->uvec.y * in->scale.y) + (in->uvec.x * in->scale.x) + (in->uvec.z * in->scale.z));
+    dest->rvec.y = src->lvec.x;
+    dest->lvec.z = src->uvec.y;
+    dest->uvec.x = src->rvec.z;
+    dest->rvec.z = src->uvec.x;
+    dest->rvec.x = src->rvec.x;
+    dest->lvec.x = src->rvec.y;
+    dest->lvec.y = src->lvec.y;
+    dest->uvec.y = src->lvec.z;
+    dest->uvec.z = src->uvec.z;
+    dest->scale.x = -((src->rvec.y * src->scale.y) + (src->rvec.z * src->scale.z) + (src->rvec.x * src->scale.x));
+    dest->scale.y = -(src->lvec.x * src->scale.x + src->lvec.z * src->scale.z + src->lvec.y * src->scale.y);
+    dest->scale.z = -((src->uvec.y * src->scale.y) + (src->uvec.x * src->scale.x) + (src->uvec.z * src->scale.z));
 }
 
 void rdMatrix_Build44(rdMatrix44 *out, const rdVector3 *rot, const rdVector3 *pos)
@@ -115,10 +115,10 @@ void rdMatrix_Build44(rdMatrix44 *out, const rdVector3 *rot, const rdVector3 *po
     out->vD.w = 1.0;
 }
 
-void rdMatrix_BuildRotate34(rdMatrix34 *out, const rdVector3 *rot)
+void rdMatrix_BuildRotate34(rdMatrix34 *mat, const rdVector3 *pyr)
 {
     rdVector3 zeroVec = {0,0,0}; // TODO this is a global const
-    rdMatrix_Build34(out, rot, &zeroVec);
+    rdMatrix_Build34(mat, pyr, &zeroVec);
 }
 
 void rdMatrix_BuildInverseRotate34(rdMatrix34 *out, const rdVector3 *rot)
@@ -151,10 +151,10 @@ void rdMatrix_BuildRotate44(rdMatrix44 *out, const rdVector3 *rot)
     rdMatrix_Build44(out, rot, &zeroVec);
 }
 
-void rdMatrix_BuildTranslate34(rdMatrix34 *out, const rdVector3 *tV)
+void rdMatrix_BuildTranslate34(rdMatrix34 *mat, const rdVector3 *vec)
 {
-    stdPlatform_Memcpy32(out, &rdroid_identMatrix34, sizeof(rdMatrix34));
-    rdVector_Copy3(&out->scale, tV);
+    stdPlatform_Memcpy32(mat, &rdroid_identMatrix34, sizeof(rdMatrix34));
+    rdVector_Copy3(&mat->scale, vec);
 }
 
 void rdMatrix_BuildTranslate44(rdMatrix44 *out, const rdVector3 *tV)
@@ -166,23 +166,23 @@ void rdMatrix_BuildTranslate44(rdMatrix44 *out, const rdVector3 *tV)
     out->vD.w = 1.0;
 }
 
-void rdMatrix_BuildScale34(rdMatrix34 *out, const rdVector3 *scale)
+void rdMatrix_BuildScale34(rdMatrix34 *mat, const rdVector3 *scale)
 {
-    out->rvec.x = scale->x;
-    out->rvec.y = 0.0;
-    out->rvec.z = 0.0;
+    mat->rvec.x = scale->x;
+    mat->rvec.y = 0.0;
+    mat->rvec.z = 0.0;
     
-    out->lvec.x = 0.0;
-    out->lvec.y = scale->y;
-    out->lvec.z = 0.0;
+    mat->lvec.x = 0.0;
+    mat->lvec.y = scale->y;
+    mat->lvec.z = 0.0;
     
-    out->uvec.x = 0.0;
-    out->uvec.y = 0.0;
-    out->uvec.z = scale->z;
+    mat->uvec.x = 0.0;
+    mat->uvec.y = 0.0;
+    mat->uvec.z = scale->z;
 
-    out->scale.x = 0.0;
-    out->scale.y = 0.0;
-    out->scale.z = 0.0;
+    mat->scale.x = 0.0;
+    mat->scale.y = 0.0;
+    mat->scale.z = 0.0;
 }
 
 void rdMatrix_BuildScale44(rdMatrix44 *out, const rdVector3 *scale)
@@ -208,7 +208,7 @@ void rdMatrix_BuildScale44(rdMatrix44 *out, const rdVector3 *scale)
     out->vD.w = 1.0;
 }
 
-void rdMatrix_BuildFromVectorAngle34(rdMatrix34* NO_ALIAS out, const rdVector3* NO_ALIAS v, flex_t angle)
+void rdMatrix_BuildFromVectorAngle34(rdMatrix34* NO_ALIAS mat, const rdVector3* NO_ALIAS vec, flex_t angle)
 {
     flex_t v12;
     flex_t v44;
@@ -216,57 +216,57 @@ void rdMatrix_BuildFromVectorAngle34(rdMatrix34* NO_ALIAS out, const rdVector3* 
     flex_t angleRad_sin, angleRad_cos;
 
     stdMath_SinCos(angle, &angleRad_sin, &angleRad_cos);
-    if ( v->z >= 1.0 )
+    if ( vec->z >= 1.0 )
     {
-        out->rvec.x = angleRad_cos;
-        out->lvec.y = angleRad_cos;
-        out->lvec.x = -angleRad_sin;
-        out->rvec.y = angleRad_sin;
-        out->rvec.z = 0.0;
-        out->lvec.z = 0.0;
-        out->uvec.x = 0.0;
-        out->uvec.y = 0.0;
-        out->uvec.z = 1.0;
-        out->scale.x = 0.0;
-        out->scale.y = 0.0;
-        out->scale.z = 0.0;
+        mat->rvec.x = angleRad_cos;
+        mat->lvec.y = angleRad_cos;
+        mat->lvec.x = -angleRad_sin;
+        mat->rvec.y = angleRad_sin;
+        mat->rvec.z = 0.0;
+        mat->lvec.z = 0.0;
+        mat->uvec.x = 0.0;
+        mat->uvec.y = 0.0;
+        mat->uvec.z = 1.0;
+        mat->scale.x = 0.0;
+        mat->scale.y = 0.0;
+        mat->scale.z = 0.0;
         return;
     }
-    if ( v->z <= -1.0 )
+    if ( vec->z <= -1.0 )
     {
-        out->rvec.x = angleRad_cos;
-        out->lvec.y = angleRad_cos;
-        out->rvec.y = -angleRad_sin;
-        out->lvec.x = angleRad_sin;
-        out->rvec.z = 0.0;
-        out->lvec.z = 0.0;
-        out->uvec.x = 0.0;
-        out->uvec.y = 0.0;
-        out->uvec.z = 1.0;
-        out->scale.x = 0.0;
-        out->scale.y = 0.0;
-        out->scale.z = 0.0;
+        mat->rvec.x = angleRad_cos;
+        mat->lvec.y = angleRad_cos;
+        mat->rvec.y = -angleRad_sin;
+        mat->lvec.x = angleRad_sin;
+        mat->rvec.z = 0.0;
+        mat->lvec.z = 0.0;
+        mat->uvec.x = 0.0;
+        mat->uvec.y = 0.0;
+        mat->uvec.z = 1.0;
+        mat->scale.x = 0.0;
+        mat->scale.y = 0.0;
+        mat->scale.z = 0.0;
         return;
     }
-    v12 = v->x * v->x;
-    v44 = v->y * v->y;
+    v12 = vec->x * vec->x;
+    v44 = vec->y * vec->y;
     v51 = 1.0 - v12 - v44;
-    out->rvec.x = (((angleRad_cos * v12) * v51 + (angleRad_cos * v44)) / (1.0 - v51)) + (v->z * v->x * (1.0 - angleRad_cos));
-    out->scale.x = 0.0;
-    out->scale.y = 0.0;
-    out->lvec.y = (((angleRad_cos * v44) * v51 + (angleRad_cos * v12)) / (1.0 - v51)) + v44;
-    out->uvec.z = ((angleRad_cos * v12) + (angleRad_cos * v44)) + v51;
-    out->rvec.y = (v->z * angleRad_sin) + ((v->y * v->x) * (1.0 - angleRad_cos));
-    out->lvec.x = ((v->y * v->x) * (1.0 - angleRad_cos)) - (v->z * angleRad_sin);
-    out->rvec.z = ((v->z * v->x) * (1.0 - angleRad_cos)) - ((v->y) * angleRad_sin);
-    out->lvec.z = ((v->z * v->y) * (1.0 - angleRad_cos)) + (v->x * angleRad_sin);
-    out->uvec.x = ((v->z * v->x) * (1.0 - angleRad_cos)) + ((v->y) * angleRad_sin);
-    out->uvec.y = ((v->z * v->y) * (1.0 - angleRad_cos)) - (v->x * angleRad_sin);
-    out->scale.z = 0.0;
+    mat->rvec.x = (((angleRad_cos * v12) * v51 + (angleRad_cos * v44)) / (1.0 - v51)) + (vec->z * vec->x * (1.0 - angleRad_cos));
+    mat->scale.x = 0.0;
+    mat->scale.y = 0.0;
+    mat->lvec.y = (((angleRad_cos * v44) * v51 + (angleRad_cos * v12)) / (1.0 - v51)) + v44;
+    mat->uvec.z = ((angleRad_cos * v12) + (angleRad_cos * v44)) + v51;
+    mat->rvec.y = (vec->z * angleRad_sin) + ((vec->y * vec->x) * (1.0 - angleRad_cos));
+    mat->lvec.x = ((vec->y * vec->x) * (1.0 - angleRad_cos)) - (vec->z * angleRad_sin);
+    mat->rvec.z = ((vec->z * vec->x) * (1.0 - angleRad_cos)) - ((vec->y) * angleRad_sin);
+    mat->lvec.z = ((vec->z * vec->y) * (1.0 - angleRad_cos)) + (vec->x * angleRad_sin);
+    mat->uvec.x = ((vec->z * vec->x) * (1.0 - angleRad_cos)) + ((vec->y) * angleRad_sin);
+    mat->uvec.y = ((vec->z * vec->y) * (1.0 - angleRad_cos)) - (vec->x * angleRad_sin);
+    mat->scale.z = 0.0;
 }
 
 // MOTS altered
-void rdMatrix_LookAt(rdMatrix34 *out, const rdVector3* NO_ALIAS v1, const rdVector3* NO_ALIAS v2, flex_t angle)
+void rdMatrix_LookAt(rdMatrix34 *mat, const rdVector3* NO_ALIAS eyePos, const rdVector3* NO_ALIAS lookPos, flex_t angle)
 {
     flex_t v7;
     flex_t v11;
@@ -275,12 +275,12 @@ void rdMatrix_LookAt(rdMatrix34 *out, const rdVector3* NO_ALIAS v1, const rdVect
     flex_t v25;
     rdMatrix34 tmp;
 
-    out->lvec.x = v2->x - v1->x;
-    out->lvec.y = v2->y - v1->y;
-    out->lvec.z = v2->z - v1->z;
-    rdVector_Normalize3Acc(&out->lvec);
-    rdMatrix_BuildFromVectorAngle34(&tmp, &out->lvec, angle);
-    v7 = stdMath_Fabs((out->lvec.y * 0.0) + (out->lvec.x * 0.0) + (out->lvec.z * 1.0));
+    mat->lvec.x = lookPos->x - eyePos->x;
+    mat->lvec.y = lookPos->y - eyePos->y;
+    mat->lvec.z = lookPos->z - eyePos->z;
+    rdVector_Normalize3Acc(&mat->lvec);
+    rdMatrix_BuildFromVectorAngle34(&tmp, &mat->lvec, angle);
+    v7 = stdMath_Fabs((mat->lvec.y * 0.0) + (mat->lvec.x * 0.0) + (mat->lvec.z * 1.0));
     if ( v7 <= 0.999 )
     {
         v24 = tmp.rvec.x * 0.0 + tmp.lvec.x * 0.0 + tmp.uvec.x * 1.0;
@@ -288,7 +288,7 @@ void rdMatrix_LookAt(rdMatrix34 *out, const rdVector3* NO_ALIAS v1, const rdVect
         v12 = tmp.rvec.z * 0.0 + tmp.lvec.z * 0.0;
         v11 = tmp.uvec.z * 1.0;
     }
-    else if ( out->lvec.z <= 0.0 )
+    else if ( mat->lvec.z <= 0.0 )
     {
         v24 = tmp.rvec.x * 0.0 + tmp.lvec.x * 1.0 + tmp.uvec.x * 0.0;
         v25 = tmp.rvec.y * 0.0 + tmp.lvec.y * 1.0 + tmp.uvec.y * 0.0;
@@ -302,20 +302,20 @@ void rdMatrix_LookAt(rdMatrix34 *out, const rdVector3* NO_ALIAS v1, const rdVect
         v11 = tmp.rvec.z * -0.0;
         v12 = tmp.lvec.z * -1.0 + tmp.uvec.z * -0.0;
     }
-    out->rvec.x = out->lvec.y * (v12 + v11) - out->lvec.z * v25;
-    out->rvec.y = (out->lvec.z * v24) - out->lvec.x * (v12 + v11);
-    out->rvec.z = out->lvec.x * v25 - out->lvec.y * v24;
-    rdVector_Normalize3Acc(&out->rvec);
-    out->uvec.x = (out->rvec.y * out->lvec.z) - (out->rvec.z * out->lvec.y);
-    out->uvec.y = (out->rvec.z * out->lvec.x) - (out->lvec.z * out->rvec.x);
-    out->uvec.z = (out->lvec.y * out->rvec.x) - (out->rvec.y * out->lvec.x);
-    rdVector_Normalize3Acc(&out->uvec);
-    out->scale.x = v1->x;
-    out->scale.y = v1->y;
-    out->scale.z = v1->z;
+    mat->rvec.x = mat->lvec.y * (v12 + v11) - mat->lvec.z * v25;
+    mat->rvec.y = (mat->lvec.z * v24) - mat->lvec.x * (v12 + v11);
+    mat->rvec.z = mat->lvec.x * v25 - mat->lvec.y * v24;
+    rdVector_Normalize3Acc(&mat->rvec);
+    mat->uvec.x = (mat->rvec.y * mat->lvec.z) - (mat->rvec.z * mat->lvec.y);
+    mat->uvec.y = (mat->rvec.z * mat->lvec.x) - (mat->lvec.z * mat->rvec.x);
+    mat->uvec.z = (mat->lvec.y * mat->rvec.x) - (mat->rvec.y * mat->lvec.x);
+    rdVector_Normalize3Acc(&mat->uvec);
+    mat->scale.x = eyePos->x;
+    mat->scale.y = eyePos->y;
+    mat->scale.z = eyePos->z;
 }
 
-void rdMatrix_ExtractAngles34(const rdMatrix34* NO_ALIAS in, rdVector3 *out)
+void rdMatrix_ExtractAngles34(const rdMatrix34* NO_ALIAS mat, rdVector3 *pyr)
 {
     flex_t v7; // ST08_4
     flex_t v9; // ST24_4
@@ -333,75 +333,75 @@ void rdMatrix_ExtractAngles34(const rdMatrix34* NO_ALIAS in, rdVector3 *out)
     flex_t v34; // [esp+30h] [ebp+8h]
     flex_t v35; // [esp+30h] [ebp+8h]
 
-    v33 = stdMath_Sqrt((in->lvec.y * in->lvec.y) + (in->lvec.x * in->lvec.x));
+    v33 = stdMath_Sqrt((mat->lvec.y * mat->lvec.y) + (mat->lvec.x * mat->lvec.x));
     if ( v33 < 0.001 )
     {
-        out->z = 90.0 - stdMath_ArcSin3(in->rvec.x);
+        pyr->z = 90.0 - stdMath_ArcSin3(mat->rvec.x);
         
-        if ( -in->lvec.y > 0.0 && in->lvec.z > 0.0 || -in->rvec.y < 0.0 && in->lvec.z < 0.0 )
-            out->z = -out->z;
-        out->y = 0.0;
+        if ( -mat->lvec.y > 0.0 && mat->lvec.z > 0.0 || -mat->rvec.y < 0.0 && mat->lvec.z < 0.0 )
+            pyr->z = -pyr->z;
+        pyr->y = 0.0;
     }
     else
     {
-        out->y = 90.0 - stdMath_ArcSin3(in->lvec.y / v33);
-        if (in->lvec.x > 0.0)
-            out->y = -out->y;
+        pyr->y = 90.0 - stdMath_ArcSin3(mat->lvec.y / v33);
+        if (mat->lvec.x > 0.0)
+            pyr->y = -pyr->y;
     }
     if ( v33 >= 0.001 )
     {
-        v7 = (in->lvec.y * in->lvec.y) + (in->lvec.x * in->lvec.x);
+        v7 = (mat->lvec.y * mat->lvec.y) + (mat->lvec.x * mat->lvec.x);
         v22 = v7 / v33;
         if ( v22 < 1.0 )
         {
             v34 = v22;
-            out->x = 90.0 - stdMath_ArcSin3(v34);
+            pyr->x = 90.0 - stdMath_ArcSin3(v34);
         }
         else
         {
-            out->x = 0.0;
+            pyr->x = 0.0;
         }
     }
     else
     {
-        out->x = 90.0;
+        pyr->x = 90.0;
     }
-    if ( in->lvec.z < 0.0 )
-        out->x = -out->x;
-    v23 = -in->lvec.y;
-    v25 = stdMath_Sqrt(v23 * v23 + (in->lvec.x * in->lvec.x));
+    if ( mat->lvec.z < 0.0 )
+        pyr->x = -pyr->x;
+    v23 = -mat->lvec.y;
+    v25 = stdMath_Sqrt(v23 * v23 + (mat->lvec.x * mat->lvec.x));
     if (v25 >= 0.001)
     {
-        v35 = (v23 * -in->rvec.x + -in->rvec.y * in->lvec.x) / v25;
+        v35 = (v23 * -mat->rvec.x + -mat->rvec.y * mat->lvec.x) / v25;
         if ( v35 < 1.0 )
         {
             if ( v35 > -1.0 )
-                out->z = 90.0 - stdMath_ArcSin3(v35);
+                pyr->z = 90.0 - stdMath_ArcSin3(v35);
             else
-                out->z = 180.0;
+                pyr->z = 180.0;
         }
         else
         {
-            out->z = 0.0;
+            pyr->z = 0.0;
         }
-        v9 = -in->rvec.z;
+        v9 = -mat->rvec.z;
         if ( v9 < 0.0 )
-            out->z = -out->z;
+            pyr->z = -pyr->z;
     }
 }
 
-void rdMatrix_Normalize34(rdMatrix34 *m)
+void rdMatrix_Normalize34(rdMatrix34 *mat)
 {
-    m->uvec.x = (m->rvec.y * m->lvec.z) - (m->rvec.z * m->lvec.y);
-    m->uvec.y = (m->rvec.z * m->lvec.x) - (m->lvec.z * m->rvec.x);
-    m->uvec.z = (m->lvec.y * m->rvec.x) - (m->rvec.y * m->lvec.x);
+    mat->uvec.x = (mat->rvec.y * mat->lvec.z) - (mat->rvec.z * mat->lvec.y);
+    mat->uvec.y = (mat->rvec.z * mat->lvec.x) - (mat->lvec.z * mat->rvec.x);
+    mat->uvec.z = (mat->lvec.y * mat->rvec.x) - (mat->rvec.y * mat->lvec.x);
 
-    rdVector_Normalize3Acc(&m->lvec);
-    rdVector_Normalize3Acc(&m->uvec);
+    rdVector_Normalize3Acc(&mat->lvec);
+    rdVector_Normalize3Acc(&mat->uvec);
 
-    m->rvec.x = (m->uvec.z * m->lvec.y) - (m->uvec.y * m->lvec.z);
-    m->rvec.y = (m->lvec.z * m->uvec.x) - (m->uvec.z * m->lvec.x);
-    m->rvec.z = (m->uvec.y * m->lvec.x) - (m->lvec.y * m->uvec.x);
+    mat->rvec.x = (mat->uvec.z * mat->lvec.y) - (mat->uvec.y * mat->lvec.z);
+    mat->rvec.y = (mat->lvec.z * mat->uvec.x) - (mat->uvec.z * mat->lvec.x);
+    mat->rvec.z = (mat->uvec.y * mat->lvec.x) - (mat->lvec.y * mat->uvec.x);
 }
 
 void rdMatrix_Identity34(rdMatrix34 *out)
@@ -485,47 +485,47 @@ void rdMatrix_Transpose44(rdMatrix44 *out, const rdMatrix44 *src)
     stdPlatform_Memcpy32(out, &tmp, sizeof(rdMatrix44));
 }
 
-void rdMatrix_Multiply34(rdMatrix34* NO_ALIAS out, const rdMatrix34* NO_ALIAS mat1, const rdMatrix34* NO_ALIAS mat2)
+void rdMatrix_Multiply34(rdMatrix34* NO_ALIAS dest, const rdMatrix34* NO_ALIAS a, const rdMatrix34* NO_ALIAS b)
 {
-    out->rvec.x = (mat1->uvec.x * mat2->rvec.z)
-                  + (mat2->rvec.y * mat1->lvec.x)
-                  + (mat2->rvec.x * mat1->rvec.x);
-    out->rvec.y = (mat1->rvec.y * mat2->rvec.x)
-                  + (mat1->lvec.y * mat2->rvec.y)
-                  + (mat1->uvec.y * mat2->rvec.z);
-    out->rvec.z = (mat1->rvec.z * mat2->rvec.x)
-                  + (mat1->uvec.z * mat2->rvec.z)
-                  + (mat1->lvec.z * mat2->rvec.y);
-    out->lvec.x = (mat2->lvec.x * mat1->rvec.x)
-                  + (mat2->lvec.z * mat1->uvec.x)
-                  + (mat2->lvec.y * mat1->lvec.x);
-    out->lvec.y = (mat2->lvec.z * mat1->uvec.y)
-                  + (mat2->lvec.y * mat1->lvec.y)
-                  + (mat2->lvec.x * mat1->rvec.y);
-    out->lvec.z = (mat2->lvec.z * mat1->uvec.z)
-                  + (mat1->lvec.z * mat2->lvec.y)
-                  + (mat2->lvec.x * mat1->rvec.z);
-    out->uvec.x = (mat2->uvec.x * mat1->rvec.x)
-                  + (mat2->uvec.y * mat1->lvec.x)
-                  + (mat2->uvec.z * mat1->uvec.x);
-    out->uvec.y = (mat2->uvec.x * mat1->rvec.y)
-                  + (mat2->uvec.y * mat1->lvec.y)
-                  + (mat2->uvec.z * mat1->uvec.y);
-    out->uvec.z = (mat2->uvec.z * mat1->uvec.z)
-                  + (mat2->uvec.x * mat1->rvec.z)
-                  + (mat2->uvec.y * mat1->lvec.z);
-    out->scale.x = (mat2->scale.x * mat1->rvec.x)
-                   + (mat2->scale.z * mat1->uvec.x)
-                   + (mat2->scale.y * mat1->lvec.x)
-                   + mat1->scale.x;
-    out->scale.y = (mat2->scale.x * mat1->rvec.y)
-                   + (mat2->scale.y * mat1->lvec.y)
-                   + (mat2->scale.z * mat1->uvec.y)
-                   + mat1->scale.y;
-    out->scale.z = (mat2->scale.y * mat1->lvec.z) 
-                   + (mat2->scale.x * mat1->rvec.z) 
-                   + (mat2->scale.z * mat1->uvec.z) 
-                   + mat1->scale.z;
+    dest->rvec.x = (a->uvec.x * b->rvec.z)
+                  + (b->rvec.y * a->lvec.x)
+                  + (b->rvec.x * a->rvec.x);
+    dest->rvec.y = (a->rvec.y * b->rvec.x)
+                  + (a->lvec.y * b->rvec.y)
+                  + (a->uvec.y * b->rvec.z);
+    dest->rvec.z = (a->rvec.z * b->rvec.x)
+                  + (a->uvec.z * b->rvec.z)
+                  + (a->lvec.z * b->rvec.y);
+    dest->lvec.x = (b->lvec.x * a->rvec.x)
+                  + (b->lvec.z * a->uvec.x)
+                  + (b->lvec.y * a->lvec.x);
+    dest->lvec.y = (b->lvec.z * a->uvec.y)
+                  + (b->lvec.y * a->lvec.y)
+                  + (b->lvec.x * a->rvec.y);
+    dest->lvec.z = (b->lvec.z * a->uvec.z)
+                  + (a->lvec.z * b->lvec.y)
+                  + (b->lvec.x * a->rvec.z);
+    dest->uvec.x = (b->uvec.x * a->rvec.x)
+                  + (b->uvec.y * a->lvec.x)
+                  + (b->uvec.z * a->uvec.x);
+    dest->uvec.y = (b->uvec.x * a->rvec.y)
+                  + (b->uvec.y * a->lvec.y)
+                  + (b->uvec.z * a->uvec.y);
+    dest->uvec.z = (b->uvec.z * a->uvec.z)
+                  + (b->uvec.x * a->rvec.z)
+                  + (b->uvec.y * a->lvec.z);
+    dest->scale.x = (b->scale.x * a->rvec.x)
+                   + (b->scale.z * a->uvec.x)
+                   + (b->scale.y * a->lvec.x)
+                   + a->scale.x;
+    dest->scale.y = (b->scale.x * a->rvec.y)
+                   + (b->scale.y * a->lvec.y)
+                   + (b->scale.z * a->uvec.y)
+                   + a->scale.y;
+    dest->scale.z = (b->scale.y * a->lvec.z) 
+                   + (b->scale.x * a->rvec.z) 
+                   + (b->scale.z * a->uvec.z) 
+                   + a->scale.z;
 }
 
 void rdMatrix_Multiply44(rdMatrix44 *out, const rdMatrix44 *mat1, const rdMatrix44 *mat2)
@@ -548,11 +548,11 @@ void rdMatrix_Multiply44(rdMatrix44 *out, const rdMatrix44 *mat1, const rdMatrix
     out->vD.w = mat2->vD.w * mat1->vD.w + mat2->vD.y * mat1->vB.w + mat2->vD.x * mat1->vA.w + mat2->vD.z * mat1->vC.w;
 }
 
-void rdMatrix_PreMultiply34(rdMatrix34 *mat1, const rdMatrix34 *mat2)
+void rdMatrix_PreMultiply34(rdMatrix34 *a, const rdMatrix34 *b)
 {
     rdMatrix34 tmp;
-    stdPlatform_Memcpy32(&tmp, mat1, sizeof(tmp));
-    rdMatrix_Multiply34(mat1, &tmp, mat2);
+    stdPlatform_Memcpy32(&tmp, a, sizeof(tmp));
+    rdMatrix_Multiply34(a, &tmp, b);
 }
 
 void rdMatrix_PreMultiply44(rdMatrix44 *mat1, const rdMatrix44 *mat2)
@@ -562,11 +562,11 @@ void rdMatrix_PreMultiply44(rdMatrix44 *mat1, const rdMatrix44 *mat2)
     rdMatrix_Multiply44(mat1, &tmp, mat2);
 }
 
-void rdMatrix_PostMultiply34(rdMatrix34 *mat1, const rdMatrix34 *mat2)
+void rdMatrix_PostMultiply34(rdMatrix34 *a, const rdMatrix34 *b)
 {
     rdMatrix34 tmp;
-    stdPlatform_Memcpy32(&tmp, mat1, sizeof(tmp));
-    rdMatrix_Multiply34(mat1, mat2, &tmp);
+    stdPlatform_Memcpy32(&tmp, a, sizeof(tmp));
+    rdMatrix_Multiply34(a, b, &tmp);
 }
 
 void rdMatrix_PostMultiply44(rdMatrix44 *mat1, const rdMatrix44 *mat2)
@@ -576,12 +576,12 @@ void rdMatrix_PostMultiply44(rdMatrix44 *mat1, const rdMatrix44 *mat2)
     rdMatrix_Multiply44(mat1, mat2, &tmp);
 }
 
-void rdMatrix_PreRotate34(rdMatrix34 *out, const rdVector3 *rot)
+void rdMatrix_PreRotate34(rdMatrix34 *mat, const rdVector3 *pyr)
 {
     rdMatrix34 tmp;
 
-    rdMatrix_BuildRotate34(&tmp, rot);
-    rdMatrix_PreMultiply34(out, &tmp);
+    rdMatrix_BuildRotate34(&tmp, pyr);
+    rdMatrix_PreMultiply34(mat, &tmp);
 }
 
 void rdMatrix_PreRotate44(rdMatrix44 *out, const rdVector3 *rot)
@@ -592,12 +592,12 @@ void rdMatrix_PreRotate44(rdMatrix44 *out, const rdVector3 *rot)
     rdMatrix_PreMultiply44(out, &a);
 }
 
-void rdMatrix_PostRotate34(rdMatrix34 *out, const rdVector3 *rot)
+void rdMatrix_PostRotate34(rdMatrix34 *mat, const rdVector3 *vecPYR)
 {
     rdMatrix34 a;
 
-    rdMatrix_BuildRotate34(&a, rot);
-    rdMatrix_PostMultiply34(out, &a);
+    rdMatrix_BuildRotate34(&a, vecPYR);
+    rdMatrix_PostMultiply34(mat, &a);
 }
 
 void rdMatrix_PostRotate44(rdMatrix44 *out, const rdVector3 *rot)
@@ -608,15 +608,15 @@ void rdMatrix_PostRotate44(rdMatrix44 *out, const rdVector3 *rot)
     rdMatrix_PostMultiply44(out, &a);
 }
 
-void rdMatrix_PreTranslate34(rdMatrix34 *out, const rdVector3 *trans)
+void rdMatrix_PreTranslate34(rdMatrix34 *mat, const rdVector3 *vec)
 {
     rdMatrix34 mat2;
 
     stdPlatform_Memcpy32(&mat2, &rdroid_identMatrix34, sizeof(mat2));
-    mat2.scale.x = trans->x;
-    mat2.scale.y = trans->y;
-    mat2.scale.z = trans->z;
-    rdMatrix_PreMultiply34(out, &mat2);
+    mat2.scale.x = vec->x;
+    mat2.scale.y = vec->y;
+    mat2.scale.z = vec->z;
+    rdMatrix_PreMultiply34(mat, &mat2);
 }
 
 void rdMatrix_PreTranslate44(rdMatrix44 *out, const rdVector3 *tV)
@@ -631,15 +631,15 @@ void rdMatrix_PreTranslate44(rdMatrix44 *out, const rdVector3 *tV)
     rdMatrix_PreMultiply44(out, &mTmp);
 }
 
-void rdMatrix_PostTranslate34(rdMatrix34 *out, const rdVector3 *trans)
+void rdMatrix_PostTranslate34(rdMatrix34 *pMat, const rdVector3 *pVec)
 {
     rdMatrix34 mat2;
 
     stdPlatform_Memcpy32(&mat2, &rdroid_identMatrix34, sizeof(mat2));
-    mat2.scale.x = trans->x;
-    mat2.scale.y = trans->y;
-    mat2.scale.z = trans->z;
-    rdMatrix_PostMultiply34(out, &mat2);
+    mat2.scale.x = pVec->x;
+    mat2.scale.y = pVec->y;
+    mat2.scale.z = pVec->z;
+    rdMatrix_PostMultiply34(pMat, &mat2);
 }
 
 void rdMatrix_PostTranslate44(rdMatrix44 *out, const rdVector3 *tV)
@@ -654,23 +654,23 @@ void rdMatrix_PostTranslate44(rdMatrix44 *out, const rdVector3 *tV)
     rdMatrix_PostMultiply44(out, &mTmp);
 }
 
-void rdMatrix_PreScale34(rdMatrix34 *out, const rdVector3 *scale)
+void rdMatrix_PreScale34(rdMatrix34 *mat, const rdVector3 *vec)
 {
     rdMatrix34 tmp;
 
     tmp.rvec.y = 0.0;
     tmp.rvec.z = 0.0;
     tmp.lvec.x = 0.0;
-    tmp.rvec.x = scale->x;
-    tmp.lvec.y = scale->y;
-    tmp.uvec.z = scale->z;
+    tmp.rvec.x = vec->x;
+    tmp.lvec.y = vec->y;
+    tmp.uvec.z = vec->z;
     tmp.scale.x = 0.0;
     tmp.scale.y = 0.0;
     tmp.lvec.z = 0.0;
     tmp.uvec.x = 0.0;
     tmp.uvec.y = 0.0;
     tmp.scale.z = 0.0;
-    rdMatrix_PreMultiply34(out, &tmp);
+    rdMatrix_PreMultiply34(mat, &tmp);
 }
 
 void rdMatrix_PreScale44(rdMatrix44 *out, const rdVector4 *scale)
@@ -693,23 +693,23 @@ void rdMatrix_PreScale44(rdMatrix44 *out, const rdVector4 *scale)
     rdMatrix_PreMultiply44(out, &tmp);
 }
 
-void rdMatrix_PostScale34(rdMatrix34 *out, const rdVector3 *scale)
+void rdMatrix_PostScale34(rdMatrix34 *mat, const rdVector3 *vec)
 {
     rdMatrix34 tmp;
 
     tmp.rvec.y = 0.0;
     tmp.rvec.z = 0.0;
     tmp.lvec.x = 0.0;
-    tmp.rvec.x = scale->x;
-    tmp.lvec.y = scale->y;
-    tmp.uvec.z = scale->z;
+    tmp.rvec.x = vec->x;
+    tmp.lvec.y = vec->y;
+    tmp.uvec.z = vec->z;
     tmp.scale.x = 0.0;
     tmp.scale.y = 0.0;
     tmp.lvec.z = 0.0;
     tmp.uvec.x = 0.0;
     tmp.uvec.y = 0.0;
     tmp.scale.z = 0.0;
-    rdMatrix_PostMultiply34(out, &tmp);
+    rdMatrix_PostMultiply34(mat, &tmp);
 }
 
 void rdMatrix_PostScale44(rdMatrix44 *out, const rdVector4 *scale)
@@ -758,7 +758,7 @@ void rdMatrix_GetRowVector44(rdMatrix44 *m, int row, rdVector4 *out)
     rdVector_Copy4(out, v3);
 }
 
-void rdMatrix_TransformVector34(rdVector3 *out, const rdVector3 *v, const rdMatrix34 *m)
+void rdMatrix_TransformVector34(rdVector3 *dest, const rdVector3 *src, const rdMatrix34 *mat)
 {
     flex_d_t v3; // st5
     flex_d_t v4; // st4
@@ -770,21 +770,21 @@ void rdMatrix_TransformVector34(rdVector3 *out, const rdVector3 *v, const rdMatr
     flex_d_t v10; // st4
     flex_d_t v11; // st5
 
-    v3 = m->uvec.y;
-    v4 = m->lvec.y;
-    v5 = m->uvec.z;
-    v6 = m->lvec.z;
-    v7 = v->z;
-    out->x = m->uvec.x * v7 + m->lvec.x * v->y + m->rvec.x * v->x;
+    v3 = mat->uvec.y;
+    v4 = mat->lvec.y;
+    v5 = mat->uvec.z;
+    v6 = mat->lvec.z;
+    v7 = src->z;
+    dest->x = mat->uvec.x * v7 + mat->lvec.x * src->y + mat->rvec.x * src->x;
     v8 = v5;
-    v9 = v->z;
-    v10 = v3 * v7 + v4 * v->y + m->rvec.y * v->x;
-    v11 = v->y;
-    out->y = v10;
-    out->z = v8 * v9 + v6 * v11 + m->rvec.z * v->x;
+    v9 = src->z;
+    v10 = v3 * v7 + v4 * src->y + mat->rvec.y * src->x;
+    v11 = src->y;
+    dest->y = v10;
+    dest->z = v8 * v9 + v6 * v11 + mat->rvec.z * src->x;
 }
 
-void rdMatrix_TransformVectorOrtho34(rdVector3* NO_ALIAS a1, const rdVector3* NO_ALIAS a2, const rdMatrix34 *a3)
+void rdMatrix_TransformVectorOrtho34(rdVector3* NO_ALIAS dest, const rdVector3* NO_ALIAS src, const rdMatrix34 *mat)
 {
     flex_d_t v3; // st5
     flex_d_t v4; // st4
@@ -796,28 +796,28 @@ void rdMatrix_TransformVectorOrtho34(rdVector3* NO_ALIAS a1, const rdVector3* NO
     flex_d_t v10; // st4
     flex_d_t v11; // st5
 
-    v3 = a3->lvec.z;
-    v4 = a3->lvec.y;
-    v5 = a3->uvec.z;
-    v6 = a3->uvec.y;
-    v7 = a2->z;
-    a1->x = a3->rvec.z * v7 + a3->rvec.y * a2->y + a3->rvec.x * a2->x;
+    v3 = mat->lvec.z;
+    v4 = mat->lvec.y;
+    v5 = mat->uvec.z;
+    v6 = mat->uvec.y;
+    v7 = src->z;
+    dest->x = mat->rvec.z * v7 + mat->rvec.y * src->y + mat->rvec.x * src->x;
     v8 = v5;
-    v9 = a2->z;
-    v10 = v3 * v7 + v4 * a2->y + a3->lvec.x * a2->x;
-    v11 = a2->y;
-    a1->y = v10;
-    a1->z = v8 * v9 + v6 * v11 + a3->uvec.x * a2->x;
+    v9 = src->z;
+    v10 = v3 * v7 + v4 * src->y + mat->lvec.x * src->x;
+    v11 = src->y;
+    dest->y = v10;
+    dest->z = v8 * v9 + v6 * v11 + mat->uvec.x * src->x;
 }
 
-void rdMatrix_TransformVector34Acc(rdVector3* NO_ALIAS pAcc, const rdMatrix34 *pIn)
+void rdMatrix_TransformVector34Acc(rdVector3* NO_ALIAS dest, const rdMatrix34 *mat)
 {
     rdVector3 tmp;
 
-    tmp.x = pIn->uvec.x * pAcc->z + pIn->lvec.x * pAcc->y + pIn->rvec.x * pAcc->x;
-    tmp.y = pIn->lvec.y * pAcc->y + pIn->uvec.y * pAcc->z + pIn->rvec.y * pAcc->x;
-    tmp.z = pIn->uvec.z * pAcc->z + pIn->lvec.z * pAcc->y + pIn->rvec.z * pAcc->x;
-    *pAcc = tmp;
+    tmp.x = mat->uvec.x * dest->z + mat->lvec.x * dest->y + mat->rvec.x * dest->x;
+    tmp.y = mat->lvec.y * dest->y + mat->uvec.y * dest->z + mat->rvec.y * dest->x;
+    tmp.z = mat->uvec.z * dest->z + mat->lvec.z * dest->y + mat->rvec.z * dest->x;
+    *dest = tmp;
 }
 
 void rdMatrix_TransformVector44(rdMatrix44 *pOut, const rdVector4 *pTrans4, const rdMatrix44 *pIn)
@@ -847,19 +847,19 @@ void rdMatrix_TransformVector44Acc(rdVector4 *a1, const rdMatrix44 *a2)
     a1->w = v6 + v5;
 }
 
-void rdMatrix_TransformPoint34(rdVector3* NO_ALIAS vOut, const rdVector3* NO_ALIAS vIn, const rdMatrix34 *camera)
+void rdMatrix_TransformPoint34(rdVector3* NO_ALIAS dest, const rdVector3* NO_ALIAS src, const rdMatrix34 *mat)
 {
-    vOut->x = camera->lvec.x * vIn->y + camera->uvec.x * vIn->z + camera->rvec.x * vIn->x + camera->scale.x;
-    vOut->y = (camera->lvec.y * vIn->y + camera->uvec.y * vIn->z + camera->rvec.y * vIn->x) + camera->scale.y;
-    vOut->z = camera->uvec.z * vIn->z + camera->lvec.z * vIn->y + camera->rvec.z * vIn->x + camera->scale.z;
+    dest->x = mat->lvec.x * src->y + mat->uvec.x * src->z + mat->rvec.x * src->x + mat->scale.x;
+    dest->y = (mat->lvec.y * src->y + mat->uvec.y * src->z + mat->rvec.y * src->x) + mat->scale.y;
+    dest->z = mat->uvec.z * src->z + mat->lvec.z * src->y + mat->rvec.z * src->x + mat->scale.z;
 }
 
-void rdMatrix_TransformPoint34Acc(rdVector3* NO_ALIAS a1, const rdMatrix34 *a2)
+void rdMatrix_TransformPoint34Acc(rdVector3* NO_ALIAS dest, const rdMatrix34 *mat)
 {
     rdVector3 tmp;
-    stdPlatform_Memcpy32(&tmp, a1, sizeof(tmp));
+    stdPlatform_Memcpy32(&tmp, dest, sizeof(tmp));
     
-    rdMatrix_TransformPoint34(a1, &tmp, a2);
+    rdMatrix_TransformPoint34(dest, &tmp, mat);
 }
 
 void rdMatrix_TransformPoint44(rdVector4 *a1, const rdVector4 *a2, const rdMatrix44 *a3)
@@ -878,11 +878,11 @@ void rdMatrix_TransformPoint44Acc(rdVector4 *a1, const rdMatrix44 *a2)
     rdMatrix_TransformPoint44(a1, &tmp, a2);
 }
 
-void rdMatrix_TransformPointList34(const rdMatrix34 *m, const rdVector3 *in, rdVector3 *out, int num)
+void rdMatrix_TransformPointList34(const rdMatrix34 *mat, const rdVector3 *aSrc, rdVector3 *aDest, int size)
 {
-    for (int i = 0; i < num; i++)
+    for (int i = 0; i < size; i++)
     {
-        rdMatrix_TransformPoint34(&out[i], &in[i], m);
+        rdMatrix_TransformPoint34(&aDest[i], &aSrc[i], mat);
     }
 }
 
