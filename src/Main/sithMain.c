@@ -360,7 +360,7 @@ int sithUpdate()
                 sithThing_TickAll(sithTime_deltaSeconds, sithTime_deltaMs);
                 sithThing_MotsTick(0x1F, 0, 0);
 
-                sithCogScript_TickAll();
+                sithCog_ProcessCogs();
 
                 // COG scripts will sleep for periods of time based on sithTime_curMs,
                 // so we have to emulate the current time as well
@@ -401,7 +401,7 @@ int sithUpdate()
             sithThing_TickAll(sithTime_deltaSeconds, sithTime_deltaMs);
             sithThing_MotsTick(0x1F, 0, 0);
 
-            sithCogScript_TickAll();
+            sithCog_ProcessCogs();
         }
 
         //sithAI_AIList();
@@ -518,7 +518,7 @@ void sithOpenPostProcess()
     sithTime_Startup();
     sithInventory_ResetInventory(sithPlayer_pLocalPlayerThing);
 
-    sithCog_SendSimpleMessageToAll(SITH_MESSAGE_STARTUP, 0, 0, 0, 0);
+    sithCog_BroadcastMessage(SITH_MESSAGE_STARTUP, 0, 0, 0, 0);
     for (uint32_t v2 = 0; v2 < sithWorld_pCurrentWorld->numThingsLoaded; v2++)
     {
         v3 = &sithWorld_pCurrentWorld->things[v2];

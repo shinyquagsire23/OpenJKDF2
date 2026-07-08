@@ -62,80 +62,80 @@ int32_t sithCog_Startup()
     sithCogFunctionSound_Startup(sithCog_pSymbolTable);
     sithCogFunctionSector_Startup(sithCog_pSymbolTable);
     sithCogFunctionPlayer_Startup(sithCog_pSymbolTable);
-	sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 1, "activate");
-	sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 1, "activated");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 3, "startup");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 4, "timer");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 5, "blocked");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 6, "entered");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 7, "exited");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 8, "crossed");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 9, "sighted");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 10, "damaged");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 11, "arrived");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 12, "killed");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 13, "pulse");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 14, "touched");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 15, "created");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 16, "loading");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 17, "selected");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 18, "deselected");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 20, "changed");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 21, "deactivated");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 22, "shutdown");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 23, "respawn");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 2, "removed");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 19, "autoselect");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 24, "aievent");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 25, "skill");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 26, "taken");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 27, "user0");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 28, "user1");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 29, "user2");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 30, "user3");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 31, "user4");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 32, "user5");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 33, "user6");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 34, "user7");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 35, "newplayer");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 36, "fire");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 37, "join");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 38, "leave");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 39, "splash");
-    sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 40, "trigger");
+	sithCog_AddIntSymbol(sithCog_pSymbolTable, 1, "activate");
+	sithCog_AddIntSymbol(sithCog_pSymbolTable, 1, "activated");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 3, "startup");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 4, "timer");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 5, "blocked");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 6, "entered");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 7, "exited");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 8, "crossed");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 9, "sighted");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 10, "damaged");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 11, "arrived");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 12, "killed");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 13, "pulse");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 14, "touched");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 15, "created");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 16, "loading");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 17, "selected");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 18, "deselected");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 20, "changed");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 21, "deactivated");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 22, "shutdown");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 23, "respawn");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 2, "removed");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 19, "autoselect");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 24, "aievent");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 25, "skill");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 26, "taken");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 27, "user0");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 28, "user1");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 29, "user2");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 30, "user3");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 31, "user4");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 32, "user5");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 33, "user6");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 34, "user7");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 35, "newplayer");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 36, "fire");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 37, "join");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 38, "leave");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 39, "splash");
+    sithCog_AddIntSymbol(sithCog_pSymbolTable, 40, "trigger");
     if (Main_bDwCompat) {
-        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 41, "laserhit");
-        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 42, "cut");
-        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 43, "injected");
-        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 44, "powerplug");
-        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 45, "welded");
-        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 46, "tugged");
-        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 48, "used");
-        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 47, "converse");
+        sithCog_AddIntSymbol(sithCog_pSymbolTable, 41, "laserhit");
+        sithCog_AddIntSymbol(sithCog_pSymbolTable, 42, "cut");
+        sithCog_AddIntSymbol(sithCog_pSymbolTable, 43, "injected");
+        sithCog_AddIntSymbol(sithCog_pSymbolTable, 44, "powerplug");
+        sithCog_AddIntSymbol(sithCog_pSymbolTable, 45, "welded");
+        sithCog_AddIntSymbol(sithCog_pSymbolTable, 46, "tugged");
+        sithCog_AddIntSymbol(sithCog_pSymbolTable, 48, "used");
+        sithCog_AddIntSymbol(sithCog_pSymbolTable, 47, "converse");
     }
     else if (Main_bMotsCompat) {
-        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 41, "preblock");
-        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 42, "escaped");
-        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 43, "attachkilled");
-        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 44, "playeraction");
+        sithCog_AddIntSymbol(sithCog_pSymbolTable, 41, "preblock");
+        sithCog_AddIntSymbol(sithCog_pSymbolTable, 42, "escaped");
+        sithCog_AddIntSymbol(sithCog_pSymbolTable, 43, "attachkilled");
+        sithCog_AddIntSymbol(sithCog_pSymbolTable, 44, "playeraction");
     }
-    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global0", 0);
-    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global1", 0);
-    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global2", 0);
-    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global3", 0);
-    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global4", 0);
-    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global5", 0);
-    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global6", 0);
-    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global7", 0);
-    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global8", 0);
-    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global9", 0);
-    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global10", 0);
-    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global11", 0);
-    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global12", 0);
-    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global13", 0);
-    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global14", 0);
-    sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global15", 0);
-    sithEvent_RegisterTask(4, sithCogScript_TimerTick, 0, 2);
+    sithCog_AddFloatSymbol(sithCog_pSymbolTable, "global0", 0);
+    sithCog_AddFloatSymbol(sithCog_pSymbolTable, "global1", 0);
+    sithCog_AddFloatSymbol(sithCog_pSymbolTable, "global2", 0);
+    sithCog_AddFloatSymbol(sithCog_pSymbolTable, "global3", 0);
+    sithCog_AddFloatSymbol(sithCog_pSymbolTable, "global4", 0);
+    sithCog_AddFloatSymbol(sithCog_pSymbolTable, "global5", 0);
+    sithCog_AddFloatSymbol(sithCog_pSymbolTable, "global6", 0);
+    sithCog_AddFloatSymbol(sithCog_pSymbolTable, "global7", 0);
+    sithCog_AddFloatSymbol(sithCog_pSymbolTable, "global8", 0);
+    sithCog_AddFloatSymbol(sithCog_pSymbolTable, "global9", 0);
+    sithCog_AddFloatSymbol(sithCog_pSymbolTable, "global10", 0);
+    sithCog_AddFloatSymbol(sithCog_pSymbolTable, "global11", 0);
+    sithCog_AddFloatSymbol(sithCog_pSymbolTable, "global12", 0);
+    sithCog_AddFloatSymbol(sithCog_pSymbolTable, "global13", 0);
+    sithCog_AddFloatSymbol(sithCog_pSymbolTable, "global14", 0);
+    sithCog_AddFloatSymbol(sithCog_pSymbolTable, "global15", 0);
+    sithEvent_RegisterTask(4, sithCog_TimerEventTask, 0, 2);
     sithCog_bInitted = 1;
     return 1;
 }
@@ -149,56 +149,56 @@ int32_t sithCog_StartupEnhanced()
 
     // Generic
     if (!Main_bMotsCompat) {
-        sithCogScript_RegisterVerb(ctx, sithCogFunction_Pow, "pow");
-        sithCogScript_RegisterVerb(ctx, sithCogFunction_Wakeup, "wakeup");
+        sithCog_RegisterFunction(ctx, sithCogFunction_Pow, "pow");
+        sithCog_RegisterFunction(ctx, sithCogFunction_Wakeup, "wakeup");
 
-        sithCogScript_RegisterVerb(ctx,sithCogFunction_VectorEqual,"vectorequal");
+        sithCog_RegisterFunction(ctx,sithCogFunction_VectorEqual,"vectorequal");
 
-        sithCogScript_RegisterVerb(ctx,sithCogFunction_FireProjectileData,"fireprojectiledata");
-        sithCogScript_RegisterVerb(ctx,sithCogFunction_FireProjectileLocal,"fireprojectilelocal");
+        sithCog_RegisterFunction(ctx,sithCogFunction_FireProjectileData,"fireprojectiledata");
+        sithCog_RegisterFunction(ctx,sithCogFunction_FireProjectileLocal,"fireprojectilelocal");
 
-        sithCogScript_RegisterVerb(ctx,sithCogFunction_GetWeaponBin,"getweaponbin");
+        sithCog_RegisterFunction(ctx,sithCogFunction_GetWeaponBin,"getweaponbin");
 
-        sithCogScript_RegisterVerb(ctx,sithCogFunction_SendMessageExRadius,"sendmessageexradius");
+        sithCog_RegisterFunction(ctx,sithCogFunction_SendMessageExRadius,"sendmessageexradius");
 
-        sithCogScript_RegisterVerb(ctx,sithCogFunction_WorldFlash,"worldflash");
+        sithCog_RegisterFunction(ctx,sithCogFunction_WorldFlash,"worldflash");
 
-        sithCogScript_RegisterVerb(ctx,sithCogFunction_SetCameraZoom,"setcamerazoom");
+        sithCog_RegisterFunction(ctx,sithCogFunction_SetCameraZoom,"setcamerazoom");
 
-        sithCogScript_RegisterVerb(ctx,sithCogFunction_GetActionCog,"getactioncog");
-        sithCogScript_RegisterVerb(ctx,sithCogFunction_SetActionCog,"setactioncog");
+        sithCog_RegisterFunction(ctx,sithCogFunction_GetActionCog,"getactioncog");
+        sithCog_RegisterFunction(ctx,sithCogFunction_SetActionCog,"setactioncog");
 
-        sithCogScript_RegisterVerb(ctx,sithCogFunction_Sin,"sin");
-        sithCogScript_RegisterVerb(ctx,sithCogFunction_Cos,"cos");
-        sithCogScript_RegisterVerb(ctx,sithCogFunction_Tan,"tan");
-        sithCogScript_RegisterVerb(ctx,sithCogFunction_GetCogFlags,"getcogflags");
-        sithCogScript_RegisterVerb(ctx,sithCogFunction_SetCogFlags,"setcogflags");
-        sithCogScript_RegisterVerb(ctx,sithCogFunction_ClearCogFlags,"clearcogflags");
-        sithCogScript_RegisterVerb(ctx,sithCogFunction_DebugBreak,"debugbreak");
-        sithCogScript_RegisterVerb(ctx,sithCogFunction_GetSysDate,"getsysdate");
-        sithCogScript_RegisterVerb(ctx,sithCogFunction_GetSysTime,"getsystime");
+        sithCog_RegisterFunction(ctx,sithCogFunction_Sin,"sin");
+        sithCog_RegisterFunction(ctx,sithCogFunction_Cos,"cos");
+        sithCog_RegisterFunction(ctx,sithCogFunction_Tan,"tan");
+        sithCog_RegisterFunction(ctx,sithCogFunction_GetCogFlags,"getcogflags");
+        sithCog_RegisterFunction(ctx,sithCogFunction_SetCogFlags,"setcogflags");
+        sithCog_RegisterFunction(ctx,sithCogFunction_ClearCogFlags,"clearcogflags");
+        sithCog_RegisterFunction(ctx,sithCogFunction_DebugBreak,"debugbreak");
+        sithCog_RegisterFunction(ctx,sithCogFunction_GetSysDate,"getsysdate");
+        sithCog_RegisterFunction(ctx,sithCogFunction_GetSysTime,"getsystime");
     }
     
     // Droidworks generic
     if (!Main_bDwCompat) {
-        sithCogScript_RegisterVerb(ctx, sithCogFunction_SetCameraFocii, "setcamerafocii");
+        sithCog_RegisterFunction(ctx, sithCogFunction_SetCameraFocii, "setcamerafocii");
     }
 
     // AI
     if (!Main_bMotsCompat) {
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_FirstThingInCone,"firstthingincone");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_NextThingInCone,"nextthingincone");
+        sithCog_RegisterFunction(ctx, sithCogFunctionAI_FirstThingInCone,"firstthingincone");
+        sithCog_RegisterFunction(ctx, sithCogFunctionAI_NextThingInCone,"nextthingincone");
     }
     
 #ifdef JKM_AI
     if (!Main_bMotsCompat) {
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIGetAlignment, "aigetalignment");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetAlignment, "aisetalignment");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetInterest, "aisetinterest");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIGetInterest, "aigetinterest");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetDistractor, "aisetdistractor");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIAddAlignmentPriority, "aiaddalignmentpriority");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIRemoveAlignmentPriority, "airemovealignmentpriority");
+        sithCog_RegisterFunction(ctx, sithCogFunctionAI_AIGetAlignment, "aigetalignment");
+        sithCog_RegisterFunction(ctx, sithCogFunctionAI_AISetAlignment, "aisetalignment");
+        sithCog_RegisterFunction(ctx, sithCogFunctionAI_AISetInterest, "aisetinterest");
+        sithCog_RegisterFunction(ctx, sithCogFunctionAI_AIGetInterest, "aigetinterest");
+        sithCog_RegisterFunction(ctx, sithCogFunctionAI_AISetDistractor, "aisetdistractor");
+        sithCog_RegisterFunction(ctx, sithCogFunctionAI_AIAddAlignmentPriority, "aiaddalignmentpriority");
+        sithCog_RegisterFunction(ctx, sithCogFunctionAI_AIRemoveAlignmentPriority, "airemovealignmentpriority");
     
         //TODO: actor_rc.cog references a "AISetMoveTarget"?
     }
@@ -206,72 +206,72 @@ int32_t sithCog_StartupEnhanced()
 
     // Player
     if (!Main_bMotsCompat) {
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_KillPlayerQuietly, "killplayerquietly");
+        sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_KillPlayerQuietly, "killplayerquietly");
     }
 
     // Sector
     if (!Main_bMotsCompat) {
-        sithCogScript_RegisterVerb(ctx,sithCogFunctionSector_ChangeAllSectorsLight,"changeallsectorslight");
-        sithCogScript_RegisterVerb(ctx,sithCogFunctionSector_FindSectorAtPos,"findsectoratpos");
-        sithCogScript_RegisterVerb(ctx,sithCogFunctionSector_IsSphereInSector,"issphereinsector");
-        sithCogScript_RegisterVerb(ctx,sithCogFunctionSector_GetSectorAmbientLight,"getsectorambientlight");
-        sithCogScript_RegisterVerb(ctx,sithCogFunctionSector_SetSectorAmbientLight,"setsectorambientlight");
+        sithCog_RegisterFunction(ctx,sithCogFunctionSector_ChangeAllSectorsLight,"changeallsectorslight");
+        sithCog_RegisterFunction(ctx,sithCogFunctionSector_FindSectorAtPos,"findsectoratpos");
+        sithCog_RegisterFunction(ctx,sithCogFunctionSector_IsSphereInSector,"issphereinsector");
+        sithCog_RegisterFunction(ctx,sithCogFunctionSector_GetSectorAmbientLight,"getsectorambientlight");
+        sithCog_RegisterFunction(ctx,sithCogFunctionSector_SetSectorAmbientLight,"setsectorambientlight");
     }
 
     // Sound
     if (!Main_bMotsCompat) {
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySoundThingLocal, "playsoundthinglocal");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySoundPosLocal, "playsoundposlocal");
+        sithCog_RegisterFunction(ctx, sithCogFunctionSound_PlaySoundThingLocal, "playsoundthinglocal");
+        sithCog_RegisterFunction(ctx, sithCogFunctionSound_PlaySoundPosLocal, "playsoundposlocal");
         
-        sithCogScript_RegisterVerb(ctx,sithCogFunctionSound_PlaySoundThing,"playvoicething");
-        sithCogScript_RegisterVerb(ctx,sithCogFunctionSound_PlaySoundPos,"playvoicepos");
-        sithCogScript_RegisterVerb(ctx,sithCogFunctionSound_PlaySoundLocal,"playvoicelocal");
-        sithCogScript_RegisterVerb(ctx,sithCogFunctionSound_PlaySoundGlobal,"playvoiceglobal");
+        sithCog_RegisterFunction(ctx,sithCogFunctionSound_PlaySoundThing,"playvoicething");
+        sithCog_RegisterFunction(ctx,sithCogFunctionSound_PlaySoundPos,"playvoicepos");
+        sithCog_RegisterFunction(ctx,sithCogFunctionSound_PlaySoundLocal,"playvoicelocal");
+        sithCog_RegisterFunction(ctx,sithCogFunctionSound_PlaySoundGlobal,"playvoiceglobal");
     }
 
     // Surface
     if (!Main_bMotsCompat) {
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetSurfaceVertexLight, "getsurfacevertexlight");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SetSurfaceVertexLight, "setsurfacevertexlight");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetSurfaceVertexLightRGB, "getsurfacevertexlightrgb");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_SetSurfaceVertexLightRGB, "setsurfacevertexlightrgb");
+        sithCog_RegisterFunction(ctx, sithCogFunctionSurface_GetSurfaceVertexLight, "getsurfacevertexlight");
+        sithCog_RegisterFunction(ctx, sithCogFunctionSurface_SetSurfaceVertexLight, "setsurfacevertexlight");
+        sithCog_RegisterFunction(ctx, sithCogFunctionSurface_GetSurfaceVertexLightRGB, "getsurfacevertexlightrgb");
+        sithCog_RegisterFunction(ctx, sithCogFunctionSurface_SetSurfaceVertexLightRGB, "setsurfacevertexlightrgb");
     }
 
     // Thing
     
     if (!Main_bMotsCompat) {
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_CreateThingLocal, "createthinglocal");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_CreateThingLocal, "createthinglocal");
 
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_CreateThingAtPosOwner, "createthingatposowner");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_CreateThingAtPos, "createthingatposold");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_CreateThingAtPosOwner, "createthingatposowner");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_CreateThingAtPos, "createthingatposold");
 
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingParent, "setthingparent");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_SetThingParent, "setthingparent");
 
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingPosEx, "setthingposex");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_SetThingPosEx, "setthingposex");
 
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetThingLvecPYR, "getthinglvecpyr");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_GetThingLvecPYR, "getthinglvecpyr");
 
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetCurInvWeapon, "getcurinvweapon2");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_GetCurInvWeapon, "getcurinvweapon2");
 
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetActorWeapon, "getactorweapon2");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_GetActorWeapon, "getactorweapon2");
 
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingLookPYR, "setthinglookpyr");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_SetThingLookPYR, "setthinglookpyr");
 
-        sithCogScript_RegisterVerb(ctx,sithCogFunctionThing_GetThingGUID,"getthingguid");
-        sithCogScript_RegisterVerb(ctx,sithCogFunctionThing_GetGUIDThing,"getguidthing");
+        sithCog_RegisterFunction(ctx,sithCogFunctionThing_GetThingGUID,"getthingguid");
+        sithCog_RegisterFunction(ctx,sithCogFunctionThing_GetGUIDThing,"getguidthing");
 
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetThingMaxVelocity, "getthingmaxvelocity");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingMaxVelocity, "setthingmaxvelocity");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetThingMaxAngularVelocity, "getthingmaxangularvelocity");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingMaxAngularVelocity, "setthingmaxangularvelocity");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetActorHeadPYR, "getactorheadpyr");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetActorHeadPYR, "setactorheadpyr");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingJointAngle, "setthingjointangle");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetThingJointAngle, "getthingjointangle");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingMaxHeadPitch, "setthingmaxheadpitch");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingMinHeadPitch, "setthingminheadpitch");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_InterpolatePYR, "interpolatepyr");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetWeaponTarget, "setweapontarget");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_GetThingMaxVelocity, "getthingmaxvelocity");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_SetThingMaxVelocity, "setthingmaxvelocity");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_GetThingMaxAngularVelocity, "getthingmaxangularvelocity");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_SetThingMaxAngularVelocity, "setthingmaxangularvelocity");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_GetActorHeadPYR, "getactorheadpyr");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_SetActorHeadPYR, "setactorheadpyr");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_SetThingJointAngle, "setthingjointangle");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_GetThingJointAngle, "getthingjointangle");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_SetThingMaxHeadPitch, "setthingmaxheadpitch");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_SetThingMinHeadPitch, "setthingminheadpitch");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_InterpolatePYR, "interpolatepyr");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_SetWeaponTarget, "setweapontarget");
 
         // TODO: weap_eweb_m.cog references a "SetThingCollide" verb? Superceded by "SetThingCollideSize"?
         // TODO: exp_hrail.cog references a "GetUserData" verb? Superceded by "GetThingUserData"?
@@ -279,109 +279,109 @@ int32_t sithCog_StartupEnhanced()
 
     // Present in files, but registered?
     if (Main_bMotsCompat) {
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetCurInvWeaponMots, "getcurinvweapon");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_GetCurInvWeaponMots, "getcurinvweapon");
     }
 
 
     // JK
     if (!Main_bMotsCompat && !Main_bDwCompat) {
-        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 45, "enterbubble");
-        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 46, "exitbubble");
+        sithCog_AddIntSymbol(sithCog_pSymbolTable, 45, "enterbubble");
+        sithCog_AddIntSymbol(sithCog_pSymbolTable, 46, "exitbubble");
     }
     
     if (!Main_bMotsCompat) {
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_PrintUniVoice, "jkprintunivoice");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_PrintUniVoice, "jkprintunivoice");
 
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_GetSaberSideMat, "jkgetsabersidemat");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_GetSaberSideMat, "jkgetsabersidemat");
 
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_SyncForcePowers, "jksyncforcepowers");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_SyncForcePowers, "jksyncforcepowers");
 
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_BeginCutscene,"jkbegincutscene");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_EndCutscene,"jkendcutscene");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_StartupCutscene,"jkstartupcutscene");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_GetMultiParam,"jkgetmultiparam");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_InsideLeia,"insideleia");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_CreateBubble,"jkcreatebubble");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_DestroyBubble,"jkdestroybubble");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_GetBubbleDistance,"jkgetbubbledistance");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_ThingInBubble,"jkthinginbubble");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_GetFirstBubble,"jkgetfirstbubble");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_GetNextBubble,"jkgetnextbubble");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_GetBubbleType,"jkgetbubbletype");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_GetBubbleRadius,"jkgetbubbleradius");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_SetBubbleType,"jksetbubbletype");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_SetBubbleRadius,"jksetbubbleradius");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_Screenshot,"jkscreenshot");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_GetOpenFrames,"jkgetopenframes");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_BeginCutscene,"jkbegincutscene");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_EndCutscene,"jkendcutscene");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_StartupCutscene,"jkstartupcutscene");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_GetMultiParam,"jkgetmultiparam");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_InsideLeia,"insideleia");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_CreateBubble,"jkcreatebubble");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_DestroyBubble,"jkdestroybubble");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_GetBubbleDistance,"jkgetbubbledistance");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_ThingInBubble,"jkthinginbubble");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_GetFirstBubble,"jkgetfirstbubble");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_GetNextBubble,"jkgetnextbubble");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_GetBubbleType,"jkgetbubbletype");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_GetBubbleRadius,"jkgetbubbleradius");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_SetBubbleType,"jksetbubbletype");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_SetBubbleRadius,"jksetbubbleradius");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_Screenshot,"jkscreenshot");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_GetOpenFrames,"jkgetopenframes");
     }
     
     if (!Main_bDwCompat) {
         // Added for droidwork tests
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_dwGetActivateBin, "dwGetActivateBin");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_stub1Args, "dwsetreftopic");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_addBeam, "addbeam");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_addLaser, "addlaser");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_removeLaser, "removelaser");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_getLaserId, "getlaserid");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_stub0Args, "dwFlashInventory");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_dwPlayCammySpeech, "dwplaycammyspeech");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_stub0Args, "dwfreezeplayer");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_stub0Args, "dwunfreezeplayer");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_stub2Args, "dwplaycharacterspeech");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_stub0Args, "dwcleardialog");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_dwGetActivateBin, "dwGetActivateBin");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_stub1Args, "dwsetreftopic");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_addBeam, "addbeam");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_addLaser, "addlaser");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_removeLaser, "removelaser");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_getLaserId, "getlaserid");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_stub0Args, "dwFlashInventory");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_dwPlayCammySpeech, "dwplaycammyspeech");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_stub0Args, "dwfreezeplayer");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_stub0Args, "dwunfreezeplayer");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_stub2Args, "dwplaycharacterspeech");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_stub0Args, "dwcleardialog");
     }
 
     // JK13
     if (!Main_bMotsCompat && !Main_bDwCompat)
     {
-        //sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 40, "trigger");
-        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 44, "playeraction");
-        sithCogScript_RegisterMessageSymbol(sithCog_pSymbolTable, 47, "hotkey");
+        //sithCog_AddIntSymbol(sithCog_pSymbolTable, 40, "trigger");
+        sithCog_AddIntSymbol(sithCog_pSymbolTable, 44, "playeraction");
+        sithCog_AddIntSymbol(sithCog_pSymbolTable, 47, "hotkey");
 
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingAttachSurface, "getthingattachsurface");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingAttachThing, "getthingattachthing");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetCameraFov, "getcamerafov");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetCameraOffset, "getcameraoffset");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetCameraFov, "setcamerafov");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetCameraOffset, "setcameraoffset");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Absolute, "absolute");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Arccosine, "arccosine");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Arcsine, "arcsine");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Arctangent, "arctangent");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Ceiling, "ceiling");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Cosine, "cosine");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Floor, "floor");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Power, "power");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Randomflex, "randomflex");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Randomint, "randomint");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Sine, "sine");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_Squareroot, "squareroot");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetHotkeyCog, "gethotkeycog");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetHotkeyCog, "sethotkeycog");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_IsAdjoin, "isadjoin");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetGameSpeed, "setgamespeed");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingHeadLvec, "getthingheadlvec");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingHeadPitch, "getthingheadpitch");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingHeadPYR, "getthingheadpyr");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingPYR, "getthingpyr");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingHeadPYR, "setthingheadpyr");
-        //sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingPosEx, "setthingposex");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingPYR, "setthingpyr");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingLRUVecs, "setthingrluvecs");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingSector, "setthingsector");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_RestoreJoint, "restorejoint");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingAirDrag, "getthingairdrag");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingEyeOffset, "getthingeyeoffset");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingHeadPitchMax, "getthingheadpitchmax");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingHeadPitchMin, "getthingheadpitchmin");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_GetThingJumpSpeed, "getthingjumpspeed");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingAirDrag, "setthingairdrag");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingEyeOffset, "setthingeyeoffset");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingHeadPitchMinMax, "setthingheadpitchminmax");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingJumpSpeed, "setthingjumpspeed");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingMesh, "setthingmesh");
-        //sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetThingParent, "setthingparent");
-        sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCogExt_SetSaberFaceFlags, "jksetsaberfaceflags");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_GetThingAttachSurface, "getthingattachsurface");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_GetThingAttachThing, "getthingattachthing");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_GetCameraFov, "getcamerafov");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_GetCameraOffset, "getcameraoffset");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_SetCameraFov, "setcamerafov");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_SetCameraOffset, "setcameraoffset");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_Absolute, "absolute");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_Arccosine, "arccosine");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_Arcsine, "arcsine");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_Arctangent, "arctangent");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_Ceiling, "ceiling");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_Cosine, "cosine");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_Floor, "floor");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_Power, "power");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_Randomflex, "randomflex");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_Randomint, "randomint");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_Sine, "sine");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_Squareroot, "squareroot");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_GetHotkeyCog, "gethotkeycog");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_SetHotkeyCog, "sethotkeycog");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_IsAdjoin, "isadjoin");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_SetGameSpeed, "setgamespeed");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_GetThingHeadLvec, "getthingheadlvec");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_GetThingHeadPitch, "getthingheadpitch");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_GetThingHeadPYR, "getthingheadpyr");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_GetThingPYR, "getthingpyr");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_SetThingHeadPYR, "setthingheadpyr");
+        //sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_SetThingPosEx, "setthingposex");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_SetThingPYR, "setthingpyr");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_SetThingLRUVecs, "setthingrluvecs");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_SetThingSector, "setthingsector");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_RestoreJoint, "restorejoint");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_GetThingAirDrag, "getthingairdrag");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_GetThingEyeOffset, "getthingeyeoffset");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_GetThingHeadPitchMax, "getthingheadpitchmax");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_GetThingHeadPitchMin, "getthingheadpitchmin");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_GetThingJumpSpeed, "getthingjumpspeed");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_SetThingAirDrag, "setthingairdrag");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_SetThingEyeOffset, "setthingeyeoffset");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_SetThingHeadPitchMinMax, "setthingheadpitchminmax");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_SetThingJumpSpeed, "setthingjumpspeed");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_SetThingMesh, "setthingmesh");
+        //sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_SetThingParent, "setthingparent");
+        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCogExt_SetSaberFaceFlags, "jksetsaberfaceflags");
     }
 
     return 1;
@@ -434,7 +434,7 @@ int32_t sithCog_Open()
             {
                 v3 = &v2->cogscript->aIdk[j];
                 if ( _strlen(v3->value) )
-                    sithCog_LoadEntry(&v2->pSymbolTable->buckets[v3->hash], v3, v3->value);
+                    sithCog_ParseSymbolRef(&v2->pSymbolTable->buckets[v3->hash], v3, v3->value);
             }
 #ifdef COG_HEAP_INIT_ARGS
             // Added: static-world cogs never consume jkl init strings; drop them
@@ -484,21 +484,21 @@ LABEL_25:
             if ( (idk->flags & 1) != 0 )
             {
                 if ( _strlen(idk->value) )
-                    sithCog_LoadEntry(v8, v6, idk->value);
+                    sithCog_ParseSymbolRef(v8, v6, idk->value);
                 goto LABEL_24;
             }
             else if ( v13 && _strlen(v13) ) { // Added: v13 NULL guard for COG_HEAP_INIT_ARGS
-                sithCog_LoadEntry(v8, v6, v13);
+                sithCog_ParseSymbolRef(v8, v6, v13);
                 v8 = v14;
             }
             else if ( _strlen(idk->value) )
             {
-                sithCog_LoadEntry(v8, v6, idk->value);
+                sithCog_ParseSymbolRef(v8, v6, idk->value);
                 v8 = v14;
             }
             if (v13) // Added: NULL guard for COG_HEAP_INIT_ARGS
                 v13 += 32;
-            sithCog_ThingsSectorsRegSymbolIdk(cogs, v6, v8);
+            sithCog_LinkCog(cogs, v6, v8);
 
 
 LABEL_24:
@@ -518,7 +518,7 @@ void sithCog_Close()
 {
     if ( sithCog_bOpened )
     {
-        sithCog_SendMessageToAll(SITH_MESSAGE_SHUTDOWN, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0);
+        sithCog_BroadcastMessageEx(SITH_MESSAGE_SHUTDOWN, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0);
         sithCog_numSectorLinks = 0;
         sithCog_numSurfaceLinks = 0;
         sithCog_numThingLinks = 0;
@@ -530,7 +530,7 @@ void sithCog_Close()
 }
 
 // MOTS altered?
-int sithCog_Load(sithWorld *world, int a2)
+int sithCog_ReadCogsListText(sithWorld *world, int a2)
 {
     int32_t num_cogs; // esi
     int32_t result; // eax
@@ -571,7 +571,7 @@ int sithCog_Load(sithWorld *world, int a2)
                 break;
             if ( stdConffile_entry.numArgs < 2u )
                 return 0;
-            v9 = sithCog_LoadCogscript(stdConffile_entry.args[1].value);
+            v9 = sithCog_Load(stdConffile_entry.args[1].value);
 
             //printf("%s\n", stdConffile_entry.args[1].value);
 
@@ -614,7 +614,7 @@ int sithCog_Load(sithWorld *world, int a2)
     return result;
 }
 
-sithCog* sithCog_LoadCogscript(const char *fpath)
+sithCog* sithCog_Load(const char *fpath)
 {
     uint32_t cogIdx; // eax
     sithCogSymboltable *result; // eax
@@ -669,7 +669,7 @@ sithCog* sithCog_LoadCogscript(const char *fpath)
     return NULL;
 }
 
-int32_t sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogReference *cogIdk, char *val)
+int32_t sithCog_ParseSymbolRef(sithCogSymbol *cogSymbol, sithCogReference *cogIdk, char *val)
 {
     sithCogSymbol *v5; // esi
     sithCogSymbol *v7; // ecx
@@ -820,7 +820,7 @@ int32_t sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogReference *cogIdk, ch
     }
 }
 
-int32_t sithCog_ThingsSectorsRegSymbolIdk(sithCog *cog, sithCogReference *idk, sithCogSymbol *symbol)
+int32_t sithCog_LinkCog(sithCog *cog, sithCogReference *idk, sithCogSymbol *symbol)
 {
     cog_int_t v3 = symbol->val.data[0];
     if ( v3 < 0 )
@@ -830,25 +830,25 @@ int32_t sithCog_ThingsSectorsRegSymbolIdk(sithCog *cog, sithCogReference *idk, s
         case 3:
             if ( v3 >= sithWorld_pCurrentWorld->numThingsLoaded )
                 return 0;
-            return sithCog_ThingFromSymbolidk(cog, &sithWorld_pCurrentWorld->things[v3], idk->linkid, idk->mask);
+            return sithCog_LinkCogToThing(cog, &sithWorld_pCurrentWorld->things[v3], idk->linkid, idk->mask);
         case 5:
             if ( v3 >= sithWorld_pCurrentWorld->numSectors )
                 return 0;
-            return sithCog_Sectoridk(cog, &sithWorld_pCurrentWorld->sectors[v3], idk->linkid, idk->mask);
+            return sithCog_LinkCogToSector(cog, &sithWorld_pCurrentWorld->sectors[v3], idk->linkid, idk->mask);
         case 6:
             if ( v3 >= sithWorld_pCurrentWorld->numSurfaces )
                 return 0;
-            return sithCog_Thingidk(cog, &sithWorld_pCurrentWorld->surfaces[v3], idk->linkid, idk->mask);
+            return sithCog_LinkCogToSurface(cog, &sithWorld_pCurrentWorld->surfaces[v3], idk->linkid, idk->mask);
     }
     return 1;
 }
 
-void sithCog_SendMessageFromThing(sithThing *a1, sithThing *a2, int32_t msg)
+void sithCog_ThingSendMessage(sithThing *a1, sithThing *a2, int32_t msg)
 {
-    sithCog_SendMessageFromThingEx(a1, a2, msg, 0.0, 0.0, 0.0, 0.0);
+    sithCog_ThingSendMessageEx(a1, a2, msg, 0.0, 0.0, 0.0, 0.0);
 }
 
-cog_flex_t sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver, SITH_MESSAGE message, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3)
+cog_flex_t sithCog_ThingSendMessageEx(sithThing *sender, sithThing *receiver, SITH_MESSAGE message, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3)
 {
     //return _sithCog_SendMessageFromThingEx(sender, receiver, message, param0, param1, param2, param3);
     int32_t v7; // ebx
@@ -988,12 +988,12 @@ cog_flex_t sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver
     return v19;
 }
 
-void sithCog_SendMessageFromSurface(sithSurface *surface, sithThing *thing, int32_t msg)
+void sithCog_SurfaceSendMessage(sithSurface *surface, sithThing *thing, int32_t msg)
 {
-    sithCog_SendMessageFromSurfaceEx(surface, thing, msg, 0.0, 0.0, 0.0, 0.0);
+    sithCog_SurfaceSendMessageEx(surface, thing, msg, 0.0, 0.0, 0.0, 0.0);
 }
 
-cog_flex_t sithCog_SendMessageFromSurfaceEx(sithSurface *sender, sithThing *thing, SITH_MESSAGE msg, cog_flex_t a4, cog_flex_t a5, cog_flex_t a6, cog_flex_t a7)
+cog_flex_t sithCog_SurfaceSendMessageEx(sithSurface *sender, sithThing *thing, SITH_MESSAGE msg, cog_flex_t a4, cog_flex_t a5, cog_flex_t a6, cog_flex_t a7)
 {
     int32_t v8; // ebp
     cog_flex_t v9; // ebx
@@ -1064,12 +1064,12 @@ cog_flex_t sithCog_SendMessageFromSurfaceEx(sithSurface *sender, sithThing *thin
     return v14;
 }
 
-void sithCog_SendMessageFromSector(sithSector *sector, sithThing *thing, int32_t message)
+void sithCog_SectorSendMessage(sithSector *sector, sithThing *thing, int32_t message)
 {
-    sithCog_SendMessageFromSectorEx(sector, thing, message, 0.0, 0.0, 0.0, 0.0);
+    sithCog_SectorSendMessageEx(sector, thing, message, 0.0, 0.0, 0.0, 0.0);
 }
 
-cog_flex_t sithCog_SendMessageFromSectorEx(sithSector *a1, sithThing *sourceType, SITH_MESSAGE message, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3)
+cog_flex_t sithCog_SectorSendMessageEx(sithSector *a1, sithThing *sourceType, SITH_MESSAGE message, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3)
 {
     int32_t v8; // ebp
     cog_flex_t v11; // st7
@@ -1135,12 +1135,12 @@ cog_flex_t sithCog_SendMessageFromSectorEx(sithSector *a1, sithThing *sourceType
     return v13;
 }
 
-void sithCog_SendSimpleMessageToAll(int32_t a1, int32_t a2, int32_t a3, int32_t a4, int32_t a5)
+void sithCog_BroadcastMessage(int32_t a1, int32_t a2, int32_t a3, int32_t a4, int32_t a5)
 {
-    sithCog_SendMessageToAll(a1, a2, a3, a4, a5, 0.0, 0.0, 0.0, 0.0);
+    sithCog_BroadcastMessageEx(a1, a2, a3, a4, a5, 0.0, 0.0, 0.0, 0.0);
 }
 
-void sithCog_SendMessageToAll(int32_t cmdid, int32_t senderType, int32_t senderIdx, int32_t sourceType, int32_t sourceIdx, cog_flex_t arg0, cog_flex_t arg1, cog_flex_t arg2, cog_flex_t arg3)
+void sithCog_BroadcastMessageEx(int32_t cmdid, int32_t senderType, int32_t senderIdx, int32_t sourceType, int32_t sourceIdx, cog_flex_t arg0, cog_flex_t arg1, cog_flex_t arg2, cog_flex_t arg3)
 {
     sithCog *v9; // esi
     uint32_t i; // edi
@@ -1442,7 +1442,7 @@ execute:
     return result;
 }
 
-void sithCog_Free(sithWorld *world)
+void sithCog_FreeWorldCogs(sithWorld *world)
 {
     int32_t v2; // edi
     sithCogScript *v4; // esi
@@ -1524,22 +1524,22 @@ void sithCog_Free(sithWorld *world)
     }
 }
 
-void sithCog_HandleThingTimerPulse(sithThing *thing)
+void sithCog_UpdateThingTimer(sithThing *thing)
 {
     if ( (thing->thingflags & SITH_TF_PULSE) != 0 && thing->pulse_end_ms <= sithTime_curMs )
     {
         thing->pulse_end_ms = sithTime_curMs + thing->pulse_ms;
-        sithCog_SendMessageFromThingEx(thing, 0, SITH_MESSAGE_PULSE, 0.0, 0.0, 0.0, 0.0);
+        sithCog_ThingSendMessageEx(thing, 0, SITH_MESSAGE_PULSE, 0.0, 0.0, 0.0, 0.0);
     }
     if ( (thing->thingflags & SITH_TF_TIMER) != 0 && thing->timer <= sithTime_curMs )
     {
         thing->thingflags &= ~SITH_TF_TIMER;
-        sithCog_SendMessageFromThingEx(thing, 0, SITH_MESSAGE_TIMER, 0.0, 0.0, 0.0, 0.0);
+        sithCog_ThingSendMessageEx(thing, 0, SITH_MESSAGE_TIMER, 0.0, 0.0, 0.0, 0.0);
     }
 }
 
 // MOTS altered?
-int sithCogScript_Load(sithWorld *lvl, int a2)
+int sithCog_ReadCogScriptsListText(sithWorld *lvl, int a2)
 {
     int32_t numCogScripts; // esi
     int32_t result; // eax
@@ -1578,7 +1578,7 @@ int sithCogScript_Load(sithWorld *lvl, int a2)
                     return 0;
 
 
-                sithCogScript_LoadEntry(stdConffile_entry.args[1].value, v8);
+                sithCog_LoadScript(stdConffile_entry.args[1].value, v8);
             }
         }
         result = 1;
@@ -1591,7 +1591,7 @@ int sithCogScript_Load(sithWorld *lvl, int a2)
     return result;
 }
 
-sithCogScript* sithCogScript_LoadEntry(const char *pFpath, int32_t unk)
+sithCogScript* sithCog_LoadScript(const char *pFpath, int32_t unk)
 {
     sithCogScript *result; // eax
     uint32_t v4; // eax
@@ -1622,7 +1622,7 @@ sithCogScript* sithCogScript_LoadEntry(const char *pFpath, int32_t unk)
     return result;
 }
 
-void sithCogScript_RegisterVerb(sithCogSymboltable *a1, cogSymbolFunc_t a2, const char *a3)
+void sithCog_RegisterFunction(sithCogSymboltable *a1, cogSymbolFunc_t a2, const char *a3)
 {
     sithCogStackvar a2a;
 
@@ -1635,7 +1635,7 @@ void sithCogScript_RegisterVerb(sithCogSymboltable *a1, cogSymbolFunc_t a2, cons
     }
 }
 
-void sithCogScript_RegisterMessageSymbol(sithCogSymboltable *a1, int32_t a2, const char *a3)
+void sithCog_AddIntSymbol(sithCogSymboltable *a1, int32_t a2, const char *a3)
 {
     sithCogStackvar a2a; // [esp+0h] [ebp-10h] BYREF
 
@@ -1648,7 +1648,7 @@ void sithCogScript_RegisterMessageSymbol(sithCogSymboltable *a1, int32_t a2, con
     }
 }
 
-void sithCogScript_RegisterGlobalMessage(sithCogSymboltable *a1, const char *a2, int32_t a3)
+void sithCog_AddFloatSymbol(sithCogSymboltable *a1, const char *a2, int32_t a3)
 {
     sithCogStackvar a2a; // [esp+0h] [ebp-10h] BYREF
 
@@ -1661,26 +1661,26 @@ void sithCogScript_RegisterGlobalMessage(sithCogSymboltable *a1, const char *a2,
     }
 }
 
-void sithCogScript_TickAll()
+void sithCog_ProcessCogs()
 {
     if (g_sithMode == 2)
         return;
 
     for (uint32_t i = 0; i < sithWorld_pCurrentWorld->numCogsLoaded; i++)
     {
-        sithCogScript_Tick(&sithWorld_pCurrentWorld->cogs[i]);
+        sithCog_ProcessCog(&sithWorld_pCurrentWorld->cogs[i]);
     }
 
     if ( sithWorld_pStatic )
     {
         for (uint32_t i = 0; i < sithWorld_pStatic->numCogsLoaded; i++)
         {
-            sithCogScript_Tick(&sithWorld_pStatic->cogs[i]);
+            sithCog_ProcessCog(&sithWorld_pStatic->cogs[i]);
         }
     }
 }
 
-void sithCogScript_Tick(sithCog *cog)
+void sithCog_ProcessCog(sithCog *cog)
 {
     if (!(cog->flags & SITH_COG_DISABLED))
     {
@@ -1728,7 +1728,7 @@ void sithCogScript_Tick(sithCog *cog)
     }
 }
 
-int sithCogScript_TimerTick(int32_t deltaMs, sithEventInfo *info)
+int sithCog_TimerEventTask(int32_t deltaMs, sithEventInfo *info)
 {
     sithWorld *v2; // ecx
     int32_t v3; // eax
@@ -1751,7 +1751,7 @@ int sithCogScript_TimerTick(int32_t deltaMs, sithEventInfo *info)
 }
 
 // MOTS altered
-int sithCogScript_DevCmdCogStatus(stdDebugConsoleCmd *cmd, const char *extra)
+int sithCog_CogStatus(stdDebugConsoleCmd *cmd, const char *extra)
 {
     sithWorld *world; // esi
     sithCog *v3; // ebp
@@ -1806,7 +1806,7 @@ int sithCogScript_DevCmdCogStatus(stdDebugConsoleCmd *cmd, const char *extra)
     return 1;
 }
 
-sithCog* sithCog_GetByIdx(int32_t idx)
+sithCog* sithCog_GetCogByIndex(int32_t idx)
 {
     sithWorld *world; // ecx
     sithCog *result; // eax
@@ -1844,7 +1844,7 @@ void sithCog_FreeEntry(sithCog *cog)
     }
 }
 
-void sithCog_Free2(sithCogScript *cogscript)
+void sithCog_FreeScriptEntry(sithCogScript *cogscript)
 {
     sithCogParse_FreeSymbolTable(cogscript->pSymbolTable);
     if ( cogscript->script_program )
@@ -1854,7 +1854,7 @@ void sithCog_Free2(sithCogScript *cogscript)
     }
 }
 
-int sithCog_InitScripts(sithWorld *world, int num)
+int sithCog_AllocWorldCogScripts(sithWorld *world, int num)
 {
     sithCogScript *scripts = (sithCogScript *)SITH_ALLOC(num * sizeof(sithCogScript));
     world->cogScripts = scripts;
@@ -1870,7 +1870,7 @@ int sithCog_InitScripts(sithWorld *world, int num)
     return 1;
 }
 
-int sithCog_InitCogs(sithWorld *world, int num)
+int sithCog_AllocWorldCogs(sithWorld *world, int num)
 {
     sithCog *cogs;
     { TWL_EXTRAM_SUGGEST(pSithHS); // Added
@@ -1889,7 +1889,7 @@ int sithCog_InitCogs(sithWorld *world, int num)
     return 1;
 }
 
-int sithCog_ThingFromSymbolidk(sithCog *cog, sithThing *thing, int linkId, int mask)
+int sithCog_LinkCogToThing(sithCog *cog, sithThing *thing, int linkId, int mask)
 {
     int thingIdx = sithThing_GetIdxFromThing(thing);
     if ( !thingIdx || !thing->type )
@@ -1907,7 +1907,7 @@ int sithCog_ThingFromSymbolidk(sithCog *cog, sithThing *thing, int linkId, int m
     return 1;
 }
 
-int sithCog_Thingidk(sithCog *cog, sithSurface *surface, int linkId, int mask)
+int sithCog_LinkCogToSurface(sithCog *cog, sithSurface *surface, int linkId, int mask)
 {
     int surfIdx = sithSurface_ValidateSurfacePointer(surface);
     if ( !surfIdx )
@@ -1924,7 +1924,7 @@ int sithCog_Thingidk(sithCog *cog, sithSurface *surface, int linkId, int mask)
     return 1;
 }
 
-int sithCog_Sectoridk(sithCog *cog, sithSector *sector, int linkId, int mask)
+int sithCog_LinkCogToSector(sithCog *cog, sithSector *sector, int linkId, int mask)
 {
     int sectorIdx = sithSector_GetIdxFromPtr(sector);
     if ( !sectorIdx )

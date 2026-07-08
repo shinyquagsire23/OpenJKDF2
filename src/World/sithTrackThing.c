@@ -43,7 +43,7 @@ void sithTrackThing_Arrivedidk(sithThing *thing)
             sithSoundClass_StopMode(thing, SITH_SC_MOVING);
             sithSoundClass_PlayModeFirst(thing, SITH_SC_STOPMOVE);
             if ( (thing->thingflags & SITH_TF_CAPTURED) != 0 && (thing->thingflags & SITH_TF_INVULN) == 0 )
-                sithCog_SendMessageFromThing(thing, 0, SITH_MESSAGE_ARRIVED);
+                sithCog_ThingSendMessage(thing, 0, SITH_MESSAGE_ARRIVED);
             return;
         }
         goalFrame = thing->goalframe;
@@ -212,7 +212,7 @@ void sithTrackThing_BlockedIdk(sithThing* pThing)
 {
     if ((pThing->thingflags & SITH_TF_CAPTURED) && !(pThing->thingflags & SITH_TF_INVULN))
     {
-        sithCog_SendMessageFromThing(pThing, 0, SITH_MESSAGE_BLOCKED);
+        sithCog_ThingSendMessage(pThing, 0, SITH_MESSAGE_BLOCKED);
     }
 }
 
@@ -349,7 +349,7 @@ void sithTrackThing_Stop(sithThing *thing)
     sithSoundClass_StopMode(thing, SITH_SC_MOVING);
     sithSoundClass_PlayModeFirst(thing, SITH_SC_STOPMOVE);
     if ( (thing->thingflags & SITH_TF_CAPTURED) != 0 && (thing->thingflags & SITH_TF_INVULN) == 0 )
-        sithCog_SendMessageFromThing(thing, 0, SITH_MESSAGE_ARRIVED);
+        sithCog_ThingSendMessage(thing, 0, SITH_MESSAGE_ARRIVED);
 }
 
 void sithTrackThing_idkpathmove(sithThing *thing, sithThing *thing2, rdVector3 *a3)

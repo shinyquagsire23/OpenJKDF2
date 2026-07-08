@@ -57,7 +57,7 @@ void sithPlayerActions_Activate(sithThing *thing)
 #endif
                     if (searchResult->surface->surfaceFlags & SITH_SURFACE_COG_LINKED)
                     {
-                        sithCog_SendMessageFromSurface(searchResult->surface, thing, SITH_MESSAGE_ACTIVATE);
+                        sithCog_SurfaceSendMessage(searchResult->surface, thing, SITH_MESSAGE_ACTIVATE);
                         sithCollision_DecreaseStackLevel();
                         return;
                     }
@@ -73,7 +73,7 @@ void sithPlayerActions_Activate(sithThing *thing)
 #endif
                     if ( v7->type != SITH_THING_ITEM && v7->type != SITH_THING_WEAPON && (v7->thingflags & SITH_TF_CAPTURED) != 0 )
                     {
-                        sithCog_SendMessageFromThing(searchResult->receiver, thing, SITH_MESSAGE_ACTIVATE);
+                        sithCog_ThingSendMessage(searchResult->receiver, thing, SITH_MESSAGE_ACTIVATE);
                         break;
                     }
                 }
@@ -227,7 +227,7 @@ sithThing* sithPlayerActions_SpawnThingAtLookAt(sithThing *pPlayerThing, sithThi
             else if ( (searchResult->hitType & SITHCOLLISION_WORLD) != 0 )
             {
                 pSectorIter = searchResult->surface->parent_sector;
-                //sithCog_SendMessageFromSurface(searchResult->surface, pPlayerThing, SITH_MESSAGE_ACTIVATE);
+                //sithCog_SurfaceSendMessage(searchResult->surface, pPlayerThing, SITH_MESSAGE_ACTIVATE);
                 if (pSectorIter)
                     sithThing_MoveToSector(pSpawned, pSectorIter, 0);
 
@@ -250,7 +250,7 @@ sithThing* sithPlayerActions_SpawnThingAtLookAt(sithThing *pPlayerThing, sithThi
                 {
                     sithThing_MoveToSector(i, v5->sector, 0);
 
-                    //sithCog_SendMessageFromThing(searchResult->receiver, pPlayerThing, SITH_MESSAGE_ACTIVATE);
+                    //sithCog_ThingSendMessage(searchResult->receiver, pPlayerThing, SITH_MESSAGE_ACTIVATE);
                     sithCollision_DecreaseStackLevel();
                     return pSpawned;
                 }

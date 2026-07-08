@@ -245,7 +245,7 @@ int sithDSSThing_ProcessStateUpdate(sithCogMsg *msg)
             && !sithNet_isServer
             && pThing->itemParams.respawnFactor != 0 
             && pThing->itemParams.typeflags & SITH_ITEM_RESPAWN_MP) {
-            sithCog_SendMessageFromThing(pThing, pThing, SITH_MESSAGE_RESPAWN);
+            sithCog_ThingSendMessage(pThing, pThing, SITH_MESSAGE_RESPAWN);
         }
     }
 
@@ -1039,8 +1039,8 @@ int sithDSSThing_ProcessFullDescription(sithCogMsg *msg)
 
     if ( thing->thingflags & SITH_TF_CAPTURED )
     {
-        thing->class_cog = sithCog_GetByIdx(NETMSG_POPS16());
-        thing->capture_cog = sithCog_GetByIdx(NETMSG_POPS16());
+        thing->class_cog = sithCog_GetCogByIndex(NETMSG_POPS16());
+        thing->capture_cog = sithCog_GetCogByIndex(NETMSG_POPS16());
     }
 
     // MOTS added

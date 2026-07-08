@@ -438,7 +438,7 @@ int sithAICmd_BlindFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorIn
                 v11 = sithWeapon_WeaponFire(weapon, projectile, &fireOffs, &actor->blindAimError, 0, bWhichProjectile + SITH_ANIM_FIRE, 1.0, 0, 0.0);
                 if ( v11 )
                 {
-                    sithCog_SendMessageFromThing(weapon, v11, SITH_MESSAGE_FIRE);
+                    sithCog_ThingSendMessage(weapon, v11, SITH_MESSAGE_FIRE);
                     return 0;
                 }
             }
@@ -773,7 +773,7 @@ LABEL_50:
             sithSoundClass_PlayModeFirst(actor->thing, SITH_SC_FIRE1);
             v29 = sithWeapon_WeaponFire(actor->thing, v8, &v37.lvec, &actor->blindAimError, 0, SITH_ANIM_FIRE, 1.0, 0, 0.0);
             if ( v29 )
-                sithCog_SendMessageFromThing(actor->thing, v29, SITH_MESSAGE_FIRE);
+                sithCog_ThingSendMessage(actor->thing, v29, SITH_MESSAGE_FIRE);
             instinct->param0 = aiclass->argsAsFloat[0] * 0.001 + sithTime_curSeconds;
         }
         instinct->nextUpdate = sithTime_curMs + 1;
@@ -800,7 +800,7 @@ LABEL_50:
         sithSoundClass_PlayModeFirst(actor->thing, SITH_SC_FIRE1);
         v15 = sithWeapon_WeaponFire(actor->thing, v8, &v37.lvec, &actor->thing->position, 0, SITH_ANIM_FIRE, 1.0, 0, 0.0);
         if ( v15 )
-            sithCog_SendMessageFromThing(actor->thing, v15, SITH_MESSAGE_FIRE);
+            sithCog_ThingSendMessage(actor->thing, v15, SITH_MESSAGE_FIRE);
         v13 = instinct;
         instinct->param0 = aiclass->argsAsFloat[6] * 0.001 + sithTime_curSeconds;
     }

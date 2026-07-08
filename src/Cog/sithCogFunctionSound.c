@@ -579,32 +579,32 @@ void sithCogFunctionSound_PlaySoundThingAndWait(sithCog *ctx)
 
 void sithCogFunctionSound_Startup(sithCogSymboltable* ctx)
 {
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySong, "playsong");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySoundThing, "playsoundthing");
+    sithCog_RegisterFunction(ctx, sithCogFunctionSound_PlaySong, "playsong");
+    sithCog_RegisterFunction(ctx, sithCogFunctionSound_PlaySoundThing, "playsoundthing");
     if (Main_bMotsCompat) {
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySoundThingLocal, "playsoundthinglocal");
+        sithCog_RegisterFunction(ctx, sithCogFunctionSound_PlaySoundThingLocal, "playsoundthinglocal");
     }
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySoundPos, "playsoundpos");
+    sithCog_RegisterFunction(ctx, sithCogFunctionSound_PlaySoundPos, "playsoundpos");
     if (Main_bMotsCompat) {
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySoundPosLocal, "playsoundposlocal");
+        sithCog_RegisterFunction(ctx, sithCogFunctionSound_PlaySoundPosLocal, "playsoundposlocal");
     }
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySoundLocal, "playsoundlocal");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySoundGlobal, "playsoundglobal");
+    sithCog_RegisterFunction(ctx, sithCogFunctionSound_PlaySoundLocal, "playsoundlocal");
+    sithCog_RegisterFunction(ctx, sithCogFunctionSound_PlaySoundGlobal, "playsoundglobal");
     if (Main_bMotsCompat) {
-        sithCogScript_RegisterVerb(ctx,sithCogFunctionSound_PlaySoundThing,"playvoicething");
-        sithCogScript_RegisterVerb(ctx,sithCogFunctionSound_PlaySoundPos,"playvoicepos");
-        sithCogScript_RegisterVerb(ctx,sithCogFunctionSound_PlaySoundLocal,"playvoicelocal");
-        sithCogScript_RegisterVerb(ctx,sithCogFunctionSound_PlaySoundGlobal,"playvoiceglobal");
+        sithCog_RegisterFunction(ctx,sithCogFunctionSound_PlaySoundThing,"playvoicething");
+        sithCog_RegisterFunction(ctx,sithCogFunctionSound_PlaySoundPos,"playvoicepos");
+        sithCog_RegisterFunction(ctx,sithCogFunctionSound_PlaySoundLocal,"playvoicelocal");
+        sithCog_RegisterFunction(ctx,sithCogFunctionSound_PlaySoundGlobal,"playvoiceglobal");
     }
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_StopSound, "stopsound");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_LoadSound, "loadsound");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySoundClass, "playsoundclass");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_ChangeVolume, "changesoundvol");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_ChangePitch, "changesoundpitch");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_SectorSound, "sectorsound");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_SetMusicVol, "setmusicvol");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_GetSoundLen, "getsoundlen");
+    sithCog_RegisterFunction(ctx, sithCogFunctionSound_StopSound, "stopsound");
+    sithCog_RegisterFunction(ctx, sithCogFunctionSound_LoadSound, "loadsound");
+    sithCog_RegisterFunction(ctx, sithCogFunctionSound_PlaySoundClass, "playsoundclass");
+    sithCog_RegisterFunction(ctx, sithCogFunctionSound_ChangeVolume, "changesoundvol");
+    sithCog_RegisterFunction(ctx, sithCogFunctionSound_ChangePitch, "changesoundpitch");
+    sithCog_RegisterFunction(ctx, sithCogFunctionSound_SectorSound, "sectorsound");
+    sithCog_RegisterFunction(ctx, sithCogFunctionSound_SetMusicVol, "setmusicvol");
+    sithCog_RegisterFunction(ctx, sithCogFunctionSound_GetSoundLen, "getsoundlen");
     if (Main_bDwCompat) {
-        sithCogScript_RegisterVerb(ctx,sithCogFunctionSound_PlaySoundThingAndWait,"playsoundthingandwait");
+        sithCog_RegisterFunction(ctx,sithCogFunctionSound_PlaySoundThingAndWait,"playsoundthingandwait");
     }
 }

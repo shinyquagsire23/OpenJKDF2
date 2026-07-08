@@ -781,7 +781,7 @@ LABEL_78:
                     v37 = v19->surface;
                     rdVector_Copy3(&v72, &v5->position);
                     if ( (v37->surfaceFlags & SITH_SURFACE_COG_LINKED) != 0 )
-                        sithCog_SendMessageFromSurface(v37, v5, 8);
+                        sithCog_SurfaceSendMessage(v37, v5, 8);
                     sithThing_MoveToSector(v5, v19->surface->adjoin->sector, 0);
                     v36 = _memcmp(&v72, &v5->position, sizeof(rdVector3)) != 0;
                 }
@@ -925,7 +925,7 @@ int sithCollision_HandleThingHitSurface(sithThing *thing, sithSurface *surface, 
     if ( (surface->surfaceFlags & SITH_SURFACE_COG_LINKED) != 0 && (v3->thingflags & SITH_TF_INVULN) == 0 && surface->surfaceInfo.lastTouchedMs + 500 <= sithTime_curMsAbsolute )
     {
         surface->surfaceInfo.lastTouchedMs = sithTime_curMsAbsolute;
-        sithCog_SendMessageFromSurface(surface, v3, SITH_MESSAGE_TOUCHED);
+        sithCog_SurfaceSendMessage(surface, v3, SITH_MESSAGE_TOUCHED);
     }
     if ( a1a > 0.15000001 )
     {
@@ -972,9 +972,9 @@ int sithCollision_ThingCollisionHandler(sithThing *thing1, sithThing *thing2, si
     a2 = a3->hitNorm;
 
     if ( (v4->thingflags & SITH_TF_CAPTURED) != 0 && (v4->thingflags & SITH_TF_INVULN) == 0 )
-        sithCog_SendMessageFromThing(v4, v5, SITH_MESSAGE_TOUCHED);
+        sithCog_ThingSendMessage(v4, v5, SITH_MESSAGE_TOUCHED);
     if ( (v5->thingflags & SITH_TF_CAPTURED) != 0 && (v4->thingflags & SITH_TF_INVULN) == 0 )
-        sithCog_SendMessageFromThing(v5, v4, SITH_MESSAGE_TOUCHED);
+        sithCog_ThingSendMessage(v5, v4, SITH_MESSAGE_TOUCHED);
 
     if ( v4->moveType != SITH_MT_PHYSICS || v4->physicsParams.mass == 0.0 )
     {

@@ -234,7 +234,7 @@ void sithThing_TickAll(flex_t deltaSeconds, int deltaMs)
                 continue;
 
             if ( (pThingIter->thingflags & (SITH_TF_TIMER|SITH_TF_PULSE)) != 0 )
-                sithCog_HandleThingTimerPulse(pThingIter);
+                sithCog_UpdateThingTimer(pThingIter);
 
             switch ( pThingIter->controlType )
             {
@@ -386,7 +386,7 @@ void sithThing_Remove(sithThing* pThing)
         default:
             pThing->thingflags |= SITH_TF_WILLBEREMOVED;
             if (pThing->thingflags & SITH_TF_CAPTURED && !(pThing->thingflags & SITH_TF_INVULN))
-                sithCog_SendMessageFromThing(pThing, 0, SITH_MESSAGE_REMOVED);
+                sithCog_ThingSendMessage(pThing, 0, SITH_MESSAGE_REMOVED);
             break;
     }
 }
@@ -446,7 +446,7 @@ void sithThing_Destroy(sithThing* pThing)
 {
     pThing->thingflags |= SITH_TF_WILLBEREMOVED;
     if ( (pThing->thingflags & SITH_TF_CAPTURED) != 0 && (pThing->thingflags & SITH_TF_INVULN) == 0 )
-        sithCog_SendMessageFromThing(pThing, 0, SITH_MESSAGE_REMOVED);
+        sithCog_ThingSendMessage(pThing, 0, SITH_MESSAGE_REMOVED);
 }
 
 flex_t sithThing_Damage(sithThing *sender, sithThing *reciever, flex_t amount, int damageClass)
@@ -465,7 +465,7 @@ flex_t sithThing_Damage(sithThing *sender, sithThing *reciever, flex_t amount, i
     if ( (sender->thingflags & SITH_TF_CAPTURED) != 0 && (sender->thingflags & SITH_TF_INVULN) == 0 )
     {
         param1 = (flex_t)(unsigned int)damageClass; // FLEXTODO
-        amount = sithCog_SendMessageFromThingEx(sender, reciever, SITH_MESSAGE_DAMAGED, amount, param1, 0.0, 0.0);
+        amount = sithCog_ThingSendMessageEx(sender, reciever, SITH_MESSAGE_DAMAGED, amount, param1, 0.0, 0.0);
     }
     if ( amount > 0.0 )
     {
@@ -712,7 +712,7 @@ void sithThing_LeaveSector(sithThing* pThing)
         goto LABEL_5;
     pos = pThing->position;
     if ( (pThing->thingflags & (SITH_TF_DISABLED|SITH_TF_INVULN)) == 0 )
-        sithCog_SendMessageFromSector(sector, pThing, SITH_MESSAGE_EXITED);
+        sithCog_SectorSendMessage(sector, pThing, SITH_MESSAGE_EXITED);
     if ( !_memcmp(&pos, &pThing->position, sizeof(rdVector3)) )
     {
 LABEL_5:
@@ -791,7 +791,7 @@ void sithThing_EnterSector(sithThing* pThing, sithSector *sector, int a3, int a4
     if ( !a4 )
     {
         if ( (pThing->sector->flags & SITH_SECTOR_COGLINKED) != 0 && (pThing->thingflags & (SITH_TF_DISABLED|SITH_TF_INVULN)) == 0 )
-            sithCog_SendMessageFromSector(pThing->sector, pThing, SITH_MESSAGE_ENTERED);
+            sithCog_SectorSendMessage(pThing->sector, pThing, SITH_MESSAGE_ENTERED);
     }
 }
 
@@ -808,7 +808,7 @@ void sithThing_EnterWater(sithThing* pThing, int a2)
     {
         pThing->thingflags |= SITH_TF_WILLBEREMOVED;
         if ( (pThing->thingflags & SITH_TF_CAPTURED) != 0 && (pThing->thingflags & SITH_TF_INVULN) == 0 )
-            sithCog_SendMessageFromThing(pThing, 0, SITH_MESSAGE_REMOVED);
+            sithCog_ThingSendMessage(pThing, 0, SITH_MESSAGE_REMOVED);
     }
     else if ( !a2 )
     {
@@ -882,7 +882,7 @@ void sithThing_ExitWater(sithThing* pThing, int a2)
     {
         pThing->thingflags |= SITH_TF_WILLBEREMOVED;
         if ( (pThing->thingflags & SITH_TF_CAPTURED) != 0 && (pThing->thingflags & SITH_TF_INVULN) == 0 )
-            sithCog_SendMessageFromThing(pThing, 0, SITH_MESSAGE_REMOVED);
+            sithCog_ThingSendMessage(pThing, 0, SITH_MESSAGE_REMOVED);
     }
     else if ( !a2 )
     {
@@ -1191,7 +1191,7 @@ void sithThing_AttachToSurface(sithThing* pThing, sithSurface *surface, int a3)
         rdVector_Sub3Acc(&pThing->physicsParams.vel, &a2a);
     }
     if ( (surface->surfaceFlags & SITH_SURFACE_COG_LINKED) != 0 && (pThing->thingflags & (SITH_TF_DISABLED|SITH_TF_INVULN)) == 0 )
-        sithCog_SendMessageFromSurface(surface, pThing, SITH_MESSAGE_ENTERED);
+        sithCog_SurfaceSendMessage(surface, pThing, SITH_MESSAGE_ENTERED);
     if ( !a3 && v4 )
     {
         v14 = -rdVector_Dot3(&pThing->physicsParams.vel, &surface->surfaceInfo.face.normal);
@@ -1281,7 +1281,7 @@ void sithThing_LandThing(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3 *a4
     rdVector_Sub3(&a2a, &a1->position, &a2->position);
     rdMatrix_TransformVector34Acc_0(&a1->field_4C, &a2a, &a2->lookOrientation);
     if ( (a2->thingflags & SITH_TF_CAPTURED) != 0 && (a1->thingflags & (SITH_TF_DISABLED|SITH_TF_INVULN)) == 0 )
-        sithCog_SendMessageFromThing(a2, a1, SITH_MESSAGE_ENTERED);
+        sithCog_ThingSendMessage(a2, a1, SITH_MESSAGE_ENTERED);
     if ( v18 && !a5 )
     {
         rdMatrix_TransformVector34(&out, &a3->normal, &a2->lookOrientation);
@@ -1335,7 +1335,7 @@ void sithThing_AttachThing(sithThing *parent, sithThing *child)
     rdVector_Sub3(&a2, &parent->position, &child->position);
     rdMatrix_TransformVector34Acc_0(&parent->field_4C, &a2, &child->lookOrientation);
     if ( (child->thingflags & SITH_TF_CAPTURED) != 0 && (parent->thingflags & (SITH_TF_DISABLED|SITH_TF_INVULN)) == 0 )
-        sithCog_SendMessageFromThing(child, parent, SITH_MESSAGE_ENTERED);
+        sithCog_ThingSendMessage(child, parent, SITH_MESSAGE_ENTERED);
 }
 
 int sithThing_DetachThing(sithThing* pThing)
@@ -1361,7 +1361,7 @@ int sithThing_DetachThing(sithThing* pThing)
                 rdVector_Add3Acc(&pThing->physicsParams.vel, &a2);
             }
             if ( (attached->surfaceFlags & SITH_SURFACE_COG_LINKED) != 0 && (pThing->thingflags & SITH_TF_INVULN) == 0 )
-                sithCog_SendMessageFromSurface(attached, pThing, SITH_MESSAGE_EXITED);
+                sithCog_SurfaceSendMessage(attached, pThing, SITH_MESSAGE_EXITED);
         }
         result = 0;
 
@@ -1386,7 +1386,7 @@ int sithThing_DetachThing(sithThing* pThing)
     }
 LABEL_8:
     if ( (v3->thingflags & SITH_TF_CAPTURED) != 0 && (pThing->thingflags & SITH_TF_INVULN) == 0 )
-        sithCog_SendMessageFromThing(v3, pThing, SITH_MESSAGE_EXITED);
+        sithCog_ThingSendMessage(v3, pThing, SITH_MESSAGE_EXITED);
     v13 = pThing->parentThing;
     v14 = pThing->childThing;
     if ( v13 )
@@ -1808,7 +1808,7 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing* pThing, int param)
             result = 1;
             break;
         case THINGPARAM_COG:
-            pCog = sithCog_LoadCogscript(arg->value);
+            pCog = sithCog_Load(arg->value);
             pThing->class_cog = pCog;
             if ( !pCog )
                 return 1;

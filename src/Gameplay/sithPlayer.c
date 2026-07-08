@@ -363,7 +363,7 @@ void sithPlayer_KillPlayer(sithThing *thing)
         sithDSSThing_Death(thing, thing, 1, -1, 255);
 
     if ( (thing->thingflags & SITH_TF_CAPTURED) == 0
-      || (sithCog_SendMessageFromThing(thing, thing, SITH_MESSAGE_KILLED), (thing->thingflags & SITH_TF_WILLBEREMOVED) == 0) )
+      || (sithCog_ThingSendMessage(thing, thing, SITH_MESSAGE_KILLED), (thing->thingflags & SITH_TF_WILLBEREMOVED) == 0) )
     {
         sithSoundClass_StopSound(thing, 0);
         sithThing_detachallchildren(thing);
@@ -526,7 +526,7 @@ void sithPlayer_NewPlayer(sithThing *player)
             sithCamera_Update(sithCamera_currentCamera);
             sithPhysics_ResetThingMovement(player);
             sithWeapon_SyncPuppet(player);
-            sithCog_SendSimpleMessageToAll(SITH_MESSAGE_NEWPLAYER, SENDERTYPE_THING, player->thingIdx, SENDERTYPE_THING, player->thingIdx);
+            sithCog_BroadcastMessage(SITH_MESSAGE_NEWPLAYER, SENDERTYPE_THING, player->thingIdx, SENDERTYPE_THING, player->thingIdx);
             if ( sithComm_multiplayerFlags )
                 sithDSSThing_UpdateState(player, -1, 255);
         }

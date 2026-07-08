@@ -345,7 +345,7 @@ void sithAI_Process()
                   && (actor->flags & (SITHAI_MODE_DISABLED|SITHAI_MODE_SLEEPING)) == 0 )
             {
                 if (actor->thing && actor->pInterest && (actor->pInterest->type == SITH_THING_FREE || actor->pInterest->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED))) {
-                    sithCog_SendMessageFromThingEx(actor->thing,NULL,SITH_MESSAGE_AIEVENT,65536.0,0.0,0.0,0.0);
+                    sithCog_ThingSendMessageEx(actor->thing,NULL,SITH_MESSAGE_AIEVENT,65536.0,0.0,0.0,0.0);
                 }
                 if (actor->nextUpdate <= sithTime_curMs) {
                     sithAI_InstinctUpdate(actor);
@@ -447,7 +447,7 @@ void sithAI_EmitEvent(sithActor *actor, int a2, intptr_t actorFlags)
         }
 
         if ( a2 == SITHAI_MODE_UNK100 )
-            sithCog_SendMessageFromThingEx(actor->thing, 0, SITH_MESSAGE_AIEVENT, Main_bMotsCompat ? (flex_t)actor->flags : (flex_t)SITHAI_EVENTMODECHANGED, 0.0, 0.0, 0.0); // FLEXTODO
+            sithCog_ThingSendMessageEx(actor->thing, 0, SITH_MESSAGE_AIEVENT, Main_bMotsCompat ? (flex_t)actor->flags : (flex_t)SITHAI_EVENTMODECHANGED, 0.0, 0.0, 0.0); // FLEXTODO
 
         v7 = 0;
         for (v7 = 0; v7 < actor->numAIClassEntries; v7++)
@@ -842,7 +842,7 @@ LABEL_22:
                     rdVector_Zero3(&v3->physicsParams.vel);
                     actor->flags &= ~SITHAI_MODE_MOVING;
                     sithSoundClass_StopMode(v3, SITH_SC_MOVING);
-                    sithCog_SendMessageFromThing(v3, 0, SITH_MESSAGE_ARRIVED);
+                    sithCog_ThingSendMessage(v3, 0, SITH_MESSAGE_ARRIVED);
                     sithAI_EmitEvent(actor, SITHAI_MODE_FLEEING, 0);
                 }
                 return;
@@ -1499,7 +1499,7 @@ LABEL_12:
     sithSoundClass_PlayModeRandom(v9, bAltFire + SITH_SC_FIRE1);
     v16 = sithWeapon_WeaponFire(v9, v8, &v1, &actor->blindAimError, 0, v20, v21, v15, 0.0);
     if ( v16 )
-        sithCog_SendMessageFromThing(v9, v16, SITH_MESSAGE_FIRE);
+        sithCog_ThingSendMessage(v9, v16, SITH_MESSAGE_FIRE);
     return 1;
 }
 

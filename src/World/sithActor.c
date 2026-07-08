@@ -215,7 +215,7 @@ void sithActor_KillActor(sithThing *thing, sithThing *a3, int a4)
 
 
     thing->actorParams.health = 0.0;
-    if ( (thing->thingflags & SITH_TF_CAPTURED) == 0 || (sithCog_SendMessageFromThing(thing, a3, SITH_MESSAGE_KILLED), (thing->thingflags & SITH_TF_WILLBEREMOVED) == 0) )
+    if ( (thing->thingflags & SITH_TF_CAPTURED) == 0 || (sithCog_ThingSendMessage(thing, a3, SITH_MESSAGE_KILLED), (thing->thingflags & SITH_TF_WILLBEREMOVED) == 0) )
     {
         sithSoundClass_StopSound(thing, 0);
 
@@ -462,7 +462,7 @@ int sithActor_thing_anim_blocked(sithThing *a1, sithThing *thing2, sithCollision
     a1->actorParams.typeflags &= ~SITH_AF_CAN_ROTATE_HEAD;
     a1->prev_thing = thing2;
     a1->child_signature = thing2->signature;
-    sithCog_SendMessageFromThing(thing2, 0, SITH_MESSAGE_BLOCKED);
+    sithCog_ThingSendMessage(thing2, 0, SITH_MESSAGE_BLOCKED);
     return 1;
 }
 

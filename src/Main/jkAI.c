@@ -320,7 +320,7 @@ LABEL_25:
     {
         v13 = (flex_t)v14;
         v12 = (flex_t)(unsigned int)actor->pDistractor->thingIdx;
-        sithCog_SendMessageFromThingEx(actor->thing, 0, SITH_MESSAGE_USER0, v12, v13, 0.0, 0.0);
+        sithCog_ThingSendMessageEx(actor->thing, 0, SITH_MESSAGE_USER0, v12, v13, 0.0, 0.0);
         instinct->nextUpdate = sithTime_curMs + aiclass->argsAsInt[v6 + 9];
     }
     return 0;

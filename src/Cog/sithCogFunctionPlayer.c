@@ -579,60 +579,60 @@ void sithCogFunctionPlayer_KillPlayerQuietly(sithCog *ctx)
 
 void sithCogFunctionPlayer_Startup(sithCogSymboltable* ctx)
 {
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetInvActivated, "setinvactivated");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_SetInvActivated, "setinvactivated");
 
     // DW added: g_debugModeFlags & DEBUGFLAG_100 check
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetInvAvailable, "setinvavailable");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_IsInvActivated, "isinvactivated");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_IsInvAvailable, "isinvavailable");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_SetInvAvailable, "setinvavailable");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_IsInvActivated, "isinvactivated");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_IsInvAvailable, "isinvavailable");
 
     // Start DW removed
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetGoalFlags, "setgoalflags");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_ClearGoalFlags, "cleargoalflags");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetNumPlayers, "getnumplayers");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetMaxPlayers, "getmaxplayers");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetAbsoluteMaxPlayers, "getabsolutemaxplayers");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_SetGoalFlags, "setgoalflags");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_ClearGoalFlags, "cleargoalflags");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_GetNumPlayers, "getnumplayers");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_GetMaxPlayers, "getmaxplayers");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_GetAbsoluteMaxPlayers, "getabsolutemaxplayers");
     // End DW removed
 
     // Start DW removed
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetLocalPlayerThing, "getlocalplayerthing");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetPlayerThing, "getplayerthing");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetPlayerNum, "getplayernum");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetPlayerTeam, "getplayerteam");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetPlayerTeam, "setplayerteam");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetPlayerScore, "getplayerscore");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetPlayerScore, "setplayerscore");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetPlayerKills, "getplayerkills");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetPlayerKills, "setplayerkills");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetPlayerKilled, "getplayerkilled");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetPlayerKilled, "setplayerkilled");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetPlayerSuicides, "getplayersuicides");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetPlayerSuicides, "setplayersuicides");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_PickupBackpack, "pickupbackpack");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_CreateBackpack, "createbackpack");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_NthBackpackBin, "nthbackpackbin");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_NthBackpackValue, "nthbackpackvalue");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetNumBackbackItems, "numbackpackitems");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetAutoSwitch, "getautoswitch");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetAutoSwitch, "setautoswitch");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetAutoPickup, "getautopickup");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetAutoPickup, "setautopickup");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetAutoReload, "getautoreload");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetAutoReload, "setautoreload");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetRespawnMask, "getrespawnmask");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetRespawnMask, "setrespawnmask");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_GetLocalPlayerThing, "getlocalplayerthing");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_GetPlayerThing, "getplayerthing");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_GetPlayerNum, "getplayernum");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_GetPlayerTeam, "getplayerteam");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_SetPlayerTeam, "setplayerteam");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_GetPlayerScore, "getplayerscore");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_SetPlayerScore, "setplayerscore");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_GetPlayerKills, "getplayerkills");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_SetPlayerKills, "setplayerkills");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_GetPlayerKilled, "getplayerkilled");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_SetPlayerKilled, "setplayerkilled");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_GetPlayerSuicides, "getplayersuicides");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_SetPlayerSuicides, "setplayersuicides");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_PickupBackpack, "pickupbackpack");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_CreateBackpack, "createbackpack");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_NthBackpackBin, "nthbackpackbin");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_NthBackpackValue, "nthbackpackvalue");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_GetNumBackbackItems, "numbackpackitems");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_GetAutoSwitch, "getautoswitch");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_SetAutoSwitch, "setautoswitch");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_GetAutoPickup, "getautopickup");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_SetAutoPickup, "setautopickup");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_GetAutoReload, "getautoreload");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_SetAutoReload, "setautoreload");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_GetRespawnMask, "getrespawnmask");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_SetRespawnMask, "setrespawnmask");
     // End DW removed
 
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_ActivateBin, "activatebin");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_DeactivateBin, "deactivatebin");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_ActivateBin, "activatebin");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_DeactivateBin, "deactivatebin");
 
     // Start DW removed
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetBinWait, "setbinwait");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetNumPlayersInTeam, "getnumplayersinteam");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_AddScoreToTeamMembers, "addscoretoteammembers");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SyncScores, "syncscores");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_SetBinWait, "setbinwait");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_GetNumPlayersInTeam, "getnumplayersinteam");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_AddScoreToTeamMembers, "addscoretoteammembers");
+    sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_SyncScores, "syncscores");
     if (Main_bMotsCompat) {
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_KillPlayerQuietly, "killplayerquietly");
+        sithCog_RegisterFunction(ctx, sithCogFunctionPlayer_KillPlayerQuietly, "killplayerquietly");
     }
     // End DW removed
 }

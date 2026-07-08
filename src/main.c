@@ -1052,14 +1052,14 @@ void do_hooks()
     // sithCog
     hook_function(sithCog_Startup_ADDR, sithCog_Startup);
     hook_function(sithCog_Shutdown_ADDR, sithCog_Shutdown);
-    hook_function(sithCog_LoadEntry_ADDR, sithCog_LoadEntry);
-    hook_function(sithCog_SendMessageFromThing_ADDR, sithCog_SendMessageFromThing);
-    hook_function(sithCog_SendMessageFromSector_ADDR, sithCog_SendMessageFromSector);
-    hook_function(sithCog_SendMessageFromSectorEx_ADDR, sithCog_SendMessageFromSectorEx);
+    hook_function(sithCog_ParseSymbolRef_ADDR, sithCog_ParseSymbolRef);
+    hook_function(sithCog_ThingSendMessage_ADDR, sithCog_ThingSendMessage);
+    hook_function(sithCog_SectorSendMessage_ADDR, sithCog_SectorSendMessage);
+    hook_function(sithCog_SectorSendMessageEx_ADDR, sithCog_SectorSendMessageEx);
     hook_function(sithCog_SendMessageEx_ADDR, sithCog_SendMessageEx);
-    hook_function(sithCog_Free_ADDR, sithCog_Free);
-    hook_function(sithCog_HandleThingTimerPulse_ADDR, sithCog_HandleThingTimerPulse);
-    hook_function(sithCog_GetByIdx_ADDR, sithCog_GetByIdx);
+    hook_function(sithCog_FreeWorldCogs_ADDR, sithCog_FreeWorldCogs);
+    hook_function(sithCog_UpdateThingTimer_ADDR, sithCog_UpdateThingTimer);
+    hook_function(sithCog_GetCogByIndex_ADDR, sithCog_GetCogByIndex);
     hook_function(sithCogFunction_Startup_ADDR, sithCogFunction_Startup);
     hook_function(sithCogFunctionThing_Startup_ADDR, sithCogFunctionThing_Startup);
     hook_function(sithCogFunctionAI_Startup_ADDR, sithCogFunctionAI_Startup);
@@ -1067,11 +1067,11 @@ void do_hooks()
     hook_function(sithCogFunctionSound_Startup_ADDR, sithCogFunctionSound_Startup);
     hook_function(sithCogFunctionSector_Startup_ADDR, sithCogFunctionSector_Startup);
     hook_function(sithCogFunctionPlayer_Startup_ADDR, sithCogFunctionPlayer_Startup);
-    hook_function(sithCogScript_RegisterVerb_ADDR, sithCogScript_RegisterVerb);
-    hook_function(sithCogScript_RegisterMessageSymbol_ADDR, sithCogScript_RegisterMessageSymbol);
-    hook_function(sithCogScript_RegisterGlobalMessage_ADDR, sithCogScript_RegisterGlobalMessage);
-    hook_function(sithCogScript_TimerTick_ADDR, sithCogScript_TimerTick);
-    hook_function(sithCogScript_DevCmdCogStatus_ADDR, sithCogScript_DevCmdCogStatus);
+    hook_function(sithCog_RegisterFunction_ADDR, sithCog_RegisterFunction);
+    hook_function(sithCog_AddIntSymbol_ADDR, sithCog_AddIntSymbol);
+    hook_function(sithCog_AddFloatSymbol_ADDR, sithCog_AddFloatSymbol);
+    hook_function(sithCog_TimerEventTask_ADDR, sithCog_TimerEventTask);
+    hook_function(sithCog_CogStatus_ADDR, sithCog_CogStatus);
     
     // sithComm
     hook_function(sithComm_Startup_ADDR, sithComm_Startup);
@@ -1096,12 +1096,12 @@ void do_hooks()
 
     // sithCog
     hook_function(sithCog_FreeEntry_ADDR, sithCog_FreeEntry);
-    hook_function(sithCog_Free2_ADDR, sithCog_Free2);
-    hook_function(sithCog_InitScripts_ADDR, sithCog_InitScripts);
-    hook_function(sithCog_InitCogs_ADDR, sithCog_InitCogs);
-    hook_function(sithCog_ThingFromSymbolidk_ADDR, sithCog_ThingFromSymbolidk);
-    hook_function(sithCog_Thingidk_ADDR, sithCog_Thingidk);
-    hook_function(sithCog_Sectoridk_ADDR, sithCog_Sectoridk);
+    hook_function(sithCog_FreeScriptEntry_ADDR, sithCog_FreeScriptEntry);
+    hook_function(sithCog_AllocWorldCogScripts_ADDR, sithCog_AllocWorldCogScripts);
+    hook_function(sithCog_AllocWorldCogs_ADDR, sithCog_AllocWorldCogs);
+    hook_function(sithCog_LinkCogToThing_ADDR, sithCog_LinkCogToThing);
+    hook_function(sithCog_LinkCogToSurface_ADDR, sithCog_LinkCogToSurface);
+    hook_function(sithCog_LinkCogToSector_ADDR, sithCog_LinkCogToSector);
 
     // sithCogVm
     hook_function(sithCogExec_Execute_ADDR, sithCogExec_Execute);

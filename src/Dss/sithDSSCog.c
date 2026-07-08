@@ -71,7 +71,7 @@ int sithDSSCog_ProcessMessage(sithCogMsg *in_netMsg)
     NETMSG_IN_START(in_netMsg);
 
     linkId = NETMSG_POPS32();
-    cog = sithCog_GetByIdx(NETMSG_POPS16());
+    cog = sithCog_GetCogByIndex(NETMSG_POPS16());
     senderType = NETMSG_POPU8();
     sourceType = NETMSG_POPU8();
     senderIdx = NETMSG_POPS32();
@@ -96,7 +96,7 @@ int sithDSSCog_ProcessMessage(sithCogMsg *in_netMsg)
     //printf("%x %x %x %x %x %x %x, %f %f %f %f\n", linkId, cog->selfCog, senderType, sourceType, senderIdx, sourceIndex, msgid, param0, param1, param2, param3);
     if ( !cog )
     {
-        sithCog_SendMessageToAll(msgid, senderType, senderIdx, sourceType, sourceIndex, param0, param1, param2, param3);
+        sithCog_BroadcastMessageEx(msgid, senderType, senderIdx, sourceType, sourceIndex, param0, param1, param2, param3);
         return 1;
     }
     if ( senderType == SENDERTYPE_THING )
@@ -193,7 +193,7 @@ int sithDSSCog_ProcessCogState(sithCogMsg *msg)
     
     NETMSG_IN_START(msg);
 
-    cog = sithCog_GetByIdx(NETMSG_POPS32());
+    cog = sithCog_GetCogByIndex(NETMSG_POPS32());
     if (!cog)
         return 0;
 

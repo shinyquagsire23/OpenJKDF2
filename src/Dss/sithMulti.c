@@ -599,7 +599,7 @@ int sithMulti_ProcessWelcome(sithCogMsg *msg)
             sithConsole_PrintWString(a1a);
             jkPlayer_playerInfos[v1].lastUpdateMs = sithTime_curMs;
             if ( sithNet_isServer )
-                sithCog_SendSimpleMessageToAll(SITH_MESSAGE_JOIN, 3, jkPlayer_playerInfos[v1].playerThing->thingIdx, 0, v1);
+                sithCog_BroadcastMessage(SITH_MESSAGE_JOIN, 3, jkPlayer_playerInfos[v1].playerThing->thingIdx, 0, v1);
             if ( sithMulti_handlerIdk )
                 sithMulti_handlerIdk();
             sithDSSThing_UpdateState(sithPlayer_pLocalPlayerThing, -1, 255);
@@ -714,7 +714,7 @@ int sithMulti_ProcessQuit(sithCogMsg *msg)
             sithSoundClass_StopSound(jkPlayer_playerInfos[v5].playerThing, 0);
             sithPlayer_Startup(v4);
             if ( sithNet_isServer )
-                sithCog_SendSimpleMessageToAll(SITH_MESSAGE_LEAVE, 3, jkPlayer_playerInfos[v5].playerThing->thingIdx, 0, v4);
+                sithCog_BroadcastMessage(SITH_MESSAGE_LEAVE, 3, jkPlayer_playerInfos[v5].playerThing->thingIdx, 0, v4);
         }
     }
     return 1;
@@ -770,7 +770,7 @@ int sithMulti_CheckPlayers(int32_t a, sithEventInfo* b)
                     sithSoundClass_StopSound(v1->playerThing, 0);
                     sithPlayer_Startup(v0);
                     if ( sithNet_isServer )
-                        sithCog_SendSimpleMessageToAll(SITH_MESSAGE_LEAVE, 3, v1->playerThing->thingIdx, 0, v0);
+                        sithCog_BroadcastMessage(SITH_MESSAGE_LEAVE, 3, v1->playerThing->thingIdx, 0, v0);
                 }
                 ++v0;
                 ++v1;
@@ -805,7 +805,7 @@ int sithMulti_CheckPlayers(int32_t a, sithEventInfo* b)
         sithSoundClass_StopSound(jkPlayer_playerInfos[0].playerThing, 0);
         sithPlayer_Startup(0);
         if ( sithNet_isServer )
-            sithCog_SendSimpleMessageToAll(SITH_MESSAGE_LEAVE, 3, jkPlayer_playerInfos[0].playerThing->thingIdx, 0, 0);
+            sithCog_BroadcastMessage(SITH_MESSAGE_LEAVE, 3, jkPlayer_playerInfos[0].playerThing->thingIdx, 0, 0);
     }
     return 1;
 }
@@ -912,7 +912,7 @@ int sithMulti_ProcessSyncPlayers(sithCogMsg *msg)
                     sithSoundClass_StopSound(v6->playerThing, 0);
                     sithPlayer_Startup(v3);
                     if ( sithNet_isServer )
-                        sithCog_SendSimpleMessageToAll(SITH_MESSAGE_LEAVE, 3, v6->playerThing->thingIdx, 0, v3);
+                        sithCog_BroadcastMessage(SITH_MESSAGE_LEAVE, 3, v6->playerThing->thingIdx, 0, v3);
                 }
             }
             else
@@ -923,7 +923,7 @@ int sithMulti_ProcessSyncPlayers(sithCogMsg *msg)
 
                 v6->lastUpdateMs = sithTime_curMs;
                 if (sithNet_isServer)
-                    sithCog_SendSimpleMessageToAll(SITH_MESSAGE_JOIN, 3, v6->playerThing->thingIdx, 0, v3);
+                    sithCog_BroadcastMessage(SITH_MESSAGE_JOIN, 3, v6->playerThing->thingIdx, 0, v3);
                 if ( sithMulti_handlerIdk )
                     sithMulti_handlerIdk();
                 sithDSSThing_UpdateState(sithPlayer_pLocalPlayerThing, -1, 255);
@@ -1012,7 +1012,7 @@ LABEL_10:
         sithSoundClass_StopSound(jkPlayer_playerInfos[v3].playerThing, 0);
         sithPlayer_Startup(v3);
         if ( sithNet_isServer )
-            sithCog_SendSimpleMessageToAll(SITH_MESSAGE_LEAVE, 3, jkPlayer_playerInfos[v3].playerThing->thingIdx, 0, v3);
+            sithCog_BroadcastMessage(SITH_MESSAGE_LEAVE, 3, jkPlayer_playerInfos[v3].playerThing->thingIdx, 0, v3);
     }
 }
 
@@ -1561,7 +1561,7 @@ void sithMulti_RemovePlayer(int playerIdx)
 
     if ( sithNet_isServer )
     {
-        sithCog_SendSimpleMessageToAll(SITH_MESSAGE_JOIN, 3, jkPlayer_playerInfos[playerIdx].playerThing->thing_id, 0, playerIdx);
+        sithCog_BroadcastMessage(SITH_MESSAGE_JOIN, 3, jkPlayer_playerInfos[playerIdx].playerThing->thing_id, 0, playerIdx);
     }
 }
 
@@ -1576,7 +1576,7 @@ void sithMulti_ProcessPlayerJoin(int playerIdx)
 
     if ( sithNet_isServer )
     {
-        sithCog_SendSimpleMessageToAll(SITH_MESSAGE_JOIN, 3, jkPlayer_playerInfos[playerIdx].playerThing->thing_id, 0, playerIdx);
+        sithCog_BroadcastMessage(SITH_MESSAGE_JOIN, 3, jkPlayer_playerInfos[playerIdx].playerThing->thing_id, 0, playerIdx);
     }
 
     if ( sithMulti_handlerIdk )

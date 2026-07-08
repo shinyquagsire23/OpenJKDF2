@@ -672,7 +672,7 @@ void sithRender_BuildVisibleSectorList(sithSector *sector, rdClipFrustum *frustu
         {
             sector->flags |= SITH_SECTOR_AUTOMAPVISIBLE;
             if ( (sector->flags & SITH_SECTOR_COGLINKED) != 0 )
-                sithCog_SendMessageFromSector(sector, 0, SITH_MESSAGE_SIGHTED);
+                sithCog_SectorSendMessage(sector, 0, SITH_MESSAGE_SIGHTED);
         }
         frustum = &sithRender_clipFrustums[sithRender_numClipFrustums++];
         _memcpy(frustum, frustumArg, sizeof(rdClipFrustum));
@@ -1019,7 +1019,7 @@ void sithRender_NoClip(sithSector *sector, rdClipFrustum *frustumArg, flex_t pre
         {
             sector->flags |= SITH_SECTOR_AUTOMAPVISIBLE;
             if ( (sector->flags & SITH_SECTOR_COGLINKED) != 0 )
-                sithCog_SendMessageFromSector(sector, 0, SITH_MESSAGE_SIGHTED);
+                sithCog_SectorSendMessage(sector, 0, SITH_MESSAGE_SIGHTED);
         }
         frustum = &sithRender_clipFrustums[sithRender_numClipFrustums++];
         _memcpy(frustum, frustumArg, sizeof(rdClipFrustum));
@@ -1255,7 +1255,7 @@ void sithRender_KindaClipAssignFrustum(sithSector *sector, rdClipFrustum *frustu
     {
         sector->flags |= SITH_SECTOR_AUTOMAPVISIBLE;
         if ( (sector->flags & SITH_SECTOR_COGLINKED) != 0 )
-            sithCog_SendMessageFromSector(sector, 0, SITH_MESSAGE_SIGHTED);
+            sithCog_SectorSendMessage(sector, 0, SITH_MESSAGE_SIGHTED);
     }
     frustum = &sithRender_clipFrustums[sithRender_numClipFrustums++];
     _memcpy(frustum, frustumArg, sizeof(rdClipFrustum));
@@ -2976,7 +2976,7 @@ int sithRender_RenderThing(sithThing *pThing)
     if (!(pThing->thingflags & SITH_TF_INCAMFOV) && !(g_debugmodeFlags & DEBUGFLAG_NOCLIP)) // Added: don't send sighted stuff in noclip
     {
         if (pThing->thingflags & SITH_TF_CAPTURED) {
-            sithCog_SendMessageFromThing(pThing, 0, SITH_MESSAGE_SIGHTED);
+            sithCog_ThingSendMessage(pThing, 0, SITH_MESSAGE_SIGHTED);
         }
 
         if (pThing->controlType == SITH_CT_AI && pThing->actor)

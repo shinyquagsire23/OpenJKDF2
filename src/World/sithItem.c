@@ -20,7 +20,7 @@ int sithItem_PlayerCollisionHandler(sithThing *a1, sithThing *a2, sithCollisionS
 
         if ( sithCollision_HasLOS(a2, a1, 0) && a1->itemParams.respawnTime < sithTime_curMs )
         {
-            sithCog_SendMessageFromThing(a1, a2, SITH_MESSAGE_TOUCHED);
+            sithCog_ThingSendMessage(a1, a2, SITH_MESSAGE_TOUCHED);
             a1->itemParams.respawnTime = sithTime_curMs + 500;
         }
     }
@@ -54,7 +54,7 @@ void sithItem_SetItemTaken(sithThing *item, sithThing *actor, int a3)
 
     if ( actor == sithPlayer_pLocalPlayerThing )
     {
-        sithCog_SendMessageFromThing(item, actor, SITH_MESSAGE_TAKEN);
+        sithCog_ThingSendMessage(item, actor, SITH_MESSAGE_TAKEN);
     }
 
     if ( (item->itemParams.typeflags & SITH_ITEM_RESPAWN_SP && !sithNet_isMulti) 
@@ -126,7 +126,7 @@ void sithItem_DestroyItem(sithThing *item)
                 return;
             }
         }
-        sithCog_SendMessageFromThing(item, item, SITH_MESSAGE_RESPAWN);
+        sithCog_ThingSendMessage(item, item, SITH_MESSAGE_RESPAWN);
     }
 
     if ( sithComm_multiplayerFlags )

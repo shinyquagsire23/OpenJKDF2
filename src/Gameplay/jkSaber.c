@@ -296,7 +296,7 @@ void  jkSaber_UpdateCollision2(sithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
 
                     jkSaber_SpawnSparks(playerInfo, &local_54, pSectorIter, SPARKTYPE_SABER);
 
-                    sithCog_SendMessageFromThing(resultThing, 0, SITH_MESSAGE_BLOCKED);
+                    sithCog_ThingSendMessage(resultThing, 0, SITH_MESSAGE_BLOCKED);
                     pCollideInfo->damagedThings[pCollideInfo->numDamagedThings++] = searchResult->receiver;
                     break;
                 }

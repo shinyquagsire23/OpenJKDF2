@@ -584,7 +584,7 @@ int jkEpisode_UpdateExtra(sithThing *pPlayerThing)
         iVar4 = 0;
         if (bHasBubble == 0) {
             if (playerThings[playerThingIdx].jkmUnk4 != 0) {
-                sithCog_SendMessageFromThingEx(pPlayerThing, NULL, SITH_MESSAGE_EXITBUBBLE,(flex_t)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
+                sithCog_ThingSendMessageEx(pPlayerThing, NULL, SITH_MESSAGE_EXITBUBBLE,(flex_t)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
 
                 for (int binIdx = 0; binIdx < SITHBIN_NUMBINS; binIdx++) 
                 {
@@ -595,7 +595,7 @@ int jkEpisode_UpdateExtra(sithThing *pPlayerThing)
             }
         }
         else if (playerThings[playerThingIdx].jkmUnk4 == 0) {
-            sithCog_SendMessageFromThingEx(pPlayerThing,pBubbleThing,SITH_MESSAGE_ENTERBUBBLE,(flex_t)bubbleType,0.0,0.0,0.0);
+            sithCog_ThingSendMessageEx(pPlayerThing,pBubbleThing,SITH_MESSAGE_ENTERBUBBLE,(flex_t)bubbleType,0.0,0.0,0.0);
             if (!pBubbleThing) {
                 uVar5 = 0xffffffff;
                 iVar4 = 0;
@@ -615,7 +615,7 @@ int jkEpisode_UpdateExtra(sithThing *pPlayerThing)
         else {
             if ((flex_t)playerThings[playerThingIdx].jkmUnk5 != (flex_t)bubbleType) 
             {
-                sithCog_SendMessageFromThingEx(pPlayerThing, NULL, SITH_MESSAGE_EXITBUBBLE,(flex_t)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
+                sithCog_ThingSendMessageEx(pPlayerThing, NULL, SITH_MESSAGE_EXITBUBBLE,(flex_t)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
                 
                 for (int binIdx = 0; binIdx < SITHBIN_NUMBINS; binIdx++) 
                 {
@@ -624,7 +624,7 @@ int jkEpisode_UpdateExtra(sithThing *pPlayerThing)
                     }
                 }
 
-                sithCog_SendMessageFromThingEx(pPlayerThing,pBubbleThing,SITH_MESSAGE_ENTERBUBBLE,(flex_t)bubbleType,0.0,0.0,0.0);
+                sithCog_ThingSendMessageEx(pPlayerThing,pBubbleThing,SITH_MESSAGE_ENTERBUBBLE,(flex_t)bubbleType,0.0,0.0,0.0);
                 
                 if (!pBubbleThing) {
                     uVar5 = 0xffffffff;

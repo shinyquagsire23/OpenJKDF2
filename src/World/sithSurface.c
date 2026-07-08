@@ -1486,7 +1486,7 @@ void sithSurface_HandleThingImpact(sithSurface *sender, sithThing *receiver, fle
     if ( (!sithNet_isMulti || !receiver || (receiver->thingflags & SITH_TF_INVULN) == 0) && (sender->surfaceFlags & SITH_SURFACE_COG_LINKED) != 0 )
     {
         v4 = (flex_t)(uint32_t)damageType; // FLEXTODO
-        sithCog_SendMessageFromSurfaceEx(sender, receiver, SITH_MESSAGE_DAMAGED, damage, v4, 0.0, 0.0);
+        sithCog_SurfaceSendMessageEx(sender, receiver, SITH_MESSAGE_DAMAGED, damage, v4, 0.0, 0.0);
     }
 }
 

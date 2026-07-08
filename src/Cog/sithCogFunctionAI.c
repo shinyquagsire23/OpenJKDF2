@@ -700,39 +700,39 @@ void sithCogFunctionAI_NextThingInCone(sithCog *ctx)
 
 void sithCogFunctionAI_Startup(sithCogSymboltable* ctx)
 {
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIGetMode, "aigetmode");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetMode, "aisetmode");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIClearMode, "aiclearmode");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIGetMovePos, "aigetmovepos");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetMovePos, "aisetmovepos");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_FirstThingInView, "firstthinginview");
+    sithCog_RegisterFunction(ctx, sithCogFunctionAI_AIGetMode, "aigetmode");
+    sithCog_RegisterFunction(ctx, sithCogFunctionAI_AISetMode, "aisetmode");
+    sithCog_RegisterFunction(ctx, sithCogFunctionAI_AIClearMode, "aiclearmode");
+    sithCog_RegisterFunction(ctx, sithCogFunctionAI_AIGetMovePos, "aigetmovepos");
+    sithCog_RegisterFunction(ctx, sithCogFunctionAI_AISetMovePos, "aisetmovepos");
+    sithCog_RegisterFunction(ctx, sithCogFunctionAI_FirstThingInView, "firstthinginview");
     if (Main_bMotsCompat) {
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_FirstThingInCone,"firstthingincone");
+        sithCog_RegisterFunction(ctx, sithCogFunctionAI_FirstThingInCone,"firstthingincone");
     }
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_NextThingInView, "nextthinginview");
+    sithCog_RegisterFunction(ctx, sithCogFunctionAI_NextThingInView, "nextthinginview");
     if (Main_bMotsCompat) {
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_NextThingInCone,"nextthingincone");
+        sithCog_RegisterFunction(ctx, sithCogFunctionAI_NextThingInCone,"nextthingincone");
     }
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_ThingViewDot, "thingviewdot");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetFireTarget, "aisetfiretarget");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetMoveThing, "aisetmovething");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetLookPos, "aisetlookpos");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetMoveSpeed, "aisetmovespeed");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetLookFrame, "aisetlookframe");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetMoveFrame, "aisetmoveframe");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_IsAITargetInSight, "isaitargetinsight");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIFlee, "aiflee");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetClass, "aisetclass");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIJump, "aijump");
+    sithCog_RegisterFunction(ctx, sithCogFunctionAI_ThingViewDot, "thingviewdot");
+    sithCog_RegisterFunction(ctx, sithCogFunctionAI_AISetFireTarget, "aisetfiretarget");
+    sithCog_RegisterFunction(ctx, sithCogFunctionAI_AISetMoveThing, "aisetmovething");
+    sithCog_RegisterFunction(ctx, sithCogFunctionAI_AISetLookPos, "aisetlookpos");
+    sithCog_RegisterFunction(ctx, sithCogFunctionAI_AISetMoveSpeed, "aisetmovespeed");
+    sithCog_RegisterFunction(ctx, sithCogFunctionAI_AISetLookFrame, "aisetlookframe");
+    sithCog_RegisterFunction(ctx, sithCogFunctionAI_AISetMoveFrame, "aisetmoveframe");
+    sithCog_RegisterFunction(ctx, sithCogFunctionAI_IsAITargetInSight, "isaitargetinsight");
+    sithCog_RegisterFunction(ctx, sithCogFunctionAI_AIFlee, "aiflee");
+    sithCog_RegisterFunction(ctx, sithCogFunctionAI_AISetClass, "aisetclass");
+    sithCog_RegisterFunction(ctx, sithCogFunctionAI_AIJump, "aijump");
 #ifdef JKM_AI
     if (Main_bMotsCompat) {
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIGetAlignment, "aigetalignment");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetAlignment, "aisetalignment");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetInterest, "aisetinterest");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIGetInterest, "aigetinterest");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetDistractor, "aisetdistractor");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIAddAlignmentPriority, "aiaddalignmentpriority");
-        sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIRemoveAlignmentPriority, "airemovealignmentpriority");
+        sithCog_RegisterFunction(ctx, sithCogFunctionAI_AIGetAlignment, "aigetalignment");
+        sithCog_RegisterFunction(ctx, sithCogFunctionAI_AISetAlignment, "aisetalignment");
+        sithCog_RegisterFunction(ctx, sithCogFunctionAI_AISetInterest, "aisetinterest");
+        sithCog_RegisterFunction(ctx, sithCogFunctionAI_AIGetInterest, "aigetinterest");
+        sithCog_RegisterFunction(ctx, sithCogFunctionAI_AISetDistractor, "aisetdistractor");
+        sithCog_RegisterFunction(ctx, sithCogFunctionAI_AIAddAlignmentPriority, "aiaddalignmentpriority");
+        sithCog_RegisterFunction(ctx, sithCogFunctionAI_AIRemoveAlignmentPriority, "airemovealignmentpriority");
     
         //TODO: actor_rc.cog references a "AISetMoveTarget"?
     }

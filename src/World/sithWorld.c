@@ -90,8 +90,8 @@ int sithWorld_Startup()
     sithWorld_RegisterTextSectionParser("templates", sithTemplate_ReadThingTemplatesListText);
     sithWorld_RegisterTextSectionParser("materials", sithMaterial_ReadMaterialsListText);
     sithWorld_RegisterTextSectionParser("sounds", sithSound_ReadSoundsListText);
-    sithWorld_RegisterTextSectionParser("cogs", sithCog_Load);
-    sithWorld_RegisterTextSectionParser("cogscripts", sithCogScript_Load);
+    sithWorld_RegisterTextSectionParser("cogs", sithCog_ReadCogsListText);
+    sithWorld_RegisterTextSectionParser("cogscripts", sithCog_ReadCogScriptsListText);
     sithWorld_RegisterTextSectionParser("keyframes", sithKeyFrame_Load);
     sithWorld_RegisterTextSectionParser("animclass", sithAnimClass_Load);
     sithWorld_RegisterTextSectionParser("aiclass", sithAIClass_ReadStaticAIClassesListText);
@@ -423,7 +423,7 @@ void sithWorld_FreeEntry(sithWorld *pWorld)
     if ( pWorld->sounds )
         sithSound_FreeWorldSounds(pWorld);
     if ( pWorld->cogs || pWorld->cogScripts )
-        sithCog_Free(pWorld);
+        sithCog_FreeWorldCogs(pWorld);
     if ( pWorld->animclasses )
         sithAnimClass_Free(pWorld);
     if ( pWorld->aiclasses )
