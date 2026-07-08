@@ -1,4 +1,5 @@
 #include "sithCogFunctionSector.h"
+#include "stdPlatform.h" // Added: for SITHLOG_*/SITH_ASSERT macros
 
 #include "General/stdMath.h"
 #include "Cog/sithCogExec.h"
@@ -20,6 +21,7 @@ void sithCogFunctionSector_GetSectorTint(sithCog *pCog)
     }
     else
     {
+        SITHLOG_ERROR("Cog %s: Illegal call to GetSectorTint().\n", pCog->aName); // Added: from OpenJones3D
         sithCogExec_PushVector(pCog, &rdroid_zeroVector3);
     }
 }
@@ -80,7 +82,10 @@ void sithCogFunctionSector_GetSectorLight(sithCog *pCog)
     if ( sector )
         sithCogExec_PushFlex(pCog, sector->extraLight);
     else
+    {
+        SITHLOG_ERROR("Cog %s: Illegal call to GetSectorLight().\n", pCog->aName); // Added: from OpenJones3D
         sithCogExec_PushFlex(pCog, 0.0);
+    }
 }
 
 void sithCogFunctionSector_SetSectorLight(sithCog *pCog)
@@ -154,7 +159,10 @@ void sithCogFunctionSector_GetSectorThrust(sithCog *pCog)
     if ( sector )
         sithCogExec_PushVector(pCog, &sector->thrust);
     else
+    {
+        SITHLOG_ERROR("Cog %s: Illegal call to GetSectorThrust().\n", pCog->aName); // Added: from OpenJones3D
         sithCogExec_PushVector(pCog, &rdroid_zeroVector3);
+    }
 }
 
 void sithCogFunctionSector_SetSectorThrust(sithCog *pCog)
@@ -270,7 +278,10 @@ void sithCogFunctionSector_GetSectorCenter(sithCog *pCog)
     if ( v1 )
         sithCogExec_PushVector(pCog, &v1->center);
     else
+    {
+        SITHLOG_ERROR("Cog %s: Bad sector passed to GetSectorCenter.\n", pCog->aName); // Added: from OpenJones3D
         sithCogExec_PushVector(pCog, &rdroid_zeroVector3);
+    }
 }
 
 void sithCogFunctionSector_GetNumSectorVertices(sithCog *pCog)
@@ -281,7 +292,10 @@ void sithCogFunctionSector_GetNumSectorVertices(sithCog *pCog)
     if ( v1 )
         sithCogExec_PushInt(pCog, v1->numVertices);
     else
+    {
+        SITHLOG_ERROR("Cog %s: Bad sector passed to GetNumSectorVertices.\n", pCog->aName); // Added: from OpenJones3D
         sithCogExec_PushInt(pCog, -1);
+    }
 }
 
 void sithCogFunctionSector_GetNumSectorSurfaces(sithCog *pCog)
@@ -292,7 +306,10 @@ void sithCogFunctionSector_GetNumSectorSurfaces(sithCog *pCog)
     if ( v1 )
         sithCogExec_PushInt(pCog, v1->numSurfaces);
     else
+    {
+        SITHLOG_ERROR("Cog %s: Bad sector passed to GetNumSectorSurfaces.\n", pCog->aName); // Added: from OpenJones3D
         sithCogExec_PushInt(pCog, -1);
+    }
 }
 
 void sithCogFunctionSector_GetSectorVertexPos(sithCog *pCog)

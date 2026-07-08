@@ -165,6 +165,7 @@ void sithCogFunction_SurfaceAnim(sithCog *pCog)
     surface = sithCogExec_PopSurface(ctx_); // TODO
     if ( !surface )
     {
+        SITHLOG_ERROR("Cog %s: Bad surface index.\n", pCog->aName); // Added: J3D log
         sithCogExec_PushInt(ctx_, -1);
         return;
     }
@@ -194,6 +195,7 @@ void sithCogFunction_MaterialAnim(sithCog *pCog)
     material = sithCogExec_PopMaterial(ctx_);
     if ( !material )
     {
+        SITHLOG_ERROR("Cog %s: Bad material index.\n", pCog->aName); // Added: J3D log
         sithCogExec_PushInt(ctx_, -1);
         return;
     }
@@ -271,6 +273,7 @@ void sithCogFunction_GetSurfaceAnim(sithCog *pCog)
     }
     else
     {
+        SITHLOG_ERROR("Cog %s: Trying to call GetSurfaceAnim on an invalid surface.\n", pCog->aName); // Added: J3D log
         sithCogExec_PushInt(pCog, -1);
     }
 }
@@ -557,6 +560,7 @@ void sithCogFunction_GetKeyLen(sithCog *pCog)
 
     if (!keyframe || keyframe->fps == 0.0)
     {
+        SITHLOG_ERROR("Cog %s: Bad Track reference passed to GetKeyLen.\n", pCog->aName); // Added: J3D log
         sithCogExec_PushFlex(pCog, 0.0);
         return;
     }
@@ -973,10 +977,12 @@ void sithCogFunction_HeapGet(sithCog *pCog)
     int idx = sithCogExec_PopInt(pCog);
     if (idx < 0 || idx >= pCog->heapSize)
     {
+        SITHLOG_ERROR("HeapGet: index %d out of range.\n", idx); // Added: J3D log
         sithCogExec_PushInt(pCog, 0);
     }
     else
     {
+        SITH_ASSERTREL(pCog->heap); // Added: J3D assert
         heapVar = &pCog->heap[idx];
         tmp.type = heapVar->type;
         tmp.data[0] = heapVar->data[0];
@@ -1408,6 +1414,7 @@ void sithCogFunction_GetCurWeapon(sithCog *pCog)
     }
     else
     {
+        SITHLOG_ERROR("Cog %s: Invalid thing called from GetCurWeapon.\n", pCog->aName); // Added: J3D log
         sithCogExec_PushInt(pCog, -1);
     }
 }
@@ -1563,6 +1570,7 @@ void sithCogFunction_Pow(sithCog *pCog)
     cog_flex_t fVar2 = sithCogExec_PopFlex(pCog);
     cog_flex_t fVar3 = sithCogExec_PopFlex(pCog);
     if ((fVar2 == 0.0) && (fVar3 == 0.0)) {
+        SITHLOG_ERROR("Cog %s: 0 to the 0 power is undefined\n", pCog->aName); // Added: J3D log
         sithCogExec_PushFlex(pCog,0.0);
         return;
     }

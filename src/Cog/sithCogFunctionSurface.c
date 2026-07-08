@@ -1,4 +1,5 @@
 #include "sithCogFunctionSurface.h"
+#include "stdPlatform.h" // Added: for SITHLOG_*/SITH_ASSERT macros
 
 #include "Cog/sithCogExec.h"
 #include "World/sithWorld.h"
@@ -169,6 +170,7 @@ void sithCogFunctionSurface_SlideWall(sithCog *pCog)
 
 void sithCogFunctionSurface_GetWallCel(sithCog *pCog)
 {
+    SITH_ASSERTREL(pCog); // Added: ported J3D assert
     SithSurface* surface = sithCogExec_PopSurface(pCog);
     if ( surface && surface->surfaceInfo.face.material )
         sithCogExec_PushInt(pCog, surface->surfaceInfo.face.wallCel);
@@ -178,6 +180,7 @@ void sithCogFunctionSurface_GetWallCel(sithCog *pCog)
 
 void sithCogFunctionSurface_SetWallCel(sithCog *pCog)
 {
+    SITH_ASSERTREL(pCog); // Added: ported J3D assert
     int wallCel; // esi
     SithSurface *surface; // eax
     rdMaterial *v3; // ecx
