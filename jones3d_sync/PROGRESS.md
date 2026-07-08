@@ -32,10 +32,22 @@ lets fixes/insights flow between them.
   decomposition differs (e.g. DF2 `sithAICmd` ↔ J3D `sithAIInstinct` +
   `sithAIMove` + `sithAIUtil`) — refactor to match OpenJones3D's file
   organization, staying within the current directory. A file rename also touches
-  the `#include`s, the include-guard macro, and `CMakeLists.txt`.
+  the `#include`s and the include-guard macro.
   (NB: a differing *function prefix* does not always imply a file rename — J3D's
   `sithMessage_*` functions still live in a file named `sithComm.c`, so `sithComm`
   keeps its filename and only its functions are renamed.)
+  - **CMake:** sources come from `file(GLOB ...)` in the root `CMakeLists.txt`
+    (no per-file list). A *genuine* file rename (e.g. `stdHashTable.c`→
+    `stdHashtbl.c`) must be followed by re-running `cmake .` in the build dir so
+    the glob refreshes, or `make` fails looking for the old name. A *case-only*
+    rename (`rdPolyLine.c`→`rdPolyline.c`, `stdLinklist.c`→`stdLinkList.c`)
+    builds without reconfigure on macOS's case-insensitive FS (same inode), but
+    reconfigure anyway to be safe.
+  - The type/typedef that shares the module's name (e.g. the `stdHashTable`
+    struct, `stdLinklist` struct) is a **type rename → deferred to the struct
+    phase**. During the functions pass, rename only the `<module>_*` functions
+    (and file); leave the bare type name, so a file can be temporarily
+    mixed (`stdHashtbl_*` funcs but still a `stdHashTable` type).
 - **Prefer the OpenJKDF2 name when it is clearer than the OpenJones3D name.** The
   goal is the best canonical name, not blind matching. In particular, **skip any
   rename whose J3D target is an unnamed `sub_XXXXXX`** (a Jones3D binary address,
@@ -125,7 +137,7 @@ Symbols with **no** OpenJones3D counterpart (JK-only features, platform backends
 ## Progress
 
 **91 shared engine modules** identified (52 sith · 20 rdroid · 18 std · 1 w32util).
-Functions-only pass completed: **72 / 91**.
+Functions-only pass completed: **91 / 91** ✅ COMPLETE.
 
 Current phase: **functions only** (per project decision, globals → struct
 members/names/typedefs come in later passes). `_Startup` functions are **kept**
@@ -235,30 +247,30 @@ as-is (DF2 soft-reset convention), not renamed to J3D's `_Reset`/`_ResetGlobals`
 
 | ☐ | DF2 module | J3D module | DF2 src | J3D src | Notes |
 |---|-----------|-----------|---------|---------|-------|
-| ☐ | `std` | `std` | Win95/std.c | Libs/std/General/std.c |  |
-| ☐ | `std3D` | `std3D` | Platform/D3D/std3D.c<br>Platform/Dreamcast/std3D.c<br>Platform/GL/std3D.c<br>Platform/GL11/std3D.c<br>Platform/TWL/std3D.c | Libs/std/Win95/std3D.c | 5 platform variants |
-| ☐ | `stdBmp` | `stdBmp` | General/stdBmp.c | Libs/std/General/stdBmp.c |  |
-| ☐ | `stdColor` | `stdColor` | General/stdColor.c | Libs/std/General/stdColor.c |  |
-| ☐ | `stdComm` | `stdComm` | Win95/stdComm.c | Libs/std/Win95/stdComm.c |  |
-| ☐ | `stdConffile` | `stdConffile` | General/stdConffile.c | Libs/std/General/stdConffile.c |  |
-| ☐ | `stdConsole` | `stdConsole` | Win95/stdConsole.c | Libs/std/Win95/stdConsole.c |  |
-| ☐ | `stdControl` | `stdControl` | Platform/Common/stdControl.c<br>Platform/Dreamcast/stdControl.c<br>Platform/SDL2/stdControl.c<br>Platform/TWL/stdControl.c | Libs/std/Win95/stdControl.c | 4 platform variants |
-| ☐ | `stdDisplay` | `stdDisplay` | Win95/stdDisplay.c | Libs/std/Win95/stdDisplay.c |  |
-| ☐ | `stdFileUtil` | `stdFileUtil` | General/stdFileUtil.c | Libs/std/General/stdFileUtil.c |  |
-| ☐ | `stdFnames` | `stdFnames` | General/stdFnames.c | Libs/std/General/stdFnames.c |  |
-| ☐ | `stdGob` | `stdGob` | Win95/stdGob.c | Libs/std/Win95/stdGob.c |  |
-| ☐ | `stdHashTable` | `stdHashtbl` | General/stdHashTable.c | Libs/std/General/stdHashtbl.c | **semantic rename** |
-| ☐ | `stdLinklist` | `stdLinkList` | General/stdLinklist.c | Libs/std/General/stdLinkList.c | case differs |
-| ☐ | `stdMath` | `stdMath` | General/stdMath.c | Libs/std/General/stdMath.c |  |
-| ☐ | `stdMemory` | `stdMemory` | General/stdMemory.c | Libs/std/General/stdMemory.c |  |
-| ☐ | `stdPlatform` | `stdPlatform` | ./stdPlatform.c | Libs/std/General/stdPlatform.c |  |
-| ☐ | `stdStrTable` | `stdStrTable` | General/stdStrTable.c | Libs/std/General/stdStrTable.c |  |
+| ☑fn | `std` | `std` | already matched — no renames | Libs/std/General/std.c |  |
+| ☑fn | `std3D` | `std3D` | GL/platform reimpl — no confident renames | Libs/std/Win95/std3D.c | 5 platform variants |
+| ☑fn | `stdBmp` | `stdBmp` | already matched — no renames | Libs/std/General/stdBmp.c |  |
+| ☑fn | `stdColor` | `stdColor` | already matched — no renames | Libs/std/General/stdColor.c |  |
+| ☑fn | `stdComm` | `stdComm` | Win95/stdComm.c | Libs/std/Win95/stdComm.c |  |
+| ☑fn | `stdConffile` | `stdConffile` | General/stdConffile.c | Libs/std/General/stdConffile.c |  |
+| ☑fn | `stdConsole` | `stdConsole` | Win95/stdConsole.c | Libs/std/Win95/stdConsole.c |  |
+| ☑fn | `stdControl` | `stdControl` | Platform/Common/stdControl.c<br>Platform/Dreamcast/stdControl.c<br>Platform/SDL2/stdControl.c<br>Platform/TWL/stdControl.c | Libs/std/Win95/stdControl.c | 4 platform variants |
+| ☑fn | `stdDisplay` | `stdDisplay` | already matched — no renames | Libs/std/Win95/stdDisplay.c |  |
+| ☑fn | `stdFileUtil` | `stdFileUtil` | General/stdFileUtil.c | Libs/std/General/stdFileUtil.c |  |
+| ☑fn | `stdFnames` | `stdFnames` | already matched — no renames | Libs/std/General/stdFnames.c |  |
+| ☑fn | `stdGob` | `stdGob` | Win95/stdGob.c | Libs/std/Win95/stdGob.c |  |
+| ☑fn | `stdHashTable` | `stdHashtbl` | General/stdHashTable.c | Libs/std/General/stdHashtbl.c | **semantic rename** |
+| ☑fn | `stdLinklist` | `stdLinkList` | General/stdLinklist.c | Libs/std/General/stdLinkList.c | case differs |
+| ☑fn | `stdMath` | `stdMath` | General/stdMath.c | Libs/std/General/stdMath.c |  |
+| ☑fn | `stdMemory` | `stdMemory` | General/stdMemory.c | Libs/std/General/stdMemory.c |  |
+| ☑fn | `stdPlatform` | `stdPlatform` | already matched — no renames | Libs/std/General/stdPlatform.c |  |
+| ☑fn | `stdStrTable` | `stdStrTable` | General/stdStrTable.c | Libs/std/General/stdStrTable.c |  |
 
 ### w32util  (1 modules)
 
 | ☐ | DF2 module | J3D module | DF2 src | J3D src | Notes |
 |---|-----------|-----------|---------|---------|-------|
-| ☐ | `wuRegistry` | `wuRegistry` | Platform/Posix/wuRegistry.c<br>Platform/Win32/wuRegistry.c | Libs/w32util/wuRegistry.c | 2 platform variants |
+| ☑fn | `wuRegistry` | `wuRegistry` | Platform/Posix/wuRegistry.c<br>Platform/Win32/wuRegistry.c | Libs/w32util/wuRegistry.c | 2 platform variants |
 
 ## Candidate semantic pairs (different filenames — verify before acting)
 
