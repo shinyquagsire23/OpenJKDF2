@@ -109,7 +109,7 @@ void jkCog_computeCatapaultVelocity(sithCog *ctx)
     cog_flex_t v4 = rdVector_Normalize3Acc(&ret);
     cog_flex_t ctxb = stdMath_Sqrt(v4 * v4 * a / d);
     rdVector_Scale3Acc(&ret, ctxb);
-    sithCogExec_PushVector3(ctx, &ret);
+    sithCogExec_PushVector(ctx, &ret);
 }
 
 void jkCog_dwPlayCammySpeech(sithCog* ctx)
@@ -625,7 +625,7 @@ void jkCog_SetWaggle(sithCog *ctx)
     cog_flex_t a1a; // [esp+14h] [ebp+4h]
 
     a1a = sithCogExec_PopFlex(ctx);
-    sithCogExec_PopVector3(ctx, &a2);
+    sithCogExec_PopVector(ctx, &a2);
     v2 = sithCogExec_PopThing(ctx);
     if ( v2 )
     {
@@ -823,7 +823,7 @@ void jkCog_StringConcatVector(sithCog *pCog)
     rdVector3 v2; // [esp+1Ch] [ebp-110h] BYREF
     wchar_t v3[130]; // [esp+28h] [ebp-104h] BYREF
 
-    if ( sithCogExec_PopVector3(pCog, &v2) )
+    if ( sithCogExec_PopVector(pCog, &v2) )
         jk_snwprintf(v3, 130, L"<%f %f %f>", v2.x, v2.y, v2.z);
     else
         _wcscpy(v3, L"<Bad Vector>");
@@ -1238,7 +1238,7 @@ void jkCogExt_GetCameraOffset(sithCog* ctx)
 
     //TODO
     rdVector3 vec = {0};
-    sithCogExec_PushVector3(ctx, &vec);
+    sithCogExec_PushVector(ctx, &vec);
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
 
@@ -1255,7 +1255,7 @@ void jkCogExt_SetCameraFov(sithCog* ctx)
 void jkCogExt_SetCameraOffset(sithCog* ctx)
 {
     rdVector3 vec;
-    sithCogExec_PopVector3(ctx, &vec);
+    sithCogExec_PopVector(ctx, &vec);
     int camIdx = sithCogExec_PopInt(ctx);
 
     // TODO
@@ -1381,7 +1381,7 @@ void jkCogExt_GetThingHeadLvec(sithCog* ctx)
 
     // TODO
     rdVector3 vec = {0};
-    sithCogExec_PushVector3(ctx, &vec);
+    sithCogExec_PushVector(ctx, &vec);
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
 
@@ -1398,7 +1398,7 @@ void jkCogExt_GetThingHeadPYR(sithCog* ctx)
 
     // TODO
     rdVector3 vec = {0};
-    sithCogExec_PushVector3(ctx, &vec);
+    sithCogExec_PushVector(ctx, &vec);
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
 
@@ -1408,7 +1408,7 @@ void jkCogExt_GetThingPYR(sithCog* ctx)
 
     // TODO
     rdVector3 vec = {0};
-    sithCogExec_PushVector3(ctx, &vec);
+    sithCogExec_PushVector(ctx, &vec);
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
 
@@ -1416,7 +1416,7 @@ void jkCogExt_SetThingHeadPYR(sithCog* ctx)
 {
     //TODO
     rdVector3 vec = {0};
-    sithCogExec_PopVector3(ctx, &vec);
+    sithCogExec_PopVector(ctx, &vec);
     sithThing* pThing = sithCogExec_PopThing(ctx);
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
@@ -1426,7 +1426,7 @@ void jkCogExt_SetThingPosEx(sithCog* ctx)
     //TODO
     sithSector* pSector = sithCogExec_PopSector(ctx);
     rdVector3 vec = {0};
-    sithCogExec_PopVector3(ctx, &vec);
+    sithCogExec_PopVector(ctx, &vec);
     sithThing* pThing = sithCogExec_PopThing(ctx);
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
@@ -1435,7 +1435,7 @@ void jkCogExt_SetThingPYR(sithCog* ctx)
 {
     //TODO
     rdVector3 vec = {0};
-    sithCogExec_PopVector3(ctx, &vec);
+    sithCogExec_PopVector(ctx, &vec);
     sithThing* pThing = sithCogExec_PopThing(ctx);
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
@@ -1444,9 +1444,9 @@ void jkCogExt_SetThingLRUVecs(sithCog* ctx)
 {
     //TODO
     rdVector3 vec = {0};
-    sithCogExec_PopVector3(ctx, &vec);
-    sithCogExec_PopVector3(ctx, &vec);
-    sithCogExec_PopVector3(ctx, &vec);
+    sithCogExec_PopVector(ctx, &vec);
+    sithCogExec_PopVector(ctx, &vec);
+    sithCogExec_PopVector(ctx, &vec);
     sithThing* pThing = sithCogExec_PopThing(ctx);
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
@@ -1478,7 +1478,7 @@ void jkCogExt_GetThingEyeOffset(sithCog* ctx)
     sithThing* pThing = sithCogExec_PopThing(ctx);
     // TODO
     rdVector3 vec = {0};
-    sithCogExec_PushVector3(ctx, &vec);
+    sithCogExec_PushVector(ctx, &vec);
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
 
@@ -1514,7 +1514,7 @@ void jkCogExt_SetThingEyeOffset(sithCog* ctx)
 {
     //TODO
     rdVector3 vec = {0};
-    sithCogExec_PopVector3(ctx, &vec);
+    sithCogExec_PopVector(ctx, &vec);
     sithThing* pThing = sithCogExec_PopThing(ctx);
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }

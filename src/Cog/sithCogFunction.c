@@ -76,7 +76,7 @@ void sithCogFunction_RandVec(sithCog *ctx)
     rvec.x = _frand();
     rvec.y = _frand();
     rvec.z = _frand();
-    sithCogExec_PushVector3(ctx, &rvec);
+    sithCogExec_PushVector(ctx, &rvec);
 }
 
 void sithCogFunction_Sleep(sithCog *ctx)
@@ -134,7 +134,7 @@ void sithCogFunction_PrintVector(sithCog *ctx)
     rdVector3 popVec;
     char tmp[32];
 
-    if (sithCogExec_PopVector3(ctx, &popVec))
+    if (sithCogExec_PopVector(ctx, &popVec))
         stdString_snprintf(tmp, 32, "<%f %f %f>", popVec.x, popVec.y, popVec.z);
     else
         stdString_snprintf(tmp, 32, "Bad vector");
@@ -430,7 +430,7 @@ void sithCogFunction_VectorSet(sithCog *ctx)
     out.z = sithCogExec_PopFlex(ctx);
     out.y = sithCogExec_PopFlex(ctx);
     out.x = sithCogExec_PopFlex(ctx);
-    sithCogExec_PushVector3(ctx, &out);
+    sithCogExec_PushVector(ctx, &out);
 }
 
 void sithCogFunction_VectorAdd(sithCog *ctx)
@@ -439,10 +439,10 @@ void sithCogFunction_VectorAdd(sithCog *ctx)
     rdVector3 inB;
     rdVector3 out;
 
-    sithCogExec_PopVector3(ctx, &inA);
-    sithCogExec_PopVector3(ctx, &inB);
+    sithCogExec_PopVector(ctx, &inA);
+    sithCogExec_PopVector(ctx, &inB);
     rdVector_Add3(&out, &inA, &inB);
-    sithCogExec_PushVector3(ctx, &out);
+    sithCogExec_PushVector(ctx, &out);
 }
 
 void sithCogFunction_VectorSub(sithCog *ctx)
@@ -451,10 +451,10 @@ void sithCogFunction_VectorSub(sithCog *ctx)
     rdVector3 inB;
     rdVector3 out;
 
-    sithCogExec_PopVector3(ctx, &inA);
-    sithCogExec_PopVector3(ctx, &inB);
+    sithCogExec_PopVector(ctx, &inA);
+    sithCogExec_PopVector(ctx, &inB);
     rdVector_Sub3(&out, &inB, &inA);
-    sithCogExec_PushVector3(ctx, &out);
+    sithCogExec_PushVector(ctx, &out);
 }
 
 void sithCogFunction_VectorDot(sithCog *ctx)
@@ -462,8 +462,8 @@ void sithCogFunction_VectorDot(sithCog *ctx)
     rdVector3 inA;
     rdVector3 inB;
 
-    sithCogExec_PopVector3(ctx, &inA);
-    sithCogExec_PopVector3(ctx, &inB);
+    sithCogExec_PopVector(ctx, &inA);
+    sithCogExec_PopVector(ctx, &inB);
     sithCogExec_PushFlex(ctx, rdVector_Dot3(&inA, &inB));
 }
 
@@ -473,17 +473,17 @@ void sithCogFunction_VectorCross(sithCog *ctx)
     rdVector3 inB;
     rdVector3 out;
 
-    sithCogExec_PopVector3(ctx, &inA);
-    sithCogExec_PopVector3(ctx, &inB);
+    sithCogExec_PopVector(ctx, &inA);
+    sithCogExec_PopVector(ctx, &inB);
     rdVector_Cross3(&out, &inA, &inB);
-    sithCogExec_PushVector3(ctx, &out);
+    sithCogExec_PushVector(ctx, &out);
 }
 
 void sithCogFunction_VectorLen(sithCog *ctx)
 {
     rdVector3 in;
 
-    sithCogExec_PopVector3(ctx, &in);
+    sithCogExec_PopVector(ctx, &in);
     sithCogExec_PushFlex(ctx, rdVector_Len3(&in));
 }
 
@@ -493,9 +493,9 @@ void sithCogFunction_VectorScale(sithCog *ctx)
     rdVector3 out;
 
     cog_flex_t scale = sithCogExec_PopFlex(ctx);
-    sithCogExec_PopVector3(ctx, &inA);
+    sithCogExec_PopVector(ctx, &inA);
     rdVector_Scale3(&out, &inA, scale);
-    sithCogExec_PushVector3(ctx, &out);
+    sithCogExec_PushVector(ctx, &out);
 }
 
 void sithCogFunction_VectorDist(sithCog *ctx)
@@ -504,8 +504,8 @@ void sithCogFunction_VectorDist(sithCog *ctx)
     rdVector3 inB;
     rdVector3 tmp;
 
-    sithCogExec_PopVector3(ctx, &inA);
-    sithCogExec_PopVector3(ctx, &inB);
+    sithCogExec_PopVector(ctx, &inA);
+    sithCogExec_PopVector(ctx, &inB);
     rdVector_Sub3(&tmp, &inB, &inA);
     sithCogExec_PushFlex(ctx, rdVector_Len3(&tmp));
 }
@@ -516,8 +516,8 @@ void sithCogFunction_VectorEqual(sithCog *ctx)
     rdVector3 popB;
     rdVector3 popA;
     
-    sithCogExec_PopVector3(ctx,&popA);
-    sithCogExec_PopVector3(ctx,&popB);
+    sithCogExec_PopVector(ctx,&popA);
+    sithCogExec_PopVector(ctx,&popB);
     if (((popB.x == popA.x) && (popB.y == popA.y)) && (popB.z == popA.z)) {
         sithCogExec_PushInt(ctx,1);
         return;
@@ -711,7 +711,7 @@ void sithCogFunction_VectorX(sithCog *ctx)
 {
     rdVector3 popVec;
 
-    sithCogExec_PopVector3(ctx, &popVec);
+    sithCogExec_PopVector(ctx, &popVec);
     sithCogExec_PushFlex(ctx, popVec.x);
 }
 
@@ -719,7 +719,7 @@ void sithCogFunction_VectorY(sithCog *ctx)
 {
     rdVector3 popVec;
 
-    sithCogExec_PopVector3(ctx, &popVec);
+    sithCogExec_PopVector(ctx, &popVec);
     sithCogExec_PushFlex(ctx, popVec.y);
 }
 
@@ -727,7 +727,7 @@ void sithCogFunction_VectorZ(sithCog *ctx)
 {
     rdVector3 popVec;
 
-    sithCogExec_PopVector3(ctx, &popVec);
+    sithCogExec_PopVector(ctx, &popVec);
     sithCogExec_PushFlex(ctx, popVec.z);
 }
 
@@ -736,9 +736,9 @@ void sithCogFunction_VectorNorm(sithCog *ctx)
     rdVector3 popVec;
     rdVector3 out;
 
-    sithCogExec_PopVector3(ctx, &popVec);
+    sithCogExec_PopVector(ctx, &popVec);
     rdVector_Normalize3(&out, &popVec);
-    sithCogExec_PushVector3(ctx, &out);
+    sithCogExec_PushVector(ctx, &out);
 }
 
 void sithCogFunction_SetMaterialCel(sithCog *ctx)
@@ -921,9 +921,9 @@ void sithCogFunction_SetPovShake(sithCog *ctx)
 
     cog_flex_t a1a = sithCogExec_PopFlex(ctx);
     cog_flex_t v2 = sithCogExec_PopFlex(ctx);
-    if ( sithCogExec_PopVector3(ctx, &v3) )
+    if ( sithCogExec_PopVector(ctx, &v3) )
     {
-        if ( sithCogExec_PopVector3(ctx, &v4) )
+        if ( sithCogExec_PopVector(ctx, &v4) )
             sithCamera_SetPOVShake(&v4, &v3, v2, a1a);
     }
 }
@@ -959,7 +959,7 @@ void sithCogFunction_HeapSet(sithCog *ctx)
 {
     sithCogStackvar stackVar;
 
-    int val = sithCogExec_PopValue(ctx, &stackVar);
+    int val = sithCogExec_PopSymbol(ctx, &stackVar);
     int idx = sithCogExec_PopInt(ctx);
     if ( val && idx >= 0 && idx < ctx->numHeapVars )
         ctx->heap[idx] = stackVar;
@@ -982,7 +982,7 @@ void sithCogFunction_HeapGet(sithCog *ctx)
         tmp.data[0] = heapVar->data[0];
         tmp.data[1] = heapVar->data[1];
         tmp.data[2] = heapVar->data[2];
-        sithCogExec_PushVar(ctx, &tmp);
+        sithCogExec_PushStack(ctx, &tmp);
     }
 }
 
@@ -1149,8 +1149,8 @@ void sithCogFunction_FireProjectileInternal(sithCog *ctx, int extra)
     cog_flex_t autoaimFov = sithCogExec_PopFlex(ctx);
     int scaleFlags = sithCogExec_PopInt(ctx);
     cog_flex_t scale = sithCogExec_PopFlex(ctx);
-    sithCogExec_PopVector3(ctx,&aimError);
-    sithCogExec_PopVector3(ctx,&fireOffset);
+    sithCogExec_PopVector(ctx,&aimError);
+    sithCogExec_PopVector(ctx,&fireOffset);
     int mode = sithCogExec_PopInt(ctx);
     sithSound* fireSound = sithCogExec_PopSound(ctx);
     sithThing* projectileTemplate = sithCogExec_PopTemplate(ctx);
@@ -1674,7 +1674,7 @@ void sithCogFunction_GetSysDate(sithCog *ctx)
         rdVector_Zero3(&out);
     }
 
-    sithCogExec_PushVector3(ctx, &out);
+    sithCogExec_PushVector(ctx, &out);
 }
 
 // MOTS added
@@ -1704,7 +1704,7 @@ void sithCogFunction_GetSysTime(sithCog *ctx)
     }
     
 
-    sithCogExec_PushVector3(ctx, &out);
+    sithCogExec_PushVector(ctx, &out);
 }
 
 // MOTS added
@@ -1727,7 +1727,7 @@ void sithCogFunction_SendMessageExRadius(sithCog *ctx)
     message = sithCogExec_PopInt(ctx);
     uVar4 = sithCogExec_PopInt(ctx);
     cog_flex_t fVar6 = sithCogExec_PopFlex(ctx);
-    iVar5 = sithCogExec_PopVector3(ctx,&local_1c);
+    iVar5 = sithCogExec_PopVector(ctx,&local_1c);
     cog_flex_t param1 = local_c;
     cog_flex_t param0 = local_10;
     if ((((iVar5 != 0) && (-1 < message)) && (message < SITH_MESSAGE_ENTERBUBBLE)) 

@@ -16,11 +16,11 @@ void sithCogFunctionSector_GetSectorTint(sithCog *ctx)
     if ( sector )
     {
         vecCopy = sector->tint;
-        sithCogExec_PushVector3(ctx, &vecCopy);
+        sithCogExec_PushVector(ctx, &vecCopy);
     }
     else
     {
-        sithCogExec_PushVector3(ctx, &rdroid_zeroVector3);
+        sithCogExec_PushVector(ctx, &rdroid_zeroVector3);
     }
 }
 
@@ -29,7 +29,7 @@ void sithCogFunctionSector_SetSectorTint(sithCog *ctx)
     sithSector *sector; // ecx
     rdVector3 poppedVector; // [esp+4h] [ebp-Ch] BYREF
 
-    sithCogExec_PopVector3(ctx, &poppedVector);
+    sithCogExec_PopVector(ctx, &poppedVector);
     sector = sithCogExec_PopSector(ctx);
     if ( sector )
     {
@@ -152,9 +152,9 @@ void sithCogFunctionSector_GetSectorThrust(sithCog *ctx)
     sithSector* sector = sithCogExec_PopSector(ctx);
 
     if ( sector )
-        sithCogExec_PushVector3(ctx, &sector->thrust);
+        sithCogExec_PushVector(ctx, &sector->thrust);
     else
-        sithCogExec_PushVector3(ctx, &rdroid_zeroVector3);
+        sithCogExec_PushVector(ctx, &rdroid_zeroVector3);
 }
 
 void sithCogFunctionSector_SetSectorThrust(sithCog *ctx)
@@ -162,7 +162,7 @@ void sithCogFunctionSector_SetSectorThrust(sithCog *ctx)
     rdVector3 thrust;
 
     cog_flex_t mult = sithCogExec_PopFlex(ctx);
-    int thrust_valid = sithCogExec_PopVector3(ctx, &thrust);
+    int thrust_valid = sithCogExec_PopVector(ctx, &thrust);
     sithSector* sector = sithCogExec_PopSector(ctx);
 
     if ( sector && thrust_valid )
@@ -268,9 +268,9 @@ void sithCogFunctionSector_GetSectorCenter(sithCog *ctx)
 
     v1 = sithCogExec_PopSector(ctx);
     if ( v1 )
-        sithCogExec_PushVector3(ctx, &v1->center);
+        sithCogExec_PushVector(ctx, &v1->center);
     else
-        sithCogExec_PushVector3(ctx, &rdroid_zeroVector3);
+        sithCogExec_PushVector(ctx, &rdroid_zeroVector3);
 }
 
 void sithCogFunctionSector_GetNumSectorVertices(sithCog *ctx)
@@ -305,9 +305,9 @@ void sithCogFunctionSector_GetSectorVertexPos(sithCog *ctx)
     vertex_idx = sithCogExec_PopInt(ctx);
     sector = sithCogExec_PopSector(ctx);
     if ( sector && (unsigned int)vertex_idx < sector->numVertices && vertex_idx >= 0 )
-        sithCogExec_PushVector3(ctx, &active_jkl->vertices[sector->verticeIdxs[vertex_idx]]);
+        sithCogExec_PushVector(ctx, &active_jkl->vertices[sector->verticeIdxs[vertex_idx]]);
     else
-        sithCogExec_PushVector3(ctx, &rdroid_zeroVector3);
+        sithCogExec_PushVector(ctx, &rdroid_zeroVector3);
 }
 
 void sithCogFunctionSector_GetSectorSurfaceRef(sithCog *ctx)
@@ -349,7 +349,7 @@ void sithCogFunctionSector_FindSectorAtPos(sithCog *ctx)
 {
     rdVector3 tmp;
     
-    sithCogExec_PopVector3(ctx,&tmp);
+    sithCogExec_PopVector(ctx,&tmp);
     sithSector* pSector = sithSector_FindSectorAtPos(sithWorld_pCurrentWorld,&tmp);
     if (pSector) {
         sithCogExec_PushInt(ctx, pSector->id);
@@ -365,7 +365,7 @@ void sithCogFunctionSector_IsSphereInSector(sithCog *ctx)
     
     sithSector* pSector = sithCogExec_PopSector(ctx);
     cog_flex_t radius = sithCogExec_PopFlex(ctx);
-    sithCogExec_PopVector3(ctx,&tmp);
+    sithCogExec_PopVector(ctx,&tmp);
     if (pSector && (0.0 <= radius)) {
         if (sithIntersect_IsSphereInSector(&tmp,radius,pSector)) {
             sithCogExec_PushInt(ctx,1);

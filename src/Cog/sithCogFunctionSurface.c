@@ -50,9 +50,9 @@ void sithCogFunctionSurface_GetSurfaceVertexPos(sithCog *ctx)
     vtx_idx = sithCogExec_PopInt(ctx);
     surface = sithCogExec_PopSurface(ctx);
     if ( surface && vtx_idx < surface->surfaceInfo.face.numVertices && (vtx_idx & 0x80000000) == 0 )
-        sithCogExec_PushVector3(ctx, &sithWorld_pCurrentWorld->vertices[surface->surfaceInfo.face.vertexPosIdx[vtx_idx]]);
+        sithCogExec_PushVector(ctx, &sithWorld_pCurrentWorld->vertices[surface->surfaceInfo.face.vertexPosIdx[vtx_idx]]);
     else
-        sithCogExec_PushVector3(ctx, &rdroid_zeroVector3);
+        sithCogExec_PushVector(ctx, &rdroid_zeroVector3);
 }
 
 void sithCogFunctionSurface_SetHorizonSkyOffset(sithCog *ctx)
@@ -60,7 +60,7 @@ void sithCogFunctionSurface_SetHorizonSkyOffset(sithCog *ctx)
     rdVector3 offs;
 
     // TODO add valid check?
-    sithCogExec_PopVector3(ctx, &offs);
+    sithCogExec_PopVector(ctx, &offs);
     sithWorld_pCurrentWorld->horizontalSkyOffs.x = offs.x;
     sithWorld_pCurrentWorld->horizontalSkyOffs.y = offs.y;
 }
@@ -72,7 +72,7 @@ void sithCogFunctionSurface_GetHorizonSkyOffset(sithCog *ctx)
     offs.x = sithWorld_pCurrentWorld->horizontalSkyOffs.x;
     offs.y = sithWorld_pCurrentWorld->horizontalSkyOffs.y;
     offs.z = 0.0;
-    sithCogExec_PushVector3(ctx, &offs);
+    sithCogExec_PushVector(ctx, &offs);
 }
 
 void sithCogFunctionSurface_SetCeilingSkyOffset(sithCog *ctx)
@@ -80,7 +80,7 @@ void sithCogFunctionSurface_SetCeilingSkyOffset(sithCog *ctx)
     rdVector3 offs;
 
     // TODO add valid check?
-    sithCogExec_PopVector3(ctx, &offs);
+    sithCogExec_PopVector(ctx, &offs);
     sithWorld_pCurrentWorld->ceilingSkyOffs.x = offs.x;
     sithWorld_pCurrentWorld->ceilingSkyOffs.y = offs.y;
 }
@@ -92,7 +92,7 @@ void sithCogFunctionSurface_GetCeilingSkyOffset(sithCog *ctx)
     offs.x = sithWorld_pCurrentWorld->ceilingSkyOffs.x;
     offs.y = sithWorld_pCurrentWorld->ceilingSkyOffs.y;
     offs.z = 0.0;
-    sithCogExec_PushVector3(ctx, &offs);
+    sithCogExec_PushVector(ctx, &offs);
 }
 
 void sithCogFunctionSurface_SlideHorizonSky(sithCog *ctx)
@@ -147,7 +147,7 @@ void sithCogFunctionSurface_SlideWall(sithCog *ctx)
     rdVector3 v7; // [esp+Ch] [ebp-Ch] BYREF
 
     cog_flex_t scale = sithCogExec_PopFlex(ctx) * 0.1;
-    pop_vec = sithCogExec_PopVector3(ctx, &v7);
+    pop_vec = sithCogExec_PopVector(ctx, &v7);
     surface = sithCogExec_PopSurface(ctx);
     v4 = surface;
     if ( surface
@@ -517,11 +517,11 @@ void sithCogFunctionSurface_GetSurfaceCenter(sithCog *ctx)
     if ( v1 )
     {
         sithSurface_GetCenterPoint(v1, &a2);
-        sithCogExec_PushVector3(ctx, &a2);
+        sithCogExec_PushVector(ctx, &a2);
     }
     else
     {
-        sithCogExec_PushVector3(ctx, &rdroid_zeroVector3);
+        sithCogExec_PushVector(ctx, &rdroid_zeroVector3);
     }
 }
 
@@ -539,9 +539,9 @@ void sithCogFunctionSurface_GetSurfaceNormal(sithCog *ctx)
 
     v1 = sithCogExec_PopSurface(ctx);
     if ( v1 )
-        sithCogExec_PushVector3(ctx, &v1->surfaceInfo.face.normal);
+        sithCogExec_PushVector(ctx, &v1->surfaceInfo.face.normal);
     else
-        sithCogExec_PushVector3(ctx, &rdroid_zeroVector3);
+        sithCogExec_PushVector(ctx, &rdroid_zeroVector3);
 }
 
 void sithCogFunctionSurface_SyncSurface(sithCog *ctx)
@@ -590,7 +590,7 @@ void sithCogFunctionSurface_GetSurfaceVertexLightRGB(sithCog *ctx)
         tmp.x = -1.0;
         tmp.y = -1.0;
         tmp.z = -1.0;
-        sithCogExec_PushVector3(ctx,&tmp);
+        sithCogExec_PushVector(ctx,&tmp);
         return;
     }
 
@@ -600,20 +600,20 @@ void sithCogFunctionSurface_GetSurfaceVertexLightRGB(sithCog *ctx)
             tmp.x = -1.0;
             tmp.y = -1.0;
             tmp.z = -1.0;
-            sithCogExec_PushVector3(ctx,&tmp);
+            sithCogExec_PushVector(ctx,&tmp);
             return;
         }
         tmp.x = (pSurface->surfaceInfo).intensities[num + numVerts];
         tmp.y = (pSurface->surfaceInfo).intensities[num + (pSurface->surfaceInfo).face.numVertices * 2];
         tmp.z = (pSurface->surfaceInfo).intensities[num + (pSurface->surfaceInfo).face.numVertices * 3];
-        sithCogExec_PushVector3(ctx,&tmp);
+        sithCogExec_PushVector(ctx,&tmp);
         return;
     }
 
     tmp.x = -1.0;
     tmp.y = -1.0;
     tmp.z = -1.0;
-    sithCogExec_PushVector3(ctx,&tmp);
+    sithCogExec_PushVector(ctx,&tmp);
 }
 
 // MOTS added
@@ -622,7 +622,7 @@ void sithCogFunctionSurface_SetSurfaceVertexLightRGB(sithCog *ctx)
     rdVector3 valRGB;
     uint32_t uVar1;
     
-    sithCogExec_PopVector3(ctx, &valRGB);
+    sithCogExec_PopVector(ctx, &valRGB);
     int num = sithCogExec_PopInt(ctx);
     sithSurface* pSurface = sithCogExec_PopSurface(ctx);
 

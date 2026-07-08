@@ -156,8 +156,8 @@ void sithCogFunctionThing_createThingAtPos_nr_Mots(sithCog *ctx, int idk, sithTh
     rdVector3 rot; // [esp+28h] [ebp-3Ch]
     rdMatrix34 a3; // [esp+34h] [ebp-30h]
 
-    sithCogExec_PopVector3(ctx, &rot);
-    sithCogExec_PopVector3(ctx, &pos);
+    sithCogExec_PopVector(ctx, &rot);
+    sithCogExec_PopVector(ctx, &pos);
     popSector = sithCogExec_PopSector(ctx);
     popTemplate = sithCogExec_PopTemplate(ctx);
     if ( !popTemplate || !popSector )
@@ -231,8 +231,8 @@ void sithCogFunctionThing_createThingAtPos_nr(sithCog *ctx, int idk)
     rdVector3 rot; // [esp+28h] [ebp-3Ch]
     rdMatrix34 a3; // [esp+34h] [ebp-30h]
 
-    sithCogExec_PopVector3(ctx, &rot);
-    sithCogExec_PopVector3(ctx, &pos);
+    sithCogExec_PopVector(ctx, &rot);
+    sithCogExec_PopVector(ctx, &pos);
     popSector = sithCogExec_PopSector(ctx);
     popTemplate = sithCogExec_PopTemplate(ctx);
     if ( !popTemplate || !popSector )
@@ -427,7 +427,7 @@ void sithCogFunctionThing_Rotate(sithCog *ctx)
 {
     rdVector3 rot;
 
-    sithCogExec_PopVector3(ctx, &rot);
+    sithCogExec_PopVector(ctx, &rot);
     sithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing)
@@ -682,16 +682,16 @@ void sithCogFunctionThing_GetThingPos(sithCog *ctx)
 {
     sithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
-        sithCogExec_PushVector3(ctx, &pThing->position);
+        sithCogExec_PushVector(ctx, &pThing->position);
     else
-        sithCogExec_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
+        sithCogExec_PushVector(ctx, (rdVector3*)&rdroid_zeroVector3);
 }
 
 void sithCogFunctionThing_SetThingPos(sithCog *ctx)
 {
     rdVector3 poppedVec;
 
-    sithCogExec_PopVector3(ctx, &poppedVec);
+    sithCogExec_PopVector(ctx, &poppedVec);
     sithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
     {
@@ -714,7 +714,7 @@ void sithCogFunctionThing_SetThingPosEx(sithCog *ctx)
     rdVector3 poppedVec;
 
     sithSector* pSector = sithCogExec_PopSector(ctx);
-    sithCogExec_PopVector3(ctx, &poppedVec);
+    sithCogExec_PopVector(ctx, &poppedVec);
     sithThing* pThing = sithCogExec_PopThing(ctx);
     if (pSector || (pSector == (sithSector *)-1)) {
         pSector = sithSector_FindSectorAtPos(sithWorld_pCurrentWorld, &poppedVec);
@@ -851,11 +851,11 @@ void sithCogFunctionThing_GetThingVel(sithCog *ctx)
         {
             rdVector_Scale3(&retval, &pThing->trackParams.vel, pThing->trackParams.lerpSpeed);
         }
-        sithCogExec_PushVector3(ctx, &retval);
+        sithCogExec_PushVector(ctx, &retval);
     }
     else
     {
-        sithCogExec_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
+        sithCogExec_PushVector(ctx, (rdVector3*)&rdroid_zeroVector3);
     }
 }
 
@@ -863,7 +863,7 @@ void sithCogFunctionThing_SetThingVel(sithCog *ctx)
 {
     rdVector3 poppedVec;
 
-    sithCogExec_PopVector3(ctx, &poppedVec);
+    sithCogExec_PopVector(ctx, &poppedVec);
     sithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && pThing->moveType == SITH_MT_PHYSICS)
     {
@@ -879,7 +879,7 @@ void sithCogFunctionThing_ApplyForce(sithCog *ctx)
 {
     rdVector3 poppedVec;
 
-    sithCogExec_PopVector3(ctx, &poppedVec);
+    sithCogExec_PopVector(ctx, &poppedVec);
     sithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && pThing->moveType == SITH_MT_PHYSICS)
     {
@@ -895,7 +895,7 @@ void sithCogFunctionThing_AddThingVel(sithCog *ctx)
 {
     rdVector3 poppedVec;
 
-    sithCogExec_PopVector3(ctx, &poppedVec);
+    sithCogExec_PopVector(ctx, &poppedVec);
     sithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && pThing->moveType == SITH_MT_PHYSICS)
     {
@@ -911,16 +911,16 @@ void sithCogFunctionThing_GetThingLvec(sithCog *ctx)
 {
     sithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
-        sithCogExec_PushVector3(ctx, &pThing->lookOrientation.lvec);
+        sithCogExec_PushVector(ctx, &pThing->lookOrientation.lvec);
     else
-        sithCogExec_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
+        sithCogExec_PushVector(ctx, (rdVector3*)&rdroid_zeroVector3);
 }
 
 void sithCogFunctionThing_GetThingLvecPYR(sithCog *ctx)
 {
     sithThing* pThing = sithCogExec_PopThing(ctx);
     if (!pThing) {
-        sithCogExec_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
+        sithCogExec_PushVector(ctx, (rdVector3*)&rdroid_zeroVector3);
         return;
     }
 
@@ -928,16 +928,16 @@ void sithCogFunctionThing_GetThingLvecPYR(sithCog *ctx)
     rdMatrix34 lookOrient;
     rdMatrix_Copy34(&lookOrient, &pThing->lookOrientation);
     rdMatrix_ExtractAngles34(&lookOrient, &pyrOut);
-    sithCogExec_PushVector3(ctx, &pyrOut);
+    sithCogExec_PushVector(ctx, &pyrOut);
 }
 
 void sithCogFunctionThing_GetThingUvec(sithCog *ctx)
 {
     sithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
-        sithCogExec_PushVector3(ctx, &pThing->lookOrientation.uvec);
+        sithCogExec_PushVector(ctx, &pThing->lookOrientation.uvec);
     else
-        sithCogExec_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
+        sithCogExec_PushVector(ctx, (rdVector3*)&rdroid_zeroVector3);
 }
 
 void sithCogFunctionThing_GetThingRvec(sithCog *ctx)
@@ -945,9 +945,9 @@ void sithCogFunctionThing_GetThingRvec(sithCog *ctx)
     sithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing)
-        sithCogExec_PushVector3(ctx, &pThing->lookOrientation.rvec);
+        sithCogExec_PushVector(ctx, &pThing->lookOrientation.rvec);
     else
-        sithCogExec_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
+        sithCogExec_PushVector(ctx, (rdVector3*)&rdroid_zeroVector3);
 }
 
 void sithCogFunctionThing_GetEyePYR(sithCog *ctx)
@@ -955,9 +955,9 @@ void sithCogFunctionThing_GetEyePYR(sithCog *ctx)
     sithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing && (pThing->type == SITH_THING_ACTOR || pThing->type == SITH_THING_PLAYER))
-        sithCogExec_PushVector3(ctx, &pThing->actorParams.eyePYR);
+        sithCogExec_PushVector(ctx, &pThing->actorParams.eyePYR);
     else
-        sithCogExec_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
+        sithCogExec_PushVector(ctx, (rdVector3*)&rdroid_zeroVector3);
 }
 
 void sithCogFunctionThing_DetachThing(sithCog *ctx)
@@ -1381,8 +1381,8 @@ void sithCogFunctionThing_GetFramePos(sithCog *ctx)
     sithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing && pThing->moveType == SITH_MT_PATH && frame < pThing->trackParams.loadedFrames )
-        sithCogExec_PushVector3(ctx, &pThing->trackParams.aFrames[frame].pos);
-    sithCogExec_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
+        sithCogExec_PushVector(ctx, &pThing->trackParams.aFrames[frame].pos);
+    sithCogExec_PushVector(ctx, (rdVector3*)&rdroid_zeroVector3);
 }
 
 // unused/unreferenced
@@ -1392,8 +1392,8 @@ void sithCogFunctionThing_GetFrameRot(sithCog *ctx)
     sithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing && pThing->moveType == SITH_MT_PATH && frame < pThing->trackParams.loadedFrames)
-        sithCogExec_PushVector3(ctx, &pThing->trackParams.aFrames[frame].rot);
-    sithCogExec_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
+        sithCogExec_PushVector(ctx, &pThing->trackParams.aFrames[frame].rot);
+    sithCogExec_PushVector(ctx, (rdVector3*)&rdroid_zeroVector3);
 }
 
 void sithCogFunctionThing_PathMovePause(sithCog *ctx)
@@ -1648,12 +1648,12 @@ void sithCogFunctionThing_SetThingThrust(sithCog *ctx)
 {
     rdVector3 poppedVec;
 
-    int couldPopVec = sithCogExec_PopVector3(ctx, &poppedVec);
+    int couldPopVec = sithCogExec_PopVector(ctx, &poppedVec);
     sithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing && pThing->moveType == SITH_MT_PHYSICS && couldPopVec)
     {
-        sithCogExec_PushVector3(ctx, &pThing->physicsParams.acceleration);
+        sithCogExec_PushVector(ctx, &pThing->physicsParams.acceleration);
         rdVector_Copy3(&pThing->physicsParams.acceleration, &poppedVec);
     }
 }
@@ -1665,7 +1665,7 @@ void sithCogFunctionThing_GetThingThrust(sithCog *ctx)
     if ( pThing )
     {
         if ( pThing->moveType == SITH_MT_PHYSICS )
-            sithCogExec_PushVector3(ctx, &pThing->physicsParams.acceleration);
+            sithCogExec_PushVector(ctx, &pThing->physicsParams.acceleration);
     }
 }
 
@@ -1892,7 +1892,7 @@ void sithCogFunctionThing_SetThingRotVel(sithCog *ctx)
 {
     rdVector3 popped_vector3;
 
-    sithCogExec_PopVector3(ctx, &popped_vector3);
+    sithCogExec_PopVector(ctx, &popped_vector3);
     sithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && pThing->moveType == SITH_MT_PHYSICS)
     {
@@ -1908,16 +1908,16 @@ void sithCogFunctionThing_GetThingRotVel(sithCog *ctx)
 {
     sithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && pThing->moveType == SITH_MT_PHYSICS )
-        sithCogExec_PushVector3(ctx, &pThing->physicsParams.angVel);
+        sithCogExec_PushVector(ctx, &pThing->physicsParams.angVel);
     else
-        sithCogExec_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
+        sithCogExec_PushVector(ctx, (rdVector3*)&rdroid_zeroVector3);
 }
 
 void sithCogFunctionThing_SetThingLook(sithCog *ctx)
 {
     rdVector3 popped_vector3;
 
-    int pop_v3_retval = sithCogExec_PopVector3(ctx, &popped_vector3);
+    int pop_v3_retval = sithCogExec_PopVector(ctx, &popped_vector3);
     sithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing && pop_v3_retval == 1)
@@ -2241,16 +2241,16 @@ void sithCogFunctionThing_GetThingFireOffset(sithCog *ctx)
     sithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing)
-        sithCogExec_PushVector3(ctx, &pThing->actorParams.fireOffset);
+        sithCogExec_PushVector(ctx, &pThing->actorParams.fireOffset);
     else
-        sithCogExec_PushVector3(ctx, (rdVector3*)&rdroid_zeroVector3);
+        sithCogExec_PushVector(ctx, (rdVector3*)&rdroid_zeroVector3);
 }
 
 void sithCogFunctionThing_SetThingFireOffset(sithCog *ctx)
 {
     rdVector3 poppedVec;
 
-    sithCogExec_PopVector3(ctx, &poppedVec);
+    sithCogExec_PopVector(ctx, &poppedVec);
     sithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing)
@@ -2433,10 +2433,10 @@ void sithCogFunctionThing_GetActorHeadPYR(sithCog *ctx)
     sithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing && (pThing->type == SITH_THING_ACTOR || pThing->type == SITH_THING_PLAYER))
     {
-        sithCogExec_PushVector3(ctx, &pThing->actorParams.eyePYR);
+        sithCogExec_PushVector(ctx, &pThing->actorParams.eyePYR);
         return;
     }
-    sithCogExec_PushVector3(ctx,&rdroid_zeroVector3);
+    sithCogExec_PushVector(ctx,&rdroid_zeroVector3);
 }
 
 // MOTS added
@@ -2444,7 +2444,7 @@ void sithCogFunctionThing_SetActorHeadPYR(sithCog *ctx)
 {
     rdVector3 tmp;
 
-    sithCogExec_PopVector3(ctx, &tmp);
+    sithCogExec_PopVector(ctx, &tmp);
     sithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing && (pThing->type == SITH_THING_ACTOR || pThing->type == SITH_THING_PLAYER))
     {
@@ -2502,9 +2502,9 @@ void sithCogFunctionThing_InterpolatePYR(sithCog *ctx)
     rdMatrix34 local_30;
     
     cog_flex_t fVar1 = sithCogExec_PopFlex(ctx);
-    sithCogExec_PopVector3(ctx,&inVec0);
-    sithCogExec_PopVector3(ctx,&inVec1);
-    sithCogExec_PopVector3(ctx,&inVec2);
+    sithCogExec_PopVector(ctx,&inVec0);
+    sithCogExec_PopVector(ctx,&inVec1);
+    sithCogExec_PopVector(ctx,&inVec2);
     tmpOut.x = inVec1.x - inVec2.x;
     tmpOut.y = inVec1.y - inVec2.y;
     tmpOut.z = inVec1.z - inVec2.z;
@@ -2520,7 +2520,7 @@ void sithCogFunctionThing_InterpolatePYR(sithCog *ctx)
     tmpOut.x = (tmpAngles2.x - tmpAngles.x) * fVar1 + tmpAngles.x;
     tmpOut.y = (tmpAngles2.y - tmpAngles.y) * fVar1 + tmpAngles.y;
     tmpOut.z = (tmpAngles2.z - tmpAngles.z) * fVar1 + tmpAngles.z;
-    sithCogExec_PushVector3(ctx,&tmpOut);
+    sithCogExec_PushVector(ctx,&tmpOut);
     return;
 }
 
@@ -2573,7 +2573,7 @@ void sithCogFunctionThing_SetThingLookPYR(sithCog *ctx)
     rdVector3 pyr;
     rdMatrix34 tmp_mat;
 
-    iVar1 = sithCogExec_PopVector3(ctx, &pyr);
+    iVar1 = sithCogExec_PopVector(ctx, &pyr);
     pThing = sithCogExec_PopThing(ctx);
     if (pThing && iVar1 == 1) 
     {
@@ -2596,10 +2596,10 @@ void sithCogFunctionThing_GetThingInsertOffset(sithCog *ctx)
         && ((pThing->rdthing).type == RD_THINGTYPE_MODEL)) 
         && (prVar1 = (pThing->rdthing).model3, prVar1 != (rdModel3 *)0x0))
     {
-        sithCogExec_PushVector3(ctx,&prVar1->insertOffset);
+        sithCogExec_PushVector(ctx,&prVar1->insertOffset);
         return;
     }
-    sithCogExec_PushVector3(ctx,&rdroid_zeroVector3);
+    sithCogExec_PushVector(ctx,&rdroid_zeroVector3);
 }
 
 

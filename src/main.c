@@ -1104,13 +1104,13 @@ void do_hooks()
     hook_function(sithCog_Sectoridk_ADDR, sithCog_Sectoridk);
 
     // sithCogVm
-    hook_function(sithCogExec_Exec_ADDR, sithCogExec_Exec);
-    hook_function(sithCogExec_ExecCog_ADDR, sithCogExec_ExecCog);
-    hook_function(sithCogExec_PopValue_ADDR, sithCogExec_PopValue);
+    hook_function(sithCogExec_Execute_ADDR, sithCogExec_Execute);
+    hook_function(sithCogExec_ExecuteMessage_ADDR, sithCogExec_ExecuteMessage);
+    hook_function(sithCogExec_PopSymbol_ADDR, sithCogExec_PopSymbol);
     hook_function(sithCogExec_PopFlex_ADDR, sithCogExec_PopFlex);
     hook_function(sithCogExec_PopInt_ADDR, sithCogExec_PopInt);
-    hook_function(sithCogExec_PopSymbolIdx_ADDR, sithCogExec_PopSymbolIdx);
-    hook_function(sithCogExec_PopVector3_ADDR, sithCogExec_PopVector3);
+    hook_function(sithCogExec_PopArray_ADDR, sithCogExec_PopArray);
+    hook_function(sithCogExec_PopVector_ADDR, sithCogExec_PopVector);
     hook_function(sithCogExec_PopCog_ADDR, sithCogExec_PopCog);
     hook_function(sithCogExec_PopThing_ADDR, sithCogExec_PopThing);
     hook_function(sithCogExec_PopTemplate_ADDR, sithCogExec_PopTemplate);
@@ -1121,16 +1121,16 @@ void do_hooks()
     hook_function(sithCogExec_PopModel3_ADDR, sithCogExec_PopModel3);
     hook_function(sithCogExec_PopKeyframe_ADDR, sithCogExec_PopKeyframe);
     hook_function(sithCogExec_PopString_ADDR, sithCogExec_PopString);
-    hook_function(sithCogExec_PushVar_ADDR, sithCogExec_PushVar);
+    hook_function(sithCogExec_PushStack_ADDR, sithCogExec_PushStack);
     hook_function(sithCogExec_PushInt_ADDR, sithCogExec_PushInt);
     hook_function(sithCogExec_PushFlex_ADDR, sithCogExec_PushFlex);
-    hook_function(sithCogExec_PushVector3_ADDR, sithCogExec_PushVector3);
-    hook_function(sithCogExec_PopProgramVal_ADDR, sithCogExec_PopProgramVal);
+    hook_function(sithCogExec_PushVector_ADDR, sithCogExec_PushVector);
+    hook_function(sithCogExec_GetOpCode_ADDR, sithCogExec_GetOpCode);
     hook_function(sithCogExec_ResetStack_ADDR, sithCogExec_ResetStack);
-    hook_function(sithCogExec_Call_ADDR, sithCogExec_Call);
-    hook_function(sithCogExec_Ret_ADDR, sithCogExec_Ret);
-    hook_function(sithCogExec_PopStackVar_ADDR, sithCogExec_PopStackVar);
-    hook_function(sithCogExec_AssignStackVar_ADDR, sithCogExec_AssignStackVar);
+    hook_function(sithCogExec_PushCallstack_ADDR, sithCogExec_PushCallstack);
+    hook_function(sithCogExec_PopCallstack_ADDR, sithCogExec_PopCallstack);
+    hook_function(sithCogExec_PopStack_ADDR, sithCogExec_PopStack);
+    hook_function(sithCogExec_GetSymbolValue_ADDR, sithCogExec_GetSymbolValue);
     
     // stdBitmap
     hook_function(stdBitmap_Load_ADDR, stdBitmap_Load);

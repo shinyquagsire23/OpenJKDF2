@@ -1276,7 +1276,7 @@ execute:
             sithConsole_PrintString(std_genBuffer);
 #endif
         }
-        sithCogExec_ExecCog(cog, v10);
+        sithCogExec_ExecuteMessage(cog, v10);
     }
     else if ( msgid != SITH_MESSAGE_PULSE && msgid != SITH_MESSAGE_TIMER )
     {
@@ -1415,7 +1415,7 @@ execute:
             sithConsole_PrintString(std_genBuffer);
 #endif
         }
-        sithCogExec_ExecCog(cog, trigIdx);
+        sithCogExec_ExecuteMessage(cog, trigIdx);
         result = cog->returnEx;
     }
     else if ( message == SITH_MESSAGE_PULSE || message == SITH_MESSAGE_TIMER )
@@ -1709,7 +1709,7 @@ void sithCogScript_Tick(sithCog *cog)
 #endif
             }
 
-            sithCogExec_Exec(cog);
+            sithCogExec_Execute(cog);
             return;
         }
         if ( cog->script_running == 3 && (sithWorld_pCurrentWorld->things[cog->wakeTimeMs].trackParams.flags & 3) == 0 )
@@ -1722,7 +1722,7 @@ void sithCogScript_Tick(sithCog *cog)
 #endif
             }
 
-            sithCogExec_Exec(cog);
+            sithCogExec_Execute(cog);
             return;
         }
     }

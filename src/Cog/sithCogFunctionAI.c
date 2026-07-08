@@ -25,7 +25,7 @@ void sithCogFunctionAI_AISetMovePos(sithCog *ctx)
     rdVector3 v3; // [esp+4h] [ebp-Ch] BYREF
 
     // TODO: Bug? If the vector is invalid, other args will never get popped.
-    if (sithCogExec_PopVector3(ctx, &v3))
+    if (sithCogExec_PopVector(ctx, &v3))
     {
         sithThing* pThing = sithCogExec_PopThing(ctx);
         
@@ -47,7 +47,7 @@ void sithCogFunctionAI_AIJump(sithCog *ctx)
     rdVector3 v5; // [esp+8h] [ebp-Ch] BYREF
 
     cog_flex_t a1 = sithCogExec_PopFlex(ctx);
-    v2 = sithCogExec_PopVector3(ctx, &v5);
+    v2 = sithCogExec_PopVector(ctx, &v5);
     v3 = sithCogExec_PopThing(ctx);
     
     // Added
@@ -122,7 +122,7 @@ void sithCogFunctionAI_AISetLookPos(sithCog *ctx)
     rdVector3 v3; // [esp+4h] [ebp-Ch] BYREF
 
     // TODO: Bug? If the vector is invalid, other args will never get popped.
-    if ( sithCogExec_PopVector3(ctx, &v3) )
+    if ( sithCogExec_PopVector(ctx, &v3) )
     {
         v1 = sithCogExec_PopThing(ctx);
         
@@ -182,7 +182,7 @@ void sithCogFunctionAI_AIGetMovePos(sithCog *ctx)
     {
         v2 = v1->actor;
         if ( v2 )
-            sithCogExec_PushVector3(ctx, &v2->movepos);
+            sithCogExec_PushVector(ctx, &v2->movepos);
     }
 }
 

@@ -119,7 +119,7 @@ void sithCogFunctionSound_PlaySoundPos(sithCog *ctx)
     cog_flex_t maxDist = sithCogExec_PopFlex(ctx);
     cog_flex_t minDist = sithCogExec_PopFlex(ctx);
     cog_flex_t volume = sithCogExec_PopFlex(ctx);
-    int posVal = sithCogExec_PopVector3(ctx, &pos);
+    int posVal = sithCogExec_PopVector(ctx, &pos);
     sithSound* pSound = sithCogExec_PopSound(ctx);
 
     if ( !pSound || !posVal )
@@ -458,7 +458,7 @@ void sithCogFunctionSound_PlaySoundPosLocal(sithCog *ctx)
     cog_flex_t maxDist = sithCogExec_PopFlex(ctx);
     cog_flex_t minDist = sithCogExec_PopFlex(ctx);
     cog_flex_t volume = sithCogExec_PopFlex(ctx);
-    int posVal = sithCogExec_PopVector3(ctx, &pos);
+    int posVal = sithCogExec_PopVector(ctx, &pos);
     sithSound* pSound = sithCogExec_PopSound(ctx);
 
     if ( !pSound || !posVal )
