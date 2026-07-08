@@ -130,9 +130,9 @@ for (int i = 0; i < len; i++)
     return ret;
 }
 
-static int Linux_stdFileClose(stdFile_t fhand)
+static int Linux_stdFileClose(stdFile_t hGobFile)
 {
-    int ret = fclose((FILE*)fhand);
+    int ret = fclose((FILE*)hGobFile);
 
 #ifdef ARCH_WASM
     EM_ASM(
@@ -146,25 +146,25 @@ static int Linux_stdFileClose(stdFile_t fhand)
 }
 
 
-static size_t Linux_stdFileRead(stdFile_t fhand, void* dst, size_t len)
+static size_t Linux_stdFileRead(stdFile_t hGobFile, void* dst, size_t len)
 {
 #ifdef TARGET_TWL
     if (!dst || !len) return 0;
 #endif
-    size_t val =  fread(dst, 1, len, (FILE*)fhand);
+    size_t val =  fread(dst, 1, len, (FILE*)hGobFile);
 
     return val;
 }
 
-static size_t Linux_stdFileWrite(stdFile_t fhand, void* dst, size_t len)
+static size_t Linux_stdFileWrite(stdFile_t hGobFile, void* dst, size_t len)
 {
 #ifdef TARGET_TWL
     if (!dst || !len) return 0;
 #endif
-    return fwrite(dst, 1, len, (FILE*)fhand);
+    return fwrite(dst, 1, len, (FILE*)hGobFile);
 }
 
-static const char* Linux_stdFileGets(stdFile_t fhand, char* dst, size_t len)
+static const char* Linux_stdFileGets(stdFile_t hGobFile, char* dst, size_t len)
 {
     // Drops static.jkl pPuppetClass parsing from 21.87s to 13.578s due to slow locks on getc
 #ifdef TARGET_RETRO_HOMEBREW
@@ -172,7 +172,7 @@ static const char* Linux_stdFileGets(stdFile_t fhand, char* dst, size_t len)
     const char* retval = dst;
     if (!dst || !len) return 0;
     while(1) {
-        size_t res = fread(tmp, 1, sizeof(tmp), (FILE*)fhand);
+        size_t res = fread(tmp, 1, sizeof(tmp), (FILE*)hGobFile);
         if (!res) break;
         for (size_t i = 0; i < res; i++) {
             char val = tmp[i];
@@ -180,22 +180,22 @@ static const char* Linux_stdFileGets(stdFile_t fhand, char* dst, size_t len)
             *dst++ = val;
             len--;
             if (val == '\n' || len == 1) {
-                fseek((FILE*)fhand, (i+1)-res, SEEK_CUR);
+                fseek((FILE*)hGobFile, (i+1)-res, SEEK_CUR);
                 *dst++ = 0;
                 return retval;
             }
             if (!val) {
-                fseek((FILE*)fhand, (i+1)-res, SEEK_CUR);
+                fseek((FILE*)hGobFile, (i+1)-res, SEEK_CUR);
                 return retval;
             }
         }
     }
 #else
-    return fgets(dst, len, (FILE*)fhand);
+    return fgets(dst, len, (FILE*)hGobFile);
 #endif
 }
 
-static const wchar_t* Linux_stdFileGetws(stdFile_t fhand, wchar_t* dst, size_t len)
+static const wchar_t* Linux_stdFileGetws(stdFile_t hGobFile, wchar_t* dst, size_t len)
 {
     // Can't use fgetws because -fshort-wchar makes wchar_t 2 bytes
     // but libc fgetws expects native wchar_t (4 bytes on POSIX).
@@ -204,7 +204,7 @@ static const wchar_t* Linux_stdFileGetws(stdFile_t fhand, wchar_t* dst, size_t l
     size_t i = 0;
     while (i < len - 1) {
         wchar_t ch = 0;
-        if (fread(&ch, sizeof(wchar_t), 1, (FILE*)fhand) != 1) {
+        if (fread(&ch, sizeof(wchar_t), 1, (FILE*)hGobFile) != 1) {
             if (i == 0) return NULL;
             break;
         }
@@ -215,17 +215,17 @@ static const wchar_t* Linux_stdFileGetws(stdFile_t fhand, wchar_t* dst, size_t l
     return dst;
 }
 
-static int Linux_stdFseek(stdFile_t fhand, int a, int b)
+static int Linux_stdFseek(stdFile_t hGobFile, int a, int b)
 {
     //printf("fseek? %x %x\n", a, b);
-    int ret = fseek((FILE*)fhand, a, b);
+    int ret = fseek((FILE*)hGobFile, a, b);
     //printf("fseek %x\n", ret);
     return ret;
 }
 
-static int Linux_stdFtell(stdFile_t fhand)
+static int Linux_stdFtell(stdFile_t hGobFile)
 {
-    return ftell((FILE*)fhand);
+    return ftell((FILE*)hGobFile);
 }
 
 static void* Linux_alloc(uint32_t len)
@@ -948,9 +948,9 @@ void *__wrap_calloc(size_t num, size_t size) {
 }
 #endif // TARGET_DREAMCAST
 
-static int Linux_stdFeof(stdFile_t fhand)
+static int Linux_stdFeof(stdFile_t hGobFile)
 {
-    return feof((FILE*)fhand);
+    return feof((FILE*)hGobFile);
 }
 
 uint32_t stdPlatform_GetTimeMsec()
@@ -1091,11 +1091,11 @@ int stdPlatform_Startup()
 #ifdef PLATFORM_POSIX
 int stdPrintf(int (*a1)(const char *, ...), const char *a2, int line, const char *fmt, ...)
 {
-    va_list args;
-    va_start (args, fmt);
+    va_list aArgs;
+    va_start (aArgs, fmt);
     printf("(%p %s:%d) ", a1, a2, line);
-    int ret = vprintf(fmt, args);
-    va_end (args);
+    int ret = vprintf(fmt, aArgs);
+    va_end (aArgs);
     return ret;
 }
 
@@ -1106,7 +1106,7 @@ static SDL_mutex* stdPlatform_mtxPrintf = NULL;
 int stdPlatform_Printf(const char *fmt, ...)
 {
     char tmp[256];
-    va_list args;
+    va_list aArgs;
 
 #ifdef SDL2_RENDER
     if (!stdPlatform_mtxPrintf)
@@ -1115,15 +1115,15 @@ int stdPlatform_Printf(const char *fmt, ...)
     SDL_LockMutex(stdPlatform_mtxPrintf);
 #endif
     
-    va_start (args, fmt);
-    int ret = vprintf(fmt, args);
-    va_end (args);
+    va_start (aArgs, fmt);
+    int ret = vprintf(fmt, aArgs);
+    va_end (aArgs);
 
 #ifdef QUAKE_CONSOLE
-    va_start (args, fmt);
-    vsnprintf(tmp, sizeof(tmp), fmt, args);
+    va_start (aArgs, fmt);
+    vsnprintf(tmp, sizeof(tmp), fmt, aArgs);
     jkQuakeConsole_PrintLine(tmp);
-    va_end(args);
+    va_end(aArgs);
 #endif
 
 #ifdef TARGET_ANDROID
@@ -1139,9 +1139,9 @@ int stdPlatform_Printf(const char *fmt, ...)
         // Static: the stack lives in DTCM, which the emulator's bus-level string
         // read can't see; this buffer lands in main RAM.
         static char aNocashBuf[256];
-        va_start(args, fmt);
-        vsnprintf(aNocashBuf, sizeof(aNocashBuf), fmt, args);
-        va_end(args);
+        va_start(aArgs, fmt);
+        vsnprintf(aNocashBuf, sizeof(aNocashBuf), fmt, aArgs);
+        va_end(aArgs);
         size_t tlen = strlen(aNocashBuf);
         if (tlen && aNocashBuf[tlen-1] == '\n')
             aNocashBuf[tlen-1] = 0; // the port appends the newline

@@ -312,8 +312,8 @@ struct Widget_Guard {
 void FileActivatedSignalHandler(GtkButton* saveButton, void* userval) {
     (void)saveButton;  // silence the unused arg warning
 
-    ButtonClickedArgs* args = static_cast<ButtonClickedArgs*>(userval);
-    GtkFileChooserNative* chooser = args->chooser;
+    ButtonClickedArgs* aArgs = static_cast<ButtonClickedArgs*>(userval);
+    GtkFileChooserNative* chooser = aArgs->chooser;
     char* currentFileName = gtk_file_chooser_get_current_name(GTK_FILE_CHOOSER(chooser));
     if (*currentFileName) {  // string is not empty
 
@@ -327,7 +327,7 @@ void FileActivatedSignalHandler(GtkButton* saveButton, void* userval) {
 
         if (!*p_period) {  // there is no '.', so append the default extension
             Pair_GtkFileFilter_FileExtension* filterMap =
-                static_cast<Pair_GtkFileFilter_FileExtension*>(args->map);
+                static_cast<Pair_GtkFileFilter_FileExtension*>(aArgs->map);
             GtkFileFilter* currentFilter = gtk_file_chooser_get_filter(GTK_FILE_CHOOSER(chooser));
             if (currentFilter) {
                 for (; filterMap->filter; ++filterMap) {

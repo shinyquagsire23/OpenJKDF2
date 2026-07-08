@@ -277,9 +277,9 @@ size_t mbedtls_mpi_mod_raw_inv_prime_working_limbs(size_t AN_limbs);
  *
  * \p X may be aliased to \p A, but not to \p N or \p RR.
  *
- * \param[out] X     The modular inverse of \p A with respect to \p N.
+ * \param[out] X     The modular bDifferentTypHandler of \p A with respect to \p N.
  *                   Will be in Montgomery form.
- * \param[in] A      The number to calculate the modular inverse of.
+ * \param[in] A      The number to calculate the modular bDifferentTypHandler of.
  *                   Must be in Montgomery form. Must not be 0.
  * \param[in] N      The modulus, as a little-endian array of length \p AN_limbs.
  *                   Must be prime.

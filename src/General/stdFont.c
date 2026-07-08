@@ -1371,14 +1371,14 @@ int stdFont_Write(const char *fpath, stdFont *font)
     }
     header.numCharsets = numCharsets;
 
-    int fhand = std_g_pHS->fileOpen(fpath, "wb");
-    if ( !fhand )
+    int hGobFile = std_g_pHS->fileOpen(fpath, "wb");
+    if ( !hGobFile )
         return 0;
 
-    int written = std_g_pHS->fileWrite(fhand, &header, sizeof(stdFontHeader));
+    int written = std_g_pHS->fileWrite(hGobFile, &header, sizeof(stdFontHeader));
     if ( written != sizeof(stdFontHeader) )
     {
-        std_g_pHS->fileClose(fhand);
+        std_g_pHS->fileClose(hGobFile);
         return 0;
     }
 
@@ -1388,25 +1388,25 @@ int stdFont_Write(const char *fpath, stdFont *font)
     {
         extHeader.characterFirst = charset->charFirst;
         extHeader.characterLast = charset->charLast;
-        written = std_g_pHS->fileWrite(fhand, &extHeader, sizeof(stdFontExtHeader));
+        written = std_g_pHS->fileWrite(hGobFile, &extHeader, sizeof(stdFontExtHeader));
         if ( written != sizeof(stdFontExtHeader) )
         {
-            std_g_pHS->fileClose(fhand);
+            std_g_pHS->fileClose(hGobFile);
             return 0;
         }
         uint32_t entryBytes = ((uint32_t)(charset->charLast - charset->charFirst)) * sizeof(stdFontEntry) + sizeof(stdFontEntry);
-        written = std_g_pHS->fileWrite(fhand, charset->pEntries, entryBytes);
+        written = std_g_pHS->fileWrite(hGobFile, charset->pEntries, entryBytes);
         if ( (uint32_t)written != entryBytes )
         {
-            std_g_pHS->fileClose(fhand);
+            std_g_pHS->fileClose(hGobFile);
             return 0;
         }
         charset = charset->previous;
         idx++;
     }
 
-    stdBitmap_AppendToFile(fhand, font->pBitmap);
-    std_g_pHS->fileClose(fhand);
+    stdBitmap_AppendToFile(hGobFile, font->pBitmap);
+    std_g_pHS->fileClose(hGobFile);
     return 1;
 }
 

@@ -434,12 +434,12 @@ static int ftp_send_command(struct Curl_easy *data, const char *message, ...)
 {
   int ftp_code;
   ssize_t nread = 0;
-  va_list args;
+  va_list aArgs;
   char print_buffer[50];
 
-  va_start(args, message);
-  mvsnprintf(print_buffer, sizeof(print_buffer), message, args);
-  va_end(args);
+  va_start(aArgs, message);
+  mvsnprintf(print_buffer, sizeof(print_buffer), message, aArgs);
+  va_end(aArgs);
 
   if(ftpsend(data, data->conn, print_buffer)) {
     ftp_code = -1;

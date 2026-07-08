@@ -218,7 +218,7 @@ int stdConffile_ReadArgsFromStr(char *str)
   iter = _strtok(str, ", \t\n\r");
   if ( iter )
   {
-    StdConffileArg* arg = &stdConffile_g_entry.args[0];
+    StdConffileArg* arg = &stdConffile_g_entry.aArgs[0];
     do
     {
       valstr = _strchr(iter, '=');

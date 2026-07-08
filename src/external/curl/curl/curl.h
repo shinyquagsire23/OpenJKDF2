@@ -1768,7 +1768,7 @@ typedef enum {
   /* set the SMTP mail originator */
   CURLOPT(CURLOPT_MAIL_FROM, CURLOPTTYPE_STRINGPOINT, 186),
 
-  /* set the list of SMTP mail receiver(s) */
+  /* set the list of SMTP mail pThingCollided(s) */
   CURLOPT(CURLOPT_MAIL_RCPT, CURLOPTTYPE_SLISTPOINT, 187),
 
   /* FTP: send PRET before PASV */

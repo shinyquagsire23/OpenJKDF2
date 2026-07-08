@@ -1532,7 +1532,7 @@ int sithInventory_GetPowerKeybind(int idx)
         return -1;
 }
 
-void sithInventory_BroadcastKilledMessage(SithThing *player, SithThing *sender)
+void sithInventory_BroadcastKilledMessage(SithThing *player, SithThing *pMeshCollided)
 {
     for (int i = 0; i < SITHBIN_NUMBINS; i++)
     {
@@ -1544,7 +1544,7 @@ void sithInventory_BroadcastKilledMessage(SithThing *player, SithThing *sender)
           && player->actorParams.pPlayer->aItems[i].state & SITHINVENTORY_ITEM_AVAILABLE 
           && desc->cog )
         {
-            sithCog_SendMessage(desc->cog, SITH_MESSAGE_KILLED, SENDERTYPE_THING, player->idx, SENDERTYPE_THING, sender ? sender->idx : -1, 0);
+            sithCog_SendMessage(desc->cog, SITH_MESSAGE_KILLED, SENDERTYPE_THING, player->idx, SENDERTYPE_THING, pMeshCollided ? pMeshCollided->idx : -1, 0);
         }
     }
 }

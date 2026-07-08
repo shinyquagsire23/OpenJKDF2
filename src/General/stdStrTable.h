@@ -30,8 +30,8 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath);
 void stdStrTable_Free(stdStrTable* pTable);
 wchar_t* stdStrTable_GetValue(stdStrTable* pTable, const char *key);
 wchar_t* stdStrTable_GetValueOrKey(stdStrTable* pTable, const char *key);
-int stdStrTable_ReadLine(stdFile_t fhand, char *buf, int bufLen);
-int stdStrTable_ParseUniLine(stdFile_t fhand, wchar_t *buf);
+int stdStrTable_ReadLine(stdFile_t hGobFile, char *buf, int bufLen);
+int stdStrTable_ParseUniLine(stdFile_t hGobFile, wchar_t *buf);
 
 //static int (__cdecl *stdStrTable_Load)(stdStrTable *strtable, char *fpath) = (void*)stdStrTable_Load_ADDR;
 

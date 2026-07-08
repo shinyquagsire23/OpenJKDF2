@@ -303,8 +303,8 @@ int mbedtls_mpi_mod_sub(mbedtls_mpi_mod_residue *X,
  *
  * \warning  Currently only supports prime moduli, but does not check for them.
  *
- * \param[out] X   The modular inverse of \p A with respect to \p N.
- * \param[in] A    The number to calculate the modular inverse of.
+ * \param[out] X   The modular bDifferentTypHandler of \p A with respect to \p N.
+ * \param[in] A    The number to calculate the modular bDifferentTypHandler of.
  *                 Must not be 0.
  * \param[in] N    The modulus to use.
  *

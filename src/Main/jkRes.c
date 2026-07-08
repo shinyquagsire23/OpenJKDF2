@@ -477,7 +477,7 @@ stdFile_t jkRes_FileOpen(const char *fpath, const char *mode)
 {
     unsigned int resIdx; // edi
     int v6; // esi
-    stdFile_t fhand; // eax
+    stdFile_t hGobFile; // eax
     unsigned int v8; // esi
     const char *v11; // eax
     stdFile_t v12; // eax
@@ -502,12 +502,12 @@ stdFile_t jkRes_FileOpen(const char *fpath, const char *mode)
 #ifndef TARGET_TWL
     // Try in the EXE root (not in resource/), ex "3do\key\kysabrf2.key"
     // This was also used for `player/...` and `controls/...`
-    fhand = pLowLevelHS->fileOpen(fpath, mode);
-    if ( fhand )
+    hGobFile = pLowLevelHS->fileOpen(fpath, mode);
+    if ( hGobFile )
     {
         v8 = resIdx;
         jkRes_aFiles[v8].useLowLevel = 1;
-        jkRes_aFiles[v8].fsHandle = fhand;
+        jkRes_aFiles[v8].fsHandle = hGobFile;
         stdString_SafeStrCopy(jkRes_aFiles[resIdx].fpath, fpath, 128);
         jkRes_aFiles[resIdx].bOpened = 1;
         v6 = 1;

@@ -326,7 +326,7 @@ LABEL_21:
         rdroid_g_pHS->fileRead(
           mat_file__,
           (void *)(*texture_struct)->surface_lock_alloc,
-          (*texture_struct)->format.texture_size_in_bytes);
+          (*texture_struct)->format.size);
         stdDisplay_VBufferUnlock(*texture_struct);
 
 #if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
@@ -353,14 +353,14 @@ LABEL_21:
                 std_g_pHS->fseek(mat_file__, format.width*format.height*(format.format.is16bit?2:1), SEEK_CUR);
                 goto no_loading;
             }
-            (*texture_struct)->format.texture_size_in_bytes = format.width*format.height*(format.format.is16bit?2:1);
+            (*texture_struct)->format.size = format.width*format.height*(format.format.is16bit?2:1);
             if ( texture->alpha_en & 1 )
               stdDisplay_VBufferSetColorKey(created_tex, texture->color_transparent);
             stdDisplay_VBufferLock(*texture_struct);
             // Added: bounce through a temp; fileRead byte-writes internally and the
             // pVBuffer may be word-addressable-only (DC VRAM / NDS slot-2).
             {
-                uint32_t mipLen = (*texture_struct)->format.texture_size_in_bytes;
+                uint32_t mipLen = (*texture_struct)->format.size;
                 void* pMipTmp = STD_ALLOC(mipLen);
                 if (pMipTmp) {
                     rdroid_g_pHS->fileRead(mat_file__, pMipTmp, mipLen);

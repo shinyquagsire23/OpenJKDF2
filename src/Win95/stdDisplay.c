@@ -52,7 +52,7 @@ void stdDisplay_Close()
     stdDisplay_bOpen = 0;
 }
 
-int stdDisplay_FindClosestMode(render_pair *a1, struct StdVideoMode *render_surface, unsigned int max_modes)
+int stdDisplay_FindClosestMode(render_pair *a1, struct StdVideoMode *render_surface, unsigned int numModes)
 {
     Video_curMode = 0;
     stdDisplay_bPaged = 1;
@@ -85,7 +85,7 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
     stdDisplay_pCurVideoMode = &Video_renderSurface[modeIdx];
     
     stdDisplay_pCurVideoMode->format.format.bpp = 8;
-    stdDisplay_pCurVideoMode->format.width_in_pixels = newW;
+    stdDisplay_pCurVideoMode->format.rowWidth = newW;
     stdDisplay_pCurVideoMode->format.width = newW;
     stdDisplay_pCurVideoMode->format.height = newH;
     
@@ -149,13 +149,13 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
     Video_menuBuffer.sdlSurface = menuSurface;
     Video_overlayMapBuffer.sdlSurface = overlaySurface;
     
-    Video_menuBuffer.format.width_in_bytes = menuSurface->pitch;
-    Video_otherBuf.format.width_in_bytes = otherSurface->pitch;
-    Video_overlayMapBuffer.format.width_in_bytes = overlaySurface->pitch;
+    Video_menuBuffer.format.rowSize = menuSurface->pitch;
+    Video_otherBuf.format.rowSize = otherSurface->pitch;
+    Video_overlayMapBuffer.format.rowSize = overlaySurface->pitch;
     
-    Video_menuBuffer.format.width_in_pixels = menuSurface->pitch;
-    Video_otherBuf.format.width_in_pixels = otherSurface->pitch;
-    Video_overlayMapBuffer.format.width_in_pixels = overlaySurface->pitch;
+    Video_menuBuffer.format.rowWidth = menuSurface->pitch;
+    Video_otherBuf.format.rowWidth = otherSurface->pitch;
+    Video_overlayMapBuffer.format.rowWidth = overlaySurface->pitch;
     Video_menuBuffer.format.width = newW;
     Video_otherBuf.format.width = newW;
     Video_overlayMapBuffer.format.width = newW;
@@ -225,8 +225,8 @@ tVBuffer* stdDisplay_VBufferNew(tRasterInfo *fmt, int create_ddraw_surface, int 
     
     // force 0 reads
     //out->format.width = 0;
-    //out->format.width_in_bytes = 0;
-    //out->surface_lock_alloc = STD_ALLOC(texture_size_in_bytes);
+    //out->format.rowSize = 0;
+    //out->surface_lock_alloc = STD_ALLOC(size);
     
     //if (fmt->format.g_bits == 6) // RGB565
     {
@@ -256,9 +256,9 @@ tVBuffer* stdDisplay_VBufferNew(tRasterInfo *fmt, int create_ddraw_surface, int 
     {
         static int num = 0;
         //printf("Allocated VBuffer %u, w %u h %u bpp %u %x %x %x\n", num++, fmt->width, fmt->height, fmt->format.bpp, rbitmask, gbitmask, bbitmask);
-        out->format.width_in_bytes = surface->pitch;
-        out->format.width_in_pixels = fmt->width;
-        out->format.texture_size_in_bytes = surface->pitch * fmt->height;
+        out->format.rowSize = surface->pitch;
+        out->format.rowWidth = fmt->width;
+        out->format.size = surface->pitch * fmt->height;
     }
     else
     {
@@ -342,8 +342,8 @@ int stdDisplay_VBufferCopy(tVBuffer *vbuf, tVBuffer *vbuf2, unsigned int blit_x,
     
     uint8_t* srcPixels = (uint8_t*)vbuf2->sdlSurface->pixels;
     uint8_t* dstPixels = (uint8_t*)vbuf->sdlSurface->pixels;
-    uint32_t srcStride = vbuf2->format.width_in_bytes;
-    uint32_t dstStride = vbuf->format.width_in_bytes;
+    uint32_t srcStride = vbuf2->format.rowSize;
+    uint32_t dstStride = vbuf->format.rowSize;
 
     int self_copy = 0;
 
@@ -426,7 +426,7 @@ int stdDisplay_VBufferFill(tVBuffer *vbuf, int fillColor, rdRect *rect)
     //printf("%x; %u %u %u %u\n", fillColor, rect->x, rect->y, rect->width, rect->height);
     
     uint8_t* dstPixels = (uint8_t*)vbuf->sdlSurface->pixels;
-    uint32_t dstStride = vbuf->format.width_in_bytes;
+    uint32_t dstStride = vbuf->format.rowSize;
     uint32_t max_idx = dstStride * vbuf->format.height;
     for (int i = 0; i < rect->width; i++)
     {
@@ -449,9 +449,9 @@ int stdDisplay_VBufferSetColorKey(tVBuffer *vbuf, int color)
 {
     //DDCOLORKEY v3; // [esp+0h] [ebp-8h] BYREF
 
-    if ( vbuf->bSurfaceLocked )
+    if ( vbuf->lockRefCount )
     {
-        /*if ( vbuf->bSurfaceLocked == 1 )
+        /*if ( vbuf->lockRefCount == 1 )
         {
             v3.dwColorSpaceLowValue = color;
             v3.dwColorSpaceHighValue = color;

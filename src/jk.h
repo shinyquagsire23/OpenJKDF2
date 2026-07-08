@@ -372,7 +372,7 @@ wchar_t* __wcschr(const wchar_t *, wchar_t);
 wchar_t* __wcsncpy(wchar_t *, const wchar_t *, size_t);
 wchar_t* __wcsrchr(const wchar_t *, wchar_t);
 int __snprintf(char *, size_t, const char *, ...);
-int __vsnprintf(char *a1, size_t a2, const char *fmt, va_list args);
+int __vsnprintf(char *a1, size_t a2, const char *fmt, va_list aArgs);
 char* _strstr(const char* a, const char* b);
 #endif // WIN32_BLOBS
 

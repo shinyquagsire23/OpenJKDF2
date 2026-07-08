@@ -738,8 +738,8 @@ int jkPlayer_ReadConf(wchar_t *name)
         if ( stdConffile_ReadArgs() )
         {
             if ( stdConffile_g_entry.numArgs >= 1u
-              && !_memcmp(stdConffile_g_entry.args[0].key, "numcutscenes", 0xDu)
-              && _sscanf(stdConffile_g_entry.args[1].value, "%d", &jkPlayer_setNumCutscenes) == 1 )
+              && !_memcmp(stdConffile_g_entry.aArgs[0].key, "numcutscenes", 0xDu)
+              && _sscanf(stdConffile_g_entry.aArgs[1].value, "%d", &jkPlayer_setNumCutscenes) == 1 )
             {
                 v4 = jkPlayer_cutscenePath;
                 for (int i = 0; i < jkPlayer_setNumCutscenes; i++)
@@ -748,9 +748,9 @@ int jkPlayer_ReadConf(wchar_t *name)
                         break;
                     if ( stdConffile_g_entry.numArgs < 2u )
                         break;
-                    if ( _sscanf(stdConffile_g_entry.args[0].key, "%s", v4) != 1 )
+                    if ( _sscanf(stdConffile_g_entry.aArgs[0].key, "%s", v4) != 1 )
                         break;
-                    if ( _sscanf(stdConffile_g_entry.args[1].value, "%d", &jkPlayer_aCutsceneVal[i]) != 1 )
+                    if ( _sscanf(stdConffile_g_entry.aArgs[1].value, "%d", &jkPlayer_aCutsceneVal[i]) != 1 )
                         break;
                     v4 += 32;
                 }
@@ -1696,8 +1696,8 @@ int jkPlayer_ReadCutsceneConf()
 
     if ( stdConffile_ReadArgs()
       && stdConffile_g_entry.numArgs
-      && !_strcmp(stdConffile_g_entry.args[0].key, "numcutscenes")
-      && _sscanf(stdConffile_g_entry.args[1].value, "%d", &jkPlayer_setNumCutscenes) == 1 )
+      && !_strcmp(stdConffile_g_entry.aArgs[0].key, "numcutscenes")
+      && _sscanf(stdConffile_g_entry.aArgs[1].value, "%d", &jkPlayer_setNumCutscenes) == 1 )
     {
         v0 = 0;
         if ( jkPlayer_setNumCutscenes <= 0 )
@@ -1706,8 +1706,8 @@ int jkPlayer_ReadCutsceneConf()
         for ( i = jkPlayer_cutscenePath;
               stdConffile_ReadArgs()
            && stdConffile_g_entry.numArgs >= 2u
-           && _sscanf(stdConffile_g_entry.args[0].key, "%s", i) == 1
-           && _sscanf(stdConffile_g_entry.args[1].value, "%d", v1) == 1;
+           && _sscanf(stdConffile_g_entry.aArgs[0].key, "%s", i) == 1
+           && _sscanf(stdConffile_g_entry.aArgs[1].value, "%d", v1) == 1;
               i += 32 )
         {
             ++v0;

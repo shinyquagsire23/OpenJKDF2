@@ -383,7 +383,7 @@ typedef enum
 #define DEBUGFLAG_80000                (0x80000)
 #define DEBUGFLAG_NOCLIP               (0x40000000)
 
-// hitType
+// type
 enum SITHCOLLISION
 {
     SITHCOLLISION_NONE = 0x0,

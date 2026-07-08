@@ -58,10 +58,10 @@ typedef struct stdGobDiskEntry
 
 typedef struct GobFileHandle
 {
-    uint32_t isOpen;
+    uint32_t bUsed;
     Gob* parent;
     stdGobEntry* entry;
-    int32_t seekOffs;
+    int32_t offset;
 #ifdef QOL_IMPROVEMENTS
     uint32_t bIsMemoryMapped;
     intptr_t pMemory;
@@ -72,17 +72,17 @@ typedef struct GobFileHandle
 typedef struct Gob
 {
     char fpath[128];
-    stdFile_t fhand;
+    stdFile_t hGobFile;
     uint32_t numFiles;
     stdGobEntry* entries;
-    tHashTable* entriesHashtable;
-    uint32_t numFilesOpen;
-    GobFileHandle *openedFile;
-    GobFileHandle *lastReadFile;
-    uint32_t viewMapped;
-    void* viewAddr;
-    uint32_t viewHandle2;
-    uint32_t viewHandle;
+    tHashTable* pDirHash;
+    uint32_t numHandles;
+    GobFileHandle *aHandles;
+    GobFileHandle *pCurHandle;
+    uint32_t bFileMap;
+    void* pBase;
+    uint32_t hFile;
+    uint32_t hMapFile;
 } Gob;
 
 int stdGob_Startup(HostServices *pHS_in);

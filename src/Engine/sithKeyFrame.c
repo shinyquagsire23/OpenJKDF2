@@ -19,10 +19,10 @@ int sithKeyFrame_Load(SithWorld *world, int a2)
         return 0;
 
     stdConffile_ReadArgs();
-    if ( _memcmp(stdConffile_g_entry.args[0].value, "world", 6u) || _memcmp(stdConffile_g_entry.args[1].value, "aKeyframes", 0xAu) )
+    if ( _memcmp(stdConffile_g_entry.aArgs[0].value, "world", 6u) || _memcmp(stdConffile_g_entry.aArgs[1].value, "aKeyframes", 0xAu) )
         return 0;
 
-    int sizeKeyframes = _atoi(stdConffile_g_entry.args[2].value);
+    int sizeKeyframes = _atoi(stdConffile_g_entry.aArgs[2].value);
     if ( !sizeKeyframes )
         return 1;
 
@@ -35,11 +35,11 @@ int sithKeyFrame_Load(SithWorld *world, int a2)
 
     while ( stdConffile_ReadArgs() )
     {
-        if ( !_memcmp(stdConffile_g_entry.args[0].value, "end", 4u) )
+        if ( !_memcmp(stdConffile_g_entry.aArgs[0].value, "end", 4u) )
             return 1;
         
         // Weird inline?
-        if ( !sithKeyFrame_LoadEntry(stdConffile_g_entry.args[1].value) )
+        if ( !sithKeyFrame_LoadEntry(stdConffile_g_entry.aArgs[1].value) )
         {
             stdPrintf(
                 pSithHS->errorPrint,

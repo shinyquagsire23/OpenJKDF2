@@ -11,7 +11,7 @@ static wchar_t stdStrTable_tmpBuf[64];
 int stdStrTable_Load(stdStrTable *strtable, char *fpath)
 {
     int v2; // edi
-    int fhand; // ebp
+    int hGobFile; // ebp
     char *i; // esi
     char v6; // al
     int v11; // ebx
@@ -40,19 +40,19 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
     numMsgs = 0;
     strtable->pHashtbl = 0;
     strtable->magic_sTbl = 0;
-    fhand = std_g_pHS->fileOpen(fpath, "rt");
+    hGobFile = std_g_pHS->fileOpen(fpath, "rt");
 
-    if ( !fhand )
+    if ( !hGobFile )
         return 0;
 
     do
     {
-        std_g_pHS->fileGets(fhand, a1a, 255);
+        std_g_pHS->fileGets(hGobFile, a1a, 255);
         if ( !_strchr(a1a, 10) )
         {
             do
             {
-                std_g_pHS->fileGets(fhand, v32, 64);
+                std_g_pHS->fileGets(hGobFile, v32, 64);
             }
             while ( !_strchr(v32, '\n') );
         }
@@ -66,7 +66,7 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
 
     if ( _sscanf(a1a, "MSGS %d", &numMsgs) != 1 )
     {
-        std_g_pHS->fileClose(fhand);
+        std_g_pHS->fileClose(hGobFile);
         std_g_pHS->errorPrint("Bad 'MSG n' line in string table file '%s'\n", fpath);
         return 0;
     }
@@ -90,11 +90,11 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
         v12 = 0;
         do
         {
-            std_g_pHS->fileGets(fhand, a1a, 255);
+            std_g_pHS->fileGets(hGobFile, a1a, 255);
             if ( !_strchr(a1a, '\n') )
             {
                 do
-                    std_g_pHS->fileGets(fhand, v32, 64);
+                    std_g_pHS->fileGets(hGobFile, v32, 64);
                 while ( !_strchr(v32, '\n') );
             }
             for ( j = a1a; __isspace(*j); ++j )
@@ -171,11 +171,11 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
         v21 = 0;
         do
         {
-            std_g_pHS->fileGets(fhand, a1a, 255);
+            std_g_pHS->fileGets(hGobFile, a1a, 255);
             if ( !_strchr(a1a, '\n') )
             {
                 do
-                    std_g_pHS->fileGets(fhand, v32, 64);
+                    std_g_pHS->fileGets(hGobFile, v32, 64);
                 while ( !_strchr(v32, '\n') );
             }
             for ( k = a1a; __isspace(*k); ++k )
@@ -193,7 +193,7 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
         }
     }
     strtable->magic_sTbl = 0x7354626C;
-    std_g_pHS->fileClose(fhand);
+    std_g_pHS->fileClose(hGobFile);
     return v11;
 }
 
@@ -243,7 +243,7 @@ wchar_t* stdStrTable_GetValue(stdStrTable* pTable, const char *key)
     return result;
 }
 
-int stdStrTable_ReadLine(stdFile_t fhand, char *buf, int bufLen)
+int stdStrTable_ReadLine(stdFile_t hGobFile, char *buf, int bufLen)
 {
     int found;
     char *p;
@@ -252,11 +252,11 @@ int stdStrTable_ReadLine(stdFile_t fhand, char *buf, int bufLen)
     found = 0;
     do
     {
-        std_g_pHS->fileGets(fhand, buf, bufLen);
+        std_g_pHS->fileGets(hGobFile, buf, bufLen);
         if ( !_strchr(buf, '\n') )
         {
             do
-                std_g_pHS->fileGets(fhand, tmpBuf, 64);
+                std_g_pHS->fileGets(hGobFile, tmpBuf, 64);
             while ( !_strchr(tmpBuf, '\n') );
         }
         for ( p = buf; __isspace(*p); ++p )
@@ -268,7 +268,7 @@ int stdStrTable_ReadLine(stdFile_t fhand, char *buf, int bufLen)
     return 1;
 }
 
-int stdStrTable_ParseUniLine(stdFile_t fhand, wchar_t *buf)
+int stdStrTable_ParseUniLine(stdFile_t hGobFile, wchar_t *buf)
 {
     int found;
     wchar_t *p;
@@ -277,11 +277,11 @@ int stdStrTable_ParseUniLine(stdFile_t fhand, wchar_t *buf)
     found = 0;
     do
     {
-        std_g_pHS->fileGetws(fhand, buf, 10);
+        std_g_pHS->fileGetws(hGobFile, buf, 10);
         if ( !__wcschr(buf, L'\n') )
         {
             do
-                std_g_pHS->fileGetws(fhand, tmpBuf, 10);
+                std_g_pHS->fileGetws(hGobFile, tmpBuf, 10);
             while ( !__wcschr(tmpBuf, L'\n') );
         }
         for ( p = buf; iswspace(*p); ++p )

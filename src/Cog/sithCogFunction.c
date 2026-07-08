@@ -1154,10 +1154,10 @@ void sithCogFunction_FireProjectileInternal(sithCog *ctx, int extra)
     int mode = sithCogExec_PopInt(ctx);
     sithSound* fireSound = sithCogExec_PopSound(ctx);
     SithThing* projectileTemplate = sithCogExec_PopTemplate(ctx);
-    SithThing* sender = sithCogExec_PopThing(ctx);
+    SithThing* pMeshCollided = sithCogExec_PopThing(ctx);
 
-    if (sender) {
-        projectileTemplate = sithWeapon_FireProjectile(sender,projectileTemplate,fireSound,mode,&fireOffset,&aimError,scale,(int16_t)scaleFlags,autoaimFov,autoaimMaxDist,extra);
+    if (pMeshCollided) {
+        projectileTemplate = sithWeapon_FireProjectile(pMeshCollided,projectileTemplate,fireSound,mode,&fireOffset,&aimError,scale,(int16_t)scaleFlags,autoaimFov,autoaimMaxDist,extra);
         if (projectileTemplate) {
             sithCogExec_PushInt(ctx,projectileTemplate->idx);
             return;
@@ -1716,7 +1716,7 @@ void sithCogFunction_SendMessageExRadius(sithCog *ctx)
     int message;
     uint32_t uVar4;
     int iVar5;
-    SithThing *sender;
+    SithThing *pMeshCollided;
     int local_28;
     rdVector3 local_1c;
 
@@ -1737,16 +1737,16 @@ void sithCogFunction_SendMessageExRadius(sithCog *ctx)
         local_28 = local_28 + 1;
         do 
         {
-            sender = &sithWorld_g_pCurrentWorld->aThings[iVar5_idx];
-            if (((((uVar4 & 1 << (sender->type & 0x1f)) != 0) 
-                && ((sender->flags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_DESTROYED)) == 0))
-                && ((sender->type != 10 || ((uVar4 & 0x400) != 0)))) 
-                && (fVar3 = (sender->position).x - local_1c.x, fVar1 = (sender->position).y - local_1c.y,
-                    fVar2 = (sender->position).z - local_1c.z,
+            pMeshCollided = &sithWorld_g_pCurrentWorld->aThings[iVar5_idx];
+            if (((((uVar4 & 1 << (pMeshCollided->type & 0x1f)) != 0) 
+                && ((pMeshCollided->flags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_DESTROYED)) == 0))
+                && ((pMeshCollided->type != 10 || ((uVar4 & 0x400) != 0)))) 
+                && (fVar3 = (pMeshCollided->position).x - local_1c.x, fVar1 = (pMeshCollided->position).y - local_1c.y,
+                    fVar2 = (pMeshCollided->position).z - local_1c.z,
                     fVar1 = stdMath_Sqrt(fVar2 * fVar2 + fVar1 * fVar1 + fVar3 * fVar3),
                     fVar1 <= fVar6))
             {
-                sithCog_ThingSendMessageEx(sender, NULL, message, param0, param1, local_8, local_4);
+                sithCog_ThingSendMessageEx(pMeshCollided, NULL, message, param0, param1, local_8, local_4);
             }
             iVar5_idx--;
             local_28--;

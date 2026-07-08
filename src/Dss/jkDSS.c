@@ -302,7 +302,7 @@ void jkDSS_SendSetSaberInfoMots(SithThing *thing, int personality)
     NETMSG_PUSHS32(thing->guid);
     NETMSG_PUSHSTR(thing->renderData.model3->filename, 0x20);
 #ifdef SITH_DEBUG_STRUCT_NAMES
-    NETMSG_PUSHSTR(thing->pSoundClass->snd_fname, 0x20);
+    NETMSG_PUSHSTR(thing->pSoundClass->aName, 0x20);
 #else
     const char* dummy = "ky.snd";
     NETMSG_PUSHSTR(dummy, 0x20);
@@ -400,7 +400,7 @@ void jkDSS_SendSetSaberInfo(SithThing *thing)
     NETMSG_PUSHS32(thing->guid);
     NETMSG_PUSHSTR(thing->renderData.model3->filename, 0x20);
 #ifdef SITH_DEBUG_STRUCT_NAMES
-    NETMSG_PUSHSTR(thing->pSoundClass->snd_fname, 0x20);
+    NETMSG_PUSHSTR(thing->pSoundClass->aName, 0x20);
 #else
     const char* dummy = "ky.snd";
     NETMSG_PUSHSTR(dummy, 0x20);

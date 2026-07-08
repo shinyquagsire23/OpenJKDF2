@@ -568,31 +568,31 @@ int sithControl_ReadConf()
     stdControl_Reset();
     if ( !stdConffile_ReadArgs()
       || !stdConffile_g_entry.numArgs
-      || strcmp(stdConffile_g_entry.args[0].key, "flags")
-      || _sscanf(stdConffile_g_entry.args[0].value, "%x", &sithWeapon_controlOptions) != 1 )
+      || strcmp(stdConffile_g_entry.aArgs[0].key, "flags")
+      || _sscanf(stdConffile_g_entry.aArgs[0].value, "%x", &sithWeapon_controlOptions) != 1 )
     {
         return 0;
     }
     while ( stdConffile_ReadArgs() )
     {
-        if ( !_strcmp(stdConffile_g_entry.args[0].key, "end.") )
+        if ( !_strcmp(stdConffile_g_entry.aArgs[0].key, "end.") )
             break;
         v18 = 0.0;
-        if ( !_strcmp(stdConffile_g_entry.args[0].value, "axis") )
+        if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "axis") )
         {
-            _atoi(stdConffile_g_entry.args[1].value);
-            _atof(stdConffile_g_entry.args[2].value);
+            _atoi(stdConffile_g_entry.aArgs[1].value);
+            _atof(stdConffile_g_entry.aArgs[2].value);
         }
         else
         {
-            v0 = _atoi(stdConffile_g_entry.args[1].value);
+            v0 = _atoi(stdConffile_g_entry.aArgs[1].value);
             v1 = v0;
-            if ( v0 <= 0x4A && (sithControl_inputFuncToControlType[v0] & 1) != 0 && _sscanf(stdConffile_g_entry.args[3].value, "%x", &v19) == 1 )
+            if ( v0 <= 0x4A && (sithControl_inputFuncToControlType[v0] & 1) != 0 && _sscanf(stdConffile_g_entry.aArgs[3].value, "%x", &v19) == 1 )
             {
-                dxKeyNum = _atoi(stdConffile_g_entry.args[2].value);
+                dxKeyNum = _atoi(stdConffile_g_entry.aArgs[2].value);
                 dxKeyNum_ = dxKeyNum;
                 if ( stdConffile_g_entry.numArgs > 4u )
-                    v18 = _atof(stdConffile_g_entry.args[4].value);
+                    v18 = _atof(stdConffile_g_entry.aArgs[4].value);
                 v3 = v19;
                 if ( (v19 & INPUT_MAPPING_FLAG_DXKEY) != 0 )
                 {

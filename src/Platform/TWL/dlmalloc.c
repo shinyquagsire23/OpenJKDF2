@@ -5986,8 +5986,8 @@ int mspace_mallopt(int param_number, int value) {
   * MORECORE need not handle negative arguments -- it may instead
       just return MFAIL when given negative arguments.
       Negative arguments are always multiples of pagesize. MORECORE
-      must not misinterpret negative args as large positive unsigned
-      args. You can suppress all such calls from even occurring by defining
+      must not misinterpret negative aArgs as large positive unsigned
+      aArgs. You can suppress all such calls from even occurring by defining
       MORECORE_CANNOT_TRIM,
 
   As an example alternative MORECORE, here is a custom allocator

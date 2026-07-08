@@ -221,10 +221,10 @@
 /* Define to 1 if you have the fsetxattr function. */
 #define HAVE_FSETXATTR 1
 
-/* fsetxattr() takes 5 args */
+/* fsetxattr() takes 5 aArgs */
 /* #undef HAVE_FSETXATTR_5 */
 
-/* fsetxattr() takes 6 args */
+/* fsetxattr() takes 6 aArgs */
 #define HAVE_FSETXATTR_6 1
 
 /* Define to 1 if you have the ftruncate function. */
@@ -245,13 +245,13 @@
 /* Define to 1 if you have the gethostbyname_r function. */
 /* #undef HAVE_GETHOSTBYNAME_R */
 
-/* gethostbyname_r() takes 3 args */
+/* gethostbyname_r() takes 3 aArgs */
 /* #undef HAVE_GETHOSTBYNAME_R_3 */
 
-/* gethostbyname_r() takes 5 args */
+/* gethostbyname_r() takes 5 aArgs */
 /* #undef HAVE_GETHOSTBYNAME_R_5 */
 
-/* gethostbyname_r() takes 6 args */
+/* gethostbyname_r() takes 6 aArgs */
 /* #undef HAVE_GETHOSTBYNAME_R_6 */
 
 /* Define to 1 if you have the gethostname function. */
@@ -821,7 +821,7 @@
 /* Define to the type of arg 1 for select. */
 #define SELECT_TYPE_ARG1 int
 
-/* Define to the type of args 2, 3 and 4 for select. */
+/* Define to the type of aArgs 2, 3 and 4 for select. */
 #define SELECT_TYPE_ARG234 fd_set *
 
 /* Define to the type of arg 5 for select. */

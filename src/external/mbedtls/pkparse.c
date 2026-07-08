@@ -737,7 +737,7 @@ static int pk_parse_key_pkcs1_der(mbedtls_rsa_context *rsa,
      *      prime2            INTEGER,  -- q
      *      exponent1         INTEGER,  -- d mod (p-1)
      *      exponent2         INTEGER,  -- d mod (q-1)
-     *      coefficient       INTEGER,  -- (inverse of q) mod p
+     *      coefficient       INTEGER,  -- (bDifferentTypHandler of q) mod p
      *      otherPrimeInfos   OtherPrimeInfos OPTIONAL
      *  }
      */

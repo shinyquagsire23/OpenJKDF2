@@ -1589,13 +1589,13 @@ void jkMain_FixRes()
     stdDisplay_pCurVideoMode->format.width = newW;
     stdDisplay_pCurVideoMode->format.height = newH;
     stdDisplay_pCurVideoMode->widthMaybe = newW;
-    stdDisplay_pCurVideoMode->format.width_in_pixels = newW;
-    stdDisplay_pCurVideoMode->format.width_in_bytes = newW;
+    stdDisplay_pCurVideoMode->format.rowWidth = newW;
+    stdDisplay_pCurVideoMode->format.rowSize = newW;
     
-    Video_menuBuffer.format.width_in_pixels = newW;
-    Video_otherBuf.format.width_in_pixels = newW;
-    Video_menuBuffer.format.width_in_bytes = newW;
-    Video_otherBuf.format.width_in_bytes = newW;
+    Video_menuBuffer.format.rowWidth = newW;
+    Video_otherBuf.format.rowWidth = newW;
+    Video_menuBuffer.format.rowSize = newW;
+    Video_otherBuf.format.rowSize = newW;
     Video_menuBuffer.format.width = newW;
     Video_otherBuf.format.width = newW;
     Video_menuBuffer.format.height = newH;
@@ -1690,13 +1690,13 @@ int jkMain_SetVideoMode()
     stdDisplay_pCurVideoMode->format.width = newW;
     stdDisplay_pCurVideoMode->format.height = newH;
     stdDisplay_pCurVideoMode->widthMaybe = newW;
-    stdDisplay_pCurVideoMode->format.width_in_pixels = newW;
-    stdDisplay_pCurVideoMode->format.width_in_bytes = newW;
+    stdDisplay_pCurVideoMode->format.rowWidth = newW;
+    stdDisplay_pCurVideoMode->format.rowSize = newW;
     
-    Video_menuBuffer.format.width_in_pixels = newW;
-    Video_otherBuf.format.width_in_pixels = newW;
-    Video_menuBuffer.format.width_in_bytes = newW;
-    Video_otherBuf.format.width_in_bytes = newW;
+    Video_menuBuffer.format.rowWidth = newW;
+    Video_otherBuf.format.rowWidth = newW;
+    Video_menuBuffer.format.rowSize = newW;
+    Video_otherBuf.format.rowSize = newW;
     Video_menuBuffer.format.width = newW;
     Video_otherBuf.format.width = newW;
     Video_menuBuffer.format.height = newH;

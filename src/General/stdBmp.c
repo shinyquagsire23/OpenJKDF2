@@ -29,27 +29,27 @@ int stdBmp_LoadEntryFromFile(const char *fpath, stdBitmap *bitmap, int create_dd
     tRasterInfo format;
     const char *fname;
 
-    int fhand = std_g_pHS->fileOpen(fpath, "rb");
-    if ( !fhand )
+    int hGobFile = std_g_pHS->fileOpen(fpath, "rb");
+    if ( !hGobFile )
         return 0;
 
-    int headerRead = std_g_pHS->fileRead(fhand, &bmpHeader, sizeof(stdBmp_Header));
-    int infoRead = std_g_pHS->fileRead(fhand, &infoHeader, sizeof(stdBmp_InfoHeader));
+    int headerRead = std_g_pHS->fileRead(hGobFile, &bmpHeader, sizeof(stdBmp_Header));
+    int infoRead = std_g_pHS->fileRead(hGobFile, &infoHeader, sizeof(stdBmp_InfoHeader));
     if ( headerRead + infoRead != sizeof(stdBmp_Header) + sizeof(stdBmp_InfoHeader) )
     {
-        std_g_pHS->fileClose(fhand);
+        std_g_pHS->fileClose(hGobFile);
         return 0;
     }
 
     if ( bmpHeader.magic != 0x4D42 ) // 'BM'
     {
-        std_g_pHS->fileClose(fhand);
+        std_g_pHS->fileClose(hGobFile);
         return 0;
     }
 
     if ( infoHeader.headerSize != 0x28 )
     {
-        std_g_pHS->fileClose(fhand);
+        std_g_pHS->fileClose(hGobFile);
         return 0;
     }
 
@@ -58,7 +58,7 @@ int stdBmp_LoadEntryFromFile(const char *fpath, stdBitmap *bitmap, int create_dd
     {
         int paletteSize = (1 << infoHeader.bpp) * 4;
         paletteData = STD_ALLOC(paletteSize + sizeof(tRasterInfo));
-        int palRead = std_g_pHS->fileRead(fhand, paletteData, paletteSize);
+        int palRead = std_g_pHS->fileRead(hGobFile, paletteData, paletteSize);
         if ( palRead != paletteSize )
         {
             std_g_pHS->assert("Unable to read the palette. Your BMP file may be corrupt.", ".\\General\\stdBmp.c", 0x122);
@@ -141,7 +141,7 @@ int stdBmp_LoadEntryFromFile(const char *fpath, stdBitmap *bitmap, int create_dd
     tVBuffer *vbuf = bitmap->mipSurfaces[0];
     int height = vbuf->format.height;
     uint8_t *pixels = (uint8_t *)vbuf->surface_lock_alloc;
-    int stride = vbuf->format.width_in_bytes;
+    int stride = vbuf->format.rowSize;
 
     // Read rows
 #ifdef TARGET_RETRO_HOMEBREW
@@ -154,20 +154,20 @@ int stdBmp_LoadEntryFromFile(const char *fpath, stdBitmap *bitmap, int create_dd
 #ifdef TARGET_RETRO_HOMEBREW
         int bytesRead;
         if (pRowTmp) {
-            bytesRead = std_g_pHS->fileRead(fhand, pRowTmp, vbuf->format.width_in_bytes);
-            stdPlatform_Memcpy32(pixels, pRowTmp, vbuf->format.width_in_bytes);
+            bytesRead = std_g_pHS->fileRead(hGobFile, pRowTmp, vbuf->format.rowSize);
+            stdPlatform_Memcpy32(pixels, pRowTmp, vbuf->format.rowSize);
         } else {
-            bytesRead = std_g_pHS->fileRead(fhand, pixels, vbuf->format.width_in_bytes);
+            bytesRead = std_g_pHS->fileRead(hGobFile, pixels, vbuf->format.rowSize);
         }
 #else
-        int bytesRead = std_g_pHS->fileRead(fhand, pixels, vbuf->format.width_in_bytes);
+        int bytesRead = std_g_pHS->fileRead(hGobFile, pixels, vbuf->format.rowSize);
 #endif
-        if ( bytesRead != (int)vbuf->format.width_in_bytes )
+        if ( bytesRead != (int)vbuf->format.rowSize )
         {
             std_g_pHS->assert("Unable to read all the data from file.", ".\\General\\stdBmp.c", 0x17E);
         }
         // Skip padding to 4-byte alignment
-        std_g_pHS->fseek(fhand, ((stride + 3) & ~3) - stride, 1);
+        std_g_pHS->fseek(hGobFile, ((stride + 3) & ~3) - stride, 1);
         pixels += stride;
     }
 
@@ -202,7 +202,7 @@ int stdBmp_LoadEntryFromFile(const char *fpath, stdBitmap *bitmap, int create_dd
 #endif
 
     stdDisplay_VBufferUnlock(vbuf);
-    std_g_pHS->fileClose(fhand);
+    std_g_pHS->fileClose(hGobFile);
     return 1;
 }
 
@@ -247,8 +247,8 @@ int stdBmp_Write(const char *fpath, stdBitmap *bitmap)
     bmpHeader.dataOffset = paletteSize + sizeof(stdBmp_Header) + sizeof(stdBmp_InfoHeader);
     bmpHeader.fileSize = rowBytes + bmpHeader.dataOffset;
 
-    int fhand = std_g_pHS->fileOpen(fpath, "wb");
-    if ( !fhand )
+    int hGobFile = std_g_pHS->fileOpen(fpath, "wb");
+    if ( !hGobFile )
     {
         stdPrintf(std_g_pHS->errorPrint, ".\\General\\stdBmp.c", 0x1FB,
                   "Unable to open file '%s' for writing.", fpath);
@@ -256,34 +256,34 @@ int stdBmp_Write(const char *fpath, stdBitmap *bitmap)
     }
 
     // Write BMP header
-    int written = std_g_pHS->fileWrite(fhand, &bmpHeader, sizeof(stdBmp_Header));
+    int written = std_g_pHS->fileWrite(hGobFile, &bmpHeader, sizeof(stdBmp_Header));
     if ( written != sizeof(stdBmp_Header) )
     {
         stdPrintf(std_g_pHS->errorPrint, ".\\General\\stdBmp.c", 0x204,
                   "Error attempting to write %d bytes to '%s'.", sizeof(stdBmp_Header), fpath);
-        std_g_pHS->fileClose(fhand);
+        std_g_pHS->fileClose(hGobFile);
         return 0;
     }
 
     // Write info header
-    written = std_g_pHS->fileWrite(fhand, &infoHeader, sizeof(stdBmp_InfoHeader));
+    written = std_g_pHS->fileWrite(hGobFile, &infoHeader, sizeof(stdBmp_InfoHeader));
     if ( written != sizeof(stdBmp_InfoHeader) )
     {
         stdPrintf(std_g_pHS->errorPrint, ".\\General\\stdBmp.c", 0x20E,
                   "Error attempting to write %d bytes to '%s'.", sizeof(stdBmp_InfoHeader), fpath);
-        std_g_pHS->fileClose(fhand);
+        std_g_pHS->fileClose(hGobFile);
         return 0;
     }
 
     // Write palette if present
     if ( paletteSize > 0 )
     {
-        written = std_g_pHS->fileWrite(fhand, bitmap->palette, paletteSize);
+        written = std_g_pHS->fileWrite(hGobFile, bitmap->palette, paletteSize);
         if ( (uint32_t)written != paletteSize )
         {
             stdPrintf(std_g_pHS->errorPrint, ".\\General\\stdBmp.c", 0x21C,
                       "Error attempting to write %d bytes to '%s'.", paletteSize, fpath);
-            std_g_pHS->fileClose(fhand);
+            std_g_pHS->fileClose(hGobFile);
             return 0;
         }
     }
@@ -293,16 +293,16 @@ int stdBmp_Write(const char *fpath, stdBitmap *bitmap)
     uint32_t rowStride = (vbuf->format.width * vbuf->format.format.bpp) >> 3;
     while ( --height >= 0 )
     {
-        written = std_g_pHS->fileWrite(fhand, (uint8_t *)vbuf->surface_lock_alloc + height * vbuf->format.width_in_bytes, rowStride);
+        written = std_g_pHS->fileWrite(hGobFile, (uint8_t *)vbuf->surface_lock_alloc + height * vbuf->format.rowSize, rowStride);
         if ( (uint32_t)written != rowStride )
         {
             stdPrintf(std_g_pHS->errorPrint, ".\\General\\stdBmp.c", 0x22D,
                       "Error attempting to write %d bytes to '%s'.", rowStride, fpath);
-            std_g_pHS->fileClose(fhand);
+            std_g_pHS->fileClose(hGobFile);
             return 0;
         }
     }
 
-    std_g_pHS->fileClose(fhand);
+    std_g_pHS->fileClose(hGobFile);
     return 1;
 }

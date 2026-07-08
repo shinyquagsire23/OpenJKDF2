@@ -18,8 +18,8 @@ stdBitmap* stdPcx_Load(char *fpath, int create_ddraw_surface, int gpu_mem)
     tRasterInfo format;
     stdPcx_Header pcxHeader;
 
-    int fhand = std_g_pHS->fileOpen(fpath, "rb");
-    if ( !fhand )
+    int hGobFile = std_g_pHS->fileOpen(fpath, "rb");
+    if ( !hGobFile )
         return 0;
 
     bitmap = (stdBitmap *)STD_ALLOC(sizeof(stdBitmap));
@@ -27,7 +27,7 @@ stdBitmap* stdPcx_Load(char *fpath, int create_ddraw_surface, int gpu_mem)
         goto fail; // TODO will this nullptr deref?
 
     _memset(bitmap, 0, sizeof(stdBitmap));
-    std_g_pHS->fileRead(fhand, &pcxHeader, sizeof(stdPcx_Header));
+    std_g_pHS->fileRead(hGobFile, &pcxHeader, sizeof(stdPcx_Header));
     if ( pcxHeader.magic != 10 )
         goto fail;
 
@@ -58,12 +58,12 @@ stdBitmap* stdPcx_Load(char *fpath, int create_ddraw_surface, int gpu_mem)
 
     mipSurface = bitmap->mipSurfaces[0];
     lockAlloc = (char*)mipSurface->surface_lock_alloc;
-    for (int i = 0; i < mipSurface->format.texture_size_in_bytes; i++ )
+    for (int i = 0; i < mipSurface->format.size; i++ )
     {
-        uint8_t v11 = stdFGetc(fhand);
+        uint8_t v11 = stdFGetc(hGobFile);
         if ((v11 & 0xC0) == 0xC0)
         {
-            uint8_t v13 = stdFGetc(fhand);
+            uint8_t v13 = stdFGetc(hGobFile);
             uint32_t v16 = (v11 & 0x3F);
             uint32_t v15 = (v11 & 0x3F) - 1;
             if (v11 & 0x3F)
@@ -85,9 +85,9 @@ stdBitmap* stdPcx_Load(char *fpath, int create_ddraw_surface, int gpu_mem)
     bitmap->palette = paletteAlloc;
     if ( paletteAlloc )
     {
-        stdFGetc(fhand);
-        std_g_pHS->fileRead(fhand, (void *)bitmap->palette, 0x300);
-        std_g_pHS->fileClose(fhand);
+        stdFGetc(hGobFile);
+        std_g_pHS->fileRead(hGobFile, (void *)bitmap->palette, 0x300);
+        std_g_pHS->fileClose(hGobFile);
     }
     else
     {
@@ -96,7 +96,7 @@ stdBitmap* stdPcx_Load(char *fpath, int create_ddraw_surface, int gpu_mem)
     return bitmap;
     
 fail:
-    std_g_pHS->fileClose(fhand);
+    std_g_pHS->fileClose(hGobFile);
     stdBitmap_Free(bitmap);
     return NULL;
 }
@@ -125,11 +125,11 @@ int stdPcx_Write(char *fpath, stdBitmap *bitmap)
     _memset(&pcxHeader.width, 0, 0x38u);
     *(uint16_t*)&pcxHeader.reserved_4A[52] = 0;
     
-    int fhand = std_g_pHS->fileOpen(fpath, "wb");
-    if ( !fhand )
+    int hGobFile = std_g_pHS->fileOpen(fpath, "wb");
+    if ( !hGobFile )
         return 0;
 
-    std_g_pHS->fileWrite(fhand, &pcxHeader, sizeof(stdPcx_Header));
+    std_g_pHS->fileWrite(hGobFile, &pcxHeader, sizeof(stdPcx_Header));
     mipSurface = *bitmap->mipSurfaces;
     lockAlloc = (uint8_t*)mipSurface->surface_lock_alloc;
     for (int i = 0; i < mipSurface->format.height; i++)
@@ -148,14 +148,14 @@ int stdPcx_Write(char *fpath, stdBitmap *bitmap)
             }
 
             if ( v15 > 1u || v13 > 0xBFu )
-                stdFPutc(v15 | 0xC0, fhand);
-            stdFPutc(*v14, fhand);
+                stdFPutc(v15 | 0xC0, hGobFile);
+            stdFPutc(*v14, hGobFile);
             j += v15;
         }
     }
 
-    stdFPutc(0xC, fhand);
-    std_g_pHS->fileWrite(fhand, bitmap->palette, 0x300);
-    std_g_pHS->fileClose(fhand);
+    stdFPutc(0xC, hGobFile);
+    std_g_pHS->fileWrite(hGobFile, bitmap->palette, 0x300);
+    std_g_pHS->fileClose(hGobFile);
     return 1;
 }

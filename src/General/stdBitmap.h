@@ -78,7 +78,7 @@ void stdBitmap_ConvertColorFormat(rdTexFormat *formatTo, stdBitmap *bitmap);
 void stdBitmap_FreeEntry(stdBitmap *pBitmap);
 void stdBitmap_Free(stdBitmap *bitmap);
 
-int stdBitmap_AppendToFile(stdFile_t fhand, stdBitmap *pBitmap);
+int stdBitmap_AppendToFile(stdFile_t hGobFile, stdBitmap *pBitmap);
 int stdBitmap_Write(const char *fpath, stdBitmap *pBitmap);
 void stdBitmap_MemUsage(stdBitmap *pBitmap, int mipIdx, tVBuffer *vbuf);
 stdBitmap* stdBitmap_New(uint32_t numMips, int palFmt, int field_20, int field_68, rdTexFormat *pFormat);

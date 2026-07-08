@@ -66,7 +66,7 @@ static int (*stdDisplay_SetMasterPalette)(uint8_t* pal) = (void*)stdDisplay_SetM
 static int (*stdDisplay_DDrawGdiSurfaceFlip)() = (void*)stdDisplay_DDrawGdiSurfaceFlip_ADDR;
 static int (*stdDisplay_ClearRect)(tVBuffer *buf, int fillColor, rdRect *rect) = (void*)stdDisplay_ClearRect_ADDR;
 static int (*stdDisplay_SetMode)(unsigned int modeIdx, const void *palette, int paged) = (void*)stdDisplay_SetMode_ADDR;
-static int (*stdDisplay_FindClosestMode)(render_pair *a1, struct StdVideoMode *render_surface, unsigned int max_modes) = (void*)stdDisplay_FindClosestMode_ADDR;
+static int (*stdDisplay_FindClosestMode)(render_pair *a1, struct StdVideoMode *render_surface, unsigned int numModes) = (void*)stdDisplay_FindClosestMode_ADDR;
 static int (*stdDisplay_FindClosestDevice)(stdDeviceParams *a1) = (void*)stdDisplay_FindClosestDevice_ADDR;
 static void (*stdDisplay_Close)() = (void*)stdDisplay_Close_ADDR;
 static int (*stdDisplay_Open)(unsigned int index) = (void*)stdDisplay_Open_ADDR;
@@ -91,7 +91,7 @@ int stdDisplay_DDrawGdiSurfaceFlip();
 int stdDisplay_ddraw_waitforvblank();
 int stdDisplay_ClearRect(tVBuffer *buf, int fillColor, rdRect *rect);
 MATH_FUNC int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged);
-int stdDisplay_FindClosestMode(render_pair *a1, struct StdVideoMode *render_surface, unsigned int max_modes);
+int stdDisplay_FindClosestMode(render_pair *a1, struct StdVideoMode *render_surface, unsigned int numModes);
 int stdDisplay_FindClosestDevice(void* a);
 int stdDisplay_Open(int a); // MOTS altered (added a video mode)
 void stdDisplay_Close();

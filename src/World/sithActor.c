@@ -76,29 +76,29 @@ void sithActor_Update(SithThing *thing, int deltaMs)
 }
 
 // MOTS altered
-flex_t sithActor_DamageActor(SithThing *sender, SithThing *receiver, flex_t amount, int flags)
+flex_t sithActor_DamageActor(SithThing *pMeshCollided, SithThing *pThingCollided, flex_t amount, int flags)
 {
     SithThing *receiver_; // edi
     flex_d_t v6; // st7
     SithThing *v7; // eax
     flex_t fR; // [esp+0h] [ebp-1Ch]
 
-    if ( sithNet_isMulti && (sender->flags & SITH_TF_INVULN) != 0 )
+    if ( sithNet_isMulti && (pMeshCollided->flags & SITH_TF_INVULN) != 0 )
     {
-        receiver_ = receiver;
+        receiver_ = pThingCollided;
         goto LABEL_32;
     }
-    if ( (sender->actorParams.flags & SITH_AF_INVULNERABLE) != 0 && flags != 0x40 )
+    if ( (pMeshCollided->actorParams.flags & SITH_AF_INVULNERABLE) != 0 && flags != 0x40 )
         return 0.0;
-    if ( sender->actorParams.health <= 0.0 )
+    if ( pMeshCollided->actorParams.health <= 0.0 )
         return amount;
-    receiver_ = receiver;
-    if ( sender->type == SITH_THING_PLAYER )
+    receiver_ = pThingCollided;
+    if ( pMeshCollided->type == SITH_THING_PLAYER )
     {
         v6 = sithInventory_BroadcastMessage(
-                 sender,
+                 pMeshCollided,
                  SENDERTYPE_THING,
-                 receiver->idx,
+                 pThingCollided->idx,
                  SITH_MESSAGE_DAMAGED,
                  0x10,
                  amount,
@@ -109,11 +109,11 @@ flex_t sithActor_DamageActor(SithThing *sender, SithThing *receiver, flex_t amou
         if ( v6 == 0.0 )
             return 0.0;
     }
-    if ( receiver )
+    if ( pThingCollided )
     {
-        if ( receiver != sender && sender->controlType == SITH_CT_AI )
-            sithAI_EmitEvent(sender->actor, SITHAI_MODE_MOVING, (intptr_t)receiver);
-        v7 = sithThing_GetThingParent(receiver);
+        if ( pThingCollided != pMeshCollided && pMeshCollided->controlType == SITH_CT_AI )
+            sithAI_EmitEvent(pMeshCollided->actor, SITHAI_MODE_MOVING, (intptr_t)pThingCollided);
+        v7 = sithThing_GetThingParent(pThingCollided);
         receiver_ = v7;
 
         flex_t damageMult = 1.0;
@@ -122,47 +122,47 @@ flex_t sithActor_DamageActor(SithThing *sender, SithThing *receiver, flex_t amou
           && flags != 0x40
           && v7->type == SITH_THING_ACTOR
           && (v7->actorParams.flags & SITH_AF_FULLDAMAGE) == 0
-          && sender->type == SITH_THING_ACTOR )
+          && pMeshCollided->type == SITH_THING_ACTOR )
         {
             damageMult = 0.1;
 
             // MOTS added: alignment
             if (Main_bMotsCompat
-                && sender->controlType == SITH_CT_AI
-                && sender->actor
-                && sender->actor->pClass
+                && pMeshCollided->controlType == SITH_CT_AI
+                && pMeshCollided->actor
+                && pMeshCollided->actor->pClass
                 && v7->controlType == SITH_CT_AI
                 && v7->actor
                 && v7->actor->pClass) {
 
-                if (v7->actor->pClass->alignment * sender->actor->pClass->alignment <= -1.0) {
+                if (v7->actor->pClass->alignment * pMeshCollided->actor->pClass->alignment <= -1.0) {
                     damageMult = 0.5;
                 }
             }
         }
         amount *= damageMult;
-        if ( sithNet_isMulti && (sithNet_MultiModeFlags & MULTIMODEFLAG_2) != 0 && sithPlayer_sub_4C9060(v7, sender) )
+        if ( sithNet_isMulti && (sithNet_MultiModeFlags & MULTIMODEFLAG_2) != 0 && sithPlayer_sub_4C9060(v7, pMeshCollided) )
             return 0.0;
     }
 
-    sender->actorParams.health -= amount;
-    if ( sender == sithPlayer_g_pLocalPlayerThing )
+    pMeshCollided->actorParams.health -= amount;
+    if ( pMeshCollided == sithPlayer_g_pLocalPlayerThing )
     {
         fR = amount * 0.04;
         sithPlayer_AddDynamicTint(fR, 0.0, 0.0);
     }
-    if ( sender->actorParams.health >= 1.0 )
+    if ( pMeshCollided->actorParams.health >= 1.0 )
     {
 LABEL_32:
-        if ( sender->pPuppetClass && sender != receiver_ && amount * 0.05 > _frand() )
-            sithPuppet_PlayMode(sender, SITH_ANIM_HIT, 0);
-        sithActor_PlayDamageSoundFx(sender, amount, flags);
+        if ( pMeshCollided->pPuppetClass && pMeshCollided != receiver_ && amount * 0.05 > _frand() )
+            sithPuppet_PlayMode(pMeshCollided, SITH_ANIM_HIT, 0);
+        sithActor_PlayDamageSoundFx(pMeshCollided, amount, flags);
         return amount;
     }
     if ( sithMessage_g_outputstream )
-        sithDSSThing_Death(sender, receiver_, 0, -1, 255);
-    sithActor_KillActor(sender, receiver_, flags);
-    return amount - sender->actorParams.health;
+        sithDSSThing_Death(pMeshCollided, receiver_, 0, -1, 255);
+    sithActor_KillActor(pMeshCollided, receiver_, flags);
+    return amount - pMeshCollided->actorParams.health;
 }
 
 void sithActor_PlayDamageSoundFx(SithThing *thing, flex_t amount, int hurtType)

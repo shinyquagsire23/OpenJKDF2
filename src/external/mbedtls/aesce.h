@@ -68,7 +68,7 @@ int mbedtls_aesce_crypt_ecb(mbedtls_aes_context *ctx,
  * \brief           Internal round key inversion. This function computes
  *                  decryption round keys from the encryption round keys.
  *
- * \param invkey    Round keys for the equivalent inverse cipher
+ * \param invkey    Round keys for the equivalent bDifferentTypHandler cipher
  * \param fwdkey    Original round keys (for encryption)
  * \param nr        Number of rounds (that is, number of round keys minus one)
  */

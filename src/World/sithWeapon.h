@@ -45,7 +45,7 @@ MATH_FUNC void sithWeapon_HandleImpact(SithThing *weapon);
 MATH_FUNC void sithWeapon_sub_4D3920(SithThing *weapon);
 int sithWeapon_ParseArg(StdConffileArg *arg, SithThing *thing, int param);
 MATH_FUNC SithThing* sithWeapon_WeaponFire(SithThing *weapon, SithThing *projectile, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, flex_t scale, int16_t scaleFlags, flex_t a9);
-MATH_FUNC SithThing* sithWeapon_WeaponFireProjectile(SithThing *sender, SithThing *projectileTemplate, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, flex_t scale, char scaleFlags, flex_t a9, int extra);
+MATH_FUNC SithThing* sithWeapon_WeaponFireProjectile(SithThing *pMeshCollided, SithThing *projectileTemplate, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, flex_t scale, char scaleFlags, flex_t a9, int extra);
 void sithWeapon_DamageWeapon(SithThing *weapon, SithThing* a2, flex_t timeLeft);
 MATH_FUNC int sithWeapon_ThingCollisionHandler(SithThing *physicsThing, SithThing *collidedThing, SithCollision *a4, int a5);
 MATH_FUNC int sithWeapon_SurfaceCollisionHandler(SithThing *thing, SithSurface *surface, SithCollision *a3);
@@ -61,7 +61,7 @@ void sithWeapon_ActivateWeapon(SithThing *weapon, sithCog *cogCtx, flex_t fireRa
 flex_t sithWeapon_DeactivateWeapon(SithThing *weapon, sithCog *cogCtx, int mode);
 int sithWeapon_AutoSelect(SithThing *player, int weapIdx);
 int sithWeapon_ProcessWeaponControls(SithThing *player, flex_t a2);
-MATH_FUNC void sithWeapon_GetAimOrient(rdMatrix34 *out, SithThing *sender, rdMatrix34 *in, rdVector3 *fireOffset, flex_t autoaimFov, flex_t autoaimMaxDist);
+MATH_FUNC void sithWeapon_GetAimOrient(rdMatrix34 *out, SithThing *pMeshCollided, rdMatrix34 *in, rdVector3 *fireOffset, flex_t autoaimFov, flex_t autoaimMaxDist);
 MATH_FUNC SithThing* sithWeapon_FireProjectile(SithThing *pSender, SithThing *pProjectileTemplate, sithSound *pFireSound, int mode, rdVector3 *pFireOffset, rdVector3 *pAimError, flex_t scale, int16_t scaleFlags, flex_t autoaimFov, flex_t autoaimMaxDist, int extra);
 flex_t sithWeapon_GetPriority(SithThing *player, int binIdx, int mode);
 int sithWeapon_GetCurWeaponMode();
@@ -87,7 +87,7 @@ void sithWeapon_SetFireRate(SithThing *weapon, flex32_t fireRate);
 //static int (*sithWeapon_AutoSelect)(SithThing *player, int weapIdx) = (void*)sithWeapon_AutoSelect_ADDR;
 //static void (*sithWeapon_GetAimOrient)(rdMatrix34 *a2, SithThing *a3, rdMatrix34 *a4, rdVector3 *a5, flex_t a6, flex_t a7) = (void*)sithWeapon_GetAimOrient_ADDR;
 
-//static SithThing* (*sithWeapon_FireProjectile_0_)(SithThing *sender, SithThing *projectileTemplate, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, flex_t scale, char scaleFlags, flex_t a9) = (void*)sithWeapon_WeaponFireProjectile_ADDR;
+//static SithThing* (*sithWeapon_FireProjectile_0_)(SithThing *pMeshCollided, SithThing *projectileTemplate, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, flex_t scale, char scaleFlags, flex_t a9) = (void*)sithWeapon_WeaponFireProjectile_ADDR;
 //static int (*sithWeapon_HandleWeaponKeys_)(SithThing *a1, flex_t a2) = (void*)sithWeapon_ProcessWeaponControls_ADDR;
 
 #endif // _SITHWEAPON_H

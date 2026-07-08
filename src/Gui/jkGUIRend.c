@@ -142,9 +142,9 @@ void jkGuiRend_DrawRect(tVBuffer *vbuf, rdRect *rect, int16_t color)
     if (!stdDisplay_VBufferLock(vbuf))
         return;
 
-    v36 = rect->y * vbuf->format.width_in_pixels;
+    v36 = rect->y * vbuf->format.rowWidth;
     v12 = rect->y + rect->height;
-    v14 = vbuf->format.width_in_pixels * (v12 - 1);
+    v14 = vbuf->format.rowWidth * (v12 - 1);
     if ( vbuf->format.format.bpp == 8 )
     {
         if ( rect->x < rect->x + rect->width )
@@ -190,11 +190,11 @@ LABEL_22:
         if ( rect->y < v12 )
         {
             v32 = rect->x - v24;
-            v33 = (char*)vbuf->surface_lock_alloc + rect->y * vbuf->format.width_in_pixels + v24;
+            v33 = (char*)vbuf->surface_lock_alloc + rect->y * vbuf->format.rowWidth + v24;
             v34 = v12 - rect->y;
             do
             {
-                v35 = vbuf->format.width_in_pixels;
+                v35 = vbuf->format.rowWidth;
                 // Added: word-safe stores (vbuffers may be word-addressable-only)
                 stdPlatform_WriteByte16(v33 + v32, (uint8_t)color);
                 stdPlatform_WriteByte16(v33, (uint8_t)color);
@@ -209,7 +209,7 @@ LABEL_22:
         uint16_t* as16Bit = (uint16_t*)vbuf->surface_lock_alloc;
         if ( rect->y < v12 )
         {
-            v26 = vbuf->format.width_in_pixels;
+            v26 = vbuf->format.rowWidth;
             v27 = 2 * v26;
             v28 = rect->y * v26;
             v29 = (__int16 *)&as16Bit[v28 + v24];

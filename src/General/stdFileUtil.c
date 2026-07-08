@@ -370,7 +370,7 @@ int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2)
 
     if (a1->isNotFirst++)
     {
-        if (a1->isNotFirst >= a1->num_found)
+        if (a1->isNotFirst >= a1->nFoundFiles)
             iter = NULL;
         else
             iter = a1->namelist[a1->isNotFirst];
@@ -425,15 +425,15 @@ int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2)
 #ifdef TARGET_RETRO_HOMEBREW
         errno = 0;
 #endif
-        a1->num_found = scandir(tmp, &a1->namelist, search_ext ? parse_ext : NULL, alphasort);
+        a1->nFoundFiles = scandir(tmp, &a1->namelist, search_ext ? parse_ext : NULL, alphasort);
         
-        if (!a1->namelist || a1->num_found <= 0) return 0;
+        if (!a1->namelist || a1->nFoundFiles <= 0) return 0;
         
         iter = a1->namelist[2];
         a1->isNotFirst = 2;
     }
 
-    if (a1->num_found <= 2 || !iter)
+    if (a1->nFoundFiles <= 2 || !iter)
         return 0;
 
     strncpy(a2->fpath, iter->d_name, sizeof(a2->fpath));
@@ -448,7 +448,7 @@ void stdFileUtil_DisposeFind(stdFileSearch *search)
 {
     if ( search )
     {
-        for (int i = 0; i < search->num_found; i++)
+        for (int i = 0; i < search->nFoundFiles; i++)
         {
            free(search->namelist[i]);
         }
@@ -462,14 +462,14 @@ void stdFileUtil_FindReset(stdFileSearch *search)
 {
     if ( search )
     {
-        for (int i = 0; i < search->num_found; i++)
+        for (int i = 0; i < search->nFoundFiles; i++)
         {
             free(search->namelist[i]);
         }
         free(search->namelist);
         search->namelist = NULL;
         search->isNotFirst = 0;
-        search->num_found = 0;
+        search->nFoundFiles = 0;
     }
 }
 

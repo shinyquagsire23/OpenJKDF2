@@ -46,55 +46,55 @@ int stdGob_LoadEntry(Gob *gob, char *fname, int a3, int a4)
     stdGobHeader header; // [esp+10h] [ebp-Ch]
 
     stdString_SafeStrCopy(gob->fpath, fname, 128);
-    gob->numFilesOpen = a3;
-    gob->lastReadFile = 0;
+    gob->numHandles = a3;
+    gob->pCurHandle = 0;
 
     //TODO fix this? WINE/df2_reimpl.dll keeps corrupting the gobs? Might be something else idk.
 #if 0
     if ( a4 )
     {
         HANDLE v6 = jk_CreateFileA(gob->fpath, 0x80000000, 1u, 0, 3u, 0x10000000u, 0);
-        gob->viewHandle2 = v6;
+        gob->hFile = v6;
         HANDLE v7 = jk_CreateFileMappingA(v6, 0, 2u, 0, 0, 0);
-        gob->viewHandle = v7;
+        gob->hMapFile = v7;
         if ( v7 )
         {
-            v8 = gob->numFilesOpen;
-            gob->viewMapped = 1;
+            v8 = gob->numHandles;
+            gob->bFileMap = 1;
             v9 = (GobFileHandle *)jk_LocalAlloc(0x40u, 16 * v8);
-            gob->openedFile = v9;
+            gob->aHandles = v9;
             if ( v9 )
             {
-                gob->viewAddr = jk_MapViewOfFile(gob->viewHandle, 4u, 0, 0, 0);
+                gob->pBase = jk_MapViewOfFile(gob->hMapFile, 4u, 0, 0, 0);
                 return 1;
             }
             else
             {
-                jk_UnmapViewOfFile(gob->viewAddr);
-                jk_CloseHandle(gob->viewHandle);
+                jk_UnmapViewOfFile(gob->pBase);
+                jk_CloseHandle(gob->hMapFile);
             }
         }
         else
         {
-            jk_CloseHandle(gob->viewHandle2);
+            jk_CloseHandle(gob->hFile);
         }
     }
 #endif
 
-    gob->viewMapped = 0;
-    gob->fhand = pGobHS->fileOpen(gob->fpath, "rb"); // Added: r+b -> rb, we don't actually need to write GOBs
-    if ( !gob->fhand ) {
+    gob->bFileMap = 0;
+    gob->hGobFile = pGobHS->fileOpen(gob->fpath, "rb"); // Added: r+b -> rb, we don't actually need to write GOBs
+    if ( !gob->hGobFile ) {
         stdPlatform_Printf("OpenJKDF2: Gob failed to open `%s`.\n", gob->fpath); // Added
         return 0;
     }
     else {
         stdPlatform_Printf("OpenJKDF2: Gob opened `%s`.\n", gob->fpath); // Added
     }
-    gob->openedFile = (GobFileHandle *)STD_ALLOC(sizeof(GobFileHandle) * gob->numFilesOpen);
-    if ( !gob->openedFile )
+    gob->aHandles = (GobFileHandle *)STD_ALLOC(sizeof(GobFileHandle) * gob->numHandles);
+    if ( !gob->aHandles )
       return 0;
-    _memset(gob->openedFile, 0, sizeof(GobFileHandle) * gob->numFilesOpen);
-    pGobHS->fileRead(gob->fhand, &header, sizeof(stdGobHeader));
+    _memset(gob->aHandles, 0, sizeof(GobFileHandle) * gob->numHandles);
+    pGobHS->fileRead(gob->hGobFile, &header, sizeof(stdGobHeader));
     if ( _memcmp((const char *)&header, "GOB ", 4u) )
     {
       stdPrintf(std_g_pHS->errorPrint, ".\\Win95\\stdGob.c", 270, "Error: Bad signature in header of gob file.\n", 0, 0, 0, 0);
@@ -105,8 +105,8 @@ int stdGob_LoadEntry(Gob *gob, char *fname, int a3, int a4)
       stdPrintf(std_g_pHS->errorPrint, ".\\Win95\\stdGob.c", 277, "Error: Bad version %d for gob file\n", header.version, 0, 0, 0);
       return 0;
     }
-    pGobHS->fseek(gob->fhand, header.entryTable_offs, 0);
-    pGobHS->fileRead(gob->fhand, &gob->numFiles, sizeof(uint32_t));
+    pGobHS->fseek(gob->hGobFile, header.entryTable_offs, 0);
+    pGobHS->fileRead(gob->hGobFile, &gob->numFiles, sizeof(uint32_t));
     gob->entries = (stdGobEntry *)STD_ALLOC(sizeof(stdGobEntry) * gob->numFiles);
     if ( !gob->entries )
       return 0;
@@ -116,9 +116,9 @@ int stdGob_LoadEntry(Gob *gob, char *fname, int a3, int a4)
 
     // We're not adding anything so like, keep it small?
 #ifdef TARGET_RETRO_HOMEBREW
-    gob->entriesHashtable = stdHashtbl_New(gob->numFiles);
+    gob->pDirHash = stdHashtbl_New(gob->numFiles);
 #else
-    gob->entriesHashtable = stdHashtbl_New(1024);
+    gob->pDirHash = stdHashtbl_New(1024);
 #endif
     for (int v4 = 0; v4 < gob->numFiles; v4++)
     {
@@ -126,13 +126,13 @@ int stdGob_LoadEntry(Gob *gob, char *fname, int a3, int a4)
         // Added: stage the fixed 136-byte disk entry; only offset/size stay
         // resident (the CRC-keyed pHashtbl doesn't retain the name pointer).
         stdGobDiskEntry diskEntry;
-        pGobHS->fileRead(gob->fhand, &diskEntry, sizeof(stdGobDiskEntry));
+        pGobHS->fileRead(gob->hGobFile, &diskEntry, sizeof(stdGobDiskEntry));
         gob->entries[v4].fileOffset = diskEntry.fileOffset;
         gob->entries[v4].fileSize = diskEntry.fileSize;
-        stdHashtbl_Add(gob->entriesHashtable, diskEntry.fname, &gob->entries[v4]);
+        stdHashtbl_Add(gob->pDirHash, diskEntry.fname, &gob->entries[v4]);
 #else
-        pGobHS->fileRead(gob->fhand, &gob->entries[v4], sizeof(stdGobEntry));
-        stdHashtbl_Add(gob->entriesHashtable, gob->entries[v4].fname, &gob->entries[v4]);
+        pGobHS->fileRead(gob->hGobFile, &gob->entries[v4], sizeof(stdGobEntry));
+        stdHashtbl_Add(gob->pDirHash, gob->entries[v4].fname, &gob->entries[v4]);
 #endif
     }
 
@@ -152,33 +152,33 @@ void stdGob_Free(Gob *gob)
 
 void stdGob_FreeEntry(Gob *gob)
 {
-    if ( gob->viewMapped )
+    if ( gob->bFileMap )
     {
-        jk_UnmapViewOfFile(gob->viewAddr);
-        jk_CloseHandle(gob->viewHandle);
-        jk_CloseHandle(gob->viewHandle2);
+        jk_UnmapViewOfFile(gob->pBase);
+        jk_CloseHandle(gob->hMapFile);
+        jk_CloseHandle(gob->hFile);
     }
     else
     {
         // Added: Fix file handle leak
-        if (gob->fhand) {
-            pGobHS->fileClose(gob->fhand);
-            gob->fhand = 0;
+        if (gob->hGobFile) {
+            pGobHS->fileClose(gob->hGobFile);
+            gob->hGobFile = 0;
         }
         // Added: Fix memleak
-        if (gob->openedFile) {
-            STD_FREE(gob->openedFile);
-            gob->openedFile = NULL;
+        if (gob->aHandles) {
+            STD_FREE(gob->aHandles);
+            gob->aHandles = NULL;
         }
         if ( gob->entries )
         {
             STD_FREE(gob->entries);
             gob->entries = 0;
         }
-        if ( gob->entriesHashtable )
+        if ( gob->pDirHash )
         {
-            stdHashtbl_Free(gob->entriesHashtable);
-            gob->entriesHashtable = 0;
+            stdHashtbl_Free(gob->pDirHash);
+            gob->pDirHash = 0;
         }
     }
 }
@@ -194,28 +194,28 @@ GobFileHandle* stdGob_FileOpen(Gob *gob, const char *filepath)
     size_t sz = 0;
     void* data = stdEmbeddedRes_LoadOnlyInternal(filepath, &sz);
     if (data) {
-        result = gob->openedFile;
+        result = gob->aHandles;
         v5 = 0;
-        if ( !gob->numFilesOpen )
+        if ( !gob->numHandles )
             return 0;
 
-        while ( result->isOpen )
+        while ( result->bUsed )
         {
             ++result;
-            if ( ++v5 >= gob->numFilesOpen )
+            if ( ++v5 >= gob->numHandles )
                 return 0;
         }
         result->bIsMemoryMapped = 1;
         result->pMemory = (intptr_t)data;
         result->memorySz = sz;
 
-        result->isOpen = 1;
+        result->bUsed = 1;
         result->parent = gob;
         result->entry = entry;
-        result->seekOffs = 0;
+        result->offset = 0;
         // Added: Opening another file in this GOB makes the shared handle's position
         // ambiguous: invalidate the seek-skip cache so the next read re-seeks.
-        gob->lastReadFile = 0;
+        gob->pCurHandle = 0;
         return result;
     }
 #endif
@@ -234,19 +234,19 @@ GobFileHandle* stdGob_FileOpen(Gob *gob, const char *filepath)
             stdGob_fpath[i] = '\\';
     }
 #endif
-    entry = (stdGobEntry*)stdHashtbl_Find(gob->entriesHashtable, stdGob_fpath);
+    entry = (stdGobEntry*)stdHashtbl_Find(gob->pDirHash, stdGob_fpath);
     if (!entry)
         return 0;
 
-    result = gob->openedFile;
+    result = gob->aHandles;
     v5 = 0;
-    if ( !gob->numFilesOpen )
+    if ( !gob->numHandles )
         return 0;
 
-    while ( result->isOpen )
+    while ( result->bUsed )
     {
         ++result;
-        if ( ++v5 >= gob->numFilesOpen )
+        if ( ++v5 >= gob->numHandles )
             return 0;
     }
 #ifdef QOL_IMPROVEMENTS
@@ -254,13 +254,13 @@ GobFileHandle* stdGob_FileOpen(Gob *gob, const char *filepath)
     result->pMemory = (intptr_t)NULL;
     result->memorySz = 0;
 #endif
-    result->isOpen = 1;
+    result->bUsed = 1;
     result->parent = gob;
     result->entry = entry;
-    result->seekOffs = 0;
+    result->offset = 0;
     // Added: Opening another file in this GOB makes the shared handle's position
     // ambiguous: invalidate the seek-skip cache so the next read re-seeks.
-    gob->lastReadFile = 0;
+    gob->pCurHandle = 0;
     return result;
 }
 
@@ -275,10 +275,10 @@ void stdGob_FileClose(GobFileHandle *f)
 #endif
 
     Gob* gob = f->parent;
-    f->isOpen = 0;
+    f->bUsed = 0;
 
-    if (f == gob->lastReadFile) {
-        gob->lastReadFile = 0;
+    if (f == gob->pCurHandle) {
+        gob->pCurHandle = 0;
     }
 }
 
@@ -294,7 +294,7 @@ int stdGob_FileSeek(GobFileHandle *f, int pos, int whence)
             seekOffsAbsolute = pos;
             break;
         case SEEK_CUR:
-            seekOffsAbsolute = pos + f->seekOffs;
+            seekOffsAbsolute = pos + f->offset;
             break;
         case SEEK_END:
             seekOffsAbsolute = pos + f->entry->fileSize;
@@ -304,23 +304,23 @@ int stdGob_FileSeek(GobFileHandle *f, int pos, int whence)
     }
 
     gob = f->parent;
-    f->seekOffs = seekOffsAbsolute;
+    f->offset = seekOffsAbsolute;
 
-    if (f == gob->lastReadFile)
-        gob->lastReadFile = 0;
+    if (f == gob->pCurHandle)
+        gob->pCurHandle = 0;
 
     return 1;
 }
 
 int32_t stdGob_FileTell(GobFileHandle *f)
 {
-    return f->seekOffs;
+    return f->offset;
 }
 
 bool stdGob_FileEOF(GobFileHandle *f)
 {
     int ret = 0;
-    ret = f->seekOffs >= f->entry->fileSize - 1;
+    ret = f->offset >= f->entry->fileSize - 1;
     return ret;
 }
 
@@ -334,66 +334,66 @@ size_t stdGob_FileRead(GobFileHandle *f, void *out, uint32_t len)
 #ifdef QOL_IMPROVEMENTS
     if (f->bIsMemoryMapped) {
         size_t to_read = len;
-        if (f->seekOffs >= f->memorySz) {
-            f->seekOffs = f->memorySz;
+        if (f->offset >= f->memorySz) {
+            f->offset = f->memorySz;
             return 0;
         }
 
-        if (f->seekOffs + to_read > f->memorySz) {
-            to_read = f->memorySz - f->seekOffs;
+        if (f->offset + to_read > f->memorySz) {
+            to_read = f->memorySz - f->offset;
         }
-        memcpy(out, (void*)(f->pMemory + f->seekOffs), to_read);
-        f->seekOffs += to_read;
+        memcpy(out, (void*)(f->pMemory + f->offset), to_read);
+        f->offset += to_read;
 
         return to_read;
     }
 #endif
 
     gob = f->parent;
-    if (gob->lastReadFile != f)
+    if (gob->pCurHandle != f)
     {
-        pGobHS->fseek(gob->fhand, f->seekOffs + f->entry->fileOffset, 0);
+        pGobHS->fseek(gob->hGobFile, f->offset + f->entry->fileOffset, 0);
         gob = f->parent;
-        gob->lastReadFile = f;
+        gob->pCurHandle = f;
     }
 
-    if ( f->entry->fileSize - f->seekOffs < len )
-        len = f->entry->fileSize - f->seekOffs;
+    if ( f->entry->fileSize - f->offset < len )
+        len = f->entry->fileSize - f->offset;
 
-    result = pGobHS->fileRead(gob->fhand, out, len);
-    f->seekOffs += result;
+    result = pGobHS->fileRead(gob->hGobFile, out, len);
+    f->offset += result;
     return result;
 }
 
 const char* stdGob_FileGets(GobFileHandle *f, char *out, unsigned int len)
 {
     stdGobEntry *entry;
-    int seekOffs;
+    int offset;
     const char *result;
     Gob *gob;
 
 #ifdef QOL_IMPROVEMENTS
     if (f->bIsMemoryMapped) {
         size_t to_read = len;
-        if (f->seekOffs >= f->memorySz) {
-            f->seekOffs = f->memorySz;
+        if (f->offset >= f->memorySz) {
+            f->offset = f->memorySz;
             return NULL;
         }
 
-        if (f->seekOffs + to_read > f->memorySz) {
-            to_read = f->memorySz - f->seekOffs;
+        if (f->offset + to_read > f->memorySz) {
+            to_read = f->memorySz - f->offset;
         }
         if (!to_read) {
             return NULL;
         }
-        strncpy(out, (char*)(f->pMemory + f->seekOffs), to_read);
+        strncpy(out, (char*)(f->pMemory + f->offset), to_read);
         char* cutoff = strchr(out, '\n');
         if (cutoff) {
             *(++cutoff) = 0;
         }
 
         size_t actual_read = strlen(out);
-        f->seekOffs += actual_read;
+        f->offset += actual_read;
 
         if (!actual_read) return NULL;
 
@@ -402,23 +402,23 @@ const char* stdGob_FileGets(GobFileHandle *f, char *out, unsigned int len)
 #endif
 
     entry = f->entry;
-    seekOffs = f->seekOffs;
-    if ( seekOffs >= entry->fileSize - 1 )
+    offset = f->offset;
+    if ( offset >= entry->fileSize - 1 )
         return 0;
     gob = f->parent;
-    if ( gob->lastReadFile != f )
+    if ( gob->pCurHandle != f )
     {
-        pGobHS->fseek(gob->fhand, seekOffs + entry->fileOffset, 0);
+        pGobHS->fseek(gob->hGobFile, offset + entry->fileOffset, 0);
         gob = f->parent;
-        gob->lastReadFile = f;
+        gob->pCurHandle = f;
     }
 
-    if ( f->entry->fileSize - f->seekOffs + 1 < len )
-        len = f->entry->fileSize - f->seekOffs + 1;
+    if ( f->entry->fileSize - f->offset + 1 < len )
+        len = f->entry->fileSize - f->offset + 1;
 
-    result = pGobHS->fileGets(gob->fhand, out, len);
+    result = pGobHS->fileGets(gob->hGobFile, out, len);
     if ( result )
-        f->seekOffs += _strlen(result);
+        f->offset += _strlen(result);
 
     return result;
 }
@@ -426,7 +426,7 @@ const char* stdGob_FileGets(GobFileHandle *f, char *out, unsigned int len)
 const wchar_t* stdGob_FileGetws(GobFileHandle *f, wchar_t *out, unsigned int len)
 {
     stdGobEntry *entry; // ecx
-    int seekOffs; // edx
+    int offset; // edx
     Gob *gob; // eax
     unsigned int seekOffs_; // edi
     unsigned int len_wide; // ecx
@@ -436,25 +436,25 @@ const wchar_t* stdGob_FileGetws(GobFileHandle *f, wchar_t *out, unsigned int len
 #ifdef QOL_IMPROVEMENTS
     if (f->bIsMemoryMapped) {
         size_t to_read = len * sizeof(wchar_t);
-        if (f->seekOffs >= f->memorySz) {
-            f->seekOffs = f->memorySz;
+        if (f->offset >= f->memorySz) {
+            f->offset = f->memorySz;
             return 0;
         }
 
-        if (f->seekOffs + to_read > f->memorySz) {
-            to_read = f->memorySz - f->seekOffs;
+        if (f->offset + to_read > f->memorySz) {
+            to_read = f->memorySz - f->offset;
         }
         if (!to_read) {
             return NULL;
         }
-        __wcsncpy(out, (wchar_t*)(f->pMemory + f->seekOffs), to_read / sizeof(wchar_t));
+        __wcsncpy(out, (wchar_t*)(f->pMemory + f->offset), to_read / sizeof(wchar_t));
         wchar_t* cutoff = __wcschr(out, '\n');
         if (cutoff) {
             *(++cutoff) = 0;
         }
 
         size_t actual_read = (_wcslen(out))*sizeof(wchar_t);
-        f->seekOffs += actual_read;
+        f->offset += actual_read;
 
         if (!actual_read) return NULL;
 
@@ -463,23 +463,23 @@ const wchar_t* stdGob_FileGetws(GobFileHandle *f, wchar_t *out, unsigned int len
 #endif
 
     entry = f->entry;
-    seekOffs = f->seekOffs;
-    if ( seekOffs >= entry->fileSize - 1 )
+    offset = f->offset;
+    if ( offset >= entry->fileSize - 1 )
         return 0;
     gob = f->parent;
-    if ( gob->lastReadFile != f )
+    if ( gob->pCurHandle != f )
     {
-        pGobHS->fseek(gob->fhand, seekOffs + entry->fileOffset, 0);
+        pGobHS->fseek(gob->hGobFile, offset + entry->fileOffset, 0);
         gob = f->parent;
-        gob->lastReadFile = f;
+        gob->pCurHandle = f;
     }
-    seekOffs_ = f->seekOffs;
+    seekOffs_ = f->offset;
     len_wide = len;
     if ( ((f->entry->fileSize - seekOffs_) >> 1) + 1 < len )
         len_wide = ((f->entry->fileSize - seekOffs_) >> 1) + 1;
-    ret = pGobHS->fileGetws(gob->fhand, out, len_wide);
+    ret = pGobHS->fileGetws(gob->hGobFile, out, len_wide);
     if (ret)
-        f->seekOffs += _wcslen(ret);
+        f->offset += _wcslen(ret);
     return ret;
 }
 

@@ -105,15 +105,15 @@ int sithMaterial_ReadMaterialsListText(SithWorld *world, int a2)
             sithMaterial_aMaterials = (rdMaterial **)SITH_ALLOC(sizeof(rdMaterial*) * a2);
             if ( stdConffile_ReadArgs() )
             {
-                while ( _strcmp(stdConffile_g_entry.args[0].value, "end") )
+                while ( _strcmp(stdConffile_g_entry.aArgs[0].value, "end") )
                 {
-                    v7 = sithMaterial_Load(stdConffile_g_entry.args[1].value, 0, 0);
+                    v7 = sithMaterial_Load(stdConffile_g_entry.aArgs[1].value, 0, 0);
                     if ( !v7 )
                         return 0;
-                    a1 = stdConffile_g_entry.args[2].value;
+                    a1 = stdConffile_g_entry.aArgs[2].value;
                     sithMaterial_aMaterials[v2] = v7;
                     v8 = _atof(a1);
-                    v9 = stdConffile_g_entry.args[3].value;
+                    v9 = stdConffile_g_entry.aArgs[3].value;
                     world->materials2[v2].x = v8;
                     world->materials2[v2++].y = _atof(v9);
                     a1a = (flex_d_t)(unsigned int)v2 * v12 - -5.0;
@@ -224,7 +224,7 @@ int sithMaterial_GetMemorySize(rdMaterial *mat)
     {
         for (int j = 0; j < mat->textures[i].num_mipmaps; j++)
         {
-            result += mat->textures[i].texture_struct[j]->format.texture_size_in_bytes;
+            result += mat->textures[i].texture_struct[j]->format.size;
         }
     }
     return result;

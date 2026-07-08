@@ -77,13 +77,13 @@ int sithSound_ReadSoundsListText(SithWorld *world, int a2)
 
     sithWorld_UpdateLoadProgress(0.0);
     if (!stdConffile_ReadArgs() 
-        || _strcmp(stdConffile_g_entry.args[0].value, "world") 
-        || _strcmp(stdConffile_g_entry.args[1].value, "sounds") )
+        || _strcmp(stdConffile_g_entry.aArgs[0].value, "world") 
+        || _strcmp(stdConffile_g_entry.aArgs[1].value, "sounds") )
     {
         sithSound_FreeWorldSounds(world);
         return 0;
     }
-    numSounds = _atoi(stdConffile_g_entry.args[2].value);
+    numSounds = _atoi(stdConffile_g_entry.aArgs[2].value);
     if ( !numSounds )
         return 1;
 
@@ -91,10 +91,10 @@ int sithSound_ReadSoundsListText(SithWorld *world, int a2)
     
     while ( stdConffile_ReadArgs() )
     {
-        if ( !_strcmp(stdConffile_g_entry.args[0].value, "end") )
+        if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "end") )
             break;
         if ( sithSound_bInit )
-            sithSound_Load(stdConffile_g_entry.args[0].value, stdConffile_g_entry.numArgs > 1u);
+            sithSound_Load(stdConffile_g_entry.aArgs[0].value, stdConffile_g_entry.numArgs > 1u);
     }
     return 1;
 }
@@ -183,10 +183,10 @@ sithSound* sithSound_Load(char *sound_fname, int a2)
             sound->id |= 0x8000;
         }
         stdString_SafeStrCopy(sound->sound_fname, sound_fname, 32);
-        sound->bufferBytes = stdSound_ParseWav(sound_file, &sound->sampleRateHz, &sound->bitsPerSample, &sound->bStereo, &sound->seekOffset);
+        sound->bufferBytes = stdSound_ParseWav(sound_file, &sound->sampleRate, &sound->bitsPerSample, &sound->bStereo, &sound->seekOffset);
         if ( sound->bufferBytes )
         {
-            frequencyKHz = sound->bufferBytes / (sound->sampleRateHz / 1000u);
+            frequencyKHz = sound->bufferBytes / (sound->sampleRate / 1000u);
 
             sound->sound_len = frequencyKHz;
             if ( sound->bitsPerSample == 16 )
@@ -266,7 +266,7 @@ int sithSound_LoadFileData(sithSound *sound)
 
     if ( sound->bufferBytes + sithSound_curDataLoaded > sithSound_maxDataLoaded )
         sithSound_FreeUpMemory(sound->bufferBytes + 0x19000);
-    stdSound_buffer_t* dsoundBuf = stdSound_BufferCreate(sound->bStereo, sound->sampleRateHz, sound->bitsPerSample, sound->bufferBytes);
+    stdSound_buffer_t* dsoundBuf = stdSound_BufferCreate(sound->bStereo, sound->sampleRate, sound->bitsPerSample, sound->bufferBytes);
     if ( dsoundBuf )
     {
         sound->dsoundBuffer2 = dsoundBuf;
@@ -429,7 +429,7 @@ stdSound_buffer_t* sithSound_InitFromPath(char *path)
     int32_t bStereo; // [esp+Ch] [ebp-94h] BYREF
     int32_t bufferMaxSize; // [esp+10h] [ebp-90h] BYREF
     uint32_t nSamplesPerSec; // [esp+14h] [ebp-8Ch] BYREF
-    int32_t seekOffs; // [esp+18h] [ebp-88h] BYREF
+    int32_t offset; // [esp+18h] [ebp-88h] BYREF
     int32_t bitsPerSample; // [esp+1Ch] [ebp-84h] BYREF
     char tmp[128]; // [esp+20h] [ebp-80h] BYREF
 
@@ -440,7 +440,7 @@ stdSound_buffer_t* sithSound_InitFromPath(char *path)
     fd = pSithHS->fileOpen(tmp, "rb");
     if ( fd )
     {
-        bufferLen = stdSound_ParseWav(fd, &nSamplesPerSec, &bitsPerSample, &bStereo, &seekOffs);
+        bufferLen = stdSound_ParseWav(fd, &nSamplesPerSec, &bitsPerSample, &bStereo, &offset);
         if ( bufferLen )
         {
             createdBuf = stdSound_BufferCreate(bStereo, nSamplesPerSec, bitsPerSample, bufferLen);
@@ -460,7 +460,7 @@ stdSound_buffer_t* sithSound_InitFromPath(char *path)
         }
         else
         {
-            //dsoundBuf = (stdSound_buffer_t *)seekOffs;
+            //dsoundBuf = (stdSound_buffer_t *)offset;
             // Added: fix undefined behavior?
             dsoundBuf = NULL;
         }

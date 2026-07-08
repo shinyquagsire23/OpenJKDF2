@@ -128,7 +128,7 @@ CURLcode Curl_pp_sendf(struct Curl_easy *data,
 CURLcode Curl_pp_vsendf(struct Curl_easy *data,
                         struct pingpong *pp,
                         const char *fmt,
-                        va_list args);
+                        va_list aArgs);
 
 /*
  * Curl_pp_readresp()

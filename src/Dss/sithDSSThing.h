@@ -73,7 +73,7 @@ void sithDSSThing_Fire(SithThing *pWeapon, SithThing *pProjectile, rdVector3 *pF
 int sithDSSThing_ProcessFire(SithMessage *msg);
 int sithDSSThing_ProcessMOTSNew2(SithMessage *msg);
 
-void sithDSSThing_Death(SithThing *sender, SithThing *receiver, char cause, int sendto_id, int mpFlags);
+void sithDSSThing_Death(SithThing *pMeshCollided, SithThing *pThingCollided, char cause, int sendto_id, int mpFlags);
 int sithDSSThing_ProcessDeath(SithMessage *msg);
 
 void sithDSSThing_DamageThing(SithThing *pDamagedThing, SithThing *pDamagedBy, flex32_t amt, int16_t a4, int sendtoId, int mpFlags);

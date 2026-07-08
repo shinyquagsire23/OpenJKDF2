@@ -601,7 +601,7 @@ void sithSoundMixer_SetPitch(sithPlayingSound *sound, flex_t pitch, flex_t chang
         if (sound->sound)
         {
             if (sound->pSoundBuf)
-                stdSound_BufferSetFrequency(sound->pSoundBuf, (int)((flex_d_t)sound->sound->sampleRateHz * pitch));
+                stdSound_BufferSetFrequency(sound->pSoundBuf, (int)((flex_d_t)sound->sound->sampleRate * pitch));
         }
     }
 }
@@ -614,7 +614,7 @@ int sithSoundMixer_SetFrequency(sithPlayingSound *sound, flex_t pitch)
     sound->pitch = pitch;
     if (!pSound || !sound->pSoundBuf)
         return 0;
-    stdSound_BufferSetFrequency(sound->pSoundBuf, (int)((flex_d_t)pSound->sampleRateHz * pitch));
+    stdSound_BufferSetFrequency(sound->pSoundBuf, (int)((flex_d_t)pSound->sampleRate * pitch));
     return 1;
 }
 

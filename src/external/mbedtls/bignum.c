@@ -2108,7 +2108,7 @@ int mbedtls_mpi_random(mbedtls_mpi *X,
 }
 
 /*
- * Modular inverse: X = A^-1 mod N  (HAC 14.61 / 14.64)
+ * Modular bDifferentTypHandler: X = A^-1 mod N  (HAC 14.61 / 14.64)
  */
 int mbedtls_mpi_inv_mod(mbedtls_mpi *X, const mbedtls_mpi *A, const mbedtls_mpi *N)
 {

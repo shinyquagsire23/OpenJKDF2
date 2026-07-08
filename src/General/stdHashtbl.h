@@ -27,12 +27,12 @@ typedef tLinkListNode tHashLink;
 
 typedef struct tHashTable
 {
-    int numBuckets;
+    int numNodes;
     tHashLink* aSymbols;
-    uint32_t (*keyHashToIndex)(const char *data, uint32_t numBuckets);
+    uint32_t (*pfHashFunc)(const char *data, uint32_t numNodes);
 } tHashTable;
 
-uint32_t stdHashtbl_HashStringToIdx(const char *data, uint32_t numBuckets);
+uint32_t stdHashtbl_HashStringToIdx(const char *data, uint32_t numNodes);
 tHashTable* stdHashtbl_New(int maxEntries);
 tHashLink* stdHashtbl_GetTailNode(tHashLink *pLL);
 void stdHashtbl_FreeListNodes(tHashLink *a1);

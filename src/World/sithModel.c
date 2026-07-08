@@ -33,9 +33,9 @@ int sithModel_ReadStaticModelsListText(SithWorld *world, int a2)
     if ( a2 )
         return 0;
     stdConffile_ReadArgs();
-    if ( _memcmp(stdConffile_g_entry.args[0].value, "world", 6u) || _memcmp(stdConffile_g_entry.args[1].value, "aModels", 7u) )
+    if ( _memcmp(stdConffile_g_entry.aArgs[0].value, "world", 6u) || _memcmp(stdConffile_g_entry.aArgs[1].value, "aModels", 7u) )
         return 0;
-    world->sizeModels = _atoi(stdConffile_g_entry.args[2].value);
+    world->sizeModels = _atoi(stdConffile_g_entry.aArgs[2].value);
     if ( !world->sizeModels )
         return 1;
 
@@ -53,9 +53,9 @@ int sithModel_ReadStaticModelsListText(SithWorld *world, int a2)
     loadProgress = 60.0;
     while ( stdConffile_ReadArgs() )
     {
-        if ( !_memcmp(stdConffile_g_entry.args[0].value, "end", 4u) )
+        if ( !_memcmp(stdConffile_g_entry.aArgs[0].value, "end", 4u) )
             break;
-        sithModel_Load(stdConffile_g_entry.args[1].value, 0);
+        sithModel_Load(stdConffile_g_entry.aArgs[1].value, 0);
         loadProgress = loadProgress + loadStep;
         sithWorld_UpdateLoadProgress(loadProgress);
     }

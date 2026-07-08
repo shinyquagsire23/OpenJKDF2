@@ -763,7 +763,7 @@ quit:
 static void _ldap_trace(const char *fmt, ...)
 {
   static int do_trace = -1;
-  va_list args;
+  va_list aArgs;
 
   if(do_trace == -1) {
     const char *env = getenv("CURL_TRACE");
@@ -772,9 +772,9 @@ static void _ldap_trace(const char *fmt, ...)
   if(!do_trace)
     return;
 
-  va_start(args, fmt);
-  vfprintf(stderr, fmt, args);
-  va_end(args);
+  va_start(aArgs, fmt);
+  vfprintf(stderr, fmt, aArgs);
+  va_end(aArgs);
 }
 #endif
 

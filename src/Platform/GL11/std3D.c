@@ -914,7 +914,7 @@ int std3D_AddBitmapToTextureCache(stdBitmap* texture, int mipIdx, int is_alpha_t
     if (vbuf->format.format.is16bit || texture->format.bpp == 16)
     {
         texture->is_16bit = 1;
-        uint32_t row_stride = vbuf->format.width_in_bytes / 2;
+        uint32_t row_stride = vbuf->format.rowSize / 2;
         int is565 = (vbuf->format.format.r_bits == 5 &&
                      vbuf->format.format.g_bits == 6 &&
                      vbuf->format.format.b_bits == 5);
@@ -955,7 +955,7 @@ int std3D_AddBitmapToTextureCache(stdBitmap* texture, int mipIdx, int is_alpha_t
     {
         texture->is_16bit = 0;
         uint8_t* pal = (uint8_t*)texture->palette; // 3 bytes/entry when present
-        uint32_t row_stride = vbuf->format.width_in_bytes;
+        uint32_t row_stride = vbuf->format.rowSize;
 
         for (uint32_t j = 0; j < height; j++)
         {

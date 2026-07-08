@@ -41,7 +41,7 @@ int rdPrimit2_DrawLine(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, uint16
         if ( (y2 - y1 <= 0 ? -1 : 1) > 0 )
             v20 = x1 - x2;
         if ( mask < 0 ) // Added: word-safe store (vbuffers may be word-addressable-only)
-            stdPlatform_WriteByte16((uint8_t*)v7->surface_lock_alloc + y1 * v7->format.width_in_bytes + x1, (uint8_t)color16);// crashes here
+            stdPlatform_WriteByte16((uint8_t*)v7->surface_lock_alloc + y1 * v7->format.rowSize + x1, (uint8_t)color16);// crashes here
         v10 = 0;
         while ( v8 != x2 || v9 != y2 )
         {
@@ -60,7 +60,7 @@ int rdPrimit2_DrawLine(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, uint16
                 v8 += v22;
             }
             if ( (v19 & mask) != 0 ) // Added: word-safe store
-                stdPlatform_WriteByte16((uint8_t*)pCanvas->pVBuffer->surface_lock_alloc + v9 * pCanvas->pVBuffer->format.width_in_bytes + v8, (uint8_t)color16);
+                stdPlatform_WriteByte16((uint8_t*)pCanvas->pVBuffer->surface_lock_alloc + v9 * pCanvas->pVBuffer->format.rowSize + v8, (uint8_t)color16);
         }
     }
     else
@@ -76,7 +76,7 @@ int rdPrimit2_DrawLine(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, uint16
         if ( (y2 - y1 <= 0 ? -1 : 1) > 0 )
             v21 = x1 - x2;
         if ( mask < 0 ) // Added: explicit byte-pointer math (field is void* now)
-            *(uint16_t *)((uint8_t*)v7->surface_lock_alloc + 2 * x1 + 2 * y1 * v7->format.width_in_pixels) = color16;
+            *(uint16_t *)((uint8_t*)v7->surface_lock_alloc + 2 * x1 + 2 * y1 * v7->format.rowWidth) = color16;
         v14 = 0;
         while ( v12 != x2 || v13 != y2 )
         {
@@ -95,7 +95,7 @@ int rdPrimit2_DrawLine(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, uint16
                 v12 += v23;
             }
             if ( (v19 & mask) != 0 ) // Added: explicit byte-pointer math (field is void* now)
-                *(uint16_t*)((uint8_t*)pCanvas->pVBuffer->surface_lock_alloc + 2 * v12 + 2 * v13 * pCanvas->pVBuffer->format.width_in_pixels) = color16;
+                *(uint16_t*)((uint8_t*)pCanvas->pVBuffer->surface_lock_alloc + 2 * v12 + 2 * v13 * pCanvas->pVBuffer->format.rowWidth) = color16;
         }
     }
     return 1;

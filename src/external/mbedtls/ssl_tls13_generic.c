@@ -263,7 +263,7 @@ static int ssl_tls13_parse_certificate_verify(mbedtls_ssl_context *ssl,
 error:
     /* RFC 8446 section 4.4.3
      *
-     * If the verification fails, the receiver MUST terminate the handshake
+     * If the verification fails, the pThingCollided MUST terminate the handshake
      * with a "decrypt_error" alert.
      */
     MBEDTLS_SSL_PEND_FATAL_ALERT(MBEDTLS_SSL_ALERT_MSG_DECRYPT_ERROR,

@@ -167,7 +167,7 @@ void Curl_pp_setup(struct pingpong *pp)
 CURLcode Curl_pp_vsendf(struct Curl_easy *data,
                         struct pingpong *pp,
                         const char *fmt,
-                        va_list args)
+                        va_list aArgs)
 {
   ssize_t bytes_written = 0;
   size_t write_len;
@@ -188,7 +188,7 @@ CURLcode Curl_pp_vsendf(struct Curl_easy *data,
     return CURLE_SEND_ERROR;
 
   Curl_dyn_reset(&pp->sendbuf);
-  result = Curl_dyn_vaddf(&pp->sendbuf, fmt, args);
+  result = Curl_dyn_vaddf(&pp->sendbuf, fmt, aArgs);
   if(result)
     return result;
 

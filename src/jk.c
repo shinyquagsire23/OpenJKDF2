@@ -627,19 +627,19 @@ void jk_init()
 
 int _sscanf(const char * s, const char * format, ...)
 {
-    va_list args;
-    va_start (args, format);
-    int ret = vsscanf (s, format, args);
-    va_end (args);
+    va_list aArgs;
+    va_start (aArgs, format);
+    int ret = vsscanf (s, format, aArgs);
+    va_end (aArgs);
     return ret;
 }
 
 int _sprintf(char * s, const char * format, ...)
 {
-    va_list args;
-    va_start (args, format);
-    int ret = vsnprintf (s, 0x7FFF, format, args);
-    va_end (args);
+    va_list aArgs;
+    va_start (aArgs, format);
+    int ret = vsnprintf (s, 0x7FFF, format, aArgs);
+    va_end (aArgs);
     return ret;
 }
 
@@ -710,19 +710,19 @@ void __wrap_exit(int res) {
 
 int jk_printf(const char* fmt, ...)
 {
-    va_list args;
-    va_start (args, fmt);
-    int ret = vprintf(fmt, args);
-    va_end (args);
+    va_list aArgs;
+    va_start (aArgs, fmt);
+    int ret = vprintf(fmt, aArgs);
+    va_end (aArgs);
     return ret;
 }
 
 int _printf(const char* fmt, ...)
 {
-    va_list args;
-    va_start (args, fmt);
-    int ret = vprintf(fmt, args);
-    va_end (args);
+    va_list aArgs;
+    va_start (aArgs, fmt);
+    int ret = vprintf(fmt, aArgs);
+    va_end (aArgs);
     return ret;
 }
 
@@ -815,10 +815,10 @@ int jk_snwprintf(wchar_t *a1, size_t a2, const wchar_t *fmt, ...)
     
     stdString_WcharToChar(tmp_fmt, fmt, _wcslen(fmt)+1);
     
-    va_list args;
-    va_start (args, fmt);
-    int ret = vsprintf(tmp_out, tmp_fmt, args); // TODO ehh
-    va_end (args);
+    va_list aArgs;
+    va_start (aArgs, fmt);
+    int ret = vsprintf(tmp_out, tmp_fmt, aArgs); // TODO ehh
+    va_end (aArgs);
     
     stdString_CharToWchar(a1, tmp_out, a2);
     
@@ -827,27 +827,27 @@ int jk_snwprintf(wchar_t *a1, size_t a2, const wchar_t *fmt, ...)
     return ret;
 #endif
 
-    va_list args;
-    va_start (args, fmt);
-    int ret = vsnwprintf_(a1, a2, fmt, args);
-    va_end(args);
+    va_list aArgs;
+    va_start (aArgs, fmt);
+    int ret = vsnwprintf_(a1, a2, fmt, aArgs);
+    va_end(aArgs);
 
     return ret;
 }
 
 int __snprintf(char *a1, size_t a2, const char *fmt, ...)
 {
-    va_list args;
-    va_start (args, fmt);
-    int ret = vsnprintf(a1, a2, fmt, args); // TODO ehh
-    va_end (args);
+    va_list aArgs;
+    va_start (aArgs, fmt);
+    int ret = vsnprintf(a1, a2, fmt, aArgs); // TODO ehh
+    va_end (aArgs);
 
     return ret;
 }
 
-int __vsnprintf(char *a1, size_t a2, const char *fmt, va_list args)
+int __vsnprintf(char *a1, size_t a2, const char *fmt, va_list aArgs)
 {
-    return vsnprintf(a1, a2, fmt, args); // TODO ehh
+    return vsnprintf(a1, a2, fmt, aArgs); // TODO ehh
 }
 
 wchar_t* _wcscpy(wchar_t * dst, const wchar_t *src)

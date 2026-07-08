@@ -99,7 +99,7 @@ void mbedtls_aesni_gcm_mult(unsigned char c[16],
  * \note            This function is only for internal use by other library
  *                  functions; you must not call it directly.
  *
- * \param invkey    Round keys for the equivalent inverse cipher
+ * \param invkey    Round keys for the equivalent bDifferentTypHandler cipher
  * \param fwdkey    Original round keys (for encryption)
  * \param nr        Number of rounds (that is, number of round keys minus one)
  */

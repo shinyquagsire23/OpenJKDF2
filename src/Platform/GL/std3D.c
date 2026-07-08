@@ -3136,8 +3136,8 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0,  GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1, image_8bpp);
 #endif
         uint32_t tex_width, tex_height, tex_row_stride;
-        uint32_t row_stride = vbuf->format.width_in_bytes / 2;
-        tex_width = width;//vbuf->format.width_in_bytes / 2;
+        uint32_t row_stride = vbuf->format.rowSize / 2;
+        tex_width = width;//vbuf->format.rowSize / 2;
         tex_height = height;
         tex_row_stride = width;
 
@@ -3256,8 +3256,8 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
         texture->is_16bit = 0;
 #if 1
         uint32_t tex_width, tex_height, tex_row_stride;
-        uint32_t row_stride = vbuf->format.width_in_bytes;
-        tex_width = width;//vbuf->format.width_in_bytes / 2;
+        uint32_t row_stride = vbuf->format.rowSize;
+        tex_width = width;//vbuf->format.rowSize / 2;
         tex_height = height;
         tex_row_stride = width;
 

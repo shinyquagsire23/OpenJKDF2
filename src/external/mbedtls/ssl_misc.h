@@ -510,7 +510,7 @@ void mbedtls_ssl_set_chk_buf_ptr_fail_args(
 void mbedtls_ssl_reset_chk_buf_ptr_fail_args(void);
 
 MBEDTLS_CHECK_RETURN_CRITICAL
-int mbedtls_ssl_cmp_chk_buf_ptr_fail_args(mbedtls_ssl_chk_buf_ptr_args *args);
+int mbedtls_ssl_cmp_chk_buf_ptr_fail_args(mbedtls_ssl_chk_buf_ptr_args *aArgs);
 
 static inline int mbedtls_ssl_chk_buf_ptr(const uint8_t *cur,
                                           const uint8_t *end, size_t need)

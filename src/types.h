@@ -1085,9 +1085,9 @@ typedef struct tRasterInfo
 {
     int32_t width;
     int32_t height;
-    uint32_t texture_size_in_bytes;
-    uint32_t width_in_bytes;
-    uint32_t width_in_pixels;
+    uint32_t size;
+    uint32_t rowSize;
+    uint32_t rowWidth;
 #ifdef RDMATERIAL_MINIMIZE_STRUCTS
     rdTexFormatMin format;
 #else
@@ -1151,9 +1151,9 @@ typedef struct SDL_Surface SDL_Surface;
 
 typedef struct tVBuffer
 {
-    uint32_t bSurfaceLocked;
+    uint32_t lockRefCount;
 #ifndef OPTIMIZE_AWAY_UNUSED_FIELDS
-    uint32_t lock_cnt;
+    uint32_t lockSurfRefCount;
     uint32_t gap8;
 #endif
     tRasterInfo format;
@@ -1466,7 +1466,7 @@ typedef struct sithSound
     int32_t id;
     int32_t isLoaded;
     uint32_t bufferBytes;
-    uint32_t sampleRateHz;
+    uint32_t sampleRate;
     int32_t bitsPerSample;
     int32_t bStereo; // stdSound_buffer_t*
     uint32_t sound_len;
@@ -1684,7 +1684,7 @@ typedef struct StdDisplayInfo
   char driverName[128];
   video_device video_device[14];
   GUID guid;
-  int32_t max_modes;
+  int32_t numModes;
   StdVideoMode *StdVideoMode;
   uint32_t gap2A0;
   int32_t field_2A4;
@@ -2602,20 +2602,20 @@ typedef int (*sithCollision_searchHandler_t)(SithThing*, SithThing*);
 typedef struct SithCollideResult
 {
     sithCollision_collisionHandler_t handler;
-    sithCollision_searchHandler_t search_handler;
-    uint32_t inverse;
+    sithCollision_searchHandler_t pUnknownFunc;
+    uint32_t bDifferentTypHandler;
 } SithCollideResult;
 
 typedef struct SithCollision
 {
-    uint32_t hitType;
-    SithThing* receiver;
+    uint32_t type;
+    SithThing* pThingCollided;
     SithSurface* surface;
     rdFace* face;
-    rdMesh* sender;
+    rdMesh* pMeshCollided;
     rdVector3 hitNorm;
     flex_t distance;
-    uint32_t hasBeenEnumerated;
+    uint32_t bEnumerated;
 } SithCollision;
 
 typedef struct sithCollisionSectorEntry
@@ -3310,9 +3310,9 @@ typedef struct StdConffileEntry
 {
     int32_t numArgs;
 #ifdef JKM_LIGHTING
-    StdConffileArg args[256];
+    StdConffileArg aArgs[256];
 #else
-    StdConffileArg args[128];
+    StdConffileArg aArgs[128];
 #endif
 } StdConffileEntry;
 
@@ -3332,10 +3332,10 @@ typedef struct stdMemoryAlloc
 
 typedef struct tMemoryState
 {
-    uint32_t allocCur;
-    uint32_t nextNum;
-    uint32_t allocMax;
-    stdMemoryAlloc allocTop;
+    uint32_t totalBytes;
+    uint32_t totalAllocs;
+    uint32_t maxBytes;
+    stdMemoryAlloc header;
 } tMemoryState;
 
 typedef struct sith_cog_parser_node sith_cog_parser_node;

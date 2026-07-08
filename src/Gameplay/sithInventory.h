@@ -130,7 +130,7 @@ int sithInventory_KeybindInit();
 void sithInventory_SetPowerKeybind(int idx, int binding);
 int sithInventory_GetPowerKeybind(int idx);
 void sithInventory_InitInventory(SithThing *player);
-void sithInventory_BroadcastKilledMessage(SithThing *player, SithThing *sender);
+void sithInventory_BroadcastKilledMessage(SithThing *player, SithThing *pMeshCollided);
 void sithInventory_SetBinWait(SithThing *player, int binIdx, flex_t wait);
 
 #endif // _SITHINVENTORY_H

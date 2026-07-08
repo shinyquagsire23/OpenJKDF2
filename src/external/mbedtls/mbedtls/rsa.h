@@ -400,7 +400,7 @@ int mbedtls_rsa_export_raw(const mbedtls_rsa_context *ctx,
  *                 or \c NULL if it need not be exported.
  * \param DQ       The MPI to hold \c D modulo `Q-1`,
  *                 or \c NULL if it need not be exported.
- * \param QP       The MPI to hold modular inverse of \c Q modulo \c P,
+ * \param QP       The MPI to hold modular bDifferentTypHandler of \c Q modulo \c P,
  *                 or \c NULL if it need not be exported.
  *
  * \return         \c 0 on success.

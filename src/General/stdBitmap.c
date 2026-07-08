@@ -224,7 +224,7 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
             } else {
                 std_g_pHS->fileRead(fp, lockAlloc, v15);
             }
-            lockAlloc += surface->format.width_in_bytes;
+            lockAlloc += surface->format.rowSize;
         }
         if (pRowTmp) {
             STD_FREE(pRowTmp);
@@ -233,7 +233,7 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
         for ( i = 0; i < vbufTexFmt.height; ++i )
         {
             std_g_pHS->fileRead(fp, lockAlloc, v15);
-            lockAlloc += surface->format.width_in_bytes;
+            lockAlloc += surface->format.rowSize;
         }
 #endif
         stdDisplay_VBufferUnlock(surface);
@@ -396,7 +396,7 @@ int stdBitmap_UnloadData(stdBitmap* pBitmap) {
     return 1;
 }
 
-int stdBitmap_AppendToFile(stdFile_t fhand, stdBitmap *pBitmap)
+int stdBitmap_AppendToFile(stdFile_t hGobFile, stdBitmap *pBitmap)
 {
     bitmapHeader header;
     int written;
@@ -412,7 +412,7 @@ int stdBitmap_AppendToFile(stdFile_t fhand, stdBitmap *pBitmap)
     header.colorkey = pBitmap->colorkey;
     _memcpy(&header.format, &pBitmap->format, sizeof(rdTexFormat));
 
-    written = std_g_pHS->fileWrite(fhand, &header, sizeof(bitmapHeader));
+    written = std_g_pHS->fileWrite(hGobFile, &header, sizeof(bitmapHeader));
     if ( written != sizeof(bitmapHeader) )
     {
         stdPrintf(std_g_pHS->errorPrint, ".\\General\\stdBitmap.c", 0x1AC,
@@ -426,7 +426,7 @@ int stdBitmap_AppendToFile(stdFile_t fhand, stdBitmap *pBitmap)
         int dims[2];
         dims[0] = vbuf->format.width;
         dims[1] = vbuf->format.height;
-        written = std_g_pHS->fileWrite(fhand, dims, 8);
+        written = std_g_pHS->fileWrite(hGobFile, dims, 8);
         if ( written != 8 )
         {
             stdPrintf(std_g_pHS->errorPrint, ".\\General\\stdBitmap.c", 0x1C3,
@@ -439,21 +439,21 @@ int stdBitmap_AppendToFile(stdFile_t fhand, stdBitmap *pBitmap)
         uint8_t *pixels = (uint8_t *)vbuf->surface_lock_alloc;
         for (uint32_t row = 0; row < (uint32_t)dims[1]; row++)
         {
-            written = std_g_pHS->fileWrite(fhand, pixels, rowBytes);
+            written = std_g_pHS->fileWrite(hGobFile, pixels, rowBytes);
             if ( written != (int)rowBytes )
             {
                 stdPrintf(std_g_pHS->errorPrint, ".\\General\\stdBitmap.c", 0x1D4,
                           "Error: Unable to write %d bytes to file.", rowBytes);
                 return 0;
             }
-            pixels += vbuf->format.width_in_bytes;
+            pixels += vbuf->format.rowSize;
         }
         stdDisplay_VBufferUnlock(vbuf);
     }
 
     if ( (pBitmap->palFmt & 2) && pBitmap->palette )
     {
-        written = std_g_pHS->fileWrite(fhand, pBitmap->palette, 0x300);
+        written = std_g_pHS->fileWrite(hGobFile, pBitmap->palette, 0x300);
         if ( written != 0x300 )
         {
             stdPrintf(std_g_pHS->errorPrint, ".\\General\\stdBitmap.c", 0x1E5,
@@ -466,21 +466,21 @@ int stdBitmap_AppendToFile(stdFile_t fhand, stdBitmap *pBitmap)
 
 int stdBitmap_Write(const char *fpath, stdBitmap *pBitmap)
 {
-    stdFile_t fhand = std_g_pHS->fileOpen(fpath, "wb");
-    if ( !fhand )
+    stdFile_t hGobFile = std_g_pHS->fileOpen(fpath, "wb");
+    if ( !hGobFile )
     {
         stdPrintf(std_g_pHS->errorPrint, ".\\General\\stdBitmap.c", 0x206,
                   "Error: Invalid write filename: '%s'.", fpath);
         return 0;
     }
-    if ( !stdBitmap_AppendToFile(fhand, pBitmap) )
+    if ( !stdBitmap_AppendToFile(hGobFile, pBitmap) )
     {
         stdPrintf(std_g_pHS->errorPrint, ".\\General\\stdBitmap.c", 0x20D,
                   "Error writing to file '%s'.", fpath);
-        std_g_pHS->fileClose(fhand);
+        std_g_pHS->fileClose(hGobFile);
         return 0;
     }
-    std_g_pHS->fileClose(fhand);
+    std_g_pHS->fileClose(hGobFile);
     return 1;
 }
 

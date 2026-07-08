@@ -49,7 +49,7 @@ void sithPlayerActions_Activate(SithThing *thing)
             sithCollision_SearchForCollisions(v4, thing, &thingPos, &out.lvec, a6, 0.025, /*SITH_THING_ACTOR*/RAYCAST_2);
             for ( searchResult = sithCollision_PopStack(); searchResult; searchResult = sithCollision_PopStack() )
             {
-                if ( (searchResult->hitType & SITHCOLLISION_WORLD) != 0 )
+                if ( (searchResult->type & SITHCOLLISION_WORLD) != 0 )
                 {
 #ifdef DEBUG_QOL_CHEATS
                     if (searchResult->surface && searchResult->surface->surfaceInfo.face.material && thing == sithPlayer_g_pLocalPlayerThing)
@@ -62,9 +62,9 @@ void sithPlayerActions_Activate(SithThing *thing)
                         return;
                     }
                 }
-                else if ( (searchResult->hitType & SITHCOLLISION_THING) != 0 )
+                else if ( (searchResult->type & SITHCOLLISION_THING) != 0 )
                 {
-                    v7 = searchResult->receiver;
+                    v7 = searchResult->pThingCollided;
 #ifdef DEBUG_QOL_CHEATS
 #ifdef SITH_DEBUG_STRUCT_NAMES
                     if (v7 && thing == sithPlayer_g_pLocalPlayerThing)
@@ -73,7 +73,7 @@ void sithPlayerActions_Activate(SithThing *thing)
 #endif
                     if ( v7->type != SITH_THING_ITEM && v7->type != SITH_THING_WEAPON && (v7->flags & SITH_TF_CAPTURED) != 0 )
                     {
-                        sithCog_ThingSendMessage(searchResult->receiver, thing, SITH_MESSAGE_ACTIVATE);
+                        sithCog_ThingSendMessage(searchResult->pThingCollided, thing, SITH_MESSAGE_ACTIVATE);
                         break;
                     }
                 }
@@ -216,7 +216,7 @@ SithThing* sithPlayerActions_SpawnThingAtLookAt(SithThing *pPlayerThing, SithThi
         sithCollision_SearchForCollisions(pSectorIter, pPlayerThing, &thingPos, &out.lvec, a6, 0.025, 0);
         for ( searchResult = sithCollision_PopStack(); searchResult; searchResult = sithCollision_PopStack() )
         {
-            if (searchResult->hitType & SITHCOLLISION_ADJOINCROSS)
+            if (searchResult->type & SITHCOLLISION_ADJOINCROSS)
             {
                 if (searchResult && searchResult->surface && searchResult->surface->pAdjoin && searchResult->surface->pAdjoin->sector)
                 {
@@ -224,7 +224,7 @@ SithThing* sithPlayerActions_SpawnThingAtLookAt(SithThing *pPlayerThing, SithThi
                     sithThing_SetSector(pSpawned, pSectorIter, 0);
                 }
             }
-            else if ( (searchResult->hitType & SITHCOLLISION_WORLD) != 0 )
+            else if ( (searchResult->type & SITHCOLLISION_WORLD) != 0 )
             {
                 pSectorIter = searchResult->surface->pSector;
                 //sithCog_SurfaceSendMessage(searchResult->surface, pPlayerThing, SITH_MESSAGE_ACTIVATE);
@@ -242,15 +242,15 @@ SithThing* sithPlayerActions_SpawnThingAtLookAt(SithThing *pPlayerThing, SithThi
                 sithCollision_DecreaseStackLevel();
                 return pSpawned;
             }
-            /*else if ( (searchResult->hitType & SITHCOLLISION_THING) != 0 )
+            /*else if ( (searchResult->type & SITHCOLLISION_THING) != 0 )
             {
-                v7 = searchResult->receiver;
+                v7 = searchResult->pThingCollided;
 
                 if ( v7->type != SITH_THING_ITEM && v7->type != SITH_THING_WEAPON && (v7->flags & SITH_TF_CAPTURED) != 0 )
                 {
                     sithThing_SetSector(i, v5->sector, 0);
 
-                    //sithCog_ThingSendMessage(searchResult->receiver, pPlayerThing, SITH_MESSAGE_ACTIVATE);
+                    //sithCog_ThingSendMessage(searchResult->pThingCollided, pPlayerThing, SITH_MESSAGE_ACTIVATE);
                     sithCollision_DecreaseStackLevel();
                     return pSpawned;
                 }

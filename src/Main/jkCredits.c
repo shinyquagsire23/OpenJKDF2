@@ -405,10 +405,10 @@ int jkCredits_Tick()
         {
             v8 = (uint8_t*)Video_menuBuffer.surface_lock_alloc;
             pAIdk = jkCredits_aIdk;
-            v25.x = -Video_menuBuffer.format.width_in_bytes;
+            v25.x = -Video_menuBuffer.format.rowSize;
             v23 = (char*)Video_menuBuffer.surface_lock_alloc; // Added: explicit cast (field is void* now)
             v24 = 32;
-            v10 = (uint8_t*)Video_menuBuffer.surface_lock_alloc + 479 * Video_menuBuffer.format.width_in_bytes;
+            v10 = (uint8_t*)Video_menuBuffer.surface_lock_alloc + 479 * Video_menuBuffer.format.rowSize;
             v22 = (char*)v10;
             do
             {
@@ -442,9 +442,9 @@ int jkCredits_Tick()
                 while ( v21 );
                 pAIdk += 256;
                 v10 = (uint8_t*)&v22[v25.x];
-                v8 = (uint8_t*)&v23[Video_menuBuffer.format.width_in_bytes];
+                v8 = (uint8_t*)&v23[Video_menuBuffer.format.rowSize];
                 v22 += v25.x;
-                v23 += Video_menuBuffer.format.width_in_bytes;
+                v23 += Video_menuBuffer.format.rowSize;
                 --v24;
             }
             while (v24 != 1);

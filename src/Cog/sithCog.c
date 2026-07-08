@@ -472,7 +472,7 @@ LABEL_25:
         }
 
 #ifdef COG_HEAP_INIT_ARGS
-        v13 = aCogs->aInitArgs; // may be NULL (no jkl args / arg-less cog)
+        v13 = aCogs->aInitArgs; // may be NULL (no jkl aArgs / arg-less cog)
 #else
         v13 = aCogs->field_4BC;
 #endif
@@ -551,9 +551,9 @@ int sithCog_ReadCogsListText(SithWorld *world, int a2)
     if ( a2 )
         return 0;
     stdConffile_ReadArgs();
-    if ( _strcmp(stdConffile_g_entry.args[0].value, "world") || _strcmp(stdConffile_g_entry.args[1].value, "aCogs") )
+    if ( _strcmp(stdConffile_g_entry.aArgs[0].value, "world") || _strcmp(stdConffile_g_entry.aArgs[1].value, "aCogs") )
         return 0;
-    num_cogs = _atoi(stdConffile_g_entry.args[2].value);
+    num_cogs = _atoi(stdConffile_g_entry.aArgs[2].value);
     if ( !num_cogs )
         return 1;
     { TWL_EXTRAM_SUGGEST(pSithHS); // Added: word-width fields (fpath is debug-only)
@@ -567,13 +567,13 @@ int sithCog_ReadCogsListText(SithWorld *world, int a2)
         world->numCogs = 0;
         while ( stdConffile_ReadArgs() )
         {
-            if ( !_strcmp(stdConffile_g_entry.args[0].value, "end") )
+            if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "end") )
                 break;
             if ( stdConffile_g_entry.numArgs < 2u )
                 return 0;
-            v9 = sithCog_Load(stdConffile_g_entry.args[1].value);
+            v9 = sithCog_Load(stdConffile_g_entry.aArgs[1].value);
 
-            //printf("%s\n", stdConffile_g_entry.args[1].value);
+            //printf("%s\n", stdConffile_g_entry.aArgs[1].value);
 
             if ( v9 )
             {
@@ -594,10 +594,10 @@ int sithCog_ReadCogsListText(SithWorld *world, int a2)
                 v22 = 2;
                 for (v23 = 0; v23 < v9->pScript->numSymbolRefs; v23++)
                 {
-                    //printf("%s\n", stdConffile_g_entry.args[v22].value);
+                    //printf("%s\n", stdConffile_g_entry.aArgs[v22].value);
                     if ( v21 && (v18->aSymRefs[v23].flags & 1) == 0 && stdConffile_g_entry.numArgs > v22 )
                     {
-                        stdString_SafeStrCopy(v21, stdConffile_g_entry.args[v22].value, 32);
+                        stdString_SafeStrCopy(v21, stdConffile_g_entry.aArgs[v22].value, 32);
                         v21 += 32;
                         ++v22;
                     }
@@ -848,9 +848,9 @@ void sithCog_ThingSendMessage(SithThing *a1, SithThing *a2, int32_t msg)
     sithCog_ThingSendMessageEx(a1, a2, msg, 0.0, 0.0, 0.0, 0.0);
 }
 
-cog_flex_t sithCog_ThingSendMessageEx(SithThing *sender, SithThing *receiver, SITH_MESSAGE message, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3)
+cog_flex_t sithCog_ThingSendMessageEx(SithThing *pMeshCollided, SithThing *pThingCollided, SITH_MESSAGE message, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3)
 {
-    //return _sithCog_SendMessageFromThingEx(sender, receiver, message, param0, param1, param2, param3);
+    //return _sithCog_SendMessageFromThingEx(pMeshCollided, pThingCollided, message, param0, param1, param2, param3);
     int32_t v7; // ebx
     int32_t v8; // ebp
     sithCog *v9; // eax
@@ -867,11 +867,11 @@ cog_flex_t sithCog_ThingSendMessageEx(SithThing *sender, SithThing *receiver, SI
     v19 = 0.0;
     if ( message == SITH_MESSAGE_DAMAGED )
         v19 = param0;
-    if ( receiver )
+    if ( pThingCollided )
     {
-        v7 = receiver->idx;
+        v7 = pThingCollided->idx;
         v8 = 3;
-        receivera = 1 << receiver->type;
+        receivera = 1 << pThingCollided->type;
     }
     else
     {
@@ -879,11 +879,11 @@ cog_flex_t sithCog_ThingSendMessageEx(SithThing *sender, SithThing *receiver, SI
         v8 = 0;
         receivera = 1;
     }
-    v9 = sender->pCog;
+    v9 = pMeshCollided->pCog;
     if ( v9 )
     {
 #ifdef DEBUG_QOL_CHEATS
-        if (receiver == sithPlayer_g_pLocalPlayerThing && message == SITH_MESSAGE_ACTIVATE) {
+        if (pThingCollided == sithPlayer_g_pLocalPlayerThing && message == SITH_MESSAGE_ACTIVATE) {
 #ifdef SITH_DEBUG_STRUCT_NAMES
             jk_printf("OpenJKDF2: Debug thing cog class %s\n", v9->aName);
 #endif
@@ -892,7 +892,7 @@ cog_flex_t sithCog_ThingSendMessageEx(SithThing *sender, SithThing *receiver, SI
 
         if ( message == SITH_MESSAGE_DAMAGED )
         {
-            v10 = sithCog_SendMessageEx(v9, SITH_MESSAGE_DAMAGED, SENDERTYPE_THING, sender->idx, v8, v7, 0, param0, param1, param2, param3);
+            v10 = sithCog_SendMessageEx(v9, SITH_MESSAGE_DAMAGED, SENDERTYPE_THING, pMeshCollided->idx, v8, v7, 0, param0, param1, param2, param3);
             if ( v10 != -9999.9873046875 )
             {
                 v19 = v10;
@@ -901,18 +901,18 @@ cog_flex_t sithCog_ThingSendMessageEx(SithThing *sender, SithThing *receiver, SI
         }
         else
         {
-            v11 = sithCog_SendMessageEx(v9, message, SENDERTYPE_THING, sender->idx, v8, v7, 0, param0, param1, param2, param3);
+            v11 = sithCog_SendMessageEx(v9, message, SENDERTYPE_THING, pMeshCollided->idx, v8, v7, 0, param0, param1, param2, param3);
             if ( v11 != -9999.9873046875 )
             {
                 v19 = v11 + v19;
             }
         }
     }
-    v12 = sender->pCaptureCog;
+    v12 = pMeshCollided->pCaptureCog;
     if ( v12 )
     {
 #ifdef DEBUG_QOL_CHEATS
-        if (receiver == sithPlayer_g_pLocalPlayerThing && message == SITH_MESSAGE_ACTIVATE) {
+        if (pThingCollided == sithPlayer_g_pLocalPlayerThing && message == SITH_MESSAGE_ACTIVATE) {
 #ifdef SITH_DEBUG_STRUCT_NAMES
             jk_printf("OpenJKDF2: Debug thing cog capture %s\n", v12->aName);
 #endif
@@ -920,7 +920,7 @@ cog_flex_t sithCog_ThingSendMessageEx(SithThing *sender, SithThing *receiver, SI
 #endif
         if ( message == SITH_MESSAGE_DAMAGED )
         {
-            v13 = sithCog_SendMessageEx(v12, SITH_MESSAGE_DAMAGED, SENDERTYPE_THING, sender->idx, v8, v7, 0, param0, param1, param2, param3);
+            v13 = sithCog_SendMessageEx(v12, SITH_MESSAGE_DAMAGED, SENDERTYPE_THING, pMeshCollided->idx, v8, v7, 0, param0, param1, param2, param3);
             if ( v13 != -9999.9873046875 )
             {
                 v19 = v13;
@@ -929,7 +929,7 @@ cog_flex_t sithCog_ThingSendMessageEx(SithThing *sender, SithThing *receiver, SI
         }
         else
         {
-            v14 = sithCog_SendMessageEx(v12, message, SENDERTYPE_THING, sender->idx, v8, v7, 0, param0, param1, param2, param3);
+            v14 = sithCog_SendMessageEx(v12, message, SENDERTYPE_THING, pMeshCollided->idx, v8, v7, 0, param0, param1, param2, param3);
             if ( v14 != -9999.9873046875 )
                 v19 = v14 + v19;
         }
@@ -937,10 +937,10 @@ cog_flex_t sithCog_ThingSendMessageEx(SithThing *sender, SithThing *receiver, SI
     for (int32_t i = 0; i < sithCog_numThingLinks; i++)
     {
         SithCogThingLink* v15 = &sithCog_aThingLinks[i];
-        if ( v15->thing == sender && v15->signature == sender->signature && (receivera & v15->mask) != 0 )
+        if ( v15->thing == pMeshCollided && v15->signature == pMeshCollided->signature && (receivera & v15->mask) != 0 )
         {
 #ifdef DEBUG_QOL_CHEATS
-            if (receiver == sithPlayer_g_pLocalPlayerThing &&message == SITH_MESSAGE_ACTIVATE && v15->cog) {
+            if (pThingCollided == sithPlayer_g_pLocalPlayerThing &&message == SITH_MESSAGE_ACTIVATE && v15->cog) {
 #ifdef SITH_DEBUG_STRUCT_NAMES
                 jk_printf("OpenJKDF2: Debug thing cog link %s\n", v15->cog->aName);
 #endif
@@ -952,7 +952,7 @@ cog_flex_t sithCog_ThingSendMessageEx(SithThing *sender, SithThing *receiver, SI
                           v15->cog,
                           SITH_MESSAGE_DAMAGED,
                           SENDERTYPE_THING,
-                          sender->idx,
+                          pMeshCollided->idx,
                           v8,
                           v7,
                           0,
@@ -972,7 +972,7 @@ cog_flex_t sithCog_ThingSendMessageEx(SithThing *sender, SithThing *receiver, SI
                           v15->cog,
                           message,
                           SENDERTYPE_THING,
-                          sender->idx,
+                          pMeshCollided->idx,
                           v8,
                           v7,
                           v15->linkid,
@@ -993,7 +993,7 @@ void sithCog_SurfaceSendMessage(SithSurface *surface, SithThing *thing, int32_t 
     sithCog_SurfaceSendMessageEx(surface, thing, msg, 0.0, 0.0, 0.0, 0.0);
 }
 
-cog_flex_t sithCog_SurfaceSendMessageEx(SithSurface *sender, SithThing *thing, SITH_MESSAGE msg, cog_flex_t a4, cog_flex_t a5, cog_flex_t a6, cog_flex_t a7)
+cog_flex_t sithCog_SurfaceSendMessageEx(SithSurface *pMeshCollided, SithThing *thing, SITH_MESSAGE msg, cog_flex_t a4, cog_flex_t a5, cog_flex_t a6, cog_flex_t a7)
 {
     int32_t v8; // ebp
     cog_flex_t v9; // ebx
@@ -1021,7 +1021,7 @@ cog_flex_t sithCog_SurfaceSendMessageEx(SithSurface *sender, SithThing *thing, S
     for (int32_t i = 0; i < sithCog_numSurfaceLinks; i++)
     {
         SithCogSurfaceLink* surfaceLink = &sithCog_aSurfaceLinks[i];
-        if ( surfaceLink->surface == sender && (surfaceLink->mask & v15) != 0 )
+        if ( surfaceLink->surface == pMeshCollided && (surfaceLink->mask & v15) != 0 )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
             if (thing == sithPlayer_g_pLocalPlayerThing && msg == SITH_MESSAGE_ACTIVATE) {
@@ -1034,7 +1034,7 @@ cog_flex_t sithCog_SurfaceSendMessageEx(SithSurface *sender, SithThing *thing, S
                           surfaceLink->cog,
                           SITH_MESSAGE_DAMAGED,
                           SENDERTYPE_SURFACE,
-                          sender->index,
+                          pMeshCollided->index,
                           sourceType,
                           v8,
                           surfaceLink->linkid,
@@ -1055,7 +1055,7 @@ cog_flex_t sithCog_SurfaceSendMessageEx(SithSurface *sender, SithThing *thing, S
             }
             else
             {
-                v12 = sithCog_SendMessageEx(surfaceLink->cog, msg, SENDERTYPE_SURFACE, sender->index, sourceType, v8, surfaceLink->linkid, v9, a5, a6, a7);
+                v12 = sithCog_SendMessageEx(surfaceLink->cog, msg, SENDERTYPE_SURFACE, pMeshCollided->index, sourceType, v8, surfaceLink->linkid, v9, a5, a6, a7);
                 if ( v12 != -9999.9873046875 )
                     v14 = v12 + v14;
             }
@@ -1556,9 +1556,9 @@ int sithCog_ReadCogScriptsListText(SithWorld *lvl, int a2)
     if ( a2 )
         return 0;
     stdConffile_ReadArgs();
-    if ( _strcmp(stdConffile_g_entry.args[0].value, "world") || _strcmp(stdConffile_g_entry.args[1].value, "scripts") )
+    if ( _strcmp(stdConffile_g_entry.aArgs[0].value, "world") || _strcmp(stdConffile_g_entry.aArgs[1].value, "scripts") )
         return 0;
-    sizeCogScripts = _atoi(stdConffile_g_entry.args[2].value);
+    sizeCogScripts = _atoi(stdConffile_g_entry.aArgs[2].value);
     if ( !sizeCogScripts )
         return 1;
     aCogScripts = (SithCogScript *)SITH_ALLOC(sizeof(SithCogScript) * sizeCogScripts);
@@ -1570,7 +1570,7 @@ int sithCog_ReadCogScriptsListText(SithWorld *lvl, int a2)
         lvl->numCogScripts = 0;
         while ( stdConffile_ReadArgs() )
         {
-            if ( !_strcmp(stdConffile_g_entry.args[0].value, "end") )
+            if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "end") )
                 break;
             if ( lvl->numCogScripts < (unsigned int)lvl->sizeCogScripts )
             {
@@ -1578,7 +1578,7 @@ int sithCog_ReadCogScriptsListText(SithWorld *lvl, int a2)
                     return 0;
 
 
-                sithCog_LoadScript(stdConffile_g_entry.args[1].value, v8);
+                sithCog_LoadScript(stdConffile_g_entry.aArgs[1].value, v8);
             }
         }
         result = 1;

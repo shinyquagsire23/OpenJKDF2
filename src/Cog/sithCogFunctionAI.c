@@ -24,7 +24,7 @@ void sithCogFunctionAI_AISetMovePos(sithCog *ctx)
     SithAIControlBlock *v2; // eax
     rdVector3 v3; // [esp+4h] [ebp-Ch] BYREF
 
-    // TODO: Bug? If the vector is invalid, other args will never get popped.
+    // TODO: Bug? If the vector is invalid, other aArgs will never get popped.
     if (sithCogExec_PopVector(ctx, &v3))
     {
         SithThing* pThing = sithCogExec_PopThing(ctx);
@@ -121,7 +121,7 @@ void sithCogFunctionAI_AISetLookPos(sithCog *ctx)
     SithAIControlBlock *v2; // eax
     rdVector3 v3; // [esp+4h] [ebp-Ch] BYREF
 
-    // TODO: Bug? If the vector is invalid, other args will never get popped.
+    // TODO: Bug? If the vector is invalid, other aArgs will never get popped.
     if ( sithCogExec_PopVector(ctx, &v3) )
     {
         v1 = sithCogExec_PopThing(ctx);

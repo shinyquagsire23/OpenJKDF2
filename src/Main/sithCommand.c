@@ -452,9 +452,9 @@ int sithCommand_DynamicMemory(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     _sprintf(
         std_g_genBuffer,
         "NumAllocs: %d TotalMemAlloc: %d bytes MaxMemAlloc: %d bytes",
-        stdMemory_g_curState.nextNum,
-        stdMemory_g_curState.allocCur,
-        stdMemory_g_curState.allocMax);
+        stdMemory_g_curState.totalAllocs,
+        stdMemory_g_curState.totalBytes,
+        stdMemory_g_curState.maxBytes);
     sithConsole_PrintString(std_g_genBuffer);
     return 1;
 }
@@ -473,10 +473,10 @@ int sithCommand_MemoryDump(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         pSithHS->filePrintf(
             result,
             "Total Memory allocated: %d bytes   # Allocations: %d  Max Memory used: %d bytes\n\n",
-            stdMemory_g_curState.allocCur,
-            stdMemory_g_curState.nextNum,
-            stdMemory_g_curState.allocMax);
-        for ( i = stdMemory_g_curState.allocTop.prev; i; i = i->prev )
+            stdMemory_g_curState.totalBytes,
+            stdMemory_g_curState.totalAllocs,
+            stdMemory_g_curState.maxBytes);
+        for ( i = stdMemory_g_curState.header.prev; i; i = i->prev )
             pSithHS->filePrintf(v3, "%25s:  line %3d   %8d bytes   #%d\n", i->filePath, i->lineNum, i->size, i->num);
         pSithHS->fileClose(v3);
         sithConsole_PrintString("Memory dump file 'memdump.txt' written.");
@@ -839,7 +839,7 @@ int sithCommand_CmdBind(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 
     char* pArgIter = _strtok(pArgStrMutable, ", \t\n\r");
     if ( !pArgIter || strlen(pArgIter) > 1) {
-        _sprintf(std_g_genBuffer, "Usage: %s <key> <command...args>\n", pCmd->cmdStr);
+        _sprintf(std_g_genBuffer, "Usage: %s <key> <command...aArgs>\n", pCmd->cmdStr);
         sithConsole_PrintString(std_g_genBuffer);
         free((void*)pArgStrMutable);
         return 1;
@@ -861,7 +861,7 @@ int sithCommand_CmdBind(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         sithCommand_AddBind(key, tmp);
     }
     else {
-        _sprintf(std_g_genBuffer, "Usage: %s <key> <command...args>\n", pCmd->cmdStr);
+        _sprintf(std_g_genBuffer, "Usage: %s <key> <command...aArgs>\n", pCmd->cmdStr);
         sithConsole_PrintString(std_g_genBuffer);
     }
     free((void*)pArgStrMutable);

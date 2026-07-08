@@ -449,37 +449,37 @@ void sithThing_DestroyThing(SithThing* pThing)
         sithCog_ThingSendMessage(pThing, 0, SITH_MESSAGE_REMOVED);
 }
 
-flex_t sithThing_DamageThing(SithThing *sender, SithThing *reciever, flex_t amount, int damageType)
+flex_t sithThing_DamageThing(SithThing *pMeshCollided, SithThing *reciever, flex_t amount, int damageType)
 {
     flex_t param1; // [esp+0h] [ebp-20h]
 
     // Added: noclip
-    if (sender == sithPlayer_g_pLocalPlayerThing && (g_debugmodeFlags & DEBUGFLAG_NOCLIP)) {
+    if (pMeshCollided == sithPlayer_g_pLocalPlayerThing && (g_debugmodeFlags & DEBUGFLAG_NOCLIP)) {
         return 0.0;
     }
 
     if ( amount <= 0.0 )
         return 0.0;
-    if ( (sender->flags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_DESTROYED)) != 0 )
+    if ( (pMeshCollided->flags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_DESTROYED)) != 0 )
         return 0.0;
-    if ( (sender->flags & SITH_TF_CAPTURED) != 0 && (sender->flags & SITH_TF_INVULN) == 0 )
+    if ( (pMeshCollided->flags & SITH_TF_CAPTURED) != 0 && (pMeshCollided->flags & SITH_TF_INVULN) == 0 )
     {
         param1 = (flex_t)(unsigned int)damageType; // FLEXTODO
-        amount = sithCog_ThingSendMessageEx(sender, reciever, SITH_MESSAGE_DAMAGED, amount, param1, 0.0, 0.0);
+        amount = sithCog_ThingSendMessageEx(pMeshCollided, reciever, SITH_MESSAGE_DAMAGED, amount, param1, 0.0, 0.0);
     }
     if ( amount > 0.0 )
     {
-        if ( sender->type != SITH_THING_ACTOR )
+        if ( pMeshCollided->type != SITH_THING_ACTOR )
         {
-            if ( sender->type == SITH_THING_WEAPON )
+            if ( pMeshCollided->type == SITH_THING_WEAPON )
             {
-                sithWeapon_DamageWeapon(sender, reciever, amount);
+                sithWeapon_DamageWeapon(pMeshCollided, reciever, amount);
                 return amount;
             }
-            if ( sender->type != SITH_THING_PLAYER )
+            if ( pMeshCollided->type != SITH_THING_PLAYER )
                 return amount;
         }
-        amount = amount - sithActor_DamageActor(sender, reciever, amount, damageType);
+        amount = amount - sithActor_DamageActor(pMeshCollided, reciever, amount, damageType);
     }
     return amount;
 }
@@ -1487,11 +1487,11 @@ int sithThing_ReadStaticThingsListText(SithWorld *pWorld, int a2)
         pWorld->numThings = -1;
     }
     stdConffile_ReadArgs();
-    if ( _strcmp(stdConffile_g_entry.args[0].value, "world") )
+    if ( _strcmp(stdConffile_g_entry.aArgs[0].value, "world") )
         return 0;
-    if ( _strcmp(stdConffile_g_entry.args[1].value, "aThings") )
+    if ( _strcmp(stdConffile_g_entry.aArgs[1].value, "aThings") )
         return 0;
-    v10 = _atoi(stdConffile_g_entry.args[2].value);
+    v10 = _atoi(stdConffile_g_entry.aArgs[2].value);
     { TWL_EXTRAM_SUGGEST(pSithHS); // Added: word-safe struct (audited); slow-but-loads on NDS
     paThings = (SithThing *)SITH_ALLOC(sizeof(SithThing) * v10);
     TWL_EXTRAM_RESTORE(pSithHS); }
@@ -1510,27 +1510,27 @@ int sithThing_ReadStaticThingsListText(SithWorld *pWorld, int a2)
     v38 = v20;
     while ( stdConffile_ReadArgs() )
     {
-        if ( !_strcmp(stdConffile_g_entry.args[0].value, "end") )
+        if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "end") )
             break;
-        v21 = &sithWorld_g_pCurrentWorld->aThings[_atoi(stdConffile_g_entry.args[0].value)];
-        v22 = sithTemplate_GetTemplate(stdConffile_g_entry.args[1].value);
+        v21 = &sithWorld_g_pCurrentWorld->aThings[_atoi(stdConffile_g_entry.aArgs[0].value)];
+        v22 = sithTemplate_GetTemplate(stdConffile_g_entry.aArgs[1].value);
         if ( stdConffile_g_entry.numArgs >= 0xAu )
         {
-            pos.x = _atof(stdConffile_g_entry.args[3].value);
-            pos.y = _atof(stdConffile_g_entry.args[4].value);
-            pos.z = _atof(stdConffile_g_entry.args[5].value);
-            a3.x = _atof(stdConffile_g_entry.args[6].value);
-            a3.y = _atof(stdConffile_g_entry.args[7].value);
-            a3.z = _atof(stdConffile_g_entry.args[8].value);
+            pos.x = _atof(stdConffile_g_entry.aArgs[3].value);
+            pos.y = _atof(stdConffile_g_entry.aArgs[4].value);
+            pos.z = _atof(stdConffile_g_entry.aArgs[5].value);
+            a3.x = _atof(stdConffile_g_entry.aArgs[6].value);
+            a3.y = _atof(stdConffile_g_entry.aArgs[7].value);
+            a3.z = _atof(stdConffile_g_entry.aArgs[8].value);
             rdMatrix_BuildRotate34(&a, &a3);
-            v23 = _atoi(stdConffile_g_entry.args[9].value);
+            v23 = _atoi(stdConffile_g_entry.aArgs[9].value);
             if ( v23 >= 0 && v23 < sithWorld_g_pCurrentWorld->numSectors )
             {
                 v24 = &sithWorld_g_pCurrentWorld->aSectors[v23];
-                if ( stdConffile_g_entry.numArgs >= 11 && (stdConffile_g_entry.args[10].key == stdConffile_g_entry.args[10].value)) // MOTS added (w/o comparison)
+                if ( stdConffile_g_entry.numArgs >= 11 && (stdConffile_g_entry.aArgs[10].key == stdConffile_g_entry.aArgs[10].value)) // MOTS added (w/o comparison)
                 {
-                    // && (!stdConffile_g_entry.args[10].key || strlen(stdConffile_g_entry.args[10].key) == 0)
-                    v23 = _atoi(stdConffile_g_entry.args[10].value);
+                    // && (!stdConffile_g_entry.aArgs[10].key || strlen(stdConffile_g_entry.aArgs[10].key) == 0)
+                    v23 = _atoi(stdConffile_g_entry.aArgs[10].value);
                     v21->archlightIdx = v23;
                     //printf("%p %p %x\n", , v21->archlightIdx);
                 }
@@ -1543,7 +1543,7 @@ int sithThing_ReadStaticThingsListText(SithWorld *pWorld, int a2)
                 v27 = 10;
                 if ( stdConffile_g_entry.numArgs > 10 )
                 {
-                    v28 = &stdConffile_g_entry.args[10];
+                    v28 = &stdConffile_g_entry.aArgs[10];
                     do
                     {
                         sithThing_ParseArg(v28, v21);
@@ -1559,7 +1559,7 @@ int sithThing_ReadStaticThingsListText(SithWorld *pWorld, int a2)
                 else
                 {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-                    stdString_SafeStrCopy(v21->aName, stdConffile_g_entry.args[2].value, 0x20);
+                    stdString_SafeStrCopy(v21->aName, stdConffile_g_entry.aArgs[2].value, 0x20);
 #endif
                 }
             }

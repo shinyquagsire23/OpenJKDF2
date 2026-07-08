@@ -70,14 +70,14 @@ int sithCogParse_Load(char *aName, SithCogScript *pScript, int unk)
     if ( !stdConffile_ReadArgs() )
         goto fail_cleanup;
 
-    if ( !_strcmp(stdConffile_g_entry.args[0].key, "flags") )
+    if ( !_strcmp(stdConffile_g_entry.aArgs[0].key, "flags") )
     {
-        _sscanf(stdConffile_g_entry.args[0].value, "%x", pScript);
+        _sscanf(stdConffile_g_entry.aArgs[0].value, "%x", pScript);
         if ( !stdConffile_ReadArgs() )
             goto fail_cleanup;
     }
 
-    if ( _strcmp(stdConffile_g_entry.args[0].value, "symbols") )
+    if ( _strcmp(stdConffile_g_entry.aArgs[0].value, "symbols") )
         goto fail_cleanup;
 
     symboltable = sithCogParse_AllocSymbolTable(SITHCOG_LINKED_SYMBOL_LIMIT);
@@ -87,70 +87,70 @@ int sithCogParse_Load(char *aName, SithCogScript *pScript, int unk)
 
     while ( stdConffile_ReadArgs() )
     {
-        //printf("%s\n", stdConffile_g_entry.args[0].value);
-        if ( !_strcmp(stdConffile_g_entry.args[0].value, "end") )
+        //printf("%s\n", stdConffile_g_entry.aArgs[0].value);
+        if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "end") )
             break;
         if ( pScript->pSymbolTable->numUsedSymbols < (unsigned int)pScript->pSymbolTable->tableSize )
         {
-            if ( !_strcmp(stdConffile_g_entry.args[0].value, "thing") )
+            if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "thing") )
             {
                 sithCogParse_ParseSymbolRef(pScript, 3, unk);
             }
-            else if ( !_strcmp(stdConffile_g_entry.args[0].value, "surface") )
+            else if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "surface") )
             {
                 sithCogParse_ParseSymbolRef(pScript, 6, unk);
             }
-            else if ( !_strcmp(stdConffile_g_entry.args[0].value, "sector") )
+            else if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "sector") )
             {
                 sithCogParse_ParseSymbolRef(pScript, 5, unk);
             }
-            else if ( !_strcmp(stdConffile_g_entry.args[0].value, "sound") )
+            else if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "sound") )
             {
                 sithCogParse_ParseSymbolRef(pScript, 8, unk);
             }
-            else if ( !_strcmp(stdConffile_g_entry.args[0].value, "template") )
+            else if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "template") )
             {
                 sithCogParse_ParseSymbolRef(pScript, 4, unk);
             }
-            else if ( !_strcmp(stdConffile_g_entry.args[0].value, "model") )
+            else if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "model") )
             {
                 sithCogParse_ParseSymbolRef(pScript, 12, unk);
             }
-            else if ( !_strcmp(stdConffile_g_entry.args[0].value, "keyframe") )
+            else if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "keyframe") )
             {
                 sithCogParse_ParseSymbolRef(pScript, 7, unk);
             }
-            else if ( !_strcmp(stdConffile_g_entry.args[0].value, "cog") )
+            else if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "cog") )
             {
                 sithCogParse_ParseSymbolRef(pScript, 9, unk);
             }
-            else if ( !_strcmp(stdConffile_g_entry.args[0].value, "message") )
+            else if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "message") )
             {
                 sithCogParse_ParseMessage(pScript);
             }
-            else if ( !_strcmp(stdConffile_g_entry.args[0].value, "material") )
+            else if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "material") )
             {
                 sithCogParse_ParseSymbolRef(pScript, 10, unk);
             }
-            else if ( !_strcmp(stdConffile_g_entry.args[0].value, "flex") || !_strcmp(stdConffile_g_entry.args[0].value, "float") )
+            else if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "flex") || !_strcmp(stdConffile_g_entry.aArgs[0].value, "float") )
             {
                 sithCogParse_ParseFlex(pScript, unk);
             }
-            else if ( !_strcmp(stdConffile_g_entry.args[0].value, "int") )
+            else if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "int") )
             {
                 sithCogParse_ParseInt(pScript, unk);
             }
-            else if ( !_strcmp(stdConffile_g_entry.args[0].value, "vector") )
+            else if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "vector") )
             {
                 sithCogParse_ParseVector(pScript, unk);
             }
-            else if ( !_strcmp(stdConffile_g_entry.args[0].value, "ai") )
+            else if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "ai") )
             {
                 sithCogParse_ParseSymbolRef(pScript, 13, unk);
             }
         }
     }
-    if ( stdConffile_ReadArgs() && !_strcmp(stdConffile_g_entry.args[0].value, "code") && sithCogParse_ParseSectionCode(pScript) )
+    if ( stdConffile_ReadArgs() && !_strcmp(stdConffile_g_entry.aArgs[0].value, "code") && sithCogParse_ParseSectionCode(pScript) )
     {
         for (v6 = 0; v6 < pScript->numHandlers; v6++)
         {
@@ -188,7 +188,7 @@ fail_cleanup:
 
 int sithCogParse_ParseSectionCode(SithCogScript *script)
 {
-    stdFile_t fhand; // eax
+    stdFile_t hGobFile; // eax
     sith_cog_parser_node *v2; // eax
     sith_cog_parser_node *v3; // esi
     int v5; // eax
@@ -205,14 +205,14 @@ int sithCogParse_ParseSectionCode(SithCogScript *script)
     int32_t *v17; // edx
     int next_stackpos; // ecx
 
-    fhand = stdConffile_GetFileHandle();
+    hGobFile = stdConffile_GetFileHandle();
     parsing_script = script;
-    yyin = (stdFile_t)fhand;
+    yyin = (stdFile_t)hGobFile;
     sithCogParse_pSymbolTable = script->pSymbolTable;
     if ( parsing_script_idk )
         parsing_script_idk = 0;
     else
-        yyrestart((FILE*)fhand);
+        yyrestart((FILE*)hGobFile);
     yacc_linenum = 1;
     if (yyparse())
     {
@@ -849,7 +849,7 @@ int sithCogParse_ParseSymbolRef(SithCogScript *cogScript, int a2, int unk)
     if ( stdConffile_g_entry.numArgs < 2u )
         return 0;
     
-    SithCogSymbol* symbol = sithCogParse_AddSymbol(cogScript->pSymbolTable, stdConffile_g_entry.args[1].key);
+    SithCogSymbol* symbol = sithCogParse_AddSymbol(cogScript->pSymbolTable, stdConffile_g_entry.aArgs[1].key);
     
     if ( !symbol )
         return 0;
@@ -875,7 +875,7 @@ int sithCogParse_ParseSymbolRef(SithCogScript *cogScript, int a2, int unk)
         
     for (unsigned int i = 2; i < stdConffile_g_entry.numArgs; i++)
     {
-        StdConffileArg* arg = &stdConffile_g_entry.args[i];
+        StdConffileArg* arg = &stdConffile_g_entry.aArgs[i];
         if ( !_strcmp(arg->key, "local") )
         {
             cogIdk->flags |= 1;
@@ -900,11 +900,11 @@ int sithCogParse_ParseSymbolRef(SithCogScript *cogScript, int a2, int unk)
             cogIdk->linkid = -1;
         }
     }
-    if ( stdConffile_g_entry.args[1].value )
+    if ( stdConffile_g_entry.aArgs[1].value )
     {
-        if ( stdConffile_g_entry.args[1].value != stdConffile_g_entry.args[1].key )
+        if ( stdConffile_g_entry.aArgs[1].value != stdConffile_g_entry.aArgs[1].key )
         {
-            stdString_SafeStrCopy(cogScript->aSymRefs[cogScript->numSymbolRefs].value, stdConffile_g_entry.args[1].value, 32);
+            stdString_SafeStrCopy(cogScript->aSymRefs[cogScript->numSymbolRefs].value, stdConffile_g_entry.aArgs[1].value, 32);
         }
     }
     ++cogScript->numSymbolRefs;
@@ -918,7 +918,7 @@ int sithCogParse_ParseFlex(SithCogScript *cogScript, int a2)
     if ( cogScript->numSymbolRefs >= 0x80u ) // added
         return 0;
 
-    SithCogSymbol* symbol = sithCogParse_AddSymbol(cogScript->pSymbolTable, stdConffile_g_entry.args[1].key);
+    SithCogSymbol* symbol = sithCogParse_AddSymbol(cogScript->pSymbolTable, stdConffile_g_entry.aArgs[1].key);
     
     if ( !symbol )
         return 0;
@@ -930,11 +930,11 @@ int sithCogParse_ParseFlex(SithCogScript *cogScript, int a2)
     symbol->val.dataAsPtrs[1] = 0;
     symbol->val.dataAsPtrs[2] = 0;
 #endif
-    symbol->val.dataAsFloat[0] = _atof(stdConffile_g_entry.args[1].value);
+    symbol->val.dataAsFloat[0] = _atof(stdConffile_g_entry.aArgs[1].value);
     
     for (int i = 2; i < stdConffile_g_entry.numArgs; i++)
     {
-        StdConffileArg* arg = &stdConffile_g_entry.args[i];
+        StdConffileArg* arg = &stdConffile_g_entry.aArgs[i];
         
         if ( !_strcmp(arg->key, "local") )
         {
@@ -969,7 +969,7 @@ int sithCogParse_ParseInt(SithCogScript *cogScript, int a2)
     if ( cogScript->numSymbolRefs >= 0x80u ) // added
         return 0;
 
-    SithCogSymbol* symbol = sithCogParse_AddSymbol(cogScript->pSymbolTable, stdConffile_g_entry.args[1].key);
+    SithCogSymbol* symbol = sithCogParse_AddSymbol(cogScript->pSymbolTable, stdConffile_g_entry.aArgs[1].key);
     
     if ( !symbol )
         return 0;
@@ -981,11 +981,11 @@ int sithCogParse_ParseInt(SithCogScript *cogScript, int a2)
     symbol->val.dataAsPtrs[1] = 0;
     symbol->val.dataAsPtrs[2] = 0;
 #endif
-    symbol->val.data[0] = _atoi(stdConffile_g_entry.args[1].value);
+    symbol->val.data[0] = _atoi(stdConffile_g_entry.aArgs[1].value);
     
     for (int i = 2; i < stdConffile_g_entry.numArgs; i++)
     {
-        StdConffileArg* arg = &stdConffile_g_entry.args[i];
+        StdConffileArg* arg = &stdConffile_g_entry.aArgs[i];
         
         if ( !_strcmp(arg->key, "local") )
         {
@@ -1020,7 +1020,7 @@ int sithCogParse_ParseVector(SithCogScript *cogScript, int a2)
     if ( cogScript->numSymbolRefs >= 0x80u ) // added
         return 0;
 
-    SithCogSymbol* symbol = sithCogParse_AddSymbol(cogScript->pSymbolTable, stdConffile_g_entry.args[1].key);
+    SithCogSymbol* symbol = sithCogParse_AddSymbol(cogScript->pSymbolTable, stdConffile_g_entry.aArgs[1].key);
     
     if ( !symbol )
         return 0;
@@ -1036,7 +1036,7 @@ int sithCogParse_ParseVector(SithCogScript *cogScript, int a2)
     
     for (int i = 2; i < stdConffile_g_entry.numArgs; i++)
     {
-        StdConffileArg* arg = &stdConffile_g_entry.args[i];
+        StdConffileArg* arg = &stdConffile_g_entry.aArgs[i];
         
         if ( !_strcmp(arg->key, "local") )
         {
@@ -1069,13 +1069,13 @@ int sithCogParse_ParseMessage(SithCogScript *cogScript)
     if ( cogScript->numHandlers == 32 )
         return 0;
 
-    SithCogSymbol* symbolGet = sithCogParse_GetSymbol(sithCog_g_pSymbolTable, stdConffile_g_entry.args[1].value);
+    SithCogSymbol* symbolGet = sithCogParse_GetSymbol(sithCog_g_pSymbolTable, stdConffile_g_entry.aArgs[1].value);
     if (!symbolGet) return 0;
 
-    SithCogSymbol* symbol = sithCogParse_AddSymbol(cogScript->pSymbolTable, stdConffile_g_entry.args[1].key);
+    SithCogSymbol* symbol = sithCogParse_AddSymbol(cogScript->pSymbolTable, stdConffile_g_entry.aArgs[1].key);
     if (!symbol) return 0;
     
-    //printf("Add message? %x %x %s\n", symbolGet->val.data[0], symbol->field_14, stdConffile_g_entry.args[1].value);
+    //printf("Add message? %x %x %s\n", symbolGet->val.data[0], symbol->field_14, stdConffile_g_entry.aArgs[1].value);
     
 #ifdef COG_DYNAMIC_TRIGGERS
     cogScript->aHandlers = (sithCogTrigger*)SITH_REALLOC(cogScript->aHandlers, sizeof(sithCogTrigger) * (cogScript->numHandlers+1));

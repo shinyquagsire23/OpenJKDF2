@@ -127,7 +127,7 @@ void sithWeapon_HandleImpact(SithThing *weapon)
                 }
                 while ( size < searchRes->distance );
             }
-            if ( (searchRes->hitType & SITHCOLLISION_ADJOINCROSS) == 0 )
+            if ( (searchRes->type & SITHCOLLISION_ADJOINCROSS) == 0 )
                 break;
             sector = searchRes->surface->pAdjoin->sector;
             searchRes = sithCollision_PopStack();
@@ -140,12 +140,12 @@ void sithWeapon_HandleImpact(SithThing *weapon)
             if ( weapon->weaponParams.minDamage > (flex_d_t)damage_ )
                 damage_ = weapon->weaponParams.minDamage;
         }
-        if (searchRes->hitType & SITHCOLLISION_THING)
+        if (searchRes->type & SITHCOLLISION_THING)
         {
-            sithThing_DamageThing(searchRes->receiver, weapon, damage_, weapon->weaponParams.damageType);
+            sithThing_DamageThing(searchRes->pThingCollided, weapon, damage_, weapon->weaponParams.damageType);
             if ( weapon->weaponParams.force != 0.0 )
             {
-                damageReceiver = searchRes->receiver;
+                damageReceiver = searchRes->pThingCollided;
                 if ( damageReceiver->moveType == SITH_MT_PHYSICS && MOTS_ONLY_FLAG(damageReceiver->type != SITH_THING_COG))
                 {
                     rdVector_Scale3(&tmp2, &weaponPos_, weapon->weaponParams.force);
@@ -153,7 +153,7 @@ void sithWeapon_HandleImpact(SithThing *weapon)
                 }
             }
         }
-        else if ( (searchRes->hitType & SITHCOLLISION_WORLD) != 0 )
+        else if ( (searchRes->type & SITHCOLLISION_WORLD) != 0 )
         {
             sithSurface_HandleThingImpact(searchRes->surface, weapon, damage_, weapon->weaponParams.damageType);
         }
@@ -311,7 +311,7 @@ void sithWeapon_sub_4D3920(SithThing *weapon)
                 }
                 while ( elementSize_ < (flex_d_t)searchRes->distance );
             }
-            if ( (searchRes->hitType & SITHCOLLISION_ADJOINCROSS) == 0 )
+            if ( (searchRes->type & SITHCOLLISION_ADJOINCROSS) == 0 )
                 break;
             sector = searchRes->surface->pAdjoin->sector;
             searchRes = sithCollision_PopStack();
@@ -325,12 +325,12 @@ void sithWeapon_sub_4D3920(SithThing *weapon)
             if ( v22 > amount )
                 amount = weapon->weaponParams.minDamage;
         }
-        if ( (searchRes->hitType & SITHCOLLISION_THING) != 0 )
+        if ( (searchRes->type & SITHCOLLISION_THING) != 0 )
         {
-            sithThing_DamageThing(searchRes->receiver, weapon, amount, weapon->weaponParams.damageType);
+            sithThing_DamageThing(searchRes->pThingCollided, weapon, amount, weapon->weaponParams.damageType);
             if ( weapon->weaponParams.force != 0.0 )
             {
-                receiveThing = searchRes->receiver;
+                receiveThing = searchRes->pThingCollided;
                 if ( receiveThing->moveType == SITH_MT_PHYSICS )
                 {
                     tmp2.x = weapon->weaponParams.force * lookOrient.x;
@@ -340,7 +340,7 @@ void sithWeapon_sub_4D3920(SithThing *weapon)
                 }
             }
         }
-        else if ( (searchRes->hitType & SITHCOLLISION_WORLD) != 0 )
+        else if ( (searchRes->type & SITHCOLLISION_WORLD) != 0 )
         {
             sithSurface_HandleThingImpact(searchRes->surface, weapon, amount, weapon->weaponParams.damageType);
         }
@@ -504,7 +504,7 @@ SithThing* sithWeapon_WeaponFire(SithThing *weapon, SithThing *projectile, rdVec
     return spawned;
 }
 
-SithThing* sithWeapon_WeaponFireProjectile(SithThing *sender, SithThing *projectileTemplate, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, flex_t scale, char scaleFlags, flex_t a9, int extra)
+SithThing* sithWeapon_WeaponFireProjectile(SithThing *pMeshCollided, SithThing *projectileTemplate, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, flex_t scale, char scaleFlags, flex_t a9, int extra)
 {
     SithThing *v9; // esi
     flex_d_t v17; // st7
@@ -518,10 +518,10 @@ SithThing* sithWeapon_WeaponFireProjectile(SithThing *sender, SithThing *project
     flex_t a6c; // [esp+74h] [ebp+1Ch]
     flex_t a6; // [esp+74h] [ebp+1Ch]
 
-    //return sithWeapon_FireProjectile_0_(sender, projectileTemplate, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9);
+    //return sithWeapon_FireProjectile_0_(pMeshCollided, projectileTemplate, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9);
 
     v9 = 0;
-    if ( !sender || !fireOffset )
+    if ( !pMeshCollided || !fireOffset )
         return 0;
 
     if ( projectileTemplate )
@@ -541,7 +541,7 @@ SithThing* sithWeapon_WeaponFireProjectile(SithThing *sender, SithThing *project
                 projectileTemplate->physicsParams.vel.z = 0;
             }
         }
-        v9 = sithThing_CreateThingAtPos(projectileTemplate, &sender->position, &a3a, sender->sector, sender);
+        v9 = sithThing_CreateThingAtPos(projectileTemplate, &pMeshCollided->position, &a3a, pMeshCollided->sector, pMeshCollided);
         if (Main_bMotsCompat) {
             projectileTemplate->physicsParams.vel.z = fVar3;
         }
@@ -565,7 +565,7 @@ SithThing* sithWeapon_WeaponFireProjectile(SithThing *sender, SithThing *project
             v9->weaponParams.damage *= scale;
         if (scaleFlags & 8)
             v9->weaponParams.unk8 *= scale;
-        rdVector_Sub3(&a1, aimError, &sender->position);
+        rdVector_Sub3(&a1, aimError, &pMeshCollided->position);
         if (!rdVector_IsZero3(&a1))
         {
             a6a = rdVector_Normalize3Acc(&a1);
@@ -583,16 +583,16 @@ SithThing* sithWeapon_WeaponFireProjectile(SithThing *sender, SithThing *project
         }
 
         // TODO Co-op
-        if ( !sithNet_isMulti && jkPlayer_setDiff && sender == sithPlayer_g_pLocalPlayerThing && (v9->weaponParams.flags & SITH_WF_EMITAITARGETEDEVENT) != 0 )
+        if ( !sithNet_isMulti && jkPlayer_setDiff && pMeshCollided == sithPlayer_g_pLocalPlayerThing && (v9->weaponParams.flags & SITH_WF_EMITAITARGETEDEVENT) != 0 )
         {
             v18 = rdVector_Normalize3(&a5a, &v9->physicsParams.vel) * 3.0;
             a6 = v18 >= 5.0 ? (flex_t)5.0 : (flex_t)v18; // FLEXTODO
             sithCollision_SearchForCollisions(v9->sector, v9, &v9->position, &a5a, a6, 0.0, RAYCAST_2);
             v19 = sithCollision_PopStack();
             sithCollision_DecreaseStackLevel();
-            if (v19 && v19->hitType & SITHCOLLISION_THING)
+            if (v19 && v19->type & SITHCOLLISION_THING)
             {
-                v20 = v19->receiver;
+                v20 = v19->pThingCollided;
                 if ( v20->controlType == SITH_CT_AI )
                     sithAI_EmitEvent(v20->actor, SITHAI_MODE_SLEEPING, (intptr_t)v9); // aaaaaaaaa undefined
             }
@@ -602,12 +602,12 @@ SithThing* sithWeapon_WeaponFireProjectile(SithThing *sender, SithThing *project
 
 LABEL_31:
     if ( fireSound ) {
-        sithSoundMixer_PlaySoundThing(fireSound, sender, 1.0, 1.0, 4.0, SITHSOUNDFLAG_FOLLOWSTHING|SITHSOUNDFLAG_HIGHPRIO);
+        sithSoundMixer_PlaySoundThing(fireSound, pMeshCollided, 1.0, 1.0, 4.0, SITHSOUNDFLAG_FOLLOWSTHING|SITHSOUNDFLAG_HIGHPRIO);
     }
     if ( anim >= 0 )
     {
-        if ( sender->pPuppetClass ) {
-            sithPuppet_PlayMode(sender, anim, 0);
+        if ( pMeshCollided->pPuppetClass ) {
+            sithPuppet_PlayMode(pMeshCollided, anim, 0);
         }
     }
 
@@ -1274,7 +1274,7 @@ int sithWeapon_ProcessWeaponControls(SithThing *player, flex_t a2)
 }
 
 // MOTS altered ??
-void sithWeapon_GetAimOrient(rdMatrix34 *out, SithThing *sender, rdMatrix34 *in, rdVector3 *fireOffset, flex_t autoaimFov, flex_t autoaimMaxDist)
+void sithWeapon_GetAimOrient(rdMatrix34 *out, SithThing *pMeshCollided, rdMatrix34 *in, rdVector3 *fireOffset, flex_t autoaimFov, flex_t autoaimMaxDist)
 {
     unsigned int v9; // ebp
     unsigned int v10; // ebx
@@ -1308,7 +1308,7 @@ void sithWeapon_GetAimOrient(rdMatrix34 *out, SithThing *sender, rdMatrix34 *in,
     }
     _memcpy(out, in, sizeof(rdMatrix34));
     rdVector_Copy3(&out->scale, fireOffset);
-    v9 = sithAI_FirstThingInView(sender->sector, out, autoaimFov, autoaimMaxDist, 16, thingList, 1028, g_flt_8BD044);
+    v9 = sithAI_FirstThingInView(pMeshCollided->sector, out, autoaimFov, autoaimMaxDist, 16, thingList, 1028, g_flt_8BD044);
     if ( v9 )
     {
         v10 = 0;
@@ -1318,12 +1318,12 @@ void sithWeapon_GetAimOrient(rdMatrix34 *out, SithThing *sender, rdMatrix34 *in,
         do
         {
             v12 = *v11;
-            if ( *v11 != sender && (v12->actorParams.flags & SITH_AF_NOTARGET) == 0 )
+            if ( *v11 != pMeshCollided && (v12->actorParams.flags & SITH_AF_NOTARGET) == 0 )
             {
-                if ( sithCollision_HasLOS(sender, v12, 0) )
+                if ( sithCollision_HasLOS(pMeshCollided, v12, 0) )
                 {
                     v13 = *v11;
-                    rdVector_Sub3(&v16, &v13->position, &sender->position);
+                    rdVector_Sub3(&v16, &v13->position, &pMeshCollided->position);
                     if (rdVector_Len3(&v16) > g_flt_8BD040)
                     {
                         v17 = out->lvec;
@@ -1491,32 +1491,32 @@ int sithWeapon_ReadConf()
 {
     return stdConffile_ReadArgs()
         && stdConffile_g_entry.numArgs
-        && !_strcmp(stdConffile_g_entry.args[0].key, "autopickup")
-        && _sscanf(stdConffile_g_entry.args[1].value, "%d", &sithWeapon_bAutoPickup) == 1
+        && !_strcmp(stdConffile_g_entry.aArgs[0].key, "autopickup")
+        && _sscanf(stdConffile_g_entry.aArgs[1].value, "%d", &sithWeapon_bAutoPickup) == 1
         && stdConffile_ReadArgs()
         && stdConffile_g_entry.numArgs
-        && !_strcmp(stdConffile_g_entry.args[0].key, "autoswitch")
-        && _sscanf(stdConffile_g_entry.args[1].value, "%d", &sithWeapon_bAutoSwitch) == 1
+        && !_strcmp(stdConffile_g_entry.aArgs[0].key, "autoswitch")
+        && _sscanf(stdConffile_g_entry.aArgs[1].value, "%d", &sithWeapon_bAutoSwitch) == 1
         && stdConffile_ReadArgs()
         && stdConffile_g_entry.numArgs
-        && !_strcmp(stdConffile_g_entry.args[0].key, "autoreload")
-        && _sscanf(stdConffile_g_entry.args[1].value, "%d", &sithWeapon_bAutoReload) == 1
+        && !_strcmp(stdConffile_g_entry.aArgs[0].key, "autoreload")
+        && _sscanf(stdConffile_g_entry.aArgs[1].value, "%d", &sithWeapon_bAutoReload) == 1
         && stdConffile_ReadArgs()
         && stdConffile_g_entry.numArgs
-        && !_strcmp(stdConffile_g_entry.args[0].key, "multiautopickup")
-        && _sscanf(stdConffile_g_entry.args[1].value, "%d", &sithWeapon_bMultiAutoPickup) == 1
+        && !_strcmp(stdConffile_g_entry.aArgs[0].key, "multiautopickup")
+        && _sscanf(stdConffile_g_entry.aArgs[1].value, "%d", &sithWeapon_bMultiAutoPickup) == 1
         && stdConffile_ReadArgs()
         && stdConffile_g_entry.numArgs
-        && !_strcmp(stdConffile_g_entry.args[0].key, "multiautoswitch")
-        && _sscanf(stdConffile_g_entry.args[1].value, "%d", &sithWeapon_bMultiplayerAutoSwitch) == 1
+        && !_strcmp(stdConffile_g_entry.aArgs[0].key, "multiautoswitch")
+        && _sscanf(stdConffile_g_entry.aArgs[1].value, "%d", &sithWeapon_bMultiplayerAutoSwitch) == 1
         && stdConffile_ReadArgs()
         && stdConffile_g_entry.numArgs
-        && !_strcmp(stdConffile_g_entry.args[0].key, "multiautoreload")
-        && _sscanf(stdConffile_g_entry.args[1].value, "%d", &sithWeapon_bMultiAutoReload) == 1
+        && !_strcmp(stdConffile_g_entry.aArgs[0].key, "multiautoreload")
+        && _sscanf(stdConffile_g_entry.aArgs[1].value, "%d", &sithWeapon_bMultiAutoReload) == 1
         && stdConffile_ReadArgs()
         && stdConffile_g_entry.numArgs
-        && !_strcmp(stdConffile_g_entry.args[0].key, "autoaim")
-        && _sscanf(stdConffile_g_entry.args[1].value, "%d", &sithWeapon_bAutoAim) == 1;
+        && !_strcmp(stdConffile_g_entry.aArgs[0].key, "autoaim")
+        && _sscanf(stdConffile_g_entry.aArgs[1].value, "%d", &sithWeapon_bAutoAim) == 1;
 }
 
 // TODO these functions are interesting

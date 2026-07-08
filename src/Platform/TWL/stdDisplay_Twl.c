@@ -39,7 +39,7 @@ void stdDisplay_Close()
     stdDisplay_bOpen = 0;
 }
 
-int stdDisplay_FindClosestMode(render_pair *a1, struct StdVideoMode *render_surface, unsigned int max_modes)
+int stdDisplay_FindClosestMode(render_pair *a1, struct StdVideoMode *render_surface, unsigned int numModes)
 {
     Video_curMode = 0;
     stdDisplay_bPaged = 1;
@@ -72,7 +72,7 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
     stdDisplay_pCurVideoMode = &Video_renderSurface[modeIdx];
     
     stdDisplay_pCurVideoMode->format.format.bpp = 8;
-    stdDisplay_pCurVideoMode->format.width_in_pixels = newW;
+    stdDisplay_pCurVideoMode->format.rowWidth = newW;
     stdDisplay_pCurVideoMode->format.width = newW;
     stdDisplay_pCurVideoMode->format.height = newH;
     
@@ -139,13 +139,13 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
     //Video_menuBuffer.sdlSurface = menuSurface;
     //Video_overlayMapBuffer.sdlSurface = overlaySurface;
 
-    Video_menuBuffer.format.width_in_bytes = pitch;
-    Video_otherBuf.format.width_in_bytes = pitch;
-    //Video_overlayMapBuffer.format.width_in_bytes = overlaySurface->pitch;
+    Video_menuBuffer.format.rowSize = pitch;
+    Video_otherBuf.format.rowSize = pitch;
+    //Video_overlayMapBuffer.format.rowSize = overlaySurface->pitch;
     
-    Video_menuBuffer.format.width_in_pixels = pitch;
-    Video_otherBuf.format.width_in_pixels = pitch;
-    //Video_overlayMapBuffer.format.width_in_pixels = overlaySurface->pitch;
+    Video_menuBuffer.format.rowWidth = pitch;
+    Video_otherBuf.format.rowWidth = pitch;
+    //Video_overlayMapBuffer.format.rowWidth = overlaySurface->pitch;
 
     Video_menuBuffer.format.width = newW;
     Video_otherBuf.format.width = newW;
@@ -158,14 +158,14 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
     Video_otherBuf.format.format.bpp = 8;
     //Video_overlayMapBuffer.format.format.bpp = 8;
 
-    Video_menuBuffer.format.texture_size_in_bytes = pitch * newH;
-    Video_otherBuf.format.texture_size_in_bytes = pitch * newH;
+    Video_menuBuffer.format.size = pitch * newH;
+    Video_otherBuf.format.size = pitch * newH;
 
     //out->format.width = 0;
-    //out->format.width_in_bytes = 0;
+    //out->format.rowSize = 0;
     if (!Video_menuBuffer.surface_lock_alloc)
-        Video_menuBuffer.surface_lock_alloc = (char*)STD_ALLOC(Video_menuBuffer.format.texture_size_in_bytes);
-    //Video_otherBuf.surface_lock_alloc = STD_ALLOC(Video_otherBuf.format.texture_size_in_bytes);
+        Video_menuBuffer.surface_lock_alloc = (char*)STD_ALLOC(Video_menuBuffer.format.size);
+    //Video_otherBuf.surface_lock_alloc = STD_ALLOC(Video_otherBuf.format.size);
 
 #if 0
     glGenTextures(1, &Video_menuTexId);
@@ -248,20 +248,20 @@ tVBuffer* stdDisplay_VBufferNew(tRasterInfo *fmt, int create_ddraw_surface, int 
     _memcpy(&out->format, fmt, sizeof(out->format));
     
     // TODO
-    out->format.width_in_bytes = fmt->width;
-    out->format.width_in_pixels = fmt->width;
-    out->format.texture_size_in_bytes = fmt->width * fmt->height;
+    out->format.rowSize = fmt->width;
+    out->format.rowWidth = fmt->width;
+    out->format.size = fmt->width * fmt->height;
 
     if (fmt->format.bpp == 16) {
-        out->format.texture_size_in_bytes *= 2;
+        out->format.size *= 2;
     }
 
     //out->format.width = 0;
-    //out->format.width_in_bytes = 0;
+    //out->format.rowSize = 0;
     // pVBuffer pixel data is only accessed word-safe on this port, so allow
     // placement in word-addressable-only memory (e.g. future slot-2 RAM heap).
     int prevSuggest = std_g_pHS->suggestHeap(HEAP_WORD_ADDRESSABLE);
-    out->surface_lock_alloc = (char*)STD_ALLOC(out->format.texture_size_in_bytes);
+    out->surface_lock_alloc = (char*)STD_ALLOC(out->format.size);
     std_g_pHS->suggestHeap(prevSuggest);
     if (!out->surface_lock_alloc) {
         STD_FREE(out);
@@ -299,9 +299,9 @@ tVBuffer* stdDisplay_VBufferNew(tRasterInfo *fmt, int create_ddraw_surface, int 
     {
         static int num = 0;
         //printf("Allocated VBuffer %u, w %u h %u bpp %u %x %x %x\n", num++, fmt->width, fmt->height, fmt->format.bpp, rbitmask, gbitmask, bbitmask);
-        out->format.width_in_bytes = surface->pitch;
-        out->format.width_in_pixels = fmt->width;
-        out->format.texture_size_in_bytes = surface->pitch * fmt->height;
+        out->format.rowSize = surface->pitch;
+        out->format.rowWidth = fmt->width;
+        out->format.size = surface->pitch * fmt->height;
     }
     else
     {
@@ -361,8 +361,8 @@ int stdDisplay_VBufferCopy(tVBuffer *vbuf, tVBuffer *vbuf2, unsigned int blit_x,
     
     uint8_t* srcPixels = vbuf2 ? (uint8_t*)vbuf2->surface_lock_alloc : NULL;
     uint8_t* dstPixels = (uint8_t*)vbuf->surface_lock_alloc;
-    uint32_t srcStride = vbuf2 ? vbuf2->format.width_in_bytes : 0;
-    uint32_t dstStride = vbuf->format.width_in_bytes;
+    uint32_t srcStride = vbuf2 ? vbuf2->format.rowSize : 0;
+    uint32_t dstStride = vbuf->format.rowSize;
 
     if (!srcPixels && dstPixels) {
         int has_alpha = !(rect->width == 640) && (alpha_maybe & 1);
@@ -496,7 +496,7 @@ int stdDisplay_VBufferFill(tVBuffer *vbuf, int fillColor, rdRect *rect)
     //printf("%x; %u %u %u %u\n", fillColor, rect->x, rect->y, rect->width, rect->height);
     
     uint8_t* dstPixels = (uint8_t*)vbuf->surface_lock_alloc;
-    uint32_t dstStride = vbuf->format.width_in_bytes;
+    uint32_t dstStride = vbuf->format.rowSize;
     uint32_t max_idx = dstStride * vbuf->format.height;
 
     if (!dstPixels) {
@@ -530,9 +530,9 @@ int stdDisplay_VBufferSetColorKey(tVBuffer *vbuf, int color)
     if (!vbuf) return 1;
     //DDCOLORKEY v3; // [esp+0h] [ebp-8h] BYREF
 
-    if ( vbuf->bSurfaceLocked )
+    if ( vbuf->lockRefCount )
     {
-        /*if ( vbuf->bSurfaceLocked == 1 )
+        /*if ( vbuf->lockRefCount == 1 )
         {
             v3.dwColorSpaceLowValue = color;
             v3.dwColorSpaceHighValue = color;

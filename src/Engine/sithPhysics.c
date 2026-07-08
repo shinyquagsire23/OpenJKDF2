@@ -46,7 +46,7 @@ void sithPhysics_FindFloor(SithThing *pThing, int a3)
         v5 = sithCollision_PopStack();
         if ( v5 )
         {
-            while ( (v5->hitType & SITHCOLLISION_ADJOINCROSS) == 0 || (v5->surface->pAdjoin->sector->flags & SITH_SECTOR_UNDERWATER) != 0 )
+            while ( (v5->type & SITHCOLLISION_ADJOINCROSS) == 0 || (v5->surface->pAdjoin->sector->flags & SITH_SECTOR_UNDERWATER) != 0 )
             {
                 v5 = sithCollision_PopStack();
                 if ( !v5 )
@@ -105,20 +105,20 @@ LABEL_8:
             {
                 for ( i = sithCollision_PopStack(); i; i = sithCollision_PopStack() )
                 {
-                    if ( (i->hitType & SITHCOLLISION_WORLD) != 0 )
+                    if ( (i->type & SITHCOLLISION_WORLD) != 0 )
                     {
                         //printf("Attach to new surface? %x\n", i->surface->field_0);
                         sithThing_AttachThingToSurface(pThing, i->surface, a3);
                         sithCollision_DecreaseStackLevel();
                         return;
                     }
-                    if ( (i->hitType & SITHCOLLISION_THING) != 0 )
+                    if ( (i->type & SITHCOLLISION_THING) != 0 )
                     {
-                        v11 = i->receiver;
+                        v11 = i->pThingCollided;
                         if ( v11 != pThing )
                         {
                             v12 = i->face;
-                            if ( !v12 || !i->sender )
+                            if ( !v12 || !i->pMeshCollided )
                             {
                                 sithCollision_DecreaseStackLevel();
                                 return;
@@ -128,7 +128,7 @@ LABEL_8:
                             if ( (searchFlags & RAYCAST_10) == 0
                               || (rdMatrix_TransformVector34(&a1, &v12->normal, &v11->orient), rdVector_Dot3(&a1, &rdroid_zVector3) >= 0.6) )
                             {
-                                sithThing_AttachThingToThingFace(pThing, v11, i->face, i->sender->aVertices, a3);
+                                sithThing_AttachThingToThingFace(pThing, v11, i->face, i->pMeshCollided->aVertices, a3);
                                 sithCollision_DecreaseStackLevel();
                                 return;
                             }

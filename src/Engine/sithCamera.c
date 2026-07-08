@@ -577,11 +577,11 @@ SithSector* sithCamera_SearchSectorInRadius(SithThing *a3, SithSector *a2, rdVec
     sithCollision_SearchForCollisions(a2, a3, a4, &a5, a6a, a7, flags | RAYCAST_800);
     for ( i = sithCollision_PopStack(); i; i = sithCollision_PopStack() )
     {
-        if ( (i->hitType & SITHCOLLISION_ADJOINCROSS) != 0 )
+        if ( (i->type & SITHCOLLISION_ADJOINCROSS) != 0 )
         {
             v9 = i->surface->pAdjoin->sector;
         }
-        else if ( (i->hitType & SITHCOLLISION_THING) == 0 || (i->receiver->type != SITH_THING_ITEM) && i->distance != 0.0 && i->receiver->type != SITH_THING_WEAPON )
+        else if ( (i->type & SITHCOLLISION_THING) == 0 || (i->pThingCollided->type != SITH_THING_ITEM) && i->distance != 0.0 && i->pThingCollided->type != SITH_THING_WEAPON )
         {
             rdVector_Copy3(a6, a4);
             rdVector_ScaleAdd3Acc(a6, &a5, i->distance);

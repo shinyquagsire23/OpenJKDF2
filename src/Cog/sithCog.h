@@ -83,9 +83,9 @@ void sithCogFunctionSector_Startup(SithCogSymbolTable* a1);
 void sithCogSurface_Startup(SithCogSymbolTable* a1);
 
 void sithCog_ThingSendMessage(SithThing *a1, SithThing *a2, int32_t msg);
-cog_flex_t sithCog_ThingSendMessageEx(SithThing *sender, SithThing *receiver, SITH_MESSAGE message, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3);
+cog_flex_t sithCog_ThingSendMessageEx(SithThing *pMeshCollided, SithThing *pThingCollided, SITH_MESSAGE message, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3);
 void sithCog_SurfaceSendMessage(SithSurface *surface, SithThing *thing, int32_t msg);
-cog_flex_t sithCog_SurfaceSendMessageEx(SithSurface *sender, SithThing *thing, SITH_MESSAGE msg, cog_flex_t a4, cog_flex_t a5, cog_flex_t a6, cog_flex_t a7);
+cog_flex_t sithCog_SurfaceSendMessageEx(SithSurface *pMeshCollided, SithThing *thing, SITH_MESSAGE msg, cog_flex_t a4, cog_flex_t a5, cog_flex_t a6, cog_flex_t a7);
 void sithCog_SectorSendMessage(SithSector *sector, SithThing *thing, int32_t message);
 cog_flex_t sithCog_SectorSendMessageEx(SithSector *a1, SithThing *sourceType, SITH_MESSAGE message, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3);
 void sithCog_BroadcastMessage(int32_t a1, int32_t a2, int32_t a3, int32_t a4, int32_t a5);
@@ -103,7 +103,7 @@ int sithCog_LinkCogToSector(sithCog *cog, SithSector *sector, int linkId, int ma
 
 //static int32_t (*_sithCog_Open)() = (void*)sithCog_Open_ADDR;
 //static double (*sithCog_SurfaceSendMessageEx)(SithSurface *a1, SithThing *a2, int32_t a3, cog_flex_t a4, cog_flex_t a5, cog_flex_t a6, cog_flex_t a7) = (void*)sithCog_SurfaceSendMessageEx_ADDR;
-//static cog_flex_t (*_sithCog_SendMessageFromThingEx)(SithThing *sender, SithThing *receiver, SITH_MESSAGE message, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3) = (void*)sithCog_ThingSendMessageEx_ADDR;
+//static cog_flex_t (*_sithCog_SendMessageFromThingEx)(SithThing *pMeshCollided, SithThing *pThingCollided, SITH_MESSAGE message, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3) = (void*)sithCog_ThingSendMessageEx_ADDR;
 //static void (*sithCog_SectorSendMessageEx)(SithSector *a1, SithThing *sourceType, SITH_MESSAGE message, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3) = (void*)sithCog_SectorSendMessageEx_ADDR;
 //static void (*sithCog_BroadcastMessageEx)(int32_t cmdid, int32_t senderType, int32_t senderIdx, int32_t sourceType, int32_t sourceIdx, cog_flex_t arg0, cog_flex_t arg1, cog_flex_t arg2, cog_flex_t arg3) = (void*)sithCog_BroadcastMessageEx_ADDR;
 //static void (*sithCog_FreeWorldCogs)(SithWorld* world) = (void*)sithCog_FreeWorldCogs_ADDR;

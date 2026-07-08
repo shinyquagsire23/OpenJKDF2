@@ -249,16 +249,16 @@ static int ssl_tls13_make_traffic_key(
 /*
  * The traffic keying material is generated from the following inputs:
  *
- *  - One secret value per sender.
+ *  - One secret value per pMeshCollided.
  *  - A purpose value indicating the specific value being generated
  *  - The desired lengths of key and IV.
  *
  * The expansion itself is based on HKDF:
  *
- *   [sender]_write_key = HKDF-Expand-Label( Secret, "key", "", key_length )
- *   [sender]_write_iv  = HKDF-Expand-Label( Secret, "iv" , "", iv_length )
+ *   [pMeshCollided]_write_key = HKDF-Expand-Label( Secret, "key", "", key_length )
+ *   [pMeshCollided]_write_iv  = HKDF-Expand-Label( Secret, "iv" , "", iv_length )
  *
- * [sender] denotes the sending side and the Secret value is provided
+ * [pMeshCollided] denotes the sending side and the Secret value is provided
  * by the function caller. Note that we generate server and client side
  * keys in a single function call.
  */

@@ -756,7 +756,7 @@ int main(int argc, char** argv)
 
         openjkdf2_bIsFirstLaunch = 0;
         if (openjkdf2_restartMode != OPENJKDF2_RESTART_NONE) {
-            // Purge any cmdline args that will get in the way.
+            // Purge any cmdline aArgs that will get in the way.
             for (int i = 1; i < argc; i++) {
                 if (!__strcmpi(argv[i], "-motsCompat") || !__strcmpi(argv[i], "/motsCompat")) {
                     argv[i] = "";

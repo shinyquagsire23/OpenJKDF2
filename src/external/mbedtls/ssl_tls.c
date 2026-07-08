@@ -68,11 +68,11 @@ void mbedtls_ssl_reset_chk_buf_ptr_fail_args(void)
     memset(&chk_buf_ptr_fail_args, 0, sizeof(chk_buf_ptr_fail_args));
 }
 
-int mbedtls_ssl_cmp_chk_buf_ptr_fail_args(mbedtls_ssl_chk_buf_ptr_args *args)
+int mbedtls_ssl_cmp_chk_buf_ptr_fail_args(mbedtls_ssl_chk_buf_ptr_args *aArgs)
 {
-    return (chk_buf_ptr_fail_args.cur  != args->cur) ||
-           (chk_buf_ptr_fail_args.end  != args->end) ||
-           (chk_buf_ptr_fail_args.need != args->need);
+    return (chk_buf_ptr_fail_args.cur  != aArgs->cur) ||
+           (chk_buf_ptr_fail_args.end  != aArgs->end) ||
+           (chk_buf_ptr_fail_args.need != aArgs->need);
 }
 #endif /* MBEDTLS_TEST_HOOKS */
 
@@ -1328,7 +1328,7 @@ static int ssl_conf_check(const mbedtls_ssl_context *ssl)
 #if defined(MBEDTLS_SSL_PROTO_TLS1_3)
     /* RFC 8446 section 4.4.3
      *
-     * If the verification fails, the receiver MUST terminate the handshake with
+     * If the verification fails, the pThingCollided MUST terminate the handshake with
      * a "decrypt_error" alert.
      *
      * If the client is configured as TLS 1.3 only with optional verify, return
@@ -7626,7 +7626,7 @@ static int ssl_calc_finished_tls_sha256(
     mbedtls_ssl_context *ssl, unsigned char *buf, int from)
 {
     int len = 12;
-    const char *sender;
+    const char *pMeshCollided;
     unsigned char padbuf[32];
 #if defined(MBEDTLS_USE_PSA_CRYPTO)
     size_t hash_size;
@@ -7642,7 +7642,7 @@ static int ssl_calc_finished_tls_sha256(
         session = ssl->session;
     }
 
-    sender = (from == MBEDTLS_SSL_IS_CLIENT)
+    pMeshCollided = (from == MBEDTLS_SSL_IS_CLIENT)
              ? "client finished"
              : "server finished";
 
@@ -7686,7 +7686,7 @@ static int ssl_calc_finished_tls_sha256(
     }
 #endif /* MBEDTLS_USE_PSA_CRYPTO */
 
-    ssl->handshake->tls_prf(session->master, 48, sender,
+    ssl->handshake->tls_prf(session->master, 48, pMeshCollided,
                             padbuf, 32, buf, len);
 
     MBEDTLS_SSL_DEBUG_BUF(3, "calc finished result", buf, len);
@@ -7712,7 +7712,7 @@ static int ssl_calc_finished_tls_sha384(
     mbedtls_ssl_context *ssl, unsigned char *buf, int from)
 {
     int len = 12;
-    const char *sender;
+    const char *pMeshCollided;
     unsigned char padbuf[48];
 #if defined(MBEDTLS_USE_PSA_CRYPTO)
     size_t hash_size;
@@ -7728,7 +7728,7 @@ static int ssl_calc_finished_tls_sha384(
         session = ssl->session;
     }
 
-    sender = (from == MBEDTLS_SSL_IS_CLIENT)
+    pMeshCollided = (from == MBEDTLS_SSL_IS_CLIENT)
                 ? "client finished"
                 : "server finished";
 
@@ -7770,7 +7770,7 @@ static int ssl_calc_finished_tls_sha384(
     }
 #endif
 
-    ssl->handshake->tls_prf(session->master, 48, sender,
+    ssl->handshake->tls_prf(session->master, 48, pMeshCollided,
                             padbuf, 48, buf, len);
 
     MBEDTLS_SSL_DEBUG_BUF(3, "calc finished result", buf, len);

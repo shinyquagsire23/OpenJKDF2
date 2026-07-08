@@ -19,7 +19,7 @@
 
 MATH_FUNC void sithActor_SetDifficulty(SithThing *thing);
 void sithActor_Update(SithThing *thing, int deltaMs);
-MATH_FUNC flex_t sithActor_DamageActor(SithThing *sender, SithThing *receiver, flex_t amount, int flags);
+MATH_FUNC flex_t sithActor_DamageActor(SithThing *pMeshCollided, SithThing *pThingCollided, flex_t amount, int flags);
 void sithActor_PlayDamageSoundFx(SithThing *thing, flex_t amount, int hurtType);
 void sithActor_KillActor(SithThing *thing, SithThing *a3, int a4);
 int sithActor_SurfaceCollisionHandler(SithThing *thing, SithSurface *surface, SithCollision *searchEnt);

@@ -700,7 +700,7 @@ int std3D_AddToTextureCache(tVBuffer* vbuf, rdDDrawSurface* texture, int is_alph
     {
         uint8_t* staging8 = (uint8_t*)memalign(32, width * height);
         if (!staging8) return 1;
-        uint32_t rowpx = vbuf->format.width_in_bytes;
+        uint32_t rowpx = vbuf->format.rowSize;
         for (uint32_t y = 0; y < height; y++)
             memcpy(staging8 + (size_t)y * width, src8 + (size_t)y * rowpx, width);
 
@@ -722,7 +722,7 @@ int std3D_AddToTextureCache(tVBuffer* vbuf, rdDDrawSurface* texture, int is_alph
         if (vbuf->format.format.is16bit)
         {
             // Engine 565 / ARGB1555 share the PVR bit layout: straight copy.
-            uint32_t rowpx = vbuf->format.width_in_bytes / 2;
+            uint32_t rowpx = vbuf->format.rowSize / 2;
             for (uint32_t y = 0; y < height; y++)
                 for (uint32_t x = 0; x < width; x++)
                     staging[y * width + x] = src16[y * rowpx + x];
@@ -731,7 +731,7 @@ int std3D_AddToTextureCache(tVBuffer* vbuf, rdDDrawSurface* texture, int is_alph
         {
             // 8-bit (non-POT or no colormap) -> expand through the texture palette.
             uint8_t* pal = (uint8_t*)vbuf->palette;
-            uint32_t rowpx = vbuf->format.width_in_bytes;
+            uint32_t rowpx = vbuf->format.rowSize;
             for (uint32_t y = 0; y < height; y++)
             {
                 for (uint32_t x = 0; x < width; x++)
@@ -979,7 +979,7 @@ void std3D_DrawMenu()
 
     const int srcW = Video_menuBuffer.format.width;
     const int srcH = Video_menuBuffer.format.height;
-    const uint32_t pitch = Video_menuBuffer.format.width_in_bytes;
+    const uint32_t pitch = Video_menuBuffer.format.rowSize;
     if (srcW <= 0 || srcH <= 0) return;
 
     int w = (srcW < 640) ? srcW : 640;

@@ -35,7 +35,7 @@ void sithCollision_AddSurfaceCollisionHandler(int type, sithCollisionHitHandler_
 MATH_FUNC SithCollision* sithCollision_PopStack();
 MATH_FUNC flex_t sithCollision_SearchForCollisions(SithSector* pStartSector, SithThing* pThing, const rdVector3* pStartPos, const rdVector3* pMoveNorm, flex_t moveDist, flex_t radius, int flags);
 MATH_FUNC void sithCollision_DecreaseStackLevel();
-MATH_FUNC flex_t sithCollision_SearchForThingCollisions(SithSector *a1, SithThing *sender, const rdVector3 *a2, const rdVector3 *a3, flex_t a4, flex_t range, int flags);
+MATH_FUNC flex_t sithCollision_SearchForThingCollisions(SithSector *a1, SithThing *pMeshCollided, const rdVector3 *a2, const rdVector3 *a3, flex_t a4, flex_t range, int flags);
 MATH_FUNC void sithCollision_SearchForSurfaceCollisions(SithSector *a1, const rdVector3 *a2, const rdVector3 *a3, flex_t a4, flex_t a5, int raycastFlags);
 MATH_FUNC SithSector* sithCollision_FindSectorInRadius(SithSector *sector, const rdVector3 *a3, rdVector3 *a4, flex_t a5);
 #endif
@@ -56,7 +56,7 @@ int sithCollision_CheckPathClear(SithSector *sector, rdVector3 *startPos, rdVect
 static int (*_sithCollision_Startup)() = (void*)sithCollision_Startup_ADDR;
 static SithCollision* (*sithCollision_PopStack)(void) = (void*)sithCollision_PopStack_ADDR;
 static flex_t (*sithCollision_SearchForCollisions)(SithSector *sector, SithThing *a2, rdVector3 *position, const rdVector3 *direction, flex_t a5, flex_t range, int flags) = (void*)sithCollision_SearchForCollisions_ADDR;
-static flex_t (*sithCollision_SearchForThingCollisions)(SithSector *a1, SithThing *sender, rdVector3 *a2, rdVector3 *a3, flex_t a4, flex_t range, int flags) = (void*)sithCollision_SearchForThingCollisions_ADDR;
+static flex_t (*sithCollision_SearchForThingCollisions)(SithSector *a1, SithThing *pMeshCollided, rdVector3 *a2, rdVector3 *a3, flex_t a4, flex_t range, int flags) = (void*)sithCollision_SearchForThingCollisions_ADDR;
 static void (*sithCollision_SearchForSurfaceCollisions)(SithSector *a1, rdVector3 *a2, rdVector3 *a3, flex_t a4, flex_t a5, int raycastFlags) = (void*)sithCollision_SearchForSurfaceCollisions_ADDR;
 static SithSector* (*sithCollision_FindSectorInRadius)(SithSector *sector, rdVector3 *a3, rdVector3 *a4, flex_t a5) = (void*)sithCollision_FindSectorInRadius_ADDR;
 #endif

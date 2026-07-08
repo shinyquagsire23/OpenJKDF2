@@ -712,13 +712,13 @@ int sithDSSThing_ProcessMOTSNew2(SithMessage *msg)
     return 0;
 }
 
-void sithDSSThing_Death(SithThing *sender, SithThing *receiver, char cause, int sendto_id, int mpFlags)
+void sithDSSThing_Death(SithThing *pMeshCollided, SithThing *pThingCollided, char cause, int sendto_id, int mpFlags)
 {
     NETMSG_START;
     
-    NETMSG_PUSHS32(sender->guid);
-    if ( receiver ) {
-        NETMSG_PUSHS32(receiver->guid);
+    NETMSG_PUSHS32(pMeshCollided->guid);
+    if ( pThingCollided ) {
+        NETMSG_PUSHS32(pThingCollided->guid);
     }
     else {
         NETMSG_PUSHS32(-1);

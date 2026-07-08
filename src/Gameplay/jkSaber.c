@@ -224,16 +224,16 @@ void  jkSaber_UpdateCollision2(SithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
         if (!searchResult)
             break;
 
-        if (searchResult->hitType & SITHCOLLISION_ADJOINCROSS)
+        if (searchResult->type & SITHCOLLISION_ADJOINCROSS)
         {
             pSectorIter = searchResult->surface->pAdjoin->sector;
         }
-        else if (searchResult->hitType & SITHCOLLISION_THING) 
+        else if (searchResult->type & SITHCOLLISION_THING) 
         {
             rdVector_Copy3(&local_54, pSaberPos);
             rdVector_ScaleAdd3Acc(&local_54, pSaberDir, searchResult->distance);
 
-            resultThing = searchResult->receiver;
+            resultThing = searchResult->pThingCollided;
 
             if ( resultThing->type == SITH_THING_ITEM || resultThing->type == SITH_THING_EXPLOSION || resultThing->type == SITH_THING_PARTICLE )
             {
@@ -252,7 +252,7 @@ void  jkSaber_UpdateCollision2(SithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
             int foundIdx = 0;
             for (foundIdx = 0; foundIdx < pCollideInfo->numDamagedThings; foundIdx++ )
             {
-                if ( searchResult->receiver == pCollideInfo->damagedThings[foundIdx] )
+                if ( searchResult->pThingCollided == pCollideInfo->damagedThings[foundIdx] )
                     break;
             }
 
@@ -267,8 +267,8 @@ void  jkSaber_UpdateCollision2(SithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
             {
                 jkSaber_SpawnSparks(playerInfo, &local_54, pSectorIter, SPARKTYPE_BLOOD);
 
-                sithThing_DamageThing(searchResult->receiver, pPlayerThing, pCollideInfo->damage, SITH_DAMAGE_SABER);
-                pCollideInfo->damagedThings[pCollideInfo->numDamagedThings++] = searchResult->receiver;
+                sithThing_DamageThing(searchResult->pThingCollided, pPlayerThing, pCollideInfo->damage, SITH_DAMAGE_SABER);
+                pCollideInfo->damagedThings[pCollideInfo->numDamagedThings++] = searchResult->pThingCollided;
                 break;
             }
 
@@ -297,7 +297,7 @@ void  jkSaber_UpdateCollision2(SithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
                     jkSaber_SpawnSparks(playerInfo, &local_54, pSectorIter, SPARKTYPE_SABER);
 
                     sithCog_ThingSendMessage(resultThing, 0, SITH_MESSAGE_BLOCKED);
-                    pCollideInfo->damagedThings[pCollideInfo->numDamagedThings++] = searchResult->receiver;
+                    pCollideInfo->damagedThings[pCollideInfo->numDamagedThings++] = searchResult->pThingCollided;
                     break;
                 }
             }
@@ -305,10 +305,10 @@ void  jkSaber_UpdateCollision2(SithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
             jkSaber_SpawnSparks(playerInfo, &local_54, pSectorIter, SPARKTYPE_BLOOD);
 
             sithThing_DamageThing(resultThing, pPlayerThing, pCollideInfo->damage, SITH_DAMAGE_SABER);
-            pCollideInfo->damagedThings[pCollideInfo->numDamagedThings++] = searchResult->receiver;
+            pCollideInfo->damagedThings[pCollideInfo->numDamagedThings++] = searchResult->pThingCollided;
             break;
         }
-        else if (searchResult->hitType & SITHCOLLISION_WORLD)
+        else if (searchResult->type & SITHCOLLISION_WORLD)
         {
             rdVector_Copy3(&local_54, pSaberPos);
             rdVector_ScaleAdd3Acc(&local_54, pSaberDir, searchResult->distance - 0.001);

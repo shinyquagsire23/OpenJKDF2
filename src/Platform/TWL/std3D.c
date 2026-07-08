@@ -1797,7 +1797,7 @@ MATH_FUNC void std3D_DrawMenu()
 
     if (Video_menuBuffer.surface_lock_alloc)
     {
-        uint32_t pitch = Video_menuBuffer.format.width_in_bytes;
+        uint32_t pitch = Video_menuBuffer.format.rowSize;
         if (jkCutscene_isRendering) {
             flex_t srcXf = 0;
             flex_t srcYf = 0;

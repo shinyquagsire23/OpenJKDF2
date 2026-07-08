@@ -135,8 +135,8 @@ int mbedtls_ssl_tls13_hkdf_expand_label(
  * From RFC 8446:
  *
  * <tt>
- *   [sender]_write_key = HKDF-Expand-Label(Secret, "key", "", key_length)
- *   [sender]_write_iv  = HKDF-Expand-Label(Secret, "iv", "", iv_length)*
+ *   [pMeshCollided]_write_key = HKDF-Expand-Label(Secret, "key", "", key_length)
+ *   [pMeshCollided]_write_iv  = HKDF-Expand-Label(Secret, "iv", "", iv_length)*
  * </tt>
  *
  * \param hash_alg      The identifier for the hash algorithm to be used

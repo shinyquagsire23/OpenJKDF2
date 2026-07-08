@@ -1667,17 +1667,17 @@ struct Adder_args
 static bool
 add_cert_to_certinfo(const CERT_CONTEXT *ccert_context, void *raw_arg)
 {
-  struct Adder_args *args = (struct Adder_args*)raw_arg;
-  args->result = CURLE_OK;
+  struct Adder_args *aArgs = (struct Adder_args*)raw_arg;
+  aArgs->result = CURLE_OK;
   if(valid_cert_encoding(ccert_context)) {
     const char *beg = (const char *) ccert_context->pbCertEncoded;
     const char *end = beg + ccert_context->cbCertEncoded;
-    int insert_index = (args->certs_count - 1) - args->idx;
-    args->result = Curl_extract_certinfo(args->data, insert_index,
+    int insert_index = (aArgs->certs_count - 1) - aArgs->idx;
+    aArgs->result = Curl_extract_certinfo(aArgs->data, insert_index,
                                          beg, end);
-    args->idx++;
+    aArgs->idx++;
   }
-  return args->result == CURLE_OK;
+  return aArgs->result == CURLE_OK;
 }
 
 static CURLcode
@@ -1805,12 +1805,12 @@ schannel_connect_step3(struct Curl_cfilter *cf, struct Curl_easy *data)
 
     result = Curl_ssl_init_certinfo(data, certs_count);
     if(!result) {
-      struct Adder_args args;
-      args.data = data;
-      args.idx = 0;
-      args.certs_count = certs_count;
-      traverse_cert_store(ccert_context, add_cert_to_certinfo, &args);
-      result = args.result;
+      struct Adder_args aArgs;
+      aArgs.data = data;
+      aArgs.idx = 0;
+      aArgs.certs_count = certs_count;
+      traverse_cert_store(ccert_context, add_cert_to_certinfo, &aArgs);
+      result = aArgs.result;
     }
     CertFreeCertificateContext(ccert_context);
     if(result)

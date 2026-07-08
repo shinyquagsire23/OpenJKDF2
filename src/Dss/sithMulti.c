@@ -326,9 +326,9 @@ int sithMulti_GetSpawnIdx(SithThing *pPlayerThing)
             RAYCAST_400 | RAYCAST_80 | RAYCAST_2);
         for ( i = sithCollision_PopStack(); i; i = sithCollision_PopStack() )
         {
-            if ( (i->hitType & SITHCOLLISION_THING) != 0 )
+            if ( (i->type & SITHCOLLISION_THING) != 0 )
             {
-                v10 = i->receiver;
+                v10 = i->pThingCollided;
                 if ( v10->type == SITH_THING_PLAYER && (v10->flags & (SITH_TF_DEAD|SITH_TF_DESTROYED)) == 0 )
                     break;
             }

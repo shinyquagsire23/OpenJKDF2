@@ -129,14 +129,14 @@ typedef struct sithSoundClassEntry
   flex_t maxVolume;
   flex_t minRadius;
   flex_t maxRadius;
-  uint32_t listIdx;
-  sithSoundClassEntry *nextSound;
+  uint32_t numEntries;
+  sithSoundClassEntry *pNextMode;
 } sithSoundClassEntry;
 
 typedef struct sithSoundClass
 {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-    char snd_fname[32];
+    char aName[32];
 #endif
 #ifdef STDHASHTABLE_CRC32_KEYS
     uint32_t nameCrc;

@@ -29,7 +29,7 @@ typedef struct stdFileSearch
         intptr_t field_88;
         struct dirent **namelist;
     };
-    int num_found;
+    int nFoundFiles;
 } stdFileSearch;
 
 typedef struct stdFileSearchResult

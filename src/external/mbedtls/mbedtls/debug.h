@@ -34,9 +34,9 @@
 
 #define MBEDTLS_DEBUG_STRIP_PARENS(...)   __VA_ARGS__
 
-#define MBEDTLS_SSL_DEBUG_MSG(level, args)                    \
+#define MBEDTLS_SSL_DEBUG_MSG(level, aArgs)                    \
     mbedtls_debug_print_msg(ssl, level, __FILE__, __LINE__,    \
-                            MBEDTLS_DEBUG_STRIP_PARENS args)
+                            MBEDTLS_DEBUG_STRIP_PARENS aArgs)
 
 #define MBEDTLS_SSL_DEBUG_RET(level, text, ret)                \
     mbedtls_debug_print_ret(ssl, level, __FILE__, __LINE__, text, ret)
@@ -70,7 +70,7 @@
 
 #else /* MBEDTLS_DEBUG_C */
 
-#define MBEDTLS_SSL_DEBUG_MSG(level, args)            do { } while (0)
+#define MBEDTLS_SSL_DEBUG_MSG(level, aArgs)            do { } while (0)
 #define MBEDTLS_SSL_DEBUG_RET(level, text, ret)       do { } while (0)
 #define MBEDTLS_SSL_DEBUG_BUF(level, text, buf, len)  do { } while (0)
 #define MBEDTLS_SSL_DEBUG_MPI(level, text, X)         do { } while (0)

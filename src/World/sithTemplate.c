@@ -84,10 +84,10 @@ int sithTemplate_ReadThingTemplatesListText(SithWorld *world, int a2)
         return 0;
 
     stdConffile_ReadArgs();
-    if ( _memcmp(stdConffile_g_entry.args[0].value, "world", 6u) || _memcmp(stdConffile_g_entry.args[1].value, "aThingTemplates", 0xAu) )
+    if ( _memcmp(stdConffile_g_entry.aArgs[0].value, "world", 6u) || _memcmp(stdConffile_g_entry.aArgs[1].value, "aThingTemplates", 0xAu) )
         return 0;
 
-    sizeThingTemplates = _atoi(stdConffile_g_entry.args[2].value);
+    sizeThingTemplates = _atoi(stdConffile_g_entry.aArgs[2].value);
     if ( !sizeThingTemplates )
         return 1;
     
@@ -95,7 +95,7 @@ int sithTemplate_ReadThingTemplatesListText(SithWorld *world, int a2)
     
     while ( stdConffile_ReadArgs() )
     {
-        if ( !_memcmp(stdConffile_g_entry.args[0].value, "end", 4u) )
+        if ( !_memcmp(stdConffile_g_entry.aArgs[0].value, "end", 4u) )
             break;
         sithTemplate_Parse(world);
     }
@@ -173,7 +173,7 @@ SithThing* sithTemplate_Parse(SithWorld *world)
     SithThing tmp;
     const char* aName;
 
-    result = (SithThing *)stdHashtbl_Find(sithTemplate_pHashtable, (const char*)stdConffile_g_entry.args[0].value);
+    result = (SithThing *)stdHashtbl_Find(sithTemplate_pHashtable, (const char*)stdConffile_g_entry.aArgs[0].value);
     if ( result )
         return result;
 
@@ -181,10 +181,10 @@ SithThing* sithTemplate_Parse(SithWorld *world)
     memset(&tmp, 0, sizeof(tmp));
 
     sithThing_Reset(&tmp);
-    result = (SithThing *)stdHashtbl_Find(sithTemplate_pHashtable, (const char*)stdConffile_g_entry.args[1].value);
+    result = (SithThing *)stdHashtbl_Find(sithTemplate_pHashtable, (const char*)stdConffile_g_entry.aArgs[1].value);
     sithThing_SetThingBasedOn(&tmp, result);
 
-    aName = stdConffile_g_entry.args[0].value;
+    aName = stdConffile_g_entry.aArgs[0].value;
 #ifdef SITH_DEBUG_STRUCT_NAMES
     stdString_SafeStrCopy(tmp.aName, aName, sizeof(tmp.aName));
 #endif
@@ -194,7 +194,7 @@ SithThing* sithTemplate_Parse(SithWorld *world)
 
     for (int i = 2; i < stdConffile_g_entry.numArgs; i++)
     {
-        sithThing_ParseArg(&stdConffile_g_entry.args[i], &tmp);
+        sithThing_ParseArg(&stdConffile_g_entry.aArgs[i], &tmp);
     }
 
     if (!tmp.type )

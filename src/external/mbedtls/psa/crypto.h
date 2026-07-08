@@ -687,7 +687,7 @@ psa_status_t psa_import_key(const psa_key_attributes_t *attributes,
  *       prime2              INTEGER,  -- q
  *       exponent1           INTEGER,  -- d mod (p-1)
  *       exponent2           INTEGER,  -- d mod (q-1)
- *       coefficient         INTEGER,  -- (inverse of q) mod p
+ *       coefficient         INTEGER,  -- (bDifferentTypHandler of q) mod p
  *   }
  *   ```
  * - For elliptic curve key pairs (key types for which

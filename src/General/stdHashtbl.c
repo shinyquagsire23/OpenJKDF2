@@ -89,7 +89,7 @@ int hashmapBucketSizes[hashmapBucketSizes_MAX] =
     1999
 };
 
-uint32_t stdHashtbl_HashStringToIdx(const char *data, uint32_t numBuckets)
+uint32_t stdHashtbl_HashStringToIdx(const char *data, uint32_t numNodes)
 {
     uint32_t hash;
     uint8_t i;
@@ -107,7 +107,7 @@ uint32_t stdHashtbl_HashStringToIdx(const char *data, uint32_t numBuckets)
         i = (uint8_t)data[1];
     }
 #endif
-    return hash % numBuckets;
+    return hash % numNodes;
 }
 
 tHashTable* stdHashtbl_New(int maxEntries)
@@ -142,9 +142,9 @@ tHashTable* stdHashtbl_New(int maxEntries)
     sizeIterIdx = 0;
     calcedPrime = maxEntries;
     sizeIter = hashmapBucketSizes;
-    pHashtbl->numBuckets = 0;
+    pHashtbl->numNodes = 0;
     pHashtbl->aSymbols = 0;
-    pHashtbl->keyHashToIndex = 0;
+    pHashtbl->pfHashFunc = 0;
     while ( maxEntries >= *sizeIter )
     {
         ++sizeIter;
@@ -177,14 +177,14 @@ loop_escape:
         actualNumBuckets = calcedPrime;
     }
 
-    pHashtbl->numBuckets = actualNumBuckets;
+    pHashtbl->numNodes = actualNumBuckets;
     { TWL_EXTRAM_SUGGEST(std_g_pHS); // Added: CRC-keyed links are word-safe
     pHashtbl->aSymbols = (tHashLink *)STD_ALLOC(sizeof(tHashLink) * actualNumBuckets);
     TWL_EXTRAM_RESTORE(std_g_pHS); }
     if ( pHashtbl->aSymbols )
     {
-      stdPlatform_Memzero32(pHashtbl->aSymbols, sizeof(tHashLink) * pHashtbl->numBuckets); // Added: word-safe
-      pHashtbl->keyHashToIndex = stdHashtbl_HashStringToIdx;
+      stdPlatform_Memzero32(pHashtbl->aSymbols, sizeof(tHashLink) * pHashtbl->numNodes); // Added: word-safe
+      pHashtbl->pfHashFunc = stdHashtbl_HashStringToIdx;
     }
     else {
         // Added: fail more gracefully and without memleaks
@@ -235,7 +235,7 @@ void stdHashtbl_Free(tHashTable *table)
     if (!table) return;
 
     bucketIdx = 0;
-    if ( table->numBuckets > 0 )
+    if ( table->numNodes > 0 )
     {
         bucketIdx2 = 0;
         do
@@ -245,7 +245,7 @@ void stdHashtbl_Free(tHashTable *table)
             ++bucketIdx;
             ++bucketIdx2;
         }
-        while ( bucketIdx < table->numBuckets );
+        while ( bucketIdx < table->numNodes );
     }
     STD_FREE(table->aSymbols);
     table->aSymbols = NULL; // added
@@ -271,7 +271,7 @@ int stdHashtbl_Add(tHashTable *hashmap, const char *key, void *value)
 #endif
     }
 
-    v9 = &hashmap->aSymbols[hashmap->keyHashToIndex(key, hashmap->numBuckets)];
+    v9 = &hashmap->aSymbols[hashmap->pfHashFunc(key, hashmap->numNodes)];
     v10 = stdHashtbl_GetTailNode(v9);
 
     if ( v10->key )
@@ -330,7 +330,7 @@ void* stdHashtbl_Find(tHashTable *hashmap, const char *key)
 #endif
 
     foundKey = 0;
-    for ( i = &hashmap->aSymbols[hashmap->keyHashToIndex(key, hashmap->numBuckets)]; i; i = i->next )
+    for ( i = &hashmap->aSymbols[hashmap->pfHashFunc(key, hashmap->numNodes)]; i; i = i->next )
     {
 #ifdef STDHASHTABLE_CRC32_KEYS
         if (!i->keyCrc32) {
@@ -379,7 +379,7 @@ int stdHashtbl_Remove(tHashTable *pHashtbl, const char *key)
 
     tHashLink* beforeFoundKey = NULL; // added
     foundKey = 0;
-    v2 = pHashtbl->keyHashToIndex(key, pHashtbl->numBuckets);
+    v2 = pHashtbl->pfHashFunc(key, pHashtbl->numNodes);
     for ( i = &pHashtbl->aSymbols[v2]; i; i = i->next )
     {
 #ifdef STDHASHTABLE_CRC32_KEYS
@@ -467,8 +467,8 @@ int stdHashtbl_FreeKeyCrc32(tHashTable *pHashtbl, uint32_t keyCrc32)
 
     tHashLink* beforeFoundKey = NULL; // added
     foundKey = 0;
-    //v2 = pHashtbl->keyHashToIndex(key, pHashtbl->numBuckets);
-    v2 = keyCrc32 % pHashtbl->numBuckets;
+    //v2 = pHashtbl->pfHashFunc(key, pHashtbl->numNodes);
+    v2 = keyCrc32 % pHashtbl->numNodes;
     for ( i = &pHashtbl->aSymbols[v2]; i; i = i->next )
     {
         if (!i->keyCrc32) {
@@ -540,7 +540,7 @@ void stdHashtbl_PrintTableDiagnostics(tHashTable *pHashtbl)
     bucketIdx2 = 0;
     numFilled = 0;
     totalChildren = 0;
-    if ( pHashtbl->numBuckets > 0 )
+    if ( pHashtbl->numNodes > 0 )
     {
         bucketIdx = 0;
         do
@@ -560,12 +560,12 @@ void stdHashtbl_PrintTableDiagnostics(tHashTable *pHashtbl)
             ++bucketIdx2;
             ++bucketIdx;
         }
-        while ( bucketIdx2 < pHashtbl->numBuckets );
+        while ( bucketIdx2 < pHashtbl->numNodes );
     }
     std_g_pHS->debugPrint(" Maximum Lookups = %d\n", maxLookups);
-    std_g_pHS->debugPrint(" Filled Indices = %d/%d (%2.2f%%)\n", numFilled, pHashtbl->numBuckets, (flex_t)numFilled * 100.0 / (flex_t)pHashtbl->numBuckets); // FLEXTODO
+    std_g_pHS->debugPrint(" Filled Indices = %d/%d (%2.2f%%)\n", numFilled, pHashtbl->numNodes, (flex_t)numFilled * 100.0 / (flex_t)pHashtbl->numNodes); // FLEXTODO
     std_g_pHS->debugPrint(" Average Lookup = %2.2f\n", (flex_t)totalChildren / (flex_t)numFilled); // FLEXTODO
-    std_g_pHS->debugPrint(" Weighted Lookup = %2.2f\n", (flex_t)totalChildren / (flex_t)pHashtbl->numBuckets); // FLEXTODO
+    std_g_pHS->debugPrint(" Weighted Lookup = %2.2f\n", (flex_t)totalChildren / (flex_t)pHashtbl->numNodes); // FLEXTODO
     std_g_pHS->debugPrint("---------------------\n");
 }
 
@@ -576,7 +576,7 @@ void stdHashtbl_DumpTable(tHashTable *pHashtbl)
 
     std_g_pHS->debugPrint("HASHTABLE\n---------\n");
     index = 0;
-    if ( pHashtbl->numBuckets > 0 )
+    if ( pHashtbl->numNodes > 0 )
     {
         do
         {
@@ -588,6 +588,6 @@ void stdHashtbl_DumpTable(tHashTable *pHashtbl)
             std_g_pHS->debugPrint("\n");
             ++index;
         }
-        while ( index < pHashtbl->numBuckets );
+        while ( index < pHashtbl->numNodes );
     }
 }

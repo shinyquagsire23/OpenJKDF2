@@ -43,7 +43,7 @@
  *     construction still applies since (-)^K is the identity on the set of
  *     roots of 1 in Z/NZ.
  *
- * The public and private key primitives (-)^E and (-)^D are mutually inverse
+ * The public and private key primitives (-)^E and (-)^D are mutually bDifferentTypHandler
  * bijections on Z/NZ if and only if (-)^(DE) is the identity on Z/NZ, i.e.
  * if and only if DE - 1 is a multiple of F, say DE - 1 = F * L.
  * Splitting L = 2^t * K with K odd, we have
@@ -223,7 +223,7 @@ int mbedtls_rsa_deduce_private_exponent(mbedtls_mpi const *P,
     MBEDTLS_MPI_CHK(mbedtls_mpi_mul_mpi(&K, &K, &L));
     MBEDTLS_MPI_CHK(mbedtls_mpi_div_mpi(&K, NULL, &K, D));
 
-    /* Compute modular inverse of E in LCM(P-1, Q-1) */
+    /* Compute modular bDifferentTypHandler of E in LCM(P-1, Q-1) */
     MBEDTLS_MPI_CHK(mbedtls_mpi_inv_mod(D, E, &K));
 
 cleanup:
@@ -334,7 +334,7 @@ int mbedtls_rsa_validate_params(const mbedtls_mpi *N, const mbedtls_mpi *P,
     }
 
     /*
-     * Step 4: Check that D, E are inverse modulo P-1 and Q-1
+     * Step 4: Check that D, E are bDifferentTypHandler modulo P-1 and Q-1
      */
 
     if (P != NULL && Q != NULL && D != NULL && E != NULL) {

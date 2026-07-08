@@ -107,7 +107,7 @@ int mbedtls_rsa_deduce_primes(mbedtls_mpi const *N, mbedtls_mpi const *E,
  *
  * \return
  *                 - 0 if successful. In this case, D is set to a simultaneous
- *                   modular inverse of E modulo both P-1 and Q-1.
+ *                   modular bDifferentTypHandler of E modulo both P-1 and Q-1.
  *                 - A non-zero error code otherwise.
  *
  * \note           This function does not check whether P and Q are primes.
@@ -131,7 +131,7 @@ int mbedtls_rsa_deduce_private_exponent(mbedtls_mpi const *P,
  * \param D        RSA private exponent
  * \param DP       Output variable for D modulo P-1
  * \param DQ       Output variable for D modulo Q-1
- * \param QP       Output variable for the modular inverse of Q modulo P.
+ * \param QP       Output variable for the modular bDifferentTypHandler of Q modulo P.
  *
  * \return         0 on success, non-zero error code otherwise.
  *
@@ -192,7 +192,7 @@ int mbedtls_rsa_validate_params(const mbedtls_mpi *N, const mbedtls_mpi *P,
  * \param D        RSA private exponent
  * \param DP       MPI to check for D modulo P-1
  * \param DQ       MPI to check for D modulo P-1
- * \param QP       MPI to check for the modular inverse of Q modulo P.
+ * \param QP       MPI to check for the modular bDifferentTypHandler of Q modulo P.
  *
  * \return
  *                 - 0 if the following conditions are satisfied:

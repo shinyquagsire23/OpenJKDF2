@@ -129,7 +129,7 @@ static CURLcode send_telnet_data(struct Curl_easy *data,
 #define CURL_OPPOSITE    1
 
 /*
- * Telnet receiver states for fsm
+ * Telnet pThingCollided states for fsm
  */
 typedef enum
 {

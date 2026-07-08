@@ -30,11 +30,11 @@ void stdMemory_Close()
     if (!stdMemory_bOpened)
         return;
 
-    if ( stdMemory_g_curState.nextNum || stdMemory_g_curState.allocCur )
+    if ( stdMemory_g_curState.totalAllocs || stdMemory_g_curState.totalBytes )
     {
         std_g_pHS->errorPrint("File\tLine\tSize\tNumber\n\n", 0, 0, 0, 0);
-        iter = stdMemory_g_curState.allocTop.prev;
-        if ( stdMemory_g_curState.allocTop.prev )
+        iter = stdMemory_g_curState.header.prev;
+        if ( stdMemory_g_curState.header.prev )
         {
             do
             {
@@ -58,26 +58,26 @@ stdMemoryAlloc* stdMemory_Malloc(unsigned int allocSize, char *filePath, int lin
     v4 = result;
     if ( result )
     {
-        result->num = stdMemory_g_curState.nextNum;
+        result->num = stdMemory_g_curState.totalAllocs;
         result->filePath = filePath;
-        v5 = stdMemory_g_curState.allocTop.prev;
+        v5 = stdMemory_g_curState.header.prev;
         result->lineNum = lineNum;
         result->alloc = (void*)result;
         result->size = allocSize;
         result->prev = v5;
         if ( v5 )
             v5->next = result;
-        result->next = &stdMemory_g_curState.allocTop;
+        result->next = &stdMemory_g_curState.header;
         _memset(&result[1], 0xCCu, allocSize);
-        stdMemory_g_curState.allocTop.prev = result;
+        stdMemory_g_curState.header.prev = result;
         result->magic = 0x12345678;
         *(int *)((char *)&result[1].num + allocSize) = 0x12345678;
 
-        if ( stdMemory_g_curState.allocMax <= allocSize + stdMemory_g_curState.allocCur )
-            stdMemory_g_curState.allocMax = allocSize + stdMemory_g_curState.allocCur;
+        if ( stdMemory_g_curState.maxBytes <= allocSize + stdMemory_g_curState.totalBytes )
+            stdMemory_g_curState.maxBytes = allocSize + stdMemory_g_curState.totalBytes;
 
-        stdMemory_g_curState.allocCur += allocSize;
-        ++stdMemory_g_curState.nextNum;
+        stdMemory_g_curState.totalBytes += allocSize;
+        ++stdMemory_g_curState.totalAllocs;
         result = v4 + 1;
     }
     return result;
@@ -95,11 +95,11 @@ void stdMemory_Free(stdMemoryAlloc *alloc)
     v2 = alloc[-1].prev;
     if ( v2 )
         v2->next = v1->next;
-    v3 = stdMemory_g_curState.allocCur;
-    v4 = stdMemory_g_curState.nextNum;
+    v3 = stdMemory_g_curState.totalBytes;
+    v4 = stdMemory_g_curState.totalAllocs;
     v1->next->prev = v2;
-    stdMemory_g_curState.allocCur = v3 - v1->size;
-    stdMemory_g_curState.nextNum = v4 - 1;
+    stdMemory_g_curState.totalBytes = v3 - v1->size;
+    stdMemory_g_curState.totalAllocs = v4 - 1;
     STD_FREE(v1);
 }
 
@@ -133,12 +133,12 @@ stdMemoryAlloc* stdMemory_Realloc(stdMemoryAlloc *alloc, int allocSize, char *fi
             v11 = result->next;
             if ( v11 )
                 v11->prev = result;
-            v12 = stdMemory_g_curState.allocMax;
+            v12 = stdMemory_g_curState.maxBytes;
             result->magic = 305419896;
             *(int *)((char *)&result[1].num + allocSize) = 305419896;
-            stdMemory_g_curState.allocCur += allocSize - v9;
-            if ( v12 <= stdMemory_g_curState.allocCur )
-                stdMemory_g_curState.allocMax = stdMemory_g_curState.allocCur;
+            stdMemory_g_curState.totalBytes += allocSize - v9;
+            if ( v12 <= stdMemory_g_curState.totalBytes )
+                stdMemory_g_curState.maxBytes = stdMemory_g_curState.totalBytes;
             ++result;
         }
     }
@@ -149,11 +149,11 @@ stdMemoryAlloc* stdMemory_Realloc(stdMemoryAlloc *alloc, int allocSize, char *fi
         v6 = alloc[-1].prev;
         if ( v6 )
             v6->next = v5->next;
-        v7 = stdMemory_g_curState.allocCur;
-        v8 = stdMemory_g_curState.nextNum;
+        v7 = stdMemory_g_curState.totalBytes;
+        v8 = stdMemory_g_curState.totalAllocs;
         v5->next->prev = v6;
-        stdMemory_g_curState.allocCur = v7 - v5->size;
-        stdMemory_g_curState.nextNum = v8 - 1;
+        stdMemory_g_curState.totalBytes = v7 - v5->size;
+        stdMemory_g_curState.totalAllocs = v8 - 1;
         STD_FREE(v5);
         result = 0;
     }

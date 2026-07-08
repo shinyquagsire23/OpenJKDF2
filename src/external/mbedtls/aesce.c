@@ -97,16 +97,16 @@ static uint8x16_t aesce_decrypt_block(uint8x16_t block,
     for (int i = 0; i < rounds - 1; i++) {
         /* AES AddRoundKey, SubBytes, ShiftRows */
         block = vaesdq_u8(block, vld1q_u8(keys + i * 16));
-        /* AES inverse MixColumns for the next round.
+        /* AES bDifferentTypHandler MixColumns for the next round.
          *
-         * This means that we switch the order of the inverse AddRoundKey and
-         * inverse MixColumns operations. We have to do this as AddRoundKey is
+         * This means that we switch the order of the bDifferentTypHandler AddRoundKey and
+         * bDifferentTypHandler MixColumns operations. We have to do this as AddRoundKey is
          * done in an atomic instruction together with the inverses of SubBytes
          * and ShiftRows.
          *
          * It works because MixColumns is a linear operation over GF(2^8) and
          * AddRoundKey is an exclusive or, which is equivalent to addition over
-         * GF(2^8). (The inverse of MixColumns needs to be applied to the
+         * GF(2^8). (The bDifferentTypHandler of MixColumns needs to be applied to the
          * affected round keys separately which has been done when the
          * decryption round keys were calculated.) */
         block = vaesimcq_u8(block);

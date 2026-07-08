@@ -57,10 +57,10 @@ int sithAIClass_ReadStaticAIClassesListText(SithWorld *world, int a2)
         return 0;
     }
     stdConffile_ReadArgs();
-    if (_strcmp(stdConffile_g_entry.args[0].value, "world") || _strcmp(stdConffile_g_entry.args[1].value, "aAIClasses")) {
+    if (_strcmp(stdConffile_g_entry.aArgs[0].value, "world") || _strcmp(stdConffile_g_entry.aArgs[1].value, "aAIClasses")) {
         return 0;
     }
-    sizeAIClasses = _atoi(stdConffile_g_entry.args[2].value);
+    sizeAIClasses = _atoi(stdConffile_g_entry.aArgs[2].value);
     if (!sizeAIClasses) {
         return 1;
     }
@@ -81,9 +81,9 @@ int sithAIClass_ReadStaticAIClassesListText(SithWorld *world, int a2)
     world->sizeAIClasses = sizeAIClasses;
     if ( stdConffile_ReadArgs() )
     {
-        while ( _strcmp(stdConffile_g_entry.args[0].value, "end") )
+        while ( _strcmp(stdConffile_g_entry.aArgs[0].value, "end") )
         {
-            if ( !sithAIClass_Load(stdConffile_g_entry.args[1].value) )
+            if ( !sithAIClass_Load(stdConffile_g_entry.aArgs[1].value) )
             {
                 stdPrintf(pSithHS->errorPrint, ".\\Ai\\sithAIClass.c", 172, "Parse error while reading aAIClasses, line %d.\n", stdConffile_linenum);
                 return 0;
@@ -171,7 +171,7 @@ int sithAIClass_LoadEntry(char *fpath, SithAIClass *aiclass)
         {
             for (int v19 = 0; v19 < stdConffile_g_entry.numArgs; v19++)
             {
-                StdConffileArg* arg = &stdConffile_g_entry.args[v19];
+                StdConffileArg* arg = &stdConffile_g_entry.aArgs[v19];
                 if ( !_strcmp(arg->key, "alignment") )
                 {
                     aiclass->alignment = _atof(arg->value);
@@ -213,7 +213,7 @@ int sithAIClass_LoadEntry(char *fpath, SithAIClass *aiclass)
                 entry = &aiclass->entries[nextIdx];
                 if ( nextIdx < 0x10 )
                 {
-                    instinct = sithAI_FindInstinct(stdConffile_g_entry.args[0].value);
+                    instinct = sithAI_FindInstinct(stdConffile_g_entry.aArgs[0].value);
                     if ( instinct )
                     {
                         entry->func = instinct->func;
@@ -230,7 +230,7 @@ int sithAIClass_LoadEntry(char *fpath, SithAIClass *aiclass)
                             }
                             else
                             {
-                                flex_t v15 = _atof(stdConffile_g_entry.args[1+v11].value);
+                                flex_t v15 = _atof(stdConffile_g_entry.aArgs[1+v11].value);
                                 entry->fltArg[v11] = v15;
                                 entry->intArg[v11] = (int32_t)v15;
                             }

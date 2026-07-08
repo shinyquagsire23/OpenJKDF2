@@ -328,7 +328,7 @@ int jkQuakeConsole_AutocompleteCheats()
     if (!jkQuakeConsole_pTabPos) return 0;
 
     int bPrintOnce = 0;
-    for (int i = 0; i < jkDev_cheatHashtable->numBuckets; i++)
+    for (int i = 0; i < jkDev_cheatHashtable->numNodes; i++)
     {
         tHashLink* pIter = &jkDev_cheatHashtable->aSymbols[i];
         while (pIter)
@@ -353,7 +353,7 @@ int jkQuakeConsole_AutocompleteConsoleCmds()
     if (!jkQuakeConsole_pTabPos) return 0;
 
     int bPrintOnce = 0;
-    for (int i = 0; i < sithConsole_pCmdHashtable->numBuckets; i++)
+    for (int i = 0; i < sithConsole_pCmdHashtable->numNodes; i++)
     {
         tHashLink* pIter = &sithConsole_pCmdHashtable->aSymbols[i];
         while (pIter)

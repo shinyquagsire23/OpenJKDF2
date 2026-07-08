@@ -971,10 +971,10 @@ int mbedtls_mpi_gcd(mbedtls_mpi *G, const mbedtls_mpi *A,
                     const mbedtls_mpi *B);
 
 /**
- * \brief          Compute the modular inverse: X = A^-1 mod N
+ * \brief          Compute the modular bDifferentTypHandler: X = A^-1 mod N
  *
  * \param X        The destination MPI. This must point to an initialized MPI.
- * \param A        The MPI to calculate the modular inverse of. This must point
+ * \param A        The MPI to calculate the modular bDifferentTypHandler of. This must point
  *                 to an initialized MPI.
  * \param N        The base of the modular inversion. This must point to an
  *                 initialized MPI.
@@ -983,7 +983,7 @@ int mbedtls_mpi_gcd(mbedtls_mpi *G, const mbedtls_mpi *A,
  * \return         #MBEDTLS_ERR_MPI_ALLOC_FAILED if a memory allocation failed.
  * \return         #MBEDTLS_ERR_MPI_BAD_INPUT_DATA if \p N is less than
  *                 or equal to one.
- * \return         #MBEDTLS_ERR_MPI_NOT_ACCEPTABLE if \p has no modular inverse
+ * \return         #MBEDTLS_ERR_MPI_NOT_ACCEPTABLE if \p has no modular bDifferentTypHandler
  *                 with respect to \p N.
  */
 int mbedtls_mpi_inv_mod(mbedtls_mpi *X, const mbedtls_mpi *A,

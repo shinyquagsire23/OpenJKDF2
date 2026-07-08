@@ -125,13 +125,13 @@ int sithSurface_ReadSurfacesListText(SithWorld *world)
     {
         if ( !stdConffile_ReadArgs() )
             return 0;
-        if ( _sscanf(stdConffile_g_entry.args[1].value, "%x", &world->adjoins[i].flags) != 1 )
+        if ( _sscanf(stdConffile_g_entry.aArgs[1].value, "%x", &world->adjoins[i].flags) != 1 )
             return 0;
 
-        mirror = _atoi(stdConffile_g_entry.args[2].value);
+        mirror = _atoi(stdConffile_g_entry.aArgs[2].value);
         if ( mirror >= world->numAdjoinsLoaded )
             return 0;
-        distStr = stdConffile_g_entry.args[3].value;
+        distStr = stdConffile_g_entry.aArgs[3].value;
         world->adjoins[i].mirror = &world->adjoins[mirror];
         world->adjoins[i].dist = _atof(distStr);
     }
@@ -198,7 +198,7 @@ int sithSurface_ReadSurfacesListText(SithWorld *world)
 
         if ( !stdConffile_ReadArgs() )
             return 0;
-        v20 = _atoi(stdConffile_g_entry.args[1].value);
+        v20 = _atoi(stdConffile_g_entry.aArgs[1].value);
         if ( v20 >= 0 )
         {
             if ( v20 >= sithMaterial_numMaterials )
@@ -211,16 +211,16 @@ int sithSurface_ReadSurfacesListText(SithWorld *world)
             face->material = 0;
         }
 
-        if ( _sscanf(stdConffile_g_entry.args[2].value, "%x", &surfaceIter->flags) != 1 )
+        if ( _sscanf(stdConffile_g_entry.aArgs[2].value, "%x", &surfaceIter->flags) != 1 )
             return 0;
 
-        if ( _sscanf(stdConffile_g_entry.args[3].value, "%x", &face->type) != 1 )
+        if ( _sscanf(stdConffile_g_entry.aArgs[3].value, "%x", &face->type) != 1 )
             return 0;
         if ( (sithSurface_byte_8EE668 & 1) == 0 )
         {
             face->type &= ~4;
         }
-        face->geometryMode = (rdGeoMode_t)_atoi(stdConffile_g_entry.args[4].value);
+        face->geometryMode = (rdGeoMode_t)_atoi(stdConffile_g_entry.aArgs[4].value);
 
         if ( face->material )
         {
@@ -234,7 +234,7 @@ int sithSurface_ReadSurfacesListText(SithWorld *world)
         {
             face->geometryMode = RD_GEOMETRY_NONE;
         }
-        face->lightingMode = (rdLightMode_t)_atoi(stdConffile_g_entry.args[5].value);
+        face->lightingMode = (rdLightMode_t)_atoi(stdConffile_g_entry.aArgs[5].value);
         
         if (surfaceIter->flags & (SITH_SURFACE_CEILING_SKY | SITH_SURFACE_HORIZON_SKY)) {
             face->lightingMode = RD_LIGHTMODE_FULLYLIT;
@@ -263,8 +263,8 @@ int sithSurface_ReadSurfacesListText(SithWorld *world)
 #endif
         }
 
-        face->textureMode = (rdTexMode_t)_atoi(stdConffile_g_entry.args[6].value);
-        adjoinIdx = _atoi(stdConffile_g_entry.args[7].value);
+        face->textureMode = (rdTexMode_t)_atoi(stdConffile_g_entry.aArgs[6].value);
+        adjoinIdx = _atoi(stdConffile_g_entry.aArgs[7].value);
         if ( adjoinIdx == -1 )
         {
             surfaceIter->pAdjoin = 0;
@@ -296,8 +296,8 @@ int sithSurface_ReadSurfacesListText(SithWorld *world)
                 surfaceAdjoin->flags |= SITHSURF_ADJOIN_80;
             }
         }
-        v32 = _atof(stdConffile_g_entry.args[8].value);
-        v33 = stdConffile_g_entry.args[9].value;
+        v32 = _atof(stdConffile_g_entry.aArgs[8].value);
+        v33 = stdConffile_g_entry.aArgs[9].value;
         face->extraLight = v32;
         v34 = _atoi(v33);
         if ( v34 < 3 )
@@ -366,8 +366,8 @@ int sithSurface_ReadSurfacesListText(SithWorld *world)
             v61 = 10;
             for (v40 = 0; v40 < v34; v40++)
             {
-                pPosIdx[v40] = _atoi(stdConffile_g_entry.args[v61].value);
-                pUVIdx[v40] = _atoi(stdConffile_g_entry.args[v61+1].value);
+                pPosIdx[v40] = _atoi(stdConffile_g_entry.aArgs[v61].value);
+                pUVIdx[v40] = _atoi(stdConffile_g_entry.aArgs[v61+1].value);
                 v61 += 2;
             }
         }
@@ -379,7 +379,7 @@ int sithSurface_ReadSurfacesListText(SithWorld *world)
             v61 = 10;
             for (v43 = 0; v43 < v34; v43++)
             {
-                pPosIdx[v43] = _atoi(stdConffile_g_entry.args[v61].value);
+                pPosIdx[v43] = _atoi(stdConffile_g_entry.aArgs[v61].value);
                 v61 += 2;
             }
         }
@@ -387,7 +387,7 @@ int sithSurface_ReadSurfacesListText(SithWorld *world)
 #ifndef JKM_LIGHTING
         for (int32_t v45 = 0; v45 < v34; v45++)
         {
-            pIntens[v45] = _atof(stdConffile_g_entry.args[v61+v45].value);
+            pIntens[v45] = _atof(stdConffile_g_entry.aArgs[v61+v45].value);
         }
 #else
         int32_t testAmt = 0;
@@ -395,10 +395,10 @@ int sithSurface_ReadSurfacesListText(SithWorld *world)
         {
             if (v61+(v45*4)+3 >= stdConffile_g_entry.numArgs) break; // Added
 
-            flex_t test1 = _atof(stdConffile_g_entry.args[v61+(v45*4)+0].value);
-            flex_t test2 = _atof(stdConffile_g_entry.args[v61+(v45*4)+1].value);
-            flex_t test3 = _atof(stdConffile_g_entry.args[v61+(v45*4)+2].value);
-            flex_t test4 = _atof(stdConffile_g_entry.args[v61+(v45*4)+3].value);
+            flex_t test1 = _atof(stdConffile_g_entry.aArgs[v61+(v45*4)+0].value);
+            flex_t test2 = _atof(stdConffile_g_entry.aArgs[v61+(v45*4)+1].value);
+            flex_t test3 = _atof(stdConffile_g_entry.aArgs[v61+(v45*4)+2].value);
+            flex_t test4 = _atof(stdConffile_g_entry.aArgs[v61+(v45*4)+3].value);
 
             if (test1 != test2 || (test1 != test3)) break;
 
@@ -417,7 +417,7 @@ int sithSurface_ReadSurfacesListText(SithWorld *world)
         if (testAmt < v34 * 4) {
             for (int32_t v45 = 0; v45 < v34; v45++)
             {
-                flex_t val = _atof(stdConffile_g_entry.args[v61+v45].value);
+                flex_t val = _atof(stdConffile_g_entry.aArgs[v61+v45].value);
                 pIntens[(v34*0)+v45] = val; // Added
                 pIntens[(v34*1)+v45] = val; // Added
                 pIntens[(v34*2)+v45] = val; // Added 
@@ -429,10 +429,10 @@ int sithSurface_ReadSurfacesListText(SithWorld *world)
             surfaceIter->flags |= SITH_SURFACE_1000000;
             for (int32_t v45 = 0; v45 < v34; v45++)
             {
-                pIntens[(v34*0)+v45] = _atof(stdConffile_g_entry.args[v61+(v45*4)+0].value);
-                pIntens[(v34*1)+v45] = _atof(stdConffile_g_entry.args[v61+(v45*4)+1].value);
-                pIntens[(v34*2)+v45] = _atof(stdConffile_g_entry.args[v61+(v45*4)+2].value);
-                pIntens[(v34*3)+v45] = _atof(stdConffile_g_entry.args[v61+(v45*4)+3].value);
+                pIntens[(v34*0)+v45] = _atof(stdConffile_g_entry.aArgs[v61+(v45*4)+0].value);
+                pIntens[(v34*1)+v45] = _atof(stdConffile_g_entry.aArgs[v61+(v45*4)+1].value);
+                pIntens[(v34*2)+v45] = _atof(stdConffile_g_entry.aArgs[v61+(v45*4)+2].value);
+                pIntens[(v34*3)+v45] = _atof(stdConffile_g_entry.aArgs[v61+(v45*4)+3].value);
             }
         }
 #endif
@@ -1479,14 +1479,14 @@ rdSurface* sithSurface_SetThingLight(SithThing *thing, flex_t a2, flex_t a3, int
     return result;
 }
 
-void sithSurface_HandleThingImpact(SithSurface *sender, SithThing *receiver, flex_t damage, int damageType)
+void sithSurface_HandleThingImpact(SithSurface *pMeshCollided, SithThing *pThingCollided, flex_t damage, int damageType)
 {
     flex_t v4; // [esp+0h] [ebp-14h]
 
-    if ( (!sithNet_isMulti || !receiver || (receiver->flags & SITH_TF_INVULN) == 0) && (sender->flags & SITH_SURFACE_COG_LINKED) != 0 )
+    if ( (!sithNet_isMulti || !pThingCollided || (pThingCollided->flags & SITH_TF_INVULN) == 0) && (pMeshCollided->flags & SITH_SURFACE_COG_LINKED) != 0 )
     {
         v4 = (flex_t)(uint32_t)damageType; // FLEXTODO
-        sithCog_SurfaceSendMessageEx(sender, receiver, SITH_MESSAGE_DAMAGED, damage, v4, 0.0, 0.0);
+        sithCog_SurfaceSendMessageEx(pMeshCollided, pThingCollided, SITH_MESSAGE_DAMAGED, damage, v4, 0.0, 0.0);
     }
 }
 

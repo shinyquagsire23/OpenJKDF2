@@ -37,28 +37,28 @@ int jkHudInv_ItemDatLoad(char *fpath)
     {
         flags = 0;
         cog = 0;
-        if ( !_strcmp(stdConffile_g_entry.args[0].value, "end") )
+        if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "end") )
             break;
-        if ( stdConffile_g_entry.numArgs < 4u || (binNum = _atoi(stdConffile_g_entry.args[1].value), binNum >= 0xC8) )
+        if ( stdConffile_g_entry.numArgs < 4u || (binNum = _atoi(stdConffile_g_entry.aArgs[1].value), binNum >= 0xC8) )
         {
             stdConffile_Close();
             return 0;
         }
-        min = _atof(stdConffile_g_entry.args[2].value);
-        max = _atof(stdConffile_g_entry.args[3].value);
-        _sscanf(stdConffile_g_entry.args[4].value, "%x", &flags);
+        min = _atof(stdConffile_g_entry.aArgs[2].value);
+        max = _atof(stdConffile_g_entry.aArgs[3].value);
+        _sscanf(stdConffile_g_entry.aArgs[4].value, "%x", &flags);
 
         for (v3 = 5; v3 < stdConffile_g_entry.numArgs; v3++)
         {
-            if ( !_strcmp(stdConffile_g_entry.args[v3].key, "cog") )
+            if ( !_strcmp(stdConffile_g_entry.aArgs[v3].key, "cog") )
             {
-                cog_ = sithCog_Load(stdConffile_g_entry.args[v3].value);
+                cog_ = sithCog_Load(stdConffile_g_entry.aArgs[v3].value);
                 if ( cog_ )
                     cog_->flags |= SITH_COG_LOCAL;
                 cog = cog_;
             }
         }
-        sithInventory_RegisterType(binNum, cog, stdConffile_g_entry.args[0].value, min, max, flags);
+        sithInventory_RegisterType(binNum, cog, stdConffile_g_entry.aArgs[0].value, min, max, flags);
         jkHud_aBinMaxAmt[binNum] = max; // MOTS added
     }
     stdConffile_Close();

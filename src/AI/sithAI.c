@@ -1099,9 +1099,9 @@ int sithAI_CheckSightThing(SithThing *thing, rdVector3 *targetPosition, SithThin
     v22 = sithCollision_PopStack();
     if ( v22 )
     {
-        while ( (v22->hitType & SITHCOLLISION_THING) != 0 )
+        while ( (v22->type & SITHCOLLISION_THING) != 0 )
         {
-            v23 = v22->receiver;
+            v23 = v22->pThingCollided;
             if ( v23 != targetThing )
             {
                 if ( v23->type == SITH_THING_ACTOR || v23->type == SITH_THING_COG )
@@ -1193,11 +1193,11 @@ int sithAI_CanWalk(SithAIControlBlock *actor, rdVector3 *targetPosition, int *ou
     colSearchEntry = sithCollision_PopStack();
     if ( !colSearchEntry )
         goto LABEL_20;
-    while (!(colSearchEntry->hitType & SITHCOLLISION_WORLD))
+    while (!(colSearchEntry->type & SITHCOLLISION_WORLD))
     {
-        if (colSearchEntry->hitType & SITHCOLLISION_THING)
+        if (colSearchEntry->type & SITHCOLLISION_THING)
         {
-            searchThing = colSearchEntry->receiver;
+            searchThing = colSearchEntry->pThingCollided;
             if (searchThing->flags & SITH_TF_STANDABLE)
             {
                 v12 = 1;
@@ -1267,7 +1267,7 @@ int sithAI_CanWalk_ExplicitSector(SithAIControlBlock *actor, rdVector3 *targetPo
     {
         while ( 1 )
         {
-            if ( (colSearchEntry->hitType & SITHCOLLISION_WORLD) != 0 )
+            if ( (colSearchEntry->type & SITHCOLLISION_WORLD) != 0 )
             {
                 searchSurface = colSearchEntry->surface;
                 if ( (searchSurface->flags & SITH_SURFACE_AI_CAN_WALK_ON_FLOOR) != 0 )
@@ -1289,13 +1289,13 @@ int sithAI_CanWalk_ExplicitSector(SithAIControlBlock *actor, rdVector3 *targetPo
                 }
                 return result;
             }
-            if ( (colSearchEntry->hitType & SITHCOLLISION_THING) != 0 )
+            if ( (colSearchEntry->type & SITHCOLLISION_THING) != 0 )
                 break;
             colSearchEntry = sithCollision_PopStack();
             if ( !colSearchEntry )
                 goto LABEL_13;
         }
-        searchThing = colSearchEntry->receiver;
+        searchThing = colSearchEntry->pThingCollided;
         if ( (searchThing->flags & SITH_TF_STANDABLE) == 0 )
         {
 LABEL_13:

@@ -85,13 +85,13 @@ void sithExplosion_MakeBlast(SithThing *explosion)
             flex_d_t v3 = i->distance / range;
             flex_t a1a = rdMath_clampf(1.0 - (v3 * v3), 0.25, 1.0);
 
-            if ( (i->hitType & SITHCOLLISION_WORLD) != 0 )
+            if ( (i->type & SITHCOLLISION_WORLD) != 0 )
             {
                 sithSurface_HandleThingImpact(i->surface, explosion, a1a * damage, explosion->explosionParams.damageType);
             }
             else
             {
-                SithThing* v4 = i->receiver;
+                SithThing* v4 = i->pThingCollided;
                 if ( ((explosion->explosionParams.flags & SITHEXPLOSION_FLAG_NO_DAMAGE_TO_SHOOTER) == 0
                    || v4 != explosion->pParent
                    || v4->signature != explosion->parentSignature)
