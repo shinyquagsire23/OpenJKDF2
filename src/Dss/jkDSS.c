@@ -119,7 +119,7 @@ int jkDSS_idk4()
     {
         if ( sithNet_isServer )
         {
-            if ( sithMulti_leaveJoinType )
+            if ( sithMulti_quitGameState )
             {
                 sithComm_netMsgTmp.pktData[0] = jkEpisode_GetCurrentEpisodeEntry(&jkEpisode_mLoad)->level;
                 sithComm_netMsgTmp.netMsg.flag_maybe = 0;

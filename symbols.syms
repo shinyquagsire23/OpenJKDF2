@@ -135,15 +135,15 @@ rdCache_aProcFaces 0x0086EEA0 rdProcEntry[RDCACHE_MAX_TRIS] NO_REINIT
 rdCache_dword_865258 0x00865258 int
 
 sithMulti_name 0x008C4BE0 wchar_t[32]
-sithMulti_handlerIdk 0x0083264C sithMultiHandler_t
+sithMulti_pfNewPlayerJoinedCallback 0x0083264C sithMultiHandler_t
 sithMulti_multiModeFlags 0x00832650 int
-sithMulti_dword_83265C 0x0083265C uint32_t
-sithMulti_arr_832218 0x00832218 int[256]
-sithMulti_leaveJoinWaitMs 0x00832658 uint32_t
-sithMulti_dword_832654 0x00832654 int
-sithMulti_lastScoreUpdateMs 0x00832660 uint32_t
-sithMulti_requestConnectIdx 0x00832618 uint32_t
-sithMulti_dword_832664 0x00832664 int
+sithMulti_numRemovedStaticThings 0x0083265C uint32_t
+sithMulti_aRemovedStaticThings 0x00832218 int[256]
+sithMulti_msecQuitGameTime 0x00832658 uint32_t
+sithMulti_msecPingStartTime 0x00832654 int
+sithMulti_msecLastSyncScoreTime 0x00832660 uint32_t
+sithMulti_curWelcomePlayerNum 0x00832618 uint32_t
+sithMulti_msecWelcomeUpdateInterval 0x00832664 int
 
 rdColormap_pCurMap 0x0073A3C8 rdColormap*
 rdColormap_pIdentityMap 0x0073A3CC rdColormap*
@@ -243,10 +243,10 @@ sithNet_aSyncThings 0x00832668 sithThing*[SITH_MAX_SYNC_THINGS]
 sithNet_tickrate 0x005490D4 int32_t  = 180
 sithNet_dword_8C4BA8 0x008C4BA8 int32_t 
 sithNet_dword_83262C 0x0083262C int32_t 
-sithMulti_leaveJoinType 0x0083263C int32_t 
+sithMulti_quitGameState 0x0083263C int32_t 
 sithNet_checksum 0x00832630 int32_t 
 sithNet_bNeedsFullThingSyncForLeaveJoin 0x00832640 int32_t 
-sithMulti_sendto_id 0x00832644 int32_t 
+sithMulti_newPlayerId 0x00832644 int32_t 
 sithNet_bSyncScores 0x00832648 int32_t 
 sithNet_dword_832620 0x00832620 int32_t 
 
