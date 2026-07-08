@@ -434,7 +434,7 @@ int sithAICmd_BlindFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorIn
             }
             if ( (g_debugmodeFlags & DEBUGFLAG_NO_AI) == 0 )
             {
-                sithSoundClass_ThingPlaySoundclass4(weapon, bWhichProjectile + SITH_SC_FIRE1);
+                sithSoundClass_PlayModeFirst(weapon, bWhichProjectile + SITH_SC_FIRE1);
                 v11 = sithWeapon_Fire(weapon, projectile, &fireOffs, &actor->blindAimError, 0, bWhichProjectile + SITH_ANIM_FIRE, 1.0, 0, 0.0);
                 if ( v11 )
                 {
@@ -770,7 +770,7 @@ LABEL_50:
         {
             rdMatrix_Copy34(&v37, v20);
             rdMatrix_PreRotate34(&v37, &actor->thing->actorParams.eyePYR);
-            sithSoundClass_ThingPlaySoundclass4(actor->thing, SITH_SC_FIRE1);
+            sithSoundClass_PlayModeFirst(actor->thing, SITH_SC_FIRE1);
             v29 = sithWeapon_Fire(actor->thing, v8, &v37.lvec, &actor->blindAimError, 0, SITH_ANIM_FIRE, 1.0, 0, 0.0);
             if ( v29 )
                 sithCog_SendMessageFromThing(actor->thing, v29, SITH_MESSAGE_FIRE);
@@ -797,7 +797,7 @@ LABEL_50:
     {
         _memcpy(&v37, &actor->thing->lookOrientation, sizeof(v37));
         rdMatrix_PreRotate34(&v37, &actor->thing->actorParams.eyePYR);
-        sithSoundClass_ThingPlaySoundclass4(actor->thing, SITH_SC_FIRE1);
+        sithSoundClass_PlayModeFirst(actor->thing, SITH_SC_FIRE1);
         v15 = sithWeapon_Fire(actor->thing, v8, &v37.lvec, &actor->thing->position, 0, SITH_ANIM_FIRE, 1.0, 0, 0.0);
         if ( v15 )
             sithCog_SendMessageFromThing(actor->thing, v15, SITH_MESSAGE_FIRE);
@@ -983,7 +983,7 @@ int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithAct
                 actor->flags &= ~(SITHAI_MODE_SEARCHING);
                 actor->flags |= (SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_HASDEST|SITHAI_MODE_ATTACKING);
                 sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_ALERT);
-                sithSoundClass_ThingPlaySoundclass4(actor->thing, SITH_SC_ACTIVATE);
+                sithSoundClass_PlayModeFirst(actor->thing, SITH_SC_ACTIVATE);
                 sithAIAwareness_AddEntry(actor->pDistractor->sector, &actor->thing->position, 0, 3.0, actor->pDistractor);
                 actor->pMoveThing = actor->pDistractor;
                 return 1;
@@ -1001,7 +1001,7 @@ int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithAct
                     actor->flags &= ~(SITHAI_MODE_SEARCHING);
                     actor->flags |= (SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_HASDEST|SITHAI_MODE_ATTACKING);
                     sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_ALERT);
-                    sithSoundClass_ThingPlaySoundclass4(actor->thing, SITH_SC_ACTIVATE);
+                    sithSoundClass_PlayModeFirst(actor->thing, SITH_SC_ACTIVATE);
                     sithAIAwareness_AddEntry(actor->pDistractor->sector, &actor->thing->position, 0, 3.0, actor->pDistractor);
                     actor->pMoveThing = actor->pDistractor;
                     return 1;
@@ -1022,7 +1022,7 @@ int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithAct
                     actor->flags &= ~SITHAI_MODE_SEARCHING;
                     actor->flags |= (SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_HASDEST|SITHAI_MODE_ATTACKING);
                     sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_ALERT);
-                    sithSoundClass_ThingPlaySoundclass4(actor->thing, SITH_SC_ACTIVATE);
+                    sithSoundClass_PlayModeFirst(actor->thing, SITH_SC_ACTIVATE);
                     sithAIAwareness_AddEntry(actor->pDistractor->sector, &actor->thing->position, 0, 3.0, actor->pDistractor);
                     actor->pMoveThing = actor->pDistractor;
                     return 1;
@@ -1673,7 +1673,7 @@ int sithAICmd_LookForOpposingTarget(sithActor *pActor, sithAIClassEntry *pAiclas
                 pActor->flags &= ~SITHAI_MODE_SEARCHING;
                 pActor->flags |= (SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_HASDEST|SITHAI_MODE_ATTACKING);
                 sithSoundClass_PlayModeRandom(pActor->thing, SITH_SC_ALERT);
-                sithSoundClass_ThingPlaySoundclass4(pActor->thing, SITH_SC_ACTIVATE);
+                sithSoundClass_PlayModeFirst(pActor->thing, SITH_SC_ACTIVATE);
                 sithAIAwareness_AddEntry(pActor->pDistractor->sector, &pActor->thing->position, 0, 3.0, pActor->pDistractor);
                 pActor->pMoveThing = pActor->pDistractor;
                 return 1;

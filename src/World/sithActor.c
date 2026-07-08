@@ -184,22 +184,22 @@ void sithActor_PlayDamageSoundFx(sithThing *thing, flex_t amount, int hurtType)
         switch ( hurtType )
         {
             case SITH_DAMAGE_ENERGY:
-                sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_HURTENERGY, hurt_vol);
+                sithSoundClass_PlayMode(thing, SITH_SC_HURTENERGY, hurt_vol);
                 break;
             case SITH_DAMAGE_FIRE:
-                sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_HURTFIRE, hurt_vol);
+                sithSoundClass_PlayMode(thing, SITH_SC_HURTFIRE, hurt_vol);
                 break;
             case SITH_DAMAGE_FORCE:
-                sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_HURTMAGIC, hurt_vol);
+                sithSoundClass_PlayMode(thing, SITH_SC_HURTMAGIC, hurt_vol);
                 break;
             case SITH_DAMAGE_SABER:
-                sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_HURTSPECIAL, hurt_vol);
+                sithSoundClass_PlayMode(thing, SITH_SC_HURTSPECIAL, hurt_vol);
                 break;
             case SITH_DAMAGE_DROWN:
-                sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_DROWNING, hurt_vol);
+                sithSoundClass_PlayMode(thing, SITH_SC_DROWNING, hurt_vol);
                 break;
             default:
-                sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_HURTIMPACT, hurt_vol);
+                sithSoundClass_PlayMode(thing, SITH_SC_HURTIMPACT, hurt_vol);
                 break;
         }
     }

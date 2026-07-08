@@ -933,10 +933,10 @@ int sithCollision_DefaultHitHandler(sithThing *thing, sithSurface *surface, sith
             a1a = 1.0;
         if ( (surface->surfaceFlags & SITH_SURFACE_METAL) != 0 )
         {
-            sithSoundClass_PlayThingSoundclass(v3, SITH_SC_HITMETAL, a1a);
+            sithSoundClass_PlayModeFirstEx(v3, SITH_SC_HITMETAL, a1a);
             return 1;
         }
-        sithSoundClass_PlayThingSoundclass(v3, SITH_SC_HITHARD, a1a);
+        sithSoundClass_PlayModeFirstEx(v3, SITH_SC_HITHARD, a1a);
     }
     return 1;
 }
@@ -1033,9 +1033,9 @@ int sithCollision_DebrisDebrisCollide(sithThing *thing1, sithThing *thing2, sith
     if ( sender > 1.0 )
         sender = 1.0;
     if ( (v5->thingflags & SITH_TF_METAL) != 0 )
-        sithSoundClass_PlayThingSoundclass(v4, SITH_SC_HITMETAL, sender);
+        sithSoundClass_PlayModeFirstEx(v4, SITH_SC_HITMETAL, sender);
     else
-        sithSoundClass_PlayThingSoundclass(v4, SITH_SC_HITHARD, sender);
+        sithSoundClass_PlayModeFirstEx(v4, SITH_SC_HITHARD, sender);
     return 1;
 }
 

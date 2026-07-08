@@ -655,7 +655,7 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
         physicsThing->weaponParams.typeflags |= SITH_WF_EXPLODE_AT_TIMER_TIMEOUT;
         physicsThing->collideSize = 0.0;
         physicsThing->lifeLeftMs = 550;
-        sithSoundClass_ThingPlaySoundclass4(physicsThing, SITH_SC_ACTIVATE);
+        sithSoundClass_PlayModeFirst(physicsThing, SITH_SC_ACTIVATE);
         return 0;
     }
 
@@ -707,8 +707,8 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
             return sithCollision_DebrisDebrisCollide(physicsThing, collidedThing, a4, a5);
         }
         sithPhysics_ThingStop(physicsThing);
-        sithSoundClass_ThingPauseSoundclass(physicsThing, SITH_PF_USEGRAVITY);
-        sithSoundClass_ThingPlaySoundclass4(physicsThing, SITH_SC_HITHARD);
+        sithSoundClass_StopMode(physicsThing, SITH_PF_USEGRAVITY);
+        sithSoundClass_PlayModeFirst(physicsThing, SITH_SC_HITHARD);
         physicsThing->moveSize = 0.0;
         sithThing_AttachThing(physicsThing, collidedThing);
         sithPhysics_ThingSetLook(physicsThing, &a4->hitNorm, 0.0);
@@ -829,7 +829,7 @@ int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSea
         {
             sithCollision_DefaultHitHandler(thing, surface, a3);
             sithPhysics_ThingStop(thing);
-            sithSoundClass_ThingPauseSoundclass(thing, SITH_SC_CREATE);
+            sithSoundClass_StopMode(thing, SITH_SC_CREATE);
             thing->moveSize = 0.0;
             sithThing_AttachToSurface(thing, surface, 0);
             sithPhysics_ThingSetLook(thing, &surface->surfaceInfo.face.normal, 0.0);

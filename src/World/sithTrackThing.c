@@ -16,8 +16,8 @@ void sithTrackThing_MoveToFrame(sithThing *thing, int goalFrame, flex_t a3)
         thing->trackParams.flags |= 4u;
         thing->trackParams.lerpSpeed = a3;
         thing->goalframe = goalFrame;
-        sithSoundClass_ThingPlaySoundclass4(thing, SITH_SC_STARTMOVE);
-        sithSoundClass_ThingPlaySoundclass4(thing, SITH_SC_MOVING);
+        sithSoundClass_PlayModeFirst(thing, SITH_SC_STARTMOVE);
+        sithSoundClass_PlayModeFirst(thing, SITH_SC_MOVING);
         sithTrackThing_Arrivedidk(thing);
     }
 }
@@ -40,8 +40,8 @@ void sithTrackThing_Arrivedidk(sithThing *thing)
             thing->goalframe = 0;
             thing->field_258 = 0;
             thing->field_250 = 0;
-            sithSoundClass_ThingPauseSoundclass(thing, SITH_SC_MOVING);
-            sithSoundClass_ThingPlaySoundclass4(thing, SITH_SC_STOPMOVE);
+            sithSoundClass_StopMode(thing, SITH_SC_MOVING);
+            sithSoundClass_PlayModeFirst(thing, SITH_SC_STOPMOVE);
             if ( (thing->thingflags & SITH_TF_CAPTURED) != 0 && (thing->thingflags & SITH_TF_INVULN) == 0 )
                 sithCog_SendMessageFromThing(thing, 0, SITH_MESSAGE_ARRIVED);
             return;
@@ -346,8 +346,8 @@ void sithTrackThing_Stop(sithThing *thing)
     thing->goalframe = 0;
     thing->field_258 = 0;
     thing->field_250 = 0;
-    sithSoundClass_ThingPauseSoundclass(thing, SITH_SC_MOVING);
-    sithSoundClass_ThingPlaySoundclass4(thing, SITH_SC_STOPMOVE);
+    sithSoundClass_StopMode(thing, SITH_SC_MOVING);
+    sithSoundClass_PlayModeFirst(thing, SITH_SC_STOPMOVE);
     if ( (thing->thingflags & SITH_TF_CAPTURED) != 0 && (thing->thingflags & SITH_TF_INVULN) == 0 )
         sithCog_SendMessageFromThing(thing, 0, SITH_MESSAGE_ARRIVED);
 }
@@ -372,8 +372,8 @@ void sithTrackThing_idkpathmove(sithThing *thing, sithThing *thing2, rdVector3 *
 void sithTrackThing_RotatePivot(sithThing *thing, rdVector3 *a2, rdVector3 *a3, flex_t a4)
 {
     thing->trackParams.flags |= 0x12u;
-    sithSoundClass_ThingPlaySoundclass4(thing, 3u);
-    sithSoundClass_ThingPlaySoundclass4(thing, 5u);
+    sithSoundClass_PlayModeFirst(thing, 3u);
+    sithSoundClass_PlayModeFirst(thing, 5u);
     rdVector_Copy3(&thing->trackParams.field_58, a2);
     thing->curframe = -1;
     rdMatrix_Copy34(&thing->trackParams.moveFrameOrientation, &thing->lookOrientation);
@@ -436,8 +436,8 @@ void sithTrackThing_SkipToFrame(sithThing *trackThing, uint32_t goalframeNum, fl
         trackThing->goalframe = goalframeNum;
         trackThing->trackParams.flags &= ~0x4;
         trackThing->trackParams.lerpSpeed = a3;
-        sithSoundClass_ThingPlaySoundclass4(trackThing, SITH_SC_STARTMOVE);
-        sithSoundClass_ThingPlaySoundclass4(trackThing, SITH_SC_MOVING);
+        sithSoundClass_PlayModeFirst(trackThing, SITH_SC_STARTMOVE);
+        sithSoundClass_PlayModeFirst(trackThing, SITH_SC_MOVING);
 
         goalFrame = &trackThing->trackParams.aFrames[trackThing->goalframe];
 
@@ -450,7 +450,7 @@ int sithTrackThing_PathMovePause(sithThing *trackThing)
     if ( (trackThing->trackParams.flags & 3) == 0 )
         return 0;
 
-    sithSoundClass_ThingPauseSoundclass(trackThing, SITH_SC_MOVING);
+    sithSoundClass_StopMode(trackThing, SITH_SC_MOVING);
 
     trackThing->trackParams.flags |= 0x80;
     return 1;
@@ -461,7 +461,7 @@ int sithTrackThing_PathMoveResume(sithThing *trackThing)
     if (!(trackThing->trackParams.flags & 0x80))
         return 0;
 
-    sithSoundClass_ThingPlaySoundclass4(trackThing, SITH_SC_MOVING);
+    sithSoundClass_PlayModeFirst(trackThing, SITH_SC_MOVING);
 
     trackThing->trackParams.flags &= ~0x80;
     return 1;

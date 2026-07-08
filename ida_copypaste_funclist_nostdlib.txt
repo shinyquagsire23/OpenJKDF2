@@ -2336,19 +2336,19 @@ sithSurface_Sync	.text	004E6360	0000004B			R	.	.	.	.	.	T	.
 sithSurface_sub_4E63B0	.text	004E63B0	0000002F	00000000	00000004	R	.	.	.	.	.	T	.
 sithSoundClass_Startup	.text	004E63E0	00000091	00000008	00000000	R	.	.	.	.	.	.	.
 sithSoundClass_Shutdown	.text	004E6480	00000039			R	.	.	.	.	.	.	.
-sithSoundClass_Load	.text	004E64C0	0000021E	00000090	00000008	R	.	.	.	.	.	T	.
-sithSoundClass_LoadFile	.text	004E66E0	000000E3	00000090	00000004	R	.	.	.	.	.	T	.
+sithSoundClass_ReadSoundClassesListText	.text	004E64C0	0000021E	00000090	00000008	R	.	.	.	.	.	T	.
+sithSoundClass_Load	.text	004E66E0	000000E3	00000090	00000004	R	.	.	.	.	.	T	.
 sithSoundClass_LoadEntry	.text	004E67D0	000001A4	00000000	00000008	R	.	.	.	.	.	T	.
 sithSoundClass_allocidk	.text	004E6980	0000005E	0000000C	00000008	R	.	.	.	.	.	.	.
 sithSoundClass_Free	.text	004E69E0	00000044	0000000C	00000004	R	.	.	.	.	.	.	.
-sithSoundClass_Free2	.text	004E6A30	000000BB	0000000C	00000004	R	.	.	.	.	.	T	.
-sithSoundClass_PlayThingSoundclass	.text	004E6AF0	00000034	00000000	0000000C	R	.	.	.	.	.	T	.
-sithSoundClass_ThingPlaySoundclass4	.text	004E6B30	00000034	00000000	00000008	R	.	.	.	.	.	T	.
+sithSoundClass_FreeWorldSoundClasses	.text	004E6A30	000000BB	0000000C	00000004	R	.	.	.	.	.	T	.
+sithSoundClass_PlayModeFirstEx	.text	004E6AF0	00000034	00000000	0000000C	R	.	.	.	.	.	T	.
+sithSoundClass_PlayModeFirst	.text	004E6B30	00000034	00000000	00000008	R	.	.	.	.	.	T	.
 sithSoundClass_PlayModeRandom	.text	004E6B70	0000009F	00000014	00000008	R	.	.	.	.	.	T	.
-sithSoundClass_ThingPlaySoundclass5	.text	004E6C10	0000008A	00000014	0000000C	R	.	.	.	.	.	T	.
-sithSoundClass_ThingPauseSoundclass	.text	004E6CA0	0000002C	00000000	00000008	R	.	.	.	.	.	T	.
-sithSoundClass_PlayMode	.text	004E6CD0	00000093	00000010	0000000C	R	.	.	.	.	.	T	.
-sithSoundClass_SetThingSoundClass	.text	004E6D70	0000001F	00000000	00000008	R	.	.	.	.	.	T	.
+sithSoundClass_PlayMode	.text	004E6C10	0000008A	00000014	0000000C	R	.	.	.	.	.	T	.
+sithSoundClass_StopMode	.text	004E6CA0	0000002C	00000000	00000008	R	.	.	.	.	.	T	.
+sithSoundClass_PlayModeEntry	.text	004E6CD0	00000093	00000010	0000000C	R	.	.	.	.	.	T	.
+sithSoundClass_SetThingClass	.text	004E6D70	0000001F	00000000	00000008	R	.	.	.	.	.	T	.
 sithCollision_Startup	.text	004E6D90	0000018C	00000004	00000000	R	.	.	.	.	.	.	.
 sithCollision_Shutdown	.text	004E6F20	00000014			R	.	.	.	.	.	.	.
 sithCollision_RegisterCollisionHandler	.text	004E6F40	0000005D	00000008	00000010	R	.	.	.	.	.	T	.

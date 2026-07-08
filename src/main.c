@@ -2518,15 +2518,15 @@ void do_hooks()
     // sithSoundClass
     hook_function(sithSoundClass_Startup_ADDR, sithSoundClass_Startup);
     hook_function(sithSoundClass_Shutdown_ADDR, sithSoundClass_Shutdown);
+    hook_function(sithSoundClass_ReadSoundClassesListText_ADDR, sithSoundClass_ReadSoundClassesListText);
     hook_function(sithSoundClass_Load_ADDR, sithSoundClass_Load);
-    hook_function(sithSoundClass_LoadFile_ADDR, sithSoundClass_LoadFile);
     hook_function(sithSoundClass_LoadEntry_ADDR, sithSoundClass_LoadEntry);
-    hook_function(sithSoundClass_ThingPlaySoundclass4_ADDR, sithSoundClass_ThingPlaySoundclass4);
-    hook_function(sithSoundClass_ThingPlaySoundclass5_ADDR, sithSoundClass_ThingPlaySoundclass5);
-    hook_function(sithSoundClass_PlayThingSoundclass_ADDR, sithSoundClass_PlayThingSoundclass);
-    hook_function(sithSoundClass_ThingPauseSoundclass_ADDR, sithSoundClass_ThingPauseSoundclass);
-    hook_function(sithSoundClass_Free2_ADDR, sithSoundClass_Free2);
-    hook_function(sithSoundClass_SetThingSoundClass_ADDR, sithSoundClass_SetThingSoundClass);
+    hook_function(sithSoundClass_PlayModeFirst_ADDR, sithSoundClass_PlayModeFirst);
+    hook_function(sithSoundClass_PlayMode_ADDR, sithSoundClass_PlayMode);
+    hook_function(sithSoundClass_PlayModeFirstEx_ADDR, sithSoundClass_PlayModeFirstEx);
+    hook_function(sithSoundClass_StopMode_ADDR, sithSoundClass_StopMode);
+    hook_function(sithSoundClass_FreeWorldSoundClasses_ADDR, sithSoundClass_FreeWorldSoundClasses);
+    hook_function(sithSoundClass_SetThingClass_ADDR, sithSoundClass_SetThingClass);
     
     // sithSoundMixer
     hook_function(sithSoundMixer_Startup_ADDR, sithSoundMixer_Startup);

@@ -546,7 +546,7 @@ LABEL_51:
         {
             if ( (thing->thingflags & SITH_TF_DEAD) != 0 || (thing->actorParams.typeflags & SITH_AF_SCREAMING) != 0 )
                 goto LABEL_60;
-            sithSoundClass_ThingPlaySoundclass4(thing, SITH_SC_FALLING);
+            sithSoundClass_PlayModeFirst(thing, SITH_SC_FALLING);
             v20 = thing->actorParams.typeflags | SITH_AF_SCREAMING;
         }
         else
@@ -557,7 +557,7 @@ LABEL_60:
                 sithPuppet_sub_4E4A20(thing, v19);
                 return thinga;
             }
-            sithSoundClass_ThingPauseSoundclass(thing, SITH_SC_FALLING);
+            sithSoundClass_StopMode(thing, SITH_SC_FALLING);
             v20 = thing->actorParams.typeflags & ~SITH_AF_SCREAMING;
         }
         thing->actorParams.typeflags = v20;

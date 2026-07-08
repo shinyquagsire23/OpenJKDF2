@@ -841,7 +841,7 @@ LABEL_22:
                 {
                     rdVector_Zero3(&v3->physicsParams.vel);
                     actor->flags &= ~SITHAI_MODE_MOVING;
-                    sithSoundClass_ThingPauseSoundclass(v3, SITH_SC_MOVING);
+                    sithSoundClass_StopMode(v3, SITH_SC_MOVING);
                     sithCog_SendMessageFromThing(v3, 0, SITH_MESSAGE_ARRIVED);
                     sithAI_SetActorFireTarget(actor, SITHAI_MODE_FLEEING, 0);
                 }
@@ -907,7 +907,7 @@ void sithAI_SetMoveThing(sithActor *actor, rdVector3 *movePos, flex_t moveSpeed)
     {
         actor->moveSpeed = moveSpeed;
         rdVector_Copy3(&actor->movePos, movePos);
-        sithSoundClass_ThingPlaySoundclass4(actor->thing, SITH_SC_MOVING);
+        sithSoundClass_PlayModeFirst(actor->thing, SITH_SC_MOVING);
         actor->flags |= SITHAI_MODE_MOVING;
     }
 }

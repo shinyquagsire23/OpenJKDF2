@@ -1746,7 +1746,7 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing* pThing, int param)
             result = 1;
             break;
         case THINGPARAM_SOUNDCLASS:
-            pThing->soundclass = sithSoundClass_LoadFile(arg->value);
+            pThing->soundclass = sithSoundClass_Load(arg->value);
             result = 1;
             break;
         case THINGPARAM_MODEL3D:

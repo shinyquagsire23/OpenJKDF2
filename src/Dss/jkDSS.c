@@ -373,9 +373,9 @@ int jkDSS_ProcessSetSaberInfoMots(sithCogMsg *msg)
     }
     if (v5) // MOTS added
         sithThing_SetNewModel(v2, v5);
-    sithSoundClass* v6 = sithSoundClass_LoadFile(v14);
+    sithSoundClass* v6 = sithSoundClass_Load(v14);
     if ( v6 )
-        sithSoundClass_SetThingSoundClass(v2, v6);
+        sithSoundClass_SetThingClass(v2, v6);
     sithThing* v10 = sithTemplate_GetTemplate("+ssparks_saber");
     sithThing* v9 = sithTemplate_GetTemplate("+ssparks_blood");
     sithThing* v7 = sithTemplate_GetTemplate("+ssparks_wall");
@@ -463,9 +463,9 @@ int jkDSS_ProcessSetSaberInfo(sithCogMsg *msg)
     if ( !v5 )
         return 1; // MOTS removed
     sithThing_SetNewModel(v2, v5);
-    sithSoundClass* v6 = sithSoundClass_LoadFile(v14);
+    sithSoundClass* v6 = sithSoundClass_Load(v14);
     if ( v6 )
-        sithSoundClass_SetThingSoundClass(v2, v6);
+        sithSoundClass_SetThingClass(v2, v6);
     sithThing* v10 = sithTemplate_GetTemplate("+ssparks_saber");
     sithThing* v9 = sithTemplate_GetTemplate("+ssparks_blood");
     sithThing* v7 = sithTemplate_GetTemplate("+ssparks_wall");

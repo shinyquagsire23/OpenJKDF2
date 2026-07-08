@@ -154,7 +154,7 @@ void sithSoundClass_Shutdown()
     }
 }
 
-int sithSoundClass_Load(sithWorld *world, int a2)
+int sithSoundClass_ReadSoundClassesListText(sithWorld *world, int a2)
 {
     int num_soundclasses; // ebx
     signed int result; // eax
@@ -170,7 +170,7 @@ int sithSoundClass_Load(sithWorld *world, int a2)
 
     stdConffile_ReadArgs();
     if ( _strcmp(stdConffile_entry.args[0].value, "world") || _strcmp(stdConffile_entry.args[1].value, "soundclasses") ) {
-        jk_printf("OpenJKDF2: sithSoundClass_Load failed first strcmp");
+        jk_printf("OpenJKDF2: sithSoundClass_ReadSoundClassesListText failed first strcmp");
         return 0;
     }
 
@@ -240,7 +240,7 @@ failed:
     return 0;
 }
 
-sithSoundClass* sithSoundClass_LoadFile(char *fpath)
+sithSoundClass* sithSoundClass_Load(char *fpath)
 {
     sithWorld *v1; // ebx
     sithSoundClass *result; // eax
@@ -359,7 +359,7 @@ int sithSoundClass_LoadEntry(sithSoundClass *soundClass, char *fpath)
     return 1;
 }
 
-void sithSoundClass_ThingPlaySoundclass4(sithThing *thing, unsigned int soundclass_id)
+void sithSoundClass_PlayModeFirst(sithThing *thing, unsigned int soundclass_id)
 {
     sithSoundClass *soundclass; // eax
     sithSoundClassEntry *v3; // eax
@@ -379,11 +379,11 @@ void sithSoundClass_ThingPlaySoundclass4(sithThing *thing, unsigned int soundcla
 
         v3 = soundclass->entries[soundclass_id];
         if ( v3 )
-            sithSoundClass_PlayMode(thing, v3, 1.0);
+            sithSoundClass_PlayModeEntry(thing, v3, 1.0);
     }
 }
 
-sithPlayingSound* sithSoundClass_ThingPlaySoundclass5(sithThing *thing, int sc_id, flex_t a3)
+sithPlayingSound* sithSoundClass_PlayMode(sithThing *thing, int sc_id, flex_t a3)
 {
     sithSoundClassEntry *v4; // esi
     unsigned int v5; // edi
@@ -425,13 +425,13 @@ sithPlayingSound* sithSoundClass_ThingPlaySoundclass5(sithThing *thing, int sc_i
                     while ( v7 );
                 }
             }
-            return sithSoundClass_PlayMode(thing, v4, 1.0);
+            return sithSoundClass_PlayModeEntry(thing, v4, 1.0);
         }
     }
     return NULL;
 }
 
-void sithSoundClass_PlayThingSoundclass(sithThing *thing, int sc_id, flex_t a3)
+void sithSoundClass_PlayModeFirstEx(sithThing *thing, int sc_id, flex_t a3)
 {
     sithSoundClassEntry *entry; // eax
 
@@ -450,11 +450,11 @@ void sithSoundClass_PlayThingSoundclass(sithThing *thing, int sc_id, flex_t a3)
 
         entry = thing->soundclass->entries[sc_id];
         if ( entry )
-            sithSoundClass_PlayMode(thing, entry, a3);
+            sithSoundClass_PlayModeEntry(thing, entry, a3);
     }
 }
 
-void sithSoundClass_ThingPauseSoundclass(sithThing *thing, unsigned int sc_id)
+void sithSoundClass_StopMode(sithThing *thing, unsigned int sc_id)
 {
     sithSoundClassEntry *v3; // eax
 
@@ -466,7 +466,7 @@ void sithSoundClass_ThingPauseSoundclass(sithThing *thing, unsigned int sc_id)
     }
 }
 
-void sithSoundClass_Free2(sithWorld *world)
+void sithSoundClass_FreeWorldSoundClasses(sithWorld *world)
 {
     sithSoundClass *v2; // esi
     sithSoundClassEntry **v3; // edi
@@ -541,24 +541,24 @@ sithPlayingSound* sithSoundClass_PlayModeRandom(sithThing *thing, uint32_t a2)
                     v3 = v3->nextSound;
             }
 
-            return sithSoundClass_PlayMode(thing, v3, 1.0);
+            return sithSoundClass_PlayModeEntry(thing, v3, 1.0);
         }
     }
     return NULL;
 }
 
-sithPlayingSound* sithSoundClass_PlayMode(sithThing *thing, sithSoundClassEntry *entry, flex_t a3)
+sithPlayingSound* sithSoundClass_PlayModeEntry(sithThing *thing, sithSoundClassEntry *entry, flex_t a3)
 {
     sithSound* pSithSound = entry->sound;
     if ( !entry->sound )
         return 0;
 
-    //printf("sithSoundClass_PlayMode: %s %p %f, %f\n", pSithSound->sound_fname, thing, entry->maxVolume, a3);
+    //printf("sithSoundClass_PlayModeEntry: %s %p %f, %f\n", pSithSound->sound_fname, thing, entry->maxVolume, a3);
 
     if (entry->playflags & SITHSOUNDFLAG_MUTUALLY_EXCLUSIVE_PLAYBACK_ABOLUTE)
     {
         if ( sithSoundMixer_GetThingSoundIdx(0, pSithSound) >= 0 ) {
-            //printf("sithSoundClass_PlayMode: %s already playing\n", pSithSound->sound_fname);
+            //printf("sithSoundClass_PlayModeEntry: %s already playing\n", pSithSound->sound_fname);
             return 0;
         }
     }
@@ -566,7 +566,7 @@ sithPlayingSound* sithSoundClass_PlayMode(sithThing *thing, sithSoundClassEntry 
     {
         if (entry->playflags & SITHSOUNDFLAG_MUTUALLY_EXCLUSIVE_PLAYBACK_THING) {
             if ( sithSoundMixer_GetThingSoundIdx(thing, pSithSound) >= 0 ) {
-                //printf("sithSoundClass_PlayMode: %s already playing at thing\n", pSithSound->sound_fname);
+                //printf("sithSoundClass_PlayModeEntry: %s already playing at thing\n", pSithSound->sound_fname);
                 return 0;
             }
         }
@@ -603,7 +603,7 @@ void sithSoundClass_StopSound(sithThing *thing, sithSound *sound)
         thing->actorParams.field_1BC = 0;
 }
 
-int sithSoundClass_SetThingSoundClass(sithThing *thing, sithSoundClass *soundclass)
+int sithSoundClass_SetThingClass(sithThing *thing, sithSoundClass *soundclass)
 {
     if ( thing->soundclass == soundclass )
         return 0;

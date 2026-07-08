@@ -165,7 +165,7 @@ LABEL_27:
                     v21->actorParams.typeflags &= ~SITHAI_MODE_DISABLED;
                 }
                 actor->flags |= SITHAI_MODE_TARGET_VISIBLE;
-                sithSoundClass_ThingPlaySoundclass4(v21, v17_lo + SITH_SC_FIRE1);
+                sithSoundClass_PlayModeFirst(v21, v17_lo + SITH_SC_FIRE1);
                 sithPuppet_PlayMode(actor->thing, v20, 0);
                 jkSaber_Enable(actor->thing, a2a, a3a, 0.0);
                 v23 = v19 + sithTime_curMs;

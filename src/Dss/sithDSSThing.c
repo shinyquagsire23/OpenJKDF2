@@ -388,7 +388,7 @@ int sithDSSThing_ProcessPlaySoundMode(sithCogMsg *msg)
     int16_t idk = NETMSG_POPS16();
 
     if ( v3 >= 0.0 )
-        v6 = sithSoundClass_ThingPlaySoundclass5(pThing, idk, v3);
+        v6 = sithSoundClass_PlayMode(pThing, idk, v3);
     else
         v6 = sithSoundClass_PlayModeRandom(pThing, idk);
     if ( v6 )
