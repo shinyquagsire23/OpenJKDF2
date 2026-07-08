@@ -4,7 +4,7 @@
 
 void stdMemory_Startup()
 {
-    _memset(&stdMemory_info, 0, sizeof(stdMemory_info));
+    _memset(&stdMemory_g_curState, 0, sizeof(stdMemory_g_curState));
     stdMemory_bInitted = 1;
 }
 
@@ -30,11 +30,11 @@ void stdMemory_Close()
     if (!stdMemory_bOpened)
         return;
 
-    if ( stdMemory_info.nextNum || stdMemory_info.allocCur )
+    if ( stdMemory_g_curState.nextNum || stdMemory_g_curState.allocCur )
     {
         std_g_pHS->errorPrint("File\tLine\tSize\tNumber\n\n", 0, 0, 0, 0);
-        iter = stdMemory_info.allocTop.prev;
-        if ( stdMemory_info.allocTop.prev )
+        iter = stdMemory_g_curState.allocTop.prev;
+        if ( stdMemory_g_curState.allocTop.prev )
         {
             do
             {
@@ -58,26 +58,26 @@ stdMemoryAlloc* stdMemory_Malloc(unsigned int allocSize, char *filePath, int lin
     v4 = result;
     if ( result )
     {
-        result->num = stdMemory_info.nextNum;
+        result->num = stdMemory_g_curState.nextNum;
         result->filePath = filePath;
-        v5 = stdMemory_info.allocTop.prev;
+        v5 = stdMemory_g_curState.allocTop.prev;
         result->lineNum = lineNum;
         result->alloc = (void*)result;
         result->size = allocSize;
         result->prev = v5;
         if ( v5 )
             v5->next = result;
-        result->next = &stdMemory_info.allocTop;
+        result->next = &stdMemory_g_curState.allocTop;
         _memset(&result[1], 0xCCu, allocSize);
-        stdMemory_info.allocTop.prev = result;
+        stdMemory_g_curState.allocTop.prev = result;
         result->magic = 0x12345678;
         *(int *)((char *)&result[1].num + allocSize) = 0x12345678;
 
-        if ( stdMemory_info.allocMax <= allocSize + stdMemory_info.allocCur )
-            stdMemory_info.allocMax = allocSize + stdMemory_info.allocCur;
+        if ( stdMemory_g_curState.allocMax <= allocSize + stdMemory_g_curState.allocCur )
+            stdMemory_g_curState.allocMax = allocSize + stdMemory_g_curState.allocCur;
 
-        stdMemory_info.allocCur += allocSize;
-        ++stdMemory_info.nextNum;
+        stdMemory_g_curState.allocCur += allocSize;
+        ++stdMemory_g_curState.nextNum;
         result = v4 + 1;
     }
     return result;
@@ -95,11 +95,11 @@ void stdMemory_Free(stdMemoryAlloc *alloc)
     v2 = alloc[-1].prev;
     if ( v2 )
         v2->next = v1->next;
-    v3 = stdMemory_info.allocCur;
-    v4 = stdMemory_info.nextNum;
+    v3 = stdMemory_g_curState.allocCur;
+    v4 = stdMemory_g_curState.nextNum;
     v1->next->prev = v2;
-    stdMemory_info.allocCur = v3 - v1->size;
-    stdMemory_info.nextNum = v4 - 1;
+    stdMemory_g_curState.allocCur = v3 - v1->size;
+    stdMemory_g_curState.nextNum = v4 - 1;
     STD_FREE(v1);
 }
 
@@ -133,12 +133,12 @@ stdMemoryAlloc* stdMemory_Realloc(stdMemoryAlloc *alloc, int allocSize, char *fi
             v11 = result->next;
             if ( v11 )
                 v11->prev = result;
-            v12 = stdMemory_info.allocMax;
+            v12 = stdMemory_g_curState.allocMax;
             result->magic = 305419896;
             *(int *)((char *)&result[1].num + allocSize) = 305419896;
-            stdMemory_info.allocCur += allocSize - v9;
-            if ( v12 <= stdMemory_info.allocCur )
-                stdMemory_info.allocMax = stdMemory_info.allocCur;
+            stdMemory_g_curState.allocCur += allocSize - v9;
+            if ( v12 <= stdMemory_g_curState.allocCur )
+                stdMemory_g_curState.allocMax = stdMemory_g_curState.allocCur;
             ++result;
         }
     }
@@ -149,11 +149,11 @@ stdMemoryAlloc* stdMemory_Realloc(stdMemoryAlloc *alloc, int allocSize, char *fi
         v6 = alloc[-1].prev;
         if ( v6 )
             v6->next = v5->next;
-        v7 = stdMemory_info.allocCur;
-        v8 = stdMemory_info.nextNum;
+        v7 = stdMemory_g_curState.allocCur;
+        v8 = stdMemory_g_curState.nextNum;
         v5->next->prev = v6;
-        stdMemory_info.allocCur = v7 - v5->size;
-        stdMemory_info.nextNum = v8 - 1;
+        stdMemory_g_curState.allocCur = v7 - v5->size;
+        stdMemory_g_curState.nextNum = v8 - 1;
         STD_FREE(v5);
         result = 0;
     }

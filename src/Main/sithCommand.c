@@ -452,9 +452,9 @@ int sithCommand_DynamicMemory(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     _sprintf(
         std_g_genBuffer,
         "NumAllocs: %d TotalMemAlloc: %d bytes MaxMemAlloc: %d bytes",
-        stdMemory_info.nextNum,
-        stdMemory_info.allocCur,
-        stdMemory_info.allocMax);
+        stdMemory_g_curState.nextNum,
+        stdMemory_g_curState.allocCur,
+        stdMemory_g_curState.allocMax);
     sithConsole_PrintString(std_g_genBuffer);
     return 1;
 }
@@ -473,10 +473,10 @@ int sithCommand_MemoryDump(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         pSithHS->filePrintf(
             result,
             "Total Memory allocated: %d bytes   # Allocations: %d  Max Memory used: %d bytes\n\n",
-            stdMemory_info.allocCur,
-            stdMemory_info.nextNum,
-            stdMemory_info.allocMax);
-        for ( i = stdMemory_info.allocTop.prev; i; i = i->prev )
+            stdMemory_g_curState.allocCur,
+            stdMemory_g_curState.nextNum,
+            stdMemory_g_curState.allocMax);
+        for ( i = stdMemory_g_curState.allocTop.prev; i; i = i->prev )
             pSithHS->filePrintf(v3, "%25s:  line %3d   %8d bytes   #%d\n", i->filePath, i->lineNum, i->size, i->num);
         pSithHS->fileClose(v3);
         sithConsole_PrintString("Memory dump file 'memdump.txt' written.");

@@ -872,7 +872,7 @@ stdConffile_aLine 0x860D40 char*
 
 stdMemory_bInitted 0x00570384 int
 stdMemory_bOpened 0x00570388 int
-stdMemory_info 0x008607C0 stdMemoryInfo
+stdMemory_g_curState 0x008607C0 stdMemoryInfo
 
 yyin 0x00855D90 stdFile_t
 yyout 0x00855D94 stdFile_t
