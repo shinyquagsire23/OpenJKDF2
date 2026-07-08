@@ -79,7 +79,7 @@ int sithMulti_ProcessChat(sithCogMsg *msg)
     else
         jk_snwprintf(sithMulti_chatWStrTmp, 256, L"%s says '%S'", jkPlayer_playerInfos[arg1].player_name, v5); // Added: char -> wchar
     sithConsole_AlertSound();
-    sithConsole_PrintUniStr(sithMulti_chatWStrTmp); // Added: char -> wchar
+    sithConsole_PrintWString(sithMulti_chatWStrTmp); // Added: char -> wchar
     return 1;
 }
 
@@ -364,7 +364,7 @@ void sithMulti_HandleDeath(sithPlayerInfo *pPlayerInfo, sithThing *pKilledThing,
     {
         v6 = sithStrTable_GetUniStringWithFallback("%s_DIED");
         jk_snwprintf(a1a, 0x80u, v6, pPlayerInfo);
-        sithConsole_PrintUniStr(a1a);
+        sithConsole_PrintWString(a1a);
         goto LABEL_15;
     }
     if ( pKilledByThing != pKilledThing )
@@ -372,7 +372,7 @@ void sithMulti_HandleDeath(sithPlayerInfo *pPlayerInfo, sithThing *pKilledThing,
         v10 = pKilledByThing->actorParams.playerinfo;
         v5 = sithStrTable_GetUniStringWithFallback("%s_WAS_KILLED_BY_%s");
         jk_snwprintf(a1a, 0x80u, v5, pPlayerInfo, v10);
-        sithConsole_PrintUniStr(a1a);
+        sithConsole_PrintWString(a1a);
         ++pKilledByThing->actorParams.playerinfo->numKills;
         sithMulti_ProcessScore();
         return;
@@ -403,7 +403,7 @@ LABEL_11:
         jk_snwprintf(a1a, 0x80u, v7, pPlayerInfo);
     }
 LABEL_12:
-    sithConsole_PrintUniStr(a1a);
+    sithConsole_PrintWString(a1a);
 LABEL_15:
     ++pPlayerInfo->numSuicides;
     sithMulti_ProcessScore();
@@ -458,7 +458,7 @@ void sithMulti_ProcessScore()
             wchar_t* v9 = sithStrTable_GetUniStringWithFallback("MULTI_SCORELIMIT");
             stdString_WcharToChar(std_genBuffer, v9, 127);
             std_genBuffer[127] = 0;
-            sithConsole_Print(std_genBuffer);
+            sithConsole_PrintString(std_genBuffer);
             sithConsole_AlertSound();
             uint32_t v10 = strlen(std_genBuffer) + 1;
             if ( v10 >= 0x80 )
@@ -596,7 +596,7 @@ int sithMulti_ProcessJoinLeave(sithCogMsg *msg)
             sithPlayer_sub_4C87C0(v1, v2);
             v8 = sithStrTable_GetUniStringWithFallback("%s_HAS_JOINED_THE_GAME");
             jk_snwprintf(a1a, 0x80u, v8, jkPlayer_playerInfos[v1].player_name);
-            sithConsole_PrintUniStr(a1a);
+            sithConsole_PrintWString(a1a);
             jkPlayer_playerInfos[v1].lastUpdateMs = sithTime_curMs;
             if ( sithNet_isServer )
                 sithCog_SendSimpleMessageToAll(SITH_MESSAGE_JOIN, 3, jkPlayer_playerInfos[v1].playerThing->thingIdx, 0, v1);
@@ -656,7 +656,7 @@ int sithMulti_ProcessPingResponse(sithCogMsg *msg)
                     return 1;
             }
             _sprintf(std_genBuffer, "Ping time to %S is %d msec", jkPlayer_playerInfos[v1].player_name, sithTime_curMs - sithMulti_dword_832654);
-            sithConsole_Print(std_genBuffer);
+            sithConsole_PrintString(std_genBuffer);
         }
     }
     return 1;
@@ -679,7 +679,7 @@ int sithMulti_ProcessQuit(sithCogMsg *msg)
         if ( sithMulti_leaveJoinType != 2 )
         {
             v2 = sithStrTable_GetUniStringWithFallback("MULTI_EJECTED");
-            sithConsole_PrintUniStr(v2);
+            sithConsole_PrintWString(v2);
             sithConsole_AlertSound();
             if ( sithMulti_leaveJoinType != 2 || sithTime_curMs + MULTI_LEAVEJOIN_DELAY_MS < sithMulti_leaveJoinWaitMs )
             {
@@ -698,12 +698,12 @@ int sithMulti_ProcessQuit(sithCogMsg *msg)
             v5 = v3;
             v6 = sithStrTable_GetUniStringWithFallback("%s_HAS_LEFT_THE_GAME");
             jk_snwprintf(a1a, 0x80u, v6, &jkPlayer_playerInfos[v5]);
-            sithConsole_PrintUniStr(a1a);
+            sithConsole_PrintWString(a1a);
             sithConsole_AlertSound();
             if ( jkPlayer_playerInfos[v5].net_id == sithNet_serverNetId )
             {
                 v7 = sithStrTable_GetUniStringWithFallback("SERVER_LEFT_GAME");
-                sithConsole_PrintUniStr(v7);
+                sithConsole_PrintWString(v7);
                 sithConsole_AlertSound();
                 if ( sithMulti_leaveJoinType != 2 || sithTime_curMs + MULTI_LEAVEJOIN_DELAY_MS < sithMulti_leaveJoinWaitMs )
                 {
@@ -754,12 +754,12 @@ int sithMulti_ServerLeft(int32_t a, sithEventInfo* b)
                     }
                     v3 = sithStrTable_GetUniStringWithFallback("%s_HAS_LEFT_THE_GAME");
                     jk_snwprintf(a1, 0x80u, v3, v1);
-                    sithConsole_PrintUniStr(a1);
+                    sithConsole_PrintWString(a1);
                     sithConsole_AlertSound();
                     if ( v1->net_id == sithNet_serverNetId )
                     {
                         v4 = sithStrTable_GetUniStringWithFallback("SERVER_LEFT_GAME");
-                        sithConsole_PrintUniStr(v4);
+                        sithConsole_PrintWString(v4);
                         sithConsole_AlertSound();
                         if ( sithMulti_leaveJoinType != 2 || sithTime_curMs + MULTI_LEAVEJOIN_DELAY_MS < sithMulti_leaveJoinWaitMs )
                         {
@@ -789,12 +789,12 @@ int sithMulti_ServerLeft(int32_t a, sithEventInfo* b)
         jkPlayer_playerInfos[0].lastUpdateMs = sithTime_curMs;
         v6 = sithStrTable_GetUniStringWithFallback("%s_HAS_LEFT_THE_GAME");
         jk_snwprintf(a1, 0x80u, v6, jkPlayer_playerInfos);
-        sithConsole_PrintUniStr(a1);
+        sithConsole_PrintWString(a1);
         sithConsole_AlertSound();
         if ( jkPlayer_playerInfos[0].net_id == sithNet_serverNetId )
         {
             v7 = sithStrTable_GetUniStringWithFallback("SERVER_LEFT_GAME");
-            sithConsole_PrintUniStr(v7);
+            sithConsole_PrintWString(v7);
             sithConsole_AlertSound();
             if ( sithMulti_leaveJoinType != 2 || sithTime_curMs + MULTI_LEAVEJOIN_DELAY_MS < sithMulti_leaveJoinWaitMs )
             {
@@ -896,12 +896,12 @@ int sithMulti_ProcessLeaveJoin(sithCogMsg *msg)
                 {
                     v12 = sithStrTable_GetUniStringWithFallback("%s_HAS_LEFT_THE_GAME");
                     jk_snwprintf(v22, 0x80u, v12, v6);
-                    sithConsole_PrintUniStr(v22);
+                    sithConsole_PrintWString(v22);
                     sithConsole_AlertSound();
                     if ( v6->net_id == sithNet_serverNetId )
                     {
                         v13 = sithStrTable_GetUniStringWithFallback("SERVER_LEFT_GAME");
-                        sithConsole_PrintUniStr(v13);
+                        sithConsole_PrintWString(v13);
                         sithConsole_AlertSound();
                         if ( sithMulti_leaveJoinType != 2 || sithTime_curMs + MULTI_LEAVEJOIN_DELAY_MS < sithMulti_leaveJoinWaitMs )
                         {
@@ -919,7 +919,7 @@ int sithMulti_ProcessLeaveJoin(sithCogMsg *msg)
             {
                 v10 = sithStrTable_GetUniStringWithFallback("%s_HAS_JOINED_THE_GAME");
                 jk_snwprintf(a1a, 0x80u, v10, v6);
-                sithConsole_PrintUniStr(a1a);
+                sithConsole_PrintWString(a1a);
 
                 v6->lastUpdateMs = sithTime_curMs;
                 if (sithNet_isServer)
@@ -996,12 +996,12 @@ LABEL_10:
     {
         v4 = sithStrTable_GetUniStringWithFallback("%s_HAS_LEFT_THE_GAME");
         jk_snwprintf(a1a, 0x80u, v4, &jkPlayer_playerInfos[v3]);
-        sithConsole_PrintUniStr(a1a);
+        sithConsole_PrintWString(a1a);
         sithConsole_AlertSound();
         if ( jkPlayer_playerInfos[v3].net_id == sithNet_serverNetId )
         {
             v5 = sithStrTable_GetUniStringWithFallback("SERVER_LEFT_GAME");
-            sithConsole_PrintUniStr(v5);
+            sithConsole_PrintWString(v5);
             sithConsole_AlertSound();
             if ( sithMulti_leaveJoinType != 2 || sithTime_curMs + MULTI_LEAVEJOIN_DELAY_MS < sithMulti_leaveJoinWaitMs )
             {
@@ -1291,7 +1291,7 @@ void sithMulti_HandleTimeLimit(int deltaMs)
         {
             stdString_WcharToChar(std_genBuffer, sithStrTable_GetUniStringWithFallback("MULTI_TIMELIMIT"), 127);
             std_genBuffer[127] = 0;
-            sithConsole_Print(std_genBuffer);
+            sithConsole_PrintString(std_genBuffer);
             sithConsole_AlertSound();
             v2 = strlen(std_genBuffer) + 1;
             if ( v2 >= 0x80 )
@@ -1541,13 +1541,13 @@ void sithMulti_sendmsgidk4(int playerIdx)
     wchar_t buf[128];
     wchar_t *fmt = sithStrTable_GetUniStringWithFallback("%s_HAS_LEFT_THE_GAME");
     jk_snwprintf(buf, 0x80, fmt, jkPlayer_playerInfos[playerIdx].player_name);
-    sithConsole_PrintUniStr(buf);
+    sithConsole_PrintWString(buf);
     sithConsole_AlertSound();
 
     if ( jkPlayer_playerInfos[playerIdx].net_id == sithNet_serverNetId )
     {
         wchar_t *serverMsg = sithStrTable_GetUniStringWithFallback("SERVER_LEFT_GAME");
-        sithConsole_PrintUniStr(serverMsg);
+        sithConsole_PrintWString(serverMsg);
         sithConsole_AlertSound();
         if ( sithMulti_leaveJoinType != 2 || sithMulti_leaveJoinWaitMs < sithTime_curMs + 5000 )
         {
@@ -1570,7 +1570,7 @@ void sithMulti_ProcessJoin_unused(int playerIdx)
     wchar_t buf[128];
     wchar_t *fmt = sithStrTable_GetUniStringWithFallback("%s_HAS_JOINED_THE_GAME");
     jk_snwprintf(buf, 0x80, fmt, jkPlayer_playerInfos[playerIdx].player_name);
-    sithConsole_PrintUniStr(buf);
+    sithConsole_PrintWString(buf);
 
     jkPlayer_playerInfos[playerIdx].lastUpdateMs = sithTime_curMs;
 

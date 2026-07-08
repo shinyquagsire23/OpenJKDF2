@@ -2862,14 +2862,14 @@ void do_hooks()
     hook_function(sithConsole_Shutdown_ADDR, sithConsole_Shutdown);
     hook_function(sithConsole_Open_ADDR, sithConsole_Open);
     hook_function(sithConsole_Close_ADDR, sithConsole_Close);
-    hook_function(sithConsole_Print_ADDR, sithConsole_Print);
-    hook_function(sithConsole_PrintUniStr_ADDR, sithConsole_PrintUniStr);
-    hook_function(sithConsole_TryCommand_ADDR, sithConsole_TryCommand);
+    hook_function(sithConsole_PrintString_ADDR, sithConsole_PrintString);
+    hook_function(sithConsole_PrintWString_ADDR, sithConsole_PrintWString);
+    hook_function(sithConsole_ExeCommand_ADDR, sithConsole_ExeCommand);
     hook_function(sithConsole_sub_4DA100_ADDR, sithConsole_sub_4DA100);
-    hook_function(sithConsole_AdvanceLogBuf_ADDR, sithConsole_AdvanceLogBuf);
-    hook_function(sithConsole_RegisterDevCmd_ADDR, sithConsole_RegisterDevCmd);
-    hook_function(sithConsole_SetPrintFuncs_ADDR, sithConsole_SetPrintFuncs);
-    hook_function(sithConsole_PrintHelp_ADDR, sithConsole_PrintHelp);
+    hook_function(sithConsole_Flush_ADDR, sithConsole_Flush);
+    hook_function(sithConsole_RegisterCommand_ADDR, sithConsole_RegisterCommand);
+    hook_function(sithConsole_RegisterPrintFunctions_ADDR, sithConsole_RegisterPrintFunctions);
+    hook_function(sithConsole_Help_ADDR, sithConsole_Help);
     hook_function(sithConsole_AlertSound_ADDR, sithConsole_AlertSound);
 
     // sithCommand

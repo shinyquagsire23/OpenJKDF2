@@ -47,17 +47,17 @@ void jkDev_Startup()
 
     sithConsole_Startup(JKDEV_NUM_CHEATS*2);
     sithConsole_Open(16);
-    sithConsole_SetPrintFuncs(jkDev_DebugLog, jkDev_PrintUniString);
+    sithConsole_RegisterPrintFunctions(jkDev_DebugLog, jkDev_PrintUniString);
 
     jkDev_cheatHashtable = stdHashTable_New(JKDEV_NUM_CHEATS*2);
     _memset(jkDev_aCheatCmds, 0, sizeof(stdDebugConsoleCmd) * JKDEV_NUM_CHEATS);
 
-    sithConsole_RegisterDevCmd(jkDev_CmdVersion, "version", 0);
-    sithConsole_RegisterDevCmd(jkDev_CmdTeam, "team", 0);
-    sithConsole_RegisterDevCmd(jkDev_CmdFramerate, "framerate", 0);
-    sithConsole_RegisterDevCmd(jkDev_CmdDispStats, "dispstats", 0);
-    sithConsole_RegisterDevCmd(jkDev_CmdKill, "kill", 0);
-    sithConsole_RegisterDevCmd(jkDev_CmdEndLevel, "endlevel", 0);
+    sithConsole_RegisterCommand(jkDev_CmdVersion, "version", 0);
+    sithConsole_RegisterCommand(jkDev_CmdTeam, "team", 0);
+    sithConsole_RegisterCommand(jkDev_CmdFramerate, "framerate", 0);
+    sithConsole_RegisterCommand(jkDev_CmdDispStats, "dispstats", 0);
+    sithConsole_RegisterCommand(jkDev_CmdKill, "kill", 0);
+    sithConsole_RegisterCommand(jkDev_CmdEndLevel, "endlevel", 0);
 
     jkDev_RegisterCmd(jkDev_CmdDebugFlags, "whiteflag", "Disable AI", 0);
     jkDev_RegisterCmd(jkDev_CmdFly, "eriamjh", "", 0);
@@ -557,7 +557,7 @@ char* jkDev_Decrypt(char *cheatStr)
 int jkDev_CmdVersion(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     _sprintf(std_genBuffer, "Jedi Knight v%d.%d%c %s %s\n", jkGuiTitle_verMajor, jkGuiTitle_verMinor, jkGuiTitle_verRevision, "Sep  8 1997", "16:17:30");
-    sithConsole_Print(std_genBuffer);
+    sithConsole_PrintString(std_genBuffer);
     return 1;
 }
 
@@ -729,7 +729,7 @@ int jkDev_CmdAllWeapons(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_EWEB_ROUNDS, 500.0);
         }
 
-        sithConsole_PrintUniStr(jkStrings_GetUniStringWithFallback("GAME_ALLWEAPONS"));
+        sithConsole_PrintWString(jkStrings_GetUniStringWithFallback("GAME_ALLWEAPONS"));
     }
     return 1;
 }
@@ -806,7 +806,7 @@ int jkDev_CmdAllItems(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_PRYBAR, 1.0);
             sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_RADIO, 1.0);
         }
-        sithConsole_PrintUniStr(jkStrings_GetUniStringWithFallback("GAME_ALLITEMS"));
+        sithConsole_PrintWString(jkStrings_GetUniStringWithFallback("GAME_ALLITEMS"));
     }
     return 1;
 }
@@ -843,7 +843,7 @@ int jkDev_CmdLightMaster(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_F_BLINDING, 1.0);
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_F_ABSORB, 1.0);
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_F_PROTECTION, 1.0);
-        sithConsole_PrintUniStr(jkStrings_GetUniStringWithFallback("GAME_LIGHTMASTER"));
+        sithConsole_PrintWString(jkStrings_GetUniStringWithFallback("GAME_LIGHTMASTER"));
     }
     return 1;
 }
@@ -880,7 +880,7 @@ int jkDev_CmdDarkMaster(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_F_LIGHTNING, 1.0);
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_F_DESTRUCTION, 1.0);
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_F_DEADLYSIGHT, 1.0);
-        sithConsole_PrintUniStr(jkStrings_GetUniStringWithFallback("GAME_DARKMASTER"));
+        sithConsole_PrintWString(jkStrings_GetUniStringWithFallback("GAME_DARKMASTER"));
     }
     return 1;
 }
@@ -968,7 +968,7 @@ int jkDev_CmdUberJedi(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_F_DEFENSE, 4.0);
         }
         
-        sithConsole_PrintUniStr(jkStrings_GetUniStringWithFallback("GAME_UBERJEDI"));
+        sithConsole_PrintWString(jkStrings_GetUniStringWithFallback("GAME_UBERJEDI"));
     }
     return 1;
 }
@@ -1015,7 +1015,7 @@ int jkDev_CmdLevelUp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             }
         }
 
-        sithConsole_PrintUniStr(jkStrings_GetUniStringWithFallback("GAME_LEVELUP"));
+        sithConsole_PrintWString(jkStrings_GetUniStringWithFallback("GAME_LEVELUP"));
     }
     return 1;
 }
@@ -1026,7 +1026,7 @@ int jkDev_CmdHeal(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     {
         sithPlayer_pLocalPlayerThing->actorParams.health = sithPlayer_pLocalPlayerThing->actorParams.maxHealth;
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_SHIELDS, 200.0);
-        sithConsole_PrintUniStr(jkStrings_GetUniStringWithFallback("GAME_HEAL"));
+        sithConsole_PrintWString(jkStrings_GetUniStringWithFallback("GAME_HEAL"));
     }
     return 1;
 }
@@ -1036,7 +1036,7 @@ int jkDev_CmdAllMap(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     if ( !sithNet_isMulti )
     {
         g_mapModeFlags ^= (MAPMODE_40 | MAPMODE_02);
-        sithConsole_PrintUniStr(jkStrings_GetUniStringWithFallback("GAME_ALLMAP"));
+        sithConsole_PrintWString(jkStrings_GetUniStringWithFallback("GAME_ALLMAP"));
     }
     return 1;
 }
@@ -1046,7 +1046,7 @@ int jkDev_CmdMana(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     if ( !sithNet_isMulti )
     {
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_FORCEMANA, 400.0);
-        sithConsole_PrintUniStr(jkStrings_GetUniStringWithFallback("GAME_MANA"));
+        sithConsole_PrintWString(jkStrings_GetUniStringWithFallback("GAME_MANA"));
     }
     return 1;
 }
@@ -1212,7 +1212,7 @@ int jkDev_CmdNoclip(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     wchar_t *v3; // eax
 
     if (!sithWorld_pCurrentWorld || !sithWorld_pCurrentWorld->playerThing) {
-        sithConsole_Print("No world.");
+        sithConsole_PrintString("No world.");
         return 0;
     }
 
@@ -1226,21 +1226,21 @@ int jkDev_CmdNoclip(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             v0->physicsParams.physflags |= SITH_PF_USEGRAVITY;
             g_debugmodeFlags &= ~DEBUGFLAG_NOCLIP;
             sithPlayer_bNoClippingRend = 0;
-            sithConsole_Print("Noclip OFF");
+            sithConsole_PrintString("Noclip OFF");
         }
         else
         {
             v0->physicsParams.physflags &= ~SITH_PF_USEGRAVITY;
             v0->physicsParams.physflags |= SITH_PF_FLY;
             g_debugmodeFlags |= DEBUGFLAG_NOCLIP;
-            sithConsole_Print("Noclip ON");
+            sithConsole_PrintString("Noclip ON");
         }
         
         return 1;
     }
     else
     {
-        sithConsole_Print("Not physics thing.");
+        sithConsole_PrintString("Not physics thing.");
         return 0;
     }
 

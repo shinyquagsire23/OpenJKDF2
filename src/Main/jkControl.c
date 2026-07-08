@@ -78,7 +78,7 @@ int jkControl_HandleHudKeys(sithThing *player, flex_t b)
                 jk_snwprintf(a4, 0x100u, L"%s~%s", v2, jkStrings_GetUniStringWithFallback("GUI_SLQUICKSAVE"));
                 
                 sithGamesave_Write("quicksave.jks", 1, 0, a4);
-                sithConsole_PrintUniStr(jkStrings_GetUniStringWithFallback("GUI_SLGAMEQUICKSAVED"));
+                sithConsole_PrintWString(jkStrings_GetUniStringWithFallback("GUI_SLGAMEQUICKSAVED"));
             }
         }
 

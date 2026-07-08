@@ -664,7 +664,7 @@ void Window_UpdateHeadless()
         {
             if (buffer[i] == '\n' || buffer[i] == '\r') {
                 printf("\r> %s\n", Window_headlessBuffer);
-                sithConsole_TryCommand(Window_headlessBuffer);
+                sithConsole_ExeCommand(Window_headlessBuffer);
                 memset(Window_headlessBuffer, 0, sizeof(Window_headlessBuffer));
                 continue;
             }

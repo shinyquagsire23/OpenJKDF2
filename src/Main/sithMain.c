@@ -294,7 +294,7 @@ int sithMain_Tick()
             sithSurface_Tick(sithTime_deltaSeconds);
             sithThing_TickAll(sithTime_deltaSeconds, sithTime_deltaMs);
         }
-        sithConsole_AdvanceLogBuf();
+        sithConsole_Flush();
         return 1;
     }
     else
@@ -406,7 +406,7 @@ int sithMain_Tick()
 
         //sithAI_PrintThings();
         
-        sithConsole_AdvanceLogBuf();
+        sithConsole_Flush();
         sithMulti_HandleTimeLimit(sithTime_deltaMs);
         sithGamesave_Flush();
 

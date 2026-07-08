@@ -780,7 +780,7 @@ int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSea
         else
             v5 = "none";
         _sprintf(std_genBuffer, "Weapon hit surface %d, sector %d, material '%s'.\n", surface->index, surface->parent_sector->id, v5);
-        sithConsole_Print(std_genBuffer);
+        sithConsole_PrintString(std_genBuffer);
     }
     v6 = surface->surfaceFlags;
     if (v6 & (SITH_SURFACE_CEILING_SKY|SITH_SURFACE_HORIZON_SKY)) {

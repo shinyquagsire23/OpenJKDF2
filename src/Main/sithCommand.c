@@ -46,50 +46,50 @@ int sithCommand_CmdQuit(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 // MOTS altered
 void sithCommand_Startup()
 {
-    sithConsole_RegisterDevCmd(sithCommand_CmdPlayers, "players", 0);
-    sithConsole_RegisterDevCmd(sithCommand_CmdCoords, "coords", 0);
-    sithConsole_RegisterDevCmd(sithCommand_CheatSetDebugFlags, "trackshots", 3);
-    sithConsole_RegisterDevCmd(sithCommand_CmdPing, "ping", 0);
-    sithConsole_RegisterDevCmd(sithCommand_CmdKick, "kick", 0);
-    sithConsole_RegisterDevCmd(sithCommand_CmdKick, "boot", 0); // MOTS added
-    sithConsole_RegisterDevCmd(sithCommand_CmdTick, "tick", 0);
-    sithConsole_RegisterDevCmd(sithCommand_CmdSession, "session", 0);
+    sithConsole_RegisterCommand(sithCommand_CmdPlayers, "players", 0);
+    sithConsole_RegisterCommand(sithCommand_CmdCoords, "coords", 0);
+    sithConsole_RegisterCommand(sithCommand_CheatSetDebugFlags, "trackshots", 3);
+    sithConsole_RegisterCommand(sithCommand_CmdPing, "ping", 0);
+    sithConsole_RegisterCommand(sithCommand_CmdKick, "kick", 0);
+    sithConsole_RegisterCommand(sithCommand_CmdKick, "boot", 0); // MOTS added
+    sithConsole_RegisterCommand(sithCommand_CmdTick, "tick", 0);
+    sithConsole_RegisterCommand(sithCommand_CmdSession, "session", 0);
 
     if ( (g_debugmodeFlags & DEBUGFLAG_IN_EDITOR) != 0 )
     {
-        sithConsole_RegisterDevCmd(sithConsole_PrintHelp, "help", 0);
-        sithConsole_RegisterDevCmd(sithCommand_CheatSetDebugFlags, "disableai", 0);
-        sithConsole_RegisterDevCmd(sithCommand_CheatSetDebugFlags, "notarget", 6);
-        sithConsole_RegisterDevCmd(sithCommand_CheatSetDebugFlags, "outline", 1);
-        sithConsole_RegisterDevCmd(sithCommand_CheatSetDebugFlags, "disablepuppet", 2);
-        sithConsole_RegisterDevCmd(sithCommand_CmdCogTrace, "cogtrace", 0);
-        sithConsole_RegisterDevCmd(sithCommand_CmdCogList, "coglist", 0);
-        sithConsole_RegisterDevCmd(sithCogScript_DevCmdCogStatus, "cogstatus", 0);
-        sithConsole_RegisterDevCmd(sithCommand_CheatSetDebugFlags, "noaishots", 4);
-        sithConsole_RegisterDevCmd(sithAI_PrintThingStatus, "aistatus", 0);
-        sithConsole_RegisterDevCmd(sithAI_PrintThings, "ailist", 0);
-        sithConsole_RegisterDevCmd(sithCommand_CmdFly, "fly", 0);
-        sithConsole_RegisterDevCmd(sithCommand_CmdMem, "mem", 0);
-        sithConsole_RegisterDevCmd(sithCommand_CmdDynamicMem, "dynamicmem", 0);
-        sithConsole_RegisterDevCmd(sithCommand_CmdMemDump, "memdump", 0);
-        sithConsole_RegisterDevCmd(sithCommand_CheatSetDebugFlags, "invul", 5);
-        sithConsole_RegisterDevCmd(sithCommand_CmdCogPause, "cogpause", 0);
+        sithConsole_RegisterCommand(sithConsole_Help, "help", 0);
+        sithConsole_RegisterCommand(sithCommand_CheatSetDebugFlags, "disableai", 0);
+        sithConsole_RegisterCommand(sithCommand_CheatSetDebugFlags, "notarget", 6);
+        sithConsole_RegisterCommand(sithCommand_CheatSetDebugFlags, "outline", 1);
+        sithConsole_RegisterCommand(sithCommand_CheatSetDebugFlags, "disablepuppet", 2);
+        sithConsole_RegisterCommand(sithCommand_CmdCogTrace, "cogtrace", 0);
+        sithConsole_RegisterCommand(sithCommand_CmdCogList, "coglist", 0);
+        sithConsole_RegisterCommand(sithCogScript_DevCmdCogStatus, "cogstatus", 0);
+        sithConsole_RegisterCommand(sithCommand_CheatSetDebugFlags, "noaishots", 4);
+        sithConsole_RegisterCommand(sithAI_PrintThingStatus, "aistatus", 0);
+        sithConsole_RegisterCommand(sithAI_PrintThings, "ailist", 0);
+        sithConsole_RegisterCommand(sithCommand_CmdFly, "fly", 0);
+        sithConsole_RegisterCommand(sithCommand_CmdMem, "mem", 0);
+        sithConsole_RegisterCommand(sithCommand_CmdDynamicMem, "dynamicmem", 0);
+        sithConsole_RegisterCommand(sithCommand_CmdMemDump, "memdump", 0);
+        sithConsole_RegisterCommand(sithCommand_CheatSetDebugFlags, "invul", 5);
+        sithConsole_RegisterCommand(sithCommand_CmdCogPause, "cogpause", 0);
 #ifndef LINUX_TMP
-        sithConsole_RegisterDevCmd(sithCommand_CmdMatList, "matlist", 0);
+        sithConsole_RegisterCommand(sithCommand_CmdMatList, "matlist", 0);
 #endif
-        sithConsole_RegisterDevCmd(sithCommand_CmdWarp, "warp", 0);
-        sithConsole_RegisterDevCmd(sithCommand_CmdActivate, "activate", 0);
-        sithConsole_RegisterDevCmd(sithCommand_CheatSetDebugFlags, "slowmo", 7);
-        sithConsole_RegisterDevCmd(sithCommand_CmdJump, "jump", 0);
+        sithConsole_RegisterCommand(sithCommand_CmdWarp, "warp", 0);
+        sithConsole_RegisterCommand(sithCommand_CmdActivate, "activate", 0);
+        sithConsole_RegisterCommand(sithCommand_CheatSetDebugFlags, "slowmo", 7);
+        sithConsole_RegisterCommand(sithCommand_CmdJump, "jump", 0);
     }
 
 #ifdef QOL_IMPROVEMENTS
-    sithConsole_RegisterDevCmd(sithCommand_CmdQuit, "quit", 0);
-    sithConsole_RegisterDevCmd(sithCommand_CmdQuit, "q", 0);
-    sithConsole_RegisterDevCmd(sithCommand_CmdThingNpc, "npc", 0);
-    sithConsole_RegisterDevCmd(sithCommand_CmdThingNpc, "thing", 0);
-    sithConsole_RegisterDevCmd(sithCommand_CmdBind, "bind", 0);
-    sithConsole_RegisterDevCmd(sithCommand_CmdUnbind, "unbind", 0);
+    sithConsole_RegisterCommand(sithCommand_CmdQuit, "quit", 0);
+    sithConsole_RegisterCommand(sithCommand_CmdQuit, "q", 0);
+    sithConsole_RegisterCommand(sithCommand_CmdThingNpc, "npc", 0);
+    sithConsole_RegisterCommand(sithCommand_CmdThingNpc, "thing", 0);
+    sithConsole_RegisterCommand(sithCommand_CmdBind, "bind", 0);
+    sithConsole_RegisterCommand(sithCommand_CmdUnbind, "unbind", 0);
 
     sithCommand_StartupBinds();
 #endif
@@ -159,7 +159,7 @@ LABEL_13:
             v8 = v5;
             v6 = sithStrTable_GetUniStringWithFallback("%s_IS_%s");
             jk_snwprintf(a1, 0x80u, v6, v9, v8);
-            sithConsole_PrintUniStr(a1);
+            sithConsole_PrintWString(a1);
             result = 1;
             break;
         case 6u:
@@ -195,14 +195,14 @@ int sithCommand_CmdTick(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         }
         else
         {
-            sithConsole_Print("New tick is out of range");
+            sithConsole_PrintString("New tick is out of range");
             result = 0;
         }
     }
     else
     {
         _sprintf(std_genBuffer, "Current tick rate is %d msec", sithNet_tickrate);
-        sithConsole_Print(std_genBuffer);
+        sithConsole_PrintString(std_genBuffer);
         result = 1;
     }
     return result;
@@ -218,7 +218,7 @@ int sithCommand_CmdSession(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         return 0;
     DirectPlay_EnumPlayers(0);
     _sprintf(std_genBuffer, "%d players in session", DirectPlay_numPlayers);
-    sithConsole_Print(std_genBuffer);
+    sithConsole_PrintString(std_genBuffer);
     v3 = 0;
     if ( DirectPlay_numPlayers )
     {
@@ -227,7 +227,7 @@ int sithCommand_CmdSession(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         {
             v5 = sithMulti_IterPlayersnothingidk(v4->field_80);
             _sprintf(std_genBuffer, "Player %x (%S) is in the session", v4->field_80, jkPlayer_playerInfos[v5].player_name);
-            sithConsole_Print(std_genBuffer);
+            sithConsole_PrintString(std_genBuffer);
             ++v3;
             ++v4;
         }
@@ -252,31 +252,31 @@ int sithCommand_CmdCogTrace(stdDebugConsoleCmd *pCmd, const char *pArgStr)
                 v4 = &sithWorld_pCurrentWorld->cogs[v3];
                 if ( (v4->flags & SITH_COG_DEBUG) != 0 )
                 {
-                    sithConsole_Print("Cog trace disabled.");
+                    sithConsole_PrintString("Cog trace disabled.");
                     v4->flags &= ~SITH_COG_DEBUG;
                 }
                 else
                 {
-                    sithConsole_Print("Cog trace enabled.");
+                    sithConsole_PrintString("Cog trace enabled.");
                     v4->flags |= SITH_COG_DEBUG;
                 }
                 return 1;
             }
             else
             {
-                sithConsole_Print("cog id out of range.");
+                sithConsole_PrintString("cog id out of range.");
                 result = 0;
             }
         }
         else
         {
-            sithConsole_Print("syntax error.");
+            sithConsole_PrintString("syntax error.");
             result = 0;
         }
     }
     else
     {
-        sithConsole_Print("no world open.");
+        sithConsole_PrintString("no world open.");
         result = 0;
     }
     return result;
@@ -299,31 +299,31 @@ int sithCommand_CmdCogPause(stdDebugConsoleCmd *pCmd, const char *pArgStr)
                 v4 = &sithWorld_pCurrentWorld->cogs[v3];
                 if ( (v4->flags & SITH_COG_DISABLED) != 0 )
                 {
-                    sithConsole_Print("Cog enabled.");
+                    sithConsole_PrintString("Cog enabled.");
                     v4->flags &= ~SITH_COG_DISABLED;
                 }
                 else
                 {
-                    sithConsole_Print("Cog disabled.");
+                    sithConsole_PrintString("Cog disabled.");
                     v4->flags |= SITH_COG_DISABLED;
                 }
                 result = 1;
             }
             else
             {
-                sithConsole_Print("cog id out of range.");
+                sithConsole_PrintString("cog id out of range.");
                 result = 0;
             }
         }
         else
         {
-            sithConsole_Print("syntax error.");
+            sithConsole_PrintString("syntax error.");
             result = 0;
         }
     }
     else
     {
-        sithConsole_Print("No world.");
+        sithConsole_PrintString("No world.");
         result = 0;
     }
     return result;
@@ -339,7 +339,7 @@ int sithCommand_CmdCogList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     {
 #ifdef SITH_DEBUG_STRUCT_NAMES
         _sprintf(std_genBuffer, "World cogs = %d.", sithWorld_pCurrentWorld->numCogsLoaded);
-        sithConsole_Print(std_genBuffer);
+        sithConsole_PrintString(std_genBuffer);
         v3 = 0;
         for ( i = sithWorld_pCurrentWorld->cogs; v3 < sithWorld_pCurrentWorld->numCogsLoaded; ++i )
         {
@@ -349,7 +349,7 @@ int sithCommand_CmdCogList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             if ( (i->flags & SITH_COG_DEBUG) != 0 )
                 _sprintf(&std_genBuffer[strlen(std_genBuffer)], "(trace)  ");
             _sprintf(&std_genBuffer[strlen(std_genBuffer)], sithCommand_aIdk);
-            sithConsole_Print(std_genBuffer);
+            sithConsole_PrintString(std_genBuffer);
             ++v3;
         }
 #endif
@@ -357,7 +357,7 @@ int sithCommand_CmdCogList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     }
     else
     {
-        sithConsole_Print("No world.");
+        sithConsole_PrintString("No world.");
         result = 0;
     }
     return result;
@@ -384,18 +384,18 @@ int sithCommand_CmdFly(stdDebugConsoleCmd *pCmd, const char *pArgStr)
                 v0->physicsParams.physflags |= SITH_PF_FLY;
                 v3 = sithStrTable_GetUniStringWithFallback("FLYING_ON");
             }
-            sithConsole_PrintUniStr(v3);
+            sithConsole_PrintWString(v3);
             return 1;
         }
         else
         {
-            sithConsole_Print("Not physics thing.");
+            sithConsole_PrintString("Not physics thing.");
             return 0;
         }
     }
     else
     {
-        sithConsole_Print("No world.");
+        sithConsole_PrintString("No world.");
         return 0;
     }
     return 0;
@@ -414,35 +414,35 @@ int sithCommand_CmdMem(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     }
     if (!pWorld)
     {
-        sithConsole_Print("No world.");
+        sithConsole_PrintString("No world.");
         return 0;
     }
     sithWorld_GetMemorySize(pWorld, worldAllocatedAmt, worldQuantityAmt);
     _sprintf(std_genBuffer, "%5d Materials        %8d bytes.", worldQuantityAmt[0], worldAllocatedAmt[0]);
-    sithConsole_Print(std_genBuffer);
+    sithConsole_PrintString(std_genBuffer);
     _sprintf(std_genBuffer, "%5d Models           %8d bytes.", worldQuantityAmt[10], worldAllocatedAmt[10]);
-    sithConsole_Print(std_genBuffer);
+    sithConsole_PrintString(std_genBuffer);
     _sprintf(std_genBuffer, "%5d Sounds", worldQuantityAmt[6]);
-    sithConsole_Print(std_genBuffer);
+    sithConsole_PrintString(std_genBuffer);
     _sprintf(std_genBuffer, "%5d Keyframes        %8d bytes.", worldQuantityAmt[11], worldAllocatedAmt[11]);
-    sithConsole_Print(std_genBuffer);
+    sithConsole_PrintString(std_genBuffer);
     _sprintf(std_genBuffer, "%5d World Vertices   %8d bytes.", worldQuantityAmt[1], worldAllocatedAmt[1]);
-    sithConsole_Print(std_genBuffer);
+    sithConsole_PrintString(std_genBuffer);
     _sprintf(std_genBuffer, "%5d World TexVerts   %8d bytes.", worldQuantityAmt[2], worldAllocatedAmt[2]);
-    sithConsole_Print(std_genBuffer);
+    sithConsole_PrintString(std_genBuffer);
     _sprintf(std_genBuffer, "%5d Surfaces         %8d bytes.", worldQuantityAmt[3], worldAllocatedAmt[3]);
-    sithConsole_Print(std_genBuffer);
+    sithConsole_PrintString(std_genBuffer);
     _sprintf(std_genBuffer, "%5d Sectors          %8d bytes.", worldQuantityAmt[5], worldAllocatedAmt[5]);
-    sithConsole_Print(std_genBuffer);
+    sithConsole_PrintString(std_genBuffer);
     _sprintf(std_genBuffer, "%5d Cog Scripts\t\t%8d bytes.", worldQuantityAmt[8], worldAllocatedAmt[8]);
-    sithConsole_Print(std_genBuffer);
+    sithConsole_PrintString(std_genBuffer);
     _sprintf(std_genBuffer, "%5d Cogs             %8d bytes.", worldQuantityAmt[7], worldAllocatedAmt[7]);
-    sithConsole_Print(std_genBuffer);
+    sithConsole_PrintString(std_genBuffer);
     _sprintf(std_genBuffer, "%5d Adjoins          %8d bytes.", worldQuantityAmt[4], worldAllocatedAmt[4]);
-    sithConsole_Print(std_genBuffer);
+    sithConsole_PrintString(std_genBuffer);
     _sprintf(std_genBuffer, "Total Memory Used:   %8d bytes.", worldAllocatedAmt[4] + worldAllocatedAmt[5] + worldAllocatedAmt[3] + worldAllocatedAmt[2] + worldAllocatedAmt[1] + worldAllocatedAmt[11] + worldAllocatedAmt[10] + worldAllocatedAmt[0]);
-    sithConsole_Print(std_genBuffer);
-    sithConsole_Print("(Total does not include sounds & cogs)"); 
+    sithConsole_PrintString(std_genBuffer);
+    sithConsole_PrintString("(Total does not include sounds & cogs)"); 
     
     return 1;
 }
@@ -455,7 +455,7 @@ int sithCommand_CmdDynamicMem(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         stdMemory_info.nextNum,
         stdMemory_info.allocCur,
         stdMemory_info.allocMax);
-    sithConsole_Print(std_genBuffer);
+    sithConsole_PrintString(std_genBuffer);
     return 1;
 }
 
@@ -479,7 +479,7 @@ int sithCommand_CmdMemDump(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         for ( i = stdMemory_info.allocTop.prev; i; i = i->prev )
             pSithHS->filePrintf(v3, "%25s:  line %3d   %8d bytes   #%d\n", i->filePath, i->lineNum, i->size, i->num);
         pSithHS->fileClose(v3);
-        sithConsole_Print("Memory dump file 'memdump.txt' written.");
+        sithConsole_PrintString("Memory dump file 'memdump.txt' written.");
         result = 1;
     }
     return result;
@@ -508,17 +508,17 @@ int sithCommand_CmdCoords(stdDebugConsoleCmd *pCmd, const char *pArgStr)
                 a2.y,
                 a2.z,
                 player->sector->id);
-            sithConsole_Print(std_genBuffer);
+            sithConsole_PrintString(std_genBuffer);
         }
         else
         {
-            sithConsole_Print("Thing is not in world");
+            sithConsole_PrintString("Thing is not in world");
         }
         result = 1;
     }
     else
     {
-        sithConsole_Print("No world.");
+        sithConsole_PrintString("No world.");
         result = 0;
     }
     return result;
@@ -538,12 +538,12 @@ int sithCommand_CmdWarp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 
     if ( !sithWorld_pCurrentWorld || (v3 = sithWorld_pCurrentWorld->playerThing) == 0 )
     {
-        sithConsole_Print("No world.");
+        sithConsole_PrintString("No world.");
         return 0;
     }
     if ( !pArgStr )
     {
-        sithConsole_Print("Format: WARP x y z");
+        sithConsole_PrintString("Format: WARP x y z");
         return 0;
     }
     v5 = _sscanf(pArgStr, "%f %f %f %f %f %f", &fx, &fy, &fz, &f2x, &f2y, &f2z);
@@ -571,7 +571,7 @@ int sithCommand_CmdWarp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 
     if ( i == sithWorld_pCurrentWorld->numSectors )
     {
-        sithConsole_Print("Position not in world");
+        sithConsole_PrintString("Position not in world");
         result = 0;
     }
     else
@@ -613,7 +613,7 @@ int sithCommand_CmdActivate(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     }
     else
     {
-        sithConsole_Print("No world");
+        sithConsole_PrintString("No world");
     }
     return 0;
 }
@@ -644,7 +644,7 @@ int sithCommand_CmdPlayers(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     char v7[32]; // [esp+8h] [ebp-20h] BYREF
 
     _sprintf(std_genBuffer, "Maxplayers = %d", jkPlayer_maxPlayers);
-    sithConsole_Print(std_genBuffer);
+    sithConsole_PrintString(std_genBuffer);
     v2 = 0;
     if ( jkPlayer_maxPlayers )
     {
@@ -656,7 +656,7 @@ int sithCommand_CmdPlayers(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             v5 = v3->flags;
             v7[31] = 0;
             _sprintf(std_genBuffer, "Player %d:  Name: %s  Flags: %x  ID: %x", v2, v7, v5, v4);
-            sithConsole_Print(std_genBuffer);
+            sithConsole_PrintString(std_genBuffer);
             ++v2;
             ++v3;
         }
@@ -681,7 +681,7 @@ int sithCommand_CmdPing(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         if ( v2 < 0 )
         {
             _sprintf(std_genBuffer, "Player %s not found", (const char *)v4);
-            sithConsole_Print(std_genBuffer);
+            sithConsole_PrintString(std_genBuffer);
         }
     }
     sithMulti_SendPing(jkPlayer_playerInfos[v2].net_id);
@@ -707,7 +707,7 @@ int sithCommand_CmdKick(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             if ( (v3->flags & 1) != 0 && !__wcsicmp(v3->player_name, a1) )
             {
                 _sprintf(std_genBuffer, "Kicked %S", v3->player_name);
-                sithConsole_Print(std_genBuffer);
+                sithConsole_PrintString(std_genBuffer);
                 sithMulti_SendQuit(v3->net_id);
             }
             ++v2;
@@ -728,7 +728,7 @@ int sithCommand_CmdMatList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     sithWorld *pWorld = sithWorld_pCurrentWorld;
     if ( !pWorld )
     {
-        sithConsole_Print("No world.");
+        sithConsole_PrintString("No world.");
         return 0;
     }
 
@@ -779,7 +779,7 @@ int sithCommand_CmdMatList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             _sprintf(std_genBuffer, "%-16s  %d faces, %d bytes, %d bytes/face",
                      pWorld->materials[matInfo[i][0]].mat_fpath,
                      matInfo[i][1], matInfo[i][3], matInfo[i][2]);
-            sithConsole_Print(std_genBuffer);
+            sithConsole_PrintString(std_genBuffer);
         }
     }
 
@@ -798,7 +798,7 @@ int sithCommand_CmdThingNpc(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     char* pArgIter = _strtok(pArgStrMutable, ", \t\n\r");
     if ( !pArgIter ){
         _sprintf(std_genBuffer, "Usage: %s [spawn]\n", pCmd->cmdStr);
-        sithConsole_Print(std_genBuffer);
+        sithConsole_PrintString(std_genBuffer);
         free((void*)pArgStrMutable);
         return 1;
     }
@@ -807,21 +807,21 @@ int sithCommand_CmdThingNpc(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         pArgIter = _strtok(NULL, ", \t\n\r");
         if (!pArgIter) {
             _sprintf(std_genBuffer, "Usage: %s spawn <template>\n", pCmd->cmdStr);
-            sithConsole_Print(std_genBuffer);
+            sithConsole_PrintString(std_genBuffer);
             free((void*)pArgStrMutable);
             return 1;
         }
         
         sithThing* pTemplate = sithTemplate_GetEntryByName(pArgIter);
         if (!pTemplate) {
-            sithConsole_Print("No template by that name.");
+            sithConsole_PrintString("No template by that name.");
         }
         else if (pTemplate && sithWorld_pCurrentWorld && sithPlayer_pLocalPlayerThing) {
             //sithThing* pSpawned = sithThing_SpawnTemplate(pTemplate, sithPlayer_pLocalPlayerThing);
             sithThing* pSpawned = sithPlayerActions_SpawnThingAtLookAt(sithPlayer_pLocalPlayerThing, pTemplate);
         }
         else {
-            sithConsole_Print("No world.");
+            sithConsole_PrintString("No world.");
         }
     }
     free((void*)pArgStrMutable);
@@ -840,7 +840,7 @@ int sithCommand_CmdBind(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     char* pArgIter = _strtok(pArgStrMutable, ", \t\n\r");
     if ( !pArgIter || strlen(pArgIter) > 1) {
         _sprintf(std_genBuffer, "Usage: %s <key> <command...args>\n", pCmd->cmdStr);
-        sithConsole_Print(std_genBuffer);
+        sithConsole_PrintString(std_genBuffer);
         free((void*)pArgStrMutable);
         return 1;
     }
@@ -862,7 +862,7 @@ int sithCommand_CmdBind(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     }
     else {
         _sprintf(std_genBuffer, "Usage: %s <key> <command...args>\n", pCmd->cmdStr);
-        sithConsole_Print(std_genBuffer);
+        sithConsole_PrintString(std_genBuffer);
     }
     free((void*)pArgStrMutable);
     return 1;
@@ -880,7 +880,7 @@ int sithCommand_CmdUnbind(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     char* pArgIter = _strtok(pArgStrMutable, ", \t\n\r");
     if ( !pArgIter || strlen(pArgIter) > 1) {
         _sprintf(std_genBuffer, "Usage: %s <key>\n", pCmd->cmdStr);
-        sithConsole_Print(std_genBuffer);
+        sithConsole_PrintString(std_genBuffer);
         free((void*)pArgStrMutable);
         return 1;
     }

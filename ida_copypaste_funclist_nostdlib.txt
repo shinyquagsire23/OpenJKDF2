@@ -2102,14 +2102,14 @@ sithConsole_Startup	.text	004D9DB0	000000D1	00000010	00000004	R	.	.	.	.	.	T	.
 sithConsole_Shutdown	.text	004D9E90	00000058			R	.	.	.	.	.	.	.
 sithConsole_Open	.text	004D9EF0	00000044	00000008	00000004	R	.	.	.	.	.	T	.
 sithConsole_Close	.text	004D9F40	0000000B			R	.	.	.	.	.	.	.
-sithConsole_Print	.text	004D9F50	00000081	00000000	00000004	R	.	.	.	.	.	T	.
-sithConsole_PrintUniStr	.text	004D9FE0	00000014	00000000	00000004	R	.	.	.	.	.	T	.
-sithConsole_TryCommand	.text	004DA000	000000F5	00000008	00000004	R	.	.	.	.	.	T	.
+sithConsole_PrintString	.text	004D9F50	00000081	00000000	00000004	R	.	.	.	.	.	T	.
+sithConsole_PrintWString	.text	004D9FE0	00000014	00000000	00000004	R	.	.	.	.	.	T	.
+sithConsole_ExeCommand	.text	004DA000	000000F5	00000008	00000004	R	.	.	.	.	.	T	.
 sithConsole_sub_4DA100	.text	004DA100	00000006	00000000	00000000	R	.	.	.	.	.	.	.
-sithConsole_AdvanceLogBuf	.text	004DA110	0000002A			R	.	.	.	.	.	T	.
-sithConsole_RegisterDevCmd	.text	004DA140	00000070	00000000	0000000C	R	.	.	.	.	.	T	.
-sithConsole_SetPrintFuncs	.text	004DA1B0	00000019	00000000	00000008	R	.	.	.	.	.	T	.
-sithConsole_PrintHelp	.text	004DA1D0	00000200	00000060	00000000	R	.	.	.	.	.	.	.
+sithConsole_Flush	.text	004DA110	0000002A			R	.	.	.	.	.	T	.
+sithConsole_RegisterCommand	.text	004DA140	00000070	00000000	0000000C	R	.	.	.	.	.	T	.
+sithConsole_RegisterPrintFunctions	.text	004DA1B0	00000019	00000000	00000008	R	.	.	.	.	.	T	.
+sithConsole_Help	.text	004DA1D0	00000200	00000060	00000000	R	.	.	.	.	.	.	.
 sithConsole_AlertSound	.text	004DA3D0	00000023			R	.	.	.	.	.	T	.
 sithGamesave_GetProfilePath	.text	004DA400	00000041	00000020	0000000C	R	.	.	.	.	.	T	.
 sithGamesave_Setidk	.text	004DA450	00000031	00000000	00000014	R	.	.	.	.	.	T	.

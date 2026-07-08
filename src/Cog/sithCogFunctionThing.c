@@ -505,7 +505,7 @@ void sithCogFunctionThing_WaitForStop(sithCog *ctx)
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
             _sprintf(std_genBuffer, "Cog %s: Waiting for stop on object %d.\n", ctx->cogscript_fpath, idx);
-            sithConsole_Print(std_genBuffer);
+            sithConsole_PrintString(std_genBuffer);
 #endif
         }
     }

@@ -422,7 +422,7 @@ void jkQuakeConsole_ExecuteCommand(const char* pCmd)
     }
     else if ( !jkDev_TryCommand(pCmd) )
     {
-        sithConsole_TryCommand(pCmd);
+        sithConsole_ExeCommand(pCmd);
     }
 }
 

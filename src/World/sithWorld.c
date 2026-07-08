@@ -192,7 +192,7 @@ LABEL_11:
                     if ( !sithWorld_aSectionParsers[v3].funcptr(pWorld, 0) ) {
                         // Added
                         _sprintf(tmp, "%f seconds to parse section %s -- FAILED!\n", (flex32_t)v6 * 0.001, section);
-                        sithConsole_Print(tmp);
+                        sithConsole_PrintString(tmp);
 #ifdef TARGET_RETRO_HOMEBREW
                         stdPlatform_PrintHeapStats();
 #endif
@@ -200,7 +200,7 @@ LABEL_11:
                     }
                     v6 = (unsigned int)(stdPlatform_GetTimeMsec() - startMsecs);
                     _sprintf(tmp, "%f seconds to parse section %s.\n", (flex32_t)v6 * 0.001, section);
-                    sithConsole_Print(tmp);
+                    sithConsole_PrintString(tmp);
 #ifdef TARGET_RETRO_HOMEBREW
                     stdPlatform_PrintHeapStats();
 #endif

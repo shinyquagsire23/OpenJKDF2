@@ -236,7 +236,7 @@ void sithCogExec_Exec(sithCog *cog_ctx)
                 {
 #ifdef SITH_DEBUG_STRUCT_NAMES
                     _sprintf(std_genBuffer, "Cog %s: Returned from depth %d.\n", cog_ctx->cogscript_fpath, cog_ctx->calldepth);
-                    sithConsole_Print(std_genBuffer);
+                    sithConsole_PrintString(std_genBuffer);
 #endif
                 }
                 sithCogExec_Ret(cog_ctx);
@@ -307,7 +307,7 @@ void sithCogExec_ExecCog(sithCog *ctx, int32_t trigIdx)
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
             _sprintf(std_genBuffer, "Cog %s: execution started.\n", ctx->cogscript_fpath);
-            sithConsole_Print(std_genBuffer);
+            sithConsole_PrintString(std_genBuffer);
 #endif
         }
         sithCogExec_Exec(ctx);

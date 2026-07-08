@@ -970,7 +970,7 @@ int sithControl_HandlePlayer(sithThing *player, flex_t deltaSecs)
                     {
                         v17 = sithStrTable_GetUniStringWithFallback("PRESS_ACTIVATE_TO_RESTORE");
                     }
-                    sithConsole_PrintUniStr(v17);
+                    sithConsole_PrintWString(v17);
                     sithConsole_AlertSound();
                     sithControl_death_msgtimer = 0;
 LABEL_39:
@@ -1072,7 +1072,7 @@ debug_controls:
 
             // Added
             jk_snwprintf(sithControl_debugWStrTmp, 256, L"Spawn cam %u", sithControl_curDebugCam);
-            sithConsole_PrintUniStr(sithControl_debugWStrTmp);
+            sithConsole_PrintWString(sithControl_debugWStrTmp);
 
             break;
         }
@@ -1100,7 +1100,7 @@ debug_controls:
                 jk_snwprintf(sithControl_debugWStrTmp, 256, L"Following %s", jkPlayer_playerInfos[sithControl_followingPlayer].player_name);
             else
                 jk_snwprintf(sithControl_debugWStrTmp, 256, L"Spawn cam %u", sithControl_curDebugCam);
-            sithConsole_PrintUniStr(sithControl_debugWStrTmp);
+            sithConsole_PrintWString(sithControl_debugWStrTmp);
             
             if (!sithControl_followingPlayer) {
                 sithPlayerActions_WarpToCheckpoint(player, sithControl_curDebugCam);

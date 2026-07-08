@@ -1675,7 +1675,7 @@ void jkHud_SendChat(char a1)
             }
             else if ( !jkDev_TryCommand(jkHud_chatStr) )
             {
-                sithConsole_TryCommand(jkHud_chatStr);
+                sithConsole_ExeCommand(jkHud_chatStr);
             }
         }
         jkHud_idk_time(); // Inlined

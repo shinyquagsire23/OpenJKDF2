@@ -519,7 +519,7 @@ int sithAI_PrintThings(stdDebugConsoleCmd* a, const char* b)
 #ifdef SITH_DEBUG_STRUCT_NAMES
     if ( sithAI_bOpened )
     {
-        sithConsole_Print("Active AI things:\n");
+        sithConsole_PrintString("Active AI things:\n");
         v1 = 0;
         for ( i = sithAI_actors; v1 <= sithAI_inittedActors; ++i )
         {
@@ -536,7 +536,7 @@ int sithAI_PrintThings(stdDebugConsoleCmd* a, const char* b)
                         i->thing->template_name,
                         i->thing->thingIdx,
                         i->flags);
-                    sithConsole_Print(std_genBuffer);
+                    sithConsole_PrintString(std_genBuffer);
                 }
             }
             ++v1;
@@ -545,7 +545,7 @@ int sithAI_PrintThings(stdDebugConsoleCmd* a, const char* b)
     }
     else
     {
-        sithConsole_Print("AI system not open.\n");
+        sithConsole_PrintString("AI system not open.\n");
         return 0;
     }
 #endif
@@ -569,7 +569,7 @@ int sithAI_PrintThingStatus(stdDebugConsoleCmd* a1, const char *idxStr)
         if ( v3 )
         {
             _sprintf(std_genBuffer, "AI Status dump for thing %d (%s).\n", v3->thingIdx, v3->template_name);
-            sithConsole_Print(std_genBuffer);
+            sithConsole_PrintString(std_genBuffer);
             _sprintf(
                 std_genBuffer,
                 "Class '%s', Flags=0x%x, Moods %d/%d/%d, NextUpdate=%d\n",
@@ -579,8 +579,8 @@ int sithAI_PrintThingStatus(stdDebugConsoleCmd* a1, const char *idxStr)
                 v4->mood1,
                 v4->mood2,
                 v4->nextUpdate);
-            sithConsole_Print(std_genBuffer);
-            sithConsole_Print("Current instincts:\n");
+            sithConsole_PrintString(std_genBuffer);
+            sithConsole_PrintString("Current instincts:\n");
             if ( v4->numAIClassEntries )
             {
                 v7 = 0;
@@ -598,7 +598,7 @@ int sithAI_PrintThingStatus(stdDebugConsoleCmd* a1, const char *idxStr)
                         v6->nextUpdate,
                         v4->pAIClass->entries[v7].param3,
                         v4->pAIClass->entries[v7].param1);
-                    sithConsole_Print(std_genBuffer);
+                    sithConsole_PrintString(std_genBuffer);
                     ++v2;
                     ++v6;
                     ++v7;
@@ -609,13 +609,13 @@ int sithAI_PrintThingStatus(stdDebugConsoleCmd* a1, const char *idxStr)
         }
         else
         {
-            sithConsole_Print("That AI block is not currently active.\n");
+            sithConsole_PrintString("That AI block is not currently active.\n");
             result = 1;
         }
     }
     else
     {
-        sithConsole_Print("cannot process AIStatus command.\n");
+        sithConsole_PrintString("cannot process AIStatus command.\n");
         result = 0;
     }
     return result;
