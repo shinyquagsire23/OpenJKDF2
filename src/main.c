@@ -1075,13 +1075,13 @@ void do_hooks()
     
     // sithComm
     hook_function(sithComm_Startup_ADDR, sithComm_Startup);
-    hook_function(sithComm_Shutdown_ADDR, sithComm_Shutdown);
-    hook_function(sithComm_SetMsgFunc_ADDR, sithComm_SetMsgFunc);
+    hook_function(sithMessage_Shutdown_ADDR, sithMessage_Shutdown);
+    hook_function(sithMessage_RegisterFunction_ADDR, sithMessage_RegisterFunction);
     hook_function(sithComm_SendMsgToPlayer_ADDR, sithComm_SendMsgToPlayer);
-    hook_function(sithComm_FileWrite_ADDR, sithComm_FileWrite);
-    hook_function(sithComm_Sync_ADDR, sithComm_Sync);
-    hook_function(sithComm_SetNeedsSync_ADDR, sithComm_SetNeedsSync);
-    hook_function(sithComm_InvokeMsgByIdx_ADDR, sithComm_InvokeMsgByIdx);
+    hook_function(sithMessage_FileWrite_ADDR, sithMessage_FileWrite);
+    hook_function(sithMessage_ProcessMessages_ADDR, sithMessage_ProcessMessages);
+    hook_function(sithMessage_StopProcessMessages_ADDR, sithMessage_StopProcessMessages);
+    hook_function(sithMessage_Process_ADDR, sithMessage_Process);
     hook_function(sithComm_SyncWithPlayers_ADDR, sithComm_SyncWithPlayers);
     hook_function(sithComm_ClearMsgTmpBuf_ADDR, sithComm_ClearMsgTmpBuf);
     hook_function(sithComm_cogMsg_Reset_ADDR, sithComm_cogMsg_Reset);

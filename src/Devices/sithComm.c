@@ -76,7 +76,7 @@ int sithComm_Startup()
     return 1;
 }
 
-void sithComm_Shutdown()
+void sithMessage_Shutdown()
 {
     if ( sithComm_bInit )
         sithComm_bInit = 0;
@@ -105,7 +105,7 @@ static int sithComm_EnsureMsgTmpBuf(void)
 }
 #endif
 
-void sithComm_SetMsgFunc(int msgid, cogMsg_Handler func)
+void sithMessage_RegisterFunction(int msgid, cogMsg_Handler func)
 {
     sithComm_msgFuncs[msgid] = func;
 }
@@ -213,13 +213,13 @@ LABEL_35:
     }
     if ( (multiplayerFlags & 4) != 0 )
     {
-        sithComm_FileWrite(msg);
+        sithMessage_FileWrite(msg);
     }
     return ret;
 }
 
 // MOTS altered
-void sithComm_FileWrite(sithCogMsg* ctx)
+void sithMessage_FileWrite(sithCogMsg* ctx)
 {
     // Added: multiple version handling
     if (sithComm_version == 0x7D6) {
@@ -231,7 +231,7 @@ void sithComm_FileWrite(sithCogMsg* ctx)
 }
 
 // MOTS altered
-int sithComm_Sync()
+int sithMessage_ProcessMessages()
 {
     int v1; // eax
     uint16_t v2; // dx
@@ -311,12 +311,12 @@ LABEL_25:
     return v13;
 }
 
-void sithComm_SetNeedsSync()
+void sithMessage_StopProcessMessages()
 {
     sithComm_needsSync = 1;
 }
 
-int sithComm_InvokeMsgByIdx(sithCogMsg *a1)
+int sithMessage_Process(sithCogMsg *a1)
 {
     int result; // eax
 

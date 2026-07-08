@@ -116,7 +116,7 @@ void sithMain_Shutdown()
     sithAI_Shutdown();
     sithCog_Shutdown();
     stdComm_Shutdown();
-    sithComm_Shutdown();
+    sithMessage_Shutdown();
     sithThing_Shutdown();
     sithCollision_Shutdown();
     sithRender_Shutdown();
@@ -251,7 +251,7 @@ int sithMain_Tick()
     if ( (g_submodeFlags & 8) != 0 )
     {
         sithTime_Advance();
-        sithComm_Sync();
+        sithMessage_ProcessMessages();
 
 #ifdef TARGET_RETRO_HOMEBREW
         // Fallback to stepped 30Hz physics if ms delta is very high
@@ -346,7 +346,7 @@ int sithMain_Tick()
                 sithEvent_Process();
 
                 if ( sithComm_bSyncMultiplayer )
-                    sithComm_Sync();
+                    sithMessage_ProcessMessages();
 
                 if ( (g_debugmodeFlags & DEBUGFLAG_NO_AIEVENTS) == 0  && (!sithNet_isMulti || sithNet_isMulti && sithNet_isServer))
                     sithAI_TickAll();
@@ -381,7 +381,7 @@ int sithMain_Tick()
             sithEvent_Process();
 
             if ( sithComm_bSyncMultiplayer )
-                sithComm_Sync();
+                sithMessage_ProcessMessages();
 
             if ( (g_debugmodeFlags & DEBUGFLAG_NO_AIEVENTS) == 0 && (!sithNet_isMulti || sithNet_isMulti && sithNet_isServer))
                 sithAI_TickAll();

@@ -2253,13 +2253,13 @@ sithCogFunctionPlayer_AddScoreToTeamMembers	.text	004E1640	00000048	00000008	000
 sithCogFunctionPlayer_SetBinWait	.text	004E1690	00000056	00000008	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionPlayer_SyncScores	.text	004E16F0	0000000F	00000000	00000004	R	.	.	.	.	.	T	.
 sithComm_Startup	.text	004E1700	000001D5	00000000	00000000	R	.	.	.	.	.	.	.
-sithComm_Shutdown	.text	004E18E0	00000014			R	.	.	.	.	.	T	.
-sithComm_SetMsgFunc	.text	004E1900	00000010	00000000	00000008	R	.	.	.	.	.	T	.
+sithMessage_Shutdown	.text	004E18E0	00000014			R	.	.	.	.	.	T	.
+sithMessage_RegisterFunction	.text	004E1900	00000010	00000000	00000008	R	.	.	.	.	.	T	.
 sithComm_SendMsgToPlayer	.text	004E1910	00000211	0000000C	00000010	R	.	.	.	.	.	T	.
-sithComm_FileWrite	.text	004E1B30	00000034	00000008	00000004	R	.	.	.	.	.	T	.
-sithComm_Sync	.text	004E1B70	00000247	00000008	00000000	R	.	.	.	.	.	.	.
-sithComm_SetNeedsSync	.text	004E1DC0	0000000B	00000000	00000000	R	.	.	.	.	.	.	.
-sithComm_InvokeMsgByIdx	.text	004E1DD0	0000002B	00000000	00000004	R	.	.	.	.	.	T	.
+sithMessage_FileWrite	.text	004E1B30	00000034	00000008	00000004	R	.	.	.	.	.	T	.
+sithMessage_ProcessMessages	.text	004E1B70	00000247	00000008	00000000	R	.	.	.	.	.	.	.
+sithMessage_StopProcessMessages	.text	004E1DC0	0000000B	00000000	00000000	R	.	.	.	.	.	.	.
+sithMessage_Process	.text	004E1DD0	0000002B	00000000	00000004	R	.	.	.	.	.	T	.
 sithComm_SyncWithPlayers	.text	004E1E00	000000BB	00000000	00000000	R	.	.	.	.	.	.	.
 sithComm_ClearMsgTmpBuf	.text	004E1EC0	00000016	00000004	00000000	R	.	.	.	.	.	.	.
 sithComm_cogMsg_Reset	.text	004E1EE0	0000007F	00000008	00000004	R	.	.	.	.	.	T	.

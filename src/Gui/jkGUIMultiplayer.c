@@ -446,7 +446,7 @@ int jkGuiMultiplayer_CogMsgHandleJoining(sithCogMsg *msg)
 LABEL_9:
                 jkGuiDialog_ErrorDialog(v2, v3);
                 jkGuiMultiplayer_menu4.lastClicked = -2;
-                sithComm_SetNeedsSync();
+                sithMessage_StopProcessMessages();
                 break;
             default:
                 return 1;
@@ -632,7 +632,7 @@ void jkGuiMultiplayer_idk(jkGuiMenu *pMenu)
         v1 = stdPlatform_GetTimeMsec();
         if ( v1 <= jkGuiMultiplayer_dword_5564EC + 2000 || (jkGuiMultiplayer_dword_5564EC = v1, sithMulti_SendJoinRequest(sithNet_serverNetId)) )
         {
-            sithComm_Sync();
+            sithMessage_ProcessMessages();
             if ( (g_submodeFlags & 8) == 0 )
                 pMenu->lastClicked = 1;
         }

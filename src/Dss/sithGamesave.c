@@ -338,7 +338,7 @@ skip_free_things:
             continue;
         }
         
-        if (!sithComm_InvokeMsgByIdx(&sithComm_netMsgTmp))
+        if (!sithMessage_Process(&sithComm_netMsgTmp))
         {
             stdPlatform_Printf("OpenJKDF2: Save load failed to invoke msg %u\n", sithComm_netMsgTmp.netMsg.cogMsgId);
 #ifndef SDL2_RENDER

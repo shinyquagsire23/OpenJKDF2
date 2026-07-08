@@ -629,7 +629,7 @@ int sithMulti_ProcessJoinLeave(sithCogMsg *msg)
     sithPlayer_idk(v1); // sets playerThingIdx and info
     sithPlayer_ResetPalEffects();
     sithEvent_RegisterTask(2, sithMulti_ServerLeft, sithNet_tickrate, 1);
-    sithComm_SetNeedsSync();
+    sithMessage_StopProcessMessages();
     return 1;
 }
 

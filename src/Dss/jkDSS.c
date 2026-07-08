@@ -66,26 +66,26 @@ int jkDSS_Startup()
 {
     stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
     
-    sithComm_SetMsgFunc(DSS_JKENABLESABER, jkDSS_ProcessJKEnableSaber);
-    sithComm_SetMsgFunc(DSS_SABERINFO3, jkDSS_ProcessSetSaberInfo2);
-    sithComm_SetMsgFunc(DSS_JKSETWEAPONMESH, jkDSS_ProcessJKSetWeaponMesh);
-    sithComm_SetMsgFunc(DSS_ID_32, jkDSS_Processx32);
-    sithComm_SetMsgFunc(DSS_ID_33, jkDSS_Processx33);
-    sithComm_SetMsgFunc(DSS_HUDTARGET, jkDSS_ProcessHudTarget);
-    sithComm_SetMsgFunc(DSS_ID_36, jkDSS_Processx36_setwaggle);
-    sithComm_SetMsgFunc(DSS_JKPRINTUNISTRING, jkDSS_ProcessJKPrintUniString);
-    sithComm_SetMsgFunc(DSS_ENDLEVEL, jkDSS_ProcessEndLevel);
+    sithMessage_RegisterFunction(DSS_JKENABLESABER, jkDSS_ProcessJKEnableSaber);
+    sithMessage_RegisterFunction(DSS_SABERINFO3, jkDSS_ProcessSetSaberInfo2);
+    sithMessage_RegisterFunction(DSS_JKSETWEAPONMESH, jkDSS_ProcessJKSetWeaponMesh);
+    sithMessage_RegisterFunction(DSS_ID_32, jkDSS_Processx32);
+    sithMessage_RegisterFunction(DSS_ID_33, jkDSS_Processx33);
+    sithMessage_RegisterFunction(DSS_HUDTARGET, jkDSS_ProcessHudTarget);
+    sithMessage_RegisterFunction(DSS_ID_36, jkDSS_Processx36_setwaggle);
+    sithMessage_RegisterFunction(DSS_JKPRINTUNISTRING, jkDSS_ProcessJKPrintUniString);
+    sithMessage_RegisterFunction(DSS_ENDLEVEL, jkDSS_ProcessEndLevel);
     if (Main_bMotsCompat) {
-        sithComm_SetMsgFunc(DSS_SABERINFO1, jkDSS_ProcessSetSaberInfoMots);
-        sithComm_SetMsgFunc(DSS_SABERINFO2, jkDSS_ProcessSetSaberInfoMots);
+        sithMessage_RegisterFunction(DSS_SABERINFO1, jkDSS_ProcessSetSaberInfoMots);
+        sithMessage_RegisterFunction(DSS_SABERINFO2, jkDSS_ProcessSetSaberInfoMots);
     }
     else {
-        sithComm_SetMsgFunc(DSS_SABERINFO1, jkDSS_ProcessSetSaberInfo);
-        sithComm_SetMsgFunc(DSS_SABERINFO2, jkDSS_ProcessSetSaberInfo);
+        sithMessage_RegisterFunction(DSS_SABERINFO1, jkDSS_ProcessSetSaberInfo);
+        sithMessage_RegisterFunction(DSS_SABERINFO2, jkDSS_ProcessSetSaberInfo);
     }
-    sithComm_SetMsgFunc(DSS_SETTEAM, jkDSS_ProcessSetTeam);
+    sithMessage_RegisterFunction(DSS_SETTEAM, jkDSS_ProcessSetTeam);
 #if !defined(TARGET_NO_MULTIPLAYER_MENUS)
-    sithComm_SetMsgFunc(DSS_JOINING, jkGuiMultiplayer_CogMsgHandleJoining);
+    sithMessage_RegisterFunction(DSS_JOINING, jkGuiMultiplayer_CogMsgHandleJoining);
 #endif
     sithGamesave_Setidk(jkDSS_playerconfig_idksync, jkDSS_player_thingsidkfunc, jkDSS_nullsub_2, jkDSS_Write, jkDSS_Load);
     sithMulti_SetHandleridk(jkDSS_idk4);
