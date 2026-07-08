@@ -560,7 +560,7 @@ void jkGuiJoystick_sub_41B390()
         }
         jk_snwprintf(wtmp, 0x100u, L"%ls\t%ls", v4, v5);
         v6 = v3 >> 7;
-        if ( stdControl_aJoystickExists[v6] && !v8 && (stdControl_aJoysticks[v1->dikNum].flags & INPUT_MAPPING_FLAG_AXIS) != 0
+        if ( stdControl_aJoystickExists[v6] && !v8 && (stdControl_aAxes[v1->dikNum].flags & INPUT_MAPPING_FLAG_AXIS) != 0
           || v8 == 0x200 && v2 < stdControl_aJoystickMaxButtons[v6] // Added: 4bit -> 8bit
           || v8 == 0x100 && stdControl_aJoystickEnabled[v6] ) // Added: 4bit -> 8bit
         {
@@ -946,8 +946,8 @@ void jkGuiJoystick_MenuTick(jkGuiMenu *pMenu)
                 if ( (v4->keybits & 0x300) == 0 )
                 {
                     v18 = v4->dikNum;
-                    //printf("%x vs %x\n", v4->keybits, stdControl_aJoysticks[v18].flags);
-                    jkGuiJoystick_aUnk1[v18] = stdControl_aJoysticks[v18].flags & INPUT_MAPPING_FLAG_DXKEY;
+                    //printf("%x vs %x\n", v4->keybits, stdControl_aAxes[v18].flags);
+                    jkGuiJoystick_aUnk1[v18] = stdControl_aAxes[v18].flags & INPUT_MAPPING_FLAG_DXKEY;
                     stdControl_EnableAxis(v18);
                 }
                 v4++;
@@ -978,7 +978,7 @@ void jkGuiJoystick_MenuTick(jkGuiMenu *pMenu)
             {
                 v6 = v5->dikNum;
                 if ( (v5->keybits & 0x300) == 0 && !jkGuiJoystick_aUnk1[v6] )
-                    stdControl_aJoysticks[v6].flags &= ~2u;
+                    stdControl_aAxes[v6].flags &= ~2u;
                 ++v5;
             }
             while ( v5 < &jkGuiJoystick_aEntries[JKGUIJOYSTICK_NUM_ENTRIES] );
@@ -1020,10 +1020,10 @@ void jkGuiJoystick_MenuTick(jkGuiMenu *pMenu)
         else {
             v10 = v9;
             v19 = v8->dikNum;
-            v11 = stdControl_aJoysticks[v9].flags;
-            stdControl_aJoysticks[v9].flags = v11 | 2;
+            v11 = stdControl_aAxes[v9].flags;
+            stdControl_aAxes[v9].flags = v11 | 2;
             v12 = stdControl_ReadAxis(v19);
-            stdControl_aJoysticks[v10].flags = v11;
+            stdControl_aAxes[v10].flags = v11;
             //v23 = 0;
             if ( v23 != 0 )
             {

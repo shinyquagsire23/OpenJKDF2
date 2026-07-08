@@ -394,7 +394,7 @@ void jkGuiMouse_sub_417210()
         if (!v4) v4 = L"";
         jk_snwprintf(v5, 0x100u, L"%ls\t%ls", v3, v4);
 
-        if ( i >= 3 || (stdControl_aJoysticks[v2->dxKeyNum].flags & 1) != 0 )
+        if ( i >= 3 || (stdControl_aAxes[v2->dxKeyNum].flags & 1) != 0 )
             jkGuiRend_DarrayReallocStr(&jkGuiMouse_Darray_5566B8, v5, i);
         ++v2;
     }

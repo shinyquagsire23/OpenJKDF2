@@ -794,7 +794,7 @@ void Window_SdlUpdate()
         switch (event.type)
         {
             case SDL_JOYDEVICEADDED: {
-                stdControl_bHasJoysticks = 1;
+                stdControl_bReadJoysticks = 1;
                 stdControl_InitSdlJoysticks();
                 break;
             }

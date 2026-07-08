@@ -405,7 +405,7 @@ stdControlKeyInfoEntry* sithControl_BindAxis(int funcIdx, int dxKeyNum, uint32_t
     v3 = flags;
     v3 = flags & ~2 | 1;
     flagsa = v3;
-    v4 = stdControl_aJoysticks[dxKeyNum].flags;
+    v4 = stdControl_aAxes[dxKeyNum].flags;
     if ( (v4 & 1) == 0 )
         return 0;
     if ( (sithControl_inputFuncToControlType[funcIdx] & 1) == 0 )
@@ -455,7 +455,7 @@ LABEL_20:
     if ( stdControl_EnableAxis(dxKeyNum) )
     {
         if ( (flagsa & 0x10) != 0 )
-            stdControl_aJoysticks[dxKeyNum].flags |= 8u;
+            stdControl_aAxes[dxKeyNum].flags |= 8u;
         v16 = sithControl_aInputFuncToKeyinfo[funcIdx].numEntries;
         result = &sithControl_aInputFuncToKeyinfo[funcIdx].aEntries[v16];
         result->flags = flagsa;

@@ -304,10 +304,10 @@ void stdControl_FreeSdlJoysticks()
 
 int stdControl_Startup()
 {
-    _memset(stdControl_aInput1, 0, sizeof(int) * JK_NUM_KEYS);
+    _memset(stdControl_aKeyIdleTimes, 0, sizeof(int) * JK_NUM_KEYS);
     _memset(stdControl_aKeyInfo, 0, sizeof(int) * JK_NUM_KEYS);
-    _memset(stdControl_aJoysticks, 0, sizeof(stdControlJoystickEntry) * JK_NUM_AXES);
-    _memset(stdControl_aAxisPos, 0, sizeof(int) * JK_NUM_AXES);
+    _memset(stdControl_aAxes, 0, sizeof(stdControlJoystickEntry) * JK_NUM_AXES);
+    _memset(stdControl_aAxisStates, 0, sizeof(int) * JK_NUM_AXES);
     _memset(stdControl_aDebounce, 0, sizeof(stdControl_aDebounce));
 
     for (int i = 0; i < JK_NUM_JOYSTICKS; i++) {
@@ -446,7 +446,7 @@ void stdControl_ReadControls()
         return;
 
     // Present the Dreamcast controller as joystick 0.
-    stdControl_bHasJoysticks = 1;
+    stdControl_bReadJoysticks = 1;
     stdControl_aJoystickNumAxes[0] = 1;
     stdControl_aJoystickMaxButtons[0] = 7;
     stdControl_aAxisEnabled[0] = 1;
@@ -459,8 +459,8 @@ void stdControl_ReadControls()
 
     stdControl_bControlsIdle = 1;
     stdControl_curReadTime = stdPlatform_GetTimeMsec();
-    stdControl_msDelta = stdControl_curReadTime - stdControl_msLast;
-    khz = (stdControl_msDelta != 0) ? (1.0 / (flex_d_t)(stdControl_msDelta)) : (flex_d_t)1.0;
+    stdControl_readDeltaTime = stdControl_curReadTime - stdControl_lastReadTime;
+    khz = (stdControl_readDeltaTime != 0) ? (1.0 / (flex_d_t)(stdControl_readDeltaTime)) : (flex_d_t)1.0;
     stdControl_updateKHz = khz;
     stdControl_updateHz = khz * 1000.0;
 
@@ -480,7 +480,7 @@ void stdControl_ReadControls()
 
     /*if ( !stdControl_bDisableKeyboard )
     {
-        const uint8_t *state = (const uint8_t*)stdControl_aInput1;
+        const uint8_t *state = (const uint8_t*)stdControl_aKeyIdleTimes;
         for (int i = 0; i < 256; i++)
         {
             int s = !!state[i];
@@ -512,13 +512,13 @@ void stdControl_ReadControls()
             stdControl_UpdateKeyState(KEY_JOY1_HDOWN,  !!(b & CONT_DPAD_DOWN),  stdControl_curReadTime);
 
             // Analog stick (-128..127) -> joystick axis range.
-            stdControl_aAxisPos[AXIS_JOY1_X] = (st->joyx * 0x7FFF) / 128;
-            stdControl_aAxisPos[AXIS_JOY1_Y] = (st->joyy * 0x7FFF) / 128;
+            stdControl_aAxisStates[AXIS_JOY1_X] = (st->joyx * 0x7FFF) / 128;
+            stdControl_aAxisStates[AXIS_JOY1_Y] = (st->joyy * 0x7FFF) / 128;
         }
     }
 
     stdControl_ReadMouse();
-    stdControl_msLast = stdControl_curReadTime;
+    stdControl_lastReadTime = stdControl_curReadTime;
 }
 
 void stdControl_ReadMouse()
@@ -539,15 +539,15 @@ void stdControl_ReadMouse()
 
     // Look axes: combine the maple mouse delta with any Window-posted relative
     // motion (e.g. future controller look), then consume it.
-    stdControl_aAxisPos[AXIS_MOUSE_X] = Window_lastXRel + dx;
-    stdControl_aAxisPos[AXIS_MOUSE_Y] = Window_lastYRel + dy;
-    stdControl_aAxisPos[AXIS_MOUSE_Z] = Window_mouseWheelY + dz;
+    stdControl_aAxisStates[AXIS_MOUSE_X] = Window_lastXRel + dx;
+    stdControl_aAxisStates[AXIS_MOUSE_Y] = Window_lastYRel + dy;
+    stdControl_aAxisStates[AXIS_MOUSE_Z] = Window_mouseWheelY + dz;
 
     if (dx || dy || dz || Window_lastXRel || Window_lastYRel)
         stdControl_bControlsIdle = 0;
 
-    stdControl_dwLastMouseX = stdControl_aAxisPos[AXIS_MOUSE_X];
-    stdControl_dwLastMouseY = stdControl_aAxisPos[AXIS_MOUSE_Y];
+    stdControl_dwLastMouseX = stdControl_aAxisStates[AXIS_MOUSE_X];
+    stdControl_dwLastMouseY = stdControl_aAxisStates[AXIS_MOUSE_Y];
 
     Window_lastXRel = 0;
     Window_lastYRel = 0;

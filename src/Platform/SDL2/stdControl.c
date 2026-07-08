@@ -407,15 +407,15 @@ int stdControl_Startup()
 #endif
 
     //v0 = 0;
-    _memset(stdControl_aInput1, 0, sizeof(int) * JK_NUM_KEYS);
+    _memset(stdControl_aKeyIdleTimes, 0, sizeof(int) * JK_NUM_KEYS);
     _memset(stdControl_aKeyInfo, 0, sizeof(int) * JK_NUM_KEYS);
-    _memset(stdControl_aJoysticks, 0, sizeof(stdControlJoystickEntry) * JK_NUM_AXES);
-    _memset(stdControl_aAxisPos, 0, sizeof(int) * JK_NUM_AXES);
+    _memset(stdControl_aAxes, 0, sizeof(stdControlJoystickEntry) * JK_NUM_AXES);
+    _memset(stdControl_aAxisStates, 0, sizeof(int) * JK_NUM_AXES);
     _memset(stdControl_aDebounce, 0, sizeof(stdControl_aDebounce)); // Added
 
 #if 0
-    DirectX_DirectInputCreateA(stdGdi_GetHInstance(), 0x500u, &stdControl_ppDI, 0);
-    if ( stdControl_ppDI && !stdControl_ppDI->lpVtbl->CreateDevice(stdControl_ppDI, &CLSID_GUID_SysKeyboard, &stdControl_keyboardIDirectInputDevice, 0) )
+    DirectX_DirectInputCreateA(stdGdi_GetHInstance(), 0x500u, &stdControl_pDI, 0);
+    if ( stdControl_pDI && !stdControl_pDI->lpVtbl->CreateDevice(stdControl_pDI, &CLSID_GUID_SysKeyboard, &stdControl_keyboardIDirectInputDevice, 0) )
     {
         stdControl_keyboardIDirectInputDevice->lpVtbl->SetDataFormat(stdControl_keyboardIDirectInputDevice, &stdControl_stru_50E730);
         pji.wXpos = 20;
@@ -448,7 +448,7 @@ int stdControl_Startup()
     if ( v14 )
     {
         v15 = stdControl_aJoystickEnabled;
-        pJoystickIter = stdControl_aJoysticks;
+        pJoystickIter = stdControl_aAxes;
         do
         {
             if ( !joyGetPos(v0, &pji) && !joyGetDevCapsA(v0, &pjc, 0x194u) )
@@ -492,10 +492,10 @@ int stdControl_Startup()
         while ( v0 < v14 );
     }
 
-    if ( stdControl_ppDI )
+    if ( stdControl_pDI )
     {
         GetSystemMetrics(43);
-        if ( !stdControl_ppDI->lpVtbl->CreateDevice(stdControl_ppDI, &CLSID_GUID_SysMouse, &stdControl_mouseDirectInputDevice, 0)
+        if ( !stdControl_pDI->lpVtbl->CreateDevice(stdControl_pDI, &CLSID_GUID_SysMouse, &stdControl_mouseDirectInputDevice, 0)
           && !stdControl_mouseDirectInputDevice->lpVtbl->SetDataFormat(stdControl_mouseDirectInputDevice, (LPCDIDATAFORMAT)stdControl_dword_50D710) )
         {
             v9 = stdControl_mouseDirectInputDevice->lpVtbl;
@@ -535,8 +535,8 @@ void stdControl_Shutdown()
         stdControl_mouseDirectInputDevice->lpVtbl->Release(stdControl_mouseDirectInputDevice);
     if ( stdControl_keyboardIDirectInputDevice )
         stdControl_keyboardIDirectInputDevice->lpVtbl->Release(stdControl_keyboardIDirectInputDevice);
-    if ( stdControl_ppDI )
-        stdControl_ppDI->lpVtbl->Release(stdControl_ppDI);
+    if ( stdControl_pDI )
+        stdControl_pDI->lpVtbl->Release(stdControl_pDI);
 #endif
 }
 
@@ -593,8 +593,8 @@ void stdControl_Flush()
 
     stdControl_curReadTime = stdPlatform_GetTimeMsec();
 
-    _memset(stdControl_aInput1, 0, sizeof(int) * JK_NUM_KEYS);
-    _memset(stdControl_aInput2, 0, sizeof(int) * JK_NUM_KEYS);
+    _memset(stdControl_aKeyIdleTimes, 0, sizeof(int) * JK_NUM_KEYS);
+    _memset(stdControl_aKeyPressed, 0, sizeof(int) * JK_NUM_KEYS);
     _memset(stdControl_aKeyInfo, 0, sizeof(int) * JK_NUM_KEYS);
     stdControl_ReadControls();
 
@@ -603,16 +603,16 @@ void stdControl_Flush()
     {
         v9 = -1;
         stdControl_keyboardIDirectInputDevice->lpVtbl->GetDeviceData(stdControl_keyboardIDirectInputDevice, 16, 0, (LPDWORD)&v9, 0);
-        v0 = stdControl_msDelta;
+        v0 = stdControl_readDeltaTime;
         for ( i = 0; i < 256; ++i )
         {
             if ( stdControl_aKeyInfo[i] )
             {
-                v2 = stdControl_aInput1[i];
+                v2 = stdControl_aKeyIdleTimes[i];
                 stdControl_aKeyInfo[i] = 0;
                 if ( !v2 )
-                    stdControl_aInput1[i] = v0;
-                stdControl_aInput1[i] = stdControl_aInput1[i];
+                    stdControl_aKeyIdleTimes[i] = v0;
+                stdControl_aKeyIdleTimes[i] = stdControl_aKeyIdleTimes[i];
             }
         }
     }
@@ -623,9 +623,9 @@ void stdControl_Flush()
         {
             stdControl_mouseDirectInputDevice->lpVtbl->GetDeviceState(stdControl_mouseDirectInputDevice, 16, v10);
             stdControl_mouseDirectInputDevice->lpVtbl->GetDeviceData(stdControl_mouseDirectInputDevice, 16, 0, (LPDWORD)&v9, 0);
-            v3 = stdControl_msDelta;
+            v3 = stdControl_readDeltaTime;
             v4 = 0;
-            v5 = &stdControl_aInput1[KEY_MOUSE_B1]; 
+            v5 = &stdControl_aKeyIdleTimes[KEY_MOUSE_B1]; 
             v6 = 0;
             while ( v10[v4 + 12] )
             {
@@ -636,10 +636,10 @@ void stdControl_Flush()
                 }
                 else
                 {
-                    v7 = stdControl_aInput2[v6 + KEY_MOUSE_B1];
+                    v7 = stdControl_aKeyPressed[v6 + KEY_MOUSE_B1];
                     stdControl_aKeyInfo[v6 + KEY_MOUSE_B1] = 1;
                     *v5 = 0;
-                    stdControl_aInput2[v6 + KEY_MOUSE_B1] = v7 + 1;
+                    stdControl_aKeyPressed[v6 + KEY_MOUSE_B1] = v7 + 1;
                 }
 LABEL_19:
                 ++v6;
@@ -728,10 +728,10 @@ void stdControl_ReadGamepad(int idx) {
 
     // HACK
     stdControl_aAxisEnabled[idx] = 1;
-    stdControl_aJoysticks[(JK_JOYSTICK_AXIS_STRIDE * idx) + 0].flags |= 2;
-    stdControl_aJoysticks[(JK_JOYSTICK_AXIS_STRIDE * idx) + 1].flags |= 2;
-    stdControl_aJoysticks[(JK_JOYSTICK_AXIS_STRIDE * idx) + 2].flags |= 2;
-    stdControl_aJoysticks[(JK_JOYSTICK_AXIS_STRIDE * idx) + 3].flags |= 2;
+    stdControl_aAxes[(JK_JOYSTICK_AXIS_STRIDE * idx) + 0].flags |= 2;
+    stdControl_aAxes[(JK_JOYSTICK_AXIS_STRIDE * idx) + 1].flags |= 2;
+    stdControl_aAxes[(JK_JOYSTICK_AXIS_STRIDE * idx) + 2].flags |= 2;
+    stdControl_aAxes[(JK_JOYSTICK_AXIS_STRIDE * idx) + 3].flags |= 2;
 
     int stickLX = SDL_GameControllerGetAxis(pGamepad, SDL_CONTROLLER_AXIS_LEFTX);
     int stickLY = SDL_GameControllerGetAxis(pGamepad, SDL_CONTROLLER_AXIS_LEFTY);
@@ -740,12 +740,12 @@ void stdControl_ReadGamepad(int idx) {
     int trigL = SDL_GameControllerGetAxis(pGamepad, SDL_CONTROLLER_AXIS_TRIGGERLEFT);
     int trigR = SDL_GameControllerGetAxis(pGamepad, SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
 
-    stdControl_aAxisPos[(JK_JOYSTICK_AXIS_STRIDE * idx) + 0] = stickLX;
-    stdControl_aAxisPos[(JK_JOYSTICK_AXIS_STRIDE * idx) + 1] = stickLY;
-    stdControl_aAxisPos[(JK_JOYSTICK_AXIS_STRIDE * idx) + 2] = stickRX;
-    stdControl_aAxisPos[(JK_JOYSTICK_AXIS_STRIDE * idx) + 3] = stickRY;
-    stdControl_aAxisPos[(JK_JOYSTICK_AXIS_STRIDE * idx) + 4] = trigL;
-    stdControl_aAxisPos[(JK_JOYSTICK_AXIS_STRIDE * idx) + 5] = trigR;
+    stdControl_aAxisStates[(JK_JOYSTICK_AXIS_STRIDE * idx) + 0] = stickLX;
+    stdControl_aAxisStates[(JK_JOYSTICK_AXIS_STRIDE * idx) + 1] = stickLY;
+    stdControl_aAxisStates[(JK_JOYSTICK_AXIS_STRIDE * idx) + 2] = stickRX;
+    stdControl_aAxisStates[(JK_JOYSTICK_AXIS_STRIDE * idx) + 3] = stickRY;
+    stdControl_aAxisStates[(JK_JOYSTICK_AXIS_STRIDE * idx) + 4] = trigL;
+    stdControl_aAxisStates[(JK_JOYSTICK_AXIS_STRIDE * idx) + 5] = trigR;
 
     //SDL_GameControllerGetAxis
     //SDL_GameControllerGetButton
@@ -810,16 +810,16 @@ void stdControl_ReadControls()
         return;
     if (jkQuakeConsole_bOpen) return; // Hijack input to console
 
-    _memset(stdControl_aInput1, 0, sizeof(int) * JK_NUM_KEYS);
+    _memset(stdControl_aKeyIdleTimes, 0, sizeof(int) * JK_NUM_KEYS);
     stdControl_bControlsIdle = 1;
-    _memset(stdControl_aInput2, 0, sizeof(int) * JK_NUM_KEYS);
+    _memset(stdControl_aKeyPressed, 0, sizeof(int) * JK_NUM_KEYS);
     stdControl_curReadTime = stdPlatform_GetTimeMsec();
-    stdControl_msDelta = stdControl_curReadTime - stdControl_msLast;
-    if (stdControl_msDelta != 0)
-        khz = 1.0 / (flex_d_t)(__int64)(stdControl_msDelta);
+    stdControl_readDeltaTime = stdControl_curReadTime - stdControl_lastReadTime;
+    if (stdControl_readDeltaTime != 0)
+        khz = 1.0 / (flex_d_t)(__int64)(stdControl_readDeltaTime);
     else
         khz = 1.0;
-    _memset(stdControl_aAxisPos, 0, sizeof(int) * JK_NUM_AXES);
+    _memset(stdControl_aAxisStates, 0, sizeof(int) * JK_NUM_AXES);
     stdControl_updateKHz = khz;
     stdControl_updateHz = khz * 1000.0;
 
@@ -852,7 +852,7 @@ void stdControl_ReadControls()
     }
 
     // HACK: ehh
-    //if ( stdControl_bHasJoysticks )
+    //if ( stdControl_bReadJoysticks )
     {
         for (int i = 0; i < JK_NUM_JOYSTICKS; i++)
         {
@@ -880,9 +880,9 @@ void stdControl_ReadControls()
 
                 int val = SDL_JoystickGetAxis(pJoysticks[i], j+axisShift);
                 //stdPlatform_Printf("stick %d: %d %s\n", j, val, SDL_GetError());
-                stdControl_aAxisPos[(JK_JOYSTICK_AXIS_STRIDE * i) + j] = val;
+                stdControl_aAxisStates[(JK_JOYSTICK_AXIS_STRIDE * i) + j] = val;
 
-                stdControl_aJoysticks[(JK_JOYSTICK_AXIS_STRIDE * i) + j].flags |= 2; // HACK
+                stdControl_aAxes[(JK_JOYSTICK_AXIS_STRIDE * i) + j].flags |= 2; // HACK
 
                 SDL_ClearError();
             }
@@ -989,7 +989,7 @@ void stdControl_ReadControls()
         }
     }
     stdControl_ReadMouse();
-    stdControl_msLast = stdControl_curReadTime;
+    stdControl_lastReadTime = stdControl_curReadTime;
 }
 
 void stdControl_ReadMouse()
@@ -998,32 +998,32 @@ void stdControl_ReadMouse()
         return;
     if (jkQuakeConsole_bOpen) return; // Hijack input to console
 
-    stdControl_aJoysticks[AXIS_MOUSE_X].dwYoffs = 0;
-    stdControl_aJoysticks[AXIS_MOUSE_X].uMaxVal = (__int64)(250.0 * (640.0 / Window_screenXSize));
-    stdControl_aJoysticks[AXIS_MOUSE_X].uMinVal = -stdControl_aJoysticks[AXIS_MOUSE_X].uMaxVal;
-    stdControl_aJoysticks[AXIS_MOUSE_X].flags |= 1u;
-    stdControl_aJoysticks[AXIS_MOUSE_X].dwXoffs = (2 * stdControl_aJoysticks[AXIS_MOUSE_X].uMaxVal + 1) / 2 - stdControl_aJoysticks[AXIS_MOUSE_X].uMaxVal;
-    stdControl_aJoysticks[AXIS_MOUSE_X].fRangeConversion = 1.0 / (flex_d_t)(stdControl_aJoysticks[AXIS_MOUSE_X].uMaxVal - stdControl_aJoysticks[AXIS_MOUSE_X].dwXoffs);
+    stdControl_aAxes[AXIS_MOUSE_X].dwYoffs = 0;
+    stdControl_aAxes[AXIS_MOUSE_X].uMaxVal = (__int64)(250.0 * (640.0 / Window_screenXSize));
+    stdControl_aAxes[AXIS_MOUSE_X].uMinVal = -stdControl_aAxes[AXIS_MOUSE_X].uMaxVal;
+    stdControl_aAxes[AXIS_MOUSE_X].flags |= 1u;
+    stdControl_aAxes[AXIS_MOUSE_X].dwXoffs = (2 * stdControl_aAxes[AXIS_MOUSE_X].uMaxVal + 1) / 2 - stdControl_aAxes[AXIS_MOUSE_X].uMaxVal;
+    stdControl_aAxes[AXIS_MOUSE_X].fRangeConversion = 1.0 / (flex_d_t)(stdControl_aAxes[AXIS_MOUSE_X].uMaxVal - stdControl_aAxes[AXIS_MOUSE_X].dwXoffs);
 
-    stdControl_aJoysticks[AXIS_MOUSE_Y].dwYoffs = 0;
-    stdControl_aJoysticks[AXIS_MOUSE_Y].uMaxVal = (__int64)(200.0 * (480.0 / Window_screenXSize));
-    stdControl_aJoysticks[AXIS_MOUSE_Y].uMinVal = -stdControl_aJoysticks[AXIS_MOUSE_Y].uMaxVal;
-    stdControl_aJoysticks[AXIS_MOUSE_Y].flags |= 1u;
-    stdControl_aJoysticks[AXIS_MOUSE_Y].dwXoffs = (2 * stdControl_aJoysticks[AXIS_MOUSE_Y].uMaxVal + 1) / 2 - stdControl_aJoysticks[AXIS_MOUSE_Y].uMaxVal;
-    stdControl_aJoysticks[AXIS_MOUSE_Y].fRangeConversion = 1.0 / (flex_d_t)(stdControl_aJoysticks[AXIS_MOUSE_Y].uMaxVal - stdControl_aJoysticks[AXIS_MOUSE_Y].dwXoffs);
+    stdControl_aAxes[AXIS_MOUSE_Y].dwYoffs = 0;
+    stdControl_aAxes[AXIS_MOUSE_Y].uMaxVal = (__int64)(200.0 * (480.0 / Window_screenXSize));
+    stdControl_aAxes[AXIS_MOUSE_Y].uMinVal = -stdControl_aAxes[AXIS_MOUSE_Y].uMaxVal;
+    stdControl_aAxes[AXIS_MOUSE_Y].flags |= 1u;
+    stdControl_aAxes[AXIS_MOUSE_Y].dwXoffs = (2 * stdControl_aAxes[AXIS_MOUSE_Y].uMaxVal + 1) / 2 - stdControl_aAxes[AXIS_MOUSE_Y].uMaxVal;
+    stdControl_aAxes[AXIS_MOUSE_Y].fRangeConversion = 1.0 / (flex_d_t)(stdControl_aAxes[AXIS_MOUSE_Y].uMaxVal - stdControl_aAxes[AXIS_MOUSE_Y].dwXoffs);
 
-    stdControl_aAxisPos[AXIS_MOUSE_Z] = Window_mouseWheelY; // TODO
-    stdControl_aAxisPos[AXIS_MOUSE_X] = Window_lastXRel; // TODO
-    stdControl_aAxisPos[AXIS_MOUSE_Y] = Window_lastYRel; // TODO
+    stdControl_aAxisStates[AXIS_MOUSE_Z] = Window_mouseWheelY; // TODO
+    stdControl_aAxisStates[AXIS_MOUSE_X] = Window_lastXRel; // TODO
+    stdControl_aAxisStates[AXIS_MOUSE_Y] = Window_lastYRel; // TODO
 
     if (Window_lastXRel || Window_lastYRel || Window_mouseWheelX || Window_mouseWheelY) {
         stdControl_bControlsIdle = 0;
     }
 
-    if ( stdControl_msDelta < 25 )
+    if ( stdControl_readDeltaTime < 25 )
     {
-        //stdControl_aAxisPos[AXIS_MOUSE_X] = (stdControl_aAxisPos[AXIS_MOUSE_X] + stdControl_dwLastMouseX) >> 1;
-        //stdControl_aAxisPos[AXIS_MOUSE_Y] = (stdControl_aAxisPos[AXIS_MOUSE_Y] + stdControl_dwLastMouseY) >> 1;
+        //stdControl_aAxisStates[AXIS_MOUSE_X] = (stdControl_aAxisStates[AXIS_MOUSE_X] + stdControl_dwLastMouseX) >> 1;
+        //stdControl_aAxisStates[AXIS_MOUSE_Y] = (stdControl_aAxisStates[AXIS_MOUSE_Y] + stdControl_dwLastMouseY) >> 1;
     }
     stdControl_dwLastMouseX = Window_lastXRel; // TODO
     stdControl_dwLastMouseY = Window_lastYRel; // TODO
