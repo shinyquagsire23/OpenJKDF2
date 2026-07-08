@@ -88,7 +88,7 @@ int sithWorld_Startup()
     sithWorld_SetSectionParser("sprites", sithSprite_ReadStaticSpritesListText);
     sithWorld_SetSectionParser("things", sithThing_Load);
     sithWorld_SetSectionParser("templates", sithTemplate_Load);
-    sithWorld_SetSectionParser("materials", sithMaterial_Load);
+    sithWorld_SetSectionParser("materials", sithMaterial_ReadMaterialsListText);
     sithWorld_SetSectionParser("sounds", sithSound_Load);
     sithWorld_SetSectionParser("cogs", sithCog_Load);
     sithWorld_SetSectionParser("cogscripts", sithCogScript_Load);
@@ -419,7 +419,7 @@ void sithWorld_FreeEntry(sithWorld *pWorld)
         pWorld->alloc_unk98 = 0;
     }
     if ( pWorld->materials )
-        sithMaterial_Free(pWorld);
+        sithMaterial_FreeWorldMaterials(pWorld);
     if ( pWorld->sounds )
         sithSound_Free(pWorld);
     if ( pWorld->cogs || pWorld->cogScripts )

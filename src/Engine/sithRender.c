@@ -182,7 +182,7 @@ void sithRender_RenderDebugLights()
 
 int sithRender_Startup()
 {
-    rdMaterial_RegisterLoader(sithMaterial_LoadEntry);
+    rdMaterial_RegisterLoader(sithMaterial_Load);
     rdModel3_RegisterLoader(sithModel_Load);
     rdKeyframe_RegisterLoader(sithKeyFrame_LoadEntry);
     sithRender_flag = 0;

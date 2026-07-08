@@ -2490,12 +2490,12 @@ sithSurface_SyncFull	.text	004F0B50	00000061	00000008	00000004	R	.	.	.	.	.	T	.
 sithSurface_ScrollSky	.text	004F0BC0	000000F4	00000004	00000010	R	.	.	.	.	.	T	.
 sithMaterial_Startup	.text	004F0CC0	0000001C			R	.	.	.	.	.	.	.
 sithMaterial_Shutdown	.text	004F0CE0	0000001D			R	.	.	.	.	.	.	.
-sithMaterial_Free	.text	004F0D00	00000085	00000004	00000004	R	.	.	.	.	.	T	.
-sithMaterial_Load	.text	004F0D90	000001DB	00000024	00000008	R	.	.	.	.	.	T	.
-sithMaterial_LoadEntry	.text	004F0F70	0000012A	00000094	0000000C	R	.	.	.	.	.	T	.
-sithMaterial_GetByIdx	.text	004F10A0	00000035	00000000	00000004	R	.	.	.	.	.	T	.
+sithMaterial_FreeWorldMaterials	.text	004F0D00	00000085	00000004	00000004	R	.	.	.	.	.	T	.
+sithMaterial_ReadMaterialsListText	.text	004F0D90	000001DB	00000024	00000008	R	.	.	.	.	.	T	.
+sithMaterial_Load	.text	004F0F70	0000012A	00000094	0000000C	R	.	.	.	.	.	T	.
+sithMaterial_GetMaterialByIndex	.text	004F10A0	00000035	00000000	00000004	R	.	.	.	.	.	T	.
 sithMaterial_GetMemorySize	.text	004F10E0	00000058	00000004	00000004	R	.	.	.	.	.	T	.
-sithMaterial_New	.text	004F1140	0000007D	00000008	00000008	R	.	.	.	.	.	T	.
+sithMaterial_AllocWorldMaterials	.text	004F1140	0000007D	00000008	00000008	R	.	.	.	.	.	T	.
 sithMaterial_UnloadAll	.text	004F11C0	00000030	00000008	00000000	R	.	.	.	.	.	T	.
 sithAIClass_Startup	.text	004F11F0	00000019			R	.	.	.	.	.	.	.
 sithAIClass_Shutdown	.text	004F1210	0000001D			R	.	.	.	.	.	.	.

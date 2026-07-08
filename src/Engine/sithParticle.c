@@ -108,7 +108,7 @@ int sithParticle_ParseArg(stdConffileArg *arg, sithThing *thing, int param)
             return 1;
 
         case THINGPARAM_MATERIAL:
-            thing->particleParams.material = sithMaterial_LoadEntry(arg->value, 0, 0);
+            thing->particleParams.material = sithMaterial_Load(arg->value, 0, 0);
             return 1;
 
         case THINGPARAM_RATE:

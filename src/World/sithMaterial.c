@@ -32,7 +32,7 @@ void sithMaterial_Shutdown()
     }
 }
 
-void sithMaterial_Free(sithWorld *world)
+void sithMaterial_FreeWorldMaterials(sithWorld *world)
 {
     unsigned int v1; // ebx
     int v2; // edi
@@ -62,7 +62,7 @@ void sithMaterial_Free(sithWorld *world)
     world->materials2 = 0;
 }
 
-int sithMaterial_Load(sithWorld *world, int a2)
+int sithMaterial_ReadMaterialsListText(sithWorld *world, int a2)
 {
     int v2; // ebx
     int result; // eax
@@ -86,7 +86,7 @@ int sithMaterial_Load(sithWorld *world, int a2)
             // Added: needed for JKE?
             a2 *= 2;
 
-            sithMaterial_New(world, a2);
+            sithMaterial_AllocWorldMaterials(world, a2);
 
             v12 = 45.0 / (flex_d_t)(unsigned int)a2;
 
@@ -107,7 +107,7 @@ int sithMaterial_Load(sithWorld *world, int a2)
             {
                 while ( _strcmp(stdConffile_entry.args[0].value, "end") )
                 {
-                    v7 = sithMaterial_LoadEntry(stdConffile_entry.args[1].value, 0, 0);
+                    v7 = sithMaterial_Load(stdConffile_entry.args[1].value, 0, 0);
                     if ( !v7 )
                         return 0;
                     a1 = stdConffile_entry.args[2].value;
@@ -134,7 +134,7 @@ int sithMaterial_Load(sithWorld *world, int a2)
     return result;
 }
 
-rdMaterial* sithMaterial_LoadEntry(const char *a1, int create_ddraw_surface, int gpu_mem)
+rdMaterial* sithMaterial_Load(const char *a1, int create_ddraw_surface, int gpu_mem)
 {
     sithWorld *v4; // ebp
     rdMaterial *result; // eax
@@ -195,7 +195,7 @@ LABEL_10:
     }
 }
 
-rdMaterial* sithMaterial_GetByIdx(int idx)
+rdMaterial* sithMaterial_GetMaterialByIndex(int idx)
 {
     sithWorld *world; // ecx
     rdMaterial *result; // eax
@@ -230,7 +230,7 @@ int sithMaterial_GetMemorySize(rdMaterial *mat)
     return result;
 }
 
-rdVector2* sithMaterial_New(sithWorld *world, int num)
+rdVector2* sithMaterial_AllocWorldMaterials(sithWorld *world, int num)
 {
     rdMaterial *v2; // eax
     rdVector2 *result; // eax

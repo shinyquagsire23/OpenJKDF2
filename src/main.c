@@ -2439,12 +2439,12 @@ void do_hooks()
     // sithMaterial
     hook_function(sithMaterial_Startup_ADDR, sithMaterial_Startup);
     hook_function(sithMaterial_Shutdown_ADDR, sithMaterial_Shutdown);
-    hook_function(sithMaterial_Free_ADDR, sithMaterial_Free);
+    hook_function(sithMaterial_FreeWorldMaterials_ADDR, sithMaterial_FreeWorldMaterials);
+    hook_function(sithMaterial_ReadMaterialsListText_ADDR, sithMaterial_ReadMaterialsListText);
     hook_function(sithMaterial_Load_ADDR, sithMaterial_Load);
-    hook_function(sithMaterial_LoadEntry_ADDR, sithMaterial_LoadEntry);
-    hook_function(sithMaterial_GetByIdx_ADDR, sithMaterial_GetByIdx);
+    hook_function(sithMaterial_GetMaterialByIndex_ADDR, sithMaterial_GetMaterialByIndex);
     hook_function(sithMaterial_GetMemorySize_ADDR, sithMaterial_GetMemorySize);
-    hook_function(sithMaterial_New_ADDR, sithMaterial_New);
+    hook_function(sithMaterial_AllocWorldMaterials_ADDR, sithMaterial_AllocWorldMaterials);
     hook_function(sithMaterial_UnloadAll_ADDR, sithMaterial_UnloadAll);
     
     // sithParticle
