@@ -218,7 +218,7 @@ int rdPolyline_Draw(rdThing *thing, rdMatrix34 *matrix)
     idxInfo.paDynamicLight = 0;
     idxInfo.intensities = 0;
 
-    rdMatrix_Multiply34(&out, &rdCamera_pCurCamera->view_matrix, matrix);
+    rdMatrix_Multiply34(&out, &rdCamera_g_pCurCamera->view_matrix, matrix);
     vertex.x = 0.0;
     vertex.y = polyline->length;
     vertex.z = 0.0;
@@ -348,7 +348,7 @@ void rdPolyline_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdMesh
     }
     
     procEntry->geometryMode = procEntry->geometryMode;
-    if ( rdroid_g_curRenderOptions & 2 && rdCamera_pCurCamera->ambientLight >= 1.0 )
+    if ( rdroid_g_curRenderOptions & 2 && rdCamera_g_pCurCamera->ambientLight >= 1.0 )
     {
         procEntry->lightingMode = RD_LIGHTMODE_FULLYLIT;
     }
@@ -379,14 +379,14 @@ void rdPolyline_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdMesh
             procEntry->textureMode = rdroid_curTextureMode;
     }
 
-    rdPrimit3_ClipFace(rdCamera_pCurCamera->pClipFrustum, procEntry->geometryMode, procEntry->lightingMode, procEntry->textureMode, idxInfo, &mesh_out, &face->clipIdk);
+    rdPrimit3_ClipFace(rdCamera_g_pCurCamera->pClipFrustum, procEntry->geometryMode, procEntry->lightingMode, procEntry->textureMode, idxInfo, &mesh_out, &face->clipIdk);
     if ( mesh_out.numVertices < 3 )
         return;
 
-    rdCamera_pCurCamera->fnProjectLst(mesh_out.verticesOrig, mesh_out.vertices, mesh_out.numVertices);
+    rdCamera_g_pCurCamera->fnProjectLst(mesh_out.verticesOrig, mesh_out.vertices, mesh_out.numVertices);
 
     if ( rdroid_g_curRenderOptions & 2 )
-        procEntry->ambientLight = rdCamera_pCurCamera->ambientLight;
+        procEntry->ambientLight = rdCamera_g_pCurCamera->ambientLight;
     else
         procEntry->ambientLight = 0.0;
 

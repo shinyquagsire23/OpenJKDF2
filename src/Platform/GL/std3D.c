@@ -2532,7 +2532,7 @@ void std3D_DrawRenderList()
        (float)(maxX*scaleX*zoom_xaspect),      0,                                          0,      0, // right
        0,                                       (float)(-maxY*scaleY*zoom_yaspect),               0,      0, // up
        0,                                       0,                                          1,     0, // forward
-       (float)(-(internalWidth/2)*scaleX*zoom_xaspect + shift_add_x),  (float)((internalHeight/2)*scaleY*zoom_yaspect + shift_add_y),     (float)((!rdCamera_pCurCamera || rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) ? -1 : 1),      1  // pos
+       (float)(-(internalWidth/2)*scaleX*zoom_xaspect + shift_add_x),  (float)((internalHeight/2)*scaleY*zoom_yaspect + shift_add_y),     (float)((!rdCamera_g_pCurCamera || rdCamera_g_pCurCamera->projectType == rdCameraProjectType_Perspective) ? -1 : 1),      1  // pos
     };
     
     glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, d3dmat);

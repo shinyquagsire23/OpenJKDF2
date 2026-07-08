@@ -142,9 +142,9 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     rdMeshinfo mesh_in;
 
     rdSprite *sprite = thing->sprite3;
-    rdMatrix_TransformPoint34(&vertex_out, &mat->scale, &rdCamera_pCurCamera->view_matrix);
+    rdMatrix_TransformPoint34(&vertex_out, &mat->scale, &rdCamera_g_pCurCamera->view_matrix);
     if ( rdroid_curCullFlags & 2 )
-        clipResult = rdClip_SphereInFrustrum(rdCamera_pCurCamera->pClipFrustum, &vertex_out, sprite->radius);
+        clipResult = rdClip_SphereInFrustrum(rdCamera_g_pCurCamera->pClipFrustum, &vertex_out, sprite->radius);
     else
         clipResult = thing->clippingIdk;
 
@@ -198,7 +198,7 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     }
     
     procEntry->geometryMode = procEntry->geometryMode;
-    if ( rdroid_g_curRenderOptions & 2 && rdCamera_pCurCamera->ambientLight >= 1.0 )
+    if ( rdroid_g_curRenderOptions & 2 && rdCamera_g_pCurCamera->ambientLight >= 1.0 )
     {
         procEntry->lightingMode = RD_LIGHTMODE_FULLYLIT;
     }
@@ -231,7 +231,7 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
 
     if ( clipResult )
         rdPrimit3_ClipFace(
-            rdCamera_pCurCamera->pClipFrustum,
+            rdCamera_g_pCurCamera->pClipFrustum,
             procEntry->geometryMode,
             procEntry->lightingMode,
             procEntry->textureMode,
@@ -243,10 +243,10 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     if ( mesh_out.numVertices < 3u )
         return 0;
 
-    rdCamera_pCurCamera->fnProjectLst(mesh_out.verticesOrig, mesh_out.vertices, mesh_out.numVertices);
+    rdCamera_g_pCurCamera->fnProjectLst(mesh_out.verticesOrig, mesh_out.vertices, mesh_out.numVertices);
 
     if ( rdroid_g_curRenderOptions & 2 )
-        procEntry->ambientLight = rdCamera_pCurCamera->ambientLight;
+        procEntry->ambientLight = rdCamera_g_pCurCamera->ambientLight;
     else
         procEntry->ambientLight = 0.0;
 

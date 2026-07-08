@@ -213,19 +213,19 @@ int rdClip_Point3(const rdClipFrustum* NO_ALIAS clipFrustum, rdVector3 *point)
     if (clipFrustum->bClipFar && point->y > (flex_d_t)clipFrustum->zFar )
         return 0;
 
-    flex_t v4 = (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) ? (clipFrustum->farLeft * point->y) : (clipFrustum->orthoLeft);
+    flex_t v4 = (rdCamera_g_pCurCamera->projectType == rdCameraProjectType_Perspective) ? (clipFrustum->farLeft * point->y) : (clipFrustum->orthoLeft);
     if ( v4 > point->x )
         return 0;
 
-    flex_t v5 = (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) ? (clipFrustum->right * point->y) : (clipFrustum->orthoRight);
+    flex_t v5 = (rdCamera_g_pCurCamera->projectType == rdCameraProjectType_Perspective) ? (clipFrustum->right * point->y) : (clipFrustum->orthoRight);
     if ( v5 < point->x )
         return 0;
 
-    flex_t v6 = (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) ? (clipFrustum->farTop * point->y) : (clipFrustum->orthoTop);
+    flex_t v6 = (rdCamera_g_pCurCamera->projectType == rdCameraProjectType_Perspective) ? (clipFrustum->farTop * point->y) : (clipFrustum->orthoTop);
     if ( v6 < point->z )
         return 0;
 
-    flex_t v7 = (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) ? (clipFrustum->bottom * point->y) : (clipFrustum->orthoBottom);
+    flex_t v7 = (rdCamera_g_pCurCamera->projectType == rdCameraProjectType_Perspective) ? (clipFrustum->bottom * point->y) : (clipFrustum->orthoBottom);
     return v7 <= point->z;
 }
 
@@ -906,9 +906,9 @@ int rdClip_Line3(const rdClipFrustum* NO_ALIAS clipFrustum, rdVector3 *point1, r
     rdVector3 project1;
     rdVector3 project2;
 
-    rdMatrix_TransformPoint34(&vertex_out, point1, &rdCamera_pCurCamera->view_matrix);
-    rdMatrix_TransformPoint34(&vertex_out2, point2, &rdCamera_pCurCamera->view_matrix);
-    if (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective)
+    rdMatrix_TransformPoint34(&vertex_out, point1, &rdCamera_g_pCurCamera->view_matrix);
+    rdMatrix_TransformPoint34(&vertex_out2, point2, &rdCamera_g_pCurCamera->view_matrix);
+    if (rdCamera_g_pCurCamera->projectType == rdCameraProjectType_Perspective)
         ret = rdClip_Line3Project(clipFrustum, &vertex_out, &vertex_out2, out1, out2);
     else
         ret = rdClip_Line3Ortho(clipFrustum, &vertex_out, &vertex_out2, out1, out2);
@@ -916,8 +916,8 @@ int rdClip_Line3(const rdClipFrustum* NO_ALIAS clipFrustum, rdVector3 *point1, r
     if ( !ret )
         return 0;
 
-    rdCamera_pCurCamera->fnProject(&project1, &vertex_out);
-    rdCamera_pCurCamera->fnProject(&project2, &vertex_out2);
+    rdCamera_g_pCurCamera->fnProject(&project1, &vertex_out);
+    rdCamera_g_pCurCamera->fnProject(&project2, &vertex_out2);
 
     if ( pointOut1 )
     {
@@ -961,7 +961,7 @@ int rdClip_SphereInFrustrum(const rdClipFrustum* NO_ALIAS frust, const rdVector3
 
     flex_t heightPlusRad = pos->z + rad;
     flex_t heightMinusRad = pos->z - rad;
-    if (LIKELY(rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective))
+    if (LIKELY(rdCamera_g_pCurCamera->projectType == rdCameraProjectType_Perspective))
     {
         topPlaneMin = frust->farTop * depthMinusRad;
         topPlaneMax = frust->farTop * depthPlusRad;
@@ -979,7 +979,7 @@ int rdClip_SphereInFrustrum(const rdClipFrustum* NO_ALIAS frust, const rdVector3
         bFullyInFrustum = 0;
     }
 
-    if (LIKELY(rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective))
+    if (LIKELY(rdCamera_g_pCurCamera->projectType == rdCameraProjectType_Perspective))
     {
         bottomPlaneMin = frust->bottom * depthMinusRad;
         bottomPlaneMax = frust->bottom * depthPlusRad;
@@ -999,7 +999,7 @@ int rdClip_SphereInFrustrum(const rdClipFrustum* NO_ALIAS frust, const rdVector3
 
     flex_t widthPlusRad = pos->x + rad;
     flex_t widthMinusRad = pos->x - rad;
-    if (LIKELY(rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective))
+    if (LIKELY(rdCamera_g_pCurCamera->projectType == rdCameraProjectType_Perspective))
     {
         leftPlaneMin = frust->farLeft * depthMinusRad;
         leftPlaneMax = frust->farLeft * depthPlusRad;
@@ -1017,7 +1017,7 @@ int rdClip_SphereInFrustrum(const rdClipFrustum* NO_ALIAS frust, const rdVector3
         bFullyInFrustum = 0;
     }
 
-    if (LIKELY(rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective))
+    if (LIKELY(rdCamera_g_pCurCamera->projectType == rdCameraProjectType_Perspective))
     {
         rightPlaneMin = frust->right * depthMinusRad;
         rightPlaneMax = frust->right * depthPlusRad;

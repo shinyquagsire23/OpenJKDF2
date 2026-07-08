@@ -27,7 +27,7 @@ void sithRenderSky_Close()
 
 void sithRenderSky_Update()
 {
-    sithSector_flt_8553C0 = sithSector_horizontalDist / rdCamera_pCurCamera->fovDx;
+    sithSector_flt_8553C0 = sithSector_horizontalDist / rdCamera_g_pCurCamera->fovDx;
     stdMath_SinCos(sithCamera_g_pCurCamera->viewPYR.z, &sithSector_flt_8553F4, &sithSector_flt_8553C8);
     sithSector_flt_8553B8 = -(sithCamera_g_pCurCamera->viewPYR.y * sithSector_horizontalPixelsPerRev_idk);
     sithSector_flt_8553C4 = -(sithCamera_g_pCurCamera->viewPYR.x * sithSector_horizontalPixelsPerRev_idk);
@@ -52,21 +52,21 @@ void sithRenderSky_HorizonFaceToPlane(rdProcEntry *pProcEntry, sithSurfaceInfo *
     {
 #ifdef TARGET_TWL
         rdVector3 proj;
-        rdCamera_pCurCamera->fnProjectLstClip(&proj, pVertXYZ, 1);
-        tmp1 = (proj.x - rdCamera_pCurCamera->canvas->half_screen_width) * sithSector_flt_8553C0;
-        tmp2 = (proj.y - rdCamera_pCurCamera->canvas->half_screen_height) * sithSector_flt_8553C0;
+        rdCamera_g_pCurCamera->fnProjectLstClip(&proj, pVertXYZ, 1);
+        tmp1 = (proj.x - rdCamera_g_pCurCamera->canvas->half_screen_width) * sithSector_flt_8553C0;
+        tmp2 = (proj.y - rdCamera_g_pCurCamera->canvas->half_screen_height) * sithSector_flt_8553C0;
 
         flex_t prev_z = pVertXYZ->y;
-        pVertXYZ->y = rdCamera_pCurCamera->pClipFrustum->zFar - 0.1;
+        pVertXYZ->y = rdCamera_g_pCurCamera->pClipFrustum->zFar - 0.1;
 
         pVertXYZ->x /= prev_z;
         pVertXYZ->x *= pVertXYZ->y;
         pVertXYZ->z /= prev_z;
         pVertXYZ->z *= pVertXYZ->y;
 #else
-        pVertXYZ->z = rdCamera_pCurCamera->pClipFrustum->zFar; // zFar
-        tmp1 = (pVertXYZ->x - rdCamera_pCurCamera->canvas->half_screen_width) * sithSector_flt_8553C0;
-        tmp2 = (pVertXYZ->y - rdCamera_pCurCamera->canvas->half_screen_height) * sithSector_flt_8553C0;
+        pVertXYZ->z = rdCamera_g_pCurCamera->pClipFrustum->zFar; // zFar
+        tmp1 = (pVertXYZ->x - rdCamera_g_pCurCamera->canvas->half_screen_width) * sithSector_flt_8553C0;
+        tmp2 = (pVertXYZ->y - rdCamera_g_pCurCamera->canvas->half_screen_height) * sithSector_flt_8553C0;
 #endif
 
         pVertUV->x = tmp1 * sithSector_flt_8553C8 - tmp2 * sithSector_flt_8553F4 + sithSector_flt_8553B8;
@@ -108,7 +108,7 @@ void sithRenderSky_CeilingFaceToPlane(rdProcEntry *pProcEntry, sithSurfaceInfo *
 
     for (uint32_t i = 0; i < num_vertices; i++)
     {
-        rdMatrix_TransformPoint34(&a2a, &pUntransformedVerts[i], &rdCamera_camMatrix);
+        rdMatrix_TransformPoint34(&a2a, &pUntransformedVerts[i], &rdCamera_g_camMatrix);
         rdVector_Sub3Acc(&a2a, &sithCamera_g_pCurCamera->vec3_1);
 
         // This seems to bug out when a2a.z < 0.0 (not sure how that's even happening)
@@ -141,7 +141,7 @@ void sithRenderSky_CeilingFaceToPlane(rdProcEntry *pProcEntry, sithSurfaceInfo *
         flex_t prev_z = pProcEntry->vertices[i].y;
         vertex_out.y *= 0.15;
         pProcEntry->vertices[i].y = vertex_out.y;
-        pProcEntry->vertices[i].y = stdMath_Clamp(pProcEntry->vertices[i].y, 0.0f, rdCamera_pCurCamera->pClipFrustum->zFar - 0.1);
+        pProcEntry->vertices[i].y = stdMath_Clamp(pProcEntry->vertices[i].y, 0.0f, rdCamera_g_pCurCamera->pClipFrustum->zFar - 0.1);
         pProcEntry->vertices[i].x /= prev_z;
         pProcEntry->vertices[i].x *= pProcEntry->vertices[i].y;
         pProcEntry->vertices[i].z /= prev_z;

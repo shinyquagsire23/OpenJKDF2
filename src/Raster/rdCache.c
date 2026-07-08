@@ -334,7 +334,7 @@ int rdCache_SendFaceListToHardware()
 
     std3D_ResetRenderList();
     rdCache_ResetRenderList();
-    v7 = rdCamera_pCurCamera->pClipFrustum;
+    v7 = rdCamera_g_pCurCamera->pClipFrustum;
     invZFar = 1.0 / v7->zFar;
     rend_6c_current_idx = 0;
     

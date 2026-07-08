@@ -1344,10 +1344,10 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     
     if (rdroid_curCullFlags & 2) {
         rdVector3 vertex_out;
-        rdClipFrustum* pThingFrustum = rdCamera_pCurCamera->pClipFrustum;
+        rdClipFrustum* pThingFrustum = rdCamera_g_pCurCamera->pClipFrustum;
 
         // Moved this in here, it's not used elsewhere
-        rdMatrix_TransformPoint34(&vertex_out, &matrix_4_3->scale, &rdCamera_pCurCamera->view_matrix);
+        rdMatrix_TransformPoint34(&vertex_out, &matrix_4_3->scale, &rdCamera_g_pCurCamera->view_matrix);
         frustumCull = rdClip_SphereInFrustrum(pThingFrustum, &vertex_out, pCurModel3->radius);
 #ifdef SITHRENDER_SPHERE_TEST_SURFACES
         extern rdClipFrustum sithRender_absoluteMaxFrustum;
@@ -1389,7 +1389,7 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     if ( curGeometryMode >= rdroid_g_curGeometryMode )
         curGeometryMode = rdroid_g_curGeometryMode;
 
-    if ((rdroid_g_curRenderOptions & 2) && rdCamera_pCurCamera->ambientLight >= 1.0 )
+    if ((rdroid_g_curRenderOptions & 2) && rdCamera_g_pCurCamera->ambientLight >= 1.0 )
     {
         curLightingMode = RD_LIGHTMODE_FULLYLIT;
     }
@@ -1408,10 +1408,10 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     {
         rdModel3_numGeoLights = 0;
         pGeoLight = apGeoLights;
-        for (int lNum = 0; lNum < rdCamera_pCurCamera->numLights; lNum++)
+        for (int lNum = 0; lNum < rdCamera_g_pCurCamera->numLights; lNum++)
         {
-            rdVector3* lightPos = &rdCamera_pCurCamera->lightPositions[lNum];
-            rdLight* lightIter = rdCamera_pCurCamera->lights[lNum];
+            rdVector3* lightPos = &rdCamera_g_pCurCamera->lightPositions[lNum];
+            rdLight* lightIter = rdCamera_g_pCurCamera->lights[lNum];
 
             if ( lightIter->falloffMin + pCurModel3->radius > rdVector_Dist3(lightPos, &matrix_4_3->scale))
             {
@@ -1486,10 +1486,10 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
     
     if (thingFrustumCull != SPHERE_FULLY_INSIDE) {
         rdVector3 vertex_out;
-        rdClipFrustum* pMeshFrustum = rdCamera_pCurCamera->pClipFrustum;
+        rdClipFrustum* pMeshFrustum = rdCamera_g_pCurCamera->pClipFrustum;
 
         // Moved this in here, it's not used elsewhere
-        rdMatrix_TransformPoint34(&vertex_out, &mat->scale, &rdCamera_pCurCamera->view_matrix);
+        rdMatrix_TransformPoint34(&vertex_out, &mat->scale, &rdCamera_g_pCurCamera->view_matrix);
         meshFrustumCull = (rdroid_curCullFlags & 1) ? rdClip_SphereInFrustrum(pMeshFrustum, &vertex_out, pCurMesh->radius) : SPHERE_CLIPPING_EDGE;
 #ifdef SITHRENDER_SPHERE_TEST_SURFACES
         extern rdClipFrustum sithRender_absoluteMaxFrustum;
@@ -1507,7 +1507,7 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
         return;
     }
 
-    rdMatrix_Multiply34(&out, &rdCamera_pCurCamera->view_matrix, mat);
+    rdMatrix_Multiply34(&out, &rdCamera_g_pCurCamera->view_matrix, mat);
     rdMatrix_TransformPointList34(&out, pCurMesh->vertices, aView, pCurMesh->numVertices);
     rdMatrix_InvertOrtho34(&matInv, mat);
     
@@ -1558,10 +1558,10 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
 
             // Added: dist -> dist squared
             flex_t dist = (*pGeoLight)->falloffMin + pCurMesh->radius;
-            if ( dist*dist > rdVector_DistSquared3(&rdCamera_pCurCamera->lightPositions[lightIdx], &mat->scale) )
+            if ( dist*dist > rdVector_DistSquared3(&rdCamera_g_pCurCamera->lightPositions[lightIdx], &mat->scale) )
             {
                 apMeshLights[rdModel3_numMeshLights] = *pGeoLight;
-                rdMatrix_TransformPoint34(&rdModel3_aLocalLightPos[rdModel3_numMeshLights], &rdCamera_pCurCamera->lightPositions[lightIdx], &matInv);
+                rdMatrix_TransformPoint34(&rdModel3_aLocalLightPos[rdModel3_numMeshLights], &rdCamera_g_pCurCamera->lightPositions[lightIdx], &matInv);
                 
                 // MOTS added
                 if ((*pGeoLight)->type == 3) {
@@ -1589,10 +1589,10 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
 
             // Added: dist -> dist squared
             flex_t dist = (*pGeoLight)->falloffMin + pCurMesh->radius;
-            if ( dist*dist > rdVector_DistSquared3(&rdCamera_pCurCamera->lightPositions[lightIdx], &mat->scale) )
+            if ( dist*dist > rdVector_DistSquared3(&rdCamera_g_pCurCamera->lightPositions[lightIdx], &mat->scale) )
             {
                 apMeshLights[rdModel3_numMeshLights] = *pGeoLight;
-                rdMatrix_TransformPoint34(&rdModel3_aLocalLightPos[rdModel3_numMeshLights], &rdCamera_pCurCamera->lightPositions[lightIdx], &matInv);
+                rdMatrix_TransformPoint34(&rdModel3_aLocalLightPos[rdModel3_numMeshLights], &rdCamera_g_pCurCamera->lightPositions[lightIdx], &matInv);
                 
                 // MOTS added
                 if ((*pGeoLight)->type == 3) {
@@ -1623,7 +1623,7 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
             pCurMesh->vertices_i,
             pCurMesh->vertices_unk,
             pCurMesh->numVertices,
-            rdCamera_pCurCamera->attenuationMin);
+            rdCamera_g_pCurCamera->attenuationMin);
     }
     else if (rdModel3_lightingMode == RD_LIGHTMODE_6_UNK) // MOTS added
     {
@@ -1636,7 +1636,7 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
 
     // This is about 1/2 of the render time for E-11, 1/4 for saber
     // Before this is about 1/2 the render time for saber
-    rdMatrix_TransformPoint34(&localCamera, &rdCamera_camMatrix.scale, &matInv);
+    rdMatrix_TransformPoint34(&localCamera, &rdCamera_g_camMatrix.scale, &matInv);
     rdFace* face = &meshIn->faces[0];
 
     // Be extra sure we're setting backface culling
@@ -1723,7 +1723,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
     // MOTS added: RGB
     if ((rdGetVertexColorMode() == 0) || (procEntry->lightingMode == RD_LIGHTMODE_DIFFUSE)) {
         if (meshFrustumCull != SPHERE_FULLY_INSIDE)
-            rdPrimit3_ClipFace(rdCamera_pCurCamera->pClipFrustum, geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &face->clipIdk);
+            rdPrimit3_ClipFace(rdCamera_g_pCurCamera->pClipFrustum, geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &face->clipIdk);
         else
             rdPrimit3_NoClipFace(geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &face->clipIdk);
     }
@@ -1736,7 +1736,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
         vertexDst.paBlueIntensities = procEntry->paBlueIntensities;
         //printf("%p %p %p, %p %p %p\n", vertexSrc.paRedIntensities, vertexSrc.paGreenIntensities, vertexSrc.paBlueIntensities, vertexDst.paRedIntensities, vertexDst.paGreenIntensities, vertexDst.paBlueIntensities);
         if (meshFrustumCull != SPHERE_FULLY_INSIDE)
-            rdPrimit3_ClipFaceRGB(rdCamera_pCurCamera->pClipFrustum, geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &face->clipIdk);
+            rdPrimit3_ClipFaceRGB(rdCamera_g_pCurCamera->pClipFrustum, geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &face->clipIdk);
         else
             rdPrimit3_NoClipFaceRGB(geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &face->clipIdk);
     }
@@ -1756,7 +1756,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
                       face,
                       &faceNormal,
                       pCurMesh->vertices,
-                      rdCamera_pCurCamera->attenuationMin);
+                      rdCamera_g_pCurCamera->attenuationMin);
         }
         else
         {
@@ -1767,12 +1767,12 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
                       face,
                       &face->normal,
                       pCurMesh->vertices,
-                      rdCamera_pCurCamera->attenuationMin);
+                      rdCamera_g_pCurCamera->attenuationMin);
         }
     }
-    rdCamera_pCurCamera->fnProjectLst(vertexDst.verticesOrig, vertexDst.vertices, vertexDst.numVertices);
+    rdCamera_g_pCurCamera->fnProjectLst(vertexDst.verticesOrig, vertexDst.vertices, vertexDst.numVertices);
     if ( rdroid_g_curRenderOptions & 2 )
-        procEntry->ambientLight = rdCamera_pCurCamera->ambientLight;
+        procEntry->ambientLight = rdCamera_g_pCurCamera->ambientLight;
     else
         procEntry->ambientLight = 0.0;
 

@@ -15,7 +15,7 @@ void rdActive_AdvanceFrame()
     int v1; // edx
     unsigned int v2; // esi
 
-    rdCanvas* canvas = rdCamera_pCurCamera->canvas;
+    rdCanvas* canvas = rdCamera_g_pCurCamera->canvas;
 
     activeEdgeHead.field_28 = -65536;
     activeEdgeHead.next = &activeEdgeTail;

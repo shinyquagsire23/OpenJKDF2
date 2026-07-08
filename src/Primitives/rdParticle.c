@@ -334,16 +334,16 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     flex_t matrix_4_3a; // [esp+5Ch] [ebp+8h]
 
     particle = thing->particlecloud;
-    rdMatrix_TransformPoint34(&vertex_out, &matrix_4_3->scale, &rdCamera_pCurCamera->view_matrix);
+    rdMatrix_TransformPoint34(&vertex_out, &matrix_4_3->scale, &rdCamera_g_pCurCamera->view_matrix);
     if ( rdroid_curCullFlags & 2 )
-        v3 = rdClip_SphereInFrustrum(rdCamera_pCurCamera->pClipFrustum, &vertex_out, particle->cloudRadius);
+        v3 = rdClip_SphereInFrustrum(rdCamera_g_pCurCamera->pClipFrustum, &vertex_out, particle->cloudRadius);
     else
         v3 = thing->clippingIdk;
     if ( v3 != SPHERE_FULLY_OUTSIDE )
     {
-        rdMatrix_Multiply34(&out, &rdCamera_pCurCamera->view_matrix, matrix_4_3);
+        rdMatrix_Multiply34(&out, &rdCamera_g_pCurCamera->view_matrix, matrix_4_3);
         if ( rdroid_g_curRenderOptions & 2 )
-            matrix_4_3a = rdCamera_pCurCamera->ambientLight;
+            matrix_4_3a = rdCamera_g_pCurCamera->ambientLight;
         else
             matrix_4_3a = 0.0;
         if ( matrix_4_3a < 1.0 )
@@ -390,7 +390,7 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
             v21 = v17;
             v22 = *v4;
             aParticleVerticesTmp[1].z = v21;
-            v23 = rdCamera_pCurCamera->pClipFrustum;
+            v23 = rdCamera_g_pCurCamera->pClipFrustum;
             v24 = v19;
             v25 = v9;
             aParticleVerticesTmp[2].x = v20;
@@ -405,7 +405,7 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
             v27 = v26;
             if ( v26 >= 3 )
             {
-                rdCamera_pCurCamera->fnProjectLst(v5->vertices, aParticleVerticesTmp, v26);
+                rdCamera_g_pCurCamera->fnProjectLst(v5->vertices, aParticleVerticesTmp, v26);
                 v5->lightingMode = v35;
                 v29 = particle->vertexCel;
                 v5->material = particle->material;

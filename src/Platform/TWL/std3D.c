@@ -291,9 +291,9 @@ MATH_FUNC static void update_from_world_palette()
 }
 
 MATH_FUNC static void std3D_UpdateFogColor() {
-    if (!rdCamera_pCurCamera)
+    if (!rdCamera_g_pCurCamera)
         return;
-    flex_t ambientLight = rdCamera_pCurCamera->ambientLight;
+    flex_t ambientLight = rdCamera_g_pCurCamera->ambientLight;
 
     int bHasFilter = rdroid_curColorEffects.filter.x || rdroid_curColorEffects.filter.y || rdroid_curColorEffects.filter.z;
     int bForceRefresh = 0;
@@ -475,17 +475,17 @@ c14 = a11*b14 + a12*b24 + a13*b34 + a14*b44
 */
 
 void std3DTwl_LoadProjection() {
-    if (!rdCamera_pCurCamera) {
+    if (!rdCamera_g_pCurCamera) {
         return;
     }
     const float zMult = 1.0f;
-    MATRIX_LOAD4x4 = floattof32((zMult*2.0f) * (rdCamera_pCurCamera->fovDx >> 8));
+    MATRIX_LOAD4x4 = floattof32((zMult*2.0f) * (rdCamera_g_pCurCamera->fovDx >> 8));
     MATRIX_LOAD4x4 = 0;
     MATRIX_LOAD4x4 = 0;
     MATRIX_LOAD4x4 = floattof32(0.0f);
 
     MATRIX_LOAD4x4 = 0;
-    MATRIX_LOAD4x4 = floattof32((zMult*2.0f) * (rdCamera_pCurCamera->fovDx >> 8) / rdCamera_pCurCamera->screenAspectRatio);
+    MATRIX_LOAD4x4 = floattof32((zMult*2.0f) * (rdCamera_g_pCurCamera->fovDx >> 8) / rdCamera_g_pCurCamera->screenAspectRatio);
     MATRIX_LOAD4x4 = 0;
     MATRIX_LOAD4x4 = floattof32(0.0f);
 
@@ -574,7 +574,7 @@ int std3D_StartScene()
 
         glMatrixMode(GL_MODELVIEW);
         wOverride(0);
-        //gluPerspective(/*rdCamera_pCurCamera->fov*/90.0, 256.0 / 192.0, 0.1, 40);
+        //gluPerspective(/*rdCamera_g_pCurCamera->fov*/90.0, 256.0 / 192.0, 0.1, 40);
     }
     else {
         //glFogOffset(0x6000);

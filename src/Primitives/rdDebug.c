@@ -64,10 +64,10 @@ void rdDebug_DrawLine3(rdVector3* v1, rdVector3* v2, uint32_t color)
     
     // Clip the lines to the view frustum
     int out1, out2;
-    rdClip_Line3Project(rdCamera_pCurCamera->pClipFrustum, &verts[0], &verts[1], &out1, &out2);
+    rdClip_Line3Project(rdCamera_g_pCurCamera->pClipFrustum, &verts[0], &verts[1], &out1, &out2);
 
     // And project to screen coords
-    rdCamera_pCurCamera->fnProjectLst(vertsOut, verts, 2);
+    rdCamera_g_pCurCamera->fnProjectLst(vertsOut, verts, 2);
     
     vertsOut[0].x = (flex_t)(int)vertsOut[0].x + 0.0001; // FLEXTODO
     vertsOut[0].y = (flex_t)(int)vertsOut[0].y + 0.0001; // FLEXTODO
@@ -116,7 +116,7 @@ void rdDebug_DrawBoundingBox(rdMatrix34* m, flex_t radius, uint32_t color)
     verts[7].y = v1.y + 0.0001;
     
     rdMatrix34 tmpMat;
-    rdMatrix_Multiply34(&tmpMat, &rdCamera_pCurCamera->view_matrix, m);
+    rdMatrix_Multiply34(&tmpMat, &rdCamera_g_pCurCamera->view_matrix, m);
     
     for (int i = 0; i < 8; i++)
     {

@@ -299,8 +299,8 @@ void std3D_DrawRenderList()
 
     float scaleX = 1.0f / (internalWidth  / 2.0f);
     float scaleY = 1.0f / (internalHeight / 2.0f);
-    int   bPerspective = (!rdCamera_pCurCamera ||
-                          rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective);
+    int   bPerspective = (!rdCamera_g_pCurCamera ||
+                          rdCamera_g_pCurCamera->projectType == rdCameraProjectType_Perspective);
 
     // mvp, column-major, matching the world matrix in src/Platform/GL/std3D.c
     float mvp[16] = {0};
