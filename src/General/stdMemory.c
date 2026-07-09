@@ -32,6 +32,7 @@ void stdMemory_Close()
 
     if ( stdMemory_g_curState.totalAllocs || stdMemory_g_curState.totalBytes )
     {
+        STDLOG_ERROR("UNFREED MEMORY ALERT!\n\n"); // Added: OpenJones3D unfreed-memory warning
         std_g_pHS->errorPrint("File\tLine\tSize\tNumber\n\n", 0, 0, 0, 0);
         iter = stdMemory_g_curState.header.prev;
         if ( stdMemory_g_curState.header.prev )

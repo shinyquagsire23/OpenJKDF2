@@ -189,6 +189,10 @@ GobFileHandle* stdGob_FileOpen(Gob *pGob, const char *aName)
     GobFileHandle *result = NULL;
     int v5;
 
+    // Added: J3D asserts (both are unconditionally dereferenced below)
+    STD_ASSERTREL(pGob);
+    STD_ASSERTREL(aName);
+
     // Embedded resources
 #if defined(QOL_IMPROVEMENTS)
     size_t sz = 0;
@@ -266,6 +270,7 @@ GobFileHandle* stdGob_FileOpen(Gob *pGob, const char *aName)
 
 void stdGob_FileClose(GobFileHandle *pHandle)
 {
+    STD_ASSERTREL(pHandle->bUsed); // Added: J3D assert (pHandle unconditionally dereferenced below)
 #ifdef QOL_IMPROVEMENTS
     if (pHandle->pMemory) {
         free((void*)pHandle->pMemory);
@@ -286,6 +291,8 @@ int stdGob_FileSeek(GobFileHandle *pHandle, int offset, int origin)
 {
     int seekOffsAbsolute;
     Gob *gob;
+
+    STD_ASSERTREL(pHandle); // Added: J3D assert (pHandle unconditionally dereferenced below)
 
     seekOffsAbsolute = 0;
     switch (origin)
@@ -314,11 +321,13 @@ int stdGob_FileSeek(GobFileHandle *pHandle, int offset, int origin)
 
 int32_t stdGob_FileTell(GobFileHandle *pHandle)
 {
+    STD_ASSERTREL(pHandle); // Added: J3D assert (pHandle unconditionally dereferenced below)
     return pHandle->offset;
 }
 
 bool stdGob_FileEOF(GobFileHandle *pHandle)
 {
+    STD_ASSERTREL(pHandle); // Added: J3D assert (pHandle unconditionally dereferenced below)
     int ret = 0;
     ret = pHandle->offset >= pHandle->entry->fileSize - 1;
     return ret;

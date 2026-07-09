@@ -1346,6 +1346,11 @@ void rdCache_DrawRenderList()
 {
     if ( rdCache_totalVerts )
     {
+        // Added: ported from OpenJones3D rdCache_SendFaceListToHardware, which asserts
+        //        rdCache_totalVerts < RDCACHE_VERTBUFFERSIZE right before the std3D draw.
+        //        DF2 refactored that draw submission into rdCache_DrawRenderList, and
+        //        rdCache_aHWVertices is sized RDCACHE_MAX_VERTICES.
+        RD_ASSERTREL(rdCache_totalVerts < RDCACHE_MAX_VERTICES);
         if ( !std3D_AddRenderListVertices(rdCache_aHWVertices, rdCache_totalVerts) )
         {
             std3D_DrawRenderList();
