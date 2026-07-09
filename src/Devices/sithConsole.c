@@ -95,6 +95,8 @@ void sithConsole_Close()
 
 void sithConsole_PrintString(const char *pString)
 {
+    SITH_ASSERTREL(pString); // Added: ported from OpenJones3D sithConsole_PrintString
+
     if ( DebugGui_fnPrint )
     {
         // TODO TODO regression
@@ -127,6 +129,8 @@ int sithConsole_ExeCommand(const char *pLine)
     stdDebugConsoleCmd *v2; // edi
     char *v3; // eax
     char tmp_cvar[SITHCVAR_MAX_STRLEN];
+
+    SITH_ASSERTREL(pLine); // Added: ported from OpenJones3D sithConsole_ExeCommand
 
     // Added: mutable copy of cmd
     char* pCmdMutable = (char*)malloc(strlen(pLine)+1);
@@ -182,6 +186,7 @@ int sithConsole_ExeCommand(const char *pLine)
         if ( v2 )
         {
             v3 = _strtok(0, "\n\r");
+            SITH_ASSERTREL(v2->cmdFunc); // Added: ported from OpenJones3D sithConsole_ExeCommand
             v2->cmdFunc(v2, (const char*)v3);
             free((void*)pCmdMutable);
             return 1;

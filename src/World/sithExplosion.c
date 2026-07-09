@@ -43,6 +43,8 @@ void sithExplosion_Update(SithThing *pThing)
     flex_d_t v5; // st7
     flex_d_t v6; // st6
 
+    SITH_ASSERTREL(pThing); // Added: OpenJones3D sithExplosion_Update assert (pExplode is &pThing->explosionParams)
+
     if ((pThing->explosionParams.flags & SITHEXPLOSION_FLAG_HAS_BLAST_PHASE)
       && pThing->msecLifeLeft <= pThing->explosionParams.msecBlastTime)
     {
@@ -73,6 +75,8 @@ void sithExplosion_MakeBlast(SithThing *pThing)
     rdVector3 a2; // [esp+24h] [ebp-3Ch] BYREF
     rdMatrix34 a3; // [esp+30h] [ebp-30h] BYREF
 
+    SITH_ASSERTREL(pThing && (pThing->type == SITH_THING_EXPLOSION)); // Added: OpenJones3D sithExplosion_MakeBlast assert
+
     flex_t range = pThing->explosionParams.range;
     flex_t force = pThing->explosionParams.force;
     flex_t damage = pThing->explosionParams.damage;
@@ -91,6 +95,8 @@ void sithExplosion_MakeBlast(SithThing *pThing)
             }
             else
             {
+                SITH_ASSERTREL((i->type & SITHCOLLISION_THING)); // Added: OpenJones3D sithExplosion_MakeBlast collision-type assert
+
                 SithThing* v4 = i->pThingCollided;
                 if ( ((pThing->explosionParams.flags & SITHEXPLOSION_FLAG_NO_DAMAGE_TO_SHOOTER) == 0
                    || v4 != pThing->pParent
@@ -132,6 +138,8 @@ int sithExplosion_ParseArg(StdConffileArg *pArg, SithThing *pThing, int adjNum)
     int v15; // esi
     SithThing **i; // eax
     int tmp;
+
+    SITH_ASSERTREL(pThing && pArg); // Added: OpenJones3D sithExplosion_ParseArg assert (adjNum bound term omitted; no SITHTHING_NUMADJECTIVES in DF2)
 
     switch ( adjNum )
     {

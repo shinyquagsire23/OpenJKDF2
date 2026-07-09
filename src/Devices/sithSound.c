@@ -72,6 +72,8 @@ int sithSound_ReadSoundsListText(SithWorld *pWorld, int bSkip)
 {
     int numSounds; // eax
 
+    SITH_ASSERTREL(pWorld); // Added: from OpenJones3D
+
     if ( bSkip )
         return 0;
 
@@ -101,6 +103,8 @@ int sithSound_ReadSoundsListText(SithWorld *pWorld, int bSkip)
 
 void sithSound_FreeWorldSounds(SithWorld *pWorld)
 {
+    SITH_ASSERTREL(pWorld != NULL); // Added: from OpenJones3D
+
     if (pWorld->sounds)
     {
         for (int i = 0; i < pWorld->numSoundsLoaded; i++)
@@ -151,6 +155,8 @@ sithSound* sithSound_Load(char *sound_fname, int a2)
     char tmp2[128];
 
     sound_file = 0;
+
+    SITH_ASSERTREL(sound_fname != NULL); // Added: from OpenJones3D (filename)
 
     if ( !sithSound_bInit )
         return 0;
