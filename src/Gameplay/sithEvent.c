@@ -56,6 +56,8 @@ int sithEvent_CreateEvent(int taskId, SithEventParams *params, uint32_t when)
     SithEvent *v5;
     SithEvent *i;
 
+    SITH_ASSERTREL((taskId > 0) && (taskId < 5) && (when >= 0)); // Added: ported J3D assert
+
     if ( sithEvent_numFreeEventBuffers )
         timer = &sithEvent_aEvents[sithEvent_arrLut[--sithEvent_numFreeEventBuffers]];
     else
@@ -92,6 +94,11 @@ int sithEvent_CreateEvent(int taskId, SithEventParams *params, uint32_t when)
 
 void sithEvent_FreeEvent(SithEvent *pEvent)
 {
+    SITH_ASSERTREL(sithEvent_numFreeEventBuffers < 256); // Added: ported J3D assert
+    SITH_ASSERTREL(pEvent != NULL); // Added: ported J3D assert
+    SITH_ASSERTREL((((intptr_t)pEvent - (intptr_t)sithEvent_aEvents) / (intptr_t)sizeof(SithEvent)) >= 0
+        && (((intptr_t)pEvent - (intptr_t)sithEvent_aEvents) / (intptr_t)sizeof(SithEvent)) < 256); // Added: ported J3D assert
+
     _memset(pEvent, 0, sizeof(SithEvent));
     
     intptr_t timerOffs = ((intptr_t)pEvent - (intptr_t)sithEvent_aEvents);

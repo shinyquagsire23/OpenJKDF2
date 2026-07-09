@@ -12,7 +12,10 @@ rdThing* rdThing_New(SithThing *pThing)
 
     thing = (rdThing*)RDROID_ALLOC(sizeof(rdThing));
     if ( !thing )
+    {
+        RDLOG_ERROR("Error allocating memory for thing.\n"); // Added: J3D log
         return 0;
+    }
     rdThing_NewEntry(thing, pThing);
     return thing;
 }
@@ -75,6 +78,8 @@ void rdThing_FreeEntry(rdThing *pThing)
 
 int rdThing_SetModel3(rdThing *thing, rdModel3 *model)
 {
+    RD_ASSERTREL(thing != NULL); // Added: J3D assert
+    RD_ASSERTREL(model != NULL); // Added: J3D assert
     thing->type = RD_THING_MODEL3;
     thing->model3 = model;
     thing->geosetSelect = -1;
@@ -107,7 +112,10 @@ int rdThing_SetModel3(rdThing *thing, rdModel3 *model)
     thing->paJointAmputationFlags = (int *)RDROID_ALLOC(sizeof(int) * model->numHNodes);
     TWL_EXTRAM_RESTORE(rdroid_g_pHS); }
     if (!thing->paJointAmputationFlags)
+    {
+        RDLOG_ERROR("Error allocating memory for joint amputation flags.\n"); // Added: J3D log
         return 0;
+    }
 
     stdPlatform_Memzero32(thing->paJointAmputationFlags, sizeof(int) * model->numHNodes); // Added: word-safe
 
@@ -122,6 +130,7 @@ int rdThing_SetModel3(rdThing *thing, rdModel3 *model)
 
 int rdThing_SetCamera(rdThing *pThing, rdCamera *pCamera)
 {
+    RD_ASSERTREL(pThing != NULL); // Added: J3D assert
     pThing->type = RD_THINGTYPE_CAMERA;
     pThing->camera = pCamera;
     return 1;
@@ -129,6 +138,7 @@ int rdThing_SetCamera(rdThing *pThing, rdCamera *pCamera)
 
 int rdThing_SetLight(rdThing *pThing, rdLight *pLight)
 {
+    RD_ASSERTREL(pThing != NULL); // Added: J3D assert
     pThing->type = RD_THINGTYPE_LIGHT;
     pThing->light = pLight;
     return 1;
@@ -136,6 +146,7 @@ int rdThing_SetLight(rdThing *pThing, rdLight *pLight)
 
 int rdThing_SetSprite3(rdThing *thing, rdSprite *sprite)
 {
+    RD_ASSERTREL(thing != NULL); // Added: J3D assert
     thing->type = RD_THING_SPRITE3;
     thing->sprite3 = sprite;
     thing->wallCel = -1;
@@ -144,6 +155,7 @@ int rdThing_SetSprite3(rdThing *thing, rdSprite *sprite)
 
 int rdThing_SetPolyline(rdThing *pThing, rdPolyline *pPolyline)
 {
+    RD_ASSERTREL(pThing != NULL); // Added: J3D assert
     pThing->type = RD_THING_POLYLINE;
     pThing->polyline = pPolyline;
     pThing->wallCel = -1;
@@ -152,6 +164,7 @@ int rdThing_SetPolyline(rdThing *pThing, rdPolyline *pPolyline)
 
 int rdThing_SetParticleCloud(rdThing *pThing, rdParticle *pParticle)
 {
+    RD_ASSERTREL(pThing != NULL); // Added: J3D assert
     pThing->type = RD_THING_PARTICLE;
     pThing->particlecloud = pParticle;
     return 1;
@@ -159,6 +172,7 @@ int rdThing_SetParticleCloud(rdThing *pThing, rdParticle *pParticle)
 
 int rdThing_Draw(rdThing *pThing, rdMatrix34 *pOrient)
 {
+    RD_ASSERTREL(pThing); // Added: J3D assert
     if (!rdroid_g_curGeometryMode)
         return 0;
 

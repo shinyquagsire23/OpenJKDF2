@@ -534,6 +534,7 @@ void stdHashtbl_PrintTableDiagnostics(tHashTable *pTable)
     signed int numFilled; // [esp+14h] [ebp-Ch]
     signed int totalChildren; // [esp+18h] [ebp-8h]
 
+    STD_ASSERTREL(pTable != NULL); // Added: ported from OpenJones3D
     std_g_pHS->debugPrint("HASHTABLE Diagnostics\n");
     std_g_pHS->debugPrint("---------------------\n");
     maxLookups = 0;
@@ -574,6 +575,7 @@ void stdHashtbl_DumpTable(tHashTable *pTable)
     int index;
     tHashLink *key_iter;
 
+    STD_ASSERTREL(pTable != NULL); // Added: ported from OpenJones3D
     std_g_pHS->debugPrint("HASHTABLE\n---------\n");
     index = 0;
     if ( pTable->numNodes > 0 )

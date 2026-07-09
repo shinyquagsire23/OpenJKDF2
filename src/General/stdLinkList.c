@@ -1,4 +1,5 @@
 #include "stdLinkList.h"
+#include "stdPlatform.h" // Added: for STD_ASSERT macros
 
 // Added
 tLinkListNode* stdLinklist_InsertReplace(tLinkListNode *pCur, tLinkListNode *pNodeToAdd)
@@ -17,6 +18,11 @@ tLinkListNode* stdLinklist_InsertReplace(tLinkListNode *pCur, tLinkListNode *pNo
 
 tLinkListNode* stdLinkList_AddNode(tLinkListNode *pCur, tLinkListNode *pNodeToAdd)
 {
+    STD_ASSERTREL(pCur != NULL); // Added: J3D assert
+    STD_ASSERTREL(pNodeToAdd != NULL); // Added: J3D assert
+    STD_ASSERTREL(pNodeToAdd->prev == NULL); // Added: J3D assert
+    STD_ASSERTREL(pNodeToAdd->next == NULL); // Added: J3D assert
+
     tLinkListNode* pNext = pCur->next;
 
     pNodeToAdd->prev = pCur;
