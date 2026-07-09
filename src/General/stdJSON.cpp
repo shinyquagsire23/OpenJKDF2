@@ -308,11 +308,19 @@ int stdJSON_GetString(const char* pFpath, const char* pKey, char* pOut, int outS
         stdJSON_SetString(pFpath, pKey, pValDefault);
     }
     
-    size_t readSize = strlen(out.c_str());
-    if (readSize < outSize) {
-        outSize = readSize;
+    // Fix: _strncpy does NOT NUL-terminate when strlen(src) >= n. The old code
+    // clamped n down to strlen(src) then _strncpy'd exactly that many bytes, so
+    // pOut was left unterminated and callers read trailing stack garbage after the
+    // value (e.g. playerShortName "Max" produced player/ dirs like "Max\x01\x01").
+    // Copy min(strlen, outSize-1) bytes and always write the terminator.
+    if (outSize > 0) {
+        size_t readSize = strlen(out.c_str());
+        if (readSize > (size_t)(outSize - 1)) {
+            readSize = (size_t)(outSize - 1);
+        }
+        _strncpy(pOut, out.c_str(), readSize);
+        pOut[readSize] = 0;
     }
-    _strncpy(pOut, out.c_str(), outSize);
 
     return 1;
 }
@@ -363,11 +371,17 @@ int stdJSON_GetWString(const char* pFpath, const char* pKey, char16_t* pOut, int
         out = utf8_to_utf16(out_u8);
     }
     
-    size_t readSize = _wcslen((wchar_t*)out.data());
-    if (readSize < outSize) {
-        outSize = readSize;
+    // Fix: same non-termination bug as stdJSON_GetString (see there). _wcsncpy does
+    // not NUL-terminate when wcslen(src) >= n. Copy min(wcslen, outSize-1) and always
+    // write the wide terminator so callers don't read trailing garbage.
+    if (outSize > 0) {
+        size_t readSize = _wcslen((wchar_t*)out.data());
+        if (readSize > (size_t)(outSize - 1)) {
+            readSize = (size_t)(outSize - 1);
+        }
+        _wcsncpy((wchar_t*)pOut, (wchar_t*)out.data(), readSize);
+        pOut[readSize] = 0;
     }
-    _wcsncpy((wchar_t*)pOut, (wchar_t*)out.data(), outSize);
 
     return 1;
 }
