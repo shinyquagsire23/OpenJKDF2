@@ -2,6 +2,7 @@
 
 #include "Engine/rdroid.h"
 #include "Engine/rdActive.h"
+#include "Raster/rdZRaster.h"
 #include "Platform/std3D.h"
 #include "Engine/rdColormap.h"
 #include "General/stdMath.h"
@@ -130,6 +131,36 @@ void rdCache_Flush()
         _qsort(rdCache_aProcFaces, rdCache_numProcFaces, sizeof(rdProcEntry), (int (__cdecl *)(const void *, const void *))rdCache_ProcFaceCompare);
 #endif
     }
+#ifdef RDRASTER_SOFTWARE_RENDERER
+    // Software (CPU) active-edge rasterizer path (rdActive/rdAFRaster). This mirrors
+    // JK.EXE's original rdCache_Flush dispatch (compiled out below on accelerated
+    // targets): it is taken only when the renderer is put in the non-accelerated,
+    // occlusion-method-1 mode. Only this active-edge path is ported so far.
+    if ( rdroid_curAcceleration <= 0 )
+    {
+#ifdef RDRASTER_SW_ZBUFFER
+        // Perspective-correct, z-buffered per-face path (rdZRaster): draw each cached face
+        // independently with true per-pixel perspective + a shared depth buffer. The depth
+        // buffer is cleared once per frame in jkGame_Update (rdZRaster_BeginFrame).
+        for (int rdsw_i = 0; rdsw_i < rdCache_numProcFaces; rdsw_i++)
+            rdZRaster_DrawFace(&rdCache_aProcFaces[rdsw_i]);
+#else
+        // Affine active-edge painter's path (rdActive/rdAFRaster): wireframe (LW, geometryMode 2)
+        // and the affine textured trio (geometryMode 4 / textureMode 0): FAT (flat), LAT (lit),
+        // GAT (gouraud). Force affine + non-Z but keep each face's own geometry AND lighting mode.
+        rdZBufferMethod_t rdsw_savedZ = rdroid_curZBufferMethod;
+        rdroid_curZBufferMethod = 1;   // rdAFRaster painter's (non-Z) path
+        for (int rdsw_i = 0; rdsw_i < rdCache_numProcFaces; rdsw_i++)
+            rdCache_aProcFaces[rdsw_i].textureMode = 0;                        // affine
+        rdActive_AdvanceFrame();
+        rdActive_DrawScene();
+        rdroid_curZBufferMethod = rdsw_savedZ;
+#endif
+        rdCache_drawnFaces += rdCache_numProcFaces;
+        rdCache_Reset();
+        return;
+    }
+#endif
 #if !defined(SDL2_RENDER) && !defined(TARGET_RETRO_HOMEBREW)
     if ( rdroid_curAcceleration <= 0 )
     {

@@ -397,6 +397,26 @@
 
 #define RDCACHE_RENDER_LINES
 
+// Software (CPU) rasterizer path (rdRaster/rdActive/rdAFRaster/rdNRaster/rdZRaster).
+// This is the renderdroid scanline rasterizer that JK.EXE used as its non-hardware
+// fallback; OpenJKDF2 originally only ever implemented the hardware std3D path, so it
+// is being decompiled/ported separately. Default OFF: stdDisplay has no UI toggle for
+// it yet, so it is a compile-time-selectable path only. See
+// scripts/refactoring/rdraster_decomp/PROGRESS.md.
+// Software (CPU) renderer — DESKTOP ONLY. TWL/DC (TARGET_RETRO_HOMEBREW) lack the CPU headroom
+// to rasterize in software, so the whole feature (and its rdAFRaster/rdZRaster source files,
+// which are entirely #ifdef'd on this define) gates off there.
+#if !defined(TARGET_RETRO_HOMEBREW)
+#define RDRASTER_SOFTWARE_RENDERER
+#endif
+
+// When the software renderer is on, use the perspective-correct z-buffered per-face path
+// (rdZRaster) instead of the affine active-edge painter's path (rdActive/rdAFRaster). This
+// fixes texture "swim" (true per-pixel perspective) and face overlap/sorting (per-pixel depth).
+#ifdef RDRASTER_SOFTWARE_RENDERER
+#define RDRASTER_SW_ZBUFFER
+#endif
+
 //#define RDMATERIAL_LRU_LOAD_UNLOAD
 //#define JKGUI_SMOL_SCREEN
 //#define STDHASHTABLE_CRC32_KEYS

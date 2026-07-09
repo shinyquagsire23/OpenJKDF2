@@ -1,6 +1,7 @@
 #include "Platform/std3D.h"
 
 #include "Raster/rdCache.h"
+#include "Raster/rdZRaster.h"
 #include "Win95/stdDisplay.h"
 #include "Win95/Window.h"
 #include "World/sithWorld.h"
@@ -2867,6 +2868,11 @@ void std3D_AddRenderListUITris(rdUITri *tris, unsigned int num_tris)
 
 int std3D_ClearZBuffer()
 {
+#ifdef RDRASTER_SW_ZBUFFER
+    // Added: the software rasterizer keeps its own depth buffer; clear it on the same hook JK uses
+    // (scene start + the POV weapon's clear) so the software path stays in lockstep with the HW one.
+    rdZRaster_ClearZBuffer();
+#endif
     glDepthMask(GL_TRUE);
     glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
     glClear(GL_DEPTH_BUFFER_BIT);

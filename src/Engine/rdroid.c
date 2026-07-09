@@ -1,6 +1,7 @@
 #include "rdroid.h"
 
 #include "Raster/rdRaster.h"
+#include "Raster/rdZRaster.h"
 #include "Engine/rdActive.h"
 #include "Raster/rdCache.h"
 #include "Primitives/rdModel3.h"
@@ -20,6 +21,9 @@ int rdStartup(HostServices *p_hs)
     rdCache_Startup();
     rdActive_Startup();
     rdRaster_Startup();
+#ifdef RDRASTER_SW_ZBUFFER
+    rdZRaster_Startup();
+#endif
 
     bRDroidStartup = 1;
     return 1;

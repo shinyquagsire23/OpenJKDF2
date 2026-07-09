@@ -39,6 +39,7 @@
 
 #include "Win95/stdDisplay.h"
 #include "Win95/Window.h"
+#include "Raster/rdZRaster.h"
 #include "World/sithWorld.h"
 #include "Engine/rdColormap.h"
 #include "Engine/rdCamera.h"
@@ -389,6 +390,9 @@ void std3D_DrawRenderList()
 
 int std3D_ClearZBuffer()
 {
+#ifdef RDRASTER_SW_ZBUFFER
+    rdZRaster_ClearZBuffer();   // keep the software depth buffer in lockstep (no-op unless enabled)
+#endif
     glDepthMask(GL_TRUE);
     glClear(GL_DEPTH_BUFFER_BIT);
     return 1;

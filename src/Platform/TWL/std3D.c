@@ -5,6 +5,7 @@
 #include "General/stdMath.h"
 #include "General/stdBitmap.h"
 #include "Win95/stdDisplay.h"
+#include "Raster/rdZRaster.h"
 #include "World/sithSurface.h"
 #include "World/jkPlayer.h"
 #include "stdPlatform.h"
@@ -1375,6 +1376,9 @@ void std3D_AddTextureToCacheList(rdDDrawSurface *pTexture) {
 
 int std3D_ClearZBuffer()
 {
+#ifdef RDRASTER_SW_ZBUFFER
+    rdZRaster_ClearZBuffer();   // keep the software depth buffer in lockstep (no-op unless enabled)
+#endif
     return 0;
 }
 

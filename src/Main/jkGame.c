@@ -4,6 +4,7 @@
 #include "Main/sithMain.h"
 #include "Engine/rdroid.h"
 #include "Raster/rdCache.h"
+#include "Raster/rdZRaster.h"
 #include "Engine/sithRender.h"
 #include "World/sithWorld.h"
 #include "World/jkPlayer.h"
@@ -195,6 +196,26 @@ int jkGame_Update()
 #endif
     rdAdvanceFrame();
     jkGame_Update_AdvanceFrame = stdPlatform_GetTimeMsec();
+#ifdef RDRASTER_SOFTWARE_RENDERER
+    // Added: render the world 3D through the software (CPU) rasterizer. b3DAccel stays on so
+    // the GL present + menu-compositing path still runs; rdCache_Flush takes its software
+    // branch because acceleration<=0, drawing into the canvas vbuffer (Video_menuBuffer),
+    // which std3D_DrawMenu then presents. (Only acceleration persists to the flush — the
+    // render path resets geometry/occlusion mode — so the flush forces wireframe itself.)
+    int rdsw_savedAccel = rdroid_curAcceleration;
+    rdroid_curAcceleration = 0;
+    // The software rasterizer writes pixels directly, so the canvas surface must be
+    // locked (surface_lock_alloc is NULL otherwise on the accelerated present path).
+    stdDisplay_VBufferLock(Video_pMenuBuffer);
+#ifdef RDRASTER_SW_ZBUFFER
+    // Clear the software depth buffer for the frame BEFORE the world is drawn. This must happen
+    // here (not only via std3D_ClearZBuffer) because rdCamera_AdvanceFrame clears JK's software
+    // z-buffer by filling canvas->d3d_vbuf on the accel<=0 path, so the std3D hook never fires at
+    // scene start — leaving the depth buffer unallocated until DrawPov clears it (hence the world
+    // only appeared once a POV weapon existed).
+    rdZRaster_BeginFrame(Video_pMenuBuffer);
+#endif
+#endif
 #if !defined(SDL2_RENDER) && !defined(TARGET_RETRO_HOMEBREW)
     if ( Video_modeStruct.b3DAccel )
 #endif
@@ -212,7 +233,17 @@ int jkGame_Update()
     }
 #endif
     jkGame_Update_UpdateCamera = stdPlatform_GetTimeMsec();
+#ifdef RDRASTER_SOFTWARE_RENDERER
+    // Added: keep acceleration off + the surface locked across DrawPov so the first-person weapon
+    // renders through the software path into the menu buffer, exactly as the original did (JK ran
+    // the whole frame in software). DrawPov itself calls std3D_ClearZBuffer + RD_ZBUFFER_READ_WRITE
+    // (which now also clears the software depth buffer), so the weapon draws in front of the world.
     jkPlayer_DrawPov();
+    stdDisplay_VBufferUnlock(Video_pMenuBuffer);
+    rdroid_curAcceleration = rdsw_savedAccel;
+#else
+    jkPlayer_DrawPov();
+#endif
     jkGame_Update_DrawPov = stdPlatform_GetTimeMsec();
 
 #if 1
@@ -321,6 +352,27 @@ int jkGame_Update()
 #if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
     std3D_DrawMenu();
     rdFinishFrame();
+#endif
+
+#ifdef RDRASTER_SOFTWARE_RENDERER
+    // Added: headless capture for software-renderer bring-up. If OPENJKDF2_AUTOSHOT_MS is
+    // set, screenshot the presented frame once after that many ms, then exit.
+    {
+        const char* pShotMs = getenv("OPENJKDF2_AUTOSHOT_MS");
+        if (pShotMs)
+        {
+            static uint32_t rdsw_shotStartMs = 0;
+            uint32_t nowMs = stdPlatform_GetTimeMsec();
+            if (!rdsw_shotStartMs)
+                rdsw_shotStartMs = nowMs;
+            if (nowMs - rdsw_shotStartMs > (uint32_t)atoi(pShotMs))
+            {
+                jkGame_Screenshot();
+                stdPlatform_Printf("OPENJKDF2_AUTOSHOT: captured screenshot, exiting\n");
+                exit(0);
+            }
+        }
+    }
 #endif
 
     // MOTS removed

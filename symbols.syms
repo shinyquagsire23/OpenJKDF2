@@ -455,9 +455,9 @@ stdConsole_ConsoleCursorInfo 0x0055BB78 CONSOLE_CURSOR_INFO
 stdConsole_hOutput 0x00866860 HANDLE
 stdConsole_hInput 0x00866864 HANDLE
 
-rdRaster_aOneDivXQuantLUT 0x0086ADE0 int[2048]
-rdRaster_aOtherLUT 0x86CDDC flex_t[16]
-rdRaster_aOneDivXLUT 0x0086CE20 flex_t[2048]
+rdRaster_aOneOverNFixed 0x0086ADE0 int[2048]
+rdRaster_aLerpAndScale 0x86CDDC flex_t[16]
+rdRaster_aOneOverNFlex 0x0086CE20 flex_t[2048]
 rdRaster_fixedScale 0x00548E28 flex_t = 65536.0f
 
 sithCogFunctionAI_aThingsInView 0x00855CE8 SithThing*[32]

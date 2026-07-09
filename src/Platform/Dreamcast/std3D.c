@@ -16,6 +16,7 @@
 #include "Main/Main.h"
 #include "Win95/Video.h"
 #include "Win95/stdDisplay.h"
+#include "Raster/rdZRaster.h"
 #include "Engine/rdColormap.h"
 #include "Engine/rdCamera.h"
 #include "World/sithWorld.h"
@@ -944,7 +945,13 @@ void std3D_PurgeUIEntry(int i, int idx)      {}
 void std3D_PurgeBitmapRefs(stdBitmap* pBitmap) {}
 
 // --- Z buffer / viewport / device --------------------------------------------
-int  std3D_ClearZBuffer()                 { return 1; }
+int  std3D_ClearZBuffer()
+{
+#ifdef RDRASTER_SW_ZBUFFER
+    rdZRaster_ClearZBuffer();   // keep the software depth buffer in lockstep (no-op unless enabled)
+#endif
+    return 1;
+}
 void std3D_InitializeViewport(rdRect* viewRect) {}
 int  std3D_DrawOverlay()                  { return 1; }
 int  std3D_FindClosestDevice(uint32_t index, int a2) { return 0; }

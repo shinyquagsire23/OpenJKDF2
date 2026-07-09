@@ -338,6 +338,8 @@ typedef struct rdColormap rdColormap;
 typedef struct rdColor24 rdColor24;
 typedef struct rdDDrawSurface rdDDrawSurface;
 typedef struct rdEdge rdEdge;
+typedef struct rdActiveSpan rdActiveSpan;
+typedef struct rdActiveFace rdActiveFace;
 typedef struct rdFace rdFace;
 typedef struct rdHierarchyNode rdHierarchyNode;
 typedef struct rdKeyframe rdKeyframe;
@@ -1513,30 +1515,100 @@ typedef struct sithMapView
     SithWorld *world;
 } sithMapView;
 
+// Active edge in the software rasterizer's active-edge table (AET).
+// Layout reverse-engineered from JK.EXE rdActive (0x58 bytes; all offsets are JK.EXE, not
+// Grim — Grim is a colored-lighting build with shifted layout). The interpolants at
+// +0x10..+0x47 are (value, per-scanline-delta) pairs: the family Setup*Edge callback seeds
+// them and pfnAdvance steps value += delta once per scanline. The i/di and sortX/dSortX
+// pairs are confirmed literally in JK rdAFRaster_Advance{Left,Right}EdgeNGonLW; the tex/z
+// value slots are confirmed from BuildSpans reads and their deltas follow the same pattern
+// (to be nailed down by the textured/Z advance fns in P3). Which of the tex slots (affine
+// u/v vs perspective uPersp/vPersp) is live depends on the raster mode.
 typedef struct rdEdge
 {
-    uint32_t field_0;
-    uint32_t field_4;
-    uint32_t field_8;
-    uint32_t field_C;
-    uint32_t field_10;
-    uint32_t field_14;
-    uint32_t field_18;
-    uint32_t field_1C;
-    uint32_t field_20;
-    uint32_t field_24;
-    uint32_t field_28;
-    uint32_t field_2C;
-    uint32_t field_30;
-    uint32_t field_34;
-    uint32_t field_38;
-    uint32_t field_3C;
-    uint32_t field_40;
-    uint32_t field_44;
-    uint32_t field_48;
-    rdEdge* prev;
-    rdEdge* next;
+    int32_t  leftOrRightFlag;  // +0x00  0 -> face right-edge slot (+0x1ec); else left-edge slot (+0x1e8)
+    void*    pFace;            // +0x04  active face being scanned (aActiveFaces element)
+    int32_t  yStart;          // +0x08  first scanline this edge is active on
+    int32_t  numLines;        // +0x0C  scanline count (edge height)
+    flex_t   i;               // +0x10  light intensity at current scanline (also span-sort key)
+    flex_t   di;              // +0x14   per-scanline delta
+    flex_t   u;               // +0x18  affine texture U
+    flex_t   du;              // +0x1C   per-scanline delta
+    flex_t   v;               // +0x20  affine texture V
+    flex_t   dv;              // +0x24   per-scanline delta
+    int32_t  sortX;           // +0x28  current X in 16.16 fixed; AET sort key
+    int32_t  dSortX;          // +0x2C   per-scanline delta (1/slope in 16.16)
+    int32_t  uPersp;          // +0x30  perspective texture U numerator (16.16)
+    int32_t  duPersp;         // +0x34   per-scanline delta
+    int32_t  vPersp;          // +0x38  perspective texture V numerator (16.16)
+    int32_t  dvPersp;         // +0x3C   per-scanline delta
+    int32_t  z;               // +0x40  depth/fog (16.16)
+    int32_t  dz;              // +0x44   per-scanline delta
+    void (*pfnAdvance)(struct rdEdge*); // +0x48  per-scanline edge advance
+    rdEdge*  prev;             // +0x4C  AET prev
+    rdEdge*  next;             // +0x50  AET next (also new-edge bucket next during BuildEdges)
+    rdEdge*  nextRemove;       // +0x54  remove-bucket singly-linked next
 } rdEdge;
+
+// One horizontal span emitted by rdActive_BuildSpans and drawn by the face's
+// pfnDrawSpan. Stride 0x2c (JK.EXE aActiveSpans, engine-internal so JK==Grim). The
+// texture-coordinate slots are mode-dependent: perspective texmap fills u/du/v/dv as a
+// per-pixel (start, gradient) set; affine texmap reuses u=U-start and du=V-start; flat
+// shading stashes the packed color at u.
+typedef struct rdActiveSpan
+{
+    int32_t xStart;                 // +0x00  screen X (sortX >> 16)
+    int32_t width;                  // +0x04  pixel count
+    int32_t y;                      // +0x08  scanline (yCurScanLine)
+    int32_t u;                      // +0x0C  texture U start / flat color
+    int32_t du;                     // +0x10  texture U gradient / affine V start
+    int32_t v;                      // +0x14  texture V start
+    int32_t dv;                     // +0x18  texture V gradient
+    int32_t i;                      // +0x1C  light intensity start (float bits)
+    int32_t z;                      // +0x20  depth/fog start (16.16)
+    int32_t dz;                     // +0x24  depth/fog gradient (16.16)
+    struct rdActiveSpan* pNextSpan; // +0x28  next span in this face's per-frame list
+} rdActiveSpan;
+
+// A face admitted to the active-face pool by rdActive_AddActiveFace. Stride 0x200 (JK
+// offsets; Grim's colored-lighting build is 0x204). Most of the 0x04..0x183 region is
+// per-face interpolation setup written by the rdAFRaster Setup*NGon family (ported in a
+// later phase) and is left reserved here. Only the fields the span builder itself
+// touches are named.
+typedef struct rdActiveFace
+{
+    rdProcEntry* pProcEntry;                // +0x000  source proc face (AddActiveFace arg)
+    uint8_t   reserved_004[0x184 - 0x004];  // +0x004  Setup*NGon interpolation base state
+    flex_t    dIntensity;                   // +0x184  per-pixel light gradient (float)
+    uint32_t  reserved_188;                 // +0x188
+    flex_t    dU;                           // +0x18C  affine texture U gradient (float)
+    uint32_t  reserved_190;                 // +0x190
+    flex_t    dV;                           // +0x194  affine texture V gradient (float)
+    uint32_t  reserved_198;                 // +0x198
+    int32_t   dIntensityFixed;              // +0x19C  per-pixel light gradient (16.16, from dIntensity)
+    int32_t   uRoundBias;                   // +0x1A0  affine tex U round bias (0x8000 or 0x7fff by grad sign)
+    int32_t   vRoundBias;                   // +0x1A4  affine tex V round bias
+    uint8_t   reserved_1a8[0x1B4 - 0x1A8];  // +0x1A8  (lit/gouraud scaled gradients, later phases)
+    void (*pfnDrawSpan)(struct rdActiveFace*); // +0x1B4  flush callback (draws pFirstSpan list)
+    rdActiveSpan* pFirstSpan;               // +0x1B8  per-frame span list head
+    rdActiveSpan* pLastSpan;                // +0x1BC  per-frame span list tail
+    int32_t   shift;                        // +0x1C0  affine tex mip level (0-3); also u/v coord right-shift
+    void*     pTexels;                      // +0x1C4  selected mip's texel base (surface_lock_alloc)
+    int32_t   vShift;                       // +0x1C8  texel row shift = log2(mipWidth) = width_bitcnt - mip
+    int32_t   texFormatKey;                 // +0x1CC  texel-size / sampler-variant selector (JK texture+0x18)
+    uint32_t  color;                        // +0x1D0  flat color / base value
+    uint32_t  uMask;                        // +0x1D4  affine tex U wrap mask ((mipWidth-1) << 16)
+    uint32_t  vMask;                        // +0x1D8  affine tex V wrap mask ((mipHeight-1) << vShift)
+    uint8_t*  pLightTable;                  // +0x1DC  colormap light table: LAT = row (lightlevel+lvl*256); GAT = base
+    tVBuffer* pTexMip;                      // Added: selected mip vbuffer (locked at draw time for texels)
+    int (*pfnSetupEdge)(rdEdge*, struct rdActiveFace*, int vA, int vB); // +0x1E4  build one edge
+    rdEdge*   pLeftEdge;                     // +0x1E8  left AET edge (leftOrRightFlag != 0)
+    rdEdge*   pRightEdge;                    // +0x1EC  right AET edge (leftOrRightFlag == 0)
+    int32_t   spanStartX;                   // +0x1F0  current span start X accumulator (16.16)
+    int32_t   numEdgesActive;               // +0x1F4  live edge count (2 -> span open)
+    struct rdActiveFace* nextFace;          // +0x1F8  depth-sorted active-face list next
+    struct rdActiveFace* prevFace;          // +0x1FC  depth-sorted active-face list prev
+} rdActiveFace;
 
 typedef struct rdMeshinfo
 {

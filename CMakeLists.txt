@@ -209,6 +209,16 @@ file(GLOB TEST_SRCS ${PROJECT_SOURCE_DIR}/src/Tests/*.c)
 list(REMOVE_ITEM ENGINE_SOURCE_FILES ${TEST_SRCS})
 list(REMOVE_ITEM ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/main.c)
 
+# The software (CPU) renderer is desktop-only (RDRASTER_SOFTWARE_RENDERER, off on
+# TARGET_RETRO_HOMEBREW — TWL/DC can't afford CPU rasterization). rdAFRaster.c/rdZRaster.c are
+# wholly gated on that define, so drop them from the TWL/DC build entirely (rdActive.c stays —
+# its _Startup is always compiled). engine_config.h keeps the define off there regardless.
+if(TARGET_TWL OR TARGET_DREAMCAST)
+    list(REMOVE_ITEM ENGINE_SOURCE_FILES
+        ${PROJECT_SOURCE_DIR}/src/Raster/rdAFRaster.c
+        ${PROJECT_SOURCE_DIR}/src/Raster/rdZRaster.c)
+endif()
+
 # Remove multiplayer menus from compilation
 file(GLOB MULTIPLAYER_MENU_SRCS 
     ${PROJECT_SOURCE_DIR}/src/Gui/jkGUIMultiplayer.c
@@ -276,6 +286,10 @@ else()
             add_executable(rle_test src/Tests/rle_test.c)
             target_link_libraries(rle_test PRIVATE ${SDL2_COMMON_LIBS} sith_engine)
             macos_target_add_standard_deps(rle_test)
+
+            add_executable(rdActive_test src/Tests/rdActive_test.c)
+            target_link_libraries(rdActive_test PRIVATE ${SDL2_COMMON_LIBS} sith_engine)
+            macos_target_add_standard_deps(rdActive_test)
         endif()
     endif()
 endif()
