@@ -217,6 +217,7 @@ int stdDisplay_SetMasterPalette(uint8_t* pal)
 
 tVBuffer* stdDisplay_VBufferNew(tRasterInfo *fmt, int create_ddraw_surface, int gpu_mem, const void* palette)
 {
+    STD_ASSERTREL((fmt->format.bpp % 8) == 0); // Added
     tVBuffer* out = (tVBuffer*)STD_ALLOC(sizeof(tVBuffer));
     
     _memset(out, 0, sizeof(*out));
@@ -411,7 +412,8 @@ int stdDisplay_VBufferCopy(tVBuffer *vbuf, tVBuffer *vbuf2, unsigned int blit_x,
 }
 
 int stdDisplay_VBufferFill(tVBuffer *vbuf, int fillColor, rdRect *rect)
-{    
+{
+    STD_ASSERTREL(vbuf != NULL); // Added
     rdRect fallback = {0,0,vbuf->format.width, vbuf->format.height};
     if (!rect)
     {
