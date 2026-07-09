@@ -47,10 +47,13 @@ int sithIntersect_IsSphereInSector(const rdVector3 *pos, flex_t radius, SithSect
 {
     rdVector3 *v7; // ebp
     flex_t v8; // st7
-    
+
     // Added
     if (!sector)
         return 0;
+
+    SITH_ASSERTREL(pos != NULL); // Added: J3D assert
+    SITH_ASSERTREL(radius >= 0.0f); // Added: J3D assert
 
     if ( (sector->flags & SITH_SECTOR_HASCOLLIDEBOX) != 0
       && pos->z - radius > sector->collidebox_onecorner.z
@@ -97,6 +100,10 @@ int sithIntersect_CheckSphereThingIntersection(SithThing *pThing, const rdVector
     uint32_t thinga; // [esp+60h] [ebp+4h]
     rdMatrix34 *a2a; // [esp+64h] [ebp+8h]
     int v39; // [esp+68h] [ebp+Ch]
+
+    SITH_ASSERTREL(pCheck->collide != SITH_COLLIDE_NONE); // Added: J3D assert
+    SITH_ASSERTREL(pHitDistance != NULL); // Added: J3D assert
+    SITH_ASSERTREL(ppHitMesh && ppHitFace); // Added: J3D assert
 
     v11 = pCheck;
     bFaceCollision = 0;
@@ -146,6 +153,7 @@ int sithIntersect_CheckSphereThingIntersection(SithThing *pThing, const rdVector
     }
     else
     {
+        SITH_ASSERTREL(pThing && (pThing->collide != SITH_COLLIDE_SPHERE)); // Added: J3D assert
         v11 = pThing;
         radius = pCheck->collideSize;
         rdVector_Neg3(&dirVec, moveNorm);
@@ -175,6 +183,8 @@ int sithIntersect_CheckSphereThingIntersection(SithThing *pThing, const rdVector
         *pHitDistance = tmp;
         return 1;
     }
+
+    SITH_ASSERTREL(v11->renderData.type == RD_THING_MODEL3); // Added: J3D assert
 
     rdVector_Copy3(&v11->orient.scale, &v11->position);
     a2a = &v11->orient;
@@ -274,6 +284,8 @@ int sithIntersect_CheckSphereMeshIntersection(rdVector3 *startPos, rdVector3 *mo
     flex_t v25; // [esp+Ch] [ebp-14h]
     int v26; // [esp+10h] [ebp-10h]
     rdVector3 pushVel; // [esp+14h] [ebp-Ch] BYREF
+
+    SITH_ASSERTREL(hitNorm); // Added: J3D assert
 
     v24 = 0;
     v25 = 1.0;
@@ -500,6 +512,9 @@ int sithIntersect_CheckSphereFaceHitVerticesIntersection(rdVector3 *startPos, fl
     rdVector3 a1a; // [esp+18h] [ebp-18h] BYREF
     flex_t v34; // [esp+34h] [ebp+4h]
 
+    SITH_ASSERTREL(pFace != NULL); // Added: J3D assert
+    SITH_ASSERTREL(radius >= 0.0f); // Added: J3D assert
+
     v6 = pFace;
     v7 = pFace->numVertices;
     v8 = 0;
@@ -589,6 +604,7 @@ int sithIntersect_CheckSphereHit(const rdVector3 *startPos, const rdVector3 *mov
             *pSphereHitDist = v13 / v18;
             if ( *pSphereHitDist < 0.0 )
                 *pSphereHitDist = 0.0;
+            SITH_ASSERTREL((*pSphereHitDist <= moveDistance) && (*pSphereHitDist >= 0.0f)); // Added: J3D assert
             return 1;
         }
         else
@@ -615,6 +631,10 @@ int sithIntersect_CheckSphereFaceIntersectionEx(const rdVector3 *startPos, const
     flex_d_t v37; // st7
     rdVector3 v45; // [esp+10h] [ebp-18h] BYREF
     rdVector3 projected; // [esp+1Ch] [ebp-Ch] BYREF
+
+    SITH_ASSERTREL((startPos != NULL) && (pFace != NULL) && (aVertices != NULL)); // Added: J3D assert
+    SITH_ASSERTREL((hitDist != NULL) && (moveNorm != NULL)); // Added: J3D assert
+    SITH_ASSERTREL(radius >= 0.0f); // Added: J3D assert
 
     result = sithIntersect_CheckSphereHit(startPos, moveNorm, moveDistance, radius, &pFace->normal, &aVertices[*pFace->vertexPosIdx], hitDist, colflags);
     if ( result )
@@ -710,6 +730,10 @@ int sithIntersect_CheckSphereFaceIntersection(const rdVector3 *startPos, const r
     int result; // eax
     rdVector3 v15; // [esp+10h] [ebp-Ch] BYREF
 
+    SITH_ASSERTREL((startPos != NULL) && (pFace != NULL) && (aVertices != NULL)); // Added: J3D assert
+    SITH_ASSERTREL((hitDist != NULL) && (moveNorm != NULL)); // Added: J3D assert
+    SITH_ASSERTREL(radius >= 0.0f); // Added: J3D assert
+
     v8 = pFace;
     result = sithIntersect_CheckSphereHit(startPos, moveNorm, moveDistance, radius, &pFace->face.normal, &aVertices[*pFace->face.vertexPosIdx], hitDist, flags);
     if ( result )
@@ -745,6 +769,7 @@ int sithIntersect_CheckFaceVerticesIntersection(rdVector3 *startPos, flex_t radi
         return 0;
     if ( side == 0 )
         return 4;
+    SITH_ASSERTREL(radius > 0.0f); // Added: J3D assert
     return sithIntersect_CheckSphereFaceHitVerticesIntersection(startPos, radius, pFace, aVertices, side, pHitPos);
 }
 

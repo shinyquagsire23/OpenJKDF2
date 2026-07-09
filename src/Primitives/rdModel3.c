@@ -678,6 +678,7 @@ void rdModel3_LoadPostProcess(rdModel3 *pModel3)
     rdModel3_CalcRadii(pModel3);
     rdModel3_CalcFaceNormals(pModel3);
     rdModel3_CalcVertexNormals(pModel3);
+    RD_ASSERTREL(rdModel3_Validate(pModel3)); // Added: J3D assert
     rdModel3_CalcNumParents(pModel3); // MOTS added
 }
 
@@ -804,6 +805,9 @@ int rdModel3_Write(char *pFilename, rdModel3 *pModel, char *pCratedName)
                     if ( face->material == pModel->aMaterials[j] )
                         materialIdx = j;
                 }
+
+                if ( face->material )
+                    RD_ASSERTREL(materialIdx != -1); // Added: J3D assert
 
                 rdroid_g_pHS->filePrintf(
                     fd,
@@ -1194,6 +1198,7 @@ void rdModel3_CalcFaceNormals(rdModel3 *pModel3)
             {
                 int idx1, idx2, idx3;
                 rdFace* face = &mesh->faces[faceIdx];
+                RD_ASSERTREL(face->numVertices > 2); // Added: J3D assert
                 for (idx1 = 0; idx1 < face->numVertices; idx1++)
                 {
                     idx2 = idx1 - 1;
@@ -1265,6 +1270,7 @@ void rdModel3_CalcVertexNormals(rdModel3 *pModel)
                     mesh->vertexNormals[vtxNum].x = 1.0;
                     mesh->vertexNormals[vtxNum].y = 0.0;
                     mesh->vertexNormals[vtxNum].z = 0.0;
+                    RDLOG_ERROR("Warning: Unused vertex found while calculating vert normals.\n"); // Added: J3D log
                 }
                 else
                 {
@@ -1311,6 +1317,9 @@ rdHierarchyNode* rdModel3_FindNamedNode(char *pName, rdModel3 *pModel3)
 
 int rdModel3_GetMeshMatrix(rdThing *pThing, rdMatrix34 *orient, uint32_t nodeNum, rdMatrix34 *meshOrient)
 {
+    RD_ASSERTREL(pThing && meshOrient); // Added: J3D assert
+    RD_ASSERTREL(pThing->type == RD_THING_MODEL3); // Added: J3D assert
+    RD_ASSERTREL(pThing->model3); // Added: J3D assert
     if ( nodeNum >= pThing->model3->numHNodes )
         return 0;
 
@@ -1339,9 +1348,12 @@ int rdModel3_Draw(rdThing *pThing, rdMatrix34 *pPlacement)
     int meshIdx;
     rdHierarchyNode *node;
     
+    RD_ASSERTREL(pThing != NULL); // Added: J3D assert
+    RD_ASSERTREL(pThing->model3 != NULL); // Added: J3D assert
+
     pCurThing = pThing;
     pCurModel3 = pThing->model3;
-    
+
     if (rdroid_curCullFlags & 2) {
         rdVector3 vertex_out;
         rdClipFrustum* pThingFrustum = rdCamera_g_pCurCamera->pClipFrustum;
@@ -1479,6 +1491,9 @@ void rdModel3_DrawMesh(rdMesh *pMesh, rdMatrix34 *orient)
     rdVector3 vertex;
     rdMatrix34 matInv;
     rdMatrix34 out;
+
+    RD_ASSERTREL(rdCamera_g_pCurCamera != NULL); // Added: J3D assert
+    RD_ASSERTREL(pMesh != NULL); // Added: J3D assert
 
     pCurMesh = pMesh;
     if ( !pMesh->geometryMode )

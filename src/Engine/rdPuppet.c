@@ -68,11 +68,14 @@ void rdPuppet_FreeEntry()
 
 void rdPuppet_SetPause(rdPuppet *pPuppet, int bPaused)
 {
+    RD_ASSERTREL(pPuppet != NULL); // Added
     pPuppet->bPaused = bPaused;
 }
 
 void rdPuppet_SetTrackNoise(rdPuppet *pPuppet, int track, flex_t noise)
 {
+    RD_ASSERTREL((track >= 0) && (track < RDPUPPET_MAX_TRACKS)); // Added
+    RD_ASSERTREL(pPuppet != NULL); // Added
     if ( noise != 0.0f )
     {
         pPuppet->aTracks[track].status |= 0x1000;
@@ -86,6 +89,8 @@ void rdPuppet_SetTrackNoise(rdPuppet *pPuppet, int track, flex_t noise)
 
 void rdPuppet_SetTrackPriority(rdPuppet *pPuppet, int track, int lowPri, int heighPri)
 {
+    RD_ASSERTREL(pPuppet != NULL); // Added
+    RD_ASSERTREL((track >= 0) && (track < RDPUPPET_MAX_TRACKS)); // Added
     pPuppet->aTracks[track].lowPri = lowPri;
     pPuppet->aTracks[track].highPri = heighPri;
 }
@@ -268,6 +273,7 @@ void rdPuppet_BuildJointMatrices(rdThing *prdThing, rdMatrix34 *pPlacement)
                 }
 
                 v23 = trackIter->field_120 - v20->aEntries[v21].frameNum;
+                RD_ASSERTREL(v23 >= 0.0f); // Added
                 v24 = &v20->aEntries[v21];
                 v25 = v24->flags;
                 if (v25 & 1)
@@ -310,6 +316,8 @@ void rdPuppet_BuildJointMatrices(rdThing *prdThing, rdMatrix34 *pPlacement)
                 {
                     if (v18 <= v73)
                     {
+                        RD_ASSERTREL(v18 == v73); // Added
+                        RD_ASSERTREL(v75 != v73); // Added
                         rdVector_Add3Acc(&v90, &v89);
                         rdVector_Add3Acc(&v91, &tmp1);
                         v71 += trackIter->playSpeed;
@@ -374,6 +382,8 @@ accumulate_finalize:
 
 int rdPuppet_RemoveTrack(rdPuppet *pPuppet, int track)
 {
+    RD_ASSERTREL((track >= 0) && (track < RDPUPPET_MAX_TRACKS)); // Added
+    RD_ASSERTREL(pPuppet != NULL); // Added
     if ( pPuppet->aTracks[track].callback )
         pPuppet->aTracks[track].callback(pPuppet->renderData->pThing, track, 0);
     pPuppet->aTracks[track].status = 0;
@@ -389,6 +399,8 @@ int rdPuppet_UpdateTracks(rdPuppet *pPuppet, flex_t secDeltaTime)
     
     rdPuppetTrack *v3; // esi
     int v13; // [esp+14h] [ebp-4h]
+
+    RD_ASSERTREL(pPuppet != NULL); // Added
 
     v13 = 0;
     if (pPuppet->bPaused)
@@ -449,6 +461,9 @@ int rdPuppet_AddTrack(rdPuppet *pPuppet, rdKeyframe *pKFTrack, int lowPriority, 
     rdPuppetTrack *v6; // eax
     rdPuppetTrack *newTrack; // edx
 
+    RD_ASSERTREL(pPuppet != NULL); // Added
+    RD_ASSERTREL(pKFTrack != NULL); // Added
+
     v4 = pPuppet->aTracks;
     for (newTrackIdx = 0; newTrackIdx < RDPUPPET_MAX_TRACKS; newTrackIdx++)
     {
@@ -488,11 +503,15 @@ int rdPuppet_AddTrack(rdPuppet *pPuppet, rdKeyframe *pKFTrack, int lowPriority, 
 
 void rdPuppet_SetCallback(rdPuppet *pPuppet, int track, rdPuppetTrackCallback_t pfCallback)
 {
+    RD_ASSERTREL(pPuppet != NULL); // Added
+    RD_ASSERTREL((track >= 0) && (track < RDPUPPET_MAX_TRACKS)); // Added
     pPuppet->aTracks[track].callback = pfCallback;
 }
 
 int rdPuppet_FadeInTrack(rdPuppet *pPuppet, int track, flex_t speed)
 {
+    RD_ASSERTREL((track >= 0) && (track < RDPUPPET_MAX_TRACKS)); // Added
+    RD_ASSERTREL(pPuppet != NULL); // Added
     pPuppet->aTracks[track].status = pPuppet->aTracks[track].status & ~8u | 6;
     if ( speed <= 0.0 )
     {
@@ -519,6 +538,10 @@ void rdPuppet_AdvanceTrack(rdPuppet *pPuppet, int track, flex_t frames)
     int v20; // [esp+14h] [ebp-8h]
     flex_t v21; // [esp+18h] [ebp-4h]
     flex_t v22; // [esp+2Ch] [ebp+10h]
+
+    RD_ASSERTREL((track >= 0) && (track < RDPUPPET_MAX_TRACKS)); // Added
+    RD_ASSERTREL(pPuppet != NULL); // Added
+    RD_ASSERTREL(frames >= 0.0f); // Added
 
     v21 = 0.0;
     v20 = 0;
@@ -564,6 +587,7 @@ void rdPuppet_AdvanceTrack(rdPuppet *pPuppet, int track, flex_t frames)
     {
         if ( v4->numMarkers )
         {
+            RD_ASSERTREL(pPuppet->renderData); // Added
             if ( v21 == 0.0 )
             {
                 for (uint32_t v13 = 0; v13 < v4->numMarkers; v13++)
@@ -609,6 +633,8 @@ void rdPuppet_AdvanceTrack(rdPuppet *pPuppet, int track, flex_t frames)
 
 int rdPuppet_FadeOutTrack(rdPuppet *pPuppet, int track, flex_t speed)
 {
+    RD_ASSERTREL((track >= 0) && (track < RDPUPPET_MAX_TRACKS)); // Added
+    RD_ASSERTREL(pPuppet != NULL); // Added
     pPuppet->aTracks[track].status = pPuppet->aTracks[track].status & ~4u | 8;
     if ( speed <= 0.0 )
     {
@@ -624,11 +650,15 @@ int rdPuppet_FadeOutTrack(rdPuppet *pPuppet, int track, flex_t speed)
 
 void rdPuppet_SetTrackSpeed(rdPuppet *pPuppet, int track, flex_t fps)
 {
+    RD_ASSERTREL((track >= 0) && (track < RDPUPPET_MAX_TRACKS)); // Added
+    RD_ASSERTREL(pPuppet != NULL); // Added
     pPuppet->aTracks[track].speed = fps;
 }
 
 int rdPuppet_SetStatus(rdPuppet *pPuppet, int track, int status)
 {
+    RD_ASSERTREL(pPuppet != NULL); // Added
+    RD_ASSERTREL((track >= 0) && (track < RDPUPPET_MAX_TRACKS)); // Added
     pPuppet->aTracks[track].status |= status;
     return 1;
 }
@@ -637,7 +667,11 @@ int rdPuppet_PlayTrack(rdPuppet *pPuppet, int track)
 {
     rdPuppetTrack *v2; // eax
 
+    RD_ASSERTREL((track >= 0) && (track < RDPUPPET_MAX_TRACKS)); // Added
+    RD_ASSERTREL(pPuppet != NULL); // Added
+
     v2 = &pPuppet->aTracks[track];
+    RD_ASSERTREL(v2 != NULL); // Added
     v2->status = v2->status & ~0x10u | 2;
     v2->playSpeed = 1.0;
     return 1;
@@ -646,6 +680,9 @@ int rdPuppet_PlayTrack(rdPuppet *pPuppet, int track)
 void rdPuppet_ResetTrack(rdPuppet *pPuppet, int track)
 {
     rdPuppetTrack *v2; // edx
+
+    RD_ASSERT(pPuppet); // Added
+    RD_ASSERTREL((track >= 0) && (track < RDPUPPET_MAX_TRACKS)); // Added
 
     v2 = &pPuppet->aTracks[track];
 
@@ -658,6 +695,7 @@ void rdPuppet_ResetTrack(rdPuppet *pPuppet, int track)
 
 int rdPuppet_NewEntry(rdPuppet *pPuppet, rdThing *parent)
 {
+    RD_ASSERTREL(pPuppet != NULL); // Added
     pPuppet->bPaused = 0;
     pPuppet->renderData = parent;
     for (int i = 0; i < RDPUPPET_MAX_TRACKS; i++)

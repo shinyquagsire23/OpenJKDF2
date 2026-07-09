@@ -21,8 +21,12 @@ static const int sithInventory_aMotsForcePowerBins[18] = {0, SITHBIN_F_JUMP, SIT
 
 void sithInventory_RegisterType(int binIdx, sithCog *cog, char *name, flex_t min, flex_t max, int flags)
 {
+    // Added: OpenJones3D asserts
+    SITH_ASSERTREL(binIdx < SITHBIN_NUMBINS);
+    SITH_ASSERTREL(name);
+
     SithInventoryType* desc = &sithInventory_g_aTypes[binIdx];
-    
+
     stdString_SafeStrCopy(desc->fpath, name, sizeof(desc->fpath));
 
     desc->cog = cog;
@@ -219,6 +223,8 @@ int sithInventory_FindPreviousItemID(SithThing *pThing, signed int itemId)
 
 void sithInventory_SelectItem(SithThing *pThing, int typeId)
 {
+    SITH_ASSERTREL(pThing); // Added: OpenJones3D assert
+
     if ( typeId < 0 )
         return;
 
@@ -259,11 +265,19 @@ void sithInventory_SelectItem(SithThing *pThing, int typeId)
 
 void sithInventory_SelectNextItem(SithThing *pThing)
 {
+    // Added: OpenJones3D asserts
+    SITH_ASSERTREL(pThing->type == SITH_THING_PLAYER);
+    SITH_ASSERTREL(pThing->actorParams.pPlayer);
+
     sithInventory_SelectItem(pThing, sithInventory_FindNextItemID(pThing, pThing->actorParams.pPlayer->curItemID));
 }
 
 void sithInventory_SelectPreviousItem(SithThing *pThing)
 {
+    // Added: OpenJones3D asserts
+    SITH_ASSERTREL(pThing->type == SITH_THING_PLAYER);
+    SITH_ASSERTREL(pThing->actorParams.pPlayer);
+
     sithInventory_SelectItem(pThing, sithInventory_FindPreviousItemID(pThing, pThing->actorParams.pPlayer->curItemID));
 }
 
@@ -502,6 +516,10 @@ flex_t sithInventory_ChangeInventory(SithThing *pThing, int typeId, flex_t amoun
 {
     SithInventoryItem *info;
 
+    // Added: OpenJones3D asserts
+    SITH_ASSERTREL(pThing->type == SITH_THING_PLAYER);
+    SITH_ASSERTREL(typeId < SITHBIN_NUMBINS);
+
     if ( pThing->actorParams.pPlayer == (SithPlayer *)-136 || !(sithInventory_g_aTypes[typeId].flags & SITHINVENTORY_TYPE_REGISTERED) )
         return 0.0;
 
@@ -511,6 +529,10 @@ flex_t sithInventory_ChangeInventory(SithThing *pThing, int typeId, flex_t amoun
 
 flex_t sithInventory_GetInventory(SithThing *pThing, int typeId)
 {
+    // Added: OpenJones3D asserts
+    SITH_ASSERTREL(pThing->type == SITH_THING_PLAYER);
+    SITH_ASSERTREL(typeId < SITHBIN_NUMBINS);
+
     if ( pThing->actorParams.pPlayer != (SithPlayer *)-136 && sithInventory_g_aTypes[typeId].flags & SITHINVENTORY_TYPE_REGISTERED )
         return pThing->actorParams.pPlayer->aItems[typeId].amount;
     else
@@ -521,11 +543,15 @@ flex_t sithInventory_SetInventory(SithThing *pThing, int typeId, flex_t amount)
 {
     SithInventoryItem *info;
 
+    // Added: OpenJones3D asserts
+    SITH_ASSERTREL(pThing->type == SITH_THING_PLAYER);
+    SITH_ASSERTREL(typeId < SITHBIN_NUMBINS);
+
     if ( pThing->actorParams.pPlayer == (SithPlayer *)-136 || !(sithInventory_g_aTypes[typeId].flags & SITHINVENTORY_TYPE_REGISTERED) )
         return 0.0;
 
     info = &pThing->actorParams.pPlayer->aItems[typeId];
-    
+
     flex_t origAmt = info->amount;
     info->amount = amount;
     if ( info->amount < sithInventory_g_aTypes[typeId].min )
@@ -548,6 +574,10 @@ flex_t sithInventory_SetInventory(SithThing *pThing, int typeId, flex_t amount)
 
 void sithInventory_SetInventoryActivated(SithThing *pThing, int typeId, int bActivated)
 {
+    // Added: OpenJones3D asserts
+    SITH_ASSERTREL(pThing->type == SITH_THING_PLAYER);
+    SITH_ASSERTREL(typeId < SITHBIN_NUMBINS);
+
     if ( pThing->actorParams.pPlayer != (SithPlayer *)-136 && sithInventory_g_aTypes[typeId].flags & SITHINVENTORY_TYPE_REGISTERED)
     {
         if ( bActivated )
@@ -559,6 +589,10 @@ void sithInventory_SetInventoryActivated(SithThing *pThing, int typeId, int bAct
 
 int sithInventory_IsInventoryActivated(SithThing *pThing, int typeId)
 {
+    // Added: OpenJones3D asserts
+    SITH_ASSERTREL(pThing->type == SITH_THING_PLAYER);
+    SITH_ASSERTREL(typeId < SITHBIN_NUMBINS);
+
     if ( pThing->actorParams.pPlayer != (SithPlayer *)-136 && sithInventory_g_aTypes[typeId].flags & SITHINVENTORY_TYPE_REGISTERED)
     {
         return !!(pThing->actorParams.pPlayer->aItems[typeId].state & SITHINVENTORY_ITEM_ACTIVATED);
@@ -568,6 +602,10 @@ int sithInventory_IsInventoryActivated(SithThing *pThing, int typeId)
 
 void sithInventory_SetInventoryAvailable(SithThing *pThing, int typeId, int bAvailable)
 {
+    // Added: OpenJones3D asserts
+    SITH_ASSERTREL(pThing->type == SITH_THING_PLAYER);
+    SITH_ASSERTREL(typeId < SITHBIN_NUMBINS);
+
     if ( pThing->actorParams.pPlayer != (SithPlayer *)-136 && sithInventory_g_aTypes[typeId].flags & SITHINVENTORY_TYPE_REGISTERED)
     {
         if ( bAvailable )
@@ -579,6 +617,10 @@ void sithInventory_SetInventoryAvailable(SithThing *pThing, int typeId, int bAva
 
 int sithInventory_IsInventoryAvailable(SithThing *pThing, int typeId)
 {
+    // Added: OpenJones3D asserts
+    SITH_ASSERTREL(pThing->type == SITH_THING_PLAYER);
+    SITH_ASSERTREL(typeId < SITHBIN_NUMBINS);
+
     if ( pThing->actorParams.pPlayer != (SithPlayer *)-136 && sithInventory_g_aTypes[typeId].flags & SITHINVENTORY_TYPE_REGISTERED)
     {
         return !!(pThing->actorParams.pPlayer->aItems[typeId].state & SITHINVENTORY_ITEM_AVAILABLE);
@@ -608,6 +650,8 @@ int sithInventory_GetCarries(SithThing *player, int binIdx)
 
 int sithInventory_IsBackpackItem(SithThing *pThing, int typeId)
 {
+    SITH_ASSERTREL(typeId < SITHBIN_NUMBINS); // Added: OpenJones3D assert
+
     return sithInventory_g_aTypes[typeId].flags & (SITHINVENTORY_TYPE_REGISTERED | SITHINVENTORY_TYPE_BACKPACKITEM) == (SITHINVENTORY_TYPE_REGISTERED | SITHINVENTORY_TYPE_BACKPACKITEM);
 }
 
@@ -628,31 +672,45 @@ void sithInventory_SerializedWrite(SithThing *thing)
 
 flex_t sithInventory_GetInventoryMinimum(SithThing *pThing, int id)
 {
+    SITH_ASSERTREL(id < SITHBIN_NUMBINS); // Added: OpenJones3D assert
+
     return sithInventory_g_aTypes[id].min;
 }
 
 flex_t sithInventory_GetInventoryMaximum(SithThing *pThing, int id)
 {
+    SITH_ASSERTREL(id < SITHBIN_NUMBINS); // Added: OpenJones3D assert
+
     return sithInventory_g_aTypes[id].max;
 }
 
 void sithInventory_SetInventoryFlags(SithThing *pThing, int id, int flags)
 {
+    SITH_ASSERTREL(id < SITHBIN_NUMBINS); // Added: OpenJones3D assert
+
     sithInventory_g_aTypes[id].flags |= flags;
 }
 
 int sithInventory_GetInventoryFlags(SithThing *pThing, int id)
 {
+    SITH_ASSERTREL(id < SITHBIN_NUMBINS); // Added: OpenJones3D assert
+
     return sithInventory_g_aTypes[id].flags;
 }
 
 void sithInventory_ClearInventoryFlags(SithThing *pThing, int id, int flags)
 {
+    SITH_ASSERTREL(id < SITHBIN_NUMBINS); // Added: OpenJones3D assert
+
     sithInventory_g_aTypes[id].flags &= ~flags;
 }
 
 flex_t sithInventory_BroadcastInventoryMessage(SithThing *pThing, int srcType, int srcIdx, int msg, int status, flex_t param0, flex_t param1, flex_t param2, flex_t param3)
 {
+    // Added: OpenJones3D asserts
+    SITH_ASSERTREL(pThing->type == SITH_THING_PLAYER);
+    SITH_ASSERTREL(pThing->actorParams.pPlayer);
+
     for (int i = 0; i < SITHBIN_NUMBINS; i++)
     {
         SithInventoryType* desc = &sithInventory_g_aTypes[i];
@@ -684,6 +742,8 @@ flex_t sithInventory_BroadcastInventoryMessage(SithThing *pThing, int srcType, i
 
 flex_t sithInventory_BroadcastMessage(SithThing *pThing, int srcType, int srcIdx, int messageType, int flags, flex_t param0, flex_t param1, flex_t param2, flex_t param3)
 {
+    SITH_ASSERTREL(pThing->type == SITH_THING_PLAYER); // Added: OpenJones3D assert
+
     for (int i = 0; i < SITHBIN_NUMBINS; i++)
     {
         SithInventoryType* desc = &sithInventory_g_aTypes[i];
@@ -717,6 +777,10 @@ flex_t sithInventory_BroadcastMessage(SithThing *pThing, int srcType, int srcIdx
 
 void sithInventory_ResetInventory(SithThing *pThing)
 {
+    // Added: OpenJones3D asserts
+    SITH_ASSERTREL(pThing->type == SITH_THING_PLAYER);
+    SITH_ASSERTREL(pThing->actorParams.pPlayer);
+
     SithInventoryItem *v2; // ecx
     int v4; // edi
     SithInventoryType *v5; // esi
@@ -967,6 +1031,10 @@ SithThing* sithInventory_CreateBackpack(SithThing *pThing)
 
 void sithInventory_PickupBackpack(SithThing *pPlayerThing, SithThing *pBackpackThing)
 {
+    // Added: OpenJones3D asserts
+    SITH_ASSERTREL(pBackpackThing->type == SITH_THING_ITEM);
+    SITH_ASSERTREL((pBackpackThing->itemParams.flags & SITH_ITEM_BACKPACK));
+
     for (int i = 0; i < pBackpackThing->itemParams.numBins; i++)
     {
         SithBackpackItem* item = &pBackpackThing->itemParams.contents[i];
@@ -981,6 +1049,10 @@ void sithInventory_PickupBackpack(SithThing *pPlayerThing, SithThing *pBackpackT
 
 int sithInventory_GetBackpackItemID(SithThing *pBackpackThing, signed int itemNum)
 {
+    // Added: OpenJones3D asserts
+    SITH_ASSERTREL(pBackpackThing->type == SITH_THING_ITEM);
+    SITH_ASSERTREL((pBackpackThing->itemParams.flags & SITH_ITEM_BACKPACK));
+
     if ( itemNum >= pBackpackThing->itemParams.numBins )
         return -1;
     else
@@ -989,6 +1061,10 @@ int sithInventory_GetBackpackItemID(SithThing *pBackpackThing, signed int itemNu
 
 flex_t sithInventory_GetBackpackItemValue(SithThing *pBackpackThing, signed int itemNum)
 {
+    // Added: OpenJones3D asserts
+    SITH_ASSERTREL(pBackpackThing->type == SITH_THING_ITEM);
+    SITH_ASSERTREL((pBackpackThing->itemParams.flags & SITH_ITEM_BACKPACK));
+
     if ( itemNum >= pBackpackThing->itemParams.numBins )
         return -1.0;
     else
@@ -997,6 +1073,10 @@ flex_t sithInventory_GetBackpackItemValue(SithThing *pBackpackThing, signed int 
 
 int sithInventory_GetNumBackpackItems(SithThing *pBackpackThing)
 {
+    // Added: OpenJones3D asserts
+    SITH_ASSERTREL(pBackpackThing->type == SITH_THING_ITEM);
+    SITH_ASSERTREL((pBackpackThing->itemParams.flags & SITH_ITEM_BACKPACK));
+
     return pBackpackThing->itemParams.numBins;
 }
 
@@ -1448,7 +1528,11 @@ SithInventoryItem* sithInventory_GetBin(SithThing *player, int binIdx)
 
 SithInventoryType* sithInventory_GetInventoryType(SithThing *pThing, int typeId)
 {
-    if ( pThing->actorParams.pPlayer == (SithPlayer *)-136 
+    // Added: OpenJones3D asserts
+    SITH_ASSERTREL(pThing->type == SITH_THING_PLAYER);
+    SITH_ASSERTREL(typeId < SITHBIN_NUMBINS);
+
+    if ( pThing->actorParams.pPlayer == (SithPlayer *)-136
     || !(sithInventory_g_aTypes[typeId].flags & SITHINVENTORY_TYPE_REGISTERED) )
         return NULL;
 
@@ -1486,6 +1570,10 @@ int sithInventory_KeybindInit()
 
 void sithInventory_InitInventory(SithThing *pThing)
 {
+    // Added: OpenJones3D asserts
+    SITH_ASSERTREL(pThing->type == SITH_THING_PLAYER);
+    SITH_ASSERTREL(pThing->actorParams.pPlayer);
+
     for (int i = 0; i < SITHBIN_NUMBINS; i++)
     {
         SithInventoryType* desc = &sithInventory_g_aTypes[i];
