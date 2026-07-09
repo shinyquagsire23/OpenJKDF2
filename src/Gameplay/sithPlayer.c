@@ -69,6 +69,8 @@ void sithPlayer_PlacePlayers(SithWorld *pWorld)
     int v7; // edi
     void *v8; // eax
 
+    SITH_ASSERTREL(pWorld != NULL); // Added: ported J3D assert
+
     v1 = pWorld->aThings;
     v2 = pWorld->numThings;
     v3 = 0;
@@ -160,9 +162,14 @@ void sithPlayer_SetLocalPlayer(int playerNum)
 {
     unsigned int v6; // eax
 
+    SITH_ASSERTREL(playerNum < jkPlayer_maxPlayers); // Added: ported J3D assert
+
     playerThingIdx = playerNum;
     sithPlayer_g_pLocalPlayer = &jkPlayer_playerInfos[playerNum];
     sithPlayer_g_pLocalPlayerThing = jkPlayer_playerInfos[playerNum].pLocalPlayer;
+
+    SITH_ASSERTREL(sithWorld_g_pCurrentWorld); // Added: ported J3D assert
+    SITH_ASSERTREL(sithPlayer_g_pLocalPlayerThing); // Added: ported J3D assert (pPlayer->pThing)
 
     sithWorld_g_pCurrentWorld->pLocalPlayer = sithPlayer_g_pLocalPlayerThing;
     sithWorld_g_pCurrentWorld->pCameraFocusThing = sithPlayer_g_pLocalPlayerThing;
@@ -208,7 +215,9 @@ void sithPlayer_Update(SithPlayer *pPlayer, flex_t secDeltaTime)
     v2 = (__int64)(secDeltaTime * 256.0 - -0.5);
     if ( pPlayer == sithPlayer_g_pLocalPlayer )
     {
+        SITH_ASSERTREL(pPlayer); // Added: ported J3D assert
         v3 = pPlayer->pLocalPlayer;
+        SITH_ASSERTREL(v3); // Added: ported J3D assert (pThing)
         pPalEffect = stdPalEffects_GetEffectPointer(pPlayer->palEffectsIdx1);
         if ( pPalEffect->tint.x != 0.0 )
         {
@@ -461,6 +470,8 @@ void sithPlayer_Reset(unsigned int playerNum)
 
 int sithPlayer_ShowPlayer(int playerNum, int id)
 {
+    SITH_ASSERTREL(playerNum < jkPlayer_maxPlayers); // Added: ported J3D assert
+
     if ( !jkPlayer_playerInfos[playerNum].pLocalPlayer )
         return 0;
     jkPlayer_playerInfos[playerNum].flags |= 5;
@@ -481,6 +492,8 @@ void sithPlayer_NewPlayer(SithThing *pPlayer)
     stdPalEffect *v6; // eax
     int v9; // edi
 
+    SITH_ASSERTREL(pPlayer); // Added: ported J3D assert
+
     v1 = pPlayer->renderData.puppet;
     if ( v1 )
     {
@@ -493,6 +506,7 @@ void sithPlayer_NewPlayer(SithThing *pPlayer)
     }
     if ( !sithNet_isMulti || (pPlayer->flags & SITH_TF_INVULN) == 0 )
     {
+        SITH_ASSERTREL(pPlayer->pTemplate); // Added: ported J3D assert
         v4 = pPlayer->pTemplate;
         pPlayer->actorParams.endurance = 0; // MOTS added
         pPlayer->actorParams.health = v4->actorParams.health;
