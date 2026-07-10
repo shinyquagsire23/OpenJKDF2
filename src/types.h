@@ -1551,23 +1551,32 @@ typedef struct rdEdge
 } rdEdge;
 
 // One horizontal span emitted by rdActive_BuildSpans and drawn by the face's
-// pfnDrawSpan. Stride 0x2c (JK.EXE aActiveSpans, engine-internal so JK==Grim). The
-// texture-coordinate slots are mode-dependent: perspective texmap fills u/du/v/dv as a
-// per-pixel (start, gradient) set; affine texmap reuses u=U-start and du=V-start; flat
-// shading stashes the packed color at u.
+// pfnDrawSpan. Stride 0x2c in JK.EXE (aActiveSpans, engine-internal so JK==Grim); this
+// reimplementation adds two trailing perspective fields (uOverZ/dOneOverZ family — see
+// below), so the OpenJKDF2 stride is larger. The texture-coordinate slots are mode-dependent:
+//   - affine (AT) texmap: u=U-start, du=U-gradient, v=V-start, dv=V-gradient (16.16 fixed).
+//   - perspective (IT) texmap: u=U/Z-start, du=U/Z-gradient, v=V/Z-start, dv=V/Z-gradient
+//     (float bits), plus oneOverZ/dOneOverZ; the sampler divides U/Z by 1/Z per pixel.
+//   - flat shading (solid): the packed color is stashed at u.
+// z/dz carry the per-pixel gouraud intensity (lightingMode 3) in all modes.
 typedef struct rdActiveSpan
 {
     int32_t xStart;                 // +0x00  screen X (sortX >> 16)
     int32_t width;                  // +0x04  pixel count
     int32_t y;                      // +0x08  scanline (yCurScanLine)
-    int32_t u;                      // +0x0C  texture U start / flat color
-    int32_t du;                     // +0x10  texture U gradient / affine V start
-    int32_t v;                      // +0x14  texture V start
-    int32_t dv;                     // +0x18  texture V gradient
+    int32_t u;                      // +0x0C  tex U start (AT: 16.16; IT: U/Z float bits) / flat color
+    int32_t du;                     // +0x10  tex U gradient (AT: 16.16; IT: U/Z float bits)
+    int32_t v;                      // +0x14  tex V start (AT: 16.16; IT: V/Z float bits)
+    int32_t dv;                     // +0x18  tex V gradient (AT: 16.16; IT: V/Z float bits)
     int32_t i;                      // +0x1C  light intensity start (float bits)
-    int32_t z;                      // +0x20  depth/fog start (16.16)
-    int32_t dz;                     // +0x24  depth/fog gradient (16.16)
-    struct rdActiveSpan* pNextSpan; // +0x28  next span in this face's per-frame list
+    int32_t z;                      // +0x20  depth/fog / gouraud intensity start (16.16)
+    int32_t dz;                     // +0x24  depth/fog / gouraud intensity gradient (16.16)
+    // Added (non-JK): perspective (IT) 1/Z, interpolated linearly in screen space and used as
+    // the per-pixel divisor. JK derives 1/Z from face-constant screen gradients instead; this
+    // reimplementation carries it per-span so the affine and perspective span math share shape.
+    flex_t   oneOverZ;              //         perspective 1/Z start (float)
+    flex_t   dOneOverZ;             //         perspective 1/Z gradient (float)
+    struct rdActiveSpan* pNextSpan; //         next span in this face's per-frame list
 } rdActiveSpan;
 
 // A face admitted to the active-face pool by rdActive_AddActiveFace. Stride 0x200 (JK

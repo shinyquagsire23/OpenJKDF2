@@ -35,6 +35,11 @@
 
 extern int rdroid_curVertexColorMode;
 
+#ifdef RDRASTER_SOFTWARE_RENDERER
+// Runtime software-renderer toggle (cvar "r_softwareRenderer"): 0 = hardware (GL), non-0 = software.
+extern int rdroid_bSoftwareRenderer;
+#endif
+
 int rdStartup(HostServices *p_hs);
 void rdShutdown();
 int rdOpen(int a1);

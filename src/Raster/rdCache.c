@@ -132,11 +132,11 @@ void rdCache_Flush()
 #endif
     }
 #ifdef RDRASTER_SOFTWARE_RENDERER
-    // Software (CPU) active-edge rasterizer path (rdActive/rdAFRaster). This mirrors
-    // JK.EXE's original rdCache_Flush dispatch (compiled out below on accelerated
-    // targets): it is taken only when the renderer is put in the non-accelerated,
-    // occlusion-method-1 mode. Only this active-edge path is ported so far.
-    if ( rdroid_curAcceleration <= 0 )
+    // Software (CPU) rasterizer path (rdZRaster, or rdActive/rdAFRaster when SW_ZBUFFER is off).
+    // Taken only when the runtime r_softwareRenderer cvar is on (which is also what puts the renderer
+    // in the non-accelerated mode via the jkGame_Update bracket) — the cvar makes it authoritative so
+    // an incidental acceleration<=0 elsewhere never runs the half-set-up SW path.
+    if ( rdroid_curAcceleration <= 0 && rdroid_bSoftwareRenderer )
     {
 #ifdef RDRASTER_SW_ZBUFFER
         // Perspective-correct, z-buffered per-face path (rdZRaster): draw each cached face

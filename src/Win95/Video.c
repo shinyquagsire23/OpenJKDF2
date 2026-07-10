@@ -33,6 +33,120 @@ tVBuffer* Video_pOverlayMapBuffer = NULL;
 tVBuffer Video_overlayMapBuffer;
 #endif
 
+#ifdef RDRASTER_SOFTWARE_RENDERER
+tVBuffer* Video_pSwWorldBuffer = NULL;
+int Video_swWorldPresentPending = 0;
+
+tVBuffer* Video_swEnsureWorldBuffer(void)
+{
+    // The menu buffer's SDL surface (allocated by stdDisplay_SetMode) defines the target size.
+    if (Video_pMenuBuffer == NULL || Video_pMenuBuffer->format.width == 0 || Video_pMenuBuffer->format.height == 0)
+        return NULL;
+
+    int w = Video_pMenuBuffer->format.width;
+    int h = Video_pMenuBuffer->format.height;
+
+    // Drop the old buffer when the window (and thus the menu buffer) resized.
+    if (Video_pSwWorldBuffer != NULL
+        && (Video_pSwWorldBuffer->format.width != w || Video_pSwWorldBuffer->format.height != h))
+    {
+        stdDisplay_VBufferFree(Video_pSwWorldBuffer);
+        Video_pSwWorldBuffer = NULL;
+    }
+
+    if (Video_pSwWorldBuffer == NULL)
+    {
+        tRasterInfo fmt = Video_pMenuBuffer->format; // 8bpp, matching stride/palette layout
+        fmt.format.bpp = 8;
+        fmt.width = w;
+        fmt.height = h;
+        Video_pSwWorldBuffer = stdDisplay_VBufferNew(&fmt, 0, 0, NULL);
+    }
+
+    return Video_pSwWorldBuffer;
+}
+
+// Nearest-neighbor scaled blit of pSrc's [0,srcW)x[0,srcH) region into pDst's
+// [dstX,dstX+dstW)x[dstY,dstY+dstH) region, skipping source index 0 (transparent). Both buffers must
+// be locked (surface_lock_alloc valid); strides come from format.rowSize.
+static void Video_swBlitScaledKeyed(tVBuffer* pDst, tVBuffer* pSrc,
+                                    int srcW, int srcH, int dstX, int dstY, int dstW, int dstH)
+{
+    if (dstW <= 0 || dstH <= 0 || srcW <= 0 || srcH <= 0) return;
+    uint8_t* pDstPix = (uint8_t*)pDst->surface_lock_alloc;
+    const uint8_t* pSrcPix = (const uint8_t*)pSrc->surface_lock_alloc;
+    if (pDstPix == NULL || pSrcPix == NULL) return;
+    int dstStride = pDst->format.rowSize;
+    int srcStride = pSrc->format.rowSize;
+    int dstBoundW = pDst->format.width;
+    int dstBoundH = pDst->format.height;
+
+    for (int dy = 0; dy < dstH; dy++)
+    {
+        int wy = dstY + dy;
+        if (wy < 0 || wy >= dstBoundH) continue;
+        int sy = dy * srcH / dstH;
+        const uint8_t* pSrcRow = pSrcPix + sy * srcStride;
+        uint8_t* pDstRow = pDstPix + wy * dstStride;
+        for (int dx = 0; dx < dstW; dx++)
+        {
+            int wx = dstX + dx;
+            if (wx < 0 || wx >= dstBoundW) continue;
+            uint8_t idx = pSrcRow[dx * srcW / dstW];
+            if (idx != 0)
+                pDstRow[wx] = idx;
+        }
+    }
+}
+
+// "One software frame": composite the 2D overlays (HUD, and the overlay map when visible) that were
+// drawn into their own 640x480-logical / full-res buffers INTO the full-resolution software world
+// buffer, so the whole frame is a single software image (like JK's original all-software renderer)
+// instead of the world being a separate GL layer under a GL menu-overlay present. std3D_DrawMenu then
+// presents just the world buffer and skips its menu quad (see Video_swWorldPresentPending). No-op
+// unless the software renderer rendered the world this frame.
+void Video_swCompositeOverlaysIntoWorld(void)
+{
+    if (!rdroid_bSoftwareRenderer || !Video_swWorldPresentPending) return;
+    tVBuffer* pWorld = Video_pSwWorldBuffer;
+    if (pWorld == NULL || Video_pMenuBuffer == NULL) return;
+    int worldW = pWorld->format.width;
+    int worldH = pWorld->format.height;
+
+    stdDisplay_VBufferLock(pWorld);
+    stdDisplay_VBufferLock(Video_pMenuBuffer);
+
+    // HUD: the menu buffer's top-left 640x480 texels, scaled into the 4:3-centered region of the
+    // world buffer (matches std3D_DrawMenu's in-game present, which samples that same 640x480 sub-rect
+    // and letterboxes it 4:3). The world buffer shares the window aspect, so this stays centered.
+    {
+        int dstH = worldH;
+        int dstW = (worldH * 640) / 480;
+        int dstX = (worldW - dstW) / 2;
+        Video_swBlitScaledKeyed(pWorld, Video_pMenuBuffer, 640, 480, dstX, 0, dstW, dstH);
+    }
+    stdDisplay_VBufferUnlock(Video_pMenuBuffer);
+
+#ifdef SDL2_RENDER
+    // Overlay map (automap): a full-resolution buffer the game draws the map into. Its GL present
+    // (std3D_DrawMapOverlay) early-returns on desktop, so compositing it here is what shows the map in
+    // the software frame. Full-res -> full-res (1:1), index 0 transparent, only when the map is up.
+    if (sithOverlayMap_bMapVisible && Video_pOverlayMapBuffer != NULL)
+    {
+        stdDisplay_VBufferLock(Video_pOverlayMapBuffer);
+        int mapW = Video_pOverlayMapBuffer->format.width;
+        int mapH = Video_pOverlayMapBuffer->format.height;
+        if (mapW > worldW) mapW = worldW;
+        if (mapH > worldH) mapH = worldH;
+        Video_swBlitScaledKeyed(pWorld, Video_pOverlayMapBuffer, mapW, mapH, 0, 0, mapW, mapH);
+        stdDisplay_VBufferUnlock(Video_pOverlayMapBuffer);
+    }
+#endif
+
+    stdDisplay_VBufferUnlock(pWorld);
+}
+#endif
+
 void Video_SwitchToGDI()
 {
     jkDev_Close();

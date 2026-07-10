@@ -10,6 +10,14 @@
 #include "Win95/stdDisplay.h"
 #include "Primitives/rdPrimit3.h"
 
+#ifdef RDRASTER_SOFTWARE_RENDERER
+// Runtime software-renderer toggle, bound to the "r_softwareRenderer" cvar (registered in
+// jkPlayer.c). 0 = hardware (GL) path, non-0 = the CPU software rasterizer. Cvar-managed (the cvar
+// system links + persists it), so it is NOT reset in rdStartup/rdOpen — the user's choice survives
+// soft resets. Only exists on desktop, where the software renderer is compiled in.
+int rdroid_bSoftwareRenderer = 0;
+#endif
+
 int rdStartup(HostServices *p_hs)
 {
     stdPlatform_Printf("OpenJKDF2: %s\n", __func__);

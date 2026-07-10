@@ -197,24 +197,58 @@ int jkGame_Update()
     rdAdvanceFrame();
     jkGame_Update_AdvanceFrame = stdPlatform_GetTimeMsec();
 #ifdef RDRASTER_SOFTWARE_RENDERER
-    // Added: render the world 3D through the software (CPU) rasterizer. b3DAccel stays on so
-    // the GL present + menu-compositing path still runs; rdCache_Flush takes its software
-    // branch because acceleration<=0, drawing into the canvas vbuffer (Video_menuBuffer),
-    // which std3D_DrawMenu then presents. (Only acceleration persists to the flush — the
-    // render path resets geometry/occlusion mode — so the flush forces wireframe itself.)
+    // Added: render the world 3D through the software (CPU) rasterizer when the r_softwareRenderer
+    // cvar is on. Acceleration is set to 0 so rdCache_Flush takes its software branch; the world +
+    // weapon draw is redirected into a dedicated full-resolution buffer (presented full-screen by
+    // std3D_DrawMenu), keeping Video_menuBuffer as the 640x480-logical HUD overlay composited on top.
+    // When the cvar is OFF, none of this runs and the normal hardware (GL) path renders the frame.
+    int rdsw_bActive = rdroid_bSoftwareRenderer;
     int rdsw_savedAccel = rdroid_curAcceleration;
-    rdroid_curAcceleration = 0;
-    // The software rasterizer writes pixels directly, so the canvas surface must be
-    // locked (surface_lock_alloc is NULL otherwise on the accelerated present path).
-    stdDisplay_VBufferLock(Video_pMenuBuffer);
+    tVBuffer* rdsw_pWorldBuf = NULL;
+    tVBuffer* rdsw_pSavedVBuf = NULL;
+    tVBuffer* rdsw_pRenderBuf = NULL;
+    // On a hardware->software transition, free the material GL textures the hardware path uploaded:
+    // the software rasterizer samples texels from the system-RAM SDL surfaces and never touches VRAM,
+    // so those textures are dead weight while SW is active. They re-upload lazily (texture_loaded is
+    // reset) if the user switches back to hardware. (UI/HUD textures are a separate cache, untouched.)
+    static int rdsw_bWasActive = 0;
+    if (rdsw_bActive && !rdsw_bWasActive)
+        std3D_PurgeEntireTextureCache();
+    rdsw_bWasActive = rdsw_bActive;
+    if (rdsw_bActive)
+    {
+        rdroid_curAcceleration = 0;
+        // The world buffer matches the menu buffer dims, so redirecting the canvas at it leaves the
+        // canvas geometry unchanged. (std3D_DrawMenu samples only a 640x480 sub-rect of the menu
+        // buffer, which is why rendering the world there put it in a corner.)
+        rdsw_pWorldBuf = Video_swEnsureWorldBuffer();
+        rdsw_pRenderBuf = rdsw_pWorldBuf;
+        if (rdsw_pWorldBuf && Video_pCanvas)
+        {
+            rdsw_pSavedVBuf = Video_pCanvas->pVBuffer;
+            Video_pCanvas->pVBuffer = rdsw_pWorldBuf;
+            // Clear to fill color (index 0) so untouched pixels present transparent (menu shader
+            // discards index 0), matching the per-frame Video_pMenuBuffer fill for the world.
+            stdDisplay_VBufferLock(rdsw_pWorldBuf);
+            stdDisplay_VBufferFill(rdsw_pWorldBuf, Video_fillColor, 0);
+        }
+        else
+        {
+            // No world buffer yet — fall back to the menu buffer (renders into the corner, as before).
+            rdsw_pRenderBuf = Video_pMenuBuffer;
+            // The software rasterizer writes pixels directly, so the canvas surface must be
+            // locked (surface_lock_alloc is NULL otherwise on the accelerated present path).
+            stdDisplay_VBufferLock(Video_pMenuBuffer);
+        }
 #ifdef RDRASTER_SW_ZBUFFER
-    // Clear the software depth buffer for the frame BEFORE the world is drawn. This must happen
-    // here (not only via std3D_ClearZBuffer) because rdCamera_AdvanceFrame clears JK's software
-    // z-buffer by filling canvas->d3d_vbuf on the accel<=0 path, so the std3D hook never fires at
-    // scene start — leaving the depth buffer unallocated until DrawPov clears it (hence the world
-    // only appeared once a POV weapon existed).
-    rdZRaster_BeginFrame(Video_pMenuBuffer);
+        // Clear the software depth buffer for the frame BEFORE the world is drawn. This must happen
+        // here (not only via std3D_ClearZBuffer) because rdCamera_AdvanceFrame clears JK's software
+        // z-buffer by filling canvas->d3d_vbuf on the accel<=0 path, so the std3D hook never fires at
+        // scene start — leaving the depth buffer unallocated until DrawPov clears it (hence the world
+        // only appeared once a POV weapon existed).
+        rdZRaster_BeginFrame(rdsw_pRenderBuf);
 #endif
+    }
 #endif
 #if !defined(SDL2_RENDER) && !defined(TARGET_RETRO_HOMEBREW)
     if ( Video_modeStruct.b3DAccel )
@@ -239,8 +273,20 @@ int jkGame_Update()
     // the whole frame in software). DrawPov itself calls std3D_ClearZBuffer + RD_ZBUFFER_READ_WRITE
     // (which now also clears the software depth buffer), so the weapon draws in front of the world.
     jkPlayer_DrawPov();
-    stdDisplay_VBufferUnlock(Video_pMenuBuffer);
-    rdroid_curAcceleration = rdsw_savedAccel;
+    if (rdsw_bActive)
+    {
+        if (rdsw_pWorldBuf && Video_pCanvas)
+        {
+            stdDisplay_VBufferUnlock(rdsw_pWorldBuf);
+            Video_pCanvas->pVBuffer = rdsw_pSavedVBuf;   // restore the menu-buffer canvas for the HUD
+            Video_swWorldPresentPending = 1;             // world rendered this frame → present it
+        }
+        else
+        {
+            stdDisplay_VBufferUnlock(Video_pMenuBuffer);
+        }
+        rdroid_curAcceleration = rdsw_savedAccel;
+    }
 #else
     jkPlayer_DrawPov();
 #endif
@@ -349,6 +395,11 @@ int jkGame_Update()
     jkQuakeConsole_Render();
 #endif
 
+#ifdef RDRASTER_SOFTWARE_RENDERER
+    // Software renderer: fold the 2D overlays (HUD + map) into the world buffer so the whole frame is
+    // one software image; std3D_DrawMenu then presents just that buffer and skips its menu-overlay quad.
+    Video_swCompositeOverlaysIntoWorld();
+#endif
 #if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
     std3D_DrawMenu();
     rdFinishFrame();
@@ -367,8 +418,10 @@ int jkGame_Update()
                 rdsw_shotStartMs = nowMs;
             if (nowMs - rdsw_shotStartMs > (uint32_t)atoi(pShotMs))
             {
-                jkGame_Screenshot();
-                stdPlatform_Printf("OPENJKDF2_AUTOSHOT: captured screenshot, exiting\n");
+                const char* pShotPath = getenv("OPENJKDF2_AUTOSHOT_PATH");
+                // Capture the presented window (world present + HUD), not the pre-composite scene FBO.
+                std3D_ScreenshotWindow(pShotPath ? pShotPath : "sw_autoshot.png");
+                stdPlatform_Printf("OPENJKDF2_AUTOSHOT: captured window screenshot, exiting\n");
                 exit(0);
             }
         }

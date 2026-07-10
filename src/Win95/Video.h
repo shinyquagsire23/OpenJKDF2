@@ -23,6 +23,24 @@ extern tVBuffer Video_overlayMapBuffer;
 extern uint32_t Video_overlayTexId;
 #endif
 
+#ifdef RDRASTER_SOFTWARE_RENDERER
+// Dedicated full-resolution color buffer the software renderer draws the world into (sized to
+// Video_menuBuffer, i.e. aspect*960 x 960). Kept SEPARATE from Video_menuBuffer so the world can be
+// presented full-screen while the HUD/menu stays the 640x480-logical overlay composited on top
+// (std3D_DrawMenu samples only a 640x480 sub-rect of the menu buffer). NULL until first ensured.
+extern tVBuffer* Video_pSwWorldBuffer;
+// Set by the jkGame_Update software bracket on frames that actually render the world; consumed by
+// std3D's full-screen present so stale world frames aren't shown during menus/cutscenes.
+extern int Video_swWorldPresentPending;
+// Lazily (re)allocate Video_pSwWorldBuffer to match Video_menuBuffer's current dimensions (tracks
+// window resize). Returns the buffer, or NULL if the menu buffer isn't ready yet.
+tVBuffer* Video_swEnsureWorldBuffer(void);
+// Composite the 2D overlays (HUD + overlay map) into the software world buffer so the frame is a
+// single software image. Called after the HUD is drawn, before std3D_DrawMenu presents. No-op unless
+// the software renderer rendered the world this frame.
+void Video_swCompositeOverlaysIntoWorld(void);
+#endif
+
 //static void (*Video_camera_related)() = (void*)Video_camera_related_ADDR;
 
 //static void (*Video_Shutdown)() = (void*)Video_Shutdown_ADDR;

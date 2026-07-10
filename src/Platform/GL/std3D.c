@@ -4,6 +4,7 @@
 #include "Raster/rdZRaster.h"
 #include "Win95/stdDisplay.h"
 #include "Win95/Window.h"
+#include "Win95/Video.h"
 #include "World/sithWorld.h"
 #include "Engine/rdColormap.h"
 #include "Main/jkGame.h"
@@ -1078,6 +1079,120 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
 void std3D_DrawMapOverlay();
 void std3D_DrawUIRenderList();
 
+#ifdef RDRASTER_SOFTWARE_RENDERER
+static GLuint std3D_swWorldTexId = 0;
+static int    std3D_swWorldTexW = 0;
+static int    std3D_swWorldTexH = 0;
+
+// Present the software-rendered world buffer as a full-window quad, underneath the HUD/menu overlay.
+// The software renderer draws the world at the full menu-buffer resolution into Video_pSwWorldBuffer
+// (see the jkGame_Update software bracket, which redirects the camera canvas there). Here it is
+// uploaded to a texture and stretched across the whole window through the menu shader — so the world
+// fills the window rather than the 640x480 sub-rect the menu present samples. The menu shader
+// discards palette index 0, so untouched pixels show the GL clear; the HUD menu quad, drawn after
+// this in std3D_DrawMenu, composites on top.
+static void std3D_PresentSWWorld(void)
+{
+    if (!Video_swWorldPresentPending)
+        return;
+    Video_swWorldPresentPending = 0;
+
+    tVBuffer* pWorld = Video_pSwWorldBuffer;
+    if (pWorld == NULL || pWorld->sdlSurface == NULL)
+        return;
+
+    int w = pWorld->format.width;
+    int h = pWorld->format.height;
+
+    // (Re)create the GL texture on first use or when the world buffer resized.
+    if (std3D_swWorldTexId == 0 || std3D_swWorldTexW != w || std3D_swWorldTexH != h)
+    {
+        if (std3D_swWorldTexId != 0)
+            glDeleteTextures(1, &std3D_swWorldTexId);
+        glGenTextures(1, &std3D_swWorldTexId);
+        glBindTexture(GL_TEXTURE_2D, std3D_swWorldTexId);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, w, h, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+        std3D_swWorldTexW = w;
+        std3D_swWorldTexH = h;
+    }
+    // Upload the current frame's world pixels EVERY frame (like the menu buffer) — uploading only on
+    // (re)create would freeze the world on the first rendered frame.
+    glBindTexture(GL_TEXTURE_2D, std3D_swWorldTexId);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_RED, GL_UNSIGNED_BYTE, pWorld->sdlSurface->pixels);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, std3D_windowFbo);
+    glDepthMask(GL_TRUE);
+    glCullFace(GL_FRONT);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDepthFunc(GL_ALWAYS);
+    glUseProgram(programMenu);
+
+    // Full-window quad sampling the entire world texture, same tv convention as the menu present
+    // (screen top y=0 -> tv=0), so the top-down 8bpp buffer renders upright.
+    GL_tmpVertices[0].x = 0.0;           GL_tmpVertices[0].y = 0.0;           GL_tmpVertices[0].tu = 0.0; GL_tmpVertices[0].tv = 0.0;
+    GL_tmpVertices[1].x = 0.0;           GL_tmpVertices[1].y = Window_ySize;  GL_tmpVertices[1].tu = 0.0; GL_tmpVertices[1].tv = 1.0;
+    GL_tmpVertices[2].x = Window_xSize;  GL_tmpVertices[2].y = Window_ySize;  GL_tmpVertices[2].tu = 1.0; GL_tmpVertices[2].tv = 1.0;
+    GL_tmpVertices[3].x = Window_xSize;  GL_tmpVertices[3].y = 0.0;           GL_tmpVertices[3].tu = 1.0; GL_tmpVertices[3].tv = 0.0;
+    for (int i = 0; i < 4; i++)
+    {
+        GL_tmpVertices[i].z = 0.0;
+        *(uint32_t*)&GL_tmpVertices[i].nx = 0;
+        *(uint32_t*)&GL_tmpVertices[i].nz = 0;
+        GL_tmpVertices[i].color = 0xFFFFFFFF;
+    }
+    GL_tmpTris[0].v1 = 1; GL_tmpTris[0].v2 = 0; GL_tmpTris[0].v3 = 2;
+    GL_tmpTris[1].v1 = 0; GL_tmpTris[1].v2 = 3; GL_tmpTris[1].v3 = 2;
+
+    glActiveTexture(GL_TEXTURE0 + 0);
+    glBindTexture(GL_TEXTURE_2D, std3D_swWorldTexId);
+    glActiveTexture(GL_TEXTURE0 + 1);
+    glBindTexture(GL_TEXTURE_2D, displaypal_texture);
+    glActiveTexture(GL_TEXTURE0 + 0);
+    glUniform1i(programMenu_uniform_tex, 0);
+    glUniform1i(programMenu_uniform_displayPalette, 1);
+
+    glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_all);
+    glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(D3DVERTEX), GL_tmpVertices, GL_STREAM_DRAW);
+    glVertexAttribPointer(programMenu_attribute_coord3d, 3, GL_FLOAT, GL_FALSE, sizeof(D3DVERTEX), (GLvoid*)offsetof(D3DVERTEX, x));
+    glVertexAttribPointer(programMenu_attribute_v_color, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(D3DVERTEX), (GLvoid*)offsetof(D3DVERTEX, color));
+    glVertexAttribPointer(programMenu_attribute_v_uv, 2, GL_FLOAT, GL_FALSE, sizeof(D3DVERTEX), (GLvoid*)offsetof(D3DVERTEX, tu));
+    glEnableVertexAttribArray(programMenu_attribute_coord3d);
+    glEnableVertexAttribArray(programMenu_attribute_v_color);
+    glEnableVertexAttribArray(programMenu_attribute_v_uv);
+
+    {
+        float scaleX = 1.0 / ((double)Window_xSize / 2.0);
+        float scaleY = 1.0 / ((double)Window_ySize / 2.0);
+        float width = Window_xSize, height = Window_ySize;
+        float d3dmat[16] = {
+            scaleX, 0, 0, 0,
+            0, -scaleY, 0, 0,
+            0, 0, 1, 0,
+            -(width / 2) * scaleX, (height / 2) * scaleY, -1, 1
+        };
+        glUniformMatrix4fv(programMenu_uniform_mvp, 1, GL_FALSE, d3dmat);
+        glViewport(0, 0, width, height);
+    }
+
+    menu_data_elements[0] = GL_tmpTris[0].v1;
+    menu_data_elements[1] = GL_tmpTris[0].v2;
+    menu_data_elements[2] = GL_tmpTris[0].v3;
+    menu_data_elements[3] = GL_tmpTris[1].v1;
+    menu_data_elements[4] = GL_tmpTris[1].v2;
+    menu_data_elements[5] = GL_tmpTris[1].v3;
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, menu_ibo_triangle);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(GLushort), menu_data_elements, GL_STREAM_DRAW);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+
+    glDisableVertexAttribArray(programMenu_attribute_v_uv);
+    glDisableVertexAttribArray(programMenu_attribute_v_color);
+    glDisableVertexAttribArray(programMenu_attribute_coord3d);
+}
+#endif
+
 void std3D_DrawMenu()
 {
     if (Main_bHeadless) return;
@@ -1085,6 +1200,15 @@ void std3D_DrawMenu()
     //printf("Draw menu\n");
     std3D_DrawSceneFbo();
     //glFlush();
+
+    // When the software renderer presented the world this frame, its buffer already contains the HUD
+    // (Video_swCompositeOverlaysIntoWorld folded it in), so the in-game menu-overlay quad is skipped.
+    int rdsw_bWorldPresented = 0;
+#ifdef RDRASTER_SOFTWARE_RENDERER
+    rdsw_bWorldPresented = Video_swWorldPresentPending; // capture before PresentSWWorld clears it
+    // Draw the full-window software world (world + composited HUD) as the single frame.
+    std3D_PresentSWWorld();
+#endif
 
     glBindFramebuffer(GL_FRAMEBUFFER, std3D_windowFbo);
     glDepthMask(GL_TRUE);
@@ -1201,9 +1325,11 @@ void std3D_DrawMenu()
         GL_tmpTris[1].v1 = 0;
         GL_tmpTris[1].v2 = 3;
         GL_tmpTris[1].v3 = 2;
-        
-        GL_tmpVerticesAmt = 4;
-        GL_tmpTrisAmt = 2;
+
+        // The software renderer already folded the HUD into the world buffer it just presented, so
+        // suppress this redundant in-game menu-overlay quad (else the HUD would be drawn twice).
+        GL_tmpVerticesAmt = rdsw_bWorldPresented ? 0 : 4;
+        GL_tmpTrisAmt = rdsw_bWorldPresented ? 0 : 2;
     }
     else if (jkGuiBuildMulti_bRendering)
     {
@@ -3468,6 +3594,27 @@ void std3D_Screenshot(const char* pFpath)
     free(data);
 #endif
 }
+
+#ifdef RDRASTER_SOFTWARE_RENDERER
+// Capture the presented WINDOW framebuffer (what the user actually sees, including the software
+// world present + HUD overlay), unlike std3D_Screenshot which reads the pre-composite scene FBO.
+// Used for headless verification of the software-renderer full-window present.
+void std3D_ScreenshotWindow(const char* pFpath)
+{
+#ifdef TARGET_CAN_JKGM
+    int w = Window_xSize, h = Window_ySize;
+    if (w <= 0 || h <= 0) return;
+    uint8_t* data = (uint8_t*)malloc(w * h * 3 * sizeof(uint8_t));
+    glBindFramebuffer(GL_FRAMEBUFFER, std3D_windowFbo);
+    glReadBuffer(GL_BACK);
+    glReadPixels(0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, data);
+    // jkgm_write_png already emits rows bottom-to-top, matching glReadPixels' bottom-left origin, so
+    // pass the raw buffer (no manual flip) — exactly like std3D_Screenshot.
+    jkgm_write_png(pFpath, w, h, data);
+    free(data);
+#endif
+}
+#endif
 
 int std3D_HasAlpha()
 {
