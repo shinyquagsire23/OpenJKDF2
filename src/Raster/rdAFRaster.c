@@ -9,20 +9,26 @@
 
 #include <math.h>
 
+// Shading axes for the textured span-sampler template (rdAFRaster_span.h, RDA_SHADE).
+#define RDA_FLAT    0   // raw texel (no light table)
+#define RDA_LIT     1   // one constant light row through the light table
+#define RDA_GOURAUD 2   // per-pixel interpolated light level through the light table
+
 // Scratch flat color passed from rdAFRaster_DrawNGonLW to the standalone span drawer
 // (JK.EXE DAT_0086ad0c). Write-before-read transient (set per face), so it carries no
 // state across frames and needs no _Startup reset.
 static uint8_t rdAFRaster_curColor;
 
-// Per-face texture params latched by rdAFRaster_DrawNGonFAT and read by the span sampler
+// Per-face texture params latched by the DrawNGon flush and read by the span samplers
 // (JK.EXE DAT_0086ad08/ad10/ad18/ace0/ace4/ace8). Write-before-read per face, so no reset.
 static const uint8_t* rdAFRaster_curTexels;
 static uint32_t rdAFRaster_curUMask;
 static uint32_t rdAFRaster_curVMask;
 static int      rdAFRaster_curVShift;
+static int      rdAFRaster_curMip;                // mip level (perspective sampler u/v right-shift)
 static int32_t  rdAFRaster_curURoundBias;
 static int32_t  rdAFRaster_curVRoundBias;
-static const uint8_t* rdAFRaster_curLightTable;   // LAT: pre-offset light row; GAT: table base
+static const uint8_t* rdAFRaster_curLightTable;   // LAT/LS: pre-offset light row; GAT/GS/*IT: table base
 
 // Round a float to the nearest integer (matches JK.EXE's x87 ROUND closely enough for
 // sub-pixel edge setup).
@@ -31,27 +37,20 @@ static flex_t rdAFRaster_Round(flex_t f)
     return (flex_t)floorf((float)f + 0.5f);
 }
 
-// Face setup for the wireframe mode: precompute per-vertex reciprocal depth (used as the
-// interpolated edge value), install the edge/draw callbacks, and latch the flat color.
-void rdAFRaster_SetupNGonLW_0(rdActiveFace* pFace, rdTexinfo* pTexinfo)
+// Reinterpret a span interpolant slot's raw bits back to a float (the perspective u/z, v/z
+// slots hold float bits written via rdActive's FloatToSlot).
+static flex_t rdAFRaster_SlotToFloat(int32_t bits)
 {
-    rdProcEntry* pProc = pFace->pProcEntry;
-    rdVector3* pVerts = pProc->aVertices;
-    // Per-vertex 1/z lives in the face's setup-scratch region (face+0x04..); the LW edge
-    // setup interpolates it as the edge "i" value.
-    flex_t* pRcpZ = (flex_t*)pFace->reserved_004;
-
-    for (int i = 0; i < (int)pProc->numVertices; i++)
-        pRcpZ[i] = (flex_t)1.0 / pVerts[i].z;
-
-    pFace->pfnDrawSpan = rdAFRaster_DrawNGonLW;
-    pFace->pfnSetupEdge = rdAFRaster_SetupEdgeNGonLW;
-    pFace->color = pTexinfo->header.solidColor;
+    union { flex_t f; int32_t i; } u;
+    u.i = bits;
+    return u.f;
 }
 
-// Build one active edge between screen vertices vA and vB. The sign of the vertical span
-// decides whether it is the span's left edge (downward) or right edge (upward). Returns 0
-// for a horizontal (zero-height) edge, which the AET drops.
+// ---------------------------------------------------------------------------------------
+// Wireframe (LW) family — geometryMode 2. Span drawer plots only each span's two endpoint
+// pixels, so a filled polygon renders as its outline. Edge interpolant "i" = per-vertex 1/z.
+// ---------------------------------------------------------------------------------------
+
 int rdAFRaster_SetupEdgeNGonLW(rdEdge* pEdge, rdActiveFace* pFace, int vA, int vB)
 {
     rdProcEntry* pProc = pFace->pProcEntry;
@@ -70,7 +69,6 @@ int rdAFRaster_SetupEdgeNGonLW(rdEdge* pEdge, rdActiveFace* pFace, int vA, int v
 
     if (dy < 0)
     {
-        // Upward edge -> the span's right edge.
         pEdge->leftOrRightFlag = 0;
         pEdge->yStart = ybI;
         pEdge->numLines = -dy;
@@ -92,7 +90,6 @@ int rdAFRaster_SetupEdgeNGonLW(rdEdge* pEdge, rdActiveFace* pFace, int vA, int v
     }
     else
     {
-        // Downward edge -> the span's left edge.
         pEdge->leftOrRightFlag = 1;
         pEdge->yStart = yaI;
         pEdge->pfnAdvance = rdAFRaster_AdvanceLeftEdgeNGonLW;
@@ -114,7 +111,6 @@ int rdAFRaster_SetupEdgeNGonLW(rdEdge* pEdge, rdActiveFace* pFace, int vA, int v
     return 1;
 }
 
-// Per-scanline edge step: advance X and the interpolated 1/z by their deltas.
 void rdAFRaster_AdvanceLeftEdgeNGonLW(rdEdge* pEdge)
 {
     pEdge->sortX += pEdge->dSortX;
@@ -127,7 +123,6 @@ void rdAFRaster_AdvanceRightEdgeNGonLW(rdEdge* pEdge)
     pEdge->i += pEdge->di;
 }
 
-// Flush one face's span list: plot the two endpoint pixels of every span (wireframe).
 void rdAFRaster_DrawNGonLW(rdActiveFace* pFace)
 {
     uint8_t color = (uint8_t)pFace->color;
@@ -140,15 +135,10 @@ void rdAFRaster_DrawNGonLW(rdActiveFace* pFace)
     tVBuffer* pVBuffer = rdCamera_g_pCurCamera->pCanvas->pVBuffer;
     uint32_t stride = pVBuffer->format.rowSize;
     uint8_t* pBase = (uint8_t*)pVBuffer->surface_lock_alloc;
-    if (pBase == NULL)   // Added: surface must be locked for direct pixel access
+    if (pBase == NULL)
         return;
-    // Added: spans from frustum-clipped geometry can still reach a pixel or two past the
-    // framebuffer edge; clip endpoints so the byte writes never leave the surface.
     int fbW = pVBuffer->format.width;
     int fbH = pVBuffer->format.height;
-    // Added: defensively bound the span-list walk to the pool. The multi-face depth-sort
-    // in BuildSpans can currently produce a stray pNextSpan on complex scenes; stop the
-    // walk at any link that leaves the pool rather than dereference garbage.
     rdActiveSpan* pPoolBegin = rdActive_pSpanPoolBegin();
     rdActiveSpan* pPoolEnd = rdActive_pSpanPoolEnd();
 
@@ -163,8 +153,6 @@ void rdAFRaster_DrawNGonLW(rdActiveFace* pFace)
 
         if (y >= 0 && y < fbH)
         {
-            // Word-safe byte writes: the vbuffer can live in word-addressable VRAM/extram
-            // where raw 8-bit stores are dropped (see HEAP_WORD_ADDRESSABLE in CLAUDE.md).
             uint8_t* pRow = pBase + y * stride;
             int xEnd = xStart + width - 1;
             if (xStart >= 0 && xStart < fbW)
@@ -177,7 +165,6 @@ void rdAFRaster_DrawNGonLW(rdActiveFace* pFace)
     } while (pSpan != NULL);
 }
 
-// Standalone single-span drawer (uses the color latched by rdAFRaster_DrawNGonLW).
 void rdAFRaster_DrawSpanNGonLW_8(rdActiveSpan* pSpan)
 {
     uint8_t color = rdAFRaster_curColor;
@@ -188,44 +175,23 @@ void rdAFRaster_DrawSpanNGonLW_8(rdActiveSpan* pSpan)
     stdPlatform_WriteByte16(pPixel + pSpan->width - 1, color);
 }
 
-// =====================================================================================
-// Flat affine textured (FAT) family — geometryMode 4 (RD_GEOMETRY_FULL), textureMode 0
-// (affine/linear texmap), lightingMode 0 (flat). This is the first genuinely texture-
-// sampling path: each span walks the texture in screen-linear (u,v) steps and writes real
-// texels. Grim's SetupNGon{F,G,L}AT all share rdAFRaster_CalcAffineGradients ("AT" = Affine
-// Textured); the flat variant is FAT. (JK.EXE labels its @0047bcc0 "SetupNGonFAT", but that
-// one calls CalcPerspGradients — a mislabel; the real affine flat setup is JK sub_4777A0.)
-// =====================================================================================
+// ---------------------------------------------------------------------------------------
+// Gradient / mip setup, shared by the textured families.
+// ---------------------------------------------------------------------------------------
 
-// Precompute the per-vertex reciprocal depth (the edge "i"/depth-sort interpolant), select
-// the mip level from the face distance, and set the sub-texel U/V round bias.
-//
-// JK.EXE's rdAFRaster_CalcAffineGradients additionally runs a 3-vertex screen-space solve for
-// the U/V gradient SIGNS, purely to choose a 0x8000-vs-0x7fff round bias that trims texel-seam
-// shimmer. Those gradients are otherwise unused on the textureMode==0 (FAT) path — BuildSpans
-// derives each span's U/V from the two edge endpoints via the 1/n LUT — so we use standard
-// round-to-nearest (0x8000) on both axes and skip the solve. (The full solve returns when the
-// affine-BuildSpans/textureMode==1 families that consume dU/dV land.)
-static void rdAFRaster_CalcAffineGradients(rdActiveFace* pFace, int numMipsMinus1)
+// Select the mip level for a face from its distance (mirrors JK's thresholds), clamped to the
+// material's mip count. Shared by the affine and perspective setups.
+static int rdAFRaster_SelectMip(rdProcEntry* pProc, int numMipsMinus1)
 {
-    rdProcEntry* pProc = pFace->pProcEntry;
-    flex_t* pRcpZ = (flex_t*)pFace->reserved_004;
-    for (int i = 0; i < (int)pProc->numVertices; i++)
-        pRcpZ[i] = (flex_t)1.0 / pProc->aVertices[i].z;
-
-    // Mip level by face distance vs rdroid_aMipDistances, capped at the mips the material has.
-    // The first threshold differs with mip count exactly as JK: .y for a 2-mip material, else .x.
     int mip = 0;
     flex_t dist = pProc->z_min;
     if (numMipsMinus1 == 1)
     {
-        if (rdroid_aMipDistances.y < dist)
-            mip = 1;
+        if (rdroid_aMipDistances.y < dist) mip = 1;
     }
     else if (numMipsMinus1 == 2)
     {
-        if (rdroid_aMipDistances.x < dist)
-            mip = (rdroid_aMipDistances.y < dist) ? 2 : 1;
+        if (rdroid_aMipDistances.x < dist) mip = (rdroid_aMipDistances.y < dist) ? 2 : 1;
     }
     else if (numMipsMinus1 >= 3)
     {
@@ -235,34 +201,52 @@ static void rdAFRaster_CalcAffineGradients(rdActiveFace* pFace, int numMipsMinus
             if (rdroid_aMipDistances.y < dist)
             {
                 mip = 2;
-                if (rdroid_aMipDistances.z < dist)
-                    mip = 3;
+                if (rdroid_aMipDistances.z < dist) mip = 3;
             }
         }
     }
+    return mip;
+}
 
-    pFace->shift = mip;
+// Affine gradient setup (JK CalcAffineGradients): per-vertex 1/z into the face scratch (the edge
+// "i" interpolant), mip select, and a round-nearest U/V bias. JK's full 3-vertex screen-space
+// gradient SOLVE is dropped — on the affine path BuildSpans derives per-span u/v from the edge
+// endpoints, so those gradients are unused (see the P3 note in PROGRESS.md).
+static void rdAFRaster_CalcAffineGradients(rdActiveFace* pFace, int numMipsMinus1)
+{
+    rdProcEntry* pProc = pFace->pProcEntry;
+    flex_t* pRcpZ = (flex_t*)pFace->reserved_004;
+    for (int i = 0; i < (int)pProc->numVertices; i++)
+        pRcpZ[i] = (flex_t)1.0 / pProc->aVertices[i].z;
+
+    pFace->shift = rdAFRaster_SelectMip(pProc, numMipsMinus1);
     pFace->uRoundBias = 0x8000;
     pFace->vRoundBias = 0x8000;
 }
 
-// Shared texture-param resolution for all affine textured families (FAT/LAT/GAT): run the
-// gradients (mip select + reciprocal-z), pick a resident mip, and derive the texel base + wrap
-// masks. Installs the common FAT edge callback (LAT reuses it; GAT overrides with its own).
-static void rdAFRaster_SetupTexParams(rdActiveFace* pFace, rdTexinfo* pTexinfo)
+// Perspective gradient setup (JK CalcPerspGradients): the perspective edge setup computes per-
+// vertex u/z, v/z, 1/z directly (linear in screen space), so — as with CalcAffineGradients — JK's
+// screen-space gradient SOLVE is not needed here; this just selects the mip and the round bias.
+static void rdAFRaster_CalcPerspGradients(rdActiveFace* pFace, int numMipsMinus1)
+{
+    pFace->shift = rdAFRaster_SelectMip(pFace->pProcEntry, numMipsMinus1);
+    pFace->uRoundBias = 0x8000;
+    pFace->vRoundBias = 0x8000;
+}
+
+// Resolve a texinfo's selected mip into the face's texel base + wrap masks + shifts (shared by
+// every textured family — affine and perspective). Locks nothing (the flush locks at draw time).
+static void rdAFRaster_SetupTexParams(rdActiveFace* pFace, rdTexinfo* pTexinfo, int perspective)
 {
     rdTexture* pTexture = pTexinfo->texture_ptr;
-    rdAFRaster_CalcAffineGradients(pFace, (int)pTexture->num_mipmaps - 1);
+    if (perspective)
+        rdAFRaster_CalcPerspGradients(pFace, (int)pTexture->num_mipmaps - 1);
+    else
+        rdAFRaster_CalcAffineGradients(pFace, (int)pTexture->num_mipmaps - 1);
 
-    // Always install an edge callback; BuildEdges needs pfnSetupEdge even if the texels turn
-    // out to be non-resident (in which case the draw callback no-ops on the NULL pTexels).
-    pFace->pfnSetupEdge = rdAFRaster_SetupEdgeNGonFAT;
-
-    // Clamp the distance-selected mip to one that actually exists. On the desktop GL path a
-    // material may declare more mips than it keeps CPU surfaces for (texture_struct[mip] NULL),
-    // which would otherwise NULL-deref. Note: surface_lock_alloc is NULL while unlocked on
-    // desktop (texels live in the SDL surface), so DON'T gate on it here — the draw callback
-    // locks the mip at draw time to get the pixels.
+    // Clamp the distance-selected mip to one that has a resident surface (a material can declare
+    // more mips than it keeps CPU surfaces for). Don't gate on surface_lock_alloc: it is NULL
+    // while unlocked on desktop (texels live in the SDL surface); the flush locks at draw time.
     int mip = pFace->shift;
     if (mip < 0)
         mip = 0;
@@ -274,48 +258,24 @@ static void rdAFRaster_SetupTexParams(rdActiveFace* pFace, rdTexinfo* pTexinfo)
     pFace->pTexMip = pMip;
     if (pMip == NULL)
     {
-        pFace->pTexels = NULL;   // no mip surface -> the draw callback skips this face
+        pFace->pTexels = NULL;
         return;
     }
     int vShift = (int)pTexture->width_bitcnt - mip;   // log2(mipWidth)
 
-    pFace->pTexels = pMip->surface_lock_alloc;   // resident on TWL/DC; NULL(->lock) on desktop
-    pFace->texFormatKey = (int)pMip->format.rowSize;  // JK sampler-variant key; unused (general sampler)
+    pFace->pTexels = pMip->surface_lock_alloc;
+    pFace->texFormatKey = (int)pMip->format.rowSize;
     pFace->vShift = vShift;
-    pFace->uMask = (pTexture->width_minus_1  >> mip) << 16;       // (mipWidth-1) << 16
-    pFace->vMask = (pTexture->height_minus_1 >> mip) << vShift;   // (mipHeight-1) << vShift
+    pFace->uMask = (pTexture->width_minus_1  >> mip) << 16;
+    pFace->vMask = (pTexture->height_minus_1 >> mip) << vShift;
 }
 
-// Face setup for FAT (flat): resolve the texture and install the plain texel-copy span drawer.
-void rdAFRaster_SetupNGonFAT(rdActiveFace* pFace, rdTexinfo* pTexinfo)
-{
-    rdAFRaster_SetupTexParams(pFace, pTexinfo);
-    pFace->pfnDrawSpan = rdAFRaster_DrawNGonFAT;
-}
+// ---------------------------------------------------------------------------------------
+// Affine (AT) edge family: interpolate x, 1/z (i), and 16.16 texture u,v down the edge (u/v in
+// the uPersp/vPersp slots, which rdActive_EmitSpan's affine branch reads). Used by all AT
+// variants (FAT/LAT/GAT + masked). GAT additionally interpolates the per-vertex intensity.
+// ---------------------------------------------------------------------------------------
 
-// Face setup for LAT (lit): as FAT, plus a single per-face light row (colormap->lightlevel +
-// lightLevel*256) that the span drawer maps every texel through. lightLevel is 0..63.
-void rdAFRaster_SetupNGonLAT(rdActiveFace* pFace, rdTexinfo* pTexinfo, int lightLevel)
-{
-    rdAFRaster_SetupTexParams(pFace, pTexinfo);
-    pFace->pfnDrawSpan = rdAFRaster_DrawNGonLAT;
-    pFace->pLightTable = pFace->pProcEntry->colormap->lightlevel + lightLevel * 256;
-}
-
-// Face setup for GAT (gouraud): as FAT, but the light index is interpolated per-pixel, so the
-// span drawer indexes the light table base (colormap->lightlevel) by [intensity*256 + texel].
-// Uses the gouraud edge setup, which additionally interpolates the per-vertex intensity.
-void rdAFRaster_SetupNGonGAT(rdActiveFace* pFace, rdTexinfo* pTexinfo)
-{
-    rdAFRaster_SetupTexParams(pFace, pTexinfo);
-    pFace->pfnDrawSpan = rdAFRaster_DrawNGonGAT;
-    pFace->pfnSetupEdge = rdAFRaster_SetupEdgeNGonGAT;
-    pFace->pLightTable = pFace->pProcEntry->colormap->lightlevel;
-}
-
-// Build one active edge for a FAT face: like the LW edge setup but also interpolating the
-// texture (u,v) coordinates along the edge (stored in the uPersp/vPersp slots, which the
-// textureMode==0 branch of rdActive_EmitSpan reads).
 int rdAFRaster_SetupEdgeNGonFAT(rdEdge* pEdge, rdActiveFace* pFace, int vA, int vB)
 {
     rdProcEntry* pProc = pFace->pProcEntry;
@@ -335,7 +295,6 @@ int rdAFRaster_SetupEdgeNGonFAT(rdEdge* pEdge, rdActiveFace* pFace, int vA, int 
 
     if (dy > 0)
     {
-        // Downward edge -> the span's left edge.
         pEdge->leftOrRightFlag = 1;
         pEdge->yStart = yaI;
         pEdge->pfnAdvance = rdAFRaster_AdvanceLeftEdgeNGonFAT;
@@ -364,7 +323,6 @@ int rdAFRaster_SetupEdgeNGonFAT(rdEdge* pEdge, rdActiveFace* pFace, int vA, int 
     }
     else
     {
-        // Upward edge -> the span's right edge.
         pEdge->leftOrRightFlag = 0;
         pEdge->yStart = ybI;
         pEdge->numLines = -dy;
@@ -395,7 +353,6 @@ int rdAFRaster_SetupEdgeNGonFAT(rdEdge* pEdge, rdActiveFace* pFace, int vA, int 
     return 1;
 }
 
-// Per-scanline edge step for FAT: advance X, intensity, and the texture (u,v) by their deltas.
 void rdAFRaster_AdvanceLeftEdgeNGonFAT(rdEdge* pEdge)
 {
     pEdge->sortX  += pEdge->dSortX;
@@ -412,226 +369,46 @@ void rdAFRaster_AdvanceRightEdgeNGonFAT(rdEdge* pEdge)
     pEdge->vPersp += pEdge->dvPersp;
 }
 
-// Shared flush for all affine textured families: latch the face's texture + light params into
-// the sampler globals (locking the mip on desktop to expose its texels) and run the given span
-// sampler over the face's span list. (JK.EXE's flush also exports UV coords to a D3D vbuffer as
-// a second pass — a hardware-assist path with no effect in a pure-software present, so omitted.)
-static void rdAFRaster_DrawNGonCommon(rdActiveFace* pFace, void (*pfnSpan)(rdActiveSpan*))
+// Interpolate the per-vertex gouraud intensity (proc vertexIntensities, pre-scaled 0..63 by
+// AddActiveFace) into the edge z slot, which rdActive_EmitSpan reads for lightingMode 3. Shared
+// by the affine (GAT) and perspective (GIT) gouraud edges (both add z on top of their base edge).
+static void rdAFRaster_SetupEdgeGouraudZ(rdEdge* pEdge, rdActiveFace* pFace, int vA, int vB)
 {
-    rdActiveSpan* pSpan = pFace->pFirstSpan;
-    if (pSpan == NULL)
-        return;
+    rdProcEntry* pProc = pFace->pProcEntry;
+    rdVector3* pVerts = pProc->aVertices;
+    const flex_t* pIntensity = pProc->vertexIntensities;
 
-    // Only the general 8bpp samplers are ported; skip if the framebuffer isn't 8bpp paletted.
-    tVBuffer* pVBuffer = rdCamera_g_pCurCamera->pCanvas->pVBuffer;
-    if (pVBuffer->surface_lock_alloc == NULL || pVBuffer->format.format.is16bit)
-        return;
+    int yaI = (int)rdAFRaster_Round(pVerts[vA].y);
+    int ybI = (int)rdAFRaster_Round(pVerts[vB].y);
+    int dy = ybI - yaI;
 
-    // Resolve the texel base. On TWL/DC the mip's surface_lock_alloc is a persistent buffer; on
-    // the desktop GL path the 8bpp pixels live in the SDL surface and are only exposed while the
-    // vbuffer is locked, so lock it here (cheap: a pointer + SDL_LockSurface) and unlock after.
-    const uint8_t* pTexels = (const uint8_t*)pFace->pTexels;
-    int lockedMip = 0;
-    if (pTexels == NULL && pFace->pTexMip != NULL)
+    int vTop;
+    flex_t yTopRound;
+    if (dy > 0)
     {
-        stdDisplay_VBufferLock(pFace->pTexMip);
-        pTexels = (const uint8_t*)pFace->pTexMip->surface_lock_alloc;
-        lockedMip = 1;
+        vTop = vA;
+        yTopRound = rdAFRaster_Round(pVerts[vA].y);
     }
-    if (pTexels == NULL)
-        return;   // texture not resident
-
-    rdAFRaster_curTexels = pTexels;
-    rdAFRaster_curUMask = pFace->uMask;
-    rdAFRaster_curVMask = pFace->vMask;
-    rdAFRaster_curVShift = pFace->vShift;
-    rdAFRaster_curURoundBias = pFace->uRoundBias;
-    rdAFRaster_curVRoundBias = pFace->vRoundBias;
-    rdAFRaster_curLightTable = pFace->pLightTable;   // ignored by the flat (FAT) sampler
-
-    rdActiveSpan* pPoolBegin = rdActive_pSpanPoolBegin();
-    rdActiveSpan* pPoolEnd = rdActive_pSpanPoolEnd();
-
-    do
+    else
     {
-        rdActiveSpan* pNext = pSpan->pNextSpan;
-        if (pNext != NULL && (pNext < pPoolBegin || pNext >= pPoolEnd))
-            pNext = NULL;
-        pfnSpan(pSpan);
-        pSpan = pNext;
-    } while (pSpan != NULL);
+        vTop = vB;
+        yTopRound = rdAFRaster_Round(pVerts[vB].y);
+    }
 
-    if (lockedMip)
-        stdDisplay_VBufferUnlock(pFace->pTexMip);
+    int numLines = (dy > 0) ? dy : -dy;
+    if (numLines < 2)
+    {
+        pEdge->z = (int)rdAFRaster_Round(pIntensity[vTop] * 65536.0f);
+        return;
+    }
+    int vBot = (dy > 0) ? vB : vA;
+    flex_t yFrac = yTopRound - pVerts[vTop].y;
+    flex_t invDy = 1.0f / (pVerts[vBot].y - pVerts[vTop].y);
+    flex_t dzdy = (pIntensity[vBot] - pIntensity[vTop]) * invDy;
+    pEdge->dz = (int)rdAFRaster_Round(dzdy * 65536.0f);
+    pEdge->z  = (int)rdAFRaster_Round((dzdy * yFrac + pIntensity[vTop]) * 65536.0f);
 }
 
-void rdAFRaster_DrawNGonFAT(rdActiveFace* pFace) { rdAFRaster_DrawNGonCommon(pFace, rdAFRaster_DrawSpanNGonFAT_8); }
-void rdAFRaster_DrawNGonLAT(rdActiveFace* pFace) { rdAFRaster_DrawNGonCommon(pFace, rdAFRaster_DrawSpanNGonLAT_8); }
-void rdAFRaster_DrawNGonGAT(rdActiveFace* pFace) { rdAFRaster_DrawNGonCommon(pFace, rdAFRaster_DrawSpanNGonGAT_8); }
-
-// General 8bpp affine texture span sampler (JK.EXE sub_4B5E70, the width-agnostic default).
-// Walks the span left-to-right stepping (u,v) linearly in screen space and copying texels.
-void rdAFRaster_DrawSpanNGonFAT_8(rdActiveSpan* pSpan)
-{
-    tVBuffer* pVBuffer = rdCamera_g_pCurCamera->pCanvas->pVBuffer;
-    uint32_t stride = pVBuffer->format.rowSize;
-
-    // Clip the span to the framebuffer (geometry clipped to the canvas can still land a pixel
-    // or two outside); advance the texture coords across any left-clipped pixels.
-    int fbW = pVBuffer->format.width;
-    int fbH = pVBuffer->format.height;
-    int y = pSpan->y;
-    if (y < 0 || y >= fbH)
-        return;
-
-    int xStart = pSpan->xStart;
-    int count = pSpan->width;
-    int32_t du = pSpan->du;
-    int32_t dv = pSpan->dv;
-    uint32_t uAcc = (uint32_t)pSpan->u + (uint32_t)rdAFRaster_curURoundBias;
-    uint32_t vAcc = (uint32_t)pSpan->v + (uint32_t)rdAFRaster_curVRoundBias;
-
-    if (xStart < 0)
-    {
-        int skip = -xStart;
-        if (skip >= count)
-            return;
-        uAcc += (uint32_t)du * (uint32_t)skip;
-        vAcc += (uint32_t)dv * (uint32_t)skip;
-        xStart = 0;
-        count -= skip;
-    }
-    if (xStart + count > fbW)
-        count = fbW - xStart;
-    if (count <= 0)
-        return;
-
-    const uint8_t* pTexels = rdAFRaster_curTexels;
-    uint32_t uMask = rdAFRaster_curUMask;
-    uint32_t vMask = rdAFRaster_curVMask;
-    int vshiftAmt = 0x10 - rdAFRaster_curVShift;
-    uint8_t* pDst = (uint8_t*)pVBuffer->surface_lock_alloc + xStart + y * stride;
-
-    for (int i = 0; i < count; i++)
-    {
-        uint32_t col = (uAcc & uMask) >> 16;
-        uint32_t row = (vAcc >> vshiftAmt) & vMask;
-        // Word-safe byte write (the vbuffer can live in word-addressable VRAM/extram).
-        stdPlatform_WriteByte16(pDst + i, pTexels[row + col]);
-        uAcc += (uint32_t)du;
-        vAcc += (uint32_t)dv;
-    }
-}
-
-// Lit (LAT) span sampler (JK.EXE sub_4B6500): like FAT, but each texel is remapped through the
-// per-face light row (colormap->lightlevel + lightLevel*256) latched by the flush.
-void rdAFRaster_DrawSpanNGonLAT_8(rdActiveSpan* pSpan)
-{
-    tVBuffer* pVBuffer = rdCamera_g_pCurCamera->pCanvas->pVBuffer;
-    uint32_t stride = pVBuffer->format.rowSize;
-    int fbW = pVBuffer->format.width;
-    int fbH = pVBuffer->format.height;
-    int y = pSpan->y;
-    if (y < 0 || y >= fbH)
-        return;
-
-    int xStart = pSpan->xStart;
-    int count = pSpan->width;
-    int32_t du = pSpan->du;
-    int32_t dv = pSpan->dv;
-    uint32_t uAcc = (uint32_t)pSpan->u + (uint32_t)rdAFRaster_curURoundBias;
-    uint32_t vAcc = (uint32_t)pSpan->v + (uint32_t)rdAFRaster_curVRoundBias;
-
-    if (xStart < 0)
-    {
-        int skip = -xStart;
-        if (skip >= count)
-            return;
-        uAcc += (uint32_t)du * (uint32_t)skip;
-        vAcc += (uint32_t)dv * (uint32_t)skip;
-        xStart = 0;
-        count -= skip;
-    }
-    if (xStart + count > fbW)
-        count = fbW - xStart;
-    if (count <= 0)
-        return;
-
-    const uint8_t* pTexels = rdAFRaster_curTexels;
-    const uint8_t* pLight = rdAFRaster_curLightTable;
-    uint32_t uMask = rdAFRaster_curUMask;
-    uint32_t vMask = rdAFRaster_curVMask;
-    int vshiftAmt = 0x10 - rdAFRaster_curVShift;
-    uint8_t* pDst = (uint8_t*)pVBuffer->surface_lock_alloc + xStart + y * stride;
-
-    for (int i = 0; i < count; i++)
-    {
-        uint32_t col = (uAcc & uMask) >> 16;
-        uint32_t row = (vAcc >> vshiftAmt) & vMask;
-        stdPlatform_WriteByte16(pDst + i, pLight[pTexels[row + col]]);
-        uAcc += (uint32_t)du;
-        vAcc += (uint32_t)dv;
-    }
-}
-
-// Gouraud (GAT) span sampler (JK.EXE sub_4B6BA0): like LAT, but the light-table row is chosen
-// per-pixel from the interpolated intensity (span.z, stepped by span.dz), so each texel maps
-// through lightTable[((z>>16)&0x3f)*256 + texel].
-void rdAFRaster_DrawSpanNGonGAT_8(rdActiveSpan* pSpan)
-{
-    tVBuffer* pVBuffer = rdCamera_g_pCurCamera->pCanvas->pVBuffer;
-    uint32_t stride = pVBuffer->format.rowSize;
-    int fbW = pVBuffer->format.width;
-    int fbH = pVBuffer->format.height;
-    int y = pSpan->y;
-    if (y < 0 || y >= fbH)
-        return;
-
-    int xStart = pSpan->xStart;
-    int count = pSpan->width;
-    int32_t du = pSpan->du;
-    int32_t dv = pSpan->dv;
-    int32_t dz = pSpan->dz;
-    uint32_t uAcc = (uint32_t)pSpan->u + (uint32_t)rdAFRaster_curURoundBias;
-    uint32_t vAcc = (uint32_t)pSpan->v + (uint32_t)rdAFRaster_curVRoundBias;
-    uint32_t zAcc = (uint32_t)pSpan->z;
-
-    if (xStart < 0)
-    {
-        int skip = -xStart;
-        if (skip >= count)
-            return;
-        uAcc += (uint32_t)du * (uint32_t)skip;
-        vAcc += (uint32_t)dv * (uint32_t)skip;
-        zAcc += (uint32_t)dz * (uint32_t)skip;
-        xStart = 0;
-        count -= skip;
-    }
-    if (xStart + count > fbW)
-        count = fbW - xStart;
-    if (count <= 0)
-        return;
-
-    const uint8_t* pTexels = rdAFRaster_curTexels;
-    const uint8_t* pLight = rdAFRaster_curLightTable;
-    uint32_t uMask = rdAFRaster_curUMask;
-    uint32_t vMask = rdAFRaster_curVMask;
-    int vshiftAmt = 0x10 - rdAFRaster_curVShift;
-    uint8_t* pDst = (uint8_t*)pVBuffer->surface_lock_alloc + xStart + y * stride;
-
-    for (int i = 0; i < count; i++)
-    {
-        uint32_t col = (uAcc & uMask) >> 16;
-        uint32_t row = (vAcc >> vshiftAmt) & vMask;
-        uint32_t light = (zAcc & 0x3f0000) >> 8;   // ((z >> 16) & 0x3f) * 256
-        stdPlatform_WriteByte16(pDst + i, pLight[light + pTexels[row + col]]);
-        uAcc += (uint32_t)du;
-        vAcc += (uint32_t)dv;
-        zAcc += (uint32_t)dz;
-    }
-}
-
-// Gouraud edge step (JK.EXE sub_479290): the FAT step plus the interpolated intensity (z).
 void rdAFRaster_AdvanceLeftEdgeNGonGAT(rdEdge* pEdge)
 {
     pEdge->sortX  += pEdge->dSortX;
@@ -650,51 +427,551 @@ void rdAFRaster_AdvanceRightEdgeNGonGAT(rdEdge* pEdge)
     pEdge->z      += pEdge->dz;
 }
 
-// Gouraud edge setup (JK.EXE sub_479310): the FAT edge plus the per-vertex intensity (proc
-// vertexIntensities, pre-scaled to 0..63 by AddActiveFace) interpolated into the edge z slot,
-// which rdActive_EmitSpan reads for lightingMode 3. Delegates the shared x/u/v/i math to the
-// FAT edge setup, then adds z and swaps in the gouraud advance.
 int rdAFRaster_SetupEdgeNGonGAT(rdEdge* pEdge, rdActiveFace* pFace, int vA, int vB)
 {
     if (!rdAFRaster_SetupEdgeNGonFAT(pEdge, pFace, vA, vB))
         return 0;
+    rdAFRaster_SetupEdgeGouraudZ(pEdge, pFace, vA, vB);
+    pEdge->pfnAdvance = (pEdge->leftOrRightFlag != 0)
+                      ? rdAFRaster_AdvanceLeftEdgeNGonGAT
+                      : rdAFRaster_AdvanceRightEdgeNGonGAT;
+    return 1;
+}
 
+// ---------------------------------------------------------------------------------------
+// Perspective (IT) edge family: interpolate x, 1/z (i), u/z (u), v/z (v) down the edge, all as
+// floats (rdActive_EmitSpan's perspective branch reads the u/v/i float slots). Used by all IT
+// variants (FIT/LIT/GIT + masked). GIT additionally interpolates the per-vertex intensity.
+// ---------------------------------------------------------------------------------------
+
+int rdAFRaster_SetupEdgeNGonFIT(rdEdge* pEdge, rdActiveFace* pFace, int vA, int vB)
+{
     rdProcEntry* pProc = pFace->pProcEntry;
     rdVector3* pVerts = pProc->aVertices;
-    const flex_t* pIntensity = pProc->vertexIntensities;
+    rdVector2* pUVs = pProc->aTexVerticies;
 
-    int yaI = (int)rdAFRaster_Round(pVerts[vA].y);
-    int ybI = (int)rdAFRaster_Round(pVerts[vB].y);
+    flex_t yaRound = rdAFRaster_Round(pVerts[vA].y);
+    flex_t ybRound = rdAFRaster_Round(pVerts[vB].y);
+    int yaI = (int)yaRound;
+    int ybI = (int)ybRound;
     int dy = ybI - yaI;
 
-    int vTop, vBot;
-    flex_t yTopRound;
+    pEdge->numLines = dy;
+    if (dy == 0)
+        return 0;
+
+    flex_t ozA = 1.0f / pVerts[vA].z, ozB = 1.0f / pVerts[vB].z;
+    flex_t uozA = pUVs[vA].x * ozA, uozB = pUVs[vB].x * ozB;
+    flex_t vozA = pUVs[vA].y * ozA, vozB = pUVs[vB].y * ozB;
+
     if (dy > 0)
     {
-        vTop = vA; vBot = vB;
-        yTopRound = rdAFRaster_Round(pVerts[vA].y);
-        pEdge->pfnAdvance = rdAFRaster_AdvanceLeftEdgeNGonGAT;
+        pEdge->leftOrRightFlag = 1;
+        pEdge->yStart = yaI;
+        pEdge->pfnAdvance = rdAFRaster_AdvanceLeftEdgeNGonFIT;
+        if (dy < 2)
+        {
+            pEdge->sortX = (int)rdAFRaster_Round(pVerts[vA].x * 65536.0f);
+            pEdge->i = ozA; pEdge->u = uozA; pEdge->v = vozA;
+            return 1;
+        }
+        flex_t yFrac = yaRound - pVerts[vA].y;
+        flex_t invDy = 1.0f / (pVerts[vB].y - pVerts[vA].y);
+        flex_t dxdy = (pVerts[vB].x - pVerts[vA].x) * invDy;
+        pEdge->dSortX = (int)rdAFRaster_Round(dxdy * 65536.0f);
+        pEdge->sortX  = (int)rdAFRaster_Round((dxdy * yFrac + pVerts[vA].x) * 65536.0f);
+        pEdge->di = (ozB  - ozA)  * invDy; pEdge->i = yFrac * pEdge->di + ozA;
+        pEdge->du = (uozB - uozA) * invDy; pEdge->u = yFrac * pEdge->du + uozA;
+        pEdge->dv = (vozB - vozA) * invDy; pEdge->v = yFrac * pEdge->dv + vozA;
     }
     else
     {
-        vTop = vB; vBot = vA;
-        yTopRound = rdAFRaster_Round(pVerts[vB].y);
-        pEdge->pfnAdvance = rdAFRaster_AdvanceRightEdgeNGonGAT;
+        pEdge->leftOrRightFlag = 0;
+        pEdge->yStart = ybI;
+        pEdge->numLines = -dy;
+        pEdge->pfnAdvance = rdAFRaster_AdvanceRightEdgeNGonFIT;
+        if (-dy < 2)
+        {
+            pEdge->sortX = (int)rdAFRaster_Round(pVerts[vB].x * 65536.0f);
+            pEdge->i = ozB; pEdge->u = uozB; pEdge->v = vozB;
+            return 1;
+        }
+        flex_t yFrac = ybRound - pVerts[vB].y;
+        flex_t invDy = 1.0f / (pVerts[vA].y - pVerts[vB].y);
+        flex_t dxdy = (pVerts[vA].x - pVerts[vB].x) * invDy;
+        pEdge->dSortX = (int)rdAFRaster_Round(dxdy * 65536.0f);
+        pEdge->sortX  = (int)rdAFRaster_Round((dxdy * yFrac + pVerts[vB].x) * 65536.0f);
+        pEdge->di = (ozA  - ozB)  * invDy; pEdge->i = yFrac * pEdge->di + ozB;
+        pEdge->du = (uozA - uozB) * invDy; pEdge->u = yFrac * pEdge->du + uozB;
+        pEdge->dv = (vozA - vozB) * invDy; pEdge->v = yFrac * pEdge->dv + vozB;
     }
-
-    int numLines = (dy > 0) ? dy : -dy;
-    if (numLines < 2)
-    {
-        pEdge->z = (int)rdAFRaster_Round(pIntensity[vTop] * 65536.0f);
-        return 1;
-    }
-
-    flex_t yFrac = yTopRound - pVerts[vTop].y;
-    flex_t invDy = 1.0f / (pVerts[vBot].y - pVerts[vTop].y);
-    flex_t dzdy = (pIntensity[vBot] - pIntensity[vTop]) * invDy;
-    pEdge->dz = (int)rdAFRaster_Round(dzdy * 65536.0f);
-    pEdge->z  = (int)rdAFRaster_Round((dzdy * yFrac + pIntensity[vTop]) * 65536.0f);
     return 1;
+}
+
+void rdAFRaster_AdvanceLeftEdgeNGonFIT(rdEdge* pEdge)
+{
+    pEdge->sortX += pEdge->dSortX;
+    pEdge->i     += pEdge->di;
+    pEdge->u     += pEdge->du;
+    pEdge->v     += pEdge->dv;
+}
+
+void rdAFRaster_AdvanceRightEdgeNGonFIT(rdEdge* pEdge)
+{
+    pEdge->sortX += pEdge->dSortX;
+    pEdge->i     += pEdge->di;
+    pEdge->u     += pEdge->du;
+    pEdge->v     += pEdge->dv;
+}
+
+void rdAFRaster_AdvanceLeftEdgeNGonGIT(rdEdge* pEdge)
+{
+    pEdge->sortX += pEdge->dSortX;
+    pEdge->i     += pEdge->di;
+    pEdge->u     += pEdge->du;
+    pEdge->v     += pEdge->dv;
+    pEdge->z     += pEdge->dz;
+}
+
+void rdAFRaster_AdvanceRightEdgeNGonGIT(rdEdge* pEdge)
+{
+    pEdge->sortX += pEdge->dSortX;
+    pEdge->i     += pEdge->di;
+    pEdge->u     += pEdge->du;
+    pEdge->v     += pEdge->dv;
+    pEdge->z     += pEdge->dz;
+}
+
+int rdAFRaster_SetupEdgeNGonGIT(rdEdge* pEdge, rdActiveFace* pFace, int vA, int vB)
+{
+    if (!rdAFRaster_SetupEdgeNGonFIT(pEdge, pFace, vA, vB))
+        return 0;
+    rdAFRaster_SetupEdgeGouraudZ(pEdge, pFace, vA, vB);
+    pEdge->pfnAdvance = (pEdge->leftOrRightFlag != 0)
+                      ? rdAFRaster_AdvanceLeftEdgeNGonGIT
+                      : rdAFRaster_AdvanceRightEdgeNGonGIT;
+    return 1;
+}
+
+// ---------------------------------------------------------------------------------------
+// Solid (S) family: flat-color fill, no texture. FS/LS use the wireframe edge (x + 1/z only);
+// GS adds the per-vertex gouraud intensity. The flush fills each span (not just the endpoints).
+// ---------------------------------------------------------------------------------------
+
+void rdAFRaster_AdvanceLeftEdgeNGonGS(rdEdge* pEdge)
+{
+    pEdge->sortX += pEdge->dSortX;
+    pEdge->i     += pEdge->di;
+    pEdge->z     += pEdge->dz;
+}
+
+void rdAFRaster_AdvanceRightEdgeNGonGS(rdEdge* pEdge)
+{
+    pEdge->sortX += pEdge->dSortX;
+    pEdge->i     += pEdge->di;
+    pEdge->z     += pEdge->dz;
+}
+
+int rdAFRaster_SetupEdgeNGonGS(rdEdge* pEdge, rdActiveFace* pFace, int vA, int vB)
+{
+    if (!rdAFRaster_SetupEdgeNGonLW(pEdge, pFace, vA, vB))
+        return 0;
+    rdAFRaster_SetupEdgeGouraudZ(pEdge, pFace, vA, vB);
+    pEdge->pfnAdvance = (pEdge->leftOrRightFlag != 0)
+                      ? rdAFRaster_AdvanceLeftEdgeNGonGS
+                      : rdAFRaster_AdvanceRightEdgeNGonGS;
+    return 1;
+}
+
+// ---------------------------------------------------------------------------------------
+// Shared textured flush: latch the face's texture/light params into the sampler globals (locking
+// the mip on desktop to expose its texels), then run the given span sampler over the face's span
+// list. (JK's flush also exports UVs to a D3D vbuffer / writes a HW depth buffer as a second pass;
+// both are hardware-assist with no effect in a pure-software present, so omitted.)
+// ---------------------------------------------------------------------------------------
+
+static void rdAFRaster_DrawNGonCommon(rdActiveFace* pFace, void (*pfnSpan)(rdActiveSpan*))
+{
+    rdActiveSpan* pSpan = pFace->pFirstSpan;
+    if (pSpan == NULL)
+        return;
+
+    tVBuffer* pVBuffer = rdCamera_g_pCurCamera->pCanvas->pVBuffer;
+    if (pVBuffer->surface_lock_alloc == NULL || pVBuffer->format.format.is16bit)
+        return;
+
+    const uint8_t* pTexels = (const uint8_t*)pFace->pTexels;
+    int lockedMip = 0;
+    if (pTexels == NULL && pFace->pTexMip != NULL)
+    {
+        stdDisplay_VBufferLock(pFace->pTexMip);
+        pTexels = (const uint8_t*)pFace->pTexMip->surface_lock_alloc;
+        lockedMip = 1;
+    }
+    if (pTexels == NULL)
+        return;
+
+    rdAFRaster_curTexels = pTexels;
+    rdAFRaster_curUMask = pFace->uMask;
+    rdAFRaster_curVMask = pFace->vMask;
+    rdAFRaster_curVShift = pFace->vShift;
+    rdAFRaster_curMip = pFace->shift;
+    rdAFRaster_curURoundBias = pFace->uRoundBias;
+    rdAFRaster_curVRoundBias = pFace->vRoundBias;
+    rdAFRaster_curLightTable = pFace->pLightTable;
+
+    rdActiveSpan* pPoolBegin = rdActive_pSpanPoolBegin();
+    rdActiveSpan* pPoolEnd = rdActive_pSpanPoolEnd();
+
+    do
+    {
+        rdActiveSpan* pNext = pSpan->pNextSpan;
+        if (pNext != NULL && (pNext < pPoolBegin || pNext >= pPoolEnd))
+            pNext = NULL;
+        pfnSpan(pSpan);
+        pSpan = pNext;
+    } while (pSpan != NULL);
+
+    if (lockedMip)
+        stdDisplay_VBufferUnlock(pFace->pTexMip);
+}
+
+// --- Textured span samplers: one per Grim DrawSpanNGon<V>_8 symbol, emitted from the ONE
+// template rdAFRaster_span.h (machine-generated by gen_rda_variants.py). ---
+
+#define RDA_NAME rdAFRaster_DrawSpanNGonFAT_8
+#define RDA_PERSP 0
+#define RDA_MASKED 0
+#define RDA_SHADE RDA_FLAT
+#include "rdAFRaster_span.h"
+
+#define RDA_NAME rdAFRaster_DrawSpanNGonLAT_8
+#define RDA_PERSP 0
+#define RDA_MASKED 0
+#define RDA_SHADE RDA_LIT
+#include "rdAFRaster_span.h"
+
+#define RDA_NAME rdAFRaster_DrawSpanNGonGAT_8
+#define RDA_PERSP 0
+#define RDA_MASKED 0
+#define RDA_SHADE RDA_GOURAUD
+#include "rdAFRaster_span.h"
+
+#define RDA_NAME rdAFRaster_DrawSpanNGonMFAT_8
+#define RDA_PERSP 0
+#define RDA_MASKED 1
+#define RDA_SHADE RDA_FLAT
+#include "rdAFRaster_span.h"
+
+#define RDA_NAME rdAFRaster_DrawSpanNGonMLAT_8
+#define RDA_PERSP 0
+#define RDA_MASKED 1
+#define RDA_SHADE RDA_LIT
+#include "rdAFRaster_span.h"
+
+#define RDA_NAME rdAFRaster_DrawSpanNGonMGAT_8
+#define RDA_PERSP 0
+#define RDA_MASKED 1
+#define RDA_SHADE RDA_GOURAUD
+#include "rdAFRaster_span.h"
+
+#define RDA_NAME rdAFRaster_DrawSpanNGonFIT_8
+#define RDA_PERSP 1
+#define RDA_MASKED 0
+#define RDA_SHADE RDA_FLAT
+#include "rdAFRaster_span.h"
+
+#define RDA_NAME rdAFRaster_DrawSpanNGonLIT_8
+#define RDA_PERSP 1
+#define RDA_MASKED 0
+#define RDA_SHADE RDA_LIT
+#include "rdAFRaster_span.h"
+
+#define RDA_NAME rdAFRaster_DrawSpanNGonGIT_8
+#define RDA_PERSP 1
+#define RDA_MASKED 0
+#define RDA_SHADE RDA_GOURAUD
+#include "rdAFRaster_span.h"
+
+#define RDA_NAME rdAFRaster_DrawSpanNGonMFIT_8
+#define RDA_PERSP 1
+#define RDA_MASKED 1
+#define RDA_SHADE RDA_FLAT
+#include "rdAFRaster_span.h"
+
+#define RDA_NAME rdAFRaster_DrawSpanNGonMLIT_8
+#define RDA_PERSP 1
+#define RDA_MASKED 1
+#define RDA_SHADE RDA_LIT
+#include "rdAFRaster_span.h"
+
+#define RDA_NAME rdAFRaster_DrawSpanNGonMGIT_8
+#define RDA_PERSP 1
+#define RDA_MASKED 1
+#define RDA_SHADE RDA_GOURAUD
+#include "rdAFRaster_span.h"
+
+// --- Textured DrawNGon<V> flushers: latch the face's tex/light params + run the sampler
+// over its span list (all share rdAFRaster_DrawNGonCommon). ---
+static void rdAFRaster_DrawNGonFAT(rdActiveFace* pFace) { rdAFRaster_DrawNGonCommon(pFace, rdAFRaster_DrawSpanNGonFAT_8); }
+static void rdAFRaster_DrawNGonLAT(rdActiveFace* pFace) { rdAFRaster_DrawNGonCommon(pFace, rdAFRaster_DrawSpanNGonLAT_8); }
+static void rdAFRaster_DrawNGonGAT(rdActiveFace* pFace) { rdAFRaster_DrawNGonCommon(pFace, rdAFRaster_DrawSpanNGonGAT_8); }
+static void rdAFRaster_DrawNGonMFAT(rdActiveFace* pFace) { rdAFRaster_DrawNGonCommon(pFace, rdAFRaster_DrawSpanNGonMFAT_8); }
+static void rdAFRaster_DrawNGonMLAT(rdActiveFace* pFace) { rdAFRaster_DrawNGonCommon(pFace, rdAFRaster_DrawSpanNGonMLAT_8); }
+static void rdAFRaster_DrawNGonMGAT(rdActiveFace* pFace) { rdAFRaster_DrawNGonCommon(pFace, rdAFRaster_DrawSpanNGonMGAT_8); }
+static void rdAFRaster_DrawNGonFIT(rdActiveFace* pFace) { rdAFRaster_DrawNGonCommon(pFace, rdAFRaster_DrawSpanNGonFIT_8); }
+static void rdAFRaster_DrawNGonLIT(rdActiveFace* pFace) { rdAFRaster_DrawNGonCommon(pFace, rdAFRaster_DrawSpanNGonLIT_8); }
+static void rdAFRaster_DrawNGonGIT(rdActiveFace* pFace) { rdAFRaster_DrawNGonCommon(pFace, rdAFRaster_DrawSpanNGonGIT_8); }
+static void rdAFRaster_DrawNGonMFIT(rdActiveFace* pFace) { rdAFRaster_DrawNGonCommon(pFace, rdAFRaster_DrawSpanNGonMFIT_8); }
+static void rdAFRaster_DrawNGonMLIT(rdActiveFace* pFace) { rdAFRaster_DrawNGonCommon(pFace, rdAFRaster_DrawSpanNGonMLIT_8); }
+static void rdAFRaster_DrawNGonMGIT(rdActiveFace* pFace) { rdAFRaster_DrawNGonCommon(pFace, rdAFRaster_DrawSpanNGonMGIT_8); }
+
+// ---------------------------------------------------------------------------------------
+// Solid (S) flushers: fill every pixel of each span (unlike the LW wireframe endpoints).
+// ---------------------------------------------------------------------------------------
+
+// Constant-color fill (FS flat / LS lit — the light level is baked into pFace->color at setup).
+static void rdAFRaster_DrawNGonSolidFlatCommon(rdActiveFace* pFace)
+{
+    rdActiveSpan* pSpan = pFace->pFirstSpan;
+    if (pSpan == NULL)
+        return;
+    tVBuffer* pVBuffer = rdCamera_g_pCurCamera->pCanvas->pVBuffer;
+    uint8_t* pBase = (uint8_t*)pVBuffer->surface_lock_alloc;
+    if (pBase == NULL)
+        return;
+    uint32_t stride = pVBuffer->format.rowSize;
+    int fbW = pVBuffer->format.width;
+    int fbH = pVBuffer->format.height;
+    uint8_t color = (uint8_t)pFace->color;
+    rdActiveSpan* pPoolBegin = rdActive_pSpanPoolBegin();
+    rdActiveSpan* pPoolEnd = rdActive_pSpanPoolEnd();
+
+    do
+    {
+        rdActiveSpan* pNext = pSpan->pNextSpan;
+        if (pNext != NULL && (pNext < pPoolBegin || pNext >= pPoolEnd))
+            pNext = NULL;
+        int y = pSpan->y;
+        if (y >= 0 && y < fbH)
+        {
+            int xStart = pSpan->xStart;
+            int count = pSpan->width;
+            if (xStart < 0) { count += xStart; xStart = 0; }
+            if (xStart + count > fbW) count = fbW - xStart;
+            uint8_t* pRow = pBase + y * stride + xStart;
+            for (int i = 0; i < count; i++)
+                stdPlatform_WriteByte16(pRow + i, color);
+        }
+        pSpan = pNext;
+    } while (pSpan != NULL);
+}
+
+static void rdAFRaster_DrawNGonFS(rdActiveFace* pFace) { rdAFRaster_DrawNGonSolidFlatCommon(pFace); }
+static void rdAFRaster_DrawNGonLS(rdActiveFace* pFace) { rdAFRaster_DrawNGonSolidFlatCommon(pFace); }
+
+// Gouraud solid: the fill color is the raw solid index mapped per-pixel through the light table by
+// the interpolated intensity (span.z / dz), mirroring the GAT/GS sampler shading.
+static void rdAFRaster_DrawNGonGS(rdActiveFace* pFace)
+{
+    rdActiveSpan* pSpan = pFace->pFirstSpan;
+    if (pSpan == NULL)
+        return;
+    tVBuffer* pVBuffer = rdCamera_g_pCurCamera->pCanvas->pVBuffer;
+    uint8_t* pBase = (uint8_t*)pVBuffer->surface_lock_alloc;
+    if (pBase == NULL)
+        return;
+    uint32_t stride = pVBuffer->format.rowSize;
+    int fbW = pVBuffer->format.width;
+    int fbH = pVBuffer->format.height;
+    uint8_t color = (uint8_t)pFace->color;
+    const uint8_t* pLight = pFace->pLightTable;
+    if (pLight == NULL)
+    {
+        rdAFRaster_DrawNGonSolidFlatCommon(pFace);
+        return;
+    }
+    rdActiveSpan* pPoolBegin = rdActive_pSpanPoolBegin();
+    rdActiveSpan* pPoolEnd = rdActive_pSpanPoolEnd();
+
+    do
+    {
+        rdActiveSpan* pNext = pSpan->pNextSpan;
+        if (pNext != NULL && (pNext < pPoolBegin || pNext >= pPoolEnd))
+            pNext = NULL;
+        int y = pSpan->y;
+        if (y >= 0 && y < fbH)
+        {
+            int xStart = pSpan->xStart;
+            int count = pSpan->width;
+            int32_t dz = pSpan->dz;
+            uint32_t zAcc = (uint32_t)pSpan->z;
+            if (xStart < 0)
+            {
+                zAcc += (uint32_t)dz * (uint32_t)(-xStart);
+                count += xStart;
+                xStart = 0;
+            }
+            if (xStart + count > fbW) count = fbW - xStart;
+            uint8_t* pRow = pBase + y * stride + xStart;
+            for (int i = 0; i < count; i++)
+            {
+                uint32_t light = (zAcc & 0x3f0000) >> 8;
+                stdPlatform_WriteByte16(pRow + i, pLight[light + color]);
+                zAcc += (uint32_t)dz;
+            }
+        }
+        pSpan = pNext;
+    } while (pSpan != NULL);
+}
+
+// ---------------------------------------------------------------------------------------
+// Face setups: pick the mip/texels + light params + install the family's draw + edge callbacks.
+// One per Grim SetupNGon<V>. Called by rdActive_AddActiveFace's per-mode dispatch.
+// ---------------------------------------------------------------------------------------
+
+// Wireframe.
+void rdAFRaster_SetupNGonLW_0(rdActiveFace* pFace, rdTexinfo* pTexinfo)
+{
+    rdProcEntry* pProc = pFace->pProcEntry;
+    rdVector3* pVerts = pProc->aVertices;
+    flex_t* pRcpZ = (flex_t*)pFace->reserved_004;
+    for (int i = 0; i < (int)pProc->numVertices; i++)
+        pRcpZ[i] = (flex_t)1.0 / pVerts[i].z;
+
+    pFace->pfnDrawSpan = rdAFRaster_DrawNGonLW;
+    pFace->pfnSetupEdge = rdAFRaster_SetupEdgeNGonLW;
+    pFace->color = pTexinfo->header.solidColor;
+}
+
+// Affine textured (AT).
+void rdAFRaster_SetupNGonFAT(rdActiveFace* pFace, rdTexinfo* pTexinfo)
+{
+    rdAFRaster_SetupTexParams(pFace, pTexinfo, 0);
+    pFace->pfnDrawSpan = rdAFRaster_DrawNGonFAT;
+    pFace->pfnSetupEdge = rdAFRaster_SetupEdgeNGonFAT;
+}
+
+void rdAFRaster_SetupNGonLAT(rdActiveFace* pFace, rdTexinfo* pTexinfo, int lightLevel)
+{
+    rdAFRaster_SetupTexParams(pFace, pTexinfo, 0);
+    pFace->pfnDrawSpan = rdAFRaster_DrawNGonLAT;
+    pFace->pfnSetupEdge = rdAFRaster_SetupEdgeNGonFAT;
+    pFace->pLightTable = pFace->pProcEntry->colormap->lightlevel + lightLevel * 256;
+}
+
+void rdAFRaster_SetupNGonGAT(rdActiveFace* pFace, rdTexinfo* pTexinfo)
+{
+    rdAFRaster_SetupTexParams(pFace, pTexinfo, 0);
+    pFace->pfnDrawSpan = rdAFRaster_DrawNGonGAT;
+    pFace->pfnSetupEdge = rdAFRaster_SetupEdgeNGonGAT;
+    pFace->pLightTable = pFace->pProcEntry->colormap->lightlevel;
+}
+
+void rdAFRaster_SetupNGonMFAT(rdActiveFace* pFace, rdTexinfo* pTexinfo)
+{
+    rdAFRaster_SetupTexParams(pFace, pTexinfo, 0);
+    pFace->pfnDrawSpan = rdAFRaster_DrawNGonMFAT;
+    pFace->pfnSetupEdge = rdAFRaster_SetupEdgeNGonFAT;
+}
+
+void rdAFRaster_SetupNGonMLAT(rdActiveFace* pFace, rdTexinfo* pTexinfo, int lightLevel)
+{
+    rdAFRaster_SetupTexParams(pFace, pTexinfo, 0);
+    pFace->pfnDrawSpan = rdAFRaster_DrawNGonMLAT;
+    pFace->pfnSetupEdge = rdAFRaster_SetupEdgeNGonFAT;
+    pFace->pLightTable = pFace->pProcEntry->colormap->lightlevel + lightLevel * 256;
+}
+
+void rdAFRaster_SetupNGonMGAT(rdActiveFace* pFace, rdTexinfo* pTexinfo)
+{
+    rdAFRaster_SetupTexParams(pFace, pTexinfo, 0);
+    pFace->pfnDrawSpan = rdAFRaster_DrawNGonMGAT;
+    pFace->pfnSetupEdge = rdAFRaster_SetupEdgeNGonGAT;
+    pFace->pLightTable = pFace->pProcEntry->colormap->lightlevel;
+}
+
+// Perspective textured (IT).
+void rdAFRaster_SetupNGonFIT(rdActiveFace* pFace, rdTexinfo* pTexinfo)
+{
+    rdAFRaster_SetupTexParams(pFace, pTexinfo, 1);
+    pFace->pfnDrawSpan = rdAFRaster_DrawNGonFIT;
+    pFace->pfnSetupEdge = rdAFRaster_SetupEdgeNGonFIT;
+}
+
+void rdAFRaster_SetupNGonLIT(rdActiveFace* pFace, rdTexinfo* pTexinfo, int lightLevel)
+{
+    rdAFRaster_SetupTexParams(pFace, pTexinfo, 1);
+    pFace->pfnDrawSpan = rdAFRaster_DrawNGonLIT;
+    pFace->pfnSetupEdge = rdAFRaster_SetupEdgeNGonFIT;
+    pFace->pLightTable = pFace->pProcEntry->colormap->lightlevel + lightLevel * 256;
+}
+
+void rdAFRaster_SetupNGonGIT(rdActiveFace* pFace, rdTexinfo* pTexinfo)
+{
+    rdAFRaster_SetupTexParams(pFace, pTexinfo, 1);
+    pFace->pfnDrawSpan = rdAFRaster_DrawNGonGIT;
+    pFace->pfnSetupEdge = rdAFRaster_SetupEdgeNGonGIT;
+    pFace->pLightTable = pFace->pProcEntry->colormap->lightlevel;
+}
+
+void rdAFRaster_SetupNGonMFIT(rdActiveFace* pFace, rdTexinfo* pTexinfo)
+{
+    rdAFRaster_SetupTexParams(pFace, pTexinfo, 1);
+    pFace->pfnDrawSpan = rdAFRaster_DrawNGonMFIT;
+    pFace->pfnSetupEdge = rdAFRaster_SetupEdgeNGonFIT;
+}
+
+void rdAFRaster_SetupNGonMLIT(rdActiveFace* pFace, rdTexinfo* pTexinfo, int lightLevel)
+{
+    rdAFRaster_SetupTexParams(pFace, pTexinfo, 1);
+    pFace->pfnDrawSpan = rdAFRaster_DrawNGonMLIT;
+    pFace->pfnSetupEdge = rdAFRaster_SetupEdgeNGonFIT;
+    pFace->pLightTable = pFace->pProcEntry->colormap->lightlevel + lightLevel * 256;
+}
+
+void rdAFRaster_SetupNGonMGIT(rdActiveFace* pFace, rdTexinfo* pTexinfo)
+{
+    rdAFRaster_SetupTexParams(pFace, pTexinfo, 1);
+    pFace->pfnDrawSpan = rdAFRaster_DrawNGonMGIT;
+    pFace->pfnSetupEdge = rdAFRaster_SetupEdgeNGonGIT;
+    pFace->pLightTable = pFace->pProcEntry->colormap->lightlevel;
+}
+
+// Solid (S) — per-vertex 1/z into scratch (for the wireframe-style edge), install the fill flush.
+static void rdAFRaster_SetupSolidRcpZ(rdActiveFace* pFace)
+{
+    rdProcEntry* pProc = pFace->pProcEntry;
+    flex_t* pRcpZ = (flex_t*)pFace->reserved_004;
+    for (int i = 0; i < (int)pProc->numVertices; i++)
+        pRcpZ[i] = (flex_t)1.0 / pProc->aVertices[i].z;
+}
+
+void rdAFRaster_SetupNGonFS(rdActiveFace* pFace, rdTexinfo* pTexinfo)
+{
+    rdAFRaster_SetupSolidRcpZ(pFace);
+    pFace->pfnDrawSpan = rdAFRaster_DrawNGonFS;
+    pFace->pfnSetupEdge = rdAFRaster_SetupEdgeNGonLW;
+    pFace->color = pTexinfo->header.solidColor & 0xFF;   // flat: no darkening
+}
+
+void rdAFRaster_SetupNGonLS(rdActiveFace* pFace, rdTexinfo* pTexinfo, int lightLevel)
+{
+    rdAFRaster_SetupSolidRcpZ(pFace);
+    pFace->pfnDrawSpan = rdAFRaster_DrawNGonLS;
+    pFace->pfnSetupEdge = rdAFRaster_SetupEdgeNGonLW;
+    // Lit: bake the constant light level into the solid color through the light table.
+    const uint8_t* pLight = pFace->pProcEntry->colormap->lightlevel;
+    pFace->color = pLight[lightLevel * 256 + (pTexinfo->header.solidColor & 0xFF)];
+}
+
+void rdAFRaster_SetupNGonGS(rdActiveFace* pFace, rdTexinfo* pTexinfo)
+{
+    rdAFRaster_SetupSolidRcpZ(pFace);
+    pFace->pfnDrawSpan = rdAFRaster_DrawNGonGS;
+    pFace->pfnSetupEdge = rdAFRaster_SetupEdgeNGonGS;
+    pFace->color = pTexinfo->header.solidColor & 0xFF;   // raw index; light applied per pixel
+    pFace->pLightTable = pFace->pProcEntry->colormap->lightlevel;
 }
 
 #endif // RDRASTER_SOFTWARE_RENDERER

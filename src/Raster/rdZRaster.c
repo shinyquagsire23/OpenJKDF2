@@ -81,6 +81,20 @@ static flex_t rdZRaster_Clamp01(flex_t f)
     return f;
 }
 
+// Resolve the 256x256 palette transparency LUT for a translucent face. A colormap only allocates
+// its `transparency` table when it declares a transparency section (flags & 1); without the flag
+// the pointer is uninitialized garbage, so a plain non-NULL test is unsafe. Prefer the face's own
+// colormap, then the identity map; return NULL (opaque) if neither has a valid table.
+static const uint8_t* rdZRaster_ResolveTransTable(rdColormap* pColormap)
+{
+    if (pColormap != NULL && (pColormap->flags & 1) && pColormap->transparency != NULL)
+        return (const uint8_t*)pColormap->transparency;
+    if (rdColormap_pIdentityMap != NULL && (rdColormap_pIdentityMap->flags & 1)
+        && rdColormap_pIdentityMap->transparency != NULL)
+        return (const uint8_t*)rdColormap_pIdentityMap->transparency;
+    return NULL;
+}
+
 // State shared by every generated DrawNGon variant. The mode axes (solid / masked / translucent)
 // are NOT here — they are compile-time, baked into each variant by rdZRaster_ngon.h.
 typedef struct rdZRasterState
@@ -500,11 +514,15 @@ void rdZRaster_DrawFace(rdProcEntry* pProcEntry)
     if (pProcEntry->colormap != NULL && pProcEntry->colormap->lightlevel != NULL)
         pLightBase = pProcEntry->colormap->lightlevel;
 
-    // Translucent faces (type & 2) blend the lit source over the destination through the identity
-    // colormap's 256x256 transparency LUT (matches JK's TGAT/translucent scanlines).
+    // Translucent faces (type & 2) blend the lit source over the destination through a 256x256
+    // palette transparency LUT (matches JK's TGAT/translucent scanlines). Only a colormap with a
+    // transparency section (flags & 1) allocates the table — the `transparency` pointer is
+    // UNINITIALIZED otherwise, so gate on the flag, not just non-NULL (a NULL check alone crashed
+    // on translucent faces whose colormap has no table). Prefer the proc's own colormap; fall back
+    // to the identity map.
     const uint8_t* pTransTable = NULL;
-    if ((pProcEntry->type & 2) && rdColormap_pIdentityMap != NULL)
-        pTransTable = (const uint8_t*)rdColormap_pIdentityMap->transparency;
+    if (pProcEntry->type & 2)
+        pTransTable = rdZRaster_ResolveTransTable(pProcEntry->colormap);
 
     // Per-vertex light level (0..63), by shading mode (mirrors rdCache_DrawFaceZ).
     flex_t ambient = (rdroid_g_curRenderOptions & 2) ? pProcEntry->ambientLight : 0.0f;

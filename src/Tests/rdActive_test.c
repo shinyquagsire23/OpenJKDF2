@@ -300,6 +300,173 @@ int main(int argc, char** argv)
         }
     }
     printf("\nOK: LAT and GAT drew light-modulated texture-mapped triangles.\n");
+
+    // ============================================================================
+    // Perspective (FIT) vs affine (FAT): a depth-varying triangle textured both
+    // ways. The affine active-edge path is textureMode 0 (FAT); textureMode 1 is
+    // the perspective (IT) family (per-pixel 1/z divide). With per-vertex depth
+    // variation they MUST differ, proving the perspective span pipeline runs.
+    // ============================================================================
+    printf("\n--- FIT (perspective) vs FAT (affine) test ---\n");
+
+    rdVector3 pverts[3];
+    pverts[0].x = 10.0f; pverts[0].y = 6.0f;  pverts[0].z = 4.0f;    // apex, near
+    pverts[1].x = 24.0f; pverts[1].y = 42.0f; pverts[1].z = 24.0f;   // bottom-left, far
+    pverts[2].x = 56.0f; pverts[2].y = 22.0f; pverts[2].z = 8.0f;    // right, mid
+
+    pProc = &rdCache_aProcFaces[0];
+    memset(pProc, 0, sizeof(*pProc));
+    pProc->geometryMode = RD_GEOMETRY_FULL;
+    pProc->lightingMode = RD_LIGHTMODE_FULLYLIT;
+    pProc->numVertices = 3;
+    pProc->aVertices = pverts;
+    pProc->aTexVerticies = uvs;
+    pProc->material = &matFAT;
+    pProc->wallCel = 0;
+    pProc->z_min = 5.0f;
+    rdCache_numProcFaces = 1;
+
+    rdroid_curTextureMode = 1;   // allow perspective
+
+    uint8_t fbAffine[FB_W * FB_H];
+    pProc->textureMode = 0;      // affine (FAT)
+    memset(g_framebuffer, 0, sizeof(g_framebuffer));
+    rdActive_AdvanceFrame();
+    rdActive_DrawScene();
+    memcpy(fbAffine, g_framebuffer, sizeof(fbAffine));
+    int fillAff = 0, cAff20 = 0, cAff40 = 0;
+    for (int i = 0; i < FB_W * FB_H; i++)
+    {
+        if (g_framebuffer[i]) fillAff++;
+        if (g_framebuffer[i] == 0x20) cAff20++;
+        if (g_framebuffer[i] == 0x40) cAff40++;
+    }
+    printf("FAT (affine):      fill=%d (0x20:%d 0x40:%d)\n", fillAff, cAff20, cAff40);
+
+    pProc->textureMode = 1;      // perspective (FIT)
+    memset(g_framebuffer, 0, sizeof(g_framebuffer));
+    rdActive_AdvanceFrame();
+    rdActive_DrawScene();
+    int fillPer = 0, cPer20 = 0, cPer40 = 0, diff = 0;
+    for (int i = 0; i < FB_W * FB_H; i++)
+    {
+        if (g_framebuffer[i]) fillPer++;
+        if (g_framebuffer[i] == 0x20) cPer20++;
+        if (g_framebuffer[i] == 0x40) cPer40++;
+        if (g_framebuffer[i] != fbAffine[i]) diff++;
+    }
+    printf("FIT (perspective): fill=%d (0x20:%d 0x40:%d), diff vs affine=%d\n",
+           fillPer, cPer20, cPer40, diff);
+    for (int y = 0; y < FB_H; y++)
+    {
+        for (int x = 0; x < FB_W; x++)
+        {
+            uint8_t p = g_framebuffer[y * FB_W + x];
+            putchar(p == 0x20 ? '+' : p == 0x40 ? '#' : '.');
+        }
+        putchar('\n');
+    }
+    if (fillPer < 200 || cPer20 < 20 || cPer40 < 20 || diff < 10)
+    {
+        printf("\nFAIL: FIT did not fill with both colors OR did not differ from affine.\n");
+        return 1;
+    }
+    printf("\nOK: FIT (perspective) filled and differs from FAT (affine).\n");
+
+    // ============================================================================
+    // Solid (FS): a texinfo without the "full" texture flag falls back to a flat
+    // solid-color fill. Expect the whole triangle painted with one color.
+    // ============================================================================
+    printf("\n--- FS (solid) test ---\n");
+    rdTexinfo texinfoSolid;
+    memset(&texinfoSolid, 0, sizeof(texinfoSolid));
+    texinfoSolid.header.texture_type = 0;    // not "full" -> solid fallback
+    texinfoSolid.header.solidColor = 0x55;
+    texinfoSolid.texture_ptr = NULL;
+    rdMaterial matSolid;
+    memset(&matSolid, 0, sizeof(matSolid));
+    matSolid.num_texinfo = 1;
+    matSolid.curCelNum = 0;
+    matSolid.texinfos[0] = &texinfoSolid;
+
+    pProc->geometryMode = RD_GEOMETRY_FULL;   // reclassified to SOLID by AddActiveFace
+    pProc->lightingMode = RD_LIGHTMODE_FULLYLIT;
+    pProc->textureMode = 0;
+    pProc->aVertices = verts;                 // flat-depth triangle
+    pProc->aTexVerticies = NULL;
+    pProc->material = &matSolid;
+    memset(g_framebuffer, 0, sizeof(g_framebuffer));
+    rdActive_AdvanceFrame();
+    rdActive_DrawScene();
+    int fillSolid = 0, c55 = 0;
+    for (int i = 0; i < FB_W * FB_H; i++)
+    {
+        if (g_framebuffer[i]) fillSolid++;
+        if (g_framebuffer[i] == 0x55) c55++;
+    }
+    printf("FS: fill=%d (0x55:%d)\n", fillSolid, c55);
+    if (fillSolid < 200 || c55 != fillSolid)
+    {
+        printf("\nFAIL: FS did not paint a flat solid triangle.\n");
+        return 1;
+    }
+    printf("\nOK: FS drew a flat solid triangle.\n");
+
+    // ============================================================================
+    // Masked (MFAT): a transparent texture (alpha_en&1) whose index-0 texels are
+    // skipped. Half the checker is index 0, so the fill count must drop well below
+    // the opaque FAT triangle while the opaque color still appears.
+    // ============================================================================
+    printf("\n--- MFAT (masked) test ---\n");
+    static uint8_t mtexels[TEX_W * TEX_H];
+    for (int ty = 0; ty < TEX_H; ty++)
+        for (int tx = 0; tx < TEX_W; tx++)
+            mtexels[ty * TEX_W + tx] = ((tx ^ ty) & 1) ? 0x00 : 0x40;   // half transparent
+    tVBuffer mmip;
+    memset(&mmip, 0, sizeof(mmip));
+    mmip.surface_lock_alloc = mtexels;
+    mmip.format.width = TEX_W; mmip.format.height = TEX_H;
+    mmip.format.rowSize = TEX_W; mmip.format.rowWidth = TEX_W;
+    rdTexture mtexture;
+    memset(&mtexture, 0, sizeof(mtexture));
+    mtexture.alpha_en = 1;                    // transparent -> masked path
+    mtexture.width_bitcnt = 3;
+    mtexture.width_minus_1 = TEX_W - 1;
+    mtexture.height_minus_1 = TEX_H - 1;
+    mtexture.num_mipmaps = 1;
+    mtexture.texture_struct[0] = &mmip;
+    rdTexinfo texinfoM;
+    memset(&texinfoM, 0, sizeof(texinfoM));
+    texinfoM.header.texture_type = 8;
+    texinfoM.texture_ptr = &mtexture;
+    rdMaterial matM;
+    memset(&matM, 0, sizeof(matM));
+    matM.num_texinfo = 1; matM.curCelNum = 0; matM.texinfos[0] = &texinfoM;
+
+    pProc->geometryMode = RD_GEOMETRY_FULL;
+    pProc->lightingMode = RD_LIGHTMODE_FULLYLIT;
+    pProc->textureMode = 0;
+    pProc->aVertices = verts;
+    pProc->aTexVerticies = uvs;
+    pProc->material = &matM;
+    memset(g_framebuffer, 0, sizeof(g_framebuffer));
+    rdActive_AdvanceFrame();
+    rdActive_DrawScene();
+    int fillM = 0, cM40 = 0, cM00nonzero = 0;
+    for (int i = 0; i < FB_W * FB_H; i++)
+    {
+        if (g_framebuffer[i]) fillM++;
+        if (g_framebuffer[i] == 0x40) cM40++;
+    }
+    printf("MFAT: fill=%d (0x40:%d) — expect ~half of the opaque 714\n", fillM, cM40);
+    if (fillM < 100 || fillM > 600 || cM40 < 100)
+    {
+        printf("\nFAIL: MFAT did not skip the transparent texels (masked fill wrong).\n");
+        return 1;
+    }
+    printf("\nOK: MFAT skipped transparent texels (masked).\n");
+
+    printf("\nAll rdActive/rdAFRaster family tests passed.\n");
     return 0;
 }
 

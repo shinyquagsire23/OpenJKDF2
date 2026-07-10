@@ -190,7 +190,7 @@ static void rdActive_EmitSpan(rdActiveFace* pFront, int xEnd)
 
     if (pProc->geometryMode == 4)   // textured
     {
-        if (pProc->textureMode == 0)   // perspective-correct
+        if (pProc->textureMode == 0)   // affine (AT): linear 16.16 u/v across the span
         {
             int oneOverN = rdRaster_aOneOverNFixed[edgePixels];
             int duPersp = (int)(((int64_t)(pRight->uPersp - pLeft->uPersp) * oneOverN) >> 16);
@@ -200,10 +200,20 @@ static void rdActive_EmitSpan(rdActiveFace* pFront, int xEnd)
             pSpan->dv = dvPersp >> shift;
             pSpan->v = (int)((((int64_t)subFixed * dvPersp) >> 16) + pLeft->vPersp) >> shift;
         }
-        else if (pProc->textureMode == 1)   // affine: u=U-start, du=V-start (float bits)
+        else   // perspective (IT): interpolate u/z, v/z, 1/z (all linear in screen space) from
+               // the edge float slots (edge.u=u/z, edge.v=v/z, edge.i=1/z); the IT sampler
+               // divides u/z by 1/z per pixel. Slots hold float bits (oneOverZ/dOneOverZ direct).
         {
-            pSpan->u  = rdActive_FloatToSlot(pFront->dU * subFrac + pLeft->u);
-            pSpan->du = rdActive_FloatToSlot(pFront->dV * subFrac + pLeft->v);
+            flex_t invN = rdRaster_aOneOverNFlex[edgePixels];   // 1 / edgePixels
+            flex_t duoz = (pRight->u - pLeft->u) * invN;
+            flex_t dvoz = (pRight->v - pLeft->v) * invN;
+            flex_t dooz = (pRight->i - pLeft->i) * invN;
+            pSpan->u  = rdActive_FloatToSlot(pLeft->u + duoz * subFrac);
+            pSpan->du = rdActive_FloatToSlot(duoz);
+            pSpan->v  = rdActive_FloatToSlot(pLeft->v + dvoz * subFrac);
+            pSpan->dv = rdActive_FloatToSlot(dvoz);
+            pSpan->oneOverZ  = pLeft->i + dooz * subFrac;
+            pSpan->dOneOverZ = dooz;
         }
     }
     else
@@ -388,11 +398,10 @@ int rdActive_AddActiveFace(rdProcEntry* pProcEntry)
             geometryMode = RD_GEOMETRY_SOLID;
     }
 
-    // Ported families: wireframe (LW, geometryMode 2) and the affine textured trio (geometryMode
-    // 4 / textureMode 0): FAT (flat), LAT (lit), GAT (gouraud). Drop anything else (the masked
-    // M-family, the perspective IT families, the Z-buffered path, the custom per-face hook, or a
-    // material-less face) so BuildEdges/BuildSpans never touch an uninitialized callback.
-    // P3 TODO: admit the remaining families as they land.
+    // Ported families (the full rdAFRaster affine active-edge matrix): wireframe (LW), solid
+    // (FS/LS/GS), affine textured (FAT/LAT/GAT + masked), perspective textured (FIT/LIT/GIT +
+    // masked). Drop the Z-buffered path, the custom per-face hook, or a material-less face so
+    // BuildEdges/BuildSpans never touch an uninitialized callback.
     if (lightingMode < 0 || lightingMode >= 5
         || (pProcEntry->extraData & 1) != 0
         || rdroid_curZBufferMethod != 1
@@ -401,49 +410,85 @@ int rdActive_AddActiveFace(rdProcEntry* pProcEntry)
         return 0;
     }
 
+    // Shading class shared by every textured/solid family (mirrors JK's AddActiveFace 0..63 light
+    // math and rdZRaster_DrawFace): flat = no darkening; lit = one constant level; gouraud =
+    // per-vertex. Lit/gouraud need a colormap light table (else fall back to flat).
+    const uint8_t* pLightBase = (pProcEntry->colormap != NULL && pProcEntry->colormap->lightlevel != NULL)
+                              ? pProcEntry->colormap->lightlevel : NULL;
+    flex_t ambient = (rdroid_g_curRenderOptions & 2) ? pProcEntry->ambientLight : 0.0f;
+    int shade = 0;         // 0 = flat (F), 1 = lit (L), 2 = gouraud (G)
+    int lightLevel = 63;
+    if (lightingMode == RD_LIGHTMODE_FULLYLIT || pLightBase == NULL)
+    {
+        shade = 0;
+    }
+    else if (lightingMode == RD_LIGHTMODE_GOURAUD)
+    {
+        shade = 2;
+        for (int vi = 0; vi < (int)pProcEntry->numVertices; vi++)
+        {
+            flex_t vl = rdActive_Clamp01(pProcEntry->vertexIntensities[vi] + pProcEntry->extralight);
+            if (vl < ambient)
+                vl = ambient;
+            pProcEntry->vertexIntensities[vi] = vl * 63.0f;
+        }
+    }
+    else   // NOTLIT / DIFFUSE
+    {
+        shade = 1;
+        flex_t level = (lightingMode == RD_LIGHTMODE_NOTLIT)
+                     ? rdActive_Clamp01(pProcEntry->extralight)
+                     : rdActive_Clamp01(pProcEntry->extralight + pProcEntry->light_level_static);
+        if (level < ambient)
+            level = ambient;
+        lightLevel = (int)(level * 63.0f + 0.5f);
+        if (lightLevel < 0) lightLevel = 0;
+        else if (lightLevel > 63) lightLevel = 63;
+    }
+
     if (geometryMode == RD_GEOMETRY_WIREFRAME)
     {
         rdAFRaster_SetupNGonLW_0(pFace, pTexinfo);
     }
-    else if (geometryMode == RD_GEOMETRY_FULL
-             && textureMode == 0
-             && pTexinfo->texture_ptr != NULL
-             && (pTexinfo->texture_ptr->alpha_en & 1) == 0)   // opaque texture (masked path not ported)
+    else if (geometryMode == RD_GEOMETRY_SOLID)
     {
-        // Light modulation by shading mode. LAT/GAT need the face's colormap light table; the
-        // per-face / per-vertex intensity math mirrors JK's AddActiveFace (0..63 light levels).
-        flex_t ambient = (rdroid_g_curRenderOptions & 2) ? pProcEntry->ambientLight : 0.0f;
-
-        if (lightingMode == RD_LIGHTMODE_FULLYLIT)   // flat: no darkening
+        if (shade == 0)      rdAFRaster_SetupNGonFS(pFace, pTexinfo);
+        else if (shade == 1) rdAFRaster_SetupNGonLS(pFace, pTexinfo, lightLevel);
+        else                 rdAFRaster_SetupNGonGS(pFace, pTexinfo);
+    }
+    else if (geometryMode == RD_GEOMETRY_FULL && pTexinfo->texture_ptr != NULL)
+    {
+        int masked = (pTexinfo->texture_ptr->alpha_en & 1) != 0;   // transparent texel-0 texture
+        int persp = (textureMode == 1);                            // 0 = affine (AT); 1 = perspective (IT)
+        if (!persp)
         {
-            rdAFRaster_SetupNGonFAT(pFace, pTexinfo);
-        }
-        else if (pProcEntry->colormap == NULL || pProcEntry->colormap->lightlevel == NULL)
-        {
-            return 0;   // lit/gouraud need a colormap light table
-        }
-        else if (lightingMode == RD_LIGHTMODE_NOTLIT || lightingMode == RD_LIGHTMODE_DIFFUSE)  // lit
-        {
-            flex_t level = (lightingMode == RD_LIGHTMODE_NOTLIT)
-                         ? rdActive_Clamp01(pProcEntry->extralight)
-                         : rdActive_Clamp01(pProcEntry->extralight + pProcEntry->light_level_static);
-            if (level < ambient)
-                level = ambient;
-            int lightLevel = (int)(level * 63.0f + 0.5f);
-            if (lightLevel < 0) lightLevel = 0;
-            else if (lightLevel > 63) lightLevel = 63;
-            rdAFRaster_SetupNGonLAT(pFace, pTexinfo, lightLevel);
-        }
-        else   // RD_LIGHTMODE_GOURAUD: scale each vertex intensity to 0..63 for the gouraud edge
-        {
-            for (int vi = 0; vi < (int)pProcEntry->numVertices; vi++)
+            if (!masked)
             {
-                flex_t vl = rdActive_Clamp01(pProcEntry->vertexIntensities[vi] + pProcEntry->extralight);
-                if (vl < ambient)
-                    vl = ambient;
-                pProcEntry->vertexIntensities[vi] = vl * 63.0f;
+                if (shade == 0)      rdAFRaster_SetupNGonFAT(pFace, pTexinfo);
+                else if (shade == 1) rdAFRaster_SetupNGonLAT(pFace, pTexinfo, lightLevel);
+                else                 rdAFRaster_SetupNGonGAT(pFace, pTexinfo);
             }
-            rdAFRaster_SetupNGonGAT(pFace, pTexinfo);
+            else
+            {
+                if (shade == 0)      rdAFRaster_SetupNGonMFAT(pFace, pTexinfo);
+                else if (shade == 1) rdAFRaster_SetupNGonMLAT(pFace, pTexinfo, lightLevel);
+                else                 rdAFRaster_SetupNGonMGAT(pFace, pTexinfo);
+            }
+        }
+        else
+        {
+            if (!masked)
+            {
+                if (shade == 0)      rdAFRaster_SetupNGonFIT(pFace, pTexinfo);
+                else if (shade == 1) rdAFRaster_SetupNGonLIT(pFace, pTexinfo, lightLevel);
+                else                 rdAFRaster_SetupNGonGIT(pFace, pTexinfo);
+            }
+            else
+            {
+                if (shade == 0)      rdAFRaster_SetupNGonMFIT(pFace, pTexinfo);
+                else if (shade == 1) rdAFRaster_SetupNGonMLIT(pFace, pTexinfo, lightLevel);
+                else                 rdAFRaster_SetupNGonMGIT(pFace, pTexinfo);
+            }
         }
     }
     else
