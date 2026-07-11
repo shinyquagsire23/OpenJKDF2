@@ -26,6 +26,20 @@ set(ZLIB_SHARED_LIBRARY_PATH ${ZLIB_ROOT}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${ZL
 set(ZLIB_IMPORT_LIBRARY_PATH ${ZLIB_ROOT}/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}${ZLIB_LIBRARIES}${CMAKE_IMPORT_LIBRARY_SUFFIX})
 set(ZLIB_SHARED_LIBRARY_DIR ${ZLIB_ROOT}/lib)
 
+# Added: we only ever consume the static lib (ZLIB_USE_STATIC_LIBS is hardcoded
+# TRUE above, for every platform), but macOS's postcompile_macos() bundle step
+# still copies zlib's *shared* libz.1.dylib into the .app (see
+# cmake_modules/target_macos_all.cmake) -- so the shared target can only be
+# skipped where nothing consumes it. On Emscripten specifically, zlib's shared
+# build is a hard failure: emcc 4.0.19 treats `-shared` combined with the
+# `.wasm` output suffix as a (deprecated) standalone-executable request, which
+# then wants a `main` symbol zlib never provides -- unrelated to SDL3, just
+# wasted, broken work for output we never use there.
+set(ZLIB_EXTRA_CMAKE_ARGS)
+if(TARGET_WASM)
+    set(ZLIB_EXTRA_CMAKE_ARGS -DZLIB_BUILD_SHARED=OFF)
+endif()
+
 ExternalProject_Add(
     ${ZLIB_TARGET_NAME}
     SOURCE_DIR          ${CMAKE_SOURCE_DIR}/lib/zlib
@@ -39,14 +53,7 @@ ExternalProject_Add(
                         -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
                         -DCMAKE_POLICY_VERSION_MINIMUM=3.5
                         -DZLIB_BUILD_TESTING=OFF
-                        # Added: we only ever consume the static lib (ZLIB_USE_STATIC_LIBS is
-                        # hardcoded TRUE above, for every platform), so skip zlib's shared-lib
-                        # target entirely. On Emscripten specifically, zlib's shared build was a
-                        # hard failure: emcc 4.0.19 treats `-shared` combined with the `.wasm`
-                        # output suffix as a (deprecated) standalone-executable request, which then
-                        # wants a `main` symbol zlib never provides -- unrelated to SDL3, just
-                        # wasted, broken work for output we never use.
-                        -DZLIB_BUILD_SHARED=OFF
+                        ${ZLIB_EXTRA_CMAKE_ARGS}
     BUILD_BYPRODUCTS    ${ZLIB_STATIC_LIBRARY_PATH}
 )
 
