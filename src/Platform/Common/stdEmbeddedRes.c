@@ -34,7 +34,7 @@ char* stdEmbeddedRes_LoadOnlyInternal(const char* filepath, size_t* pOutSz)
     int exists = 0;
 #endif
     FILE* f = NULL;
-    char* base_path = NULL;
+    const char* base_path = NULL;
     char* file_contents = NULL;
     char tmp_filepath[256];
     strncpy(tmp_filepath, "resource/", 256-1);
@@ -43,7 +43,7 @@ char* stdEmbeddedRes_LoadOnlyInternal(const char* filepath, size_t* pOutSz)
     if (pOutSz) {
         *pOutSz = 0;
     }
-    
+
 #ifdef WIN32
 for (int i = 0; i < strlen(tmp_filepath); i++)
 {
@@ -59,13 +59,13 @@ for (int i = 0; i < strlen(tmp_filepath); i++)
         goto skip_fopen;
     }
 #endif
-    
+
 #if defined(MACOS) && defined(SDL2_RENDER)
+    // SDL_GetBasePath() returns an internally-cached, non-owned string as of SDL3 -- must not SDL_free() it.
     base_path = SDL_GetBasePath();
     strncpy(tmp_filepath, base_path, 256-1);
     strncat(tmp_filepath, "Contents/Resources/", 256-1);
     strncat(tmp_filepath, filepath, 256-1);
-    SDL_free(base_path);
 #endif
 
     f = fopen(tmp_filepath, "r");
@@ -141,7 +141,7 @@ char* stdEmbeddedRes_Load(const char* filepath, size_t* pOutSz)
     int exists = 0;
 #endif
     FILE* f = NULL;
-    char* base_path = NULL;
+    const char* base_path = NULL;
     char* file_contents = NULL;
     char tmp_filepath[256];
     strncpy(tmp_filepath, "resource/", 256-1);
@@ -150,7 +150,7 @@ char* stdEmbeddedRes_Load(const char* filepath, size_t* pOutSz)
     if (pOutSz) {
         *pOutSz = 0;
     }
-    
+
 #ifdef WIN32
 for (int i = 0; i < strlen(tmp_filepath); i++)
 {
@@ -212,11 +212,11 @@ retry_file:
     else
     {
 #if defined(MACOS) && defined(SDL2_RENDER)
+        // SDL_GetBasePath() returns an internally-cached, non-owned string as of SDL3 -- must not SDL_free() it.
         base_path = SDL_GetBasePath();
         strncpy(tmp_filepath, base_path, 256-1);
         strncat(tmp_filepath, "Contents/Resources/", 256-1);
         strncat(tmp_filepath, filepath, 256-1);
-        SDL_free(base_path);
 
         f = fopen(tmp_filepath, "r");
         if (f)

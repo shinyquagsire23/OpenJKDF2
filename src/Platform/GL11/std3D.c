@@ -122,7 +122,7 @@ static void std3D_GetDrawableSize(int* pW, int* pH)
 {
     int dw = Window_xSize, dh = Window_ySize;
     SDL_Window* pWin = SDL_GL_GetCurrentWindow();
-    if (pWin) SDL_GL_GetDrawableSize(pWin, &dw, &dh);
+    if (pWin) SDL_GetWindowSizeInPixels(pWin, &dw, &dh);
     if (dw < 1) dw = 640;
     if (dh < 1) dh = 480;
     *pW = dw;

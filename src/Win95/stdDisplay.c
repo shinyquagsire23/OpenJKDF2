@@ -23,6 +23,17 @@ uint8_t* stdDisplay_GetPalette()
 #include "SDL2_helper.h"
 #include <assert.h>
 
+// SDL3: indexed surfaces have no palette by default, and CreateSurfacePalette()
+// replaces any existing palette rather than being idempotent -- reuse the
+// existing one (created once at surface-creation time) on hot paths like blits.
+static SDL_Palette* stdDisplay_GetOrCreateSurfacePalette(SDL_Surface* surface)
+{
+    SDL_Palette* palette = SDL_GetSurfacePalette(surface);
+    if (!palette)
+        palette = SDL_CreateSurfacePalette(surface);
+    return palette;
+}
+
 uint32_t Video_menuTexId = 0;
 uint32_t Video_overlayTexId = 0;
 rdColor24 stdDisplay_masterPalette[256];
@@ -100,29 +111,21 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
         glDeleteTextures(1, &Video_menuTexId);
         glDeleteTextures(1, &Video_overlayTexId);
         if (Video_otherBuf.sdlSurface)
-            SDL_FreeSurface(Video_otherBuf.sdlSurface);
+            SDL_DestroySurface(Video_otherBuf.sdlSurface);
         if (Video_menuBuffer.sdlSurface)
-            SDL_FreeSurface(Video_menuBuffer.sdlSurface);
+            SDL_DestroySurface(Video_menuBuffer.sdlSurface);
         if (Video_overlayMapBuffer.sdlSurface)
-            SDL_FreeSurface(Video_overlayMapBuffer.sdlSurface);
-        
+            SDL_DestroySurface(Video_overlayMapBuffer.sdlSurface);
+
         Video_otherBuf.sdlSurface = 0;
         Video_menuBuffer.sdlSurface = 0;
         Video_overlayMapBuffer.sdlSurface = 0;
     }
-    
-    SDL_Surface* otherSurface = SDL_CreateRGBSurface(0, newW, newH, 8,
-                                        0,
-                                        0,
-                                        0,
-                                        0);
-    SDL_Surface* menuSurface = SDL_CreateRGBSurface(0, newW, newH, 8,
-                                        0,
-                                        0,
-                                        0,
-                                        0);
-    SDL_Surface* overlaySurface = SDL_CreateRGBSurface(0, newW, newH, 8, 0, 0, 0, 0);
-    
+
+    SDL_Surface* otherSurface = SDL_CreateSurface(newW, newH, SDL_GetPixelFormatForMasks(8, 0, 0, 0, 0));
+    SDL_Surface* menuSurface = SDL_CreateSurface(newW, newH, SDL_GetPixelFormatForMasks(8, 0, 0, 0, 0));
+    SDL_Surface* overlaySurface = SDL_CreateSurface(newW, newH, SDL_GetPixelFormatForMasks(8, 0, 0, 0, 0));
+
     if (palette)
     {
         memcpy(stdDisplay_gammaPalette, palette, 0x300);
@@ -135,10 +138,10 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
             tmp[i].b = pal24[i].b;
             tmp[i].a = 0xFF;
         }
-        
-        SDL_SetPaletteColors(otherSurface->format->palette, tmp, 0, 256);
-        SDL_SetPaletteColors(menuSurface->format->palette, tmp, 0, 256);
-        SDL_SetPaletteColors(overlaySurface->format->palette, tmp, 0, 256);
+
+        SDL_SetPaletteColors(stdDisplay_GetOrCreateSurfacePalette(otherSurface), tmp, 0, 256);
+        SDL_SetPaletteColors(stdDisplay_GetOrCreateSurfacePalette(menuSurface), tmp, 0, 256);
+        SDL_SetPaletteColors(stdDisplay_GetOrCreateSurfacePalette(overlaySurface), tmp, 0, 256);
         free(tmp);
     }
     
@@ -251,7 +254,7 @@ tVBuffer* stdDisplay_VBufferNew(tRasterInfo *fmt, int create_ddraw_surface, int 
         abitmask = 0;
     }
 
-    SDL_Surface* surface = SDL_CreateRGBSurface(0, fmt->width, fmt->height, fmt->format.bpp, rbitmask, gbitmask, bbitmask, abitmask);
+    SDL_Surface* surface = SDL_CreateSurface(fmt->width, fmt->height, SDL_GetPixelFormatForMasks(fmt->format.bpp, rbitmask, gbitmask, bbitmask, abitmask));
     
     if (surface)
     {
@@ -318,10 +321,10 @@ int stdDisplay_VBufferCopy(tVBuffer *vbuf, tVBuffer *vbuf2, unsigned int blit_x,
             tmp[i].a = 0xFF;
         }
     
-        SDL_SetPaletteColors(vbuf->sdlSurface->format->palette, tmp, 0, 256);
+        SDL_SetPaletteColors(stdDisplay_GetOrCreateSurfacePalette(vbuf->sdlSurface), tmp, 0, 256);
         free(tmp);
     }
-    
+
     if (vbuf2->palette)
     {
         rdColor24* pal24 = (rdColor24*)vbuf2->palette;
@@ -334,7 +337,7 @@ int stdDisplay_VBufferCopy(tVBuffer *vbuf, tVBuffer *vbuf2, unsigned int blit_x,
             tmp[i].a = 0xFF;
         }
         
-        SDL_SetPaletteColors(vbuf2->sdlSurface->format->palette, tmp, 0, 256);
+        SDL_SetPaletteColors(stdDisplay_GetOrCreateSurfacePalette(vbuf2->sdlSurface), tmp, 0, 256);
         free(tmp);
     }
 
@@ -476,7 +479,7 @@ void stdDisplay_VBufferFree(tVBuffer *vbuf)
         return;
     }
     stdDisplay_VBufferUnlock(vbuf);
-    SDL_FreeSurface(vbuf->sdlSurface);
+    SDL_DestroySurface(vbuf->sdlSurface);
     STD_FREE(vbuf);
 }
 

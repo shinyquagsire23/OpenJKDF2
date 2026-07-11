@@ -587,7 +587,26 @@ int stdMci_trackFrom;
 int stdMci_trackTo;
 int stdMci_trackCurrent;
 
-Mix_Music* stdMci_music;
+MIX_Audio* stdMci_music;
+
+// SDL3_mixer has no chunk/music split -- everything is a MIX_Audio played on a
+// MIX_Track. One track stands in for the old dedicated "music channel"; the
+// track's stopped-callback replaces Mix_HookMusicFinished (registered once,
+// unlike the old per-play re-registration, since SDL3_mixer's callback is
+// per-track rather than a single global hook slot).
+static MIX_Mixer* stdMci_pMixer;
+static MIX_Track* stdMci_pTrack;
+
+void stdMci_trackStart(int track);
+
+static void stdMci_TrackStoppedCallback(void* userdata, MIX_Track* track)
+{
+    stdMci_trackCurrent++;
+    if (stdMci_trackCurrent > stdMci_trackTo)
+        stdMci_Stop();
+    else
+        stdMci_trackStart(stdMci_trackCurrent);
+}
 
 int stdMci_Startup()
 {
@@ -595,24 +614,42 @@ int stdMci_Startup()
     stdMci_music = NULL;
 
     stdMci_bInitted = 1;
-    
-    if (Mix_OpenAudio(48000, AUDIO_S16SYS, 2, 1024) < 0) {
-        stdPlatform_Printf("stdMci: Failed Mix_OpenAudio? %s\n", Mix_GetError());
+
+    if (!MIX_Init()) {
+        stdPlatform_Printf("stdMci: Failed MIX_Init? %s\n", SDL_GetError());
         return 1;
     }
 
-    Mix_AllocateChannels(2);
+    stdMci_pMixer = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, NULL);
+    if (!stdMci_pMixer) {
+        stdPlatform_Printf("stdMci: Failed MIX_CreateMixerDevice? %s\n", SDL_GetError());
+        return 1;
+    }
+
+    stdMci_pTrack = MIX_CreateTrack(stdMci_pMixer);
+    if (stdMci_pTrack) {
+        MIX_SetTrackStoppedCallback(stdMci_pTrack, stdMci_TrackStoppedCallback, NULL);
+    }
 
     // Added
     stdMci_bIsGOG = 1;
-    
+
     return 1;
 }
 
 void stdMci_Shutdown()
 {
     stdMci_bInitted = 0;
-    Mix_CloseAudio();
+
+    if (stdMci_pTrack) {
+        MIX_DestroyTrack(stdMci_pTrack);
+        stdMci_pTrack = NULL;
+    }
+    if (stdMci_pMixer) {
+        MIX_DestroyMixer(stdMci_pMixer);
+        stdMci_pMixer = NULL;
+    }
+    MIX_Quit();
 
     // Added: Clean reset
     stdMci_trackFrom = 0;
@@ -642,14 +679,14 @@ int stdMci_TryPlay(const char* fpath) {
         strcat(tmp2, "/");
     //}
     strcat(tmp2, tmp);
-    stdMci_music = Mix_LoadMUS(tmp2); 
+    stdMci_music = MIX_LoadAudio(stdMci_pMixer, tmp2, false);
 #else
-    stdMci_music = Mix_LoadMUS(tmp);
+    stdMci_music = MIX_LoadAudio(stdMci_pMixer, tmp, false);
 #endif
-    
+
     if (!stdMci_music) {
         //printf("INFO: Failed to play music `%s', trying alternate location...\n", tmp);
-        stdPlatform_Printf("stdMci: Error in Mix_LoadMUS, %s\n", Mix_GetError());
+        stdPlatform_Printf("stdMci: Error in MIX_LoadAudio, %s\n", SDL_GetError());
     }
 
     if (stdMci_music)
@@ -658,14 +695,15 @@ int stdMci_TryPlay(const char* fpath) {
     return 0;
 }
 
-void stdMci_trackFinished();
 void stdMci_trackStart(int track)
 {
     char tmp[256];
- 
+
     if (stdMci_music) {
-        Mix_HaltMusic();
-        Mix_FreeMusic(stdMci_music);
+        if (stdMci_pTrack)
+            MIX_StopTrack(stdMci_pTrack, 0);
+        MIX_DestroyAudio(stdMci_music);
+        stdMci_music = NULL;
     }
 
     int cdNum = 1;
@@ -746,21 +784,13 @@ done:
     }
 
     stdMci_trackCurrent = track;
-    Mix_HaltMusic();
-    if (Mix_PlayMusic(stdMci_music, 0) < 0) {
-        stdPlatform_Printf("stdMci: Error in Mix_PlayMusic, %s\n", Mix_GetError());
+    if (stdMci_pTrack) {
+        MIX_StopTrack(stdMci_pTrack, 0);
+        if (!MIX_SetTrackAudio(stdMci_pTrack, stdMci_music) || !MIX_PlayTrack(stdMci_pTrack, 0)) {
+            stdPlatform_Printf("stdMci: Error in MIX_PlayTrack, %s\n", SDL_GetError());
+        }
     }
-    Mix_HookMusicFinished(stdMci_trackFinished);
     stdPlatform_Printf("stdMci: Playing music `%s'\n", tmp);
-}
-
-void stdMci_trackFinished()
-{
-    stdMci_trackCurrent++;
-    if (stdMci_trackCurrent > stdMci_trackTo)
-        stdMci_Stop();
-    else
-        stdMci_trackStart(stdMci_trackCurrent);
 }
 
 int stdMci_Play(uint8_t trackFrom, uint8_t trackTo)
@@ -780,17 +810,18 @@ int stdMci_Play(uint8_t trackFrom, uint8_t trackTo)
 void stdMci_SetVolume(flex_t vol)
 {
     stdPlatform_Printf("stdMci: Set vol %f\n", vol);
-    uint8_t volQuantized = (uint16_t)(vol * (flex_d_t)MIX_MAX_VOLUME);
-    Mix_VolumeMusic(volQuantized);
+    if (stdMci_pTrack)
+        MIX_SetTrackGain(stdMci_pTrack, (float)vol);
 }
 
 void stdMci_Stop()
 {
     stdPlatform_Printf("stdMci: stop music\n");
-    
+
     if (stdMci_music) {
-        Mix_HaltMusic();
-        Mix_FreeMusic(stdMci_music);
+        if (stdMci_pTrack)
+            MIX_StopTrack(stdMci_pTrack, 0);
+        MIX_DestroyAudio(stdMci_music);
         stdMci_music = NULL;
     }
 }

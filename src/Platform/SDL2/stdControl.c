@@ -265,7 +265,7 @@ uint8_t stdControl_aDebounce[256];
 
 static uint32_t stdControl_aJoystickQuirks[JK_NUM_JOYSTICKS] = {0};
 static SDL_Joystick *pJoysticks[JK_NUM_JOYSTICKS] = {0};
-static SDL_GameController *pGamepads[JK_NUM_JOYSTICKS] = {0};
+static SDL_Gamepad *pGamepads[JK_NUM_JOYSTICKS] = {0};
 static int stdControl_aJoystickNumAxes[JK_NUM_JOYSTICKS] = {0};
 static int stdControl_bKeyboardBeingShown = 0;
 int stdControl_bControllerEscapeKey = 0;
@@ -292,9 +292,9 @@ void stdControl_FreeSdlJoysticks()
     stdPlatform_Printf("Free SDL joysticks...\n");
     for (int i = 0; i < JK_NUM_JOYSTICKS; i++) {
         if (pJoysticks[i])
-            SDL_JoystickClose(pJoysticks[i]);
+            SDL_CloseJoystick(pJoysticks[i]);
         if (pGamepads[i])
-            SDL_GameControllerClose(pGamepads[i]);
+            SDL_CloseGamepad(pGamepads[i]);
         pJoysticks[i] = NULL;
         pGamepads[i] = NULL;
     }
@@ -313,39 +313,39 @@ void stdControl_InitSdlJoysticks()
 {
     stdControl_FreeSdlJoysticks();
 
-    //SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt");
-    
-    //v2 = 2;
+    //SDL_AddGamepadMappingsFromFile("gamecontrollerdb.txt");
 
-    int numJoysticks = SDL_NumJoysticks();
+    int numJoysticks = 0;
+    SDL_JoystickID* aJoystickIds = SDL_GetJoysticks(&numJoysticks);
     stdPlatform_Printf ("SDL has %u joysticks.\n", numJoysticks);
     for (int i = 0; i < numJoysticks; i++) {
         if (i >= JK_NUM_JOYSTICKS) break;
 
-        int bIsController = SDL_IsGameController(i);
+        SDL_JoystickID joyId = aJoystickIds[i];
+        int bIsController = SDL_IsGamepad(joyId);
         int numAxes = 0;
         int numButtons = 0;
         int numHats = 0;
 
         if (bIsController) {
-            pGamepads[i] = SDL_GameControllerOpen(i);
+            pGamepads[i] = SDL_OpenGamepad(joyId);
             if (!pGamepads[i]) break;
 
             numAxes = 6;
             numButtons = 16;
             numHats = 1;
 
-            stdPlatform_Printf("SDL Gamepad %u: %s, %u axes %u buttons %u hats\n", i, SDL_JoystickNameForIndex(i), numAxes, numButtons, numHats, bIsController);
+            stdPlatform_Printf("SDL Gamepad %u: %s, %u axes %u buttons %u hats\n", i, SDL_GetJoystickNameForID(joyId), numAxes, numButtons, numHats, bIsController);
         }
         else {
-            pJoysticks[i] = SDL_JoystickOpen(i);
+            pJoysticks[i] = SDL_OpenJoystick(joyId);
             if (!pJoysticks[i]) break;
 
-            numAxes = SDL_JoystickNumAxes(pJoysticks[i]);
-            numButtons = SDL_JoystickNumButtons(pJoysticks[i]);
-            numHats = SDL_JoystickNumHats(pJoysticks[i]);
+            numAxes = SDL_GetNumJoystickAxes(pJoysticks[i]);
+            numButtons = SDL_GetNumJoystickButtons(pJoysticks[i]);
+            numHats = SDL_GetNumJoystickHats(pJoysticks[i]);
 
-            stdPlatform_Printf("SDL Joystick %u: %s, %u axes %u buttons %u hats\n", i, SDL_JoystickNameForIndex(i), numAxes, numButtons, numHats);
+            stdPlatform_Printf("SDL Joystick %u: %s, %u axes %u buttons %u hats\n", i, SDL_GetJoystickNameForID(joyId), numAxes, numButtons, numHats);
         }
 
         if (numButtons > JK_JOYSTICK_BUTTON_STRIDE + JK_JOYSTICK_EXT_BUTTON_STRIDE) {
@@ -357,14 +357,14 @@ void stdControl_InitSdlJoysticks()
         }
 
         uint32_t quirks = 0;
-        //if (!strcmp(SDL_JoystickNameForIndex(i), "Nintendo Switch Pro Controller")) {
+        //if (!strcmp(SDL_GetJoystickNameForID(joyId), "Nintendo Switch Pro Controller")) {
         //    quirks |= QUIRK_NINTENDO_TRIGGER_AXIS_TO_BUTTON;
         //}
 
-        if (!strcmp(SDL_JoystickNameForIndex(i), "Odin Controller") && !bIsController) {
+        if (!strcmp(SDL_GetJoystickNameForID(joyId), "Odin Controller") && !bIsController) {
             quirks |= QUIRK_ODIN_CONTROLLLER;
         }
-        else if (!strcmp(SDL_JoystickNameForIndex(i), "Android Accelerometer")) {
+        else if (!strcmp(SDL_GetJoystickNameForID(joyId), "Android Accelerometer")) {
             continue;
         }
 
@@ -384,6 +384,7 @@ void stdControl_InitSdlJoysticks()
             stdControl_RegisterAxis((JK_JOYSTICK_AXIS_STRIDE*i) + AXIS_JOY1_X + j, -0x7FFF, 0x7FFF, 0.2);
         }
     }
+    SDL_free(aJoystickIds);
 }
 
 int stdControl_Startup()
@@ -664,6 +665,8 @@ LABEL_19:
 
 void stdControl_SetActivation(int a)
 {
+    extern SDL_Window* displayWindow;
+
     if ( stdControl_bOpen )
     {
         if ( a )
@@ -690,7 +693,7 @@ void stdControl_SetActivation(int a)
         }
     }
 
-    SDL_SetRelativeMouseMode((SDL_bool)!!a);
+    SDL_SetWindowRelativeMouseMode(displayWindow, !!a);
 }
 
 static int _cursorState = 0;
@@ -723,7 +726,7 @@ void stdControl_ToggleMouse()
 }
 
 void stdControl_ReadGamepad(int idx) {
-    SDL_GameController* pGamepad = pGamepads[idx];
+    SDL_Gamepad* pGamepad = pGamepads[idx];
     if (!pGamepad) return;
 
     // HACK
@@ -733,12 +736,12 @@ void stdControl_ReadGamepad(int idx) {
     stdControl_aAxes[(JK_JOYSTICK_AXIS_STRIDE * idx) + 2].flags |= 2;
     stdControl_aAxes[(JK_JOYSTICK_AXIS_STRIDE * idx) + 3].flags |= 2;
 
-    int stickLX = SDL_GameControllerGetAxis(pGamepad, SDL_CONTROLLER_AXIS_LEFTX);
-    int stickLY = SDL_GameControllerGetAxis(pGamepad, SDL_CONTROLLER_AXIS_LEFTY);
-    int stickRX = SDL_GameControllerGetAxis(pGamepad, SDL_CONTROLLER_AXIS_RIGHTX);
-    int stickRY = SDL_GameControllerGetAxis(pGamepad, SDL_CONTROLLER_AXIS_RIGHTY);
-    int trigL = SDL_GameControllerGetAxis(pGamepad, SDL_CONTROLLER_AXIS_TRIGGERLEFT);
-    int trigR = SDL_GameControllerGetAxis(pGamepad, SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
+    int stickLX = SDL_GetGamepadAxis(pGamepad, SDL_GAMEPAD_AXIS_LEFTX);
+    int stickLY = SDL_GetGamepadAxis(pGamepad, SDL_GAMEPAD_AXIS_LEFTY);
+    int stickRX = SDL_GetGamepadAxis(pGamepad, SDL_GAMEPAD_AXIS_RIGHTX);
+    int stickRY = SDL_GetGamepadAxis(pGamepad, SDL_GAMEPAD_AXIS_RIGHTY);
+    int trigL = SDL_GetGamepadAxis(pGamepad, SDL_GAMEPAD_AXIS_LEFT_TRIGGER);
+    int trigR = SDL_GetGamepadAxis(pGamepad, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER);
 
     stdControl_aAxisStates[(JK_JOYSTICK_AXIS_STRIDE * idx) + 0] = stickLX;
     stdControl_aAxisStates[(JK_JOYSTICK_AXIS_STRIDE * idx) + 1] = stickLY;
@@ -747,8 +750,8 @@ void stdControl_ReadGamepad(int idx) {
     stdControl_aAxisStates[(JK_JOYSTICK_AXIS_STRIDE * idx) + 4] = trigL;
     stdControl_aAxisStates[(JK_JOYSTICK_AXIS_STRIDE * idx) + 5] = trigR;
 
-    //SDL_GameControllerGetAxis
-    //SDL_GameControllerGetButton
+    //SDL_GetGamepadAxis
+    //SDL_GetGamepadButton
 
     /*
     sithControl_BindAxis(INPUT_FUNC_FORWARD, AXIS_JOY1_Y, 4u);
@@ -781,25 +784,25 @@ void stdControl_ReadGamepad(int idx) {
     sithControl_DefaultHelper(INPUT_FUNC_FIRE1, KEY_JOY1_B17, 2); // rtrig
     */
 
-    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_B1, !!SDL_GameControllerGetButton(pGamepad, SDL_CONTROLLER_BUTTON_A) /* button val */, stdControl_curReadTime);
-    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_B2, !!SDL_GameControllerGetButton(pGamepad, SDL_CONTROLLER_BUTTON_B) /* button val */, stdControl_curReadTime);
-    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_B3, !!SDL_GameControllerGetButton(pGamepad, SDL_CONTROLLER_BUTTON_X) /* button val */, stdControl_curReadTime);
-    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_B4, !!SDL_GameControllerGetButton(pGamepad, SDL_CONTROLLER_BUTTON_Y) /* button val */, stdControl_curReadTime);
-    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_B5, !!SDL_GameControllerGetButton(pGamepad, SDL_CONTROLLER_BUTTON_BACK) /* button val */, stdControl_curReadTime);
-    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_B6, !!SDL_GameControllerGetButton(pGamepad, SDL_CONTROLLER_BUTTON_GUIDE) /* button val */, stdControl_curReadTime);
-    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_B7, !!SDL_GameControllerGetButton(pGamepad, SDL_CONTROLLER_BUTTON_START) /* button val */, stdControl_curReadTime);
-    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_B8, !!SDL_GameControllerGetButton(pGamepad, SDL_CONTROLLER_BUTTON_LEFTSTICK) /* button val */, stdControl_curReadTime);
-    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_B9, !!SDL_GameControllerGetButton(pGamepad, SDL_CONTROLLER_BUTTON_RIGHTSTICK) /* button val */, stdControl_curReadTime);
-    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_B10, !!SDL_GameControllerGetButton(pGamepad, SDL_CONTROLLER_BUTTON_LEFTSHOULDER) /* button val */, stdControl_curReadTime);
-    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_B11, !!SDL_GameControllerGetButton(pGamepad, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER) /* button val */, stdControl_curReadTime);
+    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_B1, !!SDL_GetGamepadButton(pGamepad, SDL_GAMEPAD_BUTTON_SOUTH) /* button val */, stdControl_curReadTime);
+    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_B2, !!SDL_GetGamepadButton(pGamepad, SDL_GAMEPAD_BUTTON_EAST) /* button val */, stdControl_curReadTime);
+    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_B3, !!SDL_GetGamepadButton(pGamepad, SDL_GAMEPAD_BUTTON_WEST) /* button val */, stdControl_curReadTime);
+    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_B4, !!SDL_GetGamepadButton(pGamepad, SDL_GAMEPAD_BUTTON_NORTH) /* button val */, stdControl_curReadTime);
+    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_B5, !!SDL_GetGamepadButton(pGamepad, SDL_GAMEPAD_BUTTON_BACK) /* button val */, stdControl_curReadTime);
+    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_B6, !!SDL_GetGamepadButton(pGamepad, SDL_GAMEPAD_BUTTON_GUIDE) /* button val */, stdControl_curReadTime);
+    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_B7, !!SDL_GetGamepadButton(pGamepad, SDL_GAMEPAD_BUTTON_START) /* button val */, stdControl_curReadTime);
+    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_B8, !!SDL_GetGamepadButton(pGamepad, SDL_GAMEPAD_BUTTON_LEFT_STICK) /* button val */, stdControl_curReadTime);
+    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_B9, !!SDL_GetGamepadButton(pGamepad, SDL_GAMEPAD_BUTTON_RIGHT_STICK) /* button val */, stdControl_curReadTime);
+    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_B10, !!SDL_GetGamepadButton(pGamepad, SDL_GAMEPAD_BUTTON_LEFT_SHOULDER) /* button val */, stdControl_curReadTime);
+    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_B11, !!SDL_GetGamepadButton(pGamepad, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER) /* button val */, stdControl_curReadTime);
 
     stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_B16, (trigL > 0x2666) /* button val */, stdControl_curReadTime);
     stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_B17, (trigR > 0x2666) /* button val */, stdControl_curReadTime);
 
-    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_HLEFT, !!SDL_GameControllerGetButton(pGamepad, SDL_CONTROLLER_BUTTON_DPAD_LEFT) /* button val */, stdControl_curReadTime);
-    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_HUP, !!SDL_GameControllerGetButton(pGamepad, SDL_CONTROLLER_BUTTON_DPAD_UP) /* button val */, stdControl_curReadTime);
-    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_HRIGHT, !!SDL_GameControllerGetButton(pGamepad, SDL_CONTROLLER_BUTTON_DPAD_RIGHT) /* button val */, stdControl_curReadTime);
-    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_HDOWN, !!SDL_GameControllerGetButton(pGamepad, SDL_CONTROLLER_BUTTON_DPAD_DOWN) /* button val */, stdControl_curReadTime);
+    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_HLEFT, !!SDL_GetGamepadButton(pGamepad, SDL_GAMEPAD_BUTTON_DPAD_LEFT) /* button val */, stdControl_curReadTime);
+    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_HUP, !!SDL_GetGamepadButton(pGamepad, SDL_GAMEPAD_BUTTON_DPAD_UP) /* button val */, stdControl_curReadTime);
+    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_HRIGHT, !!SDL_GetGamepadButton(pGamepad, SDL_GAMEPAD_BUTTON_DPAD_RIGHT) /* button val */, stdControl_curReadTime);
+    stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*idx) + KEY_JOY1_HDOWN, !!SDL_GetGamepadButton(pGamepad, SDL_GAMEPAD_BUTTON_DPAD_DOWN) /* button val */, stdControl_curReadTime);
 }
 
 void stdControl_ReadControls()
@@ -826,7 +829,7 @@ void stdControl_ReadControls()
     static int stdControl_bDisableKeyboard_last = 0;
     if (!stdControl_bDisableKeyboard && stdControl_bDisableKeyboard_last)
     {
-        const Uint8 *state = SDL_GetKeyboardState(NULL);
+        const bool *state = SDL_GetKeyboardState(NULL);
         for (int i = 0; i < 256; i++)
         {
             stdControl_aDebounce[i] = !!state[i];
@@ -838,7 +841,7 @@ void stdControl_ReadControls()
 
     if ( !stdControl_bDisableKeyboard )
     {
-        const Uint8 *state = SDL_GetKeyboardState(NULL);
+        const bool *state = SDL_GetKeyboardState(NULL);
         for (int i = 0; i < 256; i++)
         {
             int s = !!state[i];
@@ -878,7 +881,7 @@ void stdControl_ReadControls()
                     //axisShift += 2;
                 }
 
-                int val = SDL_JoystickGetAxis(pJoysticks[i], j+axisShift);
+                int val = SDL_GetJoystickAxis(pJoysticks[i], j+axisShift);
                 //stdPlatform_Printf("stick %d: %d %s\n", j, val, SDL_GetError());
                 stdControl_aAxisStates[(JK_JOYSTICK_AXIS_STRIDE * i) + j] = val;
 
@@ -891,11 +894,11 @@ void stdControl_ReadControls()
             int numButtons = stdControl_aJoystickMaxButtons[i];
             int numRealButtons = numButtons - (numAxes * 2);
             int numAxisButtons = numAxes * 2;
-            int numHats = SDL_JoystickNumHats(pJoysticks[i]);
+            int numHats = SDL_GetNumJoystickHats(pJoysticks[i]);
 
             uint8_t hatState = 0;
             if (numHats) {
-                hatState = SDL_JoystickGetHat(pJoysticks[i], 0);
+                hatState = SDL_GetJoystickHat(pJoysticks[i], 0);
             }
             if (quirks & QUIRK_ODIN_CONTROLLLER) {
                 hatState = 0;
@@ -909,15 +912,15 @@ void stdControl_ReadControls()
 
                 int val = 0;
                 if (j < numRealButtons) {
-                    val = SDL_JoystickGetButton(pJoysticks[i], j);
+                    val = SDL_GetJoystickButton(pJoysticks[i], j);
                 }
 
                 if (quirks & QUIRK_NINTENDO_TRIGGER_AXIS_TO_BUTTON) {
                     if (j == 15) { // Capture
-                        val = SDL_JoystickGetAxis(pJoysticks[i],4) > 0;
+                        val = SDL_GetJoystickAxis(pJoysticks[i],4) > 0;
                     }
                     else if (j == 5) { // Home
-                        val = SDL_JoystickGetAxis(pJoysticks[i],5) > 0;
+                        val = SDL_GetJoystickAxis(pJoysticks[i],5) > 0;
                     }
                 }
 
@@ -930,10 +933,10 @@ void stdControl_ReadControls()
                     int axisButtonNum = (j - numRealButtons);
                     int axisNum = (axisButtonNum / 2) + axisShift;
                     if (axisButtonNum & 1) {
-                        val = !!(SDL_JoystickGetAxis(pJoysticks[i], axisNum) < SDL2_MIN_BINARY_THRESH);
+                        val = !!(SDL_GetJoystickAxis(pJoysticks[i], axisNum) < SDL2_MIN_BINARY_THRESH);
                     }
                     else {
-                        val = !!(SDL_JoystickGetAxis(pJoysticks[i], axisNum) > SDL2_MAX_BINARY_THRESH);
+                        val = !!(SDL_GetJoystickAxis(pJoysticks[i], axisNum) > SDL2_MAX_BINARY_THRESH);
                     }
                 }
                 
@@ -1043,7 +1046,7 @@ void stdControl_ReadMouse()
         //stdControl_UpdateKeyState(KEY_MOUSE_B1 + i, 0 /* buttonval */, stdControl_curReadTime);
     }
 
-    int x,y;
+    float x,y;
     uint32_t buttons = SDL_GetMouseState(&x, &y);
 
     stdControl_UpdateKeyState(KEY_MOUSE_B1, Window_bMouseLeft, stdControl_curReadTime);
@@ -1058,7 +1061,7 @@ void stdControl_ShowSystemKeyboard() {
     if (stdControl_bKeyboardBeingShown) {
         return;
     }
-    SDL_StartTextInput();
+    SDL_StartTextInput(displayWindow);
     if (Window_bShouldPopSteamKeyboard) {
         SDL_OpenURL("steam://open/keyboard?XPosition=0&YPosition=0&Width=0&Height=0&Mode=1");
 
@@ -1075,9 +1078,10 @@ void stdControl_HideSystemKeyboard() {
     if (Window_bShouldPopSteamKeyboard) {
         SDL_OpenURL("steam://close/keyboard");
     }
-    SDL_StopTextInput();
+    SDL_StopTextInput(displayWindow);
+    // SDL_RaiseWindow() already raises AND focuses the window in SDL3;
+    // the separate SDL_SetWindowInputFocus() call is gone.
     SDL_RaiseWindow(displayWindow);
-    SDL_SetWindowInputFocus(displayWindow);
     stdControl_bKeyboardBeingShown = 0;
     Window_bNeedsKeyboardFixed = 0;
 }

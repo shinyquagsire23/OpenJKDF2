@@ -144,13 +144,13 @@ if(TARGET_USE_LIBSMUSHER)
     list(APPEND ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/external/libsmusher/src/smush.c ${PROJECT_SOURCE_DIR}/src/external/libsmusher/src/codec48.c)
 endif()
 
-# Build SDL2 from sources (n/a for WASM)
+# Build SDL3 from sources (n/a for WASM)
 if(TARGET_USE_SDL2 AND NOT PLAT_WASM)
-    message(STATUS "Going to build “SDL 2.26.5” from Git module")
+    message(STATUS "Going to build “SDL 3.4.12” from Git module")
     include(build_sdl)
 
     if(TARGET_USE_OPENAL)
-        message(STATUS "Going to build “SDL_mixer 2.6.3” from Git module")
+        message(STATUS "Going to build “SDL_mixer 3.2.4” from Git module")
         include(build_sdl_mixer)
     endif()
 endif()
@@ -259,7 +259,7 @@ endif()
 if(TARGET_WIN32)
     include_directories(
         ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/include
-        ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer/x86_64-w64-mingw32/include/SDL2
+        ${PROJECT_SOURCE_DIR}/3rdparty/SDL3_mixer/x86_64-w64-mingw32/include/SDL3_mixer
     )
     file(GLOB TARGET_WIN32_SRCS ${PROJECT_SOURCE_DIR}/src/Platform/Win32/*.c)
     list(APPEND ENGINE_SOURCE_FILES ${TARGET_WIN32_SRCS})

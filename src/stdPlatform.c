@@ -1100,7 +1100,7 @@ int stdPrintf(int (*a1)(const char *, ...), const char *a2, int line, const char
 }
 
 #ifdef SDL2_RENDER
-static SDL_mutex* stdPlatform_mtxPrintf = NULL;
+static SDL_Mutex* stdPlatform_mtxPrintf = NULL;
 #endif
 
 int stdPlatform_Printf(const char *fmt, ...)

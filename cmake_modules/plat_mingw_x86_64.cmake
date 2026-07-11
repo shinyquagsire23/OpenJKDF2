@@ -44,7 +44,7 @@ macro(plat_initialize)
 endmacro()
 
 macro(plat_specific_deps)
-    set(SDL2_COMMON_LIBS SDL2main SDL::SDL)
+    set(SDL2_COMMON_LIBS SDL::SDL)
 endmacro()
 
 macro(plat_link_and_package)
@@ -74,7 +74,7 @@ macro(plat_link_and_package)
     target_link_libraries(${BIN_NAME} PRIVATE GLEW::glew_s)
     # Note: libssp is statically linked in the toolchain's standard libraries, so
     # it is intentionally not listed here -- adding -lssp re-adds libssp-0.dll.
-    target_link_libraries(sith_engine PRIVATE mingw32 ${SDL2_COMMON_LIBS} version imm32 setupapi gdi32 winmm imm32 ole32 oleaut32 shell32 winmm user32 crypt32 advapi32) # SDL2’s peculiarity that you have to link mingw32 before SDL2main
+    target_link_libraries(sith_engine PRIVATE mingw32 ${SDL2_COMMON_LIBS} version imm32 setupapi gdi32 winmm imm32 ole32 oleaut32 shell32 winmm user32 crypt32 advapi32) # mingw32 must precede SDL::SDL so its runtime startup provides the entry point SDL3's built-in WinMain expects
     
     if(TARGET_CAN_JKGM)
         target_link_libraries(sith_engine PRIVATE PNG::PNG ZLIB::ZLIB)

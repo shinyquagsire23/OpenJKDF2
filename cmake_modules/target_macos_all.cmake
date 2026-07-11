@@ -16,6 +16,14 @@ function(macos_target_add_standard_deps target_name)
         target_link_libraries(${target_name} PRIVATE "-framework IOKit")
         target_link_libraries(${target_name} PRIVATE "-framework ForceFeedback")
         target_link_libraries(${target_name} PRIVATE "-framework GameController")
+        # SDL3 added a camera subsystem (AVFoundation/CoreMedia), Vulkan-via-Metal
+        # support (CAMetalLayer, part of QuartzCore -- Metal.framework alone doesn't
+        # provide it), and UTType-based clipboard type queries (UniformTypeIdentifiers) --
+        # none of these existed as SDL2 link requirements.
+        target_link_libraries(${target_name} PRIVATE "-framework AVFoundation")
+        target_link_libraries(${target_name} PRIVATE "-framework CoreMedia")
+        target_link_libraries(${target_name} PRIVATE "-framework QuartzCore")
+        target_link_libraries(${target_name} PRIVATE "-framework UniformTypeIdentifiers")
         target_link_libraries(${target_name} PRIVATE iconv GLEW::GLEW)
     endif()
 endfunction()

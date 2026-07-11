@@ -30,7 +30,6 @@ macro(plat_initialize)
 endmacro()
 
 macro(plat_specific_deps)
-    #set(SDL2_COMMON_LIBS SDL2main SDL::SDL)
-    set(SDL2_COMMON_LIBS SDL2main SDL::SDL ${SDL_MIXER_DEPS} SDL::Mixer OpenAL::OpenAL)
+    set(SDL2_COMMON_LIBS SDL::SDL ${SDL_MIXER_DEPS} SDL::Mixer OpenAL::OpenAL)
 endmacro()
 

@@ -44,7 +44,7 @@ macro(plat_initialize)
 endmacro()
 
 macro(plat_specific_deps)
-    set(SDL2_COMMON_LIBS SDL2main SDL::SDL)
+    set(SDL2_COMMON_LIBS SDL::SDL)
 endmacro()
 
 macro(plat_link_and_package)
@@ -66,7 +66,7 @@ macro(plat_link_and_package)
     # and extension procs (EXT_paletted_texture) are resolved via SDL_GL_GetProcAddress.
     # libssp is statically linked in the toolchain's standard libraries, so it is
     # intentionally not listed here (linking -lssp re-adds libssp-0.dll).
-    target_link_libraries(sith_engine PRIVATE mingw32 ${SDL2_COMMON_LIBS} version imm32 setupapi gdi32 winmm imm32 ole32 oleaut32 shell32 winmm user32 crypt32 advapi32) # SDL2's peculiarity that you have to link mingw32 before SDL2main
+    target_link_libraries(sith_engine PRIVATE mingw32 ${SDL2_COMMON_LIBS} version imm32 setupapi gdi32 winmm imm32 ole32 oleaut32 shell32 winmm user32 crypt32 advapi32) # mingw32 must precede SDL::SDL so its runtime startup provides the entry point SDL3's built-in WinMain expects
 
     if (TARGET_USE_OPENAL)
         # SDL::Mixer before its Vorbis/Ogg deps so the static link resolves ov_*.

@@ -964,7 +964,7 @@ int InstallHelper_AttemptInstall()
     };
 
     int buttonid;
-    if (SDL_ShowMessageBox(&messageboxdata, &buttonid) < 0) {
+    if (!SDL_ShowMessageBox(&messageboxdata, &buttonid)) {
         SDL_Log("error displaying message box");
         return 0;
     }
@@ -1065,11 +1065,11 @@ void InstallHelper_SetCwd()
     char fname[256];
 
 #if defined(MACOS)
-    // Default working directory to the folder the .app bundle is in
-    char* base_path = SDL_GetBasePath();
+    // Default working directory to the folder the .app bundle is in.
+    // SDL_GetBasePath() returns an internally-cached, non-owned string as of SDL3 -- must not SDL_free() it.
+    const char* base_path = SDL_GetBasePath();
     chdir(base_path);
     chdir("..");
-    SDL_free(base_path);
 #endif
 
     int found_override = 0;
@@ -1129,7 +1129,7 @@ void InstallHelper_SetCwd()
 void InstallHelper_SetCwd()
 {
 #if defined(TARGET_ANDROID)
-    chdir(SDL_AndroidGetExternalStoragePath());
+    chdir(SDL_GetAndroidExternalStoragePath());
     if (!Main_bMotsCompat) {
         chdir("jk1/");
     }

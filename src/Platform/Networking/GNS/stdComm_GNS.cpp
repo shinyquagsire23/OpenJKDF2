@@ -1304,7 +1304,7 @@ int DirectPlay_GetSession_passwordidk(jkMultiEntry* pEntry)
 static int stdComm_EnumThread_bForce = 0;
 static int stdComm_EnumThread_bInit = 0;
 static SDL_Thread *stdComm_EnumThread_thread = NULL;
-static SDL_mutex* stdComm_EnumThread_mutex = NULL;
+static SDL_Mutex* stdComm_EnumThread_mutex = NULL;
 
 char *get_ip_str(const struct sockaddr *sa, char *s, size_t maxlen)
 {

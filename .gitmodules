@@ -41,10 +41,10 @@
 [submodule "SDL"]
 	path = lib/SDL
 	url = https://github.com/libsdl-org/SDL.git
-	branch = release-2.26.5
+	branch = release-3.4.12
 	shallow = true
 [submodule "SDL_mixer"]
 	path = lib/SDL_mixer
 	url = https://github.com/libsdl-org/SDL_mixer.git
-	branch = release-2.6.3
+	branch = release-3.2.4
 	shallow = true

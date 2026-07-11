@@ -15,7 +15,7 @@ macro(plat_initialize)
     set(TARGET_COMPILE_FREEGLUT TRUE)
     set(TARGET_FIND_OPENAL FALSE)
     set(TARGET_USE_GAMENETWORKINGSOCKETS FALSE) # TODO why does this keep breaking :(
-    set(SDL2_COMMON_LIBS SDL2main SDL::SDL)
+    set(SDL2_COMMON_LIBS SDL::SDL)
     
     set(TARGET_WIN32 TRUE)
 
@@ -23,7 +23,7 @@ macro(plat_initialize)
 endmacro()
 
 macro(plat_specific_deps)
-    set(SDL2_COMMON_LIBS SDL2main SDL::SDL)
+    set(SDL2_COMMON_LIBS SDL::SDL)
 endmacro()
 
 macro(plat_link_and_package)
@@ -62,7 +62,7 @@ macro(plat_link_and_package)
     target_link_libraries(sith_engine PRIVATE GLUT::GLUT)
     target_link_libraries(sith_engine PRIVATE GLEW::glew_s)
     target_link_libraries(${BIN_NAME} PRIVATE GLEW::glew_s)
-    target_link_libraries(sith_engine PRIVATE ${SDL2_COMMON_LIBS} version imm32 setupapi gdi32 winmm imm32 ole32 oleaut32 shell32 winmm user32 crypt32 advapi32) # SDL2’s peculiarity that you have to link mingw32 before SDL2main
+    target_link_libraries(sith_engine PRIVATE ${SDL2_COMMON_LIBS} version imm32 setupapi gdi32 winmm imm32 ole32 oleaut32 shell32 winmm user32 crypt32 advapi32)
 
     if(TARGET_CAN_JKGM)
         target_link_libraries(sith_engine PRIVATE PNG::PNG ZLIB::ZLIB)

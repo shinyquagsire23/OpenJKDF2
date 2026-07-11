@@ -43,9 +43,7 @@
 #include <string.h>
 
 //#include <GL/glew.h>
-#ifdef MACOS
-#include "Platform/macOS/SDL_fix.h"
-#else
+#ifndef MACOS
 //#include <GL/gl.h>
 #endif
 #include "Win95/Video.h"
@@ -398,8 +396,8 @@ extern int jkGuiBuildMulti_bRendering;
 
 void Window_HandleMouseMove(SDL_MouseMotionEvent *event)
 {
-    int x = event->x;
-    int y = event->y;
+    int x = (int)event->x;
+    int y = (int)event->y;
 
     Window_lastMouseX = Window_mouseX;
     Window_lastMouseY = Window_mouseY;
@@ -431,10 +429,12 @@ void Window_HandleMouseMove(SDL_MouseMotionEvent *event)
 
     uint32_t pos = ((Window_mouseX) & 0xFFFF) | (((Window_mouseY) << 16) & 0xFFFF0000);
     
-    Window_lastSampleMs = event->timestamp - Window_lastSampleTime;
+    // event->timestamp is nanoseconds as of SDL3 (was milliseconds); convert to
+    // milliseconds to keep Window_lastSampleTime's units (set from SDL_GetTicks()).
+    Window_lastSampleMs = (int)(event->timestamp / 1000000) - Window_lastSampleTime;
     //Window_lastSampleTime = event->timestamp;
-    Window_lastXRel += event->xrel;
-    Window_lastYRel += event->yrel;
+    Window_lastXRel += (int)event->xrel;
+    Window_lastYRel += (int)event->yrel;
 
     Window_msg_main_handler(g_hWnd, WM_MOUSEMOVE, 0, pos);
 }
@@ -444,9 +444,12 @@ int jkGame_wasDDraw = 0;
 int Window_bNeedsKeyboardFixed = 0;
 void Window_HandleWindowEvent(SDL_Event* event)
 {
-    switch (event->window.event) 
+    // SDL3 flattened window sub-events into top-level SDL_EVENT_WINDOW_* types
+    // (no more nested event->window.event); this dispatches on event->type,
+    // called for the whole SDL_EVENT_WINDOW_FIRST..LAST range.
+    switch (event->type)
     {
-        case SDL_WINDOWEVENT_SHOWN:
+        case SDL_EVENT_WINDOW_SHOWN:
 #ifdef MACOS
             {
                 static int bMacosOnlyOncePerProcessLifetimeTriggerTheStupidDylibLoad = 0;
@@ -463,39 +466,39 @@ void Window_HandleWindowEvent(SDL_Event* event)
 #endif
             //printf("Window %d shown", event->window.windowID);
             break;
-        case SDL_WINDOWEVENT_HIDDEN:
+        case SDL_EVENT_WINDOW_HIDDEN:
             //printf("Window %d hidden", event->window.windowID);
             break;
-        case SDL_WINDOWEVENT_EXPOSED:
+        case SDL_EVENT_WINDOW_EXPOSED:
             //printf("Window %d exposed", event->window.windowID);
             break;
-        case SDL_WINDOWEVENT_MOVED:
+        case SDL_EVENT_WINDOW_MOVED:
             /*printf("Window %d moved to %d,%d",
                     event->window.windowID, event->window.data1,
                     event->window.data2);*/
             Window_xPos = event->window.data1;
             Window_yPos = event->window.data2;
             break;
-        case SDL_WINDOWEVENT_RESIZED:
-        case SDL_WINDOWEVENT_SIZE_CHANGED:
+        case SDL_EVENT_WINDOW_RESIZED:
+        case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
             if (Window_xSize != event->window.data1 || Window_ySize != event->window.data2)
                 Window_resized = 1;
 
             //Window_xSize = event->window.data1;
             //Window_ySize = event->window.data2;
-            SDL_GL_GetDrawableSize(displayWindow, &Window_xSize, &Window_ySize);
+            SDL_GetWindowSizeInPixels(displayWindow, &Window_xSize, &Window_ySize);
             SDL_GetWindowSize(displayWindow, &Window_screenXSize, &Window_screenYSize);
 
             if (Window_xSize < 640) Window_xSize = 640;
             if (Window_ySize < 480) Window_ySize = 480;
             //printf("%u %u\n", Window_xSize, Window_ySize);
             break;
-        case SDL_WINDOWEVENT_MINIMIZED:
+        case SDL_EVENT_WINDOW_MINIMIZED:
             stdPlatform_Printf("Window %d minimized", event->window.windowID);
 
             // HACK: Cutscene audio gets messed up when multitasking on Android :/
 #ifdef TARGET_ANDROID
-            stdPlatform_Printf("SDL_WINDOWEVENT_MINIMIZED");
+            stdPlatform_Printf("SDL_EVENT_WINDOW_MINIMIZED");
             jkCutscene_wasPaused = jkCutscene_55AA54 && jkCutscene_isRendering && std3D_IsReady();
             jkGame_wasDDraw = jkGame_isDDraw;
             if (std3D_IsReady() && jkCutscene_isRendering && !jkCutscene_wasPaused) {
@@ -510,15 +513,15 @@ void Window_HandleWindowEvent(SDL_Event* event)
             }
 #endif
             break;
-        case SDL_WINDOWEVENT_MAXIMIZED:
+        case SDL_EVENT_WINDOW_MAXIMIZED:
             stdPlatform_Printf("Window %d maximized", event->window.windowID);
             break;
-        case SDL_WINDOWEVENT_RESTORED:
+        case SDL_EVENT_WINDOW_RESTORED:
             stdPlatform_Printf("Window %d restored", event->window.windowID);
-            
+
             // HACK: Cutscene audio gets messed up when multitasking on Android :/
 #ifdef TARGET_ANDROID
-            stdPlatform_Printf("SDL_WINDOWEVENT_RESTORED");
+            stdPlatform_Printf("SDL_EVENT_WINDOW_RESTORED");
             if (std3D_IsReady() && jkCutscene_isRendering && !jkCutscene_wasPaused) {
                 stdPlatform_Printf("Play cutscene...\n");
                 Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_SPACE, 0);
@@ -531,22 +534,22 @@ void Window_HandleWindowEvent(SDL_Event* event)
             }
 #endif
             break;
-        case SDL_WINDOWEVENT_ENTER:
+        case SDL_EVENT_WINDOW_MOUSE_ENTER:
             stdPlatform_Printf("Mouse entered window %d\n", event->window.windowID);
             break;
-        case SDL_WINDOWEVENT_LEAVE:
+        case SDL_EVENT_WINDOW_MOUSE_LEAVE:
             stdPlatform_Printf("Mouse left window %d\n", event->window.windowID);
             break;
-        case SDL_WINDOWEVENT_FOCUS_GAINED:
+        case SDL_EVENT_WINDOW_FOCUS_GAINED:
             stdPlatform_Printf("Window %d gained keyboard focus\n", event->window.windowID);
             Window_bNeedsKeyboardFixed = 0;
             break;
-        case SDL_WINDOWEVENT_FOCUS_LOST:
+        case SDL_EVENT_WINDOW_FOCUS_LOST:
             stdPlatform_Printf("Window %d lost keyboard focus\n", event->window.windowID);
             if (stdControl_IsSystemKeyboardShowing() && Window_bNeedsKeyboardFixed) {
                 stdPlatform_Printf("Fixing keyboard...\n");
-                
-                SDL_Window* gimmeKeyboard = SDL_CreateWindow("Gimme Keyboard", 20, 20, 20, 20, SDL_WINDOW_KEYBOARD_GRABBED | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS);
+
+                SDL_Window* gimmeKeyboard = SDL_CreateWindow("Gimme Keyboard", 20, 20, SDL_WINDOW_KEYBOARD_GRABBED | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS);
                 SDL_RaiseWindow(gimmeKeyboard);
                 SDL_DestroyWindow(gimmeKeyboard);
                 SDL_RaiseWindow(displayWindow);
@@ -556,13 +559,10 @@ void Window_HandleWindowEvent(SDL_Event* event)
                 SDL_RaiseWindow(displayWindow);
             }
             break;
-        case SDL_WINDOWEVENT_CLOSE:
+        case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
             //printf("Window %d closed", event->window.windowID);
             break;
-        case SDL_WINDOWEVENT_TAKE_FOCUS:
-            //printf("Window %d is offered a focus", event->window.windowID);
-            break;
-        case SDL_WINDOWEVENT_HIT_TEST:
+        case SDL_EVENT_WINDOW_HIT_TEST:
             //printf("Window %d has a special hit test", event->window.windowID);
             break;
     }
@@ -782,214 +782,214 @@ void Window_SdlUpdate()
         int bIsOdin = 0;
         int bIsGamepad = 0;
 
-        if (event.type == SDL_JOYBUTTONDOWN || event.type == SDL_JOYBUTTONUP) {
-            const char* name = SDL_JoystickNameForIndex(event.jbutton.which);
+        if (event.type == SDL_EVENT_JOYSTICK_BUTTON_DOWN || event.type == SDL_EVENT_JOYSTICK_BUTTON_UP) {
+            const char* name = SDL_GetJoystickNameForID(event.jbutton.which);
             bIsOdin = name && strcmp(name, "Odin Controller") == 0;
-            bIsGamepad = SDL_IsGameController(event.jbutton.which);
+            bIsGamepad = SDL_IsGamepad(event.jbutton.which);
         }
-        if (event.type == SDL_CONTROLLERBUTTONDOWN || event.type == SDL_CONTROLLERBUTTONUP) {
+        if (event.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN || event.type == SDL_EVENT_GAMEPAD_BUTTON_UP) {
             bIsGamepad = 1;
         }
 
         switch (event.type)
         {
-            case SDL_JOYDEVICEADDED: {
+            case SDL_EVENT_JOYSTICK_ADDED: {
                 stdControl_bReadJoysticks = 1;
                 stdControl_InitSdlJoysticks();
                 break;
             }
-            case SDL_JOYDEVICEREMOVED: {
+            case SDL_EVENT_JOYSTICK_REMOVED: {
                 stdControl_InitSdlJoysticks();
                 break;
             }
 
-            case SDL_TEXTINPUT:
+            case SDL_EVENT_TEXT_INPUT:
                 for (int i = 0; i < _strlen(event.text.text); i++)
                 {
                     Window_msg_main_handler(g_hWnd, WM_CHAR, event.text.text[i], 0);
                 }
                 break;
-            case SDL_WINDOWEVENT:
+            case SDL_EVENT_WINDOW_FIRST ... SDL_EVENT_WINDOW_LAST:
                 Window_HandleWindowEvent(&event);
                 break;
-            case SDL_KEYDOWN:
-                //stdPlatform_Printf("scancode %d\n", event.key.keysym.scancode);
+            case SDL_EVENT_KEY_DOWN:
+                //stdPlatform_Printf("scancode %d\n", event.key.scancode);
                 //handleKey(&event.key.keysym, WM_KEYDOWN, 0x1);
-                if (event.key.keysym.sym == SDLK_ESCAPE)
+                if (event.key.key == SDLK_ESCAPE)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_ESCAPE, event.key.repeat & 0xFFFF);
                     Window_msg_main_handler(g_hWnd, WM_CHAR, VK_ESCAPE, event.key.repeat & 0xFFFF);
                 }
-                else if (event.key.keysym.sym == SDLK_PAGEUP)
+                else if (event.key.key == SDLK_PAGEUP)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_PRIOR, event.key.repeat & 0xFFFF);
                 }
-                else if (event.key.keysym.sym == SDLK_PAGEDOWN)
+                else if (event.key.key == SDLK_PAGEDOWN)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_NEXT, event.key.repeat & 0xFFFF);
                 }
-                else if (event.key.keysym.sym == SDLK_LEFT)
+                else if (event.key.key == SDLK_LEFT)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_LEFT, event.key.repeat & 0xFFFF);
                 }
-                else if (event.key.keysym.sym == SDLK_RIGHT)
+                else if (event.key.key == SDLK_RIGHT)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_RIGHT, event.key.repeat & 0xFFFF);
                 }
-                else if (event.key.keysym.sym == SDLK_UP)
+                else if (event.key.key == SDLK_UP)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_UP, event.key.repeat & 0xFFFF);
                 }
-                else if (event.key.keysym.sym == SDLK_DOWN)
+                else if (event.key.key == SDLK_DOWN)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_DOWN, event.key.repeat & 0xFFFF);
                 }
-                else if (event.key.keysym.sym == SDLK_BACKSPACE)
+                else if (event.key.key == SDLK_BACKSPACE)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_BACK, event.key.repeat & 0xFFFF);
                     Window_msg_main_handler(g_hWnd, WM_CHAR, VK_BACK, event.key.repeat & 0xFFFF);
                 }
-                else if (event.key.keysym.sym == SDLK_DELETE)
+                else if (event.key.key == SDLK_DELETE)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_DELETE, event.key.repeat & 0xFFFF);
                     //Window_msg_main_handler(g_hWnd, WM_CHAR, VK_DELETE, 0);
                 }
-                else if (event.key.keysym.sym == SDLK_INSERT)
+                else if (event.key.key == SDLK_INSERT)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_INSERT, event.key.repeat & 0xFFFF);
                     Window_msg_main_handler(g_hWnd, WM_CHAR, VK_INSERT, 0);
                 }
-                else if (event.key.keysym.sym == SDLK_RETURN)
+                else if (event.key.key == SDLK_RETURN)
                 {
                     // HACK apparently Windows buffers these events in some way, but to replicate the behavior in jkGUI we just spam KEYFIRST
                     Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_RETURN, event.key.repeat & 0xFFFF);
                     Window_msg_main_handler(g_hWnd, WM_CHAR, VK_RETURN, event.key.repeat & 0xFFFF);
                 }
-                else if (event.key.keysym.sym == SDLK_LSHIFT)
+                else if (event.key.key == SDLK_LSHIFT)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_LSHIFT, event.key.repeat & 0xFFFF);
                 }
-                else if (event.key.keysym.sym == SDLK_RSHIFT)
+                else if (event.key.key == SDLK_RSHIFT)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_RSHIFT, event.key.repeat & 0xFFFF);
                 }
-                else if (event.key.keysym.sym == SDLK_TAB)
+                else if (event.key.key == SDLK_TAB)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_TAB, event.key.repeat & 0xFFFF);
                     Window_msg_main_handler(g_hWnd, WM_CHAR, VK_TAB, event.key.repeat & 0xFFFF);
                 }
-                else if (event.key.keysym.sym == SDLK_END)
+                else if (event.key.key == SDLK_END)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_END, event.key.repeat & 0xFFFF);
                     //Window_msg_main_handler(g_hWnd, WM_CHAR, 0x23, 0);
                 }
-                else if (event.key.keysym.sym == SDLK_HOME)
+                else if (event.key.key == SDLK_HOME)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_HOME, event.key.repeat & 0xFFFF);
                     //Window_msg_main_handler(g_hWnd, WM_CHAR, 0x24, 0);
                 }
-                else if (event.key.keysym.sym == SDLK_BACKQUOTE)
+                else if (event.key.key == SDLK_GRAVE)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_OEM_3, event.key.repeat & 0xFFFF);
                 }
-                else if (event.key.keysym.scancode == SDL_SCANCODE_AC_BACK) {
+                else if (event.key.scancode == SDL_SCANCODE_AC_BACK) {
                     Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_ESCAPE, 0);
                     Window_msg_main_handler(g_hWnd, WM_CHAR, VK_ESCAPE, event.key.repeat & 0xFFFF);
                 }
 
                 //if (!event.key.repeat)
-                //    stdControl_SetSDLKeydown(event.key.keysym.scancode, 1, event.key.timestamp);
+                //    stdControl_SetSDLKeydown(event.key.scancode, 1, event.key.timestamp);
                 break;
-            case SDL_KEYUP:
-                if (event.key.keysym.sym == SDLK_ESCAPE)
+            case SDL_EVENT_KEY_UP:
+                if (event.key.key == SDLK_ESCAPE)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_ESCAPE, 0);
                 }
-                else if (event.key.keysym.sym == SDLK_PAGEUP)
+                else if (event.key.key == SDLK_PAGEUP)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_PRIOR, 0);
                 }
-                else if (event.key.keysym.sym == SDLK_PAGEDOWN)
+                else if (event.key.key == SDLK_PAGEDOWN)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_NEXT, 0);
                 }
-                else if (event.key.keysym.sym == SDLK_LEFT)
+                else if (event.key.key == SDLK_LEFT)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_LEFT, 0);
                 }
-                else if (event.key.keysym.sym == SDLK_RIGHT)
+                else if (event.key.key == SDLK_RIGHT)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_RIGHT, 0);
                 }
-                else if (event.key.keysym.sym == SDLK_UP)
+                else if (event.key.key == SDLK_UP)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_UP, 0);
                 }
-                else if (event.key.keysym.sym == SDLK_DOWN)
+                else if (event.key.key == SDLK_DOWN)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_DOWN, 0);
                 }
-                else if (event.key.keysym.sym == SDLK_BACKSPACE)
+                else if (event.key.key == SDLK_BACKSPACE)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_BACK, 0);
                 }
-                else if (event.key.keysym.sym == SDLK_DELETE)
+                else if (event.key.key == SDLK_DELETE)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_DELETE, 0);
                 }
-                else if (event.key.keysym.sym == SDLK_INSERT)
+                else if (event.key.key == SDLK_INSERT)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_INSERT, 0);
                 }
-                else if (event.key.keysym.sym == SDLK_RETURN)
+                else if (event.key.key == SDLK_RETURN)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_RETURN, 0); // 0xB?
                 }
-                else if (event.key.keysym.sym == SDLK_LSHIFT)
+                else if (event.key.key == SDLK_LSHIFT)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_LSHIFT, 0);
                 }
-                else if (event.key.keysym.sym == SDLK_RSHIFT)
+                else if (event.key.key == SDLK_RSHIFT)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_RSHIFT, 0);
                 }
-                else if (event.key.keysym.sym == SDLK_TAB)
+                else if (event.key.key == SDLK_TAB)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_TAB, 0);
                 }
-                else if (event.key.keysym.sym == SDLK_END)
+                else if (event.key.key == SDLK_END)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_END, 0);
                 }
-                else if (event.key.keysym.sym == SDLK_HOME)
+                else if (event.key.key == SDLK_HOME)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_HOME, 0);
                 }
-                else if (event.key.keysym.sym == SDLK_BACKQUOTE)
+                else if (event.key.key == SDLK_GRAVE)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_OEM_3, 0);
                 }
-                else if (event.key.keysym.scancode == SDL_SCANCODE_AC_BACK) {
+                else if (event.key.scancode == SDL_SCANCODE_AC_BACK) {
                     Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_ESCAPE, 0);
                 }
                 //handleKey(&event.key.keysym, WM_KEYUP, 0xc0000001);
 
                 if (jkQuakeConsole_bOpen) break; // Hijack all input to console
 
-                stdControl_SetSDLKeydown(event.key.keysym.scancode, 0, event.key.timestamp);
+                stdControl_SetSDLKeydown(event.key.scancode, 0, (uint32_t)(event.key.timestamp / 1000000));
                 break;
-            case SDL_MOUSEMOTION:
+            case SDL_EVENT_MOUSE_MOTION:
                 Window_HandleMouseMove(&event.motion);
                 break;
-            case SDL_MOUSEBUTTONDOWN:
-            case SDL_MOUSEBUTTONUP:
+            case SDL_EVENT_MOUSE_BUTTON_DOWN:
+            case SDL_EVENT_MOUSE_BUTTON_UP:
 
                 mevent = (SDL_MouseButtonEvent*)&event;
                 left = 0;
                 right = 0;
                 hasLeft = 0;
                 hasRight = 0;
-                if (event.type == SDL_MOUSEBUTTONDOWN)
+                if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
                 {
                     left = (mevent->button == SDL_BUTTON_LEFT ? 1 : 0);
                     right = (mevent->button == SDL_BUTTON_RIGHT ? 2 : 0);
@@ -999,7 +999,7 @@ void Window_SdlUpdate()
                     if (right)
                         hasRight = 1;
                 }
-                else if (event.type == SDL_MOUSEBUTTONUP)
+                else if (event.type == SDL_EVENT_MOUSE_BUTTON_UP)
                 {
                     left = (mevent->button == SDL_BUTTON_LEFT ? 0 : 1);
                     right = (mevent->button == SDL_BUTTON_RIGHT ? 0 : 2);
@@ -1015,12 +1015,12 @@ void Window_SdlUpdate()
                 if (hasRight)
                     Window_bMouseRight = right;
 
-                Window_mouseX = mevent->x;
-                Window_mouseY = mevent->y;// - (Window_ySize - 480);
+                Window_mouseX = (int)mevent->x;
+                Window_mouseY = (int)mevent->y;// - (Window_ySize - 480);
 
                 pos = ((Window_mouseX) & 0xFFFF) | (((Window_mouseY) << 16) & 0xFFFF0000);
-                msgl = (event.type == SDL_MOUSEBUTTONDOWN ? WM_LBUTTONDOWN : WM_LBUTTONUP);
-                msgr = (event.type == SDL_MOUSEBUTTONDOWN ? WM_RBUTTONDOWN : WM_RBUTTONUP);
+                msgl = (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN ? WM_LBUTTONDOWN : WM_LBUTTONUP);
+                msgr = (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN ? WM_RBUTTONDOWN : WM_RBUTTONUP);
 
                 if (jkQuakeConsole_bOpen) break; // Hijack all input to console
                 
@@ -1033,77 +1033,77 @@ void Window_SdlUpdate()
                 //stdControl_UpdateKeyState(KEY_MOUSE_B2, Window_bMouseRight, mevent->timestamp);
 
                 break;
-            case SDL_MOUSEWHEEL:
-                Window_mouseWheelY = event.wheel.y;
-                Window_mouseWheelX = event.wheel.x;
+            case SDL_EVENT_MOUSE_WHEEL:
+                Window_mouseWheelY = (int)event.wheel.y;
+                Window_mouseWheelX = (int)event.wheel.x;
 
                 if (jkQuakeConsole_bOpen) break; // Hijack all input to console
                 break;
 
             // HACK: Escape key for controllers
-            case SDL_JOYBUTTONDOWN:
-            case SDL_JOYBUTTONUP:
+            case SDL_EVENT_JOYSTICK_BUTTON_DOWN:
+            case SDL_EVENT_JOYSTICK_BUTTON_UP:
                 if (!bIsGamepad) {
                     //stdPlatform_Printf("button %d, %d\n", event.jbutton.button, event.jbutton.state);
                 }
                 if (bIsOdin && !bIsGamepad && (event.jbutton.button == 6 || event.jbutton.button == 4)) {
-                    stdControl_bControllerEscapeKey = (event.jbutton.state == SDL_PRESSED);
+                    stdControl_bControllerEscapeKey = event.jbutton.down;
                 }
-                else if (!bIsGamepad && jkCutscene_isRendering && event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 3) { // y
+                else if (!bIsGamepad && jkCutscene_isRendering && event.type == SDL_EVENT_JOYSTICK_BUTTON_DOWN && event.jbutton.button == 3) { // y
                     Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_SPACE, 0);
                     Window_msg_main_handler(g_hWnd, WM_CHAR, VK_SPACE, 0);
                 }
-                else if (!bIsGamepad && jkCutscene_isRendering  && event.type == SDL_JOYBUTTONDOWN&& event.jbutton.button == 2) { // x
+                else if (!bIsGamepad && jkCutscene_isRendering  && event.type == SDL_EVENT_JOYSTICK_BUTTON_DOWN&& event.jbutton.button == 2) { // x
                     Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_SPACE, 0);
                     Window_msg_main_handler(g_hWnd, WM_CHAR, VK_SPACE, 0);
                 }
-                else if (!bIsGamepad && jkCutscene_isRendering && event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 1) { // b
+                else if (!bIsGamepad && jkCutscene_isRendering && event.type == SDL_EVENT_JOYSTICK_BUTTON_DOWN && event.jbutton.button == 1) { // b
                     Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_ESCAPE, 0);
                     Window_msg_main_handler(g_hWnd, WM_CHAR, VK_ESCAPE, 0);
                 }
-                else if (!bIsGamepad && jkCutscene_isRendering && event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 0) { // a
+                else if (!bIsGamepad && jkCutscene_isRendering && event.type == SDL_EVENT_JOYSTICK_BUTTON_DOWN && event.jbutton.button == 0) { // a
                     Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_ESCAPE, 0);
                     Window_msg_main_handler(g_hWnd, WM_CHAR, VK_ESCAPE, 0);
                 }
                 break;
 
-            case SDL_JOYAXISMOTION:
+            case SDL_EVENT_JOYSTICK_AXIS_MOTION:
                 if (event.jaxis.which == 0) {
                     //stdPlatform_Printf("axis %d, %d\n", event.jaxis.axis, event.jaxis.value);
                 }
                 break;
 
-            case SDL_CONTROLLERBUTTONDOWN:
-            case SDL_CONTROLLERBUTTONUP:
+            case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
+            case SDL_EVENT_GAMEPAD_BUTTON_UP:
                 if (bIsGamepad) {
-                    //stdPlatform_Printf("gpad button %d, %d\n", event.cbutton.button, event.cbutton.state);
-                    if (event.cbutton.button == SDL_CONTROLLER_BUTTON_START || event.cbutton.button == SDL_CONTROLLER_BUTTON_BACK) {
-                        stdControl_bControllerEscapeKey = (event.cbutton.state == SDL_PRESSED);
+                    //stdPlatform_Printf("gpad button %d, %d\n", event.gbutton.button, event.gbutton.state);
+                    if (event.gbutton.button == SDL_GAMEPAD_BUTTON_START || event.gbutton.button == SDL_GAMEPAD_BUTTON_BACK) {
+                        stdControl_bControllerEscapeKey = event.gbutton.down;
                     }
-                    else if (jkCutscene_isRendering && event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_Y) { // y
+                    else if (jkCutscene_isRendering && event.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN && event.gbutton.button == SDL_GAMEPAD_BUTTON_NORTH) { // y
                         Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_SPACE, 0);
                         Window_msg_main_handler(g_hWnd, WM_CHAR, VK_SPACE, 0);
                     }
-                    else if (jkCutscene_isRendering  && event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_X) { // x
+                    else if (jkCutscene_isRendering  && event.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN && event.gbutton.button == SDL_GAMEPAD_BUTTON_WEST) { // x
                         Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_SPACE, 0);
                         Window_msg_main_handler(g_hWnd, WM_CHAR, VK_SPACE, 0);
                     }
-                    else if (jkCutscene_isRendering && event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_B) { // b
+                    else if (jkCutscene_isRendering && event.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN && event.gbutton.button == SDL_GAMEPAD_BUTTON_EAST) { // b
                         Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_ESCAPE, 0);
                         Window_msg_main_handler(g_hWnd, WM_CHAR, VK_ESCAPE, 0);
                     }
-                    else if (jkCutscene_isRendering && event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_A) { // a
+                    else if (jkCutscene_isRendering && event.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN && event.gbutton.button == SDL_GAMEPAD_BUTTON_SOUTH) { // a
                         Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_ESCAPE, 0);
                         Window_msg_main_handler(g_hWnd, WM_CHAR, VK_ESCAPE, 0);
                     }
                 }
                 break;
-            case SDL_CONTROLLERAXISMOTION:
+            case SDL_EVENT_GAMEPAD_AXIS_MOTION:
                 //stdPlatform_Printf("Controller %d Axis %d moved to %d\n", 
                 //       event.caxis.which, event.caxis.axis, event.caxis.value);
                 break;
 
-            case SDL_QUIT:
+            case SDL_EVENT_QUIT:
                 stdPlatform_Printf("Quit!\n");
 
                 // Added
@@ -1157,7 +1157,7 @@ void Window_SdlUpdate()
             SDL_WarpMouseInWindow(displayWindow, Window_menu_mouseX, Window_menu_mouseY);
         }
 
-        SDL_SetRelativeMouseMode(SDL_FALSE);
+        SDL_SetWindowRelativeMouseMode(displayWindow, false);
 
         if (!jkGuiBuildMulti_bRendering) {
             std3D_StartScene();
@@ -1221,16 +1221,16 @@ void Window_SdlUpdate()
 
         if (jkQuakeConsole_bOpen)
         {
-            SDL_SetRelativeMouseMode(SDL_FALSE);
+            SDL_SetWindowRelativeMouseMode(displayWindow, false);
         }
 
         if (!jkQuakeConsole_bOpen && SDL_GetWindowFlags(displayWindow) & SDL_WINDOW_MOUSE_FOCUS) {
-            SDL_SetRelativeMouseMode(SDL_TRUE);
+            SDL_SetWindowRelativeMouseMode(displayWindow, true);
             //SDL_WarpMouseInWindow(displayWindow, 100, 100);
         }
         else
         {
-            SDL_SetRelativeMouseMode(SDL_FALSE);
+            SDL_SetWindowRelativeMouseMode(displayWindow, false);
         }
 #endif
     }
@@ -1293,7 +1293,7 @@ void Window_RecreateSDL2Window()
 
     if (displayWindow) {
         std3D_FreeResources();
-        SDL_GL_DeleteContext(glWindowContext);
+        SDL_GL_DestroyContext(glWindowContext);
         SDL_DestroyWindow(displayWindow);
     }
 
@@ -1303,25 +1303,26 @@ void Window_RecreateSDL2Window()
         Window_isHiDpi = 1;
     }
 
-    int flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+    SDL_WindowFlags flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 
     if (displayWindow) {
         flags = SDL_GetWindowFlags(displayWindow);
         //std3D_FreeResources();
-        //SDL_GL_DeleteContext(glWindowContext);
+        //SDL_GL_DestroyContext(glWindowContext);
         //SDL_DestroyWindow(displayWindow);
 
         flags |= SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
     }
 
 #ifdef WIN64_STANDALONE
-    SDL_SetHint(SDL_HINT_WINDOWS_DPI_AWARENESS, "permonitorv2");
+    // SDL_HINT_WINDOWS_DPI_AWARENESS has no SDL3 equivalent (removed) -- SDL3
+    // windows are DPI-aware by default.
 #endif
 
     if (Window_isHiDpi)
-        flags |= SDL_WINDOW_ALLOW_HIGHDPI;
+        flags |= SDL_WINDOW_HIGH_PIXEL_DENSITY;
     else
-        flags &= ~SDL_WINDOW_ALLOW_HIGHDPI;
+        flags &= ~SDL_WINDOW_HIGH_PIXEL_DENSITY;
 
     if (Window_isFullscreen) {
         //flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
@@ -1335,15 +1336,17 @@ void Window_RecreateSDL2Window()
 #endif
 
 #ifdef TARGET_ANDROID
-    flags = SDL_WINDOW_SHOWN;
+    flags = 0; // SDL_WINDOW_SHOWN removed -- windows are shown by default in SDL3
 #endif
 
+    // SDL3 SDL_CreateWindow() dropped the x/y position params; position is set
+    // separately below via SDL_SetWindowPosition() on desktop.
 #ifdef ARCH_WASM
-    displayWindow = SDL_CreateWindow(Window_isHiDpi ? "OpenJKDF2 HiDPI" : "OpenJKDF2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, canvas_get_width(), canvas_get_height(), flags);
+    displayWindow = SDL_CreateWindow(Window_isHiDpi ? "OpenJKDF2 HiDPI" : "OpenJKDF2", canvas_get_width(), canvas_get_height(), flags);
 #elif defined(TARGET_ANDROID)
-    displayWindow = SDL_CreateWindow(Window_isHiDpi ? "OpenJKDF2 HiDPI" : "OpenJKDF2", 0, 0, Window_screenXSize, Window_screenYSize, flags);
+    displayWindow = SDL_CreateWindow(Window_isHiDpi ? "OpenJKDF2 HiDPI" : "OpenJKDF2", Window_screenXSize, Window_screenYSize, flags);
 #else
-    displayWindow = SDL_CreateWindow(Window_isHiDpi ? "OpenJKDF2 HiDPI" : "OpenJKDF2", Window_xPos, Window_yPos, Window_screenXSize, Window_screenYSize, flags);
+    displayWindow = SDL_CreateWindow(Window_isHiDpi ? "OpenJKDF2 HiDPI" : "OpenJKDF2", Window_screenXSize, Window_screenYSize, flags);
 #endif
     if (!displayWindow) {
         char errtmp[256];
@@ -1353,16 +1356,11 @@ void Window_RecreateSDL2Window()
     }
     //SDL_SetRenderDrawBlendMode(displayRenderer, SDL_BLENDMODE_BLEND);
 
-#if defined(MACOS) && defined(__aarch64__)
-    //SDL_FixWindowMacOS(displayWindow);
+#if !defined(ARCH_WASM) && !defined(TARGET_ANDROID)
+    SDL_SetWindowPosition(displayWindow, Window_xPos, Window_yPos);
 #endif
 
-    if (Window_isFullscreen) {
-        SDL_SetWindowFullscreen(displayWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
-    }
-    else {
-        SDL_SetWindowFullscreen(displayWindow, 0);
-    }
+    SDL_SetWindowFullscreen(displayWindow, Window_isFullscreen ? true : false);
     SDL_RaiseWindow(displayWindow);
 
     glWindowContext = SDL_GL_CreateContext(displayWindow);
@@ -1399,10 +1397,10 @@ void Window_RecreateSDL2Window()
     SDL_GL_MakeCurrent(displayWindow, glWindowContext);
     SDL_GL_SetSwapInterval(jkPlayer_enableVsync); // Disable vsync
 #ifndef TARGET_ANDROID
-    SDL_StartTextInput();
+    SDL_StartTextInput(displayWindow);
 #endif
 
-    SDL_GL_GetDrawableSize(displayWindow, &Window_xSize, &Window_ySize);
+    SDL_GetWindowSizeInPixels(displayWindow, &Window_xSize, &Window_ySize);
     SDL_GetWindowSize(displayWindow, &Window_screenXSize, &Window_screenYSize);
 
     Window_resized = 1;
@@ -1441,14 +1439,14 @@ int Window_Main_Linux(int argc, char** argv)
     SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS4, "1");
     SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_XBOX, "1");
     //SDL_SetHint(SDL_HINT_AUTO_UPDATE_JOYSTICKS, "1");
-    SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
+    // SDL_HINT_ACCELEROMETER_AS_JOYSTICK has no SDL3 equivalent (removed).
     SDL_SetHint(SDL_HINT_ANDROID_TRAP_BACK_BUTTON, "1");
     SDL_SetHint("SDL_MIXER_DEBUG_MUSIC_INTERFACES", "1");
-    SDL_SetHint(SDL_HINT_AUDIODRIVER, "aaudio"); // This is fine for music tbh
+    SDL_SetHint(SDL_HINT_AUDIO_DRIVER, "aaudio"); // This is fine for music tbh
     SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
 #endif
 
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_NOPARACHUTE | SDL_INIT_GAMECONTROLLER);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_GAMEPAD);
 
     
     if ((SDL_GetHintBoolean("SteamClientLaunch", 0) || SDL_GetHintBoolean("SteamOS", 0) || SDL_GetHintBoolean("SteamDeck", 0)) && SDL_GetHintBoolean("SteamGamepadUI", 0)) {
@@ -1542,7 +1540,7 @@ int Window_Main_Linux(int argc, char** argv)
     {
         if (displayWindow) {
             std3D_FreeResources();
-            SDL_GL_DeleteContext(glWindowContext);
+            SDL_GL_DestroyContext(glWindowContext);
             SDL_DestroyWindow(displayWindow);
         }
     }

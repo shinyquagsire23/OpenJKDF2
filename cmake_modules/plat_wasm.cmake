@@ -19,7 +19,12 @@ macro(plat_initialize)
 
     add_link_options(-fno-exceptions)
     add_compile_options(-fno-exceptions)
-    set(USE_FLAGS "-sUSE_SDL=2 -sUSE_SDL_MIXER=2 -sWASM=1 -s ALLOW_MEMORY_GROWTH=1 -sFULL_ES2 -sFULL_ES3 -sUSE_WEBGL2=1 -sASYNCIFY -sINITIAL_MEMORY=200mb -s STACK_SIZE=100mb")
+    # NOTE: Emscripten's port system has no SDL3_mixer port as of this writing (only
+    # -sUSE_SDL_MIXER=2 exists), so it's dropped here -- stdMci.c's SDL2_RENDER branch
+    # now speaks the SDL3_mixer API, which the SDL2_mixer port can't satisfy. WASM
+    # builds until someone either vendors SDL3_mixer from source for WASM or Emscripten
+    # ships a port; music/mixer playback is unverified/broken on this target for now.
+    set(USE_FLAGS "-sUSE_SDL=3 -sWASM=1 -s ALLOW_MEMORY_GROWTH=1 -sFULL_ES2 -sFULL_ES3 -sUSE_WEBGL2=1 -sASYNCIFY -sINITIAL_MEMORY=200mb -s STACK_SIZE=100mb")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${USE_FLAGS}")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${USE_FLAGS}")
     #set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${USE_FLAGS} --profiling --preload-file ${PROJECT_SOURCE_DIR}/wasm_out@/ ")
@@ -34,7 +39,7 @@ macro(plat_specific_deps)
 endmacro()
 
 macro(plat_link_and_package)
-    target_link_libraries(${BIN_NAME} PRIVATE -lm -lSDL2 -lSDL2_mixer -lGL -lGLEW -lopenal -lidbfs.js)
+    target_link_libraries(${BIN_NAME} PRIVATE -lm -lSDL3 -lGL -lGLEW -lopenal -lidbfs.js)
     target_link_libraries(sith_engine PRIVATE nlohmann_json::nlohmann_json)
 
     add_custom_command(TARGET ${BIN_NAME}
