@@ -1,6 +1,17 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#if defined(WIN32) && defined(SDL2_RENDER)
+// Added: SDL3 moved its WinMain shim into a header-only impl (SDL_main_impl.h,
+// pulled in transitively by this include) instead of providing a linkable
+// `WinMain` symbol from the archive -- the plain `-Dmain=SDL_main`
+// compile-definition trick alone no longer resolves `WinMain`/`WinMain@16` at
+// link time on mingw/MSVC. Must only be included here (the one TU defining
+// `main`) -- SDL_main_impl.h emits a real WinMain() function body, so
+// including it from a shared header would multiply-define across every TU.
+#include <SDL_main.h>
+#endif
+
 #include "hook.h"
 #include "jk.h"
 #include "types.h"

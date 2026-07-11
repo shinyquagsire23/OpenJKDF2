@@ -108,6 +108,13 @@ ExternalProject_Add(
                         -DSDLMIXER_MP3_MPG123:BOOL=FALSE
                         -DSDLMIXER_DEPS_SHARED:BOOL=FALSE
                         -DSDLMIXER_EXAMPLES:BOOL=FALSE
+                        # test/ (testaudiodecoder, testspatialization, testmixer) builds by
+                        # default too (separate option from EXAMPLES) and we don't need it either;
+                        # on mingw it also hard-fails the whole build (Homebrew's mingw-w64 links
+                        # both libssp.a and libssp.dll.a, giving a duplicate __stack_chk_fail
+                        # definition) -- disable rather than chase a toolchain packaging bug in
+                        # code we never run.
+                        -DSDLMIXER_TESTS:BOOL=FALSE
                         -DSDLMIXER_VENDORED:BOOL=TRUE
                         -DSDLMIXER_FLAC:BOOL=FALSE
                         -DSDLMIXER_OPUS:BOOL=TRUE

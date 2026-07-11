@@ -71,11 +71,16 @@ set(CMAKE_C_STANDARD_LIBRARIES
 # Everything but the system CRT (msvcrt) and kernel32 comes from static libs so the
 # .exe imports only guaranteed Windows system DLLs. libssp is static here so
 # stack-protected objects don't drag in libssp-0.dll.
-    "-Wl,-Bstatic,-lssp,-lpthread,-lmingwex,-lmingw32,-lgcc,-Bdynamic,-lmsvcrt,-lkernel32"
+# Added: on this i686 toolchain (unlike x86_64), libssp's _guard_setup calls into
+# advapi32's CryptAcquireContextA/CryptGenRandom/CryptReleaseContext for its canary
+# entropy -- advapi32 has to be linked right after -lssp here (it's already linked
+# again later in plat_mingw_x86_32.cmake's target_link_libraries for our own code,
+# but that occurrence comes too early in link order to satisfy libssp's own symbols).
+    "-Wl,-Bstatic,-lssp,-ladvapi32,-lpthread,-lmingwex,-lmingw32,-lgcc,-Bdynamic,-lmsvcrt,-lkernel32"
     CACHE INTERNAL CMAKE_C_STANDARD_LIBRARIES # there are nasty interdependencies between libpthread and libgcc/libgcc_eh
 )
 set(CMAKE_CXX_STANDARD_LIBRARIES
-    "-Wl,-Bstatic,-lstdc++,-lssp,-lpthread,-lmingwex,-lmingw32,-lgcc,-lgcc_eh,-Bdynamic,-lmsvcrt,-lkernel32"
+    "-Wl,-Bstatic,-lstdc++,-lssp,-ladvapi32,-lpthread,-lmingwex,-lmingw32,-lgcc,-lgcc_eh,-Bdynamic,-lmsvcrt,-lkernel32"
     CACHE INTERNAL CMAKE_CXX_STANDARD_LIBRARIES # there are nasty interdependencies between libpthread and libgcc/libgcc_eh
 )
 

@@ -871,6 +871,9 @@ void std3D_PurgeUIEntry(int i, int idx) {}
 void std3D_PurgeTextureEntry(int i) {}
 void std3D_UpdateSettings() {}
 void std3D_Screenshot(const char* pFpath) {}
+// Added: GL11 has no window-present capture path (no FBO compositing); stub
+// like std3D_Screenshot above rather than leaving OPENJKDF2_AUTOSHOT unlinkable.
+void std3D_ScreenshotWindow(const char* pFpath) {}
 void std3D_ResetUIRenderList()
 {
     std3D_uiVerticesAmt = 0;

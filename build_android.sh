@@ -32,10 +32,10 @@ cd ..
 pushd packaging/android-project
 mkdir -p app/src/main/jniLibs && 
 mkdir -p app/src/main/jniLibs/arm64-v8a && 
-cp $OPENJKDF2_BUILD_DIR/libopenjkdf2-armv8a.so app/src/main/jniLibs/arm64-v8a/libmain.so && 
-cp $OPENJKDF2_BUILD_DIR/openal/libopenal.so app/src/main/jniLibs/arm64-v8a/libopenal.so && 
-cp $OPENJKDF2_BUILD_DIR/SDL/libSDL2.so app/src/main/jniLibs/arm64-v8a/libSDL2.so && 
-cp $OPENJKDF2_BUILD_DIR/SDL_mixer/libSDL2_mixer.so app/src/main/jniLibs/arm64-v8a/libSDL2_mixer.so && 
+cp $OPENJKDF2_BUILD_DIR/libopenjkdf2-armv8a.so app/src/main/jniLibs/arm64-v8a/libmain.so &&
+cp $OPENJKDF2_BUILD_DIR/openal/libopenal.so app/src/main/jniLibs/arm64-v8a/libopenal.so &&
+cp $OPENJKDF2_BUILD_DIR/SDL/libSDL3.so app/src/main/jniLibs/arm64-v8a/libSDL3.so &&
+cp $OPENJKDF2_BUILD_DIR/SDL_mixer/libSDL3_mixer.so app/src/main/jniLibs/arm64-v8a/libSDL3_mixer.so &&
 ./gradlew assembleDebug && 
 ./gradlew installDebug && 
 popd

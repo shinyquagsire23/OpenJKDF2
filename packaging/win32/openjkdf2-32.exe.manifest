@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
-  <assemblyIdentity type="win32" name="OpenJKDF2" version="0.9.8.0" processorArchitecture="i686"/>
+  <assemblyIdentity type="win32" name="OpenJKDF2" version="0.9.9.0" processorArchitecture="i686"/>
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
     <security>
       <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v2">
