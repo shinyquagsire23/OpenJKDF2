@@ -117,7 +117,7 @@ void sithConsole_PrintString(const char *pString)
     }
 }
 
-void sithConsole_PrintWString(const wchar_t *pwString)
+void sithConsole_PrintWString(const char16_t *pwString)
 {
     if ( DebugGui_fnPrintUniStr )
         DebugGui_fnPrintUniStr(pwString);

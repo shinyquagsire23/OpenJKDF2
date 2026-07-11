@@ -146,7 +146,7 @@ static jkGuiMenu jkGuiMultiTally_menu3 = {
     jkGuiMultiTally_buttons3, -1, 65535, 65535, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, jkGuiMultiTally_sub_4188B0, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
 };
 
-static wchar_t jkGuiMultiTally_waTmp[64];
+static char16_t jkGuiMultiTally_waTmp[64];
 static uint32_t jkGuiMultiTally_msStart;
 static int jkGuiMultiTally_dword_5568D0;
 static int jkGuiMultiTally_idkType;
@@ -170,7 +170,7 @@ int jkGuiMultiTally_Show(int a1)
     int v15; // edi
     int v16; // eax
     int v17; // esi
-    wchar_t *v18; // eax
+    char16_t *v18; // eax
     uint32_t v19; // ecx
     jkGuiElement* v20; // esi
     SithPlayer* v21; // edi
@@ -182,21 +182,21 @@ int jkGuiMultiTally_Show(int a1)
     jkGuiElement* v27; // eax
     int v28; // edi
     int v29; // eax
-    wchar_t *v30; // eax
-    wchar_t *v31; // [esp-4h] [ebp-29EA4h]
-    wchar_t *v32; // [esp-4h] [ebp-29EA4h]
+    char16_t *v30; // eax
+    char16_t *v31; // [esp-4h] [ebp-29EA4h]
+    char16_t *v32; // [esp-4h] [ebp-29EA4h]
     int v33; // [esp+10h] [ebp-29E90h]
-    wchar_t *v34; // [esp+10h] [ebp-29E90h]
+    char16_t *v34; // [esp+10h] [ebp-29E90h]
     uint32_t v35; // [esp+14h] [ebp-29E8Ch]
     uint32_t v36; // [esp+14h] [ebp-29E8Ch]
     int v37; // [esp+18h] [ebp-29E88h]
     uint32_t v38; // [esp+18h] [ebp-29E88h]
-    wchar_t *v39; // [esp+1Ch] [ebp-29E84h]
-    wchar_t wtmp5[1024]; // [esp+20h] [ebp-29E80h] BYREF
-    wchar_t wtmp1[1024]; // [esp+820h] [ebp-29680h] BYREF
-    wchar_t wtmp2[1024]; // [esp+1020h] [ebp-28E80h] BYREF
-    wchar_t wtmp3[1024]; // [esp+1820h] [ebp-28680h] BYREF
-    wchar_t wtmp4[1024]; // [esp+2020h] [ebp-27E80h] BYREF
+    char16_t *v39; // [esp+1Ch] [ebp-29E84h]
+    char16_t wtmp5[1024]; // [esp+20h] [ebp-29E80h] BYREF
+    char16_t wtmp1[1024]; // [esp+820h] [ebp-29680h] BYREF
+    char16_t wtmp2[1024]; // [esp+1020h] [ebp-28E80h] BYREF
+    char16_t wtmp3[1024]; // [esp+1820h] [ebp-28680h] BYREF
+    char16_t wtmp4[1024]; // [esp+2020h] [ebp-27E80h] BYREF
     SithPlayer aPlayerInfoSorted[32]; // [esp+2820h] [ebp-27680h] BYREF
 
     memset(jkGuiMultiTally_waTmp, 0, 0x40u);
@@ -274,20 +274,20 @@ int jkGuiMultiTally_Show(int a1)
                     pElementIter[32].textType = 0;
                     pElementIter[48].textType = 0;
                 }
-                jk_snwprintf(&wtmp2[v8], 0x20u, L"%ls", pPlayerInfoIter);
+                jk_snwprintf(&wtmp2[v8], 0x20u, u"%ls", pPlayerInfoIter);
                 v9 = pPlayerInfoIter->score;
                 //pElementIter[-16].hoverId = (intptr_t)&wtmp2[v8]; BUG?
                 pElementIter[-16].wstr = &wtmp2[v8];
-                jk_snwprintf(&wtmp4[v8], 0x20u, L"%d", v9);
+                jk_snwprintf(&wtmp4[v8], 0x20u, u"%d", v9);
                 v10 = pPlayerInfoIter->numKills;
                 pElementIter->wstr = &wtmp4[v8];
-                jk_snwprintf(v39, 0x20u, L"%d", v10);
+                jk_snwprintf(v39, 0x20u, u"%d", v10);
                 v11 = pPlayerInfoIter->numKilled;
                 pElementIter[16].wstr = v39;
-                jk_snwprintf(&wtmp1[v8], 0x20u, L"%d", v11);
+                jk_snwprintf(&wtmp1[v8], 0x20u, u"%d", v11);
                 v12 = pPlayerInfoIter->numSuicides;
                 pElementIter[32].wstr = &wtmp1[v8];
-                jk_snwprintf(&wtmp3[v8], 0x20u, L"%d", v12);
+                jk_snwprintf(&wtmp3[v8], 0x20u, u"%d", v12);
                 pElementIter[48].wstr = &wtmp3[v8];
             }
             else
@@ -355,20 +355,20 @@ int jkGuiMultiTally_Show(int a1)
         {
             if ( (v21->flags & 2) != 0 && (v21->flags & 4) != 0 )
             {
-                jk_snwprintf(&wtmp2[v22], 0x20u, L"%ls", v21);
+                jk_snwprintf(&wtmp2[v22], 0x20u, u"%ls", v21);
                 v23 = v21->score;
                 //v20[-16].type = (JKGUIELEMENT_T)&wtmp2[v22]; BUG?
                 v20[-16].wstr = &wtmp2[v22];
-                jk_snwprintf(&wtmp4[v22], 0x20u, L"%d", v23);
+                jk_snwprintf(&wtmp4[v22], 0x20u, u"%d", v23);
                 v24 = v21->numKills;
                 v20->wstr = &wtmp4[v22];
-                jk_snwprintf(v34, 0x20u, L"%d", v24);
+                jk_snwprintf(v34, 0x20u, u"%d", v24);
                 v25 = v21->numKilled;
                 v20[16].wstr = v34;
-                jk_snwprintf(&wtmp1[v22], 0x20u, L"%d", v25);
+                jk_snwprintf(&wtmp1[v22], 0x20u, u"%d", v25);
                 v26 = v21->numSuicides;
                 v20[32].wstr = &wtmp1[v22];
-                jk_snwprintf(&wtmp3[v22], 0x20u, L"%d", v26);
+                jk_snwprintf(&wtmp3[v22], 0x20u, u"%d", v26);
                 v19 = v38;
                 v20[48].wstr = &wtmp3[v22];
             }
@@ -499,7 +499,7 @@ void jkGuiMultiTally_sub_4188B0(jkGuiMenu *pMenu)
         if ( v1 / 1000 != jkGuiMultiTally_dword_5568D0 )
         {
             jkGuiMultiTally_dword_5568D0 = v1 / 1000;
-            jk_snwprintf(jkGuiMultiTally_waTmp, 0x20u, L"%d", 30 - v1 / 1000);
+            jk_snwprintf(jkGuiMultiTally_waTmp, 0x20u, u"%d", 30 - v1 / 1000);
             if ( pMenu == &jkGuiMultiTally_menu3 )
             {
                 jkGuiMultiTally_buttons3[14].wstr = jkGuiMultiTally_waTmp;
@@ -520,16 +520,16 @@ int jkGuiMultiTally_ShowTeamScores(int a1)
     int v3; // ecx
     int v7; // esi
     jkGuiElement* pElementIter; // esi
-    wchar_t *v9; // ebx
+    char16_t *v9; // ebx
     jkHudTeamScore *v10; // edi
-    wchar_t *v11; // eax
+    char16_t *v11; // eax
     int v12; // esi
     int v13; // eax
     int v14; // edi
-    wchar_t *v15; // eax
-    wchar_t *v17; // [esp-4h] [ebp-864h]
+    char16_t *v15; // eax
+    char16_t *v17; // [esp-4h] [ebp-864h]
     jkHudTeamScore aTmpTeamScores[5]; // [esp+10h] [ebp-850h] BYREF
-    wchar_t v19[32 * 5]; // [esp+60h] [ebp-800h] BYREF
+    char16_t v19[32 * 5]; // [esp+60h] [ebp-800h] BYREF
 
     jkGuiMultiTally_msStart = stdPlatform_GetTimeMsec();
     jkGuiMultiTally_idkType = a1;
@@ -589,7 +589,7 @@ int jkGuiMultiTally_ShowTeamScores(int a1)
                     break;
             }
             pElementIter->wstr = v11;
-            jk_snwprintf(v9, 0x20u, L"%d", v10->score);
+            jk_snwprintf(v9, 0x20u, u"%d", v10->score);
             pElementIter[5].wstr = v9;
         }
         else

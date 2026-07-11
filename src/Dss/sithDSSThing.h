@@ -103,7 +103,7 @@ int sithDSSThing_ProcessMOTSNew1(SithMessage *msg);
 void sithDSSThing_SendMOTSNew1(SithThing* pThing1, SithThing* pThing2, SithThing* pThing3, SithSector* pSector, 
     rdVector3* pVec1, rdVector3* pVec2, int mpFlags, int param_8);
 
-//static void (*sithDSSThing_PlayKey)(SithThing *a1, rdKeyframe *a2, int a3, wchar_t a4, int a5, int a6, int a7) = (void*)sithDSSThing_PlayKey_ADDR;
+//static void (*sithDSSThing_PlayKey)(SithThing *a1, rdKeyframe *a2, int a3, char16_t a4, int a5, int a6, int a7) = (void*)sithDSSThing_PlayKey_ADDR;
 //static void (*sithDSSThing_StopKey)(SithThing *a1, int a2, flex32_t a3, int a4, int a5) = (void*)sithDSSThing_StopKey_ADDR;
 //static void (*sithDSSThing_SetModel)(SithThing *a1, int a2) = (void*)sithDSSThing_SetModel_ADDR;
 //static int (*sithDSSThing_StopSound)(sithPlayingSound *a1, flex32_t a2, int a3, int a4) = (void*)sithDSSThing_StopSound_ADDR;

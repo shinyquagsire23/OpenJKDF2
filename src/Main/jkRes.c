@@ -335,9 +335,9 @@ int jkRes_LoadCD(int cdNumberNeeded)
     Gob **v4; // esi
     unsigned int v5; // edi
     Gob **v6; // esi
-    wchar_t *v7; // eax
-    wchar_t *v8; // eax
-    wchar_t *v9; // eax
+    char16_t *v7; // eax
+    char16_t *v8; // eax
+    char16_t *v9; // eax
     unsigned int v10; // esi
     Gob **v11; // edi
     unsigned int v12; // esi
@@ -353,7 +353,7 @@ int jkRes_LoadCD(int cdNumberNeeded)
     int keyval; // [esp+18h] [ebp-184h] BYREF
     char v26[128]; // [esp+1Ch] [ebp-180h] BYREF
     char a2[128]; // [esp+9Ch] [ebp-100h] BYREF
-    wchar_t v28[64]; // [esp+11Ch] [ebp-80h] BYREF
+    char16_t v28[64]; // [esp+11Ch] [ebp-80h] BYREF
 
     v23 = 0;
     v24 = 0;
@@ -608,7 +608,7 @@ const char* jkRes_FileGets(stdFile_t fd, char* str, size_t n)
         return stdGob_FileGets(resFile->gobHandle, str, n);
 }
 
-const wchar_t* jkRes_FileGetws(stdFile_t fd, wchar_t* wstr, size_t n)
+const char16_t* jkRes_FileGetws(stdFile_t fd, char16_t* wstr, size_t n)
 {
     jkResFile* resFile = &jkRes_aFiles[fd - 1];
     if (resFile->useLowLevel)

@@ -27,46 +27,46 @@
 #define stdFont_sub_435950_ADDR (0x00435950)
 
 stdFont* stdFont_Load(char *fpath, int a2, int a3);
-MATH_FUNC unsigned int stdFont_Draw1(tVBuffer *vbuf, stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe);
-MATH_FUNC void stdFont_Draw2(tVBuffer *a1, stdFont *a2, unsigned int a3, int a4, rdRect *a5, const wchar_t *a6, int a7);
-MATH_FUNC void stdFont_Draw3(tVBuffer *paintSurface, stdFont *font, int a3, rdRect *a4, int a5, const wchar_t *a6, int a7);
-MATH_FUNC int stdFont_Draw4(tVBuffer *a1, stdFont *font, int xPos, int yPos, int a5, int a6, int a7, const wchar_t *text, int alpha_maybe);
-const wchar_t* stdFont_sub_4352C0(const wchar_t *a1, stdFont *a2, int a3, rdRect *a4, int *a5);
-int stdFont_sub_4357C0(stdFont *a1, const wchar_t *a2, rdRect *a4);
-int stdFont_sub_435810(stdFont *a1, const wchar_t *a2, int a3);
-int stdFont_sub_434EC0(tVBuffer *a1, stdFont *a2, int a3, int a4, int a5, int32_t *a6, const wchar_t *a7, int a8);
+MATH_FUNC unsigned int stdFont_Draw1(tVBuffer *vbuf, stdFont *font, unsigned int blit_x, int blit_y, int a5, const char16_t *a6, int alpha_maybe);
+MATH_FUNC void stdFont_Draw2(tVBuffer *a1, stdFont *a2, unsigned int a3, int a4, rdRect *a5, const char16_t *a6, int a7);
+MATH_FUNC void stdFont_Draw3(tVBuffer *paintSurface, stdFont *font, int a3, rdRect *a4, int a5, const char16_t *a6, int a7);
+MATH_FUNC int stdFont_Draw4(tVBuffer *a1, stdFont *font, int xPos, int yPos, int a5, int a6, int a7, const char16_t *text, int alpha_maybe);
+const char16_t* stdFont_sub_4352C0(const char16_t *a1, stdFont *a2, int a3, rdRect *a4, int *a5);
+int stdFont_sub_4357C0(stdFont *a1, const char16_t *a2, rdRect *a4);
+int stdFont_sub_435810(stdFont *a1, const char16_t *a2, int a3);
+int stdFont_sub_434EC0(tVBuffer *a1, stdFont *a2, int a3, int a4, int a5, int32_t *a6, const char16_t *a7, int a8);
 void stdFont_Free(stdFont *font);
 MATH_FUNC uint32_t stdFont_DrawAscii(tVBuffer *a1, stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe);
 int stdFont_sub_4355B0(stdFont *font, uint16_t a2);
 stdFont* stdFont_New(int marginY, int marginX, int16_t field_28, uint16_t charFirst, uint16_t charLast);
 int stdFont_Write(const char *fpath, stdFont *font);
 int stdFont_sub_435570(uint16_t ch);
-int stdFont_sub_4355F0(stdFont *font, const wchar_t *text);
-int stdFont_sub_4356B0(const wchar_t *text, stdFont *font, int *pMaxWidth);
+int stdFont_sub_4355F0(stdFont *font, const char16_t *text);
+int stdFont_sub_4356B0(const char16_t *text, stdFont *font, int *pMaxWidth);
 void stdFont_sub_435190(tVBuffer *vbuf, stdFont *font, int destX, int destY, uint16_t ch, int alpha);
 stdFontCharset* stdFont_sub_4358D0(stdFont *font, uint16_t charFirst, uint16_t charLast);
 int stdFont_sub_435950(stdFont *font, uint16_t ch, int *pTexX, int *pWidth);
 
 MATH_FUNC uint32_t stdFont_DrawAsciiGPU(stdFont *a2, unsigned int blit_x, int blit_y, int x_max, const char *str, int alpha_maybe, flex_t scale);
 MATH_FUNC uint32_t stdFont_DrawAsciiWidth(stdFont *a2, unsigned int blit_x, int blit_y, int x_max, const char *str, int alpha_maybe, flex_t scale);
-MATH_FUNC int stdFont_Draw4GPU(stdFont *font, int xPos, int yPos, int a5, int a6, int a7, const wchar_t *text, int alpha_maybe, flex_t scale);
-MATH_FUNC unsigned int stdFont_Draw1GPU(stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe, flex_t scale);
-MATH_FUNC unsigned int stdFont_Draw1Width(stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe, flex_t scale);
+MATH_FUNC int stdFont_Draw4GPU(stdFont *font, int xPos, int yPos, int a5, int a6, int a7, const char16_t *text, int alpha_maybe, flex_t scale);
+MATH_FUNC unsigned int stdFont_Draw1GPU(stdFont *font, unsigned int blit_x, int blit_y, int a5, const char16_t *a6, int alpha_maybe, flex_t scale);
+MATH_FUNC unsigned int stdFont_Draw1Width(stdFont *font, unsigned int blit_x, int blit_y, int a5, const char16_t *a6, int alpha_maybe, flex_t scale);
 
-MATH_FUNC unsigned int stdFont_DrawMultilineCenteredGPU(stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe, flex_t scale);
-MATH_FUNC unsigned int stdFont_DrawMultilineCenteredHeight(stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe, flex_t scale);
+MATH_FUNC unsigned int stdFont_DrawMultilineCenteredGPU(stdFont *font, unsigned int blit_x, int blit_y, int a5, const char16_t *a6, int alpha_maybe, flex_t scale);
+MATH_FUNC unsigned int stdFont_DrawMultilineCenteredHeight(stdFont *font, unsigned int blit_x, int blit_y, int a5, const char16_t *a6, int alpha_maybe, flex_t scale);
 //static int (*stdFont_DrawAscii)(tVBuffer *a1, stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe) = (void*)stdFont_DrawAscii_ADDR;
 
-//static int (*stdFont_Draw4)(tVBuffer *a1, stdFont *font, int xPos, int yPos, int a5, int a6, int a7, wchar_t *text, int alpha_maybe) = (void*)stdFont_Draw4_ADDR;
+//static int (*stdFont_Draw4)(tVBuffer *a1, stdFont *font, int xPos, int yPos, int a5, int a6, int a7, char16_t *text, int alpha_maybe) = (void*)stdFont_Draw4_ADDR;
 //static void (*stdFont_Free)(stdFont *font) = (void*)stdFont_Free_ADDR;
 //static stdFont* (*stdFont_Load)(char *fpath, int a2, int a3) = (void*)stdFont_Load_ADDR;
-//static void (*stdFont_Draw3)(tVBuffer *a1, stdFont* a2, int a3, rdRect *a4, int a5, wchar_t *a6, int a7) = (void*)stdFont_Draw3_ADDR;
-//static int (*stdFont_sub_434EC0)(tVBuffer* a1, int a2, int a3, int a4, int a5, int a6, wchar_t *a7, int a8) = (void*)stdFont_sub_434EC0_ADDR;
+//static void (*stdFont_Draw3)(tVBuffer *a1, stdFont* a2, int a3, rdRect *a4, int a5, char16_t *a6, int a7) = (void*)stdFont_Draw3_ADDR;
+//static int (*stdFont_sub_434EC0)(tVBuffer* a1, int a2, int a3, int a4, int a5, int a6, char16_t *a7, int a8) = (void*)stdFont_sub_434EC0_ADDR;
 //static int (*stdFont_sub_4355B0)(stdFont* a1, uint16_t a2) = (void*)stdFont_sub_4355B0_ADDR;
-//static int (*stdFont_sub_435810)(stdFont* a1, wchar_t *a2, int a3) = (void*)stdFont_sub_435810_ADDR;
-//static uint32_t (*stdFont_Draw1)(tVBuffer *vbuf, stdFont *font, unsigned int blit_x, int blit_y, int a5, wchar_t *a6, int alpha_maybe) = (void*)stdFont_Draw1_ADDR;
-//static int (*stdFont_sub_4357C0)(stdFont *a1, wchar_t *text, rdRect *rect) = (void*)stdFont_sub_4357C0_ADDR;
-//static void (*stdFont_Draw2)(tVBuffer *a1, stdFont *a2, unsigned int a3, int a4, rdRect *a5, wchar_t *a6, int a7) = (void*)stdFont_Draw2_ADDR;
+//static int (*stdFont_sub_435810)(stdFont* a1, char16_t *a2, int a3) = (void*)stdFont_sub_435810_ADDR;
+//static uint32_t (*stdFont_Draw1)(tVBuffer *vbuf, stdFont *font, unsigned int blit_x, int blit_y, int a5, char16_t *a6, int alpha_maybe) = (void*)stdFont_Draw1_ADDR;
+//static int (*stdFont_sub_4357C0)(stdFont *a1, char16_t *text, rdRect *rect) = (void*)stdFont_sub_4357C0_ADDR;
+//static void (*stdFont_Draw2)(tVBuffer *a1, stdFont *a2, unsigned int a3, int a4, rdRect *a5, char16_t *a6, int a7) = (void*)stdFont_Draw2_ADDR;
 
 // Added: helper
 static inline int32_t stdFont_GetHeight(stdFont* pFont) {

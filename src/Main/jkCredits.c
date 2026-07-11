@@ -265,7 +265,7 @@ int jkCredits_Tick()
     int v4; // ecx
     char *v5; // eax
     stdFont *v6; // ebx
-    wchar_t *v7; // esi
+    char16_t *v7; // esi
     uint8_t *v8; // esi
     char *pAIdk; // ecx
     uint8_t *v10; // edx
@@ -369,7 +369,7 @@ int jkCredits_Tick()
                 a4.height = 480;
                 v7 = jkCredits_table.msgs[jkCredits_strIdx].uniStr;
                 if ( !v7 )
-                    v7 = L" ";
+                    v7 = u" ";
 #ifdef SDL2_RENDER
                 stdDisplay_VBufferLock(jkCredits_pVbuffer);
 #endif

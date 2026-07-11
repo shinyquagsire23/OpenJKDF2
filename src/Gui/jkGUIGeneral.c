@@ -23,7 +23,7 @@ enum jkGuiDecisionButton_t
     GUI_ADVANCED = 105,
 };
 
-static wchar_t slider_val_text[5] = {0};
+static char16_t slider_val_text[5] = {0};
 static int32_t slider_images[2] = {JKGUI_BM_SLIDER_BACK, JKGUI_BM_SLIDER_THUMB};
 void jkGuiGeneral_FovDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, int redraw);
 
@@ -48,10 +48,10 @@ static jkGuiElement jkGuiGeneral_aElements[23] = {
     {ELEMENT_TEXT,         0,            0, slider_val_text,        3, {20, 300, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_FOV_VERTICAL",    0, {20, 320, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
 #else
-    {ELEMENT_TEXT,         0,            0, L"",                 3, {0, 0, 1, 1}, 1,  0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_TEXT,         0,            0, L"",                 3, {0, 0, 1, 1}, 1,  0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_TEXT,         0,            0, L"",                 3, {0, 0, 1, 1}, 1,  0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_TEXT,         0,            0, L"",                 3, {0, 0, 1, 1}, 1,  0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXT,         0,            0, u"",                 3, {0, 0, 1, 1}, 1,  0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXT,         0,            0, u"",                 3, {0, 0, 1, 1}, 1,  0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXT,         0,            0, u"",                 3, {0, 0, 1, 1}, 1,  0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXT,         0,            0, u"",                 3, {0, 0, 1, 1}, 1,  0, 0, 0, 0, 0, {0}, 0},
 #endif
 
     // 16
@@ -111,7 +111,7 @@ void jkGuiGeneral_FovDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf
 {
     jkPlayer_fov = FOV_MIN + jkGuiGeneral_aElements[13].selectedTextEntry;
     
-    jk_snwprintf(slider_val_text, 5, L"%u", jkPlayer_fov);
+    jk_snwprintf(slider_val_text, 5, u"%u", jkPlayer_fov);
     jkGuiGeneral_aElements[14].wstr = slider_val_text;
     
     jkGuiRend_SliderDraw(element, menu, vbuf, redraw);

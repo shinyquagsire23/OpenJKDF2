@@ -116,7 +116,7 @@ static int (*DirectPlay_IdkSessionDesc)(jkMultiEntry* pEntry) = (void*)DirectPla
 
 int stdComm_OpenConnection(void* a);
 void stdComm_CloseConnection();
-int stdComm_Open(int idx, wchar_t* pwPassword);
+int stdComm_Open(int idx, char16_t* pwPassword);
 //int stdComm_seed_idk(void* a);
 //int stdComm_CreatePlayer(void* a);
 //int stdComm_DoReceive();
@@ -129,8 +129,8 @@ BOOL DirectPlay_Send(DPID idFrom, DPID idTo, void *lpData, DWORD dwDataSize);
 void DirectPlay_SetSessionDesc(const char* a1, DWORD maxPlayers);
 BOOL DirectPlay_SetSessionFlagidk(int a1);
 BOOL DirectPlay_Startup();
-int DirectPlay_EarlyInit(wchar_t* pwIdk, wchar_t* pwPlayerName);
-DPID DirectPlay_CreatePlayer(wchar_t* pwIdk, int idk2);
+int DirectPlay_EarlyInit(char16_t* pwIdk, char16_t* pwPlayerName);
+DPID DirectPlay_CreatePlayer(char16_t* pwIdk, int idk2);
 void DirectPlay_Close();
 int DirectPlay_OpenHost(jkMultiEntry* a);
 int DirectPlay_GetSession_passwordidk(jkMultiEntry* a);

@@ -32,7 +32,7 @@
 
 // Added
 extern int jkCredits_cdOverride;
-static wchar_t jkGuiMain_versionBuffer[64];
+static char16_t jkGuiMain_versionBuffer[64];
 
 static int jkGuiMain_bIdk = 1;
 static int jkGuiCutscenes_initted;
@@ -63,7 +63,7 @@ static jkGuiElement jkGuiMain_elements[11] = {
     {ELEMENT_TEXTBUTTON, 13, 2, "GUI_SETUP", 3, {470, 380, 150, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
 #ifdef QOL_IMPROVEMENTS
     {ELEMENT_TEXTBUTTON, 16, 2, "GUI_CREDITS", 3, {130, 430, 150, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_TEXTBUTTON, 17, 2, L"Expansions & Mods", 3, {370, 430, 150, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXTBUTTON, 17, 2, u"Expansions & Mods", 3, {370, 430, 150, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXT,  0,  0,  NULL,  3, {560, 440, 70, 15},  1,  0,  0,  0,  0,  0, {0},  0},
     {ELEMENT_TEXT,  0,  0,  NULL,  3, {560, 455, 70, 15},  1,  0,  0,  0,  0,  0, {0},  0},
 #else
@@ -78,8 +78,8 @@ static jkGuiMenu jkGuiMain_menu = {jkGuiMain_elements, -1, 0xFFFF, 0xFFFF, 0xF, 
 void jkGuiMain_Show()
 {
     int v1; // esi
-    wchar_t *v2; // eax
-    wchar_t *v4; // [esp-4h] [ebp-Ch]
+    char16_t *v2; // eax
+    char16_t *v4; // [esp-4h] [ebp-Ch]
 
 #ifdef JKGUI_SMOL_SCREEN
     for (int i = 0; i < 11; i++) {
@@ -222,7 +222,7 @@ void jkGuiMain_ShowCutscenes()
     char *v0; // ebx
     char *v1; // ebp
     char *v2; // edx
-    wchar_t *v3; // eax
+    char16_t *v3; // eax
     int v4; // eax
     const char *v5; // eax
     const char *v6; // eax
@@ -230,7 +230,7 @@ void jkGuiMain_ShowCutscenes()
     void *i; // eax
     int v9; // [esp+10h] [ebp-15Ch]
     Darray darray; // [esp+14h] [ebp-158h] BYREF
-    char v11[64]; // [esp+2Ch] [ebp-140h] BYREF
+    char16_t v11[64]; // [esp+2Ch] [ebp-140h] BYREF // Added: was char -- %s in this codebase's tiny-printf reads a wide char16_t*, so a narrow buffer here produced garbage
     char v12[256]; // [esp+6Ch] [ebp-100h] BYREF
 
     if ( !jkGuiCutscenes_initted )
@@ -244,8 +244,7 @@ void jkGuiMain_ShowCutscenes()
     jkGuiRend_DarrayNewStr(&darray, 32, 1);
     if ( !jkPlayer_ReadConf(jkPlayer_playerShortName) )
     {
-        stdString_WcharToChar(v11, jkPlayer_playerShortName, 31);
-        v11[31] = 0;
+        stdString_SafeWStrCopy(v11, jkPlayer_playerShortName, 32); // Added: keep wide -- %s wants char16_t*
         Windows_ErrorMsgboxWide("ERR_CANNOT_SET_PLAYER %s", v11);
     }
     
@@ -312,7 +311,7 @@ void jkGuiMain_PopulateCutscenes(Darray *list, jkGuiElement *element)
 {
     char* v2;
     char *v3; // ebx
-    wchar_t *v5; // eax
+    char16_t *v5; // eax
     int v6; // [esp+4h] [ebp-44h]
     char key[64]; // [esp+8h] [ebp-40h] BYREF
 

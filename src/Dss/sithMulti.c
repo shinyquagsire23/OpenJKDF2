@@ -30,7 +30,7 @@
     } \
     ;
 
-static wchar_t sithMulti_chatWStrTmp[256]; // Added
+static char16_t sithMulti_chatWStrTmp[256]; // Added
 
 void sithMulti_SetHandleridk(sithMultiHandler_t a1)
 {
@@ -75,15 +75,15 @@ int sithMulti_ProcessChat(SithMessage *pMsg)
     v5[arg2 + 1] = 0;
 
     if ( arg1 < 0 )
-        jk_snwprintf(sithMulti_chatWStrTmp, 256, L"%S", v5); // Added: char -> wchar
+        jk_snwprintf(sithMulti_chatWStrTmp, 256, u"%S", v5); // Added: char -> wchar
     else
-        jk_snwprintf(sithMulti_chatWStrTmp, 256, L"%s says '%S'", jkPlayer_playerInfos[arg1].player_name, v5); // Added: char -> wchar
+        jk_snwprintf(sithMulti_chatWStrTmp, 256, u"%s says '%S'", jkPlayer_playerInfos[arg1].player_name, v5); // Added: char -> wchar
     sithConsole_AlertSound();
     sithConsole_PrintWString(sithMulti_chatWStrTmp); // Added: char -> wchar
     return 1;
 }
 
-HRESULT sithMulti_CreatePlayer(const wchar_t *a1, const wchar_t *a2, const char *a3, const char *a4, int maxPlayers, int sessionFlags, int multiModeFlags, int rate, int maxRank)
+HRESULT sithMulti_CreatePlayer(const char16_t *a1, const char16_t *a2, const char *a3, const char *a4, int maxPlayers, int sessionFlags, int multiModeFlags, int rate, int maxRank)
 {
     HRESULT result; // eax
     jkMultiEntry multiEntry; // [esp+Ch] [ebp-F0h] BYREF
@@ -350,14 +350,14 @@ void sithMulti_SyncScores()
 void sithMulti_ProcessKilledPlayer(SithPlayer *pPlayer, SithThing *pPlayerThing, SithThing *pKiller)
 {
     flex_d_t v3; // st7
-    wchar_t *v4; // eax
-    wchar_t *v5; // eax
-    wchar_t *v6; // eax
-    wchar_t *v7; // [esp-8h] [ebp-114h]
-    wchar_t *v8; // [esp-8h] [ebp-114h]
+    char16_t *v4; // eax
+    char16_t *v5; // eax
+    char16_t *v6; // eax
+    char16_t *v7; // [esp-8h] [ebp-114h]
+    char16_t *v8; // [esp-8h] [ebp-114h]
     SithPlayer *v9; // [esp-4h] [ebp-110h]
     SithPlayer *v10; // [esp-4h] [ebp-110h]
-    wchar_t a1a[128]; // [esp+Ch] [ebp-100h] BYREF
+    char16_t a1a[128]; // [esp+Ch] [ebp-100h] BYREF
 
     ++pPlayer->numKilled;
     if ( !pKiller || pKiller->type != SITH_THING_PLAYER )
@@ -455,7 +455,7 @@ void sithMulti_ProcessScore()
         }
         if ( score_limit_met )
         {
-            wchar_t* v9 = sithStrTable_GetUniStringWithFallback("MULTI_SCORELIMIT");
+            char16_t* v9 = sithStrTable_GetUniStringWithFallback("MULTI_SCORELIMIT");
             stdString_WcharToChar(std_g_genBuffer, v9, 127);
             std_g_genBuffer[127] = 0;
             sithConsole_PrintString(std_g_genBuffer);
@@ -578,8 +578,8 @@ int sithMulti_ProcessWelcome(SithMessage *pMsg)
     int v4; // ecx
     int v5; // edx
     SithPlayer* v6; // eax
-    wchar_t *v8; // eax
-    wchar_t a1a[128]; // [esp+10h] [ebp-100h] BYREF
+    char16_t *v8; // eax
+    char16_t a1a[128]; // [esp+10h] [ebp-100h] BYREF
 
     NETMSG_IN_START(pMsg);
 
@@ -664,13 +664,13 @@ int sithMulti_ProcessPong(SithMessage *pMsg)
 
 int sithMulti_ProcessQuit(SithMessage *pMsg)
 {
-    wchar_t *v2; // eax
+    char16_t *v2; // eax
     int v3; // eax
     int v4; // edi
     int v5; // esi
-    wchar_t *v6; // eax
-    wchar_t *v7; // eax
-    wchar_t a1a[128]; // [esp+Ch] [ebp-100h] BYREF
+    char16_t *v6; // eax
+    char16_t *v7; // eax
+    char16_t a1a[128]; // [esp+Ch] [ebp-100h] BYREF
 
     if ( pMsg->netMsg.idx != sithNet_serverNetId )
         return 0;
@@ -725,11 +725,11 @@ int sithMulti_CheckPlayers(int32_t msecTime, SithEventParams* pParam)
     uint32_t v0; // edi
     SithPlayer* v1; // esi
     int v2; // eax
-    wchar_t *v3; // eax
-    wchar_t *v4; // eax
-    wchar_t *v6; // eax
-    wchar_t *v7; // eax
-    wchar_t a1[128]; // [esp+10h] [ebp-100h] BYREF
+    char16_t *v3; // eax
+    char16_t *v4; // eax
+    char16_t *v6; // eax
+    char16_t *v7; // eax
+    char16_t a1[128]; // [esp+10h] [ebp-100h] BYREF
 
     if ( sithWorld_g_pCurrentWorld && sithPlayer_g_pLocalPlayerThing && (g_submodeFlags & 8) == 0 )
         sithDSSThing_Pos(sithPlayer_g_pLocalPlayerThing, -1, 0);
@@ -860,12 +860,12 @@ int sithMulti_ProcessSyncPlayers(SithMessage *pMsg)
     SithPlayer* v6; // edi
     int v7; // ecx
     int v8; // eax
-    wchar_t *v10; // eax
-    wchar_t *v12; // eax
-    wchar_t *v13; // eax
+    char16_t *v10; // eax
+    char16_t *v12; // eax
+    char16_t *v13; // eax
     char a2[32]; // [esp+10h] [ebp-220h] BYREF
-    wchar_t a1a[128]; // [esp+30h] [ebp-200h] BYREF
-    wchar_t v22[128]; // [esp+130h] [ebp-100h] BYREF
+    char16_t a1a[128]; // [esp+30h] [ebp-200h] BYREF
+    char16_t v22[128]; // [esp+130h] [ebp-100h] BYREF
 
     NETMSG_IN_START(pMsg);
 
@@ -954,9 +954,9 @@ void sithMulti_ProcessPlayerLost(int idPlayer)
     uint32_t v1; // eax
     SithPlayer* v2; // ecx
     int v3; // edi
-    wchar_t *v4; // eax
-    wchar_t *v5; // eax
-    wchar_t a1a[128]; // [esp+Ch] [ebp-100h] BYREF
+    char16_t *v4; // eax
+    char16_t *v5; // eax
+    char16_t a1a[128]; // [esp+Ch] [ebp-100h] BYREF
 
     if ( sithNet_bNeedsFullThingSyncForLeaveJoin && idPlayer == sithMulti_newPlayerId )
     {
@@ -1538,15 +1538,15 @@ void sithMulti_CleanupThings(SithWorld *pWorld)
 
 void sithMulti_RemovePlayer(int playerNum)
 {
-    wchar_t buf[128];
-    wchar_t *fmt = sithStrTable_GetUniStringWithFallback("%s_HAS_LEFT_THE_GAME");
+    char16_t buf[128];
+    char16_t *fmt = sithStrTable_GetUniStringWithFallback("%s_HAS_LEFT_THE_GAME");
     jk_snwprintf(buf, 0x80, fmt, jkPlayer_playerInfos[playerNum].player_name);
     sithConsole_PrintWString(buf);
     sithConsole_AlertSound();
 
     if ( jkPlayer_playerInfos[playerNum].playerNetId == sithNet_serverNetId )
     {
-        wchar_t *serverMsg = sithStrTable_GetUniStringWithFallback("SERVER_LEFT_GAME");
+        char16_t *serverMsg = sithStrTable_GetUniStringWithFallback("SERVER_LEFT_GAME");
         sithConsole_PrintWString(serverMsg);
         sithConsole_AlertSound();
         if ( sithMulti_quitGameState != 2 || sithMulti_msecQuitGameTime < sithTime_g_msecGameTime + 5000 )
@@ -1567,8 +1567,8 @@ void sithMulti_RemovePlayer(int playerNum)
 
 void sithMulti_ProcessPlayerJoin(int playerNum)
 {
-    wchar_t buf[128];
-    wchar_t *fmt = sithStrTable_GetUniStringWithFallback("%s_HAS_JOINED_THE_GAME");
+    char16_t buf[128];
+    char16_t *fmt = sithStrTable_GetUniStringWithFallback("%s_HAS_JOINED_THE_GAME");
     jk_snwprintf(buf, 0x80, fmt, jkPlayer_playerInfos[playerNum].player_name);
     sithConsole_PrintWString(buf);
 

@@ -57,15 +57,15 @@ void jkGuiSaveLoad_PopulateInfo(int bRedraw)
     char *v1; // ebx
     flex_t shieldsAmt; // edx
     jkGuiSaveLoad_Entry *entry; // esi
-    wchar_t *v4; // eax
+    char16_t *v4; // eax
     flex_t playerHealth; // eax
     flex_t playerMaxHealth; // ecx
     jkGuiSaveLoad_Entry* v7; // eax
     int v8; // esi
     jkEpisode *episodeIter; // edi
-    wchar_t *v10; // eax
-    wchar_t *v11; // eax
-    wchar_t *saveName; // [esp+10h] [ebp-10h]
+    char16_t *v10; // eax
+    char16_t *v11; // eax
+    char16_t *saveName; // [esp+10h] [ebp-10h]
     flex_t playerMaxHealth_; // [esp+14h] [ebp-Ch]
     flex_t playerHealth_; // [esp+18h] [ebp-8h]
     flex_t shieldsAmt_; // [esp+1Ch] [ebp-4h]
@@ -151,10 +151,10 @@ LABEL_15:
 int jkGuiSaveLoad_DeleteOnClick(jkGuiElement *element, jkGuiMenu *menu, int32_t mouseX, int32_t mouseY, int bRedraw)
 {
     jkGuiSaveLoad_Entry *v2; // esi
-    wchar_t *wstr_del; // eax
+    char16_t *wstr_del; // eax
     int i; // esi
     jkGuiSaveLoad_Entry *entry; // eax
-    wchar_t *wstr_confirmDel; // [esp-4h] [ebp-8Ch]
+    char16_t *wstr_confirmDel; // [esp-4h] [ebp-8Ch]
     char FileName[128]; // [esp+8h] [ebp-80h] BYREF
 
     jkGuiRend_PlayWav(menu->soundClick);
@@ -197,8 +197,8 @@ void jkGuiSaveLoad_PopulateList()
     stdFileSearch *v0; // eax
     stdFileSearch *v1; // edi
     stdFile_t v2; // esi
-    wchar_t *v3; // eax
-    wchar_t *v4; // ebx
+    char16_t *v3; // eax
+    char16_t *v4; // ebx
     jkGuiSaveLoad_Entry *v6; // edi
     stdFileSearch *v7; // [esp+10h] [ebp-7C0h]
     char path[128]; // [esp+18h] [ebp-7B8h] BYREF
@@ -215,7 +215,7 @@ void jkGuiSaveLoad_PopulateList()
     // the dual-write). Load-only: you don't save over the VMU slot.
     if (!jkGuiSaveLoad_bIsSaveMenu)
     {
-        static const wchar_t vmuName[] = L"VMU Save";
+        static const char16_t vmuName[] = u"VMU Save";
         sithGamesave_GetProfilePath(path, 128, "_JKAUTO_dcauto.jks");
         stdFile_t vf = pLowLevelHS->fileOpen(path, "rb");
         if (vf) {
@@ -226,7 +226,7 @@ void jkGuiSaveLoad_PopulateList()
                 _memcpy(ve, &vmuHeader, sizeof(sithGamesave_Header));
                 stdString_SafeStrCopy(ve->fpath, "_JKAUTO_dcauto.jks", 128);
                 _strtolower(ve->fpath);
-                jkGuiRend_DarrayReallocStr(&jkGuiSaveLoad_DarrayEntries, (wchar_t*)vmuName, (intptr_t)ve);
+                jkGuiRend_DarrayReallocStr(&jkGuiSaveLoad_DarrayEntries, (char16_t*)vmuName, (intptr_t)ve);
                 ++jkGuiSaveLoad_numEntries;
             }
             pLowLevelHS->fileClose(vf);
@@ -296,15 +296,15 @@ int jkGuiSaveLoad_Show(int bIsSave)
     const char *v1; // eax
     int v2; // eax
     int32_t v3; // edi
-    wchar_t *v4; // eax
+    char16_t *v4; // eax
     int v5; // eax
     jkGuiSaveLoad_Entry *v6; // esi
     int v7; // edi
     int v8; // esi
-    wchar_t *v9; // eax
+    char16_t *v9; // eax
     jkGuiSaveLoad_Entry *v10; // eax
-    wchar_t *v11; // eax
-    wchar_t *v12; // eax
+    char16_t *v11; // eax
+    char16_t *v12; // eax
     char *v13; // eax
     int v14; // edx
     char *v15; // ebp
@@ -312,16 +312,16 @@ int jkGuiSaveLoad_Show(int bIsSave)
     int v19; // esi
     jkGuiSaveLoad_Entry *v20; // eax
     int i; // eax
-    wchar_t *v22; // eax
+    char16_t *v22; // eax
     int j; // esi
     jkGuiSaveLoad_Entry *v24; // eax
     int32_t result; // eax
-    wchar_t *v26; // [esp-4h] [ebp-298h]
-    wchar_t *v27; // [esp-4h] [ebp-298h]
-    const wchar_t *v28; // [esp-4h] [ebp-298h]
+    char16_t *v26; // [esp-4h] [ebp-298h]
+    char16_t *v27; // [esp-4h] [ebp-298h]
+    const char16_t *v28; // [esp-4h] [ebp-298h]
     int v29; // [esp+10h] [ebp-284h] BYREF
     char v30[128]; // [esp+14h] [ebp-280h] BYREF
-    wchar_t v31[256]; // [esp+94h] [ebp-200h] BYREF
+    char16_t v31[256]; // [esp+94h] [ebp-200h] BYREF
 
     jkGuiSaveLoad_bIsSaveMenu = bIsSave;
     jkGuiSaveLoad_PopulateList();
@@ -431,7 +431,7 @@ LABEL_24:
 LABEL_44:
             v28 = jkGuiSaveLoad_aElements[2].wstr;
             v22 = jkGuiTitle_quicksave_related_func1(&jkCog_strings, sithWorld_g_pCurrentWorld->map_jkl_fname);
-            jk_snwprintf(v31, 0x100u, L"%s~%s", v22, v28);
+            jk_snwprintf(v31, 0x100u, u"%s~%s", v22, v28);
             sithGamesave_Save(v30, 1, 1, v31);
             sithGamesave_Process();
             goto LABEL_45;

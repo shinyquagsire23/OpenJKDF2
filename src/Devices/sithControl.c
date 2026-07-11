@@ -26,7 +26,7 @@
 // Added
 static int sithControl_followingPlayer = 0;
 static int sithControl_curDebugCam = 0;
-static wchar_t sithControl_debugWStrTmp[256];
+static char16_t sithControl_debugWStrTmp[256];
 
 // MOTS added
 static flex_t sithControl_008d7f44 = 0.0;
@@ -934,7 +934,7 @@ int sithControl_HandlePlayer(SithThing *player, flex_t deltaSecs)
     flex_d_t v14; // st3
     flex_d_t v15; // rt0
     flex_d_t v16; // st3
-    wchar_t *v17; // eax
+    char16_t *v17; // eax
     flex_t v18; // [esp+8h] [ebp-40h]
     rdVector3 a3a; // [esp+Ch] [ebp-3Ch] BYREF
     rdMatrix34 a; // [esp+18h] [ebp-30h] BYREF
@@ -1088,7 +1088,7 @@ debug_controls:
             jkPlayer_maxPlayers = old; // Added
 
             // Added
-            jk_snwprintf(sithControl_debugWStrTmp, 256, L"Spawn cam %u", sithControl_curDebugCam);
+            jk_snwprintf(sithControl_debugWStrTmp, 256, u"Spawn cam %u", sithControl_curDebugCam);
             sithConsole_PrintWString(sithControl_debugWStrTmp);
 
             break;
@@ -1114,9 +1114,9 @@ debug_controls:
                 sithControl_followingPlayer = 0;
             }
             if (sithControl_followingPlayer)
-                jk_snwprintf(sithControl_debugWStrTmp, 256, L"Following %s", jkPlayer_playerInfos[sithControl_followingPlayer].player_name);
+                jk_snwprintf(sithControl_debugWStrTmp, 256, u"Following %s", jkPlayer_playerInfos[sithControl_followingPlayer].player_name);
             else
-                jk_snwprintf(sithControl_debugWStrTmp, 256, L"Spawn cam %u", sithControl_curDebugCam);
+                jk_snwprintf(sithControl_debugWStrTmp, 256, u"Spawn cam %u", sithControl_curDebugCam);
             sithConsole_PrintWString(sithControl_debugWStrTmp);
             
             if (!sithControl_followingPlayer) {

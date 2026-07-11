@@ -30,7 +30,7 @@ static int32_t jkGUIMouse_listbox_images[2] = {JKGUI_BM_UP_15, JKGUI_BM_DOWN_15}
 static int32_t jkGUIMouse_slider_images[2] = {JKGUI_BM_SLIDER_BACK_200, JKGUI_BM_SLIDER_THUMB};
 
 #ifdef QOL_IMPROVEMENTS
-static wchar_t slider_val_text[5] = {0};
+static char16_t slider_val_text[5] = {0};
 #endif
 
 static int32_t jkGuiMouse_dword_530328 = -1;
@@ -102,7 +102,7 @@ void jkGuiMouse_SensitivityDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer
 #ifdef QOL_IMPROVEMENTS
     int32_t val = jkGuiMouse_aElements[20].selectedTextEntry;
     
-    jk_snwprintf(slider_val_text, 5, L"%u", val);
+    jk_snwprintf(slider_val_text, 5, u"%u", val);
     jkGuiMouse_aElements[24].wstr = slider_val_text;
     
 #endif
@@ -305,8 +305,8 @@ void jkGuiMouse_sub_417100(int a1, int a2)
     stdControlKeyInfoEntry *v8; // eax
     char v9; // dl
     uint32_t v10; // ecx
-    wchar_t *v11; // eax
-    wchar_t *v12; // [esp-4h] [ebp-18h]
+    char16_t *v11; // eax
+    char16_t *v12; // [esp-4h] [ebp-18h]
     flex_t v13; // [esp+10h] [ebp-4h]
 
     v13 = 1.0;
@@ -350,9 +350,9 @@ void jkGuiMouse_sub_417210()
 {
     jkGuiMouseEntry* v0; // eax
     jkGuiMouseEntry* v2; // esi
-    wchar_t *v3; // edi
-    wchar_t *v4; // eax
-    wchar_t v5[512]; // Added: 256 -> 512
+    char16_t *v3; // edi
+    char16_t *v4; // eax
+    char16_t v5[512]; // Added: 256 -> 512
 
     jkGuiRend_DarrayFreeEntry(&jkGuiMouse_Darray_5566B8);
     jkGuiRend_DarrayFreeEntry(&jkGuiMouse_Darray_556698);
@@ -376,10 +376,10 @@ void jkGuiMouse_sub_417210()
         v3 = jkStrings_GetUniStringWithFallback(v2->displayStrKey);
 
         // Added
-        if (!v3) v3 = L"";
+        if (!v3) v3 = u"";
         if ( v2->inputFuncIdx == -1 )
         {
-            v4 = L"--";
+            v4 = u"--";
         }
         else if ( i >= 3 )
         {
@@ -391,8 +391,8 @@ void jkGuiMouse_sub_417210()
         }
 
         // Added
-        if (!v4) v4 = L"";
-        jk_snwprintf(v5, 0x100u, L"%ls\t%ls", v3, v4);
+        if (!v4) v4 = u"";
+        jk_snwprintf(v5, 0x100u, u"%ls\t%ls", v3, v4);
 
         if ( i >= 3 || (stdControl_aAxes[v2->dxKeyNum].flags & 1) != 0 )
             jkGuiRend_DarrayReallocStr(&jkGuiMouse_Darray_5566B8, v5, i);
@@ -411,14 +411,14 @@ int jkGuiMouse_EnumBindings(int32_t a1, const char *a2, uint32_t a3, int32_t a4,
 {
     int32_t v7; // ebx
     void *v8; // esi
-    wchar_t *v9; // eax
+    char16_t *v9; // eax
     int32_t v10; // ebp
     int32_t v11; // edi
     int32_t i; // esi
     jkGuiMouseEntry* v13; // eax
-    wchar_t *v15; // [esp+10h] [ebp-224h]
+    char16_t *v15; // [esp+10h] [ebp-224h]
     char v16[64]; // Added: 32 -> 64
-    wchar_t v17[512]; // Added: 256 -> 512
+    char16_t v17[512]; // Added: 256 -> 512
 
     v7 = 0;
     v8 = &jkGuiMouse_pWStr_5566E8;
@@ -453,7 +453,7 @@ int jkGuiMouse_EnumBindings(int32_t a1, const char *a2, uint32_t a3, int32_t a4,
             return 1;
         v9 = v15;
     }
-    jk_snwprintf(v17, 0xFFu, L"%ls%ls", v9, v8);
+    jk_snwprintf(v17, 0xFFu, u"%ls%ls", v9, v8);
     if ( v7 )
     {
         v11 = jkGuiMouse_Darray_556698.total;
@@ -516,8 +516,8 @@ int jkGuiMouse_ListClicked3(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mo
     int32_t v11; // ebx
     int32_t v12; // esi
     int32_t v13; // edi
-    wchar_t *v14; // eax
-    wchar_t *v16; // [esp-4h] [ebp-14h]
+    char16_t *v14; // eax
+    char16_t *v16; // [esp-4h] [ebp-14h]
 
     jkGuiRend_ClickSound(pElement, pMenu, mouseX, mouseY, redraw);
     if ( pElement->texInfo.anonymous_18 )
@@ -588,8 +588,8 @@ int jkGuiMouse_CancelOkClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, 
     int32_t v10; // ebx
     int32_t v11; // esi
     int32_t v12; // edi
-    wchar_t *v13; // eax
-    wchar_t *v15; // [esp-10h] [ebp-14h]
+    char16_t *v13; // eax
+    char16_t *v15; // [esp-10h] [ebp-14h]
 
     jkGuiRend_PlayWav(pMenu->soundClick);
     if ( !jkGuiMouse_dword_5566B0 )
@@ -633,8 +633,8 @@ int jkGuiMouse_CancelOkClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, 
 
 int jkGuiMouse_RestoreDefaultsClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL redraw)
 {
-    wchar_t *v5; // eax
-    wchar_t *v7; // [esp-4h] [ebp-8h]
+    char16_t *v5; // eax
+    char16_t *v7; // [esp-4h] [ebp-8h]
 
     jkGuiRend_PlayWav(pMenu->soundClick);
     v7 = jkStrings_GetUniStringWithFallback("GUI_RESTORE_DEFAULTS_Q");

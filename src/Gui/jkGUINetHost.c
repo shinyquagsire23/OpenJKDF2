@@ -116,20 +116,20 @@ static jkGuiMenu jkGuiNetHost_menuSettings =
 };
 
 static int jkGuiNetHost_bInitted;
-static wchar_t jkGuiNetHost_wstrStarsText[32];
+static char16_t jkGuiNetHost_wstrStarsText[32];
 static Darray jkGuiNetHost_dArray1;
 static Darray jkGuiNetHost_dArray2;
 
 // Added
-wchar_t jkGuiNetHost_portText[32];
+char16_t jkGuiNetHost_portText[32];
 int jkGuiNetHost_portNum = 27020;
 int jkGuiNetHost_bIsDedicated = 0;
 int jkGuiNetHost_bIsCoop = 0;
 int jkGuiNetHost_bIsEpisodeCoop = 0;
 
-int wstr_to_int_clamped(wchar_t *pWstr, int minVal, int maxVal)
+int wstr_to_int_clamped(char16_t *pWstr, int minVal, int maxVal)
 {
-    wchar_t *dummy;
+    char16_t *dummy;
     int val = jk_wcstol(pWstr, &dummy, 10);
      if (val < minVal)
     {
@@ -296,9 +296,9 @@ void jkGuiNetHost_Shutdown()
 // MOTS altered
 int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
 {
-    wchar_t *v3; // eax
+    char16_t *v3; // eax
     int v4; // ebp
-    wchar_t *i; // eax
+    char16_t *i; // eax
     int v10; // eax
     __int64 v11; // rax
     int v12; // eax
@@ -306,19 +306,19 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
     int v14; // eax
     int v15; // eax
     int v23; // [esp+14h] [ebp-16Ch]
-    wchar_t *a2; // [esp+18h] [ebp-168h] BYREF
-    wchar_t v25[32]; // [esp+20h] [ebp-160h] BYREF
-    wchar_t v26[32]; // [esp+60h] [ebp-120h] BYREF
-    wchar_t v27[32]; // [esp+A0h] [ebp-E0h] BYREF
-    wchar_t a1[32]; // [esp+E0h] [ebp-A0h] BYREF
+    char16_t *a2; // [esp+18h] [ebp-168h] BYREF
+    char16_t v25[32]; // [esp+20h] [ebp-160h] BYREF
+    char16_t v26[32]; // [esp+60h] [ebp-120h] BYREF
+    char16_t v27[32]; // [esp+A0h] [ebp-E0h] BYREF
+    char16_t a1[32]; // [esp+E0h] [ebp-A0h] BYREF
     char v29[32]; // [esp+120h] [ebp-60h] BYREF
-    wchar_t v30[32]; // [esp+140h] [ebp-40h] BYREF
+    char16_t v30[32]; // [esp+140h] [ebp-40h] BYREF
 
     jkGuiNetHost_LoadSettings(); // Added
 
-    stdString_SafeWStrCopy(v25, L"8", 0x20);
-    stdString_SafeWStrCopy(v26, L"", 0x20);
-    stdString_SafeWStrCopy(v27, L"", 0x20);
+    stdString_SafeWStrCopy(v25, u"8", 0x20);
+    stdString_SafeWStrCopy(v26, u"", 0x20);
+    stdString_SafeWStrCopy(v27, u"", 0x20);
     jkGuiNetHost_aElements[NETHOST_SCORELIMIT_CHECKBOX].selectedTextEntry = jkGuiNetHost_gameFlags & MULTIMODEFLAG_SCORELIMIT;
     jkGuiNetHost_aElements[NETHOST_TIMELIMIT_CHECKBOX].selectedTextEntry = jkGuiNetHost_gameFlags & MULTIMODEFLAG_TIMELIMIT;
     jkGuiNetHost_aElements[NETHOST_SINGLELEVEL_CHECKBOX].selectedTextEntry = jkGuiNetHost_gameFlags & MULTIMODEFLAG_SINGLE_LEVEL;
@@ -330,22 +330,22 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
     jkGuiNetHost_aElements[NETHOST_GAMENAME_TEXTBOX].wstr = jkGuiNetHost_gameName;
     jkGuiNetHost_aElements[NETHOST_GAMENAME_TEXTBOX].selectedTextEntry = 16;
 #ifdef QOL_IMPROVEMENTS
-    jk_snwprintf(v25, 0x20u, L"%d", jkGuiNetHost_bIsDedicated ? jkGuiNetHost_maxPlayers-1 : jkGuiNetHost_maxPlayers);
+    jk_snwprintf(v25, 0x20u, u"%d", jkGuiNetHost_bIsDedicated ? jkGuiNetHost_maxPlayers-1 : jkGuiNetHost_maxPlayers);
 #else
-    jk_snwprintf(v25, 0x20u, L"%d", jkGuiNetHost_maxPlayers);
+    jk_snwprintf(v25, 0x20u, u"%d", jkGuiNetHost_maxPlayers);
 #endif
     jkGuiNetHost_aElements[NETHOST_MAXPLAYERS_TEXTBOX].wstr = v25;
     jkGuiNetHost_aElements[NETHOST_MAXPLAYERS_TEXTBOX].selectedTextEntry = 3;
-    jk_snwprintf(v27, 0x20u, L"%d", jkGuiNetHost_scoreLimit);
+    jk_snwprintf(v27, 0x20u, u"%d", jkGuiNetHost_scoreLimit);
     //a2[0] = (unsigned int)jkGuiNetHost_timeLimit; wat??
     jkGuiNetHost_aElements[NETHOST_SCORELIMIT_TEXTBOX].wstr = v27;
     jkGuiNetHost_aElements[NETHOST_SCORELIMIT_TEXTBOX].selectedTextEntry = 4;
 #ifdef QOL_IMPROVEMENTS
-    jk_snwprintf(jkGuiNetHost_portText, 0x20u, L"%d", jkGuiNetHost_portNum);
+    jk_snwprintf(jkGuiNetHost_portText, 0x20u, u"%d", jkGuiNetHost_portNum);
     jkGuiNetHost_aElements[NETHOST_PORT_TEXTBOX].wstr = jkGuiNetHost_portText;
     jkGuiNetHost_aElements[NETHOST_PORT_TEXTBOX].selectedTextEntry = 31;
 #endif
-    jk_snwprintf(v26, 0x20u, L"%d", (unsigned int)(__int64)((flex_d_t)(unsigned int)jkGuiNetHost_timeLimit * 0.000016666667));
+    jk_snwprintf(v26, 0x20u, u"%d", (unsigned int)(__int64)((flex_d_t)(unsigned int)jkGuiNetHost_timeLimit * 0.000016666667));
     jkGuiNetHost_aElements[NETHOST_TIMELIMIT_TEXTBOX].wstr = v26;
     jkGuiNetHost_aElements[NETHOST_TIMELIMIT_TEXTBOX].selectedTextEntry = 4;
     __snprintf(v29, 32, "RANK_%d_L", jkGuiNetHost_maxRank); // sprintf -> snprintf
@@ -458,8 +458,8 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
         }
         else if ( v4 == GUI_ADVANCED )
         {
-            stdString_SafeWStrCopy(a1, L"", 0x20);
-            jk_snwprintf(a1, 0x20u, L"%d", jkGuiNetHost_tickRate);
+            stdString_SafeWStrCopy(a1, u"", 0x20);
+            jk_snwprintf(a1, 0x20u, u"%d", jkGuiNetHost_tickRate);
             jkGuiNetHost_aSettingsElements[NETHOST_TICKRATE_TEXTBOX].wstr = a1;
             jkGuiNetHost_aSettingsElements[NETHOST_TICKRATE_TEXTBOX].selectedTextEntry = 32;
 #ifdef QOL_IMPROVEMENTS
@@ -498,12 +498,12 @@ int jkGuiNetHost_sub_4118C0(jkMultiEntry3 *pEntry)
 {
     int v1; // edi
     int tickRate; // eax
-    wchar_t a1a[32]; // [esp+8h] [ebp-40h] BYREF
+    char16_t a1a[32]; // [esp+8h] [ebp-40h] BYREF
 
     a1a[0] = 0;
     memset(&a1a[1], 0, 0x3Cu);
     a1a[31] = 0;
-    jk_snwprintf(a1a, 0x20u, L"%d", jkGuiNetHost_tickRate);
+    jk_snwprintf(a1a, 0x20u, u"%d", jkGuiNetHost_tickRate);
     jkGuiNetHost_aSettingsElements[NETHOST_TICKRATE_TEXTBOX].wstr = a1a;
     jkGuiNetHost_aSettingsElements[NETHOST_TICKRATE_TEXTBOX].selectedTextEntry = 32;
     jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiNetHost_menuSettings, &jkGuiNetHost_aSettingsElements[4]);
@@ -576,9 +576,9 @@ int jkGuiNetHost_sub_4119D0(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mo
 
 int jkGuiNetHost_sub_411AE0(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, int redraw)
 {
-    wchar_t *v7; // eax
+    char16_t *v7; // eax
     int v9; // [esp-8h] [ebp-28h]
-    wchar_t *v11; // [esp-4h] [ebp-24h]
+    char16_t *v11; // [esp-4h] [ebp-24h]
     char v12[32]; // [esp+0h] [ebp-20h] BYREF
 
     if ( pElement->hoverId == 1 )

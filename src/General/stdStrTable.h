@@ -14,7 +14,7 @@
 typedef struct stdStrMsg
 {
     const char* key;
-    wchar_t* uniStr;
+    char16_t* uniStr;
     uint32_t field_8;
 } stdStrMsg;
 
@@ -28,10 +28,10 @@ typedef struct stdStrTable
 
 int stdStrTable_Load(stdStrTable *pStrTable, char *pFilename);
 void stdStrTable_Free(stdStrTable* pStrTable);
-wchar_t* stdStrTable_GetValue(stdStrTable* pStrTable, const char *pKey);
-wchar_t* stdStrTable_GetValueOrKey(stdStrTable* pStrTable, const char *pKey);
+char16_t* stdStrTable_GetValue(stdStrTable* pStrTable, const char *pKey);
+char16_t* stdStrTable_GetValueOrKey(stdStrTable* pStrTable, const char *pKey);
 int stdStrTable_ReadLine(stdFile_t fh, char *pStr, int size);
-int stdStrTable_ParseUniLine(stdFile_t hGobFile, wchar_t *buf);
+int stdStrTable_ParseUniLine(stdFile_t hGobFile, char16_t *buf);
 
 //static int (__cdecl *stdStrTable_Load)(stdStrTable *strtable, char *fpath) = (void*)stdStrTable_Load_ADDR;
 

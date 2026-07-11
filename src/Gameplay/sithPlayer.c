@@ -562,7 +562,7 @@ uint32_t sithPlayer_GetPlayerNum(int playerId)
     return -1;
 }
 
-int sithPlayer_GetPlayerNumByName(wchar_t *pwName)
+int sithPlayer_GetPlayerNumByName(char16_t *pwName)
 {
     int v1; // edi
     SithPlayer *i; // esi

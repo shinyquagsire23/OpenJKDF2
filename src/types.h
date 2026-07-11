@@ -110,6 +110,13 @@ typedef uint32_t size_t;
 #include <stdint.h>
 #include <stddef.h>
 
+// char16_t must be a real, fixed-width 16-bit type, not an alias for the
+// compiler's wchar_t (which varies in width by platform/toolchain) -- see
+// the wchar_t -> char16_t migration in CLAUDE.md.
+#ifndef __cplusplus
+typedef uint16_t char16_t;
+#endif
+
 #include "Primitives/rdRect.h"
 
 
@@ -168,7 +175,7 @@ typedef struct GUID_idk
 #define __cdecl
 typedef int32_t HKEY;
 typedef char* LPCSTR;
-typedef wchar_t* LPCWSTR;
+typedef char16_t* LPCWSTR;
 typedef uint32_t DWORD;
 typedef uint32_t* LPDWORD;
 typedef uint32_t LSTATUS;
@@ -202,7 +209,7 @@ typedef int32_t HWND;
 typedef uint16_t WORD;
 typedef int16_t SHORT;
 typedef int32_t LONG;
-typedef wchar_t WCHAR;
+typedef char16_t WCHAR;
 typedef int32_t PAINTSTRUCT;
 
 #ifndef GHIDRA_IMPORT
@@ -1490,7 +1497,7 @@ typedef struct sithGamesave_Header
     flex32_t playerHealth;
     flex32_t playerMaxHealth;
     flex32_t binAmts[200];
-    wchar_t saveName[256];
+    char16_t saveName[256];
 } sithGamesave_Header;
 
 typedef struct SithOverlayMapConfig
@@ -1707,7 +1714,7 @@ typedef struct wm_handler
 } wm_handler;
 
 typedef int (*DebugConsolePrintFunc_t)(const char*);
-typedef int (*DebugConsolePrintUniStrFunc_t)(const wchar_t*);
+typedef int (*DebugConsolePrintUniStrFunc_t)(const char16_t*);
 typedef int (*DebugConsoleCmd_t)(stdDebugConsoleCmd* cmd, const char* extra);
 
 typedef struct stdDebugConsoleCmd
@@ -1719,7 +1726,7 @@ typedef struct stdDebugConsoleCmd
 
 typedef struct jkDevLogEnt
 {
-    wchar_t text[128];
+    char16_t text[128];
     int32_t timeMsExpiration;
     int32_t field_104;
     int32_t drawWidth;
@@ -2046,7 +2053,7 @@ typedef int32_t jkEpisodeTypeFlags_t;
 typedef struct jkEpisode
 {
     char name[32];
-    wchar_t unistr[32];
+    char16_t unistr[32];
     int32_t field_60;
     int32_t field_64;
     int32_t field_68;
@@ -2113,7 +2120,7 @@ typedef struct HostServicesBasic
     int (*fseek)(stdFile_t, int, int);
     int (*fileSize)(stdFile_t);
     int (*filePrintf)(stdFile_t, const char*, ...);
-    const wchar_t* (*fileGetws)(stdFile_t, wchar_t *, size_t);
+    const char16_t* (*fileGetws)(stdFile_t, char16_t *, size_t);
 #ifdef STDPLATFORM_HEAP_SUGGESTIONS
     void (*suggestHeap)(int);
 #endif
@@ -2143,7 +2150,7 @@ typedef struct HostServices
     int (*fseek)(stdFile_t, int, int);
     int (*fileSize)(stdFile_t);
     int (*filePrintf)(stdFile_t, const char*, ...);
-    const wchar_t* (*fileGetws)(stdFile_t, wchar_t *, size_t);
+    const char16_t* (*fileGetws)(stdFile_t, char16_t *, size_t);
 #ifdef STDPLATFORM_HEAP_SUGGESTIONS
     int (*suggestHeap)(int);
 #endif
@@ -2570,8 +2577,8 @@ typedef struct rdPuppet
 typedef struct SithPlayer
 {
 #ifndef DW_TYPES
-    wchar_t player_name[32];
-    wchar_t multi_name[32];
+    char16_t player_name[32];
+    char16_t multi_name[32];
 #endif
     uint32_t flags;
     uint32_t playerNetId;
@@ -2659,7 +2666,7 @@ typedef struct jkPlayerInfo
 
 typedef struct jkPlayerMpcInfo
 {
-  wchar_t name[32];
+  char16_t name[32];
   char model[32];
   char soundClass[32];
 #ifndef OPTIMIZE_AWAY_UNUSED_FIELDS
@@ -3225,7 +3232,7 @@ typedef struct jkGuiElement
         const void* compilerShutUp;
         const char* origStr;
         jkGuiStringEntry *orig_unistr;
-        const wchar_t* orig_wstr;
+        const char16_t* orig_wstr;
         int32_t origExtraInt;
     };
 #else
@@ -3234,7 +3241,7 @@ typedef struct jkGuiElement
         const void* compilerShutUp;
         const char* str;
         jkGuiStringEntry *unistr;
-        const wchar_t* wstr;
+        const char16_t* wstr;
         int32_t extraInt;
         int32_t origExtraInt;
     };
@@ -3256,14 +3263,14 @@ typedef struct jkGuiElement
     {
         const void* compilerShutUp2;
         const char* origHintText;
-        wchar_t* orig_wHintText;
+        char16_t* orig_wHintText;
     };
 #else
     union
     {
         const void* compilerShutUp2;
         const char* hintText;
-        wchar_t* wHintText;
+        char16_t* wHintText;
     };
 #endif
     jkGuiDrawFunc_t drawFuncOverride;
@@ -3282,26 +3289,26 @@ typedef struct jkGuiElement
     {
       const char* str;
       jkGuiStringEntry *unistr;
-      const wchar_t* wstr;
+      const char16_t* wstr;
       int32_t extraInt;
     };
     union
     {
         const char* hintText;
-        const wchar_t* wHintText;
+        const char16_t* wHintText;
     };
 
     union
     {
       const char* strAlloced;
       jkGuiStringEntry *unistrAlloced;
-      const wchar_t* wstrAlloced;
+      const char16_t* wstrAlloced;
       int32_t extraIntAlloced;
     };
     union
     {
         const char* hintTextAlloced;
-        const wchar_t* wHintTextAlloced;
+        const char16_t* wHintTextAlloced;
     };
 #endif
 
@@ -3315,7 +3322,7 @@ typedef struct jkGuiElement
 
 typedef struct jkGuiStringEntry
 {
-    wchar_t *str;
+    char16_t *str;
     union
     {
         intptr_t id;
@@ -3481,8 +3488,8 @@ typedef struct jkHudTeamScore
 
 typedef struct jkHudPlayerScore
 {
-    wchar_t playerName[32];
-    wchar_t modelName[32];
+    char16_t playerName[32];
+    char16_t modelName[32];
     int32_t score;
     int32_t teamNum;
 } jkHudPlayerScore;
@@ -3523,7 +3530,7 @@ typedef void* DPLCONNECTION;
 
 typedef struct sith_dplay_connection
 {
-  wchar_t name[128];
+  char16_t name[128];
   GUID guid;
   DPLCONNECTION *connection;
   int32_t connectionSize;
@@ -3535,10 +3542,10 @@ typedef struct jkMultiEntry
     GUID_idk guidInstance;
     int32_t maxPlayers;
     int32_t numPlayers;
-    wchar_t serverName[32];
+    char16_t serverName[32];
     char episodeGobName[32];
     char mapJklFname[32];
-    wchar_t wPassword[32];
+    char16_t wPassword[32];
     int32_t sessionFlags;
     int32_t checksumSeed;
     int32_t field_E0;
@@ -3550,8 +3557,8 @@ typedef struct jkMultiEntry
 
 typedef struct jkMultiEntry2
 {
-    wchar_t field_0[128];
-    wchar_t field_100[128];
+    char16_t field_0[128];
+    char16_t field_100[128];
     char field_200[256];
     char field_300[256];
 } jkMultiEntry2;
@@ -3559,11 +3566,11 @@ typedef struct jkMultiEntry2
 typedef struct jkMultiEntry3
 {
     int32_t field_0;
-    wchar_t serverName[32];
+    char16_t serverName[32];
     char episodeGobName[32];
     char mapJklFname[128];
     int32_t maxPlayers;
-    wchar_t wPassword[32];
+    char16_t wPassword[32];
     int32_t sessionFlags;
     int32_t multiModeFlags;
     int32_t maxRank;
@@ -3600,7 +3607,7 @@ typedef struct jkMultiEntry4
     int32_t field_94;
     int32_t field_98;
     int32_t field_9C;
-    wchar_t sessionName[32];
+    char16_t sessionName[32];
     int32_t tickRateMs;
 } jkMultiEntry4;
 
@@ -3686,7 +3693,7 @@ typedef struct jkMultiModelInfo
 
 typedef struct sithDplayPlayer
 {
-    wchar_t waName[32];
+    char16_t waName[32];
     int32_t field_40;
     int32_t field_44;
     int32_t field_48;
@@ -3711,7 +3718,12 @@ typedef struct sithDplayPlayer
     int32_t dpId;
 } sithDplayPlayer;
 
-typedef wchar_t* LPWSTR;
+// Added: guarded like LPCWSTR above -- on real WIN32 builds <windows.h> already
+// declares LPWSTR (as wchar_t*, which is fine there since wchar_t is natively
+// 16-bit on Windows); redeclaring it here too would conflict.
+#if defined(PLAT_MISSING_WIN32)
+typedef char16_t* LPWSTR;
+#endif
 
 typedef struct DPNAME
 {
@@ -3733,14 +3745,10 @@ typedef uint32_t DPID;
 typedef uint32_t *LPDPID;
 typedef const DPNAME *LPCDPNAME;
 
-#ifndef __cplusplus
-typedef wchar_t char16_t;
-#endif
-
 typedef struct jkGuiControlInfoHeader
 {
     uint32_t version;
-    wchar_t wstr[64];
+    char16_t wstr[64];
 } jkGuiControlInfoHeader;
 
 typedef struct jkGuiControlInfo
@@ -3751,7 +3759,7 @@ typedef struct jkGuiControlInfo
 
 typedef struct jkGuiJoystickStrings
 {
-    wchar_t aStrings[JOYSTICK_MAX_STRS][128];
+    char16_t aStrings[JOYSTICK_MAX_STRS][128];
 } jkGuiJoystickStrings;
 
 typedef struct jkGuiJoystickEntry

@@ -25,7 +25,7 @@ void jkGuiForce_ForceStarsDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer 
 int jkGuiForce_ExtraClick(jkGuiElement *element, jkGuiMenu *menu, int32_t a, int32_t b, int c);
 int jkGuiForce_ButtonClick(jkGuiElement *element, jkGuiMenu *menu, int32_t a, int32_t b, int c);
 int jkGuiForce_ResetClick(jkGuiElement *element, jkGuiMenu *menu, int32_t a, int32_t b, int c);
-int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *pbIsLight, int bEnableIdk);
+int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, char16_t* a5, int *pbIsLight, int bEnableIdk);
 void jkGuiForce_Startup();
 void jkGuiForce_Shutdown();
 void jkGuiForce_UpdateViewForRank();

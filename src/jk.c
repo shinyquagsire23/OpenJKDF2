@@ -8,15 +8,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
-//#include <wchar.h>
-#endif
-
-#ifdef MACOS
-#include <wchar.h>
-#endif
-
-#ifdef ARCH_WASM
-#include <wchar.h>
 #endif
 
 #ifdef WIN64_STANDALONE
@@ -232,9 +223,9 @@ int (*jk_printf)(const char* fmt, ...) = (void*)0x426E60;
 #define LONG_MIN (~LONG_MAX)
 #endif
 
-long jk_wcstol(const wchar_t */*restrict*/ nptr, wchar_t **/*restrict*/ endptr, int base)
+long jk_wcstol(const char16_t */*restrict*/ nptr, char16_t **/*restrict*/ endptr, int base)
 {
-    const wchar_t *p = nptr, *endp;
+    const char16_t *p = nptr, *endp;
     int is_neg = 0, overflow = 0;
     /* Need unsigned so (-LONG_MIN) can fit in these: */
     unsigned long n = 0UL, cutoff;
@@ -294,7 +285,7 @@ long jk_wcstol(const wchar_t */*restrict*/ nptr, wchar_t **/*restrict*/ endptr, 
         }
         n = n * base + c;
     }
-    if (endptr) *endptr = (wchar_t *)endp;
+    if (endptr) *endptr = (char16_t *)endp;
     if (overflow) {
         /*errno = ERANGE;*/ return ((is_neg) ? LONG_MIN : LONG_MAX);
     }
@@ -399,7 +390,7 @@ flex_t _frand()
     return (flex_t)(_rand() & 0x7FFF) * 0.000030518509;
 }
 
-int __wcscmp(const wchar_t *a, const wchar_t *b)
+int __wcscmp(const char16_t *a, const char16_t *b)
 {
     int ca, cb;
 
@@ -413,7 +404,7 @@ int __wcscmp(const wchar_t *a, const wchar_t *b)
     return ca - cb;
 }
 
-int __wcsicmp(const wchar_t *a, const wchar_t *b)
+int __wcsicmp(const char16_t *a, const char16_t *b)
 {
     int ca, cb;
 
@@ -736,9 +727,9 @@ void _free(void* a)
     free(a);
 }
 
-wchar_t* _wcsncpy(wchar_t *s1, const wchar_t *s2, size_t n)
+char16_t* _wcsncpy(char16_t *s1, const char16_t *s2, size_t n)
 {
-    wchar_t *ret = s1;
+    char16_t *ret = s1;
     for ( ; n; n--) if (!(*s1++ = *s2++)) break;
     for ( ; n; n--) *s1++ = 0;
     return ret;
@@ -795,7 +786,7 @@ const char* _strpbrk(const char* a, const char* b)
     return strpbrk(a,b);
 }
 
-size_t _wcslen(const wchar_t * str)
+size_t _wcslen(const char16_t * str)
 {
     int len;
     for (len = 0; str[len]; len++);
@@ -807,7 +798,7 @@ char* _strstr(const char* a, const char* b)
     return strstr((char*)a,(char*)b);
 }
 
-int jk_snwprintf(wchar_t *a1, size_t a2, const wchar_t *fmt, ...)
+int jk_snwprintf(char16_t *a1, size_t a2, const char16_t *fmt, ...)
 {
 #if 0
     char* tmp_fmt = malloc(_wcslen(fmt)+1);
@@ -850,12 +841,12 @@ int __vsnprintf(char *a1, size_t a2, const char *fmt, va_list aArgs)
     return vsnprintf(a1, a2, fmt, aArgs); // TODO ehh
 }
 
-wchar_t* _wcscpy(wchar_t * dst, const wchar_t *src)
+char16_t* _wcscpy(char16_t * dst, const char16_t *src)
 {
     if (!dst) return NULL;
     if (!src) return NULL;
 
-    wchar_t *tmp = dst;
+    char16_t *tmp = dst;
     while((*(dst++) = *(src++)));
     return tmp;
 }
@@ -945,15 +936,12 @@ void jk_BeginPaint(int a, struct tagPAINTSTRUCT * lpPaint)
     assert(0);
 }
 
-int jk_vsnwprintf(wchar_t * a, size_t b, const wchar_t *fmt, va_list list)
+int jk_vsnwprintf(char16_t * a, size_t b, const char16_t *fmt, va_list list)
 {
-#ifdef ARCH_WASM
-    return vswprintf(a, b, fmt, list);
-#elif defined(MACOS) || defined(WIN64_STANDALONE)
-    return vsnwprintf_(a,b, fmt,list);
-#else
+    // Added: was `return vswprintf(a, b, fmt, list);` under ARCH_WASM -- Emscripten's
+    // libc vswprintf() is a real 4-byte wchar_t implementation, not ours, and corrupted
+    // our 2-byte-wide strings. Use our own vsnwprintf_() everywhere instead.
     return vsnwprintf_(a, b, fmt, list);
-#endif
 }
 
 void jk_EndPaint(HWND hWnd, const PAINTSTRUCT *lpPaint)
@@ -1125,53 +1113,53 @@ int _iswspace(int a)
     return isspace(c);
 }
 
-size_t __wcslen(const wchar_t * strarg)
+size_t __wcslen(const char16_t * strarg)
 {
     if(!strarg)
      return -1; //strarg is NULL pointer
-   const wchar_t* str = strarg;
+   const char16_t* str = strarg;
    for(;*str;++str)
      ; // empty body
    return str-strarg;
 }
 
-wchar_t* __wcscat(wchar_t * a, const wchar_t * b)
+char16_t* __wcscat(char16_t * a, const char16_t * b)
 {
-    wchar_t* ret = a;
+    char16_t* ret = a;
     a += __wcslen(a);
-    memmove(a, b, __wcslen(b) * sizeof(wchar_t));
+    memmove(a, b, __wcslen(b) * sizeof(char16_t));
     return ret;
 }
 
-wchar_t* __wcschr(const wchar_t * s, wchar_t c)
+char16_t* __wcschr(const char16_t * s, char16_t c)
 {
     do {
         if (*s == c)
         {
-        return (wchar_t*)s;
+        return (char16_t*)s;
         }
     } while (*s++);
     return NULL;
 }
 
-wchar_t* __wcsncpy(wchar_t * a, const wchar_t * b, size_t c)
+char16_t* __wcsncpy(char16_t * a, const char16_t * b, size_t c)
 {
-    wchar_t* ret = a;
-    size_t len = __wcslen(b) * sizeof(wchar_t);
-    if (len > c*sizeof(wchar_t)) {
-        len = c*sizeof(wchar_t);
+    char16_t* ret = a;
+    size_t len = __wcslen(b) * sizeof(char16_t);
+    if (len > c*sizeof(char16_t)) {
+        len = c*sizeof(char16_t);
     }
     memmove(a, b, len);
     a[len] = 0;
     return &a[len];
 }
 
-wchar_t* __wcsrchr(const wchar_t * s, wchar_t c)
+char16_t* __wcsrchr(const char16_t * s, char16_t c)
 {
-    wchar_t *rtnval = 0;
+    char16_t *rtnval = 0;
     do {
         if (*s == c)
-            rtnval = (wchar_t*) s;
+            rtnval = (char16_t*) s;
         } while (*s++);
     return (rtnval);
 }

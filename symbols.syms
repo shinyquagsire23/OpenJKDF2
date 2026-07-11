@@ -134,7 +134,7 @@ rdCache_numProcFaces 0x0086EE80 int
 rdCache_aProcFaces 0x0086EEA0 rdProcEntry[RDCACHE_MAX_TRIS] NO_REINIT
 rdCache_dword_865258 0x00865258 int
 
-sithMulti_name 0x008C4BE0 wchar_t[32]
+sithMulti_name 0x008C4BE0 char16_t[32]
 sithMulti_pfNewPlayerJoinedCallback 0x0083264C sithMultiHandler_t
 sithMulti_multiModeFlags 0x00832650 int
 sithMulti_numRemovedStaticThings 0x0083265C uint32_t
@@ -219,7 +219,7 @@ sithGamesave_autosave_fname 0x008BBC80 char[128]
 sithGamesave_state 0x00835900 sithGamesaveState_t
 sithGamesave_dword_835914 0x00835914 int
 sithGamesave_aCurFilename 0x00835F48 char[132]
-sithGamesave_wsaveName 0x008BBD00 wchar_t[256]
+sithGamesave_wsaveName 0x008BBD00 char16_t[256]
 sithGamesave_saveName 0x008BBF00 char[128]
 sithGamesave_headerTmp 0x00835918 sithGamesave_Header
 
@@ -348,7 +348,7 @@ stdComm_currentBigSyncStage 0x0083220C int
 stdComm_dword_8321E0 0x008321E0 int
 stdComm_bIsServer 0x008321E4 int
 stdComm_dword_8321E8 0x008321E8 int
-stdComm_waIdk 0x008C4C60 wchar_t[32]
+stdComm_waIdk 0x008C4C60 char16_t[32]
 stdComm_dword_8321DC 0x008321DC int
 stdComm_dword_832200 0x00832200 int
 stdComm_dword_832210 0x00832210 int
@@ -477,8 +477,8 @@ sithComm_msgId 0x0054B004 int = 1
 sithComm_MsgTmpBuf2 0x00836C40 SithMessage
 sithComm_netMsgTmp 0x008B4C00 SithMessage
 
-jkCog_emptystring 0x005540BC wchar_t[2]
-jkCog_jkstring 0x00553FB8 wchar_t[130]
+jkCog_emptystring 0x005540BC char16_t[2]
+jkCog_jkstring 0x00553FB8 char16_t[130]
 jkCog_bInitted 0x00553FB0 int
 jkCog_strings 0x0553FA0 stdStrTable
 
@@ -665,7 +665,7 @@ jkMain_lastTickMs 0x00552B9C int
 idx_13b4_related 0x008C4BD8 int
 gamemode_1_str 0x00552958 char[128]
 jkMain_strIdk 0x005529D8 char[128]
-jkMain_wstrIdk 0x00552A58 wchar_t[128]
+jkMain_wstrIdk 0x00552A58 char16_t[128]
 
 sithWorld_aSectionParsers 0x00833548 SithWorldTextSectionParseHandler[32]
 sithWorld_some_integer_4 0x008339E0 uint32_t
@@ -715,7 +715,7 @@ sithWeapon_8BD024 0x008BD024 int
 sithWeapon_senderIndex 0x008BD028 int
 
 jkPlayer_playerInfos 0x008C4CA0 SithPlayer[JKPLAYER_NUM_INFOS]
-jkPlayer_playerShortName 0x08EC320 wchar_t[32]
+jkPlayer_playerShortName 0x08EC320 char16_t[32]
 jkPlayer_numOtherThings 0x0085FF44 int
 jkPlayer_numThings 0x0085B560 int
 jkPlayer_otherThings 0x008592E0 jkPlayerInfo[NUM_JKPLAYER_THINGS]
@@ -742,7 +742,7 @@ jkPlayer_waggleMag 0x00552BAC flex_t
 jkPlayer_mpcInfoSet 0x00552BB0 int
 jkPlayer_waggleAngle 0x00552BB4 flex_t
 jkSaber_rotateVec 0x00552BB8 rdVector3
-jkPlayer_name 0x008604C0 wchar_t[32]
+jkPlayer_name 0x008604C0 char16_t[32]
 jkPlayer_model 0x00860500 char[32]
 jkPlayer_soundClass 0x00860520 char[32]
 jkPlayer_sideMat 0x00860560 char[32]
@@ -783,15 +783,15 @@ sithThing_pParseHashtbl 0x008326A8 tHashTable*
 sithThing_pfUnknownFunc 0x008330FC sithThing_handler_t
 sithThing_guidEntropy 0x00549358 uint16_t = 1
 
-jkGuiSaveLoad_wtextEpisode 0x00559528 wchar_t[256]
-jkGuiSaveLoad_wtextHealth 0x00559728 wchar_t[64]
+jkGuiSaveLoad_wtextEpisode 0x00559528 char16_t[256]
+jkGuiSaveLoad_wtextHealth 0x00559728 char16_t[64]
 jkGuiSaveLoad_numEntries 0x005597A8 int
-jkGuiSaveLoad_wtextShields 0x005597B0 wchar_t[64]
-jkGuiSaveLoad_word_559830 0x00559830 wchar_t[256]
+jkGuiSaveLoad_wtextShields 0x005597B0 char16_t[64]
+jkGuiSaveLoad_word_559830 0x00559830 char16_t[256]
 jkGuiSaveLoad_bIsSaveMenu 0x00559A30 int
-jkGuiSaveLoad_wtextSaveName 0x00559A38 wchar_t[256]
+jkGuiSaveLoad_wtextSaveName 0x00559A38 char16_t[256]
 jkGuiSaveLoad_DarrayEntries 0x00559C38 Darray
-jkGuiSaveLoad_word_559C54 0x00559C54 wchar_t[10]
+jkGuiSaveLoad_word_559C54 0x00559C54 char16_t[10]
 jkGuiSaveLoad_byte_559C50 0x00559C50 char[4]
 
 jkGuiTitle_verMajor 0x00525030 int = 1
@@ -824,7 +824,7 @@ jkGuiNetHost_maxPlayers 0x0086046C int
 jkGuiNetHost_sessionFlags 0x00860470 int
 jkGuiNetHost_gameFlags 0x00860474 int
 jkGuiNetHost_tickRate 0x00860478 int
-jkGuiNetHost_gameName 0x0086047C wchar_t[32]
+jkGuiNetHost_gameName 0x0086047C char16_t[32]
 
 jkGuiMultiplayer_checksumSeed 0x00832634 int
 jkGuiMultiplayer_dword_5564EC 0x005564EC int
@@ -906,7 +906,7 @@ jkGuiMouse_Darray_556698 0x00556698 Darray
 jkGuiMouse_dword_5566B0 0x005566B0 int
 jkGuiMouse_Darray_5566B8 0x005566B8 Darray
 jkGuiMouse_Darray_5566D0 0x005566D0 Darray
-jkGuiMouse_pWStr_5566E8 0x005566E8 wchar_t*
+jkGuiMouse_pWStr_5566E8 0x005566E8 char16_t*
 
 jkGuiEsc_bInitialized 0x00555DD8 int
 jkGuiKeyboard_dword_555DE0 0x00555DE0 int
@@ -915,8 +915,8 @@ jkGuiKeyboard_funcIdx 0x00555DEC int
 jkGuiKeyboard_flags 0x00555DF0 int
 jkGuiKeyboard_darrEntries 0x00555DF8 Darray
 jkGuiKeyboard_dword_555E10 0x00555E10 int
-jkGuiKeyboard_wstr_555E18 0x00555E18 wchar_t[257]
-jkGuiKeyboard_pWStr_55601C 0x0055601C wchar_t*
+jkGuiKeyboard_wstr_555E18 0x00555E18 char16_t[257]
+jkGuiKeyboard_pWStr_55601C 0x0055601C char16_t*
 
 jkGuiMap_vec3Idk2 0x005565A0 rdVector3
 jkGuiMap_pCanvas 0x005565AC rdCanvas*

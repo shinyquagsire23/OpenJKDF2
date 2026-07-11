@@ -70,7 +70,7 @@ typedef struct GNSInfoPacket
 
 static jkMultiEntry sithDplayGNS_storedEntryEnum;
 static jkMultiEntry sithDplayGNS_storedEntry;
-extern wchar_t jkGuiMultiplayer_ipText[256];
+extern char16_t jkGuiMultiplayer_ipText[256];
 char jkGuiMultiplayer_ipText_conv[256];
 static int sithDplayGNS_numEnumd = 0;
 extern int Main_bVerboseNetworking;
@@ -1066,7 +1066,7 @@ void Hack_ResetClients()
     for (int i = 0; i < 32; i++)
     {
         DirectPlay_aPlayers[i].dpId = i+1;
-        jk_snwprintf(DirectPlay_aPlayers[i].waName, 32, L"asdf");
+        jk_snwprintf(DirectPlay_aPlayers[i].waName, 32, u"asdf");
     }
 
     int id_self = 1;
@@ -1096,7 +1096,7 @@ void stdComm_GNS_Startup()
     if (stdComm_GNS_bForceStubs)
     {
         jkGuiMultiplayer_numConnections = 1;
-        jk_snwprintf(jkGuiMultiplayer_aConnections[0].name, 0x80, L"Screaming Into The Void (GNS Failed)");
+        jk_snwprintf(jkGuiMultiplayer_aConnections[0].name, 0x80, u"Screaming Into The Void (GNS Failed)");
         stdComm_dword_8321E0 = 0;
 
         memset(jkGuiMultiplayer_aEntries, 0, sizeof(jkMultiEntry) * 32);
@@ -1105,12 +1105,12 @@ void stdComm_GNS_Startup()
     }
 
     jkGuiMultiplayer_numConnections = 1;
-    jk_snwprintf(jkGuiMultiplayer_aConnections[0].name, 0x80, L"Valve GNS");
+    jk_snwprintf(jkGuiMultiplayer_aConnections[0].name, 0x80, u"Valve GNS");
     stdComm_dword_8321E0 = 0;
 
     memset(jkGuiMultiplayer_aEntries, 0, sizeof(jkMultiEntry) * 32);
     dplay_dword_55D618 = 0;
-    /*jk_snwprintf(jkGuiMultiplayer_aEntries[0].serverName, 0x20, L"OpenJKDF2 Loopback");
+    /*jk_snwprintf(jkGuiMultiplayer_aEntries[0].serverName, 0x20, u"OpenJKDF2 Loopback");
     stdString_snprintf(jkGuiMultiplayer_aEntries[0].episodeGobName, 0x20, "JK1MP");
     stdString_snprintf(jkGuiMultiplayer_aEntries[0].mapJklFname, 0x20, "m2.jkl");
     jkGuiMultiplayer_aEntries[0].field_E0 = 10;*/
@@ -1198,7 +1198,7 @@ void stdComm_CloseConnection()
     }
 }
 
-int stdComm_Open(int idx, wchar_t* pwPassword)
+int stdComm_Open(int idx, char16_t* pwPassword)
 {
     DirectPlay_EnumSessions2();
 
@@ -1261,13 +1261,13 @@ BOOL DirectPlay_Startup()
     return 1;
 }
 
-int DirectPlay_EarlyInit(wchar_t* pwIdk, wchar_t* pwPlayerName)
+int DirectPlay_EarlyInit(char16_t* pwIdk, char16_t* pwPlayerName)
 {
     // This can launch straight into a game? Gaming Zone stuff. 1 and 2 autolaunch an MP game.
     return 0;
 }
 
-DPID DirectPlay_CreatePlayer(wchar_t* pwIdk, int idk2)
+DPID DirectPlay_CreatePlayer(char16_t* pwIdk, int idk2)
 {
     return 1;
 }

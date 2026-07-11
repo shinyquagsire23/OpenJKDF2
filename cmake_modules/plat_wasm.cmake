@@ -31,7 +31,15 @@ macro(plat_initialize)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${USE_FLAGS} --profiling -s FORCE_FILESYSTEM=1 ")
     set(CMAKE_EXECUTABLE_SUFFIX .js)
 
-    add_compile_options(-O2 -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces)
+    # Added: jk.c's _wcslen(const char16_t*) is a plain `for(len=0;str[len];len++)` loop,
+    # but LLVM's builtin-recognition pass pattern-matches that exact shape as the "wcslen
+    # idiom" and silently rewrites it into a call to the real libc wcslen() -- which on
+    # Emscripten operates on 4-byte wchar_t, not our 2-byte char16_t. Confirmed via `nm`
+    # (an otherwise-inexplicable undefined `U wcslen` in jk.c.o) and by hand-decoding raw
+    # string-table bytes against 4-byte units, which exactly reproduces the observed
+    # "menu text cut roughly in half" corruption. -fno-builtin-wcslen keeps our real
+    # implementation in place.
+    add_compile_options(-O2 -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces -fno-builtin-wcslen)
 endmacro()
 
 macro(plat_specific_deps)

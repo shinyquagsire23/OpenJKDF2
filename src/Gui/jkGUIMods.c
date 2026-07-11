@@ -63,11 +63,11 @@ enum jkGuiModsButton_t
 static int32_t jkGuiMods_listboxBitmapIndices[2] = {14, 15};
 
 static jkGuiElement jkGuiMods_aElements[9] = {
-    {ELEMENT_TEXT, 0, 5, L"Expansions & Mods", 3, {0, 30, 640, 60}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXT, 0, 5, u"Expansions & Mods", 3, {0, 30, 640, 60}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_LISTBOX, JKGUIMODS_BTN_LISTCLICK, 2, 0, 0, {80, 135, 480, 240}, 1, 0, 0, 0, 0, jkGuiMods_listboxBitmapIndices, {0}, 0},
     
-    {ELEMENT_TEXT, 0, 2, L"This menu is slightly functional.", 3, {160, 100, 320, 30}, 1, 0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_TEXTBUTTON, JKGUIMODS_BTN_OPENRESOURCEFOLDER, 2, L"Open Resource Folder", 3, {160, 380, 320, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXT, 0, 2, u"This menu is slightly functional.", 3, {160, 100, 320, 30}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXTBUTTON, JKGUIMODS_BTN_OPENRESOURCEFOLDER, 2, u"Open Resource Folder", 3, {160, 380, 320, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
 
     {ELEMENT_TEXT,  0,  0,  NULL,  3, {560, 440, 70, 15},  1,  0,  0,  0,  0,  0, {0},  0},
     {ELEMENT_TEXT,  0,  0,  NULL,  3, {560, 455, 70, 15},  1,  0,  0,  0,  0,  0, {0},  0},
@@ -166,7 +166,7 @@ void jkGuiMods_Show()
     char *v0; // ebx
     char *v1; // ebp
     char *v2; // edx
-    wchar_t *v3; // eax
+    char16_t *v3; // eax
     int v4; // eax
     const char *v6; // eax
     int v7; // esi
@@ -260,9 +260,9 @@ void jkGuiMods_Show()
 
 void jkGuiMods_AddEntry(Darray *pListDisplayed, int type, const char* paVal, const char* paDisplayed)
 {
-    size_t alloc_sz = (_strlen(paDisplayed) + 1) * sizeof(wchar_t);
+    size_t alloc_sz = (_strlen(paDisplayed) + 1) * sizeof(char16_t);
 
-    wchar_t* out = (wchar_t *)JK_ALLOC(alloc_sz);
+    char16_t* out = (char16_t *)JK_ALLOC(alloc_sz);
     memset(out, 0, alloc_sz);
 
     jkGuiModsElement_t* pListElement = (jkGuiModsElement_t*)JK_ALLOC(sizeof(jkGuiModsElement_t));

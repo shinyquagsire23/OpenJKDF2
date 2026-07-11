@@ -67,7 +67,7 @@ extern "C" {
 #define NETMSG_PUSHVEC3I(x) {FIX_ALIGN(uint32_t); *(rdVector3i*)craftingPacket = (x); craftingPacket += sizeof(rdVector3i);};
 #define NETMSG_PUSHMAT34(x) {FIX_ALIGN(uint32_t); *(rdMatrix34*)craftingPacket = (x); craftingPacket += sizeof(rdMatrix34);};
 #define NETMSG_PUSHSTR(x,l) {_strncpy((char*)craftingPacket, (x), (l)-1); ((char*)craftingPacket)[(l)-1] = 0; craftingPacket += (l);};
-#define NETMSG_PUSHWSTR(x,l) {FIX_ALIGN(uint16_t); _wcsncpy((wchar_t*)craftingPacket, (x), (l)-1); ((wchar_t*)craftingPacket)[(l)-1] = 0; craftingPacket += (l*sizeof(wchar_t));};
+#define NETMSG_PUSHWSTR(x,l) {FIX_ALIGN(uint16_t); _wcsncpy((char16_t*)craftingPacket, (x), (l)-1); ((char16_t*)craftingPacket)[(l)-1] = 0; craftingPacket += (l*sizeof(char16_t));};
 #define NETMSG_END(msgid) { size_t len = (intptr_t)craftingPacket - (intptr_t)&sithComm_netMsgTmp.pktData[0]; \
                             sithComm_netMsgTmp.netMsg.flag_maybe = 0; \
                             sithComm_netMsgTmp.netMsg.cogMsgId = msgid; \
@@ -105,7 +105,7 @@ rdVector3 _readingOutV3; rdVector3i _readingOutV3i; rdMatrix34 _readingOutM34;
 #define NETMSG_POPVEC3I() (CHECK_ALIGN(uint32_t), _readingOutV3i = *(rdVector3i*)_readingPacket, _readingPacket += sizeof(rdVector3i), _readingOutV3i)
 #define NETMSG_POPMAT34() (CHECK_ALIGN(uint32_t), _readingOutM34 = *(rdMatrix34*)_readingPacket, _readingPacket += sizeof(rdMatrix34), _readingOutM34)
 #define NETMSG_POPSTR(x,l) { _strncpy((x), (char*)_readingPacket, (l)-1); (x)[(l)-1] = 0; _readingPacket += (l); }
-#define NETMSG_POPWSTR(x,l) { CHECK_ALIGN(uint16_t), _wcsncpy((x), (wchar_t*)_readingPacket, (l)-1); (x)[(l)-1] = 0; _readingPacket += (l*sizeof(wchar_t)); }
+#define NETMSG_POPWSTR(x,l) { CHECK_ALIGN(uint16_t), _wcsncpy((x), (char16_t*)_readingPacket, (l)-1); (x)[(l)-1] = 0; _readingPacket += (l*sizeof(char16_t)); }
 #define NETMSG_IN_END {}
 
 extern int jkGuiNetHost_bIsDedicated;
@@ -115,7 +115,7 @@ void sithMulti_SendChat(const char *pStr, int arg0, int arg1);
 void sithMulti_ProcessScore();
 int sithMulti_ProcessChat(SithMessage *pMsg);
 
-HRESULT sithMulti_CreatePlayer(const wchar_t *a1, const wchar_t *a2, const char *a3, const char *a4, int a5, int a6, int multiModeFlags, int rate, int a9);
+HRESULT sithMulti_CreatePlayer(const char16_t *a1, const char16_t *a2, const char *a3, const char *a4, int a5, int a6, int multiModeFlags, int rate, int a9);
 int sithMulti_Startup();
 void sithMulti_RemoveStaticThing(int guid);
 void sithMulti_Shutdown();
@@ -156,7 +156,7 @@ int sithMulti_Ping(int idTo);
 //static void (*sithMulti_Update)(int) = (void*)sithMulti_Update_ADDR;
 //static int (*sithMulti_SendWelcome)(int,int,int) = (void*)sithMulti_SendWelcome_ADDR;
 //static void (*sithMulti_ProcessKilledPlayer)(SithPlayer *a1, SithThing *killed, SithThing *killed_by) = (void*)sithMulti_ProcessKilledPlayer_ADDR;
-//static int (*sithMulti_CreatePlayer)(wchar_t *a1, wchar_t *a2, char *a3, char *a4, int a5, int a6, int a7, int a8, int a9) = (void*)sithMulti_CreatePlayer_ADDR;
+//static int (*sithMulti_CreatePlayer)(char16_t *a1, char16_t *a2, char *a3, char *a4, int a5, int a6, int a7, int a8, int a9) = (void*)sithMulti_CreatePlayer_ADDR;
 //static uint32_t (*sithMulti_InitTick)(uint32_t) = (void*)sithMulti_InitTick_ADDR;
 //static int (*sithMulti_CheckPlayers)() = (void*)sithMulti_CheckPlayers_ADDR;
 //static int (*sithMulti_SendJoinRequest)(int a1) = (void*)sithMulti_SendJoinRequest_ADDR;

@@ -179,7 +179,7 @@ int stdUpdater_CheckForUpdates()
 #endif // defined(PLATFORM_LINUX) || defined(ARCH_WASM) || defined(TARGET_RETRO_HOMEBREW)
 }
 
-void stdUpdater_GetUpdateText(wchar_t* pOut, size_t outSz)
+void stdUpdater_GetUpdateText(char16_t* pOut, size_t outSz)
 {
 #ifdef TARGET_RETRO_HOMEBREW
     return;
@@ -187,18 +187,18 @@ void stdUpdater_GetUpdateText(wchar_t* pOut, size_t outSz)
     // TODO: i8n
     if (stdUpdater_bCompletedUpdate) {
 #if defined(WIN64_STANDALONE)
-        jk_snwprintf(pOut, outSz/sizeof(wchar_t), jkStrings_GetUniStringWithFallback("GUIEXT_UPDATE_COMPLETE_RESTART"));
+        jk_snwprintf(pOut, outSz/sizeof(char16_t), jkStrings_GetUniStringWithFallback("GUIEXT_UPDATE_COMPLETE_RESTART"));
 #else
-        jk_snwprintf(pOut, outSz/sizeof(wchar_t), jkStrings_GetUniStringWithFallback("GUIEXT_UPDATE_COMPLETE_SEMIAUTO"));
+        jk_snwprintf(pOut, outSz/sizeof(char16_t), jkStrings_GetUniStringWithFallback("GUIEXT_UPDATE_COMPLETE_SEMIAUTO"));
 #endif
         return;
     }
     else if (stdUpdater_bDownloading) {
-        jk_snwprintf(pOut, outSz/sizeof(wchar_t), jkStrings_GetUniStringWithFallback("GUIEXT_UPDATE_DOWNLOADING"));
+        jk_snwprintf(pOut, outSz/sizeof(char16_t), jkStrings_GetUniStringWithFallback("GUIEXT_UPDATE_DOWNLOADING"));
         return;
     }
     
-    jk_snwprintf(pOut, outSz/sizeof(wchar_t), jkStrings_GetUniStringWithFallback("GUIEXT_UPDATE_IS_AVAIL"), openjkdf2_aReleaseVersion, stdUpdater_strUpdateVersion.c_str());
+    jk_snwprintf(pOut, outSz/sizeof(char16_t), jkStrings_GetUniStringWithFallback("GUIEXT_UPDATE_IS_AVAIL"), openjkdf2_aReleaseVersion, stdUpdater_strUpdateVersion.c_str());
 }
 
 void stdUpdater_Win64UpdateThread()

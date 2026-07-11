@@ -184,7 +184,7 @@ void jkQuakeConsole_Render()
 
     // Show update text over everything
     if (jkQuakeConsole_bShowUpdateText || jkQuakeConsole_bClickedUpdate) {
-        wchar_t tmp[128];
+        char16_t tmp[128];
 
         jkQuakeConsole_updateTextCooldown -= deltaUs;
         if (jkQuakeConsole_updateTextCooldown <= 0) {
@@ -428,7 +428,7 @@ void jkQuakeConsole_ExecuteCommand(const char* pCmd)
 
 void jkQuakeConsole_SendInput(WPARAM wParam, int bIsChar)
 {
-    wchar_t tmp[256]; // [esp+4h] [ebp-100h] BYREF
+    char16_t tmp[256]; // [esp+4h] [ebp-100h] BYREF
     char tmp_cvar[SITHCVAR_MAX_STRLEN];
 
     if ( wParam == VK_ESCAPE || wParam == VK_OEM_3 || wParam == 0xffffffc0 || wParam == '`' || wParam == '~')

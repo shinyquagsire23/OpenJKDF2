@@ -44,7 +44,7 @@ static jkGuiElement jkGuiSound_elements[25] = {
     {ELEMENT_TEXT, 0, 0, "GUIEXT_CUTSCENE_VOLUME", 3, {340, 310, 220, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_SLIDER, 0, 0, (const char*)100, 0, {300, 335, 320, 30}, 1, 0, "GUIEXT_CUTSCENE_VOLUME_HINT", 0, 0, slider_images, {0}, 0},
     {ELEMENT_TEXT, 0, 0, "GUI_OFF", 2, {310, 370, 40, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_TEXT, 0, 0, L"", 2, {450, 370, 40, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXT, 0, 0, u"", 2, {450, 370, 40, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXT, 0, 0, "GUI_MAX", 2, {590, 370, 40, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
 #else
     {ELEMENT_TEXT, 0, 0, "GUI_DIGICHANNELS", 3, {340, 310, 220, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
@@ -94,10 +94,10 @@ void jkGuiSound_Shutdown()
 
 int jkGuiSound_Show()
 {
-    wchar_t *v0; // eax
+    char16_t *v0; // eax
     int v1; // esi
-    wchar_t *v2; // eax
-    wchar_t *v4; // [esp-4h] [ebp-8h]
+    char16_t *v2; // eax
+    char16_t *v4; // [esp-4h] [ebp-8h]
 
     jkGui_sub_412E20(&jkGuiSound_menu, 102, 107, 103);
     jkGuiSound_elements[7].selectedTextEntry = jkGuiSound_b3DSound_2;

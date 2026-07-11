@@ -202,7 +202,11 @@ int jkGuiSingleplayer_Show()
                         jkRes_LoadGob(a1);
                         if ( !jkEpisode_Load(&jkGui_episodeLoad) )
                         {
-                            Windows_ErrorMsgboxWide("ERR_CANNOT_LOAD_FILE %s", a1);
+                            // Added: %s wants char16_t*, a1 is narrow
+                            char16_t wTmp[128];
+                            stdString_CharToWchar(wTmp, a1, 127);
+                            wTmp[127] = 0;
+                            Windows_ErrorMsgboxWide("ERR_CANNOT_LOAD_FILE %s", wTmp);
                             clicked = -1;
                         }
                         if ( clicked == 1 )
@@ -342,10 +346,10 @@ void jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, int a3, 
     stdFileSearch *search; // eax
     stdFileSearch *v13; // esi
     char *v14; // edx
-    wchar_t *v16; // eax
+    char16_t *v16; // eax
     jkEpisodeEntry *v17; // esi
     char *v18; // edx
-    wchar_t *v20; // eax
+    char16_t *v20; // eax
     int v22; // [esp+10h] [ebp-1A4h]
     int v23; // [esp+10h] [ebp-1A4h]
     stdStrTable strtable; // [esp+18h] [ebp-19Ch]

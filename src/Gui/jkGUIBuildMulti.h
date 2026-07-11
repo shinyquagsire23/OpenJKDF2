@@ -47,7 +47,7 @@ int jkGuiBuildMulti_SaberButtonClicked(jkGuiElement *pElement, jkGuiMenu *pMenu,
 
 int jkGuiBuildMulti_Startup();
 void jkGuiBuildMulti_Shutdown();
-void jkGuiBuildMulti_Load(char *pPathOut, int pathOutLen, wchar_t *pPlayerName, wchar_t *pCharName, int bCharPath);
+void jkGuiBuildMulti_Load(char *pPathOut, int pathOutLen, char16_t *pPlayerName, char16_t *pCharName, int bCharPath);
 int jkGuiBuildMulti_Show();
 int jkGuiBuildMulti_Show2(Darray *pDarray, jkGuiElement *pElement, int minIdk, int maxIdk, int idx);
 int jkGuiBuildMulti_ShowNewCharacter(int rank, int bGameFormatIsJK, int bHasNoValidChars);

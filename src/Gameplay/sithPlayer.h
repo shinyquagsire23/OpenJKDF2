@@ -61,7 +61,7 @@ void sithPlayer_Reset(unsigned int playerNum);
 int sithPlayer_ShowPlayer(int playerNum, int id);
 void sithPlayer_NewPlayer(SithThing *pPlayer);
 uint32_t sithPlayer_GetPlayerNum(int playerId);
-int sithPlayer_GetPlayerNumByName(wchar_t *pwName);
+int sithPlayer_GetPlayerNumByName(char16_t *pwName);
 
 //static void (*sithPlayer_NewPlayer)(SithThing *player) = (void*)sithPlayer_NewPlayer_ADDR;
 //static void (*sithPlayer_Startup)(int) = (void*)sithPlayer_Startup_ADDR;

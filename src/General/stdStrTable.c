@@ -1,12 +1,10 @@
 #include "stdStrTable.h"
 
-#include <wchar.h>
-#include <wctype.h>
 #include "stdPlatform.h"
 #include "General/stdString.h"
 #include "jk.h"
 
-static wchar_t stdStrTable_tmpBuf[64];
+static char16_t stdStrTable_tmpBuf[64];
 
 int stdStrTable_Load(stdStrTable *pStrTable, char *pFilename)
 {
@@ -231,10 +229,10 @@ void stdStrTable_Free(stdStrTable* pStrTable)
     }
 }
 
-wchar_t* stdStrTable_GetValue(stdStrTable* pStrTable, const char *pKey)
+char16_t* stdStrTable_GetValue(stdStrTable* pStrTable, const char *pKey)
 {
     stdStrMsg *v2; // eax
-    wchar_t *result; // eax
+    char16_t *result; // eax
 
     if ( pStrTable->numMsgs && (v2 = (stdStrMsg *)stdHashtbl_Find(pStrTable->pHashtbl, pKey)) != 0 )
         result = v2->uniStr;
@@ -268,39 +266,39 @@ int stdStrTable_ReadLine(stdFile_t fh, char *pStr, int size)
     return 1;
 }
 
-int stdStrTable_ParseUniLine(stdFile_t hGobFile, wchar_t *buf)
+int stdStrTable_ParseUniLine(stdFile_t hGobFile, char16_t *buf)
 {
     int found;
-    wchar_t *p;
-    wchar_t tmpBuf[64];
+    char16_t *p;
+    char16_t tmpBuf[64];
 
     found = 0;
     do
     {
         std_g_pHS->fileGetws(hGobFile, buf, 10);
-        if ( !__wcschr(buf, L'\n') )
+        if ( !__wcschr(buf, u'\n') )
         {
             do
                 std_g_pHS->fileGetws(hGobFile, tmpBuf, 10);
-            while ( !__wcschr(tmpBuf, L'\n') );
+            while ( !__wcschr(tmpBuf, u'\n') );
         }
-        for ( p = buf; iswspace(*p); ++p )
+        for ( p = buf; _iswspace(*p); ++p )
             ;
-        if ( *p != L'#' && *p && *p != L'\r' && *p != L'\n' )
+        if ( *p != u'#' && *p && *p != u'\r' && *p != u'\n' )
             found = 1;
     }
     while ( !found );
     return 1;
 }
 
-wchar_t* stdStrTable_GetValueOrKey(stdStrTable* pStrTable, const char *pKey)
+char16_t* stdStrTable_GetValueOrKey(stdStrTable* pStrTable, const char *pKey)
 {
     stdStrMsg *v2; // eax
-    wchar_t *result; // eax
+    char16_t *result; // eax
 
     // Added: nullptr fallback
     if (!pKey) {
-        return L"(NULL)";
+        return u"(NULL)";
     }
 
     if ( pStrTable->numMsgs && (v2 = (stdStrMsg *)stdHashtbl_Find(pStrTable->pHashtbl, pKey)) != 0 )

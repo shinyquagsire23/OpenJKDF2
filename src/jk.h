@@ -310,7 +310,7 @@ int jk_printf(const char* fmt, ...);
 int _printf(const char* fmt, ...);
 void* _malloc(size_t a);
 void _free(void* a);
-wchar_t* _wcsncpy(wchar_t *a1, const wchar_t *a2, size_t a3);
+char16_t* _wcsncpy(char16_t *a1, const char16_t *a2, size_t a3);
 void _strtolower(char* str);
 void _qsort(void *a, size_t b, size_t c, int (__cdecl *d)(const void *, const void *));
 char* _strchr(char * a, char b);
@@ -319,10 +319,10 @@ char* _strtok(char * a, const char * b);
 char* _strncat(char* a, const char* b, size_t c);
 size_t _strspn(const char* a, const char* b);
 const char* _strpbrk(const char* a, const char* b);
-size_t _wcslen(const wchar_t * a);
-size_t __wcslen(const wchar_t * strarg);
-int jk_snwprintf(wchar_t *a1, size_t a2, const wchar_t *fmt, ...);
-wchar_t* _wcscpy(wchar_t * a, const wchar_t *b);
+size_t _wcslen(const char16_t * a);
+size_t __wcslen(const char16_t * strarg);
+int jk_snwprintf(char16_t *a1, size_t a2, const char16_t *fmt, ...);
+char16_t* _wcscpy(char16_t * a, const char16_t *b);
 int jk_MessageBeep(int a);
 int __strcmpi(const char *a, const char *b);
 int __strnicmp(const char *a, const char *b, size_t c);
@@ -336,7 +336,7 @@ void jk_PostMessageA();
 void jk_GetCursorPos(LPPOINT lpPoint);
 int jk_GetUpdateRect(HWND hWnd, LPRECT lpRect, BOOL bErase);
 void jk_BeginPaint(int a, struct tagPAINTSTRUCT * lpPaint);
-int jk_vsnwprintf(wchar_t * a, size_t b, const wchar_t *fmt, va_list list);
+int jk_vsnwprintf(char16_t * a, size_t b, const char16_t *fmt, va_list list);
 void jk_EndPaint(HWND hWnd, const PAINTSTRUCT *lpPaint);
 HINSTANCE stdGdi_GetHInstance();
 int jk_LoadCursorA(HINSTANCE hInstance, LPCSTR lpCursorName);
@@ -367,22 +367,22 @@ void jk_ValidateRect(HWND hWnd, const RECT *lpRect);
 #if !defined(ARCH_WASM)
 int __isspace(int a);
 #endif
-wchar_t* __wcscat(wchar_t *, const wchar_t *);
-wchar_t* __wcschr(const wchar_t *, wchar_t);
-wchar_t* __wcsncpy(wchar_t *, const wchar_t *, size_t);
-wchar_t* __wcsrchr(const wchar_t *, wchar_t);
+char16_t* __wcscat(char16_t *, const char16_t *);
+char16_t* __wcschr(const char16_t *, char16_t);
+char16_t* __wcsncpy(char16_t *, const char16_t *, size_t);
+char16_t* __wcsrchr(const char16_t *, char16_t);
 int __snprintf(char *, size_t, const char *, ...);
 int __vsnprintf(char *a1, size_t a2, const char *fmt, va_list aArgs);
 char* _strstr(const char* a, const char* b);
 #endif // WIN32_BLOBS
 
-long jk_wcstol(const wchar_t * nptr, wchar_t ** endptr, int base);
+long jk_wcstol(const char16_t * nptr, char16_t ** endptr, int base);
 int _strlen(const char *str);
 char* _strcat(char* str, const char* concat);
 int _strcmp(const char* s1, const char* s2);
 int _strncmp(const char *s1, const char *s2, size_t n);
-int __wcscmp(const wchar_t *a, const wchar_t *b);
-int __wcsicmp(const wchar_t *a, const wchar_t *b);
+int __wcscmp(const char16_t *a, const char16_t *b);
+int __wcsicmp(const char16_t *a, const char16_t *b);
 
 flex_t _frand();
 

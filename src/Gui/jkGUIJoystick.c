@@ -28,11 +28,11 @@ static int32_t jkGuiJoystick_dword_557128;
 static Darray jkGuiJoystick_darray2;
 static jkGuiJoystickStrings jkGuiJoystick_strings;
 static flex_t jkGuiJoystick_aFloats[JKGUIJOYSTICK_NUM_ENTRIES];
-static wchar_t jkGuiJoystick_awTmp[256];
+static char16_t jkGuiJoystick_awTmp[256];
 static Darray jkGuiJoystick_darray3;
 static int32_t jkGuiJoystick_bIsCapturingInputs;
 static int32_t jkGuiJoystick_dword_5576F4;
-static wchar_t jkGuiJoystick_waIdk2[4];
+static char16_t jkGuiJoystick_waIdk2[4];
 
 static int32_t jkGuiJoystick_dword_536B98 = -1;
 static int32_t jkGuiJoystick_dword_536B9C = -1;
@@ -247,7 +247,7 @@ void jkGuiJoystick_Draw(jkGuiMenu *pMenu, BOOL bRedraw)
     int32_t v5; // ecx
     stdControlKeyInfoEntry *v6; // eax
     flex_d_t v7; // st7
-    wchar_t *v8; // eax
+    char16_t *v8; // eax
     jkGuiMenu *v9; // edi
     Darray *v10; // edi
     stdControlKeyInfoEntry *v11; // eax
@@ -464,8 +464,8 @@ void jkGuiJoystick_BindControl(int a1, int a2)
     int32_t v7; // ebx
     stdControlKeyInfoEntry *v8; // ecx
     stdControlKeyInfoEntry *v9; // eax
-    wchar_t *v11; // eax
-    wchar_t *v12; // [esp-4h] [ebp-18h]
+    char16_t *v11; // eax
+    char16_t *v12; // [esp-4h] [ebp-18h]
     flex_t v13; // [esp+10h] [ebp-4h]
 
     v13 = 1.0;
@@ -509,12 +509,12 @@ void jkGuiJoystick_sub_41B390()
     jkGuiJoystickEntry* v1; // edi
     int32_t v2; // ebp
     int32_t v3; // esi
-    wchar_t *v4; // ebx
-    wchar_t *v5; // eax
+    char16_t *v4; // ebx
+    char16_t *v5; // eax
     int32_t v6; // esi
     int32_t v7; // [esp+10h] [ebp-208h]
     int32_t v8; // [esp+14h] [ebp-204h]
-    wchar_t wtmp[256]; // [esp+18h] [ebp-200h] BYREF
+    char16_t wtmp[256]; // [esp+18h] [ebp-200h] BYREF
 
     jkGuiRend_DarrayFreeEntry(&jkGuiJoystick_darray2);
     jkGuiRend_DarrayFreeEntry(&jkGuiJoystick_darray);
@@ -548,7 +548,7 @@ void jkGuiJoystick_sub_41B390()
         v4 = jkStrings_GetUniStringWithFallback(v1->displayStrKey);
         if ( v1->inputFunc == -1 )
         {
-            v5 = L"--";
+            v5 = u"--";
         }
         else if ( v8 )
         {
@@ -558,7 +558,7 @@ void jkGuiJoystick_sub_41B390()
         {
             v5 = jkGuiRend_GetString(&jkGuiJoystick_darray, v1->binaryAxisValInt);
         }
-        jk_snwprintf(wtmp, 0x100u, L"%ls\t%ls", v4, v5);
+        jk_snwprintf(wtmp, 0x100u, u"%ls\t%ls", v4, v5);
         v6 = v3 >> 7;
         if ( stdControl_aJoystickExists[v6] && !v8 && (stdControl_aAxes[v1->dikNum].flags & INPUT_MAPPING_FLAG_AXIS) != 0
           || v8 == 0x200 && v2 < stdControl_aJoystickMaxButtons[v6] // Added: 4bit -> 8bit
@@ -581,15 +581,15 @@ void jkGuiJoystick_sub_41B390()
 int jkGuiJoystick_EnumFunc(int32_t inputFuncIdx, const char *pInputFuncStr, uint32_t flags, int32_t dxKeyNum, uint32_t dikNum, int32_t flags2, stdControlKeyInfoEntry *pControlEntry, Darray *pDarr)
 {
     int32_t v8; // ebx
-    wchar_t *v9; // esi
-    wchar_t *v10; // eax
+    char16_t *v9; // esi
+    char16_t *v10; // eax
     int32_t v11; // ebp
     int32_t v12; // edi
     int32_t i; // esi
     jkGuiJoystickEntry* v14; // eax
-    wchar_t *v16; // [esp+10h] [ebp-224h]
+    char16_t *v16; // [esp+10h] [ebp-224h]
     char v17[32]; // [esp+14h] [ebp-220h] BYREF
-    wchar_t v18[256]; // [esp+34h] [ebp-200h] BYREF
+    char16_t v18[256]; // [esp+34h] [ebp-200h] BYREF
 
     v8 = 0;
     v9 = jkGuiJoystick_waIdk2;
@@ -624,7 +624,7 @@ int jkGuiJoystick_EnumFunc(int32_t inputFuncIdx, const char *pInputFuncStr, uint
         v10 = v16;
     }
 
-    jk_snwprintf(v18, 0xFFu, L"%ls%ls", v10, v9);
+    jk_snwprintf(v18, 0xFFu, u"%ls%ls", v10, v9);
 
     
     if ( v8 )
@@ -692,8 +692,8 @@ int jkGuiJoystick_ClickList3(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t m
     int32_t v14; // eax
     int32_t v15; // ebp
     int32_t v16; // esi
-    wchar_t *v17; // eax
-    wchar_t *v18; // [esp-14h] [ebp-14h]
+    char16_t *v17; // eax
+    char16_t *v18; // [esp-14h] [ebp-14h]
 
     if ( jkGuiJoystick_bIsCapturingInputs )
         return 0;
@@ -777,8 +777,8 @@ int jkGuiJoystick_OkCancelClick(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_
     int32_t v12; // eax
     int32_t v13; // ebp
     int32_t v14; // esi
-    wchar_t *v15; // eax
-    wchar_t *v16; // [esp-4h] [ebp-14h]
+    char16_t *v15; // eax
+    char16_t *v16; // [esp-4h] [ebp-14h]
 
 #ifdef QOL_IMPROVEMENTS
     if (pElement->hoverId == -1 && jkGuiJoystick_bIsCapturingInputs) {
@@ -834,8 +834,8 @@ int jkGuiJoystick_OkCancelClick(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_
 
 int jkGuiJoystick_RestoreDefaultsClick(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL bRedraw)
 {
-    wchar_t *v6; // eax
-    wchar_t *v7; // [esp-8h] [ebp-8h]
+    char16_t *v6; // eax
+    char16_t *v7; // [esp-8h] [ebp-8h]
 
     if ( jkGuiJoystick_bIsCapturingInputs )
         return 0;
@@ -879,7 +879,7 @@ void jkGuiJoystick_MenuTick(jkGuiMenu *pMenu)
 {
     int32_t v1; // eax
     int32_t v2; // ebp
-    wchar_t *v3; // eax
+    char16_t *v3; // eax
     jkGuiJoystickEntry *v4; // esi
     jkGuiJoystickEntry* v5; // eax
     int32_t v6; // ecx
@@ -890,8 +890,8 @@ void jkGuiJoystick_MenuTick(jkGuiMenu *pMenu)
     int32_t v11; // edi
     flex_d_t v12; // st7
     flex_d_t v14; // st7
-    wchar_t *v15; // esi
-    wchar_t *v16; // eax
+    char16_t *v15; // esi
+    char16_t *v16; // eax
     uint32_t v18; // [esp-4h] [ebp-28h]
     int32_t v19; // [esp-4h] [ebp-28h]
     flex_t *v20; // [esp+10h] [ebp-14h]

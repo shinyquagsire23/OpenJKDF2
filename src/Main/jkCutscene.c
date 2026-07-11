@@ -614,7 +614,7 @@ int jkCutscene_smack_related_loops()
 
             if (jkCutscene_pSmush)
             {
-                wchar_t* str = NULL;
+                char16_t* str = NULL;
                 int32_t uVar3 = jkCutscene_dword_55B750 & 0x7FFFFFFF;
                 if (uVar3) {
                     int32_t uVar4 = uVar3 % 10000;
@@ -688,7 +688,7 @@ int jkCutscene_smack_related_loops()
 
 int jkCutscene_PauseShow(int unk)
 {
-    wchar_t *v0; // eax
+    char16_t *v0; // eax
     int result; // eax
 
     if ( jkCutscene_55AA54 )
@@ -721,7 +721,7 @@ int jkCutscene_PauseShow(int unk)
 
 int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5)
 {
-    wchar_t *v5; // eax
+    char16_t *v5; // eax
 
     switch ( a2 )
     {

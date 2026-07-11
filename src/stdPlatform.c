@@ -195,23 +195,23 @@ static const char* Linux_stdFileGets(stdFile_t hGobFile, char* dst, size_t len)
 #endif
 }
 
-static const wchar_t* Linux_stdFileGetws(stdFile_t hGobFile, wchar_t* dst, size_t len)
+static const char16_t* Linux_stdFileGetws(stdFile_t hGobFile, char16_t* dst, size_t len)
 {
-    // Can't use fgetws because -fshort-wchar makes wchar_t 2 bytes
-    // but libc fgetws expects native wchar_t (4 bytes on POSIX).
-    // Read UTF-16LE characters one at a time instead.
+    // Can't use fgetws: it operates on the platform's native wchar_t (4 bytes
+    // on POSIX), but our strings are fixed 16-bit char16_t. Read UTF-16LE
+    // characters one at a time instead.
     if (!len) return NULL;
     size_t i = 0;
     while (i < len - 1) {
-        wchar_t ch = 0;
-        if (fread(&ch, sizeof(wchar_t), 1, (FILE*)hGobFile) != 1) {
+        char16_t ch = 0;
+        if (fread(&ch, sizeof(char16_t), 1, (FILE*)hGobFile) != 1) {
             if (i == 0) return NULL;
             break;
         }
         dst[i++] = ch;
-        if (ch == L'\n') break;
+        if (ch == u'\n') break;
     }
-    dst[i] = L'\0';
+    dst[i] = u'\0';
     return dst;
 }
 

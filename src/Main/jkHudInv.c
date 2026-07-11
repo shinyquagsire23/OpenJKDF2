@@ -149,9 +149,9 @@ void jkHudInv_Draw()
     int idx; // [esp+18h] [ebp-28h]
     int v43; // [esp+1Ch] [ebp-24h] BYREF
     char v44[4]; // [esp+20h] [ebp-20h] BYREF
-    wchar_t a6[3]; // [esp+28h] [ebp-18h] BYREF
-    wchar_t v48[3]; // [esp+30h] [ebp-10h] BYREF
-    wchar_t v50[3]; // [esp+38h] [ebp-8h] BYREF
+    char16_t a6[3]; // [esp+28h] [ebp-18h] BYREF
+    char16_t v48[3]; // [esp+30h] [ebp-10h] BYREF
+    char16_t v50[3]; // [esp+38h] [ebp-8h] BYREF
 #ifdef TARGET_TWL
     if ( Main_bNoHUD )
         return;
@@ -457,9 +457,9 @@ void jkHudInv_DrawGPU()
     int idx; // [esp+18h] [ebp-28h]
     int v43; // [esp+1Ch] [ebp-24h] BYREF
     char v44[4]; // [esp+20h] [ebp-20h] BYREF
-    wchar_t a6[3]; // [esp+28h] [ebp-18h] BYREF
-    wchar_t v48[3]; // [esp+30h] [ebp-10h] BYREF
-    wchar_t v50[3]; // [esp+38h] [ebp-8h] BYREF
+    char16_t a6[3]; // [esp+28h] [ebp-18h] BYREF
+    char16_t v48[3]; // [esp+30h] [ebp-10h] BYREF
+    char16_t v50[3]; // [esp+38h] [ebp-8h] BYREF
 
     player = sithWorld_g_pCurrentWorld->pLocalPlayer;
     if ( player->type != SITH_THING_PLAYER ) {

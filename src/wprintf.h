@@ -34,7 +34,15 @@
 
 #include <stdarg.h>
 #include <stddef.h>
+#include <stdint.h>
 
+// char16_t must be a real, fixed-width 16-bit type, not an alias for the
+// compiler's wchar_t. Self-contained (rather than including types.h) so this
+// vendored file has no dependency on the rest of the engine; mirrors the
+// identical guarded typedef in types.h so both resolve to the same type.
+#ifndef __cplusplus
+typedef uint16_t char16_t;
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,7 +54,7 @@ extern "C" {
  * This function is declared here only. You have to write your custom implementation somewhere
  * \param character Character to output
  */
-void _putwchar(wchar_t character);
+void _putwchar(char16_t character);
 
 
 /**
@@ -58,7 +66,7 @@ void _putwchar(wchar_t character);
  * \return The number of characters that are written into the array, not counting the terminating null character
  */
 //#define wprintf wprintf_
-int wprintf_(const wchar_t* format, ...);
+int wprintf_(const char16_t* format, ...);
 
 
 /**
@@ -69,7 +77,7 @@ int wprintf_(const wchar_t* format, ...);
  * \return The number of characters that are WRITTEN into the buffer, not counting the terminating null character
  */
 //#define swprintf swprintf_
-int sprintf_(wchar_t* buffer, const wchar_t* format, ...);
+int sprintf_(char16_t* buffer, const char16_t* format, ...);
 
 
 /**
@@ -84,8 +92,8 @@ int sprintf_(wchar_t* buffer, const wchar_t* format, ...);
  */
 //#define snwprintf  snwprintf_
 //#define vsnwprintf vsnwprintf_
-int  snwprintf_(wchar_t* buffer, size_t count, const wchar_t* format, ...);
-int vsnwprintf_(wchar_t* buffer, size_t count, const wchar_t* format, va_list va);
+int  snwprintf_(char16_t* buffer, size_t count, const char16_t* format, ...);
+int vsnwprintf_(char16_t* buffer, size_t count, const char16_t* format, va_list va);
 
 
 /**
@@ -95,7 +103,7 @@ int vsnwprintf_(wchar_t* buffer, size_t count, const wchar_t* format, va_list va
  * \return The number of characters that are WRITTEN into the buffer, not counting the terminating null character
  */
 //#define vwprintf vwprintf_
-int vwprintf_(const wchar_t* format, va_list va);
+int vwprintf_(const char16_t* format, va_list va);
 
 
 /**
@@ -106,7 +114,7 @@ int vwprintf_(const wchar_t* format, va_list va);
  * \param format A string that specifies the format of the output
  * \return The number of characters that are sent to the output function, not counting the terminating null character
  */
-int fctwprintf(void (*out)(wchar_t character, void* arg), void* arg, const wchar_t* format, ...);
+int fctwprintf(void (*out)(char16_t character, void* arg), void* arg, const char16_t* format, ...);
 
 
 #ifdef __cplusplus

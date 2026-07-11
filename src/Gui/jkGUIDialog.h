@@ -13,8 +13,8 @@
 void jkGuiDialog_Startup();
 void jkGuiDialog_Shutdown();
 
-int jkGuiDialog_OkCancelDialog(wchar_t *stringA, wchar_t *stringB);
-void jkGuiDialog_ErrorDialog(wchar_t *stringA, wchar_t *stringB);
-int jkGuiDialog_YesNoDialog(wchar_t *stringA, wchar_t *stringB);
+int jkGuiDialog_OkCancelDialog(char16_t *stringA, char16_t *stringB);
+void jkGuiDialog_ErrorDialog(char16_t *stringA, char16_t *stringB);
+int jkGuiDialog_YesNoDialog(char16_t *stringA, char16_t *stringB);
 
 #endif // _JKGUIDIALOG_H

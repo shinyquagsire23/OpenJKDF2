@@ -143,7 +143,7 @@ int Main_StartupDedicated(int bFullyDedicated)
         strcpy(aTmpPlayerShortName, "ServerDed");
         stdString_CharToWchar(jkPlayer_playerShortName, aTmpPlayerShortName, 31);
         jkPlayer_playerShortName[31] = 0;
-        jkPlayer_CreateConf(L"ServerDed");
+        jkPlayer_CreateConf(u"ServerDed");
     }
     else {
         wuRegistry_GetStr("playerShortName", aTmpPlayerShortName, 32, "ServerDed");
@@ -164,7 +164,7 @@ int Main_StartupDedicated(int bFullyDedicated)
 //#endif // !defined(TARGET_NO_MULTIPLAYER_MENUS)
 
     // Fake player
-    stdString_SafeWStrCopy(jkGuiMultiplayer_mpcInfo.name, L"", 32);
+    stdString_SafeWStrCopy(jkGuiMultiplayer_mpcInfo.name, u"", 32);
     stdString_SafeStrCopy(jkGuiMultiplayer_mpcInfo.model, "ky.3do", 32);
     stdString_SafeStrCopy(jkGuiMultiplayer_mpcInfo.soundClass, "ky.snd", 32);
 #ifndef OPTIMIZE_OUT_UNUSED_FIELDS
@@ -194,8 +194,8 @@ int Main_StartupDedicated(int bFullyDedicated)
         wuRegistry_SaveStr("serverMapJkl", Main_strMap);
     }
 
-    wuRegistry_GetWString("gameName", v34.serverName, 32, L"OpenJKDF2 Dedicated Server");
-    wuRegistry_GetWString("serverPassword", v34.wPassword, 32, L"");
+    wuRegistry_GetWString("gameName", v34.serverName, 32, u"OpenJKDF2 Dedicated Server");
+    wuRegistry_GetWString("serverPassword", v34.wPassword, 32, u"");
 #ifndef TARGET_DREAMCAST // TODO writable config
     wuRegistry_GetStr("serverEpisodeGob", v34.episodeGobName, 32, Main_strEpisode);
     wuRegistry_GetStr("serverMapJkl", v34.mapJklFname, 32, Main_strMap);

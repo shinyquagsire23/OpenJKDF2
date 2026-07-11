@@ -85,7 +85,7 @@ static stdBitmap* jkGuiForce_aBitmaps[19];
 
 static int32_t jkGuiForce_sliderBitmapIndices[2] = {16, 15};
 
-static wchar_t jkGuiForce_waTmp[400];
+static char16_t jkGuiForce_waTmp[400];
 
 jkGuiElement jkGuiForce_buttonsMots[31] = { 
 /*0*/        { ELEMENT_TEXT, 0, 2, NULL, 
@@ -521,7 +521,7 @@ int jkGuiForce_ResetClick(jkGuiElement *element, jkGuiMenu *menu, int32_t mouseX
 }
 
 // MOTS altered
-int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *pbIsLight, int bEnableIdk)
+int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, char16_t* a5, int *pbIsLight, int bEnableIdk)
 {
     int newStars;
     int spendStars;
@@ -580,7 +580,7 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *p
         {
             jkPlayer_SetAccessiblePowers(jkPlayer_GetJediRank());
             jkGuiForce_UpdateViewForRank();
-            jkGuiForce_pElements[EIDX_NAMETEXT].wstr = (wchar_t *)a5;
+            jkGuiForce_pElements[EIDX_NAMETEXT].wstr = (char16_t *)a5;
         }
 
         for (int i = EIDX_START_FP; i < EIDX_END_FP; i++)
@@ -735,7 +735,7 @@ void jkGuiForce_UpdateViewForRankMots(void)
     int jediRank;
     int jediRank_;
     int *piVar2;
-    wchar_t *pwVar5;
+    char16_t *pwVar5;
     int bIsMulti;
     
     jediRank = jkPlayer_GetJediRank();

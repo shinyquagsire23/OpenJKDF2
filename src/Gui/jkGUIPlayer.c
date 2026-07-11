@@ -24,7 +24,7 @@
 
 static int jkGuiPlayer_bInitted = 0;
 
-static wchar_t jkGuiPlayer_awTmp_555D28[0x100] = {0};
+static char16_t jkGuiPlayer_awTmp_555D28[0x100] = {0};
 static const char* jkGuiPlayer_GuiDifficulties[3] = {"GUI_EASY", "GUI_MED", "GUI_HARD"};
 
 static int32_t jkGuiPlayer_menuSelectIdk[2] = {0xFA, 0};
@@ -114,13 +114,13 @@ int jkGuiPlayer_sub_410640(Darray *array, jkGuiElement *element)
     stdFileSearch *v3; // eax
     stdFileSearch *v4; // ebp
     int v5; // eax
-    wchar_t *v6; // eax
+    char16_t *v6; // eax
     int v8; // [esp+10h] [ebp-3B4h] BYREF
     int v9; // [esp+14h] [ebp-3B0h] BYREF
     char a1a[32]; // [esp+18h] [ebp-3ACh] BYREF
     stdFileSearchResult searchRes; // [esp+38h] [ebp-38Ch] BYREF
     char jkl_fname[128]; // [esp+144h] [ebp-280h] BYREF
-    wchar_t tmp[256]; // [esp+1C4h] [ebp-200h] BYREF
+    char16_t tmp[256]; // [esp+1C4h] [ebp-200h] BYREF
 
     v2 = 0;
     stdString_WcharToChar(a1a, jkPlayer_playerShortName, 31);
@@ -140,7 +140,7 @@ int jkGuiPlayer_sub_410640(Darray *array, jkGuiElement *element)
                     _memset(tmp, 0, sizeof(tmp));
                     stdString_CharToWchar(tmp, searchRes.fpath, 255);
                     tmp[255] = 0;
-                    wchar_t tab[2] = {'\t', 0};
+                    char16_t tab[2] = {'\t', 0};
                     __wcscat(tmp, tab);
                     
                     if ( stdConffile_OpenReadBypass(jkl_fname) )
@@ -192,27 +192,27 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
     int v1; // eax
     int v2; // ebp
     jkGuiStringEntry *v3; // eax
-    const wchar_t *v4; // esi
-    wchar_t *v5; // eax
+    const char16_t *v4; // esi
+    char16_t *v5; // eax
     int v6; // esi
     int v7; // edi
-    const wchar_t *v8; // eax
-    wchar_t *v9; // eax
-    wchar_t *v10; // eax
+    const char16_t *v8; // eax
+    char16_t *v9; // eax
+    char16_t *v10; // eax
     jkGuiStringEntry *v11; // eax
-    const wchar_t *v12; // esi
-    wchar_t *v13; // eax
+    const char16_t *v12; // esi
+    char16_t *v13; // eax
     int v14; // [esp+10h] [ebp-664h]
     int v15; // [esp+14h] [ebp-660h]
     Darray a1a; // [esp+1Ch] [ebp-658h] BYREF
-    char v17[32]; // [esp+34h] [ebp-640h] BYREF
-    char v18[32]; // [esp+54h] [ebp-620h] BYREF
+    char16_t v17[32]; // [esp+34h] [ebp-640h] BYREF // Added: was char -- %s in this codebase's tiny-printf reads a wide char16_t*, so a narrow buffer here produced garbage
+    char16_t v18[32]; // [esp+54h] [ebp-620h] BYREF // Added: same fix as v17
     char v19[128]; // [esp+74h] [ebp-600h] BYREF
     char v20[128]; // [esp+F4h] [ebp-580h] BYREF
     char v21[128]; // [esp+174h] [ebp-500h] BYREF
     char PathName[128]; // [esp+1F4h] [ebp-480h] BYREF
-    wchar_t a2[256]; // [esp+274h] [ebp-400h] BYREF
-    wchar_t v24[256]; // [esp+474h] [ebp-200h] BYREF
+    char16_t a2[256]; // [esp+274h] [ebp-400h] BYREF
+    char16_t v24[256]; // [esp+474h] [ebp-200h] BYREF
 
     jkPlayer_playerShortName[0] = 0; // Added
 
@@ -260,8 +260,7 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
                     }
                     if ( !jkPlayer_ReadConf(a2) )
                     {
-                        stdString_WcharToChar(v17, jkPlayer_playerShortName, 31);
-                        v17[31] = 0;
+                        stdString_SafeWStrCopy(v17, jkPlayer_playerShortName, 32); // Added: keep wide -- %s wants char16_t*
                         Windows_ErrorMsgboxWide("ERR_CANNOT_SET_PLAYER %s", v17);
                     }
                 }
@@ -269,19 +268,18 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
             case 1:
                 if ( !jkPlayer_ReadConf(a2) )
                 {
-                    stdString_WcharToChar(v18, jkPlayer_playerShortName, 31);
-                    v18[31] = 0;
+                    stdString_SafeWStrCopy(v18, jkPlayer_playerShortName, 32); // Added: keep wide -- %s wants char16_t*
                     Windows_ErrorMsgboxWide("ERR_CANNOT_SET_PLAYER %s", v18);
                 }
                 continue;
             case 2:
                 jkGuiPlayer_menuNewElements[9].bIsVisible = v15 == 0;
                 jkGuiPlayer_menuNewElements[3].wstr = jkGuiPlayer_awTmp_555D28;
-                _memset(jkGuiPlayer_awTmp_555D28, 0, 16 * sizeof(wchar_t));
+                _memset(jkGuiPlayer_awTmp_555D28, 0, 16 * sizeof(char16_t));
 #ifdef TARGET_DREAMCAST
                 // Added: pre-fill a default name so a profile can be created
                 // without the on-screen keyboard (deferred for now).
-                __wcsncpy(jkGuiPlayer_awTmp_555D28, L"Player", 6);
+                __wcsncpy(jkGuiPlayer_awTmp_555D28, u"Player", 6);
 #endif
                 jkGuiPlayer_menuNewElements[3].selectedTextEntry = 16;
                 jkGuiPlayer_menuNewElements[8].unistr = 0;

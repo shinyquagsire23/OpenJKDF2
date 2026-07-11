@@ -357,7 +357,7 @@ void jkDev_PrintfLog()
 }
 
 // MOTS altered? inlined?
-int jkDev_PrintUniString(const wchar_t *str)
+int jkDev_PrintUniString(const char16_t *str)
 {
     int v1; // ecx
     int v2; // edx
@@ -408,7 +408,7 @@ LABEL_7:
 int jkDev_DebugLog(const char *lParam)
 {
     HWND v1; // eax
-    wchar_t a1[128]; // [esp+8h] [ebp-100h] BYREF
+    char16_t a1[128]; // [esp+8h] [ebp-100h] BYREF
 
     stdString_CharToWchar(a1, lParam, 127);
     a1[127] = 0;
@@ -425,7 +425,7 @@ int jkDev_DebugLog(const char *lParam)
     return ret;
 }
 
-int jkDev_sub_41FB80(int a1, const wchar_t *a2)
+int jkDev_sub_41FB80(int a1, const char16_t *a2)
 {
     int result; // eax
     int v3; // edi
@@ -470,7 +470,7 @@ LABEL_9:
 
 int jkDev_sub_41FC40(int a1, const char *a2)
 {
-    wchar_t a1a[128]; // [esp+0h] [ebp-100h] BYREF
+    char16_t a1a[128]; // [esp+0h] [ebp-100h] BYREF
 
     stdString_CharToWchar(a1a, a2, 127);
     a1a[127] = 0;
@@ -1209,7 +1209,7 @@ int jkDev_CmdNoclip(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     if (sithNet_isMulti ) return 1;
 
     SithThing *v0; // ecx
-    wchar_t *v3; // eax
+    char16_t *v3; // eax
 
     if (!sithWorld_g_pCurrentWorld || !sithWorld_g_pCurrentWorld->pLocalPlayer) {
         sithConsole_PrintString("No world.");

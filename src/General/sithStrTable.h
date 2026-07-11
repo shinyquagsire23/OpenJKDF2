@@ -10,7 +10,7 @@
 
 int sithStrTable_Startup();
 void sithStrTable_Shutdown();
-wchar_t* sithStrTable_GetUniString(const char *key);
-wchar_t* sithStrTable_GetUniStringWithFallback(char *key);
+char16_t* sithStrTable_GetUniString(const char *key);
+char16_t* sithStrTable_GetUniStringWithFallback(char *key);
 
 #endif // _SITHSTRTABLE_H

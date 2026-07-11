@@ -10,10 +10,10 @@ void Hack_ResetClients()
 {
     DirectPlay_numPlayers = 2;
     DirectPlay_aPlayers[0].dpId = 1;
-    jk_snwprintf(DirectPlay_aPlayers[0].waName, 32, L"asdf1");
+    jk_snwprintf(DirectPlay_aPlayers[0].waName, 32, u"asdf1");
 
     DirectPlay_aPlayers[1].dpId = 2;
-    jk_snwprintf(DirectPlay_aPlayers[1].waName, 32, L"asdf2");
+    jk_snwprintf(DirectPlay_aPlayers[1].waName, 32, u"asdf2");
 
     int id_self = 1;
     int id_other = 2;
@@ -33,12 +33,12 @@ void Hack_ResetClients()
 void stdComm_None_Startup()
 {
     jkGuiMultiplayer_numConnections = 1;
-    jk_snwprintf(jkGuiMultiplayer_aConnections[0].name, 0x80, L"Screaming Into The Void");
+    jk_snwprintf(jkGuiMultiplayer_aConnections[0].name, 0x80, u"Screaming Into The Void");
     stdComm_dword_8321E0 = 0;
 
     memset(jkGuiMultiplayer_aEntries, 0, sizeof(jkMultiEntry) * 32);
     dplay_dword_55D618 = 1;
-    jk_snwprintf(jkGuiMultiplayer_aEntries[0].serverName, 0x20, L"OpenJKDF2 Loopback");
+    jk_snwprintf(jkGuiMultiplayer_aEntries[0].serverName, 0x20, u"OpenJKDF2 Loopback");
     stdString_snprintf(jkGuiMultiplayer_aEntries[0].episodeGobName, 0x20, "JK1MP");
     stdString_snprintf(jkGuiMultiplayer_aEntries[0].mapJklFname, 0x20, "m2.jkl");
     jkGuiMultiplayer_aEntries[0].field_E0 = 10;
@@ -67,7 +67,7 @@ void stdComm_CloseConnection()
 
 }
 
-int stdComm_Open(int idx, wchar_t* pwPassword)
+int stdComm_Open(int idx, char16_t* pwPassword)
 {
     return 1;
 }
@@ -112,13 +112,13 @@ BOOL DirectPlay_Startup()
     return 1;
 }
 
-int DirectPlay_EarlyInit(wchar_t* pwIdk, wchar_t* pwPlayerName)
+int DirectPlay_EarlyInit(char16_t* pwIdk, char16_t* pwPlayerName)
 {
     // This can launch straight into a game? Gaming Zone stuff. 1 and 2 autolaunch an MP game.
     return 0;
 }
 
-DPID DirectPlay_CreatePlayer(wchar_t* pwIdk, int idk2)
+DPID DirectPlay_CreatePlayer(char16_t* pwIdk, int idk2)
 {
     return 1;
 }

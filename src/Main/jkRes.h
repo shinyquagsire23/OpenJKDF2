@@ -58,7 +58,7 @@ int jkRes_FileClose(stdFile_t fd);
 size_t jkRes_FileRead(stdFile_t fd, void* out, size_t len);
 size_t jkRes_FileWrite(stdFile_t fd, void* out, size_t len);
 const char* jkRes_FileGets(stdFile_t fd, char* str, size_t n);
-const wchar_t* jkRes_FileGetws(stdFile_t fd, wchar_t* wstr, size_t n);
+const char16_t* jkRes_FileGetws(stdFile_t fd, char16_t* wstr, size_t n);
 int jkRes_FEof(stdFile_t fd);
 int jkRes_FTell(stdFile_t fd);
 int jkRes_FSeek(stdFile_t fd, int offs, int whence);

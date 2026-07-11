@@ -76,7 +76,7 @@ static jkGuiMenu jkGuiMultiplayer_menu2 = {jkGuiMultiplayer_aElements2, 0, 0xFFF
 static jkGuiMenu jkGuiMultiplayer_menu3 = {jkGuiMultiplayer_aElements3, 0, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, jkGuiMultiplayer_sub_4140B0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 static jkGuiMenu jkGuiMultiplayer_menu4 = {jkGuiMultiplayer_aElements4, -1, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, jkGuiMultiplayer_idk, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
-wchar_t jkGuiMultiplayer_ipText[256];
+char16_t jkGuiMultiplayer_ipText[256];
 
 void jkGuiMultiplayer_Startup()
 {
@@ -89,7 +89,7 @@ void jkGuiMultiplayer_Startup()
     jkGuiMultiplayer_bInitted = 1;
 
 #ifdef QOL_IMPROVEMENTS
-    wuRegistry_GetWString("lastConnectedHost", jkGuiMultiplayer_ipText, 0x100, L"127.0.0.1");
+    wuRegistry_GetWString("lastConnectedHost", jkGuiMultiplayer_ipText, 0x100, u"127.0.0.1");
     jkGuiMultiplayer_aElements3[11].wstr = jkGuiMultiplayer_ipText;
     jkGuiMultiplayer_aElements3[11].selectedTextEntry = 255;
 #endif
@@ -110,31 +110,31 @@ int jkGuiMultiplayer_Show()
     sith_dplay_connection *v2; // edi
     int v3; // esi
     HRESULT v4; // eax
-    wchar_t *v5; // eax
-    wchar_t *v6; // eax
+    char16_t *v5; // eax
+    char16_t *v6; // eax
     int v7; // esi
     BOOL v8; // ecx
     HRESULT v10; // eax
-    wchar_t *v11; // eax
+    char16_t *v11; // eax
     int v12; // esi
     int v13; // eax
     uint32_t v14; // esi
     sith_dplay_connection *v15; // edi
     int v16; // esi
     HRESULT v17; // eax
-    wchar_t *v18; // eax
-    wchar_t *v19; // eax
-    wchar_t *v20; // eax
+    char16_t *v18; // eax
+    char16_t *v19; // eax
+    char16_t *v20; // eax
     int v21; // eax
-    wchar_t *v22; // eax
-    wchar_t *v23; // eax
-    wchar_t *v24; // [esp-4h] [ebp-268h]
-    wchar_t *v25; // [esp-4h] [ebp-268h]
-    wchar_t *v27; // [esp-4h] [ebp-268h]
-    wchar_t *v28; // [esp-4h] [ebp-268h]
-    wchar_t *v29; // [esp-4h] [ebp-268h]
-    wchar_t *v30; // [esp-4h] [ebp-268h]
-    wchar_t *v31; // [esp-4h] [ebp-268h]
+    char16_t *v22; // eax
+    char16_t *v23; // eax
+    char16_t *v24; // [esp-4h] [ebp-268h]
+    char16_t *v25; // [esp-4h] [ebp-268h]
+    char16_t *v27; // [esp-4h] [ebp-268h]
+    char16_t *v28; // [esp-4h] [ebp-268h]
+    char16_t *v29; // [esp-4h] [ebp-268h]
+    char16_t *v30; // [esp-4h] [ebp-268h]
+    char16_t *v31; // [esp-4h] [ebp-268h]
     Darray array; // [esp+10h] [ebp-254h] BYREF
     Darray a1; // [esp+28h] [ebp-23Ch] BYREF
     jkMultiEntry3 v34; // [esp+40h] [ebp-224h] BYREF
@@ -344,7 +344,7 @@ LABEL_29:
             goto LABEL_28;
 #ifdef QOL_IMPROVEMENTS
         // HACK: Actually do passwords correctly
-        int check = __wcscmp((const wchar_t*)jkGuiMultiplayer_aEntries[jkGuiMultiplayer_aElements3[3].selectedTextEntry].wPassword, (const wchar_t*)jkGuiMultiplayer_stru_556168.field_300);
+        int check = __wcscmp((const char16_t*)jkGuiMultiplayer_aEntries[jkGuiMultiplayer_aElements3[3].selectedTextEntry].wPassword, (const char16_t*)jkGuiMultiplayer_stru_556168.field_300);
         if (check) {
             v27 = jkStrings_GetUniStringWithFallback("GUINET_WRONGPASSWORD");
             v11 = jkStrings_GetUniStringWithFallback("GUINET_JOINERROR");
@@ -413,8 +413,8 @@ int jkGuiMultiplayer_ShowSynchronizing()
 
 int jkGuiMultiplayer_CogMsgHandleJoining(SithMessage *msg)
 {
-    wchar_t *v2; // eax
-    wchar_t *v3; // [esp-4h] [ebp-4h]
+    char16_t *v2; // eax
+    char16_t *v3; // [esp-4h] [ebp-4h]
 
     if ( (g_submodeFlags & 8) != 0 )
     {
@@ -460,12 +460,12 @@ void jkGuiMultiplayer_sub_4140B0(jkGuiMenu *pMenu)
     uint32_t v1; // eax
     int v2; // esi
     HRESULT v3; // eax
-    wchar_t *v4; // eax
+    char16_t *v4; // eax
     int v5; // ebp
     jkMultiEntry *v6; // ebx
-    wchar_t *v7; // eax
+    char16_t *v7; // eax
     int v8; // [esp-14h] [ebp-18h]
-    wchar_t *v9; // [esp-14h] [ebp-18h]
+    char16_t *v9; // [esp-14h] [ebp-18h]
     int v10; // [esp+0h] [ebp-4h]
 
     if ( g_app_suspended )
@@ -476,7 +476,7 @@ void jkGuiMultiplayer_sub_4140B0(jkGuiMenu *pMenu)
             v2 = -1;
             jkGuiMultiplayer_dword_5564E8 = v1;
             v10 = -1;
-            v3 = stdComm_EnumSessions(1, (wchar_t *)jkGuiMultiplayer_aElements3[5].wstr);
+            v3 = stdComm_EnumSessions(1, (char16_t *)jkGuiMultiplayer_aElements3[5].wstr);
             if ( !v3 )
             {
                 jkGuiRend_DarrayFreeEntry(&jkGuiMultiplayer_stru_5564A8);
@@ -530,14 +530,14 @@ void jkGuiMultiplayer_sub_4140B0(jkGuiMenu *pMenu)
 
 void jkGuiMultiplayer_sub_413E50(int idx)
 {
-    wchar_t *v1; // eax
-    wchar_t *v2; // eax
-    wchar_t *v3; // eax
-    wchar_t *v4; // eax
-    wchar_t *v5; // eax
+    char16_t *v1; // eax
+    char16_t *v2; // eax
+    char16_t *v3; // eax
+    char16_t *v4; // eax
+    char16_t *v5; // eax
     int v6; // [esp-10h] [ebp-38h]
     int v7; // [esp-Ch] [ebp-34h]
-    wchar_t *v8; // [esp-8h] [ebp-30h]
+    char16_t *v8; // [esp-8h] [ebp-30h]
     int v9; // [esp-4h] [ebp-2Ch]
     char v10[32]; // [esp+8h] [ebp-20h] BYREF
 
@@ -624,8 +624,8 @@ int jkGuiMultiplayer_sub_413E00(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_
 void jkGuiMultiplayer_idk(jkGuiMenu *pMenu)
 {
     uint32_t v1; // eax
-    wchar_t *v2; // eax
-    wchar_t *v3; // [esp-4h] [ebp-4h]
+    char16_t *v2; // eax
+    char16_t *v3; // [esp-4h] [ebp-4h]
 
     if ( stdComm_dword_8321E0 && (g_submodeFlags & 8) != 0 )
     {
@@ -652,10 +652,10 @@ int jkGuiMultiplayer_Show2()
     int v1; // eax
     int v2; // esi
     HRESULT v3; // eax
-    wchar_t *v4; // eax
-    wchar_t *v5; // eax
-    wchar_t *v6; // [esp-4h] [ebp-14Ch]
-    wchar_t *v7; // [esp-4h] [ebp-14Ch]
+    char16_t *v4; // eax
+    char16_t *v5; // eax
+    char16_t *v6; // [esp-4h] [ebp-14Ch]
+    char16_t *v7; // [esp-4h] [ebp-14Ch]
     jkMultiEntry3 v8; // [esp+8h] [ebp-140h] BYREF
 
     memset(&v8, 0, sizeof(v8));

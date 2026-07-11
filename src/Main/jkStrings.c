@@ -52,9 +52,9 @@ void jkStrings_Shutdown()
     _memset(&jkStrings_table, 0, sizeof(jkStrings_table));
 }
 
-wchar_t* jkStrings_GetUniString(const char *key)
+char16_t* jkStrings_GetUniString(const char *key)
 {
-    wchar_t *result; // eax
+    char16_t *result; // eax
 
     // Added: Allow openjkdf2_i8n.uni to override everything
 #ifdef QOL_IMPROVEMENTS
@@ -71,9 +71,9 @@ wchar_t* jkStrings_GetUniString(const char *key)
     return result;
 }
 
-wchar_t* jkStrings_GetUniStringWithFallback(const char *key)
+char16_t* jkStrings_GetUniStringWithFallback(const char *key)
 {
-    wchar_t *result; // eax
+    char16_t *result; // eax
 
     // Added: Allow openjkdf2_i8n.uni to override everything
 #ifdef QOL_IMPROVEMENTS

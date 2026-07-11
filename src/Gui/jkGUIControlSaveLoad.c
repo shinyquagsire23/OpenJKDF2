@@ -17,12 +17,12 @@
 #include "General/stdConffile.h"
 
 static int32_t jkGuiControlSaveLoad_listboxBitmapIndices[2] = {14, 15};
-static wchar_t jkGuiControlSaveLoad_awTmp[256];
+static char16_t jkGuiControlSaveLoad_awTmp[256];
 static Darray jkGuiControlSaveLoad_darray;
 static int jkGuiControlSaveLoad_dword_559C80;
 static int jkGuiControlSaveLoad_dword_559C84;
 static char jkGuiControlSaveLoad_tmp[5]; // ?
-static wchar_t jkGuiControlSaveLoad_aUnk[1]; // ???
+static char16_t jkGuiControlSaveLoad_aUnk[1]; // ???
 
 static jkGuiElement jkGuiControlSaveLoad_aElements[9] = {
     { ELEMENT_TEXT, 0, 5, NULL, 3, { 70, 45, 500, 80 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
@@ -42,7 +42,7 @@ static jkGuiMenu jkGuiControlSaveLoad_menu = {
 
 int jkGuiControlSaveLoad_sub_41E470(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, int bRedraw)
 {
-    wchar_t *v5; // eax
+    char16_t *v5; // eax
     int32_t result; // eax
 
     jkGuiRend_ClickSound(pElement, pMenu, mouseX, mouseY, bRedraw);
@@ -65,11 +65,11 @@ int jkGuiControlSaveLoad_sub_41E470(jkGuiElement *pElement, jkGuiMenu *pMenu, in
 int jkGuiControlSaveLoad_ConfirmDelete(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, int bRedraw)
 {
     jkGuiControlInfo *v5; // esi
-    wchar_t *v6; // eax
+    char16_t *v6; // eax
     int i; // esi
     void *v8; // eax
     int v9; // eax
-    wchar_t *v11; // [esp-8h] [ebp-8Ch]
+    char16_t *v11; // [esp-8h] [ebp-8Ch]
     char tmp[128]; // [esp+4h] [ebp-80h] BYREF
 
     jkGuiRend_PlayWav(pMenu->soundClick);
@@ -243,7 +243,7 @@ int jkGuiControlSaveLoad_Write(int bIdk)
         }
         v3 = 1;
         headerTmp.version = 1;
-        _wcsncpy(headerTmp.wstr, (const wchar_t *)jkGuiControlSaveLoad_aElements[2].wstr, 0x3Fu);
+        _wcsncpy(headerTmp.wstr, (const char16_t *)jkGuiControlSaveLoad_aElements[2].wstr, 0x3Fu);
         headerTmp.wstr[63] = 0;
         if ( stdConffile_OpenWriteBypass(fpath) )
         {

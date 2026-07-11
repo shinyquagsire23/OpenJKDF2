@@ -26,12 +26,12 @@ enum jkGuiDecisionButton_t
     GUI_ADVANCED = 105,
 };
 
-static wchar_t render_level[256] = {0};
-static wchar_t gamma_level[256] = {0};
-static wchar_t hud_level[256] = {0};
+static char16_t render_level[256] = {0};
+static char16_t gamma_level[256] = {0};
+static char16_t hud_level[256] = {0};
 
-static wchar_t slider_val_text[5] = {0};
-static wchar_t slider_val_text_2[5] = {0};
+static char16_t slider_val_text[5] = {0};
+static char16_t slider_val_text_2[5] = {0};
 
 static int slider_images[2] = {JKGUI_BM_SLIDER_BACK, JKGUI_BM_SLIDER_THUMB};
 
@@ -123,11 +123,11 @@ void jkGuiDisplay_Startup()
     jkGuiDisplay_aElements[28].wstr = hud_level;
 
     ftmp = jkPlayer_ssaaMultiple;
-    jk_snwprintf(render_level, 255, L"%.2f", ftmp);
+    jk_snwprintf(render_level, 255, u"%.2f", ftmp);
     ftmp = jkPlayer_gamma;
-    jk_snwprintf(gamma_level, 255, L"%.2f", ftmp);
+    jk_snwprintf(gamma_level, 255, u"%.2f", ftmp);
     ftmp = jkPlayer_hudScale;
-    jk_snwprintf(hud_level, 255, L"%.2f", ftmp);
+    jk_snwprintf(hud_level, 255, u"%.2f", ftmp);
 }
 
 void jkGuiDisplay_Shutdown()
@@ -139,7 +139,7 @@ void jkGuiDisplay_FovDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf
 {
     uint32_t tmp = FOV_MIN + jkGuiDisplay_aElements[10].selectedTextEntry;
     
-    jk_snwprintf(slider_val_text, 5, L"%u", tmp);
+    jk_snwprintf(slider_val_text, 5, u"%u", tmp);
     jkGuiDisplay_aElements[11].wstr = slider_val_text;
     
     jkGuiRend_SliderDraw(element, menu, vbuf, redraw);
@@ -152,9 +152,9 @@ void jkGuiDisplay_FramelimitDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffe
     uint32_t tmp = FPS_LIMIT_MIN + jkGuiDisplay_aElements[18].selectedTextEntry;
     
     if (tmp)
-        jk_snwprintf(slider_val_text_2, 5, L"%u", tmp);
+        jk_snwprintf(slider_val_text_2, 5, u"%u", tmp);
     else
-        jk_snwprintf(slider_val_text_2, 5, L"None");
+        jk_snwprintf(slider_val_text_2, 5, u"None");
 
     jkGuiDisplay_aElements[19].wstr = slider_val_text_2;
     
@@ -216,11 +216,11 @@ int jkGuiDisplay_Show()
     jkGuiDisplay_aElements[22].selectedTextEntry = jkPlayer_enableSSAO;
 
     ftmp = jkPlayer_ssaaMultiple;
-    jk_snwprintf(render_level, 255, L"%.2f", ftmp);
+    jk_snwprintf(render_level, 255, u"%.2f", ftmp);
     ftmp = jkPlayer_gamma;
-    jk_snwprintf(gamma_level, 255, L"%.2f", ftmp);
+    jk_snwprintf(gamma_level, 255, u"%.2f", ftmp);
     ftmp = jkPlayer_hudScale;
-    jk_snwprintf(hud_level, 255, L"%.2f", ftmp);
+    jk_snwprintf(hud_level, 255, u"%.2f", ftmp);
 
 continue_menu:
     v0 = jkGuiRend_DisplayAndReturnClicked(&jkGuiDisplay_menu);

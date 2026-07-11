@@ -461,7 +461,7 @@ void jkPlayer_nullsub_1(jkPlayerInfo* unk)
 }
 
 // MOTS altered? TODO
-void jkPlayer_CreateConf(wchar_t *name)
+void jkPlayer_CreateConf(char16_t *name)
 {
     int v6; // ebp
     char *v7; // edi
@@ -527,7 +527,7 @@ LABEL_7:
 }
 
 // MOTS altered
-void jkPlayer_WriteConf(wchar_t *name)
+void jkPlayer_WriteConf(char16_t *name)
 {
     char nameTmp[32]; // [esp+0h] [ebp-A0h]
     char fpath[128]; // [esp+20h] [ebp-80h]
@@ -696,7 +696,7 @@ void jkPlayer_ParseLegacyExt()
 }
 #endif
 
-int jkPlayer_ReadConf(wchar_t *name)
+int jkPlayer_ReadConf(char16_t *name)
 {
     char *v4; // edi
     char v6[32]; // [esp+10h] [ebp-A0h]
@@ -1134,10 +1134,10 @@ void jkPlayer_SetWaggle(SithThing *player, rdVector3 *waggleVec, flex_t waggleMa
     }
 }
 
-int jkPlayer_VerifyWcharName(wchar_t *name)
+int jkPlayer_VerifyWcharName(char16_t *name)
 {
-    wchar_t *v1; // edi
-    wchar_t v2; // ax
+    char16_t *v1; // edi
+    char16_t v2; // ax
     int v3; // ebx
     int v4; // esi
     int v5; // ecx
@@ -1188,14 +1188,14 @@ int jkPlayer_VerifyWcharName(wchar_t *name)
 
 int jkPlayer_VerifyCharName(char *name)
 {
-    wchar_t tmp[64];
+    char16_t tmp[64];
 
     stdString_CharToWchar(tmp, name, 63);
     tmp[63] = 0;
     return jkPlayer_VerifyWcharName(tmp);
 }
 
-void jkPlayer_SetMpcInfo(wchar_t *name, char *model, char *pSoundClass, char *sidemat, char *tipmat)
+void jkPlayer_SetMpcInfo(char16_t *name, char *model, char *pSoundClass, char *sidemat, char *tipmat)
 {
     jkPlayer_mpcInfoSet = 1;
     
@@ -1212,13 +1212,13 @@ void jkPlayer_SetMpcInfo(wchar_t *name, char *model, char *pSoundClass, char *si
     jkPlayer_name[31] = 0;
 }
 
-void jkPlayer_SetPlayerName(wchar_t *name)
+void jkPlayer_SetPlayerName(char16_t *name)
 {
     _wcsncpy(jkPlayer_name, name, 0x1Fu);
     jkPlayer_name[31] = 0;
 }
 
-int jkPlayer_GetMpcInfo(wchar_t *name, char *model, char *pSoundClass, char *sidemat, char *tipmat)
+int jkPlayer_GetMpcInfo(char16_t *name, char *model, char *pSoundClass, char *sidemat, char *tipmat)
 {
     _wcsncpy(name, jkPlayer_name, 0x1Fu);
     name[31] = 0;
@@ -1300,7 +1300,7 @@ void jkPlayer_MpcInitBins(SithPlayer* unk)
 }
 
 // MOTS altered TODO
-int jkPlayer_MPCParse(jkPlayerMpcInfo *info, SithPlayer* unk, wchar_t *fname, wchar_t *name, int hasBins)
+int jkPlayer_MPCParse(jkPlayerMpcInfo *info, SithPlayer* unk, char16_t *fname, char16_t *name, int hasBins)
 {
     int v6; // edi
     flex_t a2; // [esp+Ch] [ebp-CCh] BYREF
@@ -1375,7 +1375,7 @@ int jkPlayer_MPCParse(jkPlayerMpcInfo *info, SithPlayer* unk, wchar_t *fname, wc
     return 0;
 }
 
-int jkPlayer_MPCWrite(SithPlayer* unk, wchar_t *mpcName, wchar_t *playerName)
+int jkPlayer_MPCWrite(SithPlayer* unk, char16_t *mpcName, char16_t *playerName)
 {
     int v4; // esi
     char mpcNameChar[32]; // [esp+10h] [ebp-C0h] BYREF

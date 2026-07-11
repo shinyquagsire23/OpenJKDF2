@@ -70,7 +70,7 @@ tVBuffer *jkGuiDialog_sub_416900()
     return v1;
 }
 
-int jkGuiDialog_OkCancelDialog(wchar_t *stringA, wchar_t *stringB)
+int jkGuiDialog_OkCancelDialog(char16_t *stringA, char16_t *stringB)
 {
     int v2; // edi
     int v5; // esi
@@ -115,7 +115,7 @@ int jkGuiDialog_OkCancelDialog(wchar_t *stringA, wchar_t *stringB)
     return v5 == 1;
 }
 
-void jkGuiDialog_ErrorDialog(wchar_t *stringA, wchar_t *stringB)
+void jkGuiDialog_ErrorDialog(char16_t *stringA, char16_t *stringB)
 {
     int v2; // edi
 
@@ -156,7 +156,7 @@ void jkGuiDialog_ErrorDialog(wchar_t *stringA, wchar_t *stringB)
     stdBitmap_UnloadData(jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]);
 }
 
-int jkGuiDialog_YesNoDialog(wchar_t *stringA, wchar_t *stringB)
+int jkGuiDialog_YesNoDialog(char16_t *stringA, char16_t *stringB)
 {
     int v2; // edi
     int v5; // esi

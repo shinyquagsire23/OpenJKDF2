@@ -53,11 +53,11 @@ void jkControl_nullsub_37()
 // MOTS altered done
 int jkControl_HandleHudKeys(SithThing *player, flex_t b)
 {
-    wchar_t *v2; // eax
-    wchar_t *v5; // eax
+    char16_t *v2; // eax
+    char16_t *v5; // eax
     int v15; // [esp+4h] [ebp-304h] BYREF
-    wchar_t v16[128]; // [esp+8h] [ebp-300h] BYREF
-    wchar_t a4[256]; // [esp+108h] [ebp-200h] BYREF
+    char16_t v16[128]; // [esp+8h] [ebp-300h] BYREF
+    char16_t a4[256]; // [esp+108h] [ebp-200h] BYREF
 
     // Added: dedicated
     if ((sithNet_isServer && jkGuiNetHost_bIsDedicated) || (player->actorParams.flags & SITH_TF_RENDERWEAPON) == 0 )
@@ -75,7 +75,7 @@ int jkControl_HandleHudKeys(SithThing *player, flex_t b)
             if (v15 && sithThing_MotsTick(0xe,0,2.0))
             {
                 v2 = jkGuiTitle_quicksave_related_func1(&jkCog_strings, sithWorld_g_pCurrentWorld->map_jkl_fname);
-                jk_snwprintf(a4, 0x100u, L"%s~%s", v2, jkStrings_GetUniStringWithFallback("GUI_SLQUICKSAVE"));
+                jk_snwprintf(a4, 0x100u, u"%s~%s", v2, jkStrings_GetUniStringWithFallback("GUI_SLQUICKSAVE"));
                 
                 sithGamesave_Save("quicksave.jks", 1, 0, a4);
                 sithConsole_PrintWString(jkStrings_GetUniStringWithFallback("GUI_SLGAMEQUICKSAVED"));

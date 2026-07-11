@@ -71,7 +71,7 @@ void stdDelay(int unk, flex_t dur);
 //static int (*stdFseek)(stdFile_t,int,int) = (void*)stdFseek_ADDR;
 //static int (*stdFileSize)(stdFile_t) = (void*)stdFileSize_ADDR;
 //static int (*stdFilePrintf)(stdFile_t, const char *, ...) = (void*)stdFilePrintf_ADDR;
-//static const wchar_t* (*stdFileGetws)(stdFile_t,wchar_t*,size_t) = (void*)stdFileGetws_ADDR;
+//static const char16_t* (*stdFileGetws)(stdFile_t,char16_t*,size_t) = (void*)stdFileGetws_ADDR;
 
 #ifdef __cplusplus
 }

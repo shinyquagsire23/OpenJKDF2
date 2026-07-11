@@ -375,11 +375,11 @@ int stdJSON_GetWString(const char* pFpath, const char* pKey, char16_t* pOut, int
     // not NUL-terminate when wcslen(src) >= n. Copy min(wcslen, outSize-1) and always
     // write the wide terminator so callers don't read trailing garbage.
     if (outSize > 0) {
-        size_t readSize = _wcslen((wchar_t*)out.data());
+        size_t readSize = _wcslen(out.data());
         if (readSize > (size_t)(outSize - 1)) {
             readSize = (size_t)(outSize - 1);
         }
-        _wcsncpy((wchar_t*)pOut, (wchar_t*)out.data(), readSize);
+        _wcsncpy(pOut, out.data(), readSize);
         pOut[readSize] = 0;
     }
 

@@ -103,8 +103,8 @@ int jkGuiKeyboard_RemoveControlClicked(jkGuiElement *pClickedElement, jkGuiMenu 
 {
     jkGuiKeyboardEntry *pEntry; // eax
     int v3; // ecx
-    wchar_t *v5; // eax
-    wchar_t *v6; // [esp-4h] [ebp-4h]
+    char16_t *v5; // eax
+    char16_t *v6; // [esp-4h] [ebp-4h]
 
     if ( !jkGuiKeyboard_bOnceIdk )
     {
@@ -144,12 +144,12 @@ void jkGuiKeyboard_sub_411F40(jkGuiElement *pElement, Darray *pDarr)
     jkGuiStringEntry *v11; // eax
     jkGuiKeyboardEntry *v12; // edx
     jkGuiStringEntry *v13; // esi
-    wchar_t *v14; // eax
+    char16_t *v14; // eax
     size_t v15; // eax
-    wchar_t *v16; // eax
-    wchar_t *v17; // edi
+    char16_t *v16; // eax
+    char16_t *v17; // edi
     jkGuiKeyboardEntry *v18; // eax
-    const wchar_t *v19; // [esp-4h] [ebp-24h]
+    const char16_t *v19; // [esp-4h] [ebp-24h]
     int v20; // [esp+10h] [ebp-10h]
     int v21; // [esp+14h] [ebp-Ch]
     jkGuiStringEntry v22; // [esp+18h] [ebp-8h]
@@ -196,10 +196,10 @@ void jkGuiKeyboard_sub_411F40(jkGuiElement *pElement, Darray *pDarr)
                     }
                     else
                     {
-                        v19 = L" ";
-                        v15 = _wcslen(L" ");
+                        v19 = u" ";
+                        v15 = _wcslen(u" ");
                     }
-                    v16 = (wchar_t *)JK_ALLOC(sizeof(wchar_t) * (v15 + 1));
+                    v16 = (char16_t *)JK_ALLOC(sizeof(char16_t) * (v15 + 1));
                     v17 = _wcscpy(v16, v19);
                     JK_FREE(v13->str);
                     v13->str = v17;
@@ -226,16 +226,16 @@ LABEL_14:
 int jkGuiKeyboard_EnumBindings(int32_t inputFuncIdx, const char *pInputFuncStr, uint32_t a3, int32_t dxKeyNum, uint32_t a5, int32_t flags, stdControlKeyInfoEntry *pControlEntry, Darray *pDarr)
 {
     void *v8; // edi
-    wchar_t *v9; // eax
+    char16_t *v9; // eax
     BOOL v10; // eax
     const char *v11; // ecx
     int v12; // ecx
     const stdControlDikStrToNum *v13; // eax
     jkGuiKeyboardEntry *v14; // eax
     const char *v16; // [esp-8h] [ebp-240h]
-    wchar_t *v17; // [esp+14h] [ebp-224h]
+    char16_t *v17; // [esp+14h] [ebp-224h]
     char v18[32]; // [esp+18h] [ebp-220h] BYREF
-    wchar_t wStr[256]; // [esp+38h] [ebp-200h] BYREF
+    char16_t wStr[256]; // [esp+38h] [ebp-200h] BYREF
 
     v8 = &jkGuiKeyboard_pWStr_55601C;
     v17 = jkStrings_GetUniString(pInputFuncStr);
@@ -247,7 +247,7 @@ int jkGuiKeyboard_EnumBindings(int32_t inputFuncIdx, const char *pInputFuncStr, 
         {
             if ( dxKeyNum == -1 )
             {
-                v9 = L"--";
+                v9 = u"--";
             }
             else
             {
@@ -281,7 +281,7 @@ int jkGuiKeyboard_EnumBindings(int32_t inputFuncIdx, const char *pInputFuncStr, 
 LABEL_25:
                 v9 = jkStrings_GetUniStringWithFallback(v11);
             }
-            jk_snwprintf(wStr, 0xFFu, L"%ls%ls\t%ls", v17, v8, v9);
+            jk_snwprintf(wStr, 0xFFu, u"%ls%ls\t%ls", v17, v8, v9);
 
             v14 = (jkGuiKeyboardEntry *)JK_ALLOC(sizeof(jkGuiKeyboardEntry));
             if ( v14 )
@@ -303,10 +303,10 @@ int jkGuiKeyboard_AddControlClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, in
 {
     int v3; // esi
     jkGuiKeyboardEntry *v4; // eax
-    wchar_t *v6; // esi
-    wchar_t *v7; // eax
-    wchar_t *v8; // eax
-    wchar_t v9[256]; // [esp+0h] [ebp-200h] BYREF
+    char16_t *v6; // esi
+    char16_t *v7; // eax
+    char16_t *v8; // eax
+    char16_t v9[256]; // [esp+0h] [ebp-200h] BYREF
 
     if ( jkGuiKeyboard_bOnceIdk )
         return 0;
@@ -341,25 +341,25 @@ int jkGuiKeyboard_AddControlClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, in
 void jkGuiKeyboard_sub_4123C0(jkGuiMenu *pMenu)
 {
     int v1; // esi
-    const wchar_t *v2; // ebp
+    const char16_t *v2; // ebp
     size_t v3; // ebx
     int v4; // edi
     jkGuiKeyboardEntry* v5; // eax
-    wchar_t *v6; // eax
-    wchar_t *v7; // eax
-    wchar_t *v8; // eax
-    wchar_t *v9; // [esp-4h] [ebp-41Ch]
+    char16_t *v6; // eax
+    char16_t *v7; // eax
+    char16_t *v8; // eax
+    char16_t *v9; // [esp-4h] [ebp-41Ch]
     int v10; // [esp+10h] [ebp-408h] BYREF
     int v11; // [esp+14h] [ebp-404h]
-    wchar_t v12[256]; // [esp+18h] [ebp-400h] BYREF
-    wchar_t v13[256]; // [esp+218h] [ebp-200h] BYREF
+    char16_t v12[256]; // [esp+18h] [ebp-400h] BYREF
+    char16_t v13[256]; // [esp+218h] [ebp-200h] BYREF
 
     v1 = 0;
     if ( !jkGuiKeyboard_bOnceIdk )
         goto LABEL_35;
     stdControl_bControlsActive = 1;
     stdControl_ReadControls();
-    v2 = 0;//(const wchar_t *)v10;
+    v2 = 0;//(const char16_t *)v10;
     v3 = 0;//v10;
     v4 = 0;
     v11 = 0;
@@ -497,8 +497,8 @@ int jkGuiKeyboard_ControlListClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, i
 
 int jkGuiKeyboard_RestoreDefaultsClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL redraw)
 {
-    wchar_t *v3; // eax
-    wchar_t *v4; // [esp-8h] [ebp-8h]
+    char16_t *v3; // eax
+    char16_t *v4; // [esp-8h] [ebp-8h]
 
     if ( jkGuiKeyboard_bOnceIdk )
         return 0;

@@ -126,7 +126,7 @@ int jkMain_StartNextLevelInEpisode(int a1, int bIsAPath);
 int jkMain_cd_swap_reverify(jkEpisodeEntry *ent);
 int jkMain_SetMap(int levelNum);
 void jkMain_do_guistate6();
-int jkMain_sub_4034D0(char *a1, char *a2, char *a3, wchar_t *a4);
+int jkMain_sub_4034D0(char *a1, char *a2, char *a3, char16_t *a4);
 int jkMain_MissionReload();
 int jkMain_MenuReturn();
 

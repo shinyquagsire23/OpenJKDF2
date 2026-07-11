@@ -15,8 +15,8 @@ extern "C" {
 
 int jkStrings_Startup();
 void jkStrings_Shutdown();
-wchar_t* jkStrings_GetUniString(const char *key);
-wchar_t* jkStrings_GetUniStringWithFallback(const char *key);
+char16_t* jkStrings_GetUniString(const char *key);
+char16_t* jkStrings_GetUniStringWithFallback(const char *key);
 int jkStrings_unused_sub_40B490();
 
 #ifdef QOL_IMPROVEMENTS

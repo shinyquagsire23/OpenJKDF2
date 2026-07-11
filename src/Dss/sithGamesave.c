@@ -367,7 +367,7 @@ skip_free_things:
         // Added: bin-only is the intended VMU save format, not a version error --
         // don't scare the player with the "outdated save" dialog.
         if (!bIsBinOnly)
-            jkGuiDialog_ErrorDialog(jkStrings_GetUniStringWithFallback("ERROR"), L"This save is outdated and cannot be loaded fully. The level will be restarted with your existing inventory and progress.");
+            jkGuiDialog_ErrorDialog(jkStrings_GetUniStringWithFallback("ERROR"), u"This save is outdated and cannot be loaded fully. The level will be restarted with your existing inventory and progress.");
 
         goto skip_dss;
     }
@@ -501,14 +501,14 @@ int sithGamesave_SaveCurrentWorld(int mpFlags)
     return 1;
 }
 
-int sithGamesave_Save(char *saveFname, int a2, int a3, wchar_t *saveName)
+int sithGamesave_Save(char *saveFname, int a2, int a3, char16_t *saveName)
 {
-    wchar_t *v5; // esi
+    char16_t *v5; // esi
     flex32_t *v7; // eax
     SithInventoryItem *v8; // ecx
     char tmp_playerName[32]; // [esp+Ch] [ebp-2A0h] BYREF
     char PathName[128]; // [esp+2Ch] [ebp-280h] BYREF
-    wchar_t v13[256]; // [esp+ACh] [ebp-200h] BYREF
+    char16_t v13[256]; // [esp+ACh] [ebp-200h] BYREF
 
     if ( (g_submodeFlags & 1) != 0 )
         return 0;

@@ -30,8 +30,8 @@ int wuRegistry_GetBytes(LPCSTR lpValueName, BYTE *lpDefaultData, DWORD defaultDa
 int wuRegistry_SaveStr(LPCSTR lpValueName, const char *lpData);
 int wuRegistry_GetStr(LPCSTR lpValueName, char* lpData, int outSize, const char *outDefault);
 
-int wuRegistry_SetWString(LPCSTR lpValueName, const wchar_t *lpData);
-int wuRegistry_GetWString(LPCSTR lpValueName, wchar_t* lpData, int outSize, const wchar_t *outDefault);
+int wuRegistry_SetWString(LPCSTR lpValueName, const char16_t *lpData);
+int wuRegistry_GetWString(LPCSTR lpValueName, char16_t* lpData, int outSize, const char16_t *outDefault);
 
 //static int (*wuRegistry_SaveFloat)(LPCSTR lpValueName, flex_t val) = (void*)wuRegistry_SaveFloat_ADDR;
 //static int (*wuRegistry_SaveInt)(LPCSTR lpValueName, int val) = (void*)wuRegistry_SaveInt_ADDR;

@@ -23,7 +23,7 @@ void sithConsole_Shutdown();
 int sithConsole_Open(int maxLines);
 void sithConsole_Close();
 void sithConsole_PrintString(const char *pString);
-void sithConsole_PrintWString(const wchar_t *pwString);
+void sithConsole_PrintWString(const char16_t *pwString);
 int sithConsole_ExeCommand(const char *pLine);
 int sithConsole_sub_4DA100();
 void sithConsole_Flush();

@@ -98,7 +98,7 @@ int32_t stdGob_FileTell(GobFileHandle *pHandle);
 bool stdGob_FileEOF(GobFileHandle *pHandle);
 size_t stdGob_FileRead(GobFileHandle *pHandle, void *data, uint32_t size);
 const char* stdGob_FileGets(GobFileHandle *pGobFileHandle, char *pStr, unsigned int size);
-const wchar_t* stdGob_FileGetws(GobFileHandle *f, wchar_t *out, unsigned int len);
+const char16_t* stdGob_FileGetws(GobFileHandle *f, char16_t *out, unsigned int len);
 
 // ADDED
 size_t stdGob_FileSize(GobFileHandle *f);

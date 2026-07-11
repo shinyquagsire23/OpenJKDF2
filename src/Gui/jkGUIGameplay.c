@@ -16,7 +16,7 @@
 #include "World/jkPlayer.h"
 #include "types_enums.h"
 
-static wchar_t slider_val_text[5] = {0};
+static char16_t slider_val_text[5] = {0};
 static int32_t slider_images[2] = {JKGUI_BM_SLIDER_BACK_200, JKGUI_BM_SLIDER_THUMB};
 
 void jkGuiGameplay_ScaleDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, int redraw);
@@ -99,7 +99,7 @@ void jkGuiGameplay_ScaleDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *v
 {
     flex_t tmp = ((flex_t)jkGuiGameplay_buttons[41].selectedTextEntry)*0.2f; // FLEXTODO
     
-    jk_snwprintf(slider_val_text, 5, L"%f", tmp);
+    jk_snwprintf(slider_val_text, 5, u"%f", tmp);
     jkGuiGameplay_buttons[42].wstr = slider_val_text;
     
     jkGuiRend_SliderDraw(element, menu, vbuf, redraw);

@@ -115,10 +115,10 @@ void jkMain_Shutdown()
 int jkMain_SetVideoMode()
 {
     signed int result; // eax
-    wchar_t *v1; // eax
-    wchar_t *v2; // eax
-    wchar_t *v3; // [esp-4h] [ebp-10h]
-    wchar_t *v4; // [esp-4h] [ebp-10h]
+    char16_t *v1; // eax
+    char16_t *v2; // eax
+    char16_t *v3; // [esp-4h] [ebp-10h]
+    char16_t *v4; // [esp-4h] [ebp-10h]
 
     if ( jkGame_isDDraw )
         return 0;
@@ -507,9 +507,9 @@ void jkMain_GameplayShow(int a1, int a2)
 {
     signed int level_loaded; // esi
     signed int v3; // eax
-    wchar_t *v4; // eax
+    char16_t *v4; // eax
     DWORD v5; // eax
-    wchar_t *v6; // [esp-4h] [ebp-Ch]
+    char16_t *v6; // [esp-4h] [ebp-Ch]
 
     level_loaded = 0;
 
@@ -960,7 +960,11 @@ int jkMain_LoadFile(char *a1)
         }
         else
         {
-            Windows_ErrorMsgboxWide("ERR_CANNOT_LOAD_FILE %s", a1);
+            // Added: %s wants char16_t*, a1 is narrow
+            char16_t wTmp[128];
+            stdString_CharToWchar(wTmp, a1, 127);
+            wTmp[127] = 0;
+            Windows_ErrorMsgboxWide("ERR_CANNOT_LOAD_FILE %s", wTmp);
             return 0;
         }
     }
@@ -998,7 +1002,11 @@ int jkMain_loadFile2(char *pGobPath, char *pEpisodeName)
     }
     else
     {
-        Windows_ErrorMsgboxWide("ERR_CANNOT_LOAD_FILE %s", pGobPath);
+        // Added: %s wants char16_t*, pGobPath is narrow
+        char16_t wTmp[128];
+        stdString_CharToWchar(wTmp, pGobPath, 127);
+        wTmp[127] = 0;
+        Windows_ErrorMsgboxWide("ERR_CANNOT_LOAD_FILE %s", wTmp);
         result = 0;
     }
     return result;
@@ -1036,7 +1044,11 @@ int jkMain_LoadLevelSingleplayer(char *pGobPath, char *pEpisodeName)
     }
     else
     {
-        Windows_ErrorMsgboxWide("ERR_CANNOT_LOAD_FILE %s", pGobPath);
+        // Added: %s wants char16_t*, pGobPath is narrow
+        char16_t wTmp[128];
+        stdString_CharToWchar(wTmp, pGobPath, 127);
+        wTmp[127] = 0;
+        Windows_ErrorMsgboxWide("ERR_CANNOT_LOAD_FILE %s", wTmp);
         result = 0;
     }
     return result;
@@ -1144,8 +1156,8 @@ int jkMain_cd_swap_reverify(jkEpisodeEntry *ent)
     signed int v4; // edi
     int v5; // edi
     signed int v6; // esi
-    wchar_t *v7; // eax
-    wchar_t *v8; // [esp-4h] [ebp-94h]
+    char16_t *v7; // eax
+    char16_t *v8; // [esp-4h] [ebp-94h]
     char v9[128]; // [esp+10h] [ebp-80h] BYREF
 
     v1 = ent->type;
@@ -1272,7 +1284,7 @@ void jkMain_do_guistate6()
     }
 }
 
-int jkMain_sub_4034D0(char *a1, char *a2, char *a3, wchar_t *a4)
+int jkMain_sub_4034D0(char *a1, char *a2, char *a3, char16_t *a4)
 {
     sithInventory_g_bInitInventory = 0;
     _strncpy(jkMain_aLevelJklFname, a2, 0x7Fu);
@@ -1360,7 +1372,11 @@ void jkMain_VideoShow(int a1, int a2)
     result = jkCutscene_sub_421310(jkMain_aLevelJklFname);
     if ( !result )
     {
-        Windows_ErrorMsgboxWide("ERR_CANNOT_LOAD_FILE %s", jkMain_aLevelJklFname);
+        // Added: %s wants char16_t*, jkMain_aLevelJklFname is narrow
+        char16_t wTmp[128];
+        stdString_CharToWchar(wTmp, jkMain_aLevelJklFname, 127);
+        wTmp[127] = 0;
+        Windows_ErrorMsgboxWide("ERR_CANNOT_LOAD_FILE %s", wTmp);
         switch ( a1 )
         {
             case JK_GAMEMODE_VIDEO:
@@ -1639,10 +1655,10 @@ void jkMain_FixRes()
 int jkMain_SetVideoMode()
 {
     signed int result; // eax
-    wchar_t *v1; // eax
-    wchar_t *v2; // eax
-    wchar_t *v3; // [esp-4h] [ebp-10h]
-    wchar_t *v4; // [esp-4h] [ebp-10h]
+    char16_t *v1; // eax
+    char16_t *v2; // eax
+    char16_t *v3; // [esp-4h] [ebp-10h]
+    char16_t *v4; // [esp-4h] [ebp-10h]
 
     if ( jkGame_isDDraw )
         return 0;

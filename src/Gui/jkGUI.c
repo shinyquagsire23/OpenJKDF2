@@ -145,7 +145,7 @@ void jkGui_InitMenu(jkGuiMenu *menu, stdBitmap *bgBitmap)
 
         if ( iter->hintText )
         {
-            wchar_t* text = jkStrings_GetUniString(iter->hintText);
+            char16_t* text = jkStrings_GetUniString(iter->hintText);
             if ( text ) {
                 iter->wHintText = stdString_FastWCopy(text);
                 iter->wHintTextAlloced = iter->wHintText;
@@ -156,7 +156,7 @@ void jkGui_InitMenu(jkGuiMenu *menu, stdBitmap *bgBitmap)
         {
             if ( iter->str )
             {
-                wchar_t* text = jkStrings_GetUniString(iter->str);
+                char16_t* text = jkStrings_GetUniString(iter->str);
                 if ( text ) {
                     iter->wstr = stdString_FastWCopy(text);
                     iter->strAlloced = (const char*)iter->wstr;
@@ -540,7 +540,7 @@ char* jkGui_sub_412EC0()
     return jkGui_unkstr;
 }
 
-wchar_t* jkGui_sub_412ED0()
+char16_t* jkGui_sub_412ED0()
 {
     return jkGuiTitle_quicksave_related_func1(&jkCog_strings, jkGui_unkstr);
 }

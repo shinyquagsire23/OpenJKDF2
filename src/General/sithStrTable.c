@@ -23,9 +23,9 @@ void sithStrTable_Shutdown()
     _memset(&sithStrTable_pSithStrings, 0, sizeof(sithStrTable_pSithStrings));
 }
 
-wchar_t* sithStrTable_GetUniString(const char *key)
+char16_t* sithStrTable_GetUniString(const char *key)
 {
-    wchar_t* result = NULL;
+    char16_t* result = NULL;
 #ifdef QOL_IMPROVEMENTS
     if (!result) {
         result = stdStrTable_GetValue(&jkStrings_tableExtOver, key);
@@ -37,9 +37,9 @@ wchar_t* sithStrTable_GetUniString(const char *key)
     return result;
 }
 
-wchar_t* sithStrTable_GetUniStringWithFallback(char *key)
+char16_t* sithStrTable_GetUniStringWithFallback(char *key)
 {
-    wchar_t* result = NULL;
+    char16_t* result = NULL;
 #ifdef QOL_IMPROVEMENTS
     if (!result) {
         result = stdStrTable_GetValue(&jkStrings_tableExtOver, key);

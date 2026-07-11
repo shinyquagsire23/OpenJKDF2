@@ -35,7 +35,7 @@ int jkGuiSingleTally_Show()
 {
     int v7; // esi
     int ret; // eax
-    wchar_t v14[32]; // [esp+8h] [ebp-40h] BYREF
+    char16_t v14[32]; // [esp+8h] [ebp-40h] BYREF
 
     // Added
     stdBitmap_EnsureData(jkGui_stdBitmaps[JKGUI_BM_BK_TALLY]);
@@ -48,11 +48,11 @@ int jkGuiSingleTally_Show()
     jkGuiSingleTally_buttons[1].wstr = jkStrings_GetUniStringWithFallback(std_g_genBuffer);
     if ( (int)sithPlayer_GetInvItemAmount(SITHBIN_MAXSECRETS) <= 0 )
     {
-        jk_snwprintf(v14, 0x20u, L"%ls %ls", jkStrings_GetUniStringWithFallback("GUI_SECRETS_FOUND"), jkStrings_GetUniStringWithFallback("GUI_NO_SECRETS"));
+        jk_snwprintf(v14, 0x20u, u"%ls %ls", jkStrings_GetUniStringWithFallback("GUI_SECRETS_FOUND"), jkStrings_GetUniStringWithFallback("GUI_NO_SECRETS"));
     }
     else
     {
-        jk_snwprintf(v14, 0x20u, L"%ls %d/%d", jkStrings_GetUniStringWithFallback("GUI_SECRETS_FOUND"), (int)sithPlayer_GetInvItemAmount(SITHBIN_SECRETS), (int)sithPlayer_GetInvItemAmount(SITHBIN_MAXSECRETS));
+        jk_snwprintf(v14, 0x20u, u"%ls %d/%d", jkStrings_GetUniStringWithFallback("GUI_SECRETS_FOUND"), (int)sithPlayer_GetInvItemAmount(SITHBIN_SECRETS), (int)sithPlayer_GetInvItemAmount(SITHBIN_MAXSECRETS));
     }
     jkGuiSingleTally_buttons[2].wstr = v14;
     jkGuiSingleTally_buttons[3].wstr = jkStrings_GetUniStringWithFallback("GUI_STARS_EARNED");

@@ -55,11 +55,11 @@ int jkEpisode_LoadVerify()
     int v19; // edi
     char *i; // ecx
     char v21; // al
-    wchar_t *v22; // eax
+    char16_t *v22; // eax
     int v24; // edi
     char *j; // ecx
     char v26; // al
-    wchar_t *v27; // eax
+    char16_t *v27; // eax
     unsigned int v28; // [esp+10h] [ebp-1D0h]
     char v29[64]; // [esp+14h] [ebp-1CCh] BYREF
     stdFileSearchResult v30; // [esp+54h] [ebp-18Ch] BYREF

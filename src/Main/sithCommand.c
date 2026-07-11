@@ -100,12 +100,12 @@ int sithCommand_DebugMode(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     int *v2; // esi
     int v3; // edi
     SithThing *v4; // eax
-    wchar_t *v5; // eax
-    wchar_t *v6; // eax
+    char16_t *v5; // eax
+    char16_t *v6; // eax
     int result; // eax
-    wchar_t *v8; // [esp-4h] [ebp-154h]
-    wchar_t v9[32]; // [esp+10h] [ebp-140h] BYREF
-    wchar_t a1[128]; // [esp+50h] [ebp-100h] BYREF
+    char16_t *v8; // [esp-4h] [ebp-154h]
+    char16_t v9[32]; // [esp+10h] [ebp-140h] BYREF
+    char16_t a1[128]; // [esp+50h] [ebp-100h] BYREF
 
     switch ( pCmd->extra )
     {
@@ -366,7 +366,7 @@ int sithCommand_CogList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 int sithCommand_Fly(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     SithThing *v0; // ecx
-    wchar_t *v3; // eax
+    char16_t *v3; // eax
 
     if ( sithWorld_g_pCurrentWorld && (v0 = sithWorld_g_pCurrentWorld->pLocalPlayer) != 0 )
     {
@@ -668,7 +668,7 @@ int sithCommand_Players(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 int sithCommand_PingPlayer(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     int v2; // esi
-    wchar_t v4[32]; // [esp+4h] [ebp-40h] BYREF
+    char16_t v4[32]; // [esp+4h] [ebp-40h] BYREF
 
     v2 = 0;
     if ( !sithNet_isMulti )
@@ -692,7 +692,7 @@ int sithCommand_Kick(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     uint32_t v2; // edi
     SithPlayer *v3; // esi
-    wchar_t a1[32]; // [esp+Ch] [ebp-40h] BYREF
+    char16_t a1[32]; // [esp+Ch] [ebp-40h] BYREF
 
     v2 = 0;
     if ( !pArgStr || !sithNet_isMulti || !sithNet_isServer )

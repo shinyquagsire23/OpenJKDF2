@@ -212,16 +212,16 @@ int wuRegistry_GetStr(LPCSTR lpValueName, char* lpData, int outSize, const char 
     return result;
 }
 
-int wuRegistry_SetWString(LPCSTR lpValueName, const wchar_t *lpData)
+int wuRegistry_SetWString(LPCSTR lpValueName, const char16_t *lpData)
 {
     HKEY phkResult; // [esp+0h] [ebp-4h] BYREF
 
     RegOpenKeyExA(wuRegistry_hKey, wuRegistry_lpSubKey, 0, 0xF003Fu, &phkResult);
-    RegSetValueExA(phkResult, lpValueName, 0, REG_SZ, lpData, _wcslen(lpData) * sizeof(wchar_t));
+    RegSetValueExA(phkResult, lpValueName, 0, REG_SZ, lpData, _wcslen(lpData) * sizeof(char16_t));
     return RegCloseKey(phkResult);
 }
 
-int wuRegistry_GetWString(LPCSTR lpValueName, wchar_t* lpData, int outSize, const wchar_t *outDefault)
+int wuRegistry_GetWString(LPCSTR lpValueName, char16_t* lpData, int outSize, const char16_t *outDefault)
 {
     int result; // eax
     HKEY phkResult; // [esp+8h] [ebp-Ch] BYREF
@@ -229,7 +229,7 @@ int wuRegistry_GetWString(LPCSTR lpValueName, wchar_t* lpData, int outSize, cons
     DWORD Type; // [esp+10h] [ebp-4h] BYREF
 
     RegOpenKeyExA(wuRegistry_hKey, wuRegistry_lpSubKey, 0, 0xF003Fu, &phkResult);
-    cbData = outSize * sizeof(wchar_t);
+    cbData = outSize * sizeof(char16_t);
     if (RegQueryValueExA(phkResult, lpValueName, 0, &Type, lpData, &cbData))
     {
         if (outDefault)

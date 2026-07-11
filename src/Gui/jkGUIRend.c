@@ -721,10 +721,10 @@ int32_t jkGuiRend_DarrayNewStr(Darray *array, int32_t num, int32_t initVal)
     return result;
 }
 
-int32_t jkGuiRend_DarrayReallocStr(Darray *array, wchar_t *wStr, intptr_t id)
+int32_t jkGuiRend_DarrayReallocStr(Darray *array, char16_t *wStr, intptr_t id)
 {
     jkGuiStringEntry *entry; // eax
-    wchar_t *v7; // eax
+    char16_t *v7; // eax
 
     entry = (jkGuiStringEntry *)Darray_NewEntry(array);
     if (!entry)
@@ -734,7 +734,7 @@ int32_t jkGuiRend_DarrayReallocStr(Darray *array, wchar_t *wStr, intptr_t id)
     {
         if ( wStr )
         {
-            v7 = (wchar_t *)STD_ALLOC(sizeof(wchar_t) * (_wcslen(wStr) + 1));
+            v7 = (char16_t *)STD_ALLOC(sizeof(char16_t) * (_wcslen(wStr) + 1));
             wStr = _wcscpy(v7, wStr);
         }
     }
@@ -765,7 +765,7 @@ void jkGuiRend_SetClickableString(jkGuiElement *element, Darray *array)
     element->unistr = (jkGuiStringEntry *)Darray_GetIndex(array, 0);
 }
 
-wchar_t* jkGuiRend_GetString(Darray *array, int32_t idx)
+char16_t* jkGuiRend_GetString(Darray *array, int32_t idx)
 {
     return ((jkGuiStringEntry*)Darray_GetIndex(array, idx))->str;
 }
@@ -788,7 +788,7 @@ void jkGuiRend_DarrayFree(Darray *array)
 
 void jkGuiRend_DarrayFreeEntry(Darray *array)
 {
-    wchar_t *str;
+    char16_t *str;
 
     if ( array->bInitialized )
     {
@@ -2250,7 +2250,7 @@ int jkGuiRend_TextBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int32_
     int32_t *v28; // eax
     int32_t v29; // ebp
     int32_t v30; // ebx
-    const wchar_t *v31; // edx
+    const char16_t *v31; // edx
 
     if ( eventType == JKGUI_EVENT_INIT)
     {
@@ -2270,7 +2270,7 @@ int jkGuiRend_TextBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int32_
         v28[3] = v25->rect.height;
         v29 = v25->texInfo.anonymous_18;
         v30 = v25->texInfo.rect.x;
-        v31 = (const wchar_t *)v25->unistr;
+        v31 = (const char16_t *)v25->unistr;
         *v28 = v25->texInfo.maxTextEntries - 2;
         v25->texInfo.textScrollY -= 2;
         v25->texInfo.anonymous_18 = v29 + 4;
@@ -2285,7 +2285,7 @@ int jkGuiRend_TextBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int32_
         {
             case VK_END:
                 v20 = element;
-                v21 = _wcslen((const wchar_t *)element->unistr);
+                v21 = _wcslen((const char16_t *)element->unistr);
                 v22 = menu;
                 v20->texInfo.textHeight = v21;
                 jkGuiRend_UpdateAndDrawClickable(v20, v22, 1);
@@ -2308,7 +2308,7 @@ int jkGuiRend_TextBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int32_
             case VK_RIGHT:
                 v15 = element;
                 v16 = element->texInfo.textHeight;
-                if ( v16 >= _wcslen((const wchar_t *)element->unistr) )
+                if ( v16 >= _wcslen((const char16_t *)element->unistr) )
                     return 0;
                 v17 = menu;
                 v15->texInfo.textHeight = v16 + 1;
@@ -2319,7 +2319,7 @@ int jkGuiRend_TextBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int32_
                 v24 = element->texInfo.textHeight;
                 if ( v24 >= 0 )
                 {
-                    stdString_WstrRemoveCharsAt((wchar_t *)element->unistr, v24, 1);
+                    stdString_WstrRemoveCharsAt((char16_t *)element->unistr, v24, 1);
                     jkGuiRend_UpdateAndDrawClickable(v23, menu, 1);
                 }
                 return 0;
@@ -2337,16 +2337,16 @@ int jkGuiRend_TextBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int32_
             if ( v8 > 0 )
             {
                 element->texInfo.textHeight = v8 - 1;
-                stdString_WstrRemoveCharsAt((wchar_t *)v7, v8 - 1, 1);
+                stdString_WstrRemoveCharsAt((char16_t *)v7, v8 - 1, 1);
             }
         }
 
         else if ( stdFont_sub_4355B0(menu->fonts[element->textType], a4) )
         {
-            if ( _wcslen((const wchar_t *)v7) < v5->selectedTextEntry - 1 )
+            if ( _wcslen((const char16_t *)v7) < v5->selectedTextEntry - 1 )
             {
-                wchar_t tmp_wchar[2] = {(wchar_t)a4, 0}; // Added: ensure null terminator
-                stdString_wstrncat((wchar_t *)v7, v5->selectedTextEntry, v5->texInfo.textHeight, tmp_wchar);
+                char16_t tmp_wchar[2] = {(char16_t)a4, 0}; // Added: ensure null terminator
+                stdString_wstrncat((char16_t *)v7, v5->selectedTextEntry, v5->texInfo.textHeight, tmp_wchar);
                 v11 = v5->texInfo.textHeight + 1;
                 if ( v11 >= v5->selectedTextEntry - 1 )
                     v11 = v5->selectedTextEntry - 1;
@@ -2366,10 +2366,10 @@ int jkGuiRend_TextBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int32_
 
 void jkGuiRend_TextBoxDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, BOOL redraw)
 {
-    const wchar_t *v4; // edi
+    const char16_t *v4; // edi
     int32_t v9; // ecx
     int32_t v10; // ecx
-    const wchar_t *v11; // edi
+    const char16_t *v11; // edi
     int32_t v14; // edx
     int32_t v15; // eax
     int32_t v16; // edx

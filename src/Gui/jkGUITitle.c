@@ -20,8 +20,8 @@
 #include "General/stdMath.h"
 #include "Platform/std3D.h"
 
-static wchar_t jkGuiTitle_tmpBuffer[512];
-static wchar_t jkGuiTitle_versionBuffer[64];
+static char16_t jkGuiTitle_tmpBuffer[512];
+static char16_t jkGuiTitle_versionBuffer[64];
 static flex_t jkGuiTitle_loadPercent;
 
 static jkGuiElement jkGuiTitle_elementsLoad[6] = {
@@ -121,9 +121,9 @@ char jkGuiTitle_sub_4189A0(char *a1)
     return result;
 }
 
-wchar_t* jkGuiTitle_quicksave_related_func1(stdStrTable *strTable, char *jkl_fname)
+char16_t* jkGuiTitle_quicksave_related_func1(stdStrTable *strTable, char *jkl_fname)
 {
-    wchar_t *retval;
+    char16_t *retval;
     jkGuiStringEntry *texts;
     char key[64];
     char tmp[64];
@@ -156,7 +156,7 @@ wchar_t* jkGuiTitle_quicksave_related_func1(stdStrTable *strTable, char *jkl_fna
     {
         stdString_snprintf(tmp, 64, "%s_TEXT_%02d", key, i);
 
-        wchar_t* pTextStr = NULL;
+        char16_t* pTextStr = NULL;
 
         // Added: Allow openjkdf2_i8n.uni to override everything
 #ifdef QOL_IMPROVEMENTS
@@ -170,7 +170,7 @@ wchar_t* jkGuiTitle_quicksave_related_func1(stdStrTable *strTable, char *jkl_fna
     }
 
     if (retval) {
-        stdString_SafeWStrCopy(jkGuiTitle_tmpBuffer, retval, sizeof(jkGuiTitle_tmpBuffer) / sizeof(wchar_t));
+        stdString_SafeWStrCopy(jkGuiTitle_tmpBuffer, retval, sizeof(jkGuiTitle_tmpBuffer) / sizeof(char16_t));
         retval = jkGuiTitle_tmpBuffer;
     }
 
@@ -181,7 +181,7 @@ void jkGuiTitle_UnkDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, 
 {
     int v4; // esi
     jkGuiStringEntry *v5; // ecx
-    wchar_t *v6; // ebx
+    char16_t *v6; // ebx
     int32_t result; // eax
     int v8; // ecx
     int v9; // edi
@@ -303,12 +303,12 @@ void jkGuiTitle_WorldLoadCallback(flex_t percentage)
 // MOTS altered: Added some string to the printf
 void jkGuiTitle_ShowLoadingStatic()
 {
-    wchar_t *guiVersionStr; // eax
+    char16_t *guiVersionStr; // eax
     int verMajor; // [esp-Ch] [ebp-2Ch]
     int verMinor; // [esp-8h] [ebp-28h]
     int verRevision; // [esp-4h] [ebp-24h]
-    const wchar_t* verMotsStr;
-    //wchar_t v4[16]; // [esp+0h] [ebp-20h] BYREF
+    const char16_t* verMotsStr;
+    //char16_t v4[16]; // [esp+0h] [ebp-20h] BYREF
     // Added: removed undefined behavior, used to use the stack.....
 
     // Added
@@ -320,17 +320,17 @@ void jkGuiTitle_ShowLoadingStatic()
     verRevision = jkGuiTitle_verRevision;
     verMinor = jkGuiTitle_verMinor;
     verMajor = jkGuiTitle_verMajor;
-    verMotsStr = L""; // TODO?
+    verMotsStr = u""; // TODO?
     guiVersionStr = jkStrings_GetUniStringWithFallback("GUI_VERSION");
-    jk_snwprintf(jkGuiTitle_versionBuffer, (sizeof(jkGuiTitle_versionBuffer) / sizeof(wchar_t))-1, guiVersionStr, verMajor, verMinor, verRevision, verMotsStr);
+    jk_snwprintf(jkGuiTitle_versionBuffer, (sizeof(jkGuiTitle_versionBuffer) / sizeof(char16_t))-1, guiVersionStr, verMajor, verMinor, verRevision, verMotsStr);
     jkGuiTitle_elementsLoadStatic[4].wstr = jkGuiTitle_versionBuffer;
     jkGuiTitle_elementsLoadStatic[1].selectedTextEntry = 0;
     jkGuiRend_gui_sets_handler_framebufs(&jkGuiTitle_menuLoadStatic);
 }
 
-void jkGuiTitle_ShowLoading(char *a1, wchar_t *a2)
+void jkGuiTitle_ShowLoading(char *a1, char16_t *a2)
 {
-    wchar_t *v4; // ebx
+    char16_t *v4; // ebx
     int v6; // edi
     char key[64]; // [esp+Ch] [ebp-80h] BYREF
     char v8[64]; // [esp+4Ch] [ebp-40h] BYREF

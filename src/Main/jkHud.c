@@ -341,26 +341,26 @@ void jkHud_Draw()
     SithPlayer* playerInfoIter; // edi
     SithPlayer *v32; // esi
     char *v33; // ecx
-    wchar_t *v34; // eax
+    char16_t *v34; // eax
     int v35; // edx
     int v36; // ecx
     jkHudTeamScore* v39; // ecx
     int32_t *v40; // eax
     int v41; // edx
-    wchar_t *v42; // eax
+    char16_t *v42; // eax
     int v43; // eax
     int v44; // edi
     unsigned int v45; // ebp
     jkHudPlayerScore* v46; // esi
     int v47; // eax
     int v48; // edx
-    wchar_t *v49; // eax
-    wchar_t *v50; // eax
-    wchar_t *v51; // eax
-    wchar_t *v52; // eax
+    char16_t *v49; // eax
+    char16_t *v50; // eax
+    char16_t *v51; // eax
+    char16_t *v52; // eax
     int v53; // esi
     jkHudTeamScore *v54; // edi
-    wchar_t *v55; // eax
+    char16_t *v55; // eax
     flex_t v56; // [esp+0h] [ebp-168h]
     flex_t v57; // [esp+0h] [ebp-168h]
     flex_t v58; // [esp+0h] [ebp-168h]
@@ -371,10 +371,10 @@ void jkHud_Draw()
     flex_t a2b; // [esp+4h] [ebp-164h]
     flex_t a2c; // [esp+4h] [ebp-164h]
     flex_t a2d; // [esp+4h] [ebp-164h]
-    wchar_t *v66; // [esp+8h] [ebp-160h]
+    char16_t *v66; // [esp+8h] [ebp-160h]
     rdRect a4; // [esp+28h] [ebp-140h] BYREF
     char tmp[32]; // [esp+48h] [ebp-120h] BYREF
-    wchar_t a6[128]; // [esp+68h] [ebp-100h] BYREF
+    char16_t a6[128]; // [esp+68h] [ebp-100h] BYREF
     flex_t tmpFloat1;
 
     if (!jkHud_bOpened)
@@ -814,9 +814,9 @@ void jkHud_Draw()
 LABEL_115:
                             stdFont_Draw1(Video_pMenuBuffer, jkHud_pMsgFontSft, jkHud_rectViewScores.x + 40, v53, jkHud_rectViewScores.width, v55, 1);
 LABEL_116:
-                            jk_snwprintf(a6, 0x80u, L"%4d", v54->field_C);
+                            jk_snwprintf(a6, 0x80u, u"%4d", v54->field_C);
                             stdFont_Draw1(Video_pMenuBuffer, jkHud_pMsgFontSft, jkHud_rectViewScores.x + 90, v53, jkHud_rectViewScores.width, a6, 1);
-                            jk_snwprintf(a6, 0x80u, L"%4d", v54->score);
+                            jk_snwprintf(a6, 0x80u, u"%4d", v54->score);
                             stdFont_Draw1(Video_pMenuBuffer, jkHud_pMsgFontSft, jkHud_rectViewScores.x + 150, v53, jkHud_rectViewScores.width, a6, 1);
                             v53 += stdFont_GetHeight(jkHud_pMsgFontSft) + jkHud_pMsgFontSft->marginY;
                             break;
@@ -863,11 +863,11 @@ LABEL_116:
                             stdDisplay_VBufferFill(Video_pMenuBuffer, v48, &a4);
                         }
                     }
-                    jk_snwprintf(a6, 0x11u, L"%.16ls", v46);
+                    jk_snwprintf(a6, 0x11u, u"%.16ls", v46);
                     stdFont_Draw1(Video_pMenuBuffer, jkHud_pMsgFontSft, jkHud_rectViewScores.x + 10, v44, jkHud_rectViewScores.width, a6, 1);
-                    jk_snwprintf(a6, 0x80u, L"(%.8ls)", v46->modelName);
+                    jk_snwprintf(a6, 0x80u, u"(%.8ls)", v46->modelName);
                     stdFont_Draw1(Video_pMenuBuffer, jkHud_pMsgFontSft, jkHud_rectViewScores.x + 130, v44, jkHud_rectViewScores.width, a6, 1);
-                    jk_snwprintf(a6, 0x80u, L"%4d", v46->score);
+                    jk_snwprintf(a6, 0x80u, u"%4d", v46->score);
                     stdFont_Draw1(Video_pMenuBuffer, jkHud_pMsgFontSft, jkHud_rectViewScores.x + 190, v44, jkHud_rectViewScores.width, a6, 1);
                     ++v46;
                     v44 += stdFont_GetHeight(jkHud_pMsgFontSft) + jkHud_pMsgFontSft->marginY;
@@ -959,26 +959,26 @@ void jkHud_DrawGPU()
     SithPlayer* playerInfoIter; // edi
     SithPlayer *v32; // esi
     char *v33; // ecx
-    wchar_t *v34; // eax
+    char16_t *v34; // eax
     int v35; // edx
     int v36; // ecx
     jkHudTeamScore* v39; // ecx
     int32_t *v40; // eax
     int v41; // edx
-    wchar_t *v42; // eax
+    char16_t *v42; // eax
     int v43; // eax
     int v44; // edi
     unsigned int v45; // ebp
     jkHudPlayerScore* v46; // esi
     int v47; // eax
     int v48; // edx
-    wchar_t *v49; // eax
-    wchar_t *v50; // eax
-    wchar_t *v51; // eax
-    wchar_t *v52; // eax
+    char16_t *v49; // eax
+    char16_t *v50; // eax
+    char16_t *v51; // eax
+    char16_t *v52; // eax
     int v53; // esi
     jkHudTeamScore *v54; // edi
-    wchar_t *v55; // eax
+    char16_t *v55; // eax
     flex_t v56; // [esp+0h] [ebp-168h]
     flex_t v57; // [esp+0h] [ebp-168h]
     flex_t v58; // [esp+0h] [ebp-168h]
@@ -989,10 +989,10 @@ void jkHud_DrawGPU()
     flex_t a2b; // [esp+4h] [ebp-164h]
     flex_t a2c; // [esp+4h] [ebp-164h]
     flex_t a2d; // [esp+4h] [ebp-164h]
-    wchar_t *v66; // [esp+8h] [ebp-160h]
+    char16_t *v66; // [esp+8h] [ebp-160h]
     rdRect a4; // [esp+28h] [ebp-140h] BYREF
     char tmp[32]; // [esp+48h] [ebp-120h] BYREF
-    wchar_t a6[128]; // [esp+68h] [ebp-100h] BYREF
+    char16_t a6[128]; // [esp+68h] [ebp-100h] BYREF
     flex_t tmpFloat1;
 
     if (!jkHud_bOpened)
@@ -1314,7 +1314,7 @@ void jkHud_DrawGPU()
                     /*
                             _sprintf(local_11c,"%s_SHORT",&local_14c);
                             pwVar7 = jkStrings_GetUniString(local_11c);
-                            if (pwVar7 == (wchar_t *)0x0) {
+                            if (pwVar7 == (char16_t *)0x0) {
                                 pwVar7 = jkStrings_GetUniStringWithFallback((char *)&local_14c);
                             }
                     */
@@ -1428,9 +1428,9 @@ void jkHud_DrawGPU()
 LABEL_115:
                             stdFont_Draw1GPU(jkHud_pMsgFontSft, jkHud_rectViewScores.x + HUD_SCALED(40), v53, jkHud_rectViewScores.width, v55, 1, jkPlayer_hudScale);
 LABEL_116:
-                            jk_snwprintf(a6, 0x80u, L"%4d", v54->field_C);
+                            jk_snwprintf(a6, 0x80u, u"%4d", v54->field_C);
                             stdFont_Draw1GPU(jkHud_pMsgFontSft, jkHud_rectViewScores.x + HUD_SCALED(90), v53, jkHud_rectViewScores.width, a6, 1, jkPlayer_hudScale);
-                            jk_snwprintf(a6, 0x80u, L"%4d", v54->score);
+                            jk_snwprintf(a6, 0x80u, u"%4d", v54->score);
                             stdFont_Draw1GPU(jkHud_pMsgFontSft, jkHud_rectViewScores.x + HUD_SCALED(150), v53, jkHud_rectViewScores.width, a6, 1, jkPlayer_hudScale);
                             v53 += HUD_SCALED(stdFont_GetHeight(jkHud_pMsgFontSft) + jkHud_pMsgFontSft->marginY);
                             break;
@@ -1478,11 +1478,11 @@ LABEL_116:
                             std3D_DrawUIClearedRect(v48, &a4);
                         }
                     }
-                    jk_snwprintf(a6, 0x11u, L"%.16ls", v46);
+                    jk_snwprintf(a6, 0x11u, u"%.16ls", v46);
                     stdFont_Draw1GPU(jkHud_pMsgFontSft, jkHud_rectViewScores.x + HUD_SCALED(10), v44, jkHud_rectViewScores.width, a6, 1, jkPlayer_hudScale);
-                    jk_snwprintf(a6, 0x80u, L"(%.8ls)", v46->modelName);
+                    jk_snwprintf(a6, 0x80u, u"(%.8ls)", v46->modelName);
                     stdFont_Draw1GPU(jkHud_pMsgFontSft, jkHud_rectViewScores.x + HUD_SCALED(130), v44, jkHud_rectViewScores.width, a6, 1, jkPlayer_hudScale);
-                    jk_snwprintf(a6, 0x80u, L"%4d", v46->score);
+                    jk_snwprintf(a6, 0x80u, u"%4d", v46->score);
                     stdFont_Draw1GPU(jkHud_pMsgFontSft, jkHud_rectViewScores.x + HUD_SCALED(190), v44, jkHud_rectViewScores.width, a6, 1, jkPlayer_hudScale);
                     ++v46;
                     v44 += HUD_SCALED(stdFont_GetHeight(jkHud_pMsgFontSft) + jkHud_pMsgFontSft->marginY);
@@ -1623,9 +1623,9 @@ int jkHud_GetWeaponAmmo(SithThing *player)
 int jkHud_Chat()
 {
     size_t v0; // eax
-    wchar_t *v2; // [esp-8h] [ebp-108h]
-    wchar_t *v3; // [esp-8h] [ebp-108h]
-    wchar_t tmp[256]; // [esp+0h] [ebp-100h] BYREF
+    char16_t *v2; // [esp-8h] [ebp-108h]
+    char16_t *v3; // [esp-8h] [ebp-108h]
+    char16_t tmp[256]; // [esp+0h] [ebp-100h] BYREF
 
     // Added: Android/similar
     stdControl_ShowSystemKeyboard();
@@ -1659,9 +1659,9 @@ void jkHud_SendChat(char a1)
 {
     int v1; // eax
     size_t v2; // eax
-    wchar_t *v3; // [esp-8h] [ebp-10Ch]
-    wchar_t *v4; // [esp-8h] [ebp-10Ch]
-    wchar_t tmp[256]; // [esp+4h] [ebp-100h] BYREF
+    char16_t *v3; // [esp-8h] [ebp-10Ch]
+    char16_t *v4; // [esp-8h] [ebp-10Ch]
+    char16_t tmp[256]; // [esp+4h] [ebp-100h] BYREF
 
     if ( a1 == VK_RETURN )
     {
@@ -1801,9 +1801,9 @@ void jkHud_idk_time()
 int jkHud_chat2()
 {
     size_t v0; // eax
-    wchar_t *v2; // [esp-8h] [ebp-108h]
-    wchar_t *v3; // [esp-8h] [ebp-108h]
-    wchar_t a1[128]; // [esp+0h] [ebp-100h] BYREF
+    char16_t *v2; // [esp-8h] [ebp-108h]
+    char16_t *v3; // [esp-8h] [ebp-108h]
+    char16_t a1[128]; // [esp+0h] [ebp-100h] BYREF
 
     if ( jkHud_dword_552D10 == -2 )
     {

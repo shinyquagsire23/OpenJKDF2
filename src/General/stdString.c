@@ -25,13 +25,13 @@ char* stdString_FastCopy(const char *pSource)
 }
 
 // Added: wchar
-wchar_t* stdString_FastWCopy(const wchar_t *str)
+char16_t* stdString_FastWCopy(const char16_t *str)
 {
     if (!str) return NULL;
 
-    wchar_t* result;
+    char16_t* result;
     { TWL_EXTRAM_SUGGEST(std_g_pHS); // Added: wchar stores are 16-bit -> word-safe
-    result = (wchar_t*)STD_ALLOC((_wcslen(str) + 1)* sizeof(wchar_t));
+    result = (char16_t*)STD_ALLOC((_wcslen(str) + 1)* sizeof(char16_t));
     TWL_EXTRAM_RESTORE(std_g_pHS); }
     stdString_SafeWStrCopy(result, str, _wcslen(str)+1);
     return result;
@@ -111,11 +111,11 @@ char* stdString_GetQuotedStringContents(char *pSource, char *pDest, int destSize
     return result;
 }
 
-int stdString_CharToWchar(wchar_t *pwString, const char *pString, int maxChars)
+int stdString_CharToWchar(char16_t *pwString, const char *pString, int maxChars)
 {
     int result; // eax
     const char *v4; // esi
-    wchar_t *v5; // edx
+    char16_t *v5; // edx
 
     result = 0;
     if ( maxChars <= 0 )
@@ -142,10 +142,10 @@ int stdString_CharToWchar(wchar_t *pwString, const char *pString, int maxChars)
     return result;
 }
 
-int stdString_WcharToChar(char *pString, const wchar_t *pwString, int maxChars)
+int stdString_WcharToChar(char *pString, const char16_t *pwString, int maxChars)
 {
     int result; // eax
-    const wchar_t *v4; // ecx
+    const char16_t *v4; // ecx
     char *v5; // esi
 
     result = 0;
@@ -173,7 +173,7 @@ int stdString_WcharToChar(char *pString, const wchar_t *pwString, int maxChars)
     return result;
 }
 
-int stdString_WstrRemoveCharsAt(wchar_t *pwaStr, int idx, int numChars)
+int stdString_WstrRemoveCharsAt(char16_t *pwaStr, int idx, int numChars)
 {
     int len = _wcslen(pwaStr);
     if ( idx < len )
@@ -183,25 +183,25 @@ int stdString_WstrRemoveCharsAt(wchar_t *pwaStr, int idx, int numChars)
             numChars = totalChars;
 
         // Added: memcpy -> memmove
-        memmove(&pwaStr[idx], &pwaStr[idx + numChars], sizeof(wchar_t) * (totalChars - numChars + 1));
+        memmove(&pwaStr[idx], &pwaStr[idx + numChars], sizeof(char16_t) * (totalChars - numChars + 1));
     }
     return len;
 }
 
-int stdString_wstrncat(wchar_t *a1, int a2, int a3, wchar_t *a4)
+int stdString_wstrncat(char16_t *a1, int a2, int a3, char16_t *a4)
 {
-    wchar_t *v4; // ebp
+    char16_t *v4; // ebp
     size_t v5; // ebx
     signed int v6; // eax
-    wchar_t *v7; // edx
+    char16_t *v7; // edx
     int v8; // ebx
     intptr_t v9; // edi
     int v10; // ebx
-    wchar_t *v11; // ecx
+    char16_t *v11; // ecx
     int v12; // edx
     int v13; // ebx
     int result; // eax
-    wchar_t *v15; // [esp+14h] [ebp+4h]
+    char16_t *v15; // [esp+14h] [ebp+4h]
 
     v4 = a1;
     v5 = _wcslen(a1);
@@ -217,12 +217,12 @@ int stdString_wstrncat(wchar_t *a1, int a2, int a3, wchar_t *a4)
         v10 = v8 - 1;
         if ( v10 >= 0 )
         {
-            v11 = (wchar_t *)(v9 + sizeof(wchar_t) * v10);
+            v11 = (char16_t *)(v9 + sizeof(char16_t) * v10);
             v12 = (intptr_t)v7 - v9;
             v13 = v10 + 1;
             do
             {
-                *v11 = *(wchar_t *)((char *)v11 + v12);
+                *v11 = *(char16_t *)((char *)v11 + v12);
                 --v11;
                 --v13;
             }
@@ -232,22 +232,22 @@ int stdString_wstrncat(wchar_t *a1, int a2, int a3, wchar_t *a4)
     }
     if ( v6 >= a2 - a3 - 1 )
         v6 = a2 - a3 - 1;
-    _memcpy(v7, a4, sizeof(wchar_t) * v6);
+    _memcpy(v7, a4, sizeof(char16_t) * v6);
     result = a2;
     v4[a2 - 1] = 0;
     return result;
 }
 
-wchar_t* stdString_CstrCopy(const char *pString)
+char16_t* stdString_CstrCopy(const char *pString)
 {
-    wchar_t *v1; // ebp
+    char16_t *v1; // ebp
     signed int v2; // eax
-    wchar_t *v3; // esi
+    char16_t *v3; // esi
     signed int v4; // ecx
     uint8_t v5; // dl
 
     { TWL_EXTRAM_SUGGEST(std_g_pHS); // Added: fill loop below stores 16-bit wchars
-    v1 = (wchar_t *)STD_ALLOC(sizeof(wchar_t) * (_strlen(pString) + 1));
+    v1 = (char16_t *)STD_ALLOC(sizeof(char16_t) * (_strlen(pString) + 1));
     TWL_EXTRAM_RESTORE(std_g_pHS); }
     v2 = 0;
     v3 = v1;
@@ -266,13 +266,13 @@ wchar_t* stdString_CstrCopy(const char *pString)
     return v1;
 }
 
-char* stdString_WcharCopy(wchar_t *pwString)
+char* stdString_WcharCopy(char16_t *pwString)
 {
     size_t v1; // eax
     char *v2; // esi
     signed int v3; // ebp
     signed int v4; // edi
-    wchar_t *v5; // ecx
+    char16_t *v5; // ecx
     char *i; // edx
 
     v1 = _wcslen(pwString);
@@ -317,7 +317,7 @@ char* stdString_SafeStrCopy(char* pDst, const char* pSrc, uint32_t lenDst)
     return pDst;
 }
 
-wchar_t* stdString_SafeWStrCopy(wchar_t* pDst, const wchar_t* pSrc, uint32_t lenDst)
+char16_t* stdString_SafeWStrCopy(char16_t* pDst, const char16_t* pSrc, uint32_t lenDst)
 {
     _wcsncpy(pDst, pSrc, lenDst - 1);
     pDst[lenDst - 1] = 0;

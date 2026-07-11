@@ -432,19 +432,19 @@ const char* stdGob_FileGets(GobFileHandle *pGobFileHandle, char *pStr, unsigned 
     return result;
 }
 
-const wchar_t* stdGob_FileGetws(GobFileHandle *f, wchar_t *out, unsigned int len)
+const char16_t* stdGob_FileGetws(GobFileHandle *f, char16_t *out, unsigned int len)
 {
     stdGobEntry *entry; // ecx
     int offset; // edx
     Gob *gob; // eax
     unsigned int seekOffs_; // edi
     unsigned int len_wide; // ecx
-    const wchar_t *ret; // eax
-    const wchar_t *ret_; // edi
+    const char16_t *ret; // eax
+    const char16_t *ret_; // edi
 
 #ifdef QOL_IMPROVEMENTS
     if (f->bIsMemoryMapped) {
-        size_t to_read = len * sizeof(wchar_t);
+        size_t to_read = len * sizeof(char16_t);
         if (f->offset >= f->memorySz) {
             f->offset = f->memorySz;
             return 0;
@@ -456,13 +456,13 @@ const wchar_t* stdGob_FileGetws(GobFileHandle *f, wchar_t *out, unsigned int len
         if (!to_read) {
             return NULL;
         }
-        __wcsncpy(out, (wchar_t*)(f->pMemory + f->offset), to_read / sizeof(wchar_t));
-        wchar_t* cutoff = __wcschr(out, '\n');
+        __wcsncpy(out, (char16_t*)(f->pMemory + f->offset), to_read / sizeof(char16_t));
+        char16_t* cutoff = __wcschr(out, '\n');
         if (cutoff) {
             *(++cutoff) = 0;
         }
 
-        size_t actual_read = (_wcslen(out))*sizeof(wchar_t);
+        size_t actual_read = (_wcslen(out))*sizeof(char16_t);
         f->offset += actual_read;
 
         if (!actual_read) return NULL;

@@ -16,7 +16,7 @@ void sithGamesave_Setidk(sithSaveHandler_t a1, sithSaveHandler_t a2, sithSaveHan
 int sithGamesave_GetProfilePath(char *out, int outSize, char *a3);
 int sithGamesave_Restore(char *saveFname, int a2, int a3);
 int sithGamesave_RestoreFile(char *fpath);
-int sithGamesave_Save(char *saveFname, int a2, int a3, wchar_t *saveName);
+int sithGamesave_Save(char *saveFname, int a2, int a3, char16_t *saveName);
 int sithGamesave_Process();
 const char* sithGamesave_AutosaveMapName(void); // Added: single autosave slot on DC VMU/RAM
 #ifdef TARGET_DREAMCAST
@@ -26,7 +26,7 @@ void sithGamesave_DcFlushSlimToVmu(void);       // Added: write the slim VMU cop
 
 //static int (*sithGamesave_Restore)(char *a1, int a2, int a3) = (void*)sithGamesave_Restore_ADDR;
 //static int (*sithGamesave_RestoreFile)(char *fpath) = (void*)sithGamesave_RestoreFile_ADDR;
-//static int (*sithGamesave_Save)(char *a1, int a2, int a3, wchar_t *a4) = (void*)sithGamesave_Save_ADDR;
+//static int (*sithGamesave_Save)(char *a1, int a2, int a3, char16_t *a4) = (void*)sithGamesave_Save_ADDR;
 //static int (*sithGamesave_Process)() = (void*)sithGamesave_Process_ADDR;
 
 #endif // _SITHGAMESAVE_H

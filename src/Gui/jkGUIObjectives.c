@@ -83,13 +83,13 @@ int jkGuiObjectives_Show()
     int v0; // ebx
     int v1; // esi
     jkGuiStringEntry *v2; // edi
-    wchar_t *v3; // eax
+    char16_t *v3; // eax
     int v4; // esi
     flex_d_t v5; // st7
-    wchar_t *v6; // eax
-    wchar_t *v7; // eax
-    wchar_t *v9; // [esp-4h] [ebp-90h]
-    wchar_t v10[32]; // [esp+Ch] [ebp-80h] BYREF
+    char16_t *v6; // eax
+    char16_t *v7; // eax
+    char16_t *v9; // [esp-4h] [ebp-90h]
+    char16_t v10[32]; // [esp+Ch] [ebp-80h] BYREF
     char key[64]; // [esp+4Ch] [ebp-40h] BYREF
 
 #ifdef QOL_IMPROVEMENTS
@@ -125,12 +125,12 @@ int jkGuiObjectives_Show()
     {
         v9 = jkStrings_GetUniStringWithFallback("GUI_NO_SECRETS");
         v7 = jkStrings_GetUniStringWithFallback("GUI_SECRETS_FOUND");
-        jk_snwprintf(v10, 0x20u, L"%ls %ls", v7, v9);
+        jk_snwprintf(v10, 0x20u, u"%ls %ls", v7, v9);
     }
     else
     {
         v6 = jkStrings_GetUniStringWithFallback("GUI_SECRETS_FOUND");
-        jk_snwprintf(v10, 0x20u, L"%ls %d/%d", v6, v4, (unsigned int)(__int64)v5);
+        jk_snwprintf(v10, 0x20u, u"%ls %d/%d", v6, v4, (unsigned int)(__int64)v5);
     }
     jkGuiObjectives_elements[3].wstr = v10;
     jkGuiObjectives_elements[1].wstr = jkGui_sub_412ED0();
