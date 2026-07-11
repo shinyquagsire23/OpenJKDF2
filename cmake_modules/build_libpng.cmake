@@ -31,6 +31,12 @@ ExternalProject_Add(
                         -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
                         -DCMAKE_POLICY_DEFAULT_CMP0074:STRING=NEW
                         -DPNG_STATIC:BOOL=TRUE
+                        # Added: PNG::PNG below is STATIC IMPORTED (we never consume the shared
+                        # lib) -- skip it like ZLIB_BUILD_SHARED in build_zlib.cmake. On Emscripten
+                        # it's a hard failure, not just waste: emcc 4.0.19 treats `-shared` combined
+                        # with the `.wasm` output suffix as a (deprecated) standalone-executable
+                        # request needing a `main` symbol libpng never provides.
+                        -DPNG_SHARED:BOOL=FALSE
                         -DPNG_EXECUTABLES:BOOL=FALSE
                         -DPNG_TESTS:BOOL=FALSE
                         -DCMAKE_POLICY_VERSION_MINIMUM=3.5

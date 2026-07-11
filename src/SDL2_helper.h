@@ -24,9 +24,12 @@
 extern "C" {
 #endif
 
-#include <SDL.h>
+// Added: Emscripten's `-sUSE_SDL=3` port only exposes namespaced headers
+// (sysroot/include/SDL3/SDL.h), unlike our own vendored SDL3 build's include
+// dirs (which expose both styles) -- the old bare `<SDL.h>` doesn't resolve here.
+#include <SDL3/SDL.h>
 #define GL_GLEXT_PROTOTYPES 1
-#include <SDL_opengles2.h>
+#include <SDL3/SDL_opengles2.h>
 #include <GLES3/gl3.h>
 #include <GLES3/gl2ext.h>
 

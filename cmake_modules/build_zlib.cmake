@@ -39,7 +39,15 @@ ExternalProject_Add(
                         -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
                         -DCMAKE_POLICY_VERSION_MINIMUM=3.5
                         -DZLIB_BUILD_TESTING=OFF
-    BUILD_BYPRODUCTS    ${ZLIB_STATIC_LIBRARY_PATH} ${ZLIB_SHARED_LIBRARY_PATH}
+                        # Added: we only ever consume the static lib (ZLIB_USE_STATIC_LIBS is
+                        # hardcoded TRUE above, for every platform), so skip zlib's shared-lib
+                        # target entirely. On Emscripten specifically, zlib's shared build was a
+                        # hard failure: emcc 4.0.19 treats `-shared` combined with the `.wasm`
+                        # output suffix as a (deprecated) standalone-executable request, which then
+                        # wants a `main` symbol zlib never provides -- unrelated to SDL3, just
+                        # wasted, broken work for output we never use.
+                        -DZLIB_BUILD_SHARED=OFF
+    BUILD_BYPRODUCTS    ${ZLIB_STATIC_LIBRARY_PATH}
 )
 
 set(ZLIB_VERSION 1.2.13)

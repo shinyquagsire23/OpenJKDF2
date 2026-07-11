@@ -19,7 +19,7 @@
 #include "Main/jkQuakeConsole.h" // Added
 
 #ifdef SDL2_RENDER
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #endif
 
 #ifdef TARGET_TWL

@@ -1267,12 +1267,18 @@ void Window_SdlVblank()
 }
 
 #ifdef ARCH_WASM
+// Fixed: this is embedded JavaScript, not C -- `canvas` refers to the
+// <canvas id="canvas"> element the browser auto-exposes as a global (per the
+// HTML "named access on the Window object" spec), not the C rdCanvas struct.
+// An automated rd*-struct-member rename pass (d84fc7328) mistakenly renamed
+// it to `pCanvas` along with the real C-side renames, breaking WASM at
+// runtime with "pCanvas is not defined" (SDL_CreateWindow's size args).
 EM_JS(int, canvas_get_width, (), {
-  return pCanvas.width;
+  return canvas.width;
 });
 
 EM_JS(int, canvas_get_height, (), {
-  return pCanvas.height;
+  return canvas.height;
 });
 #endif
 
@@ -1336,7 +1342,12 @@ void Window_RecreateSDL2Window()
 #endif
 
 #ifdef TARGET_ANDROID
-    flags = 0; // SDL_WINDOW_SHOWN removed -- windows are shown by default in SDL3
+    // Fixed: SDL_WINDOW_SHOWN removed (windows are shown by default in SDL3), but this
+    // also dropped SDL_WINDOW_OPENGL, which SDL3 requires on the window before
+    // SDL_GL_CreateContext will succeed (SDL2 was more lenient on Android) -- caused
+    // "Failed to initialize SDL OpenGL Context // The specified window isn't an OpenGL
+    // window" at runtime.
+    flags = SDL_WINDOW_OPENGL;
 #endif
 
     // SDL3 SDL_CreateWindow() dropped the x/y position params; position is set

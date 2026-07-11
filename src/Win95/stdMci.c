@@ -501,7 +501,10 @@ flex_d_t stdMci_GetTrackLength(int track)
 
 #endif // STDMCI_DC_CDDA
 
-#elif defined(STDSOUND_NULL) || defined(STDSOUND_MAXMOD)
+#elif defined(STDSOUND_NULL) || defined(STDSOUND_MAXMOD) || defined(ARCH_WASM)
+// Added: no SDL3_mixer for WASM (Emscripten's port system only has
+// -sUSE_SDL_MIXER=2, incompatible with this file's SDL3_mixer-API rewrite below)
+// -- fall back to the same no-op stub as STDSOUND_NULL rather than a build break.
 
 int stdMci_trackFrom;
 int stdMci_trackTo;
