@@ -51,6 +51,13 @@ extern "C" void dwEnding_Startup(void)
     lecSmush_frameNum = 0;
 }
 
+// Added: C-callable factory (see dwEnding.h). Upcasts through dwMovie ->
+// dwSegment to the dwSegment subobject for dwSegment_Push.
+extern "C" dwSegment* dwEnding_New(void)
+{
+    return static_cast<dwSegment*>(new dwEnding());
+}
+
 // @410a30 (dwEnding_Ctor)
 dwEnding::dwEnding()
     : dwMovie("ending.san")

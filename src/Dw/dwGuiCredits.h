@@ -40,6 +40,12 @@ typedef struct dwGuiCredits dwGuiCredits; // C++ class; opaque in the C view
 // the project-wide soft-reset convention.
 void dwGuiCredits_Startup(void);
 
+// Added: C-callable factory — allocates the credits screen and returns its
+// dwSegment subobject (for dwSegment_Push). Consumed by dwGuiInGame_EndMission
+// (dw_Startup's end-of-game flow in P7 will also use it).
+struct dwSegment;
+struct dwSegment* dwGuiCredits_New(void);
+
 #ifdef __cplusplus
 } // extern "C"
 

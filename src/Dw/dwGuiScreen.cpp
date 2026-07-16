@@ -47,6 +47,10 @@
 #include "Dw/dwGuiWidgetBar.h" // dwGuiWidgetBar (WIDGETBAR)
 #include "Dw/dwMission.h"     // dwMissionSequence (msg 0x66)
 #include "Dw/dwGuiOptions.h"  // dwGuiRanking (STATS_JOB) + dwGuiOptions_NewEnterSeg (msg 0x65)
+#include "Dw/dwGuiQuickView.h" // dwGuiQuickView (QUICKVIEW)
+#include "Dw/dwGuiStatsPart.h"  // dwGuiStatsPart (STATS_PART)
+#include "Dw/dwGuiStatsDroid.h" // dwGuiStatsDroid (STATS_DROID)
+#include "Dw/dwGuiInGame.h"    // dwGuiInGame_New/CheckDroidValid (msg 0x67 deploy)
 
 #include "jk.h"
 #include "stdPlatform.h" // stdPlatform_Printf
@@ -449,9 +453,8 @@ extern "C" dwWidget* dwGuiScreen_CreateControl(char* pKeyword, dwConfFile* pConf
     if (dwString_Equals(pKeyword, "QUICKVIEW"))
     {
         dwConfFile_ParseRect(pConf, &rect);
-        // TODO(dw-decomp): QUICKVIEW -> dwGuiQuickView (unit dwPlayer) —
         // binary: new(0x574) dwGuiQuickView_Ctor(&rect)
-        return dwGuiScreen_StubControl("QUICKVIEW", "dwGuiQuickView", "dwPlayer");
+        return new dwGuiQuickView(&rect);
     }
     if (dwString_Equals(pKeyword, "RADIOGROUP"))
     {
@@ -506,10 +509,8 @@ extern "C" dwWidget* dwGuiScreen_CreateControl(char* pKeyword, dwConfFile* pConf
         dwConfFile_ParseULong(pConf, &v1);
         pTok2 = dwConfFile_NextToken(pConf);
         dwConfFile_ParseULong(pConf, &v2);
-        (void)pTok1; (void)pTok2;
-        // TODO(dw-decomp): STATS_DROID -> dwGuiStatsDroid (unit dwDroidStats) —
         // binary: new(0xf8) dwGuiStatsDroid_Ctor(&rect, tok1, v1, tok2, v2)
-        return dwGuiScreen_StubControl("STATS_DROID", "dwGuiStatsDroid", "dwDroidStats");
+        return new dwGuiStatsDroid(&rect, pTok1, (uint8_t)v1, pTok2, (uint8_t)v2);
     }
     if (dwString_Equals(pKeyword, "STATS_JOB"))
     {
@@ -531,10 +532,8 @@ extern "C" dwWidget* dwGuiScreen_CreateControl(char* pKeyword, dwConfFile* pConf
         dwConfFile_ParseULong(pConf, &c1);
         pTok2 = dwConfFile_NextToken(pConf); // value font
         dwConfFile_ParseULong(pConf, &c2);
-        (void)pTok1; (void)pTok2;
-        // TODO(dw-decomp): STATS_PART -> dwGuiStatsPart (unit dwPart) —
         // binary: new(0x50) dwGuiStatsPart_Ctor(&rect, labelFont, (byte)c1, valueFont, (byte)c2)
-        return dwGuiScreen_StubControl("STATS_PART", "dwGuiStatsPart", "dwPart");
+        return new dwGuiStatsPart(&rect, pTok1, (uint8_t)c1, pTok2, (uint8_t)c2);
     }
     if (dwString_Equals(pKeyword, "TEXT")) // binary: DAT_005292f4
     {
@@ -1010,12 +1009,14 @@ int dwGuiScreen::OnMessage(dwWidgetMsg* pMsg)
             pSeg = static_cast<dwSegment*>(new dwMissionSequence(this->pSnapshotImage));
             break;
         case 0x67:
-            // TODO(dw-decomp): 0x67 -> dwGuiInGame final-mission deploy (unit
-            // dwGuiInGame) — binary: if (dwGuiInGame_CheckDroidValid()) find
-            // the mission with rank/category 4 in dwCore_pMissionList and
-            // new(0x284) dwGuiInGame_Ctor(pMissionInfo); pSeg = its dwSegment
-            // subobject (obj+0x10).
-            stdPlatform_Printf("TODO(dw-decomp): dwGuiScreen msg 0x67 -> dwGuiInGame deploy (unit dwGuiInGame) not translated yet\n");
+            // dwGuiInGame final-mission deploy. binary: if the assembled droid
+            // is valid, find the rank/category-4 mission in dwCore_pMissionList
+            // and new(0x284) dwGuiInGame(pMissionInfo); pSeg = its dwSegment
+            // subobject. TODO(dw-decomp): the rank-4 mission lookup needs the
+            // populated dwCore_pMissionList (P7 boot flow) — until then deploy
+            // the current mission.
+            if (dwGuiInGame_CheckDroidValid())
+                pSeg = dwGuiInGame_New(dwCore_pCurrentMission);
             break;
         case 0x68:
             this->pSnapshotImage = dwGuiScreen_CaptureShadedScreen();

@@ -47,6 +47,11 @@ extern uint32_t lecSmush_frameNum; // @0x68b1c4
 // the soft-reset loop.
 void dwEnding_Startup(void);
 
+// Added: C-callable factory — allocates the ending sequence and returns its
+// dwSegment subobject (for dwSegment_Push). Consumed by dwGuiInGame_EndMission.
+struct dwSegment;
+struct dwSegment* dwEnding_New(void);
+
 #ifdef __cplusplus
 } // extern "C"
 

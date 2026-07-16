@@ -270,3 +270,10 @@ dwWidget* dwGuiCredits::CreateControl(char* pKeyword, dwConfFile* pConf)
 extern "C" void dwGuiCredits_Startup(void)
 {
 }
+
+// Added: C-callable factory (see dwGuiCredits.h). Upcasts through the MI
+// hierarchy (dwGuiScreen -> dwWidget,dwSegment) to the dwSegment subobject.
+extern "C" dwSegment* dwGuiCredits_New(void)
+{
+    return static_cast<dwSegment*>(new dwGuiCredits());
+}

@@ -24,6 +24,8 @@
 #include "Dw/dwGuiButton.h"    // dwWcArrows / dwWcBuildPaintButton / dwWcCargoNormalButton
 #include "Dw/dwGuiTextEntry.h" // DROID_NAME
 #include "Dw/dwPart.h"         // dwPartNode anim control + blueprint slotMask
+#include "Dw/dwDroidView.h"    // dwDroidView (PANCONTROL)
+#include "Dw/dwGuiStatsPart.h" // dwGuiPartImage (PART_IMAGE)
 #include "Dw/dwList.h"
 #include "Dw/dwConfFile.h"
 #include "Dw/dwSound.h"
@@ -479,9 +481,9 @@ dwWidget* dwWorkshop::CreateControl(char* pKeyword, dwConfFile* pConf)
         dwConfFile_ParseRect(pConf, &this->viewRect);
         dwConfFile_ParseULong(pConf, &param);
         dwConfFile_ParseULong(pConf, &param2);
-        // TODO(dw-decomp): PANCONTROL -> dwDroidView (unit dwDroidView, P6) —
         // binary: new(0x57c) dwDroidView_Ctor(&this->viewRect, param, param2) @426080
-        return dwWorkshop_StubControl("PANCONTROL", "dwDroidView", "dwDroidView");
+        // param = dead middle arg, param2 = FOV%.
+        return new dwDroidView(&this->viewRect, (int)param, (int)param2);
     }
     if (dwString_Equals(pKeyword, "PART_IMAGE"))
     {
@@ -489,10 +491,8 @@ dwWidget* dwWorkshop::CreateControl(char* pKeyword, dwConfFile* pConf)
         dwConfFile_ParseRect(pConf, &rect);
         pTok = dwConfFile_NextToken(pConf); // font
         dwConfFile_ParseULong(pConf, &param); // color
-        (void)pTok;
-        // TODO(dw-decomp): PART_IMAGE -> dwGuiPartImage (unit dwGuiStatsPart, P6) —
         // binary: new(0x34) dwGuiPartImage_Ctor(&rect, font, (u8)color) @428d10
-        return dwWorkshop_StubControl("PART_IMAGE", "dwGuiPartImage", "dwGuiStatsPart");
+        return new dwGuiPartImage(&rect, pTok, (uint8_t)param);
     }
 
     return this->dwGuiScreen::CreateControl(pKeyword, pConf); // @430a10 base factory
