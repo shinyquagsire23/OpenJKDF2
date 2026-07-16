@@ -14,7 +14,6 @@
 // TODO(dw-decomp): temporary cross-unit placeholders until the owning units
 // land. Remove each line when its owner unit is translated.
 HostServices* dwMain_pHS = NULL;                            // owner: dwMain proper (dw_hostServices @0x53d988); pointed at engine pHS in Startup for now
-uint32_t dwWidget_DispatchMsg(void* pMsg, void* pOverrideWidget) { (void)pMsg; (void)pOverrideWidget; return 0; } // owner: dwWidget (P3); @444d00, finish-msg dispatch from dwSound
 // ------------------------------------------------------------------
 
 static int dwMain_bInitted = 0;
