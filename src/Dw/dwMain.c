@@ -2,6 +2,8 @@
 
 #include "Dw/dwRect.h"
 #include "Dw/dwInits.h"
+#include "Dw/dwDisplay.h"
+#include "Dw/dwCursor.h"
 #include "stdPlatform.h"
 #include "globals.h" // pHS
 
@@ -12,9 +14,7 @@
 // TODO(dw-decomp): temporary cross-unit placeholders until the owning units
 // land. Remove each line when its owner unit is translated.
 HostServices* dwMain_pHS = NULL;                            // owner: dwMain proper (dw_hostServices @0x53d988); pointed at engine pHS in Startup for now
-void dwDisplay_AddDirtyRect(dwRect* pRect) { (void)pRect; } // owner: dwDisplay (P2)
-void dwDisplay_Present(void) {}                             // owner: dwDisplay (P2)
-tVBuffer* dwDisplay_pBackVBuf = NULL;                       // owner: dwDisplay (P2)
+uint32_t dwWidget_DispatchMsg(void* pMsg, void* pOverrideWidget) { (void)pMsg; (void)pOverrideWidget; return 0; } // owner: dwWidget (P3); @444d00, finish-msg dispatch from dwSound
 // ------------------------------------------------------------------
 
 static int dwMain_bInitted = 0;
@@ -32,6 +32,11 @@ int dwMain_Startup()
     // Bring up the DW VFS (dwGob + inits hooked fileOpen). In the original this
     // is the first thing dw_Startup does.
     inits_Startup(pHS);
+
+    // CRT-static-ctor replacements (dirty-rect list, cursor table). The
+    // binary ran these before WinMain; they must precede any dwDisplay_Open.
+    dwDisplay_Startup();
+    dwCursor_Startup();
 
     // Temporary P1 exercise: resolve a few known assets through the full
     // hooked-open chain (ext table -> base paths -> GOB basename index).
