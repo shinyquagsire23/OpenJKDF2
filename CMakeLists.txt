@@ -225,6 +225,16 @@ if(TARGET_TWL OR TARGET_DREAMCAST)
         ${PROJECT_SOURCE_DIR}/src/Raster/rdZRaster.c)
 endif()
 
+# DroidWorks app layer (src/Dw/, see DW/DECOMP_PROGRESS.md) is desktop-only for
+# now — retro targets can't afford the extra RAM/code and Main_bDroidWorks is
+# never set there.
+if(TARGET_TWL OR TARGET_DREAMCAST)
+    file(GLOB DW_SRCS ${PROJECT_SOURCE_DIR}/src/Dw/*.c)
+    if(DW_SRCS)
+        list(REMOVE_ITEM ENGINE_SOURCE_FILES ${DW_SRCS})
+    endif()
+endif()
+
 # Remove multiplayer menus from compilation
 file(GLOB MULTIPLAYER_MENU_SRCS 
     ${PROJECT_SOURCE_DIR}/src/Gui/jkGUIMultiplayer.c

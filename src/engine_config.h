@@ -43,6 +43,13 @@
 #define MICROSECOND_TIME
 #endif
 
+// DroidWorks app layer (src/Dw/, see DW/DECOMP_PROGRESS.md). Desktop-only for
+// now: src/Dw/*.c is excluded from retro builds in CMakeLists.txt, and dwMain.h
+// compiles the entry points down to no-ops when this is undefined.
+#if !defined(TARGET_RETRO_HOMEBREW)
+#define PLATFORM_DROIDWORKS
+#endif
+
 // Original game will speed up if framerate is over 100?
 #ifndef QOL_IMPROVEMENTS
 #define SITHTIME_MINDELTA (10)

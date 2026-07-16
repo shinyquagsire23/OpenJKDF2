@@ -462,6 +462,8 @@ extern int32_t openjkdf2_bIsExtraLowMemoryPlatform;
 extern char openjkdf2_aRestartPath[256];
 extern int32_t Main_bMotsCompat;
 extern int32_t Main_bDwCompat;
+extern int32_t Main_bDroidWorks; // Added: full DroidWorks game mode (implies Main_bDwCompat)
+extern int32_t Main_bDwCogVerbs; // Added: import DW COG verbs into JK/MOTS (analog of -enhancedCogVerbs)
 extern char* openjkdf2_pExecutablePath;
 
 // All the typedefs

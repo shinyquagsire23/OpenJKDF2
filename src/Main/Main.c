@@ -33,6 +33,7 @@
 #include "Gui/jkGUI.h"
 #include "Gui/jkGUIMods.h"
 #include "World/jkPlayer.h"
+#include "Dw/dwMain.h" // Added: DroidWorks app layer
 #include "Gameplay/jkSaber.h"
 #include "Win95/std.h"
 #include "Win95/stdDisplay.h"
@@ -103,6 +104,8 @@ int32_t Main_bHeadless = 0;
 int32_t Main_bVerboseNetworking = 0;
 int32_t Main_bMotsCompat = 0;
 int32_t Main_bDwCompat = 0;
+int32_t Main_bDroidWorks = 0; // Added: full DroidWorks game mode (implies Main_bDwCompat)
+int32_t Main_bDwCogVerbs = 0; // Added: import DW COG verbs into JK/MOTS
 int32_t Main_bEnhancedCogVerbs = 0;
 char Main_strEpisode[129];
 char Main_strMap[128+4];
@@ -453,13 +456,21 @@ int Main_Startup(const char *cmdline)
                 }
             }
 #endif
+            // Added: DroidWorks mode boots the DW app layer instead of the jk intro flow
+            if (Main_bDroidWorks) {
+                if (!dwMain_Startup()) {
+                    return 0;
+                }
+                Window_SetDrawHandlers(stdDisplay_DrawAndFlipGdi, stdDisplay_SetCooperativeLevel);
+                return 1;
+            }
             if (!Main_bMotsCompat) {
                 jkSmack_SmackPlay("01-02a.smk");
             }
             else {
                 jkSmack_SmackPlay("jkmintro.san");
             }
-            
+
             Window_SetDrawHandlers(stdDisplay_DrawAndFlipGdi, stdDisplay_SetCooperativeLevel);
             return 1;
         }
@@ -473,6 +484,7 @@ void Main_Shutdown()
 {
     stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
 
+    dwMain_Shutdown(); // Added: DroidWorks app layer (no-op if not started)
     std3D_Shutdown(); // Added
 #ifdef QUAKE_CONSOLE
     jkQuakeConsole_Shutdown();
@@ -555,6 +567,8 @@ void Main_Shutdown()
     Main_bHeadless = 0;
     Main_bVerboseNetworking = 0;
     Main_bDwCompat = 0;
+    Main_bDroidWorks = 0;
+    Main_bDwCogVerbs = 0;
     Main_bEnhancedCogVerbs = 0;
     memset(Main_strEpisode, 0, sizeof(Main_strEpisode));
     memset(Main_strMap, 0, sizeof(Main_strMap));
@@ -717,12 +731,23 @@ void Main_ParseCmdLine(char *cmdline)
         {
             Main_bEnhancedCogVerbs = 1;
         }
-        else if (!__strcmpi(pArgTok, "-dwCompat") 
-                 || !__strcmpi(pArgTok, "/dwCompat") 
-                 || !__strcmpi(pArgTok, "-droidworksCompat") 
+        else if (!__strcmpi(pArgTok, "-dwCompat")
+                 || !__strcmpi(pArgTok, "/dwCompat")
+                 || !__strcmpi(pArgTok, "-droidworksCompat")
                  || !__strcmpi(pArgTok, "/droidworksCompat"))
         {
             Main_bDwCompat = 1;
+        }
+        else if (!__strcmpi(pArgTok, "-droidworks") || !__strcmpi(pArgTok, "/droidworks"))
+        {
+            // Full DroidWorks game mode: DW app layer replaces the jk GUI flow.
+            Main_bDroidWorks = 1;
+            Main_bDwCompat = 1;
+        }
+        else if (!__strcmpi(pArgTok, "-dwCogVerbs") || !__strcmpi(pArgTok, "/dwCogVerbs"))
+        {
+            // DW COG verb import into JK/MOTS games (analog of -enhancedCogVerbs).
+            Main_bDwCogVerbs = 1;
         }
 #endif
         else

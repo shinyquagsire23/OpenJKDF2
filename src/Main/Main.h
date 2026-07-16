@@ -15,6 +15,8 @@ extern int32_t Main_bHeadless;
 extern int32_t Main_bVerboseNetworking;
 extern int32_t Main_bMotsCompat;
 extern int32_t Main_bDwCompat;
+extern int32_t Main_bDroidWorks; // Added: full DroidWorks game mode (implies Main_bDwCompat)
+extern int32_t Main_bDwCogVerbs; // Added: import DW COG verbs into JK/MOTS
 extern int32_t Main_bEnhancedCogVerbs;
 #endif
 
