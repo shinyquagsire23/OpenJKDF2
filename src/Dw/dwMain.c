@@ -4,6 +4,7 @@
 #include "Dw/dwInits.h"
 #include "Dw/dwDisplay.h"
 #include "Dw/dwCursor.h"
+#include "Dw/dwMovie.h" // dwMovie_Startup (C view)
 #include "stdPlatform.h"
 #include "globals.h" // pHS
 
@@ -36,6 +37,7 @@ int dwMain_Startup()
     // binary ran these before WinMain; they must precede any dwDisplay_Open.
     dwDisplay_Startup();
     dwCursor_Startup();
+    dwMovie_Startup();
 
     // Temporary P1 exercise: resolve a few known assets through the full
     // hooked-open chain (ext table -> base paths -> GOB basename index).
