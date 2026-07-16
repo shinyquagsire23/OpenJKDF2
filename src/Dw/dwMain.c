@@ -10,6 +10,11 @@
 #include "Dw/dwColormap.h"
 #include "Dw/dwFont.h"
 #include "Dw/dwControlPanel.h" // dwControlPanel_Startup (C view)
+#include "Dw/dwPart.h"      // dwPart_Startup (C view)
+#include "Dw/dwPlayer.h"    // dwPlayer_Startup (C view)
+#include "Dw/dwCog.h"       // dwCog_Startup
+#include "Dw/dwCamera.h"    // dwCamera_Startup
+#include "Dw/dwLaser.h"     // dwLaser_Startup
 #include "stdPlatform.h"
 #include "globals.h" // pHS
 
@@ -23,10 +28,13 @@ HostServices* dwMain_pHS = NULL;                            // owner: dwMain pro
 typedef struct dwStringTable dwStringTable;                 // C++ class (Dw/dwStringTable.h is C++-only); opaque here
 typedef struct dwListNode dwListNode;                       // C++-side list node (Dw/dwList.h is C++-only); opaque here
 typedef struct dwWidget dwWidget;                           // C++ class; opaque here
+typedef struct dwSegment dwSegment;                         // C++ class; opaque here
+typedef struct dwImage dwImage;                             // C++ class; opaque here
 dwStringTable* dwCore_pGlobalStrings = NULL;                // owner: dw core P7 (@0x53d958); NULL = dwGuiScreen_LocalizeString falls back to the key
 uint8_t dwMain_bFullRedraw = 0;                             // owner: dwMain P7 (@0x53e854); 0 = dirty-rect draws (faithful default)
 dwListNode* dwCore_pBlueprintList = NULL;                   // owner: dw core P7 (@0x53d964); consumers (dwWcBlueprints) unreachable until the boot flow exists
 dwListNode* dwCore_pWorkspaceNodes = NULL;                  // owner: dw core P7 (@0x53d984); same
+dwListNode* dwCore_pMissionList = NULL;                     // owner: dw core P7 (@0x53d95c); consumers (dwPlayer .plr MISSIONS, dwGuiScreen cheats) NULL-guard / unreachable
 // owner: dwGuiMission (P6) @41c0f0 — modal yes/no dialog; 5000 = YES / 5001 = NO.
 // Stub answers NO (the safe default for "randomize droid?"-style confirms).
 int dwGuiDialog_RunModal(const char* pConfName, const char* pMsgKey)
@@ -34,12 +42,49 @@ int dwGuiDialog_RunModal(const char* pConfName, const char* pMsgKey)
     stdPlatform_Printf("TODO(dw-decomp): dwGuiDialog_RunModal(%s, %s) stub -> NO (owner dwGuiMission P6)\n", pConfName, pMsgKey);
     return 5001;
 }
-// owner: dwDroidStats (P5) @40fae0 — random-droid generator; stub no-op.
+// owner: dwDroidStats (P5, agent in flight) @40fae0 — random-droid generator; stub no-op.
 void dwDroidStats_AutoBuildRandom(int bodyType, dwListNode** ppWorkspaceList)
 {
     (void)bodyType; (void)ppWorkspaceList;
     stdPlatform_Printf("TODO(dw-decomp): dwDroidStats_AutoBuildRandom stub (owner dwDroidStats P5)\n");
 }
+// owner: dwGuiInGame (P6) — HUD voice line + Cammy caption / console line /
+// per-frame SCREEN_SIZE viewport control callback (registered by dwSith_Startup).
+void dwGuiInGame_PlayVoiceLine(const char* pCammyText, const char* pWavName, uint32_t priority)
+{
+    (void)pCammyText; (void)pWavName; (void)priority;
+}
+void dwGuiInGame_ConsolePrint(const char* pText) { (void)pText; }
+int dwGuiInGame_UpdateViewSize(SithThing* pPlayer, flex_t deltaSecs)
+{
+    (void)pPlayer; (void)deltaSecs;
+    return 0;
+}
+// owner: dwCog part 1 (P8) — the 34-verb registration table.
+void dwCog_RegisterVerbs(void)
+{
+    stdPlatform_Printf("TODO(dw-decomp): dwCog_RegisterVerbs stub (owner dwCog part 1 P8)\n");
+}
+// owner: dw core part 2 (P7) — items.inv parse / inventory icon free.
+void dw_ParseInventoryTypes(void)
+{
+    stdPlatform_Printf("TODO(dw-decomp): dw_ParseInventoryTypes stub (owner dw core P7)\n");
+}
+void dw_FreeInventoryIcons(void) {}
+// owner: dwMain proper (P7) — the material recolor cache singleton (@0x53d950,
+// struct 0x187c). Stubs no-op: parts render untinted until P7.
+void dwMain_MaterialCache_RecolorMasked(rdMaterial* pMaterial, int matchColor, int newColor)
+{
+    (void)pMaterial; (void)matchColor; (void)newColor;
+}
+void dwMain_MaterialCache_Disable(void) {}
+void dwMain_MaterialCache_Enable(void) {}
+// owner: dwGuiMission (P6) — mission-flow segment factories (link-only until
+// the dwGuiScreen msg-0x66 branch is wired; dwMissionSequence::Activate is
+// unreachable before then).
+dwSegment* dwMissionTransIn_New(dwImage* pBgImage) { (void)pBgImage; return NULL; }
+dwSegment* dwGuiMissionMap_New(dwImage* pBgImage) { (void)pBgImage; return NULL; }
+dwSegment* dwMissionTransOut_New(dwImage* pBgImage) { (void)pBgImage; return NULL; }
 // ------------------------------------------------------------------
 
 static int dwMain_bInitted = 0;
@@ -69,8 +114,17 @@ int dwMain_Startup()
     dwColormap_Startup();
     dwFont_Startup();
     dwControlPanel_Startup(); // binary: called from dw_Startup @419d40 (dw_aPartSlotColors fill)
+    // P5 wave: statics resets (soft-reset loop rule; the binary's state came
+    // from .data/BSS/CRT static ctors).
+    dwPart_Startup();
+    dwPlayer_Startup();
+    dwCog_Startup();
+    dwCamera_Startup();
+    dwLaser_Startup();
     // Note: dwSound_Startup deferred to the P7 boot flow (spawns the worker
     // thread; the dwSound C API NULL-guards the manager until then).
+    // Note: dwSith_Startup is NOT a statics reset — it is DW's sith engine
+    // bring-up, called by the dw_Startup boot flow (P7).
 
     // Temporary P1 exercise: resolve a few known assets through the full
     // hooked-open chain (ext table -> base paths -> GOB basename index).

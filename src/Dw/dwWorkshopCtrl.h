@@ -78,6 +78,7 @@ typedef struct dwWcPalette dwWcPalette;
 #include "Dw/dwImage.h"
 
 struct dwGuiHypText; // Dw/dwGuiHypText.h (only pointers held here)
+struct dwPart;       // Dw/dwPart.h — blueprint records (dwWcBlueprints grid)
 
 // ---- dwWorkshopCtrl -----------------------------------------------------------
 //
@@ -419,8 +420,8 @@ struct dwWcBlueprints : dwWidget
     uint8_t bShown;       // 0x1a: fly-out is open
     uint8_t backdropColor;// 0x1b: cone blend color (0x46)
     uint32_t slotMask;    // 0x1c: blueprint slot-mask filter (init 1; msg 0x7e4)
-    uint32_t typeBits;    // 0x20: 1<<partType filter bits (init 0; msg 0x7e5)
-    void* pHover;         // 0x24: hovered blueprint record (dwPart, P5)
+    uint32_t typeBits;    // 0x20: 1<<type filter bits (init 0; msg 0x7e5)
+    dwPart* pHover;       // 0x24: hovered blueprint record (Dw/dwPart.h)
     dwRect hoverRect;     // 0x28: screen rect of the hovered cell
     int16_t cellW;        // 0x30: widest eligible blueprint image
     int16_t cellH;        // 0x32: tallest eligible blueprint image

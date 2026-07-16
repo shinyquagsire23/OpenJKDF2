@@ -12,6 +12,7 @@
 #include "Engine/rdCamera.h"
 #include "Engine/sithRender.h"
 #include "General/stdMath.h"
+#include "Dw/dwCamera.h" // Added: DroidWorks follow camera (type 0x100; no-ops off-desktop)
 #include "jk.h"
 
 static rdVector3 sithCamera_trans = {0.0, 0.3, 0.0};
@@ -363,6 +364,13 @@ void sithCamera_Update(SithCamera *pCamera)
             rdMatrix_PostTranslate34(&pCamera->orient, &focusThing->position);
             pCamera->sector = sithCollision_FindSectorInRadius(focusThing->sector, &focusThing->position, &pCamera->orient.scale, 0.02);
             break;
+#ifdef DW_CAMERA
+        case 0x100:
+            // Added: DroidWorks collision follow camera (src/Dw/dwCamera.c;
+            // compiles to a no-op where the DW app layer is excluded).
+            dwCamera_Update(pCamera);
+            break;
+#endif
         default:
             break;
     }
@@ -557,6 +565,9 @@ int sithCamera_SetCurrentCamera(SithCamera *pCamera)
 
     if ( sithCamera_g_pCurCamera && pCamera->dword4 < sithCamera_g_pCurCamera->dword4 )
         return 0;
+#ifdef DW_CAMERA
+    SithCamera* pPrevCamera = sithCamera_g_pCurCamera; // Added: DW follow-cam reset wants the pre-switch camera
+#endif
     sithCamera_g_pCurCamera = pCamera;
     sithCamera_g_bCurCameraSet = 1;
     rdCamera_SetCurrent(&pCamera->rdCamera);
@@ -568,6 +579,12 @@ int sithCamera_SetCurrentCamera(SithCamera *pCamera)
         rot.z = 0.0;
         rdMatrix_PostRotate34(&sithCamera_idleCamOrient, &rot);
     }
+#ifdef DW_CAMERA
+    // Added: DroidWorks follow camera snap-on-switch (binary: type-0x100
+    // branch in SetCurrentCamera, before the final sithCamera_Update).
+    if ( pCamera->type == 0x100 )
+        dwCamera_Reset(pPrevCamera, pCamera);
+#endif
     sithCamera_Update(sithCamera_g_pCurCamera);
     return 1;
 }

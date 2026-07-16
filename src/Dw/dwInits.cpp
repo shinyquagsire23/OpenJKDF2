@@ -18,6 +18,7 @@
 // (Linux_stdFileOpen) converts to '/' at the bottom.
 
 #include "Dw/dwGob.h"
+#include "Dw/dwPlayer.h" // dwPlayer_name/basePath/profileDir (owner unit)
 #include "General/stdFileUtil.h"
 #include "stdPlatform.h"
 
@@ -39,13 +40,16 @@ dwString dwCore_sourcePath;  // registry SourcePath (CD), read-only fallback
 static stdFile_t (*dwCore_pfnOrigFileOpen)(const char*, const char*);
 static int (*dwCore_pfnOrigFileClose)(stdFile_t);
 
-// TODO(dw-decomp): provided by dwPlayer — temporary definitions live here so
-// P1 links; MOVE to dwPlayer.c when that unit lands (P5). C linkage so the
-// future owner can be either language.
+// dwPlayer_name/basePath/profileDir now live in their owner unit (dwPlayer.h,
+// P5); this unit reads them for profile-dir resolution like the binary.
+
+// TODO(dw-decomp): temporary cross-unit placeholders — dwString objects need a
+// C++ TU, so they park here (precedent: the dwPlayer globals above) instead of
+// dwMain.c's placeholder block. Owner: dw core P7 (binary static ctors
+// dwCore_RefFileInit etc.); move there when it lands.
 extern "C" {
-dwString dwPlayer_name;
-dwString dwPlayer_basePath;
-dwString dwPlayer_profileDir;
+dwString dwCore_workspaceName;   // @0x53d978: workspace droid display name
+dwString dwCore_currentRefFile;  // @0x53d968: current reference-room topic file (.plr TOPIC)
 }
 
 // The 27-entry extension -> search-path-list table (binary: interleaved
@@ -180,7 +184,7 @@ void inits_Shutdown(void)
     dwCore_workingDir.Free();
     dwCore_installPath.Free();
     dwCore_sourcePath.Free();
-    dwPlayer_basePath.Free();  // TODO(dw-decomp): moves with dwPlayer
+    dwPlayer_basePath.Free();  // binary: inits_Shutdown frees these two dwPlayer globals
     dwPlayer_profileDir.Free();
     dwGob_Shutdown();
 }

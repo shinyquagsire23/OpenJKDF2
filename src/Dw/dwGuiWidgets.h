@@ -29,8 +29,8 @@
 // plus the .drd (saved droid) file format:
 //   dwGuiWidgets_WriteDroidFile / ReadDroidFile / SaveDroidToFile /
 //   LoadDroidFromFile / NodeIndexOf / NodeAtIndex — VERSION/NAME/PARTS/
-//   COLORS/PARENTS sections over the workspace dwPartNode list (see the
-//   notes in dwGuiWidgets.cpp; the part-tree walkers are P5-blocked stubs).
+//   COLORS/PARENTS sections over the workspace dwPartNode list (real
+//   dwPart/dwPartNode layouts from Dw/dwPart.h, P5).
 //
 // Decompiled from DroidWorks.exe, unit range 0x432150-0x433d8f (+ the four
 // MI this-adjustor thunks @0x433db0-0x433de0, which the C++ compiler now
@@ -75,19 +75,14 @@ typedef struct dwString dwString;
 // ("NAME Untitled" when pName is empty) / "PARTS %lu" (one "%s %lu %f %f %f"
 // line per node: blueprint name, slot index, position) / "COLORS" (9
 // "  %lu %lu" material-color pairs per node) / "PARENTS" (one "%lu %lu" line
-// per node: 1-based parent node index + 1-based attach-slot index, 0 0 for
-// the root). Returns 1.
-// TODO(dw-decomp): currently a LOUD STUB — the per-node payload readers need
-// the dwPart/dwPartNode unit (P5); the full binary recipe is documented at
-// the implementation. @4322a0
+// per node: 1-based parent node index + 1-based attach-slot index, 0 for a
+// root's parent index). Returns 1. @4322a0
 int dwGuiWidgets_WriteDroidFile(stdFile_t file, dwString* pName, dwList* pNodeList);
 
 // Parse a .drd out of an open dwConfFile into pNameOut (may be NULL) +
 // pNodeList (dwPart_FindBlueprint/CreateNode + Translate/AttachToSlot per
 // node; stops at an "END" line). Returns 1 on success, 0 when a blueprint
-// was missing/unavailable.
-// TODO(dw-decomp): currently a LOUD STUB (P5) — recipe at the implementation.
-// @4325d0
+// was missing/unavailable. @4325d0
 int dwGuiWidgets_ReadDroidFile(dwConfFile* pConf, dwString* pNameOut, dwList* pNodeList);
 
 // fileOpen(pPath, "wt") + WriteDroidFile + fileClose. Returns 0 when the

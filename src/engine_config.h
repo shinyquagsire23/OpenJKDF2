@@ -187,6 +187,9 @@
 // Backport Droidworks misc
 #ifdef QOL_IMPROVEMENTS
 #define DW_CAMERA
+#ifndef DW_LASERS
+#define DW_LASERS // Added: SithWorld laser pool fields for src/Dw/dwLaser.c (also set by -DDW_TYPES for Ghidra imports)
+#endif
 #endif
 
 #ifdef TARGET_RETRO_HOMEBREW

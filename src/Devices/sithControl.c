@@ -21,6 +21,8 @@
 #include "Main/jkMain.h"
 #include "Dss/sithMulti.h"
 #include "General/stdMath.h"
+#include "Main/Main.h" // Added: Main_bDwCompat (DW tool-key dispatch)
+#include "Dw/dwCog.h" // Added: DroidWorks droid-tool dispatch (no-ops off-desktop)
 #include "jk.h"
 
 // Added
@@ -1039,9 +1041,37 @@ LABEL_39:
                 else
                     sithControl_FreeCam(player);
 
-                sithControl_GetKey(INPUT_FUNC_ACTIVATE, &input_read);
-                if ( input_read != 0 &&  sithThing_MotsTick(2,0,1.0)) // MOTS added
-                    sithPlayerActions_Activate(player);
+#ifdef PLATFORM_DROIDWORKS
+                // Added: DroidWorks tool-key dispatch (binary sithControl_FUN_004579f0,
+                // called from DW's HandlePlayer where stock JK handles the activate key):
+                // SELECT1 -> tool arm slot 2, SELECT2 -> tool arm slot 1, ACTIVATE ->
+                // body slot 0; first pressed wins. Replaces the stock activate handling
+                // (dwCog_ActivateTool is also where sithPlayerActions_Activate diverts).
+                if ( Main_bDwCompat )
+                {
+                    sithControl_GetKey(INPUT_FUNC_SELECT1, &input_read);
+                    if ( input_read != 0 )
+                        dwCog_ActivateTool(player, 2);
+                    else
+                    {
+                        sithControl_GetKey(INPUT_FUNC_SELECT2, &input_read);
+                        if ( input_read != 0 )
+                            dwCog_ActivateTool(player, 1);
+                        else
+                        {
+                            sithControl_GetKey(INPUT_FUNC_ACTIVATE, &input_read);
+                            if ( input_read != 0 )
+                                dwCog_ActivateTool(player, 0);
+                        }
+                    }
+                }
+                else
+#endif
+                {
+                    sithControl_GetKey(INPUT_FUNC_ACTIVATE, &input_read);
+                    if ( input_read != 0 &&  sithThing_MotsTick(2,0,1.0)) // MOTS added
+                        sithPlayerActions_Activate(player);
+                }
 
                 sithControl_GetKey(INPUT_FUNC_MAP, &input_read);
                 if ( (input_read & 1) != 0 )

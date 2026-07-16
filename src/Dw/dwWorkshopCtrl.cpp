@@ -69,20 +69,9 @@ extern "C" void dwDroidStats_AutoBuildRandom(int bodyType, dwListNode** ppWorksp
 // `new dwGuiTimer(...)` when it lands).
 extern "C" dwWidget* dwGuiTimer_New(dwWidget* pTarget, float startTime, float duration);
 
-// Minimal read-only view of the dwPart blueprint record (owner: dwPart, P5;
-// binary struct dwPart, 0x670). ONLY the fields this unit reads are mapped;
-// the dwPart unit must keep these leading fields at these offsets.
-// TODO(dw-decomp): replace with the real dwPart type when P5 lands.
-typedef struct dwWcBlueprintView
-{
-    uint8_t pad0[5];    // 0x00
-    uint8_t bAvailable; // 0x05: blueprint unlocked/visible
-    uint8_t pad6[2];    // 0x06
-    int32_t partType;   // 0x08: part-type index (filtered as 1 << partType)
-    uint32_t slotMask;  // 0x0c: body-slot mask (filtered against slotMask)
-    uint8_t pad10[0x34];// 0x10
-    dwImage* pImage;    // 0x44: blueprint grid image
-} dwWcBlueprintView;
+// The blueprint records on dwCore_pBlueprintList are dwPart objects (P5,
+// Dw/dwPart.h) — the grid cell image is the blueprint's ICON (pIcon @0x44).
+#include "Dw/dwPart.h"
 
 // ---------------------------------------------------------------------------
 // dwWorkshopCtrl (vtbl 0x51e548)
@@ -1082,13 +1071,18 @@ dwWcBlueprints::~dwWcBlueprints()
 }
 
 // Shared filter: is this blueprint shown by the current slot/type filters?
-static int dwWcBlueprints_IsEligible(dwWcBlueprints* pThis, dwWcBlueprintView* pBp)
+static int dwWcBlueprints_IsEligible(dwWcBlueprints* pThis, dwPart* pBp)
 {
     if (pBp->bAvailable == 0)
         return 0;
+    // Note: not in the binary — dwImage_LoadFile is a P8 stub returning NULL,
+    // and the grid measures/blits pIcon unguarded; treat icon-less blueprints
+    // as ineligible until stdBitmapRle2 lands (same guard style as dwCursor).
+    if (pBp->pIcon == NULL)
+        return 0;
     if ((pBp->slotMask & pThis->slotMask) == 0)
         return 0;
-    if ((pThis->typeBits & (1u << (pBp->partType & 0x1f))) == 0)
+    if ((pThis->typeBits & (1u << (pBp->type & 0x1f))) == 0)
         return 0;
     return 1;
 }
@@ -1097,7 +1091,7 @@ static int dwWcBlueprints_IsEligible(dwWcBlueprints* pThis, dwWcBlueprintView* p
 void dwWcBlueprints::BuildGrid()
 {
     dwListNode* pNode;
-    dwWcBlueprintView* pBp;
+    dwPart* pBp;
     uint16_t count;
     int16_t maxCols;
     int16_t rows;
@@ -1107,13 +1101,13 @@ void dwWcBlueprints::BuildGrid()
     count = 0;
     for (pNode = dwCore_pBlueprintList->pNext; pNode != dwCore_pBlueprintList; pNode = pNode->pNext)
     {
-        pBp = (dwWcBlueprintView*)pNode->pData;
+        pBp = (dwPart*)pNode->pData;
         if (!dwWcBlueprints_IsEligible(this, pBp))
             continue;
-        if ((uint16_t)this->cellW < pBp->pImage->desc.width)
-            this->cellW = (int16_t)pBp->pImage->desc.width;
-        if ((uint16_t)this->cellH < pBp->pImage->desc.height)
-            this->cellH = (int16_t)pBp->pImage->desc.height;
+        if ((uint16_t)this->cellW < pBp->pIcon->desc.width)
+            this->cellW = (int16_t)pBp->pIcon->desc.width;
+        if ((uint16_t)this->cellH < pBp->pIcon->desc.height)
+            this->cellH = (int16_t)pBp->pIcon->desc.height;
         count++;
     }
 
@@ -1154,7 +1148,7 @@ void dwWcBlueprints::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
     dwPoint apex;
     dwPoint aEnds[2];
     dwListNode* pNode;
-    dwWcBlueprintView* pBp;
+    dwPart* pBp;
     int16_t x, y;
     int16_t col;
 
@@ -1180,13 +1174,13 @@ void dwWcBlueprints::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
     col = 0;
     for (pNode = dwCore_pBlueprintList->pNext; pNode != dwCore_pBlueprintList; pNode = pNode->pNext)
     {
-        pBp = (dwWcBlueprintView*)pNode->pData;
+        pBp = (dwPart*)pNode->pData;
         if (!dwWcBlueprints_IsEligible(this, pBp))
             continue;
         if (pBp == this->pHover)
-            pBp->pImage->Blit(pDestBits, x, y, pClipRect);         // vtbl +0x04
+            pBp->pIcon->Blit(pDestBits, x, y, pClipRect);         // vtbl +0x04
         else
-            pBp->pImage->BlitColorMap(pDestBits, x, y, pClipRect); // vtbl +0x08
+            pBp->pIcon->BlitColorMap(pDestBits, x, y, pClipRect); // vtbl +0x08
         col++;
         if (col == this->cols)
         {
@@ -1205,9 +1199,9 @@ void dwWcBlueprints::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 // returns 0.
 int dwWcBlueprints::OnMouseMove(int16_t x, int16_t y)
 {
-    void* pNewHover;
+    dwPart* pNewHover;
     dwListNode* pNode;
-    dwWcBlueprintView* pBp;
+    dwPart* pBp;
     dwWidgetMsg msg;
     int16_t colIdx, rowIdx;
     int16_t target;
@@ -1231,7 +1225,7 @@ int dwWcBlueprints::OnMouseMove(int16_t x, int16_t y)
             // decrement per eligible record, stop at zero or list end).
             while (pNode != dwCore_pBlueprintList)
             {
-                pBp = (dwWcBlueprintView*)pNode->pData;
+                pBp = (dwPart*)pNode->pData;
                 if (dwWcBlueprints_IsEligible(this, pBp))
                     target--;
                 if (target == 0)

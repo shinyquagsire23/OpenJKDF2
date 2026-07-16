@@ -10,13 +10,12 @@
 // this-adjustor thunks @0x433db0-0x433de0 (compiler-generated now).
 //
 // No module statics — no dwGuiWidgets_Startup needed (soft-reset rule).
-// (The warn-once flags in the two P5-blocked stubs below follow the
-// dwGuiButton.cpp stub precedent.)
 
 #include "Dw/dwGuiWidgets.h"
 #include "Dw/dwImageDraw.h"
 #include "Dw/dwColormap.h"
 #include "Dw/dwSound.h"
+#include "Dw/dwPart.h" // dwPart/dwPartNode — the .drd payloads (P5)
 
 #include "stdPlatform.h"
 
@@ -786,97 +785,197 @@ extern "C" void* dwGuiWidgets_NodeAtIndex(dwList* pList, int index)
     return NULL;
 }
 
-// @4322a0 (dwGuiWidgets_WriteDroidFile)
-//
-// TODO(dw-decomp): LOUD STUB — the per-node payload comes from the
-// UNTRANSLATED dwPart/dwPartNode unit (P5). Full binary recipe (all prints
-// via dwHS->filePrintf, dwHS @0x6b6258 = dwMain_pHS):
-//   count = walk pNodeList (node count);
-//   "VERSION 1\n"  "\n"
-//   pName->length ? "NAME %s\n" (pName->pBuffer) : "NAME Untitled\n"   "\n"
-//   "PARTS %lu\n" (count); per node (pData = dwPartNode*):
-//       dwPartNode_GetPosition@426860(node, float pos[3]);
-//       "%s %lu %f %f %f\n" (node->pPart(+0x00)->name.pBuffer(+0x18),
-//                            (uint)*(uint16*)(node+0x84) /*slot index*/,
-//                            pos[0], pos[1], pos[2])
-//   "\n" "COLORS\n"; per node: 9 pairs of bytes at node+0xe0 (stride 2):
-//       "  %lu %lu" (pb[0], pb[1]) ... then "\n"
-//   "\n" "PARENTS\n"; per node:
-//       parentIdx = slotIdx = -1;
-//       if (*(int*)(node+0x88) != 0xb /*root part type*/
-//           && (parent = *(void**)(node+0x94)) != NULL) {
-//           parentIdx = dwGuiWidgets_NodeIndexOf(pNodeList, parent);
-//           for (slot = parent+0x9c, i = 0; i < *(int*)(parent+0x98);
-//                slot += 0x10, i++)  // find node's attach slot by ADDRESS
-//               if (slot == *(void**)(node+0x90)) { slotIdx = i; break; }
-//           // (slotIdx stays the last i when the address never matches)
-//       }
-//       "%lu %lu\n" (parentIdx + 1, slotIdx + 1)
-//   "\n"; return 1.
+// @4322a0 (dwGuiWidgets_WriteDroidFile) — all prints via dwHS->filePrintf
+// (dwHS @0x6b6258 = dwMain_pHS). Sections: VERSION / NAME / PARTS (blueprint
+// name + slotIdx16 + position per node) / COLORS (the 9 recorded paint pairs
+// per node) / PARENTS (1-based parent node index + attach-slot ordinal).
 extern "C" int dwGuiWidgets_WriteDroidFile(stdFile_t file, dwString* pName, dwList* pNodeList)
 {
-    static int bWarned = 0;
+    dwListNode* pNode;
+    dwPartNode* pPartNode;
+    dwPartNode* pParent;
+    unsigned long count;
+    rdVector3 pos;
+    int parentIdx;
+    int slotIdx;
+    int i;
 
-    (void)file; (void)pName; (void)pNodeList;
-    if (!bWarned)
+    count = 0;
+    for (pNode = pNodeList->pSentinel->pNext; pNode != pNodeList->pSentinel; pNode = pNode->pNext)
+        count++;
+
+    dwMain_pHS->filePrintf(file, "VERSION 1\n");
+    dwMain_pHS->filePrintf(file, "\n");
+    if (pName->length == 0)
+        dwMain_pHS->filePrintf(file, "NAME Untitled\n");
+    else
+        dwMain_pHS->filePrintf(file, "NAME %s\n", pName->pBuffer);
+    dwMain_pHS->filePrintf(file, "\n");
+
+    dwMain_pHS->filePrintf(file, "PARTS %lu\n", count);
+    for (pNode = pNodeList->pSentinel->pNext; pNode != pNodeList->pSentinel; pNode = pNode->pNext)
     {
-        bWarned = 1;
-        stdPlatform_Printf("TODO(dw-decomp): dwGuiWidgets_WriteDroidFile stubbed (needs dwPart/dwPartNode, P5) — droid NOT saved\n");
+        pPartNode = (dwPartNode*)pNode->pData;
+        pPartNode->GetPosition(&pos);
+        dwMain_pHS->filePrintf(file, "%s %lu %f %f %f\n",
+                               pPartNode->pPart->name.pBuffer,
+                               (unsigned long)(uint16_t)pPartNode->slotIdx16,
+                               pos.x, pos.y, pos.z);
     }
-    return 1; // binary always returns 1
+
+    dwMain_pHS->filePrintf(file, "\n");
+    dwMain_pHS->filePrintf(file, "COLORS\n");
+    for (pNode = pNodeList->pSentinel->pNext; pNode != pNodeList->pSentinel; pNode = pNode->pNext)
+    {
+        pPartNode = (dwPartNode*)pNode->pData;
+        for (i = 0; i < 9; i++)
+        {
+            dwMain_pHS->filePrintf(file, "  %lu %lu",
+                                   (unsigned long)pPartNode->aContacts[i][0],
+                                   (unsigned long)pPartNode->aContacts[i][1]);
+        }
+        dwMain_pHS->filePrintf(file, "\n");
+    }
+
+    dwMain_pHS->filePrintf(file, "\n");
+    dwMain_pHS->filePrintf(file, "PARENTS\n");
+    // Faithful register quirk: the binary only sets the slot ordinal inside
+    // the attached-node branch, so a detached/root node re-prints the
+    // PREVIOUS node's value (+1). Carried across iterations here too.
+    slotIdx = -1;
+    for (pNode = pNodeList->pSentinel->pNext; pNode != pNodeList->pSentinel; pNode = pNode->pNext)
+    {
+        pPartNode = (dwPartNode*)pNode->pData;
+        parentIdx = -1;
+        if (pPartNode->partType != DW_PARTTYPE_NONE && pPartNode->pAttachData != NULL)
+        {
+            pParent = pPartNode->pAttachData;
+            parentIdx = dwGuiWidgets_NodeIndexOf(pNodeList, pParent);
+            // Find the node's attach slot by ADDRESS (== slotCount when the
+            // address never matches — faithful).
+            for (slotIdx = 0; slotIdx < pParent->slotCount; slotIdx++)
+            {
+                if (&pParent->aSlots[slotIdx] == pPartNode->pAttachSlot)
+                    break;
+            }
+        }
+        dwMain_pHS->filePrintf(file, "%lu %lu\n",
+                               (unsigned long)(parentIdx + 1), (unsigned long)(slotIdx + 1));
+    }
+
+    dwMain_pHS->filePrintf(file, "\n");
+    return 1;
 }
 
-// @4325d0 (dwGuiWidgets_ReadDroidFile)
-//
-// TODO(dw-decomp): LOUD STUB — needs the UNTRANSLATED dwPart/dwPartNode unit
-// (P5). Full binary recipe (over an open dwConfFile):
-//   ok = 1;
-//   while (!pConf->bEof && ok) {
-//     dwConfFile_ReadLine; tok = dwConfFile_NextToken;
-//     if (dwString_Equals(tok, "END")) break;                 // @528470
-//     else if (dwString_Equals(tok, "VERSION")) {}            // ignored
-//     else if (dwString_Equals(tok, "NAME")) {
-//         if (pNameOut) dwString_AssignCStr(pNameOut, pConf->pCursor); // REST of the line
-//     } else if (dwString_Equals(tok, "PARTS")) {
-//         dwConfFile_ParseULong(&count);
-//         for (; count; count--) {
-//             ReadLine; name = NextToken; ParseULong(&slot16 /*int16*/);
-//             ParseFloat(&pos[0..2]);
-//             bp = dwPart_FindBlueprint@4271b0(name);
-//             if (!bp || !*(uint8*)(bp+5) /*bAvailable*/) { ok = 0; continue; }
-//             node = dwPart_CreateNode@4281a0(bp /*ECX*/);
-//             if (node) {
-//                 *(int16*)(node+0x84) += slot16;             // slot index
-//                 dwPartNode_Translate@4268d0(node, pos);
-//                 pNodeList push-back (InsertAfter(sentinel->pPrev, node));
-//             }
-//         }
-//     } else if (dwString_Equals(tok, "COLORS")) {
-//         per pNodeList node: ReadLine; 9x { ParseULong(&a); ParseULong(&b);
-//             if (a != b) dwPartNode_CollectContacts@426af0(node, a, b); }
-//             // (Ghidra name; semantically "set material a to color b")
-//     } else if (dwString_Equals(tok, "PARENTS")) {
-//         per pNodeList node: ReadLine; ParseULong(&p); ParseULong(&s);
-//             if (p != 0) { p--; s--;
-//                 parent = dwGuiWidgets_NodeAtIndex(pNodeList, p);
-//                 slot = parent + 0x9c + s * 0x10;
-//                 if (parent && slot)
-//                     dwPartNode_AttachToSlot@426c70(node, parent, slot);
-//             }
-//     }
-//   }
-//   return ok;
+// @4325d0 (dwGuiWidgets_ReadDroidFile) — rebuild the part tree from an open
+// .drd dwConfFile. Returns 0 when any referenced blueprint is missing or
+// locked (the parse still consumes the remaining PARTS lines, as in the
+// binary, and the outer keyword loop then stops).
 extern "C" int dwGuiWidgets_ReadDroidFile(dwConfFile* pConf, dwString* pNameOut, dwList* pNodeList)
 {
-    static int bWarned = 0;
+    dwListNode* pNode;
+    dwPartNode* pPartNode;
+    dwPartNode* pNewNode;
+    dwPartNode* pParent;
+    dwPart* pBp;
+    dwPartSlot* pSlot;
+    char* pTok;
+    uint32_t count;
+    uint32_t slotVal;
+    uint32_t a, b;
+    uint32_t p, s;
+    rdVector3 pos;
+    int bOk;
+    int i;
 
-    (void)pConf; (void)pNameOut; (void)pNodeList;
-    if (!bWarned)
+    bOk = 1;
+    while (!pConf->bEof && bOk)
     {
-        bWarned = 1;
-        stdPlatform_Printf("TODO(dw-decomp): dwGuiWidgets_ReadDroidFile stubbed (needs dwPart/dwPartNode, P5) — droid NOT loaded\n");
+        dwConfFile_ReadLine(pConf);
+        pTok = dwConfFile_NextToken(pConf);
+        if (dwString_Equals(pTok, "END")) // @528470
+            break;
+        if (dwString_Equals(pTok, "VERSION"))
+        {
+            // ignored
+        }
+        else if (dwString_Equals(pTok, "NAME"))
+        {
+            if (pNameOut != NULL)
+                pNameOut->AssignCStr(pConf->pCursor); // REST of the line
+        }
+        else if (dwString_Equals(pTok, "PARTS"))
+        {
+            count = 0;
+            dwConfFile_ParseULong(pConf, &count);
+            for (; count != 0; count--)
+            {
+                dwConfFile_ReadLine(pConf);
+                pTok = dwConfFile_NextToken(pConf);
+                slotVal = 0;
+                dwConfFile_ParseULong(pConf, &slotVal);
+                pos.x = pos.y = pos.z = 0.0f;
+                dwConfFile_ParseFloat(pConf, &pos.x);
+                dwConfFile_ParseFloat(pConf, &pos.y);
+                dwConfFile_ParseFloat(pConf, &pos.z);
+                pBp = dwPart_FindBlueprint(pTok);
+                if (pBp == NULL || pBp->bAvailable == 0)
+                {
+                    bOk = 0; // missing/locked blueprint (keep consuming lines)
+                    continue;
+                }
+                pNewNode = pBp->CreateNode();
+                if (pNewNode != NULL)
+                {
+                    pNewNode->slotIdx16 = (int16_t)(pNewNode->slotIdx16 + (int16_t)slotVal);
+                    pNewNode->Translate(&pos);
+                    pNodeList->InsertAfter(pNodeList->pSentinel->pPrev, pNewNode); // push-back
+                }
+            }
+        }
+        else if (dwString_Equals(pTok, "COLORS"))
+        {
+            for (pNode = pNodeList->pSentinel->pNext; pNode != pNodeList->pSentinel; pNode = pNode->pNext)
+            {
+                dwConfFile_ReadLine(pConf);
+                pPartNode = (dwPartNode*)pNode->pData;
+                for (i = 0; i < 9; i++)
+                {
+                    a = 0;
+                    b = 0;
+                    dwConfFile_ParseULong(pConf, &a);
+                    dwConfFile_ParseULong(pConf, &b);
+                    if (a != b)
+                        pPartNode->CollectContacts((int)a, (int)b); // "paint material a -> color b"
+                }
+            }
+        }
+        else if (dwString_Equals(pTok, "PARENTS"))
+        {
+            for (pNode = pNodeList->pSentinel->pNext; pNode != pNodeList->pSentinel; pNode = pNode->pNext)
+            {
+                dwConfFile_ReadLine(pConf);
+                p = 0;
+                s = 0;
+                dwConfFile_ParseULong(pConf, &p);
+                dwConfFile_ParseULong(pConf, &s);
+                if (p != 0)
+                {
+                    p--;
+                    s--;
+                    pParent = (dwPartNode*)dwGuiWidgets_NodeAtIndex(pNodeList, (int)p);
+                    // Note: the binary computes the slot address before the
+                    // NULL check; ordered NULL-check-first here (same result).
+                    if (pParent != NULL)
+                    {
+                        pSlot = pParent->aSlots + (int32_t)s;
+                        ((dwPartNode*)pNode->pData)->AttachToSlot(pParent, pSlot);
+                    }
+                }
+            }
+        }
     }
-    return 0; // "a blueprint was unavailable" failure path
+    return bOk;
 }
 
 // @432580 (dwGuiWidgets_SaveDroidToFile)

@@ -28,6 +28,8 @@
 #include "World/sithSector.h"
 #include "World/sithWorld.h"
 #include "World/sithExplosion.h"
+#include "Main/Main.h" // Added: Main_bDwCompat (DW laser pass)
+#include "Dw/dwLaser.h" // Added: DroidWorks laser pass (no-ops off-desktop)
 #include "Platform/std3D.h"
 #include "Primitives/rdMath.h"
 #include "stdPlatform.h"
@@ -593,6 +595,14 @@ void sithRender_Draw()
     int testThingsEnd = stdPlatform_GetTimeMsec();
 
     int testAlpha = stdPlatform_GetTimeMsec();
+#endif
+
+#ifdef DW_LASERS
+    // Added: DroidWorks laser/beam pass (binary sithRender_DrawLasers@45e780,
+    // called between the thing passes and the alpha adjoins; body lives in
+    // src/Dw/dwLaser.c and no-ops off-desktop).
+    if ( Main_bDwCompat )
+        dwLaser_DrawAll();
 #endif
 
     // TWL: 0ms
