@@ -40,6 +40,11 @@
 #include "Dw/dwGuiHypText.h"  // dwGuiHypText (TEXT keyword)
 #include "Dw/dwWorkshopCtrl.h" // dwWorkshopCtrl/dwWcButtonBlink (BUTTON/TOGGLE/BUTTON_BLINK)
 #include "Dw/dwGuiButton.h"   // dwGuiTextButton/dwGuiClock (BUTTON_TEXT[_LEFT]/CLOCK)
+#include "Dw/dwControlPanel.h" // dwControlPanelHelpRect (HELPRECT)
+#include "Dw/dwGuiViewBox.h"  // dwGuiImage (IMAGE)
+#include "Dw/dwGuiTextMisc.h" // dwGuiTextPopup/dwGuiTimer (TEXTPOPUP/TIMER)
+#include "Dw/dwGuiWidgets.h"  // dwGuiScrollBar (SCROLLBAR)
+#include "Dw/dwGuiWidgetBar.h" // dwGuiWidgetBar (WIDGETBAR)
 
 #include "jk.h"
 #include "stdPlatform.h" // stdPlatform_Printf
@@ -416,20 +421,17 @@ extern "C" dwWidget* dwGuiScreen_CreateControl(char* pKeyword, dwConfFile* pConf
     {
         dwConfFile_ParseRect(pConf, &rect);
         dwConfFile_ParseULong(pConf, &param);
-        // TODO(dw-decomp): HELPRECT -> dwControlPanelHelpRect (unit dwControlPanel) —
-        // binary builds it INLINE: new(0x14) { dwWidget(&rect); msgParam@+0x10 = param;
-        // vptr = dwControlPanelHelpRect_vtbl@0x51e750 } (hover hotspot that
-        // notifies the help control).
-        return dwGuiScreen_StubControl("HELPRECT", "dwControlPanelHelpRect", "dwControlPanel");
+        // binary builds it INLINE: new(0x14) { dwWidget(&rect); helpCode@+0x10 =
+        // param; vptr = dwControlPanelHelpRect_vtbl@0x51e750 } (hover hotspot
+        // that notifies the help control).
+        return new dwControlPanelHelpRect(&rect, (int32_t)param);
     }
     if (dwString_Equals(pKeyword, "IMAGE"))
     {
         dwConfFile_ParseRect(pConf, &rect);
         pTok1 = dwConfFile_NextToken(pConf); // image name
-        (void)pTok1;
-        // TODO(dw-decomp): IMAGE -> dwGuiImage (unit dwGuiViewBox) —
         // binary: new(0x20) dwGuiImage_Ctor(&rect, imageName)
-        return dwGuiScreen_StubControl("IMAGE", "dwGuiImage", "dwGuiViewBox");
+        return new dwGuiImage(&rect, pTok1);
     }
     if (dwString_Equals(pKeyword, "INDICATOR"))
     {
@@ -491,10 +493,8 @@ extern "C" dwWidget* dwGuiScreen_CreateControl(char* pKeyword, dwConfFile* pConf
         dwConfFile_ParseLong(pConf, &l2);
         pTok1 = dwConfFile_NextToken(pConf);
         pTok2 = dwConfFile_NextToken(pConf);
-        (void)pTok1; (void)pTok2;
-        // TODO(dw-decomp): SCROLLBAR -> dwGuiScrollBar (unit dwGuiWidgets) —
         // binary: new(0x5c) dwGuiScrollBar_Ctor(&rect, u1, u2, u3, l1, l2, tok1, tok2)
-        return dwGuiScreen_StubControl("SCROLLBAR", "dwGuiScrollBar", "dwGuiWidgets");
+        return new dwGuiScrollBar(&rect, (int)u1, (int)u2, (int)u3, l1, l2, pTok1, pTok2);
     }
     if (dwString_Equals(pKeyword, "STATS_DROID"))
     {
@@ -749,11 +749,11 @@ dwWidget* dwGuiScreen::CreateControl(char* pKeyword, dwConfFile* pConf)
         pTokMid = dwConfFile_NextToken(pConf);
         pText3 = dwGuiScreen_LocalizeString(dwConfFile_NextToken(pConf), this->pStringTable);
         pTokEnd = dwConfFile_NextToken(pConf);
-        (void)pFontName; (void)pText1; (void)pText2; (void)pTokMid; (void)pText3; (void)pTokEnd;
-        // TODO(dw-decomp): TEXTPOPUP -> dwGuiTextPopup (unit dwGuiTextPopup/Slider) —
         // binary: new(0x78) dwGuiTextPopup_Ctor(&rect, pText1, fontName, colorA,
         //   colorB, cmdId, pText2, pTokMid, pText3, pTokEnd, 1)
-        return dwGuiScreen_StubControl("TEXTPOPUP", "dwGuiTextPopup", "dwGuiTextMisc");
+        return new dwGuiTextPopup(&rect, pText1, pFontName, (uint8_t)colorA,
+                                  (uint8_t)colorB, (int)cmdId, pText2, pTokMid,
+                                  pText3, pTokEnd, 1);
     }
     if (dwString_Equals(pKeyword, "TIMER"))
     {
@@ -766,13 +766,9 @@ dwWidget* dwGuiScreen::CreateControl(char* pKeyword, dwConfFile* pConf)
         pChild = this->CreateControl(pChildKeyword, pConf); // virtual recurse
         if (!pChild)
             return NULL;
-        // TODO(dw-decomp): TIMER -> dwGuiTimer decorator (unit dwGuiTextMisc) —
-        // binary: new(0x20) dwGuiTimer_Ctor(pChild, t0, t1) wrapping pChild
-        // (timed show/hide). Note: the stub deletes the freshly-built child
-        // instead of leaking it.
-        dwGuiScreen_StubControl("TIMER", "dwGuiTimer", "dwGuiTextMisc");
-        delete pChild;
-        return NULL;
+        // binary: new(0x20) dwGuiTimer_Ctor(pChild, t0, t1) — timed show/hide
+        // decorator; the timer OWNS (and deletes) the wrapped child.
+        return new dwGuiTimer(pChild, t0, t1);
     }
     if (dwString_Equals(pKeyword, "TUTORIAL"))
     {
@@ -793,15 +789,13 @@ dwWidget* dwGuiScreen::CreateControl(char* pKeyword, dwConfFile* pConf)
     if (dwString_Equals(pKeyword, "WIDGETBAR"))
     {
         uint32_t count = 0;
+        dwGuiWidgetBar* pBar;
         dwConfFile_ParseRect(pConf, &rect);
-        // TODO(dw-decomp): WIDGETBAR -> dwGuiWidgetBar (unit dwGuiWidgetBar) —
         // binary: new(0x18) dwGuiWidgetBar_Ctor(&rect), then per item line:
         // name token + localized text + token + 3 ulongs + a recursive child
-        // control -> dwGuiWidgetBar_AddItem(bar, child-or-plain-dwWidget,
-        // name, text, tok, (byte)u1, u2, u3).
-        dwGuiScreen_StubControl("WIDGETBAR", "dwGuiWidgetBar", "dwGuiWidgetBar");
-        // Note: consume the item lines faithfully so the rest of the script
-        // still parses; recursive children are built then discarded.
+        // control -> dwGuiWidgetBar_AddItem(bar, child, name, text, tok,
+        // (byte)u1, u2, u3).
+        pBar = new dwGuiWidgetBar(&rect);
         dwConfFile_ParseULong(pConf, &count);
         for (; count != 0; count--)
         {
@@ -822,11 +816,9 @@ dwWidget* dwGuiScreen::CreateControl(char* pKeyword, dwConfFile* pConf)
             dwConfFile_ParseULong(pConf, &u3);
             pChildKeyword = dwConfFile_NextToken(pConf);
             pChild = this->CreateControl(pChildKeyword, pConf);
-            (void)pItemName; (void)pItemText; (void)pTok; (void)u1; (void)u2; (void)u3;
-            if (pChild)
-                delete pChild;
+            pBar->AddItem(pChild, pItemName, pItemText, pTok, (uint8_t)u1, (int)u2, (int)u3);
         }
-        return NULL;
+        return pBar;
     }
 
     // everything else: the common screen-state-less factory

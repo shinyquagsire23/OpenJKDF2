@@ -9,6 +9,7 @@
 #include "Dw/dwSegment.h" // dwSegment_Startup/_Shutdown/_FreePlaylist (C view)
 #include "Dw/dwColormap.h"
 #include "Dw/dwFont.h"
+#include "Dw/dwControlPanel.h" // dwControlPanel_Startup (C view)
 #include "stdPlatform.h"
 #include "globals.h" // pHS
 
@@ -39,15 +40,6 @@ void dwDroidStats_AutoBuildRandom(int bodyType, dwListNode** ppWorkspaceList)
     (void)bodyType; (void)ppWorkspaceList;
     stdPlatform_Printf("TODO(dw-decomp): dwDroidStats_AutoBuildRandom stub (owner dwDroidStats P5)\n");
 }
-// owner: dwGuiTextMisc (P4 batch 2) — dwGuiTimer decorator factory (C shim
-// invented by the dwWorkshopCtrl unit; the dwGuiTextMisc agent must export
-// it). Stub returns the child unwrapped: shown always, no timed show/hide.
-dwWidget* dwGuiTimer_New(dwWidget* pTarget, float startTime, float duration)
-{
-    (void)startTime; (void)duration;
-    stdPlatform_Printf("TODO(dw-decomp): dwGuiTimer_New stub — child unwrapped (owner dwGuiTextMisc P4b2)\n");
-    return pTarget;
-}
 // ------------------------------------------------------------------
 
 static int dwMain_bInitted = 0;
@@ -76,6 +68,7 @@ int dwMain_Startup()
     dwSegment_Startup();
     dwColormap_Startup();
     dwFont_Startup();
+    dwControlPanel_Startup(); // binary: called from dw_Startup @419d40 (dw_aPartSlotColors fill)
     // Note: dwSound_Startup deferred to the P7 boot flow (spawns the worker
     // thread; the dwSound C API NULL-guards the manager until then).
 
