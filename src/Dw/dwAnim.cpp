@@ -16,13 +16,13 @@
 //    (P8). dwAnim::EnsureImages calls two placeholder factories at the
 //    bottom of this file that currently return NULL (frames stay empty,
 //    draw is skipped) — see the TODO(dw-decomp) block.
-//  - dwGuiAnimView::AddHypTextChild is stubbed pending dwGuiHypText (P4).
 //
 // No module statics — no Startup hook needed here (soft-reset rule).
 
 #include "Dw/dwAnim.h"
 
 #include "Dw/dwFlic.h"
+#include "Dw/dwGuiHypText.h"
 #include "Dw/dwImage.h"
 
 #include "jk.h"
@@ -509,9 +509,15 @@ void dwGuiAnimView::AddItem(const char* pAnimFile, int code, uint8_t flag,
     this->itemCount = this->itemCount + 1;
 }
 
-// @4032f0 (dwGuiAnimView_AddHypTextChild) — STUBBED pending dwGuiHypText.
+// @4032f0 (dwGuiAnimView_AddHypTextChild) — build a "BLN"-format (word-wrap,
+// left, normal glyphs) dwGuiHypText caption child and push-FRONT it onto the
+// group. param_4 is the glyph color index and param_5 the font name — kept
+// as ints to match the original decompiled signature (TODO(dw-decomp):
+// retype to (uint8_t color, char* pFontName) when the caller,
+// dwGuiReference_BuildAnimViewer, lands).
 void dwGuiAnimView::AddHypTextChild(char* pText, dwPoint pos, dwPoint size, int param_4, int param_5)
 {
+    dwGuiHypText* pChild;
     dwRect rect;
 
     // Child rect: (pos, size) relative to the GROUP rect origin.
@@ -520,18 +526,12 @@ void dwGuiAnimView::AddHypTextChild(char* pText, dwPoint pos, dwPoint size, int 
     rect.right = (int16_t)(size.x + rect.left);
     rect.bottom = (int16_t)(size.y + rect.top);
 
-    // TODO(dw-decomp): needs the dwGuiHypText unit (P4). Original sequence:
-    //   pChild = new(0x48) dwGuiHypText @438690 (&rect, 0, param_5, param_4, "BLN");
-    //   pChild->str_0x14.Free();          [drop the ctor's default text]
-    //   pChild->vtbl+0x48(pText);         [dwGuiHypText's first new virtual — set/parse the text]
-    //   children.InsertAfter(children.pSentinel, pChild);   [push-FRONT onto the group]
-    // Until it lands the child is not created (reference-room anim captions
-    // will be missing).
-    (void)pText;
-    (void)param_4;
-    (void)param_5;
-    (void)rect;
-    stdPlatform_Printf("TODO(dw-decomp): dwGuiAnimView::AddHypTextChild stubbed (needs dwGuiHypText @438690)\n");
+    // Note: the binary null-checked the 0x48 allocation and still inserted
+    // the NULL payload on failure; unreachable with new.
+    pChild = new dwGuiHypText(&rect, NULL, (char*)(uintptr_t)param_5, (uint8_t)param_4, (char*)"BLN"); // @438690
+    pChild->text.Free();     // drop any current text so SetText replaces (it appends)
+    pChild->SetText(pText);  // virtual +0x48
+    this->children.InsertAfter(this->children.pSentinel, pChild); // push-FRONT
 }
 
 // @4033d0 (dwGuiAnimView_InitFirstFrame)

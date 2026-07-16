@@ -106,6 +106,11 @@ void dwSegment_Startup(void);
 // the sentinel pointer is left dangling like the binary — atexit there). @433e80
 void dwSegment_FreePlaylist(void);
 
+// Nonzero when no recorded-input cues are pending (playlist empty or not yet
+// allocated). Note: no binary counterpart — dwGuiScreen's tutorial auto-exit
+// read the playlist sentinel global directly; it is module-static here.
+int dwSegment_IsPlaylistEmpty(void);
+
 // Sets the quit flag returned by dwSegment_Tick. @433f00
 void dwSegment_SignalQuit(void);
 

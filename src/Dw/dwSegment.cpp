@@ -228,6 +228,14 @@ void dwSegment_FreePlaylist(void)
     }
 }
 
+// Note: no binary counterpart — accessor over the static cue sentinel for
+// dwGuiScreen's tutorial auto-exit check (the binary read the playlist global
+// @0x53e858 directly; the sentinel is module-static here).
+int dwSegment_IsPlaylistEmpty(void)
+{
+    return dwSegment_pCueList == NULL || dwSegment_pCueList->pNext == dwSegment_pCueList;
+}
+
 // @433f00
 void dwSegment_SignalQuit(void)
 {

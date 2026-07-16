@@ -73,6 +73,11 @@ typedef struct dwWidgetMsg
 // msg, i.e. originally a dwWidgetMsg method)
 uint32_t dwWidget_DispatchMsg(void* pMsg, void* pOverrideWidget);
 
+// Note: no binary counterpart — resets the module globals/statics for
+// OpenJKDF2's soft-reset loop (closes a live recording, uninstalls a stale
+// msg handler if any widget leaked). C linkage so dwMain.c can wire it.
+void dwWidget_Startup(void);
+
 #ifdef __cplusplus
 } // extern "C"
 
@@ -175,11 +180,6 @@ void dwWidget_RecordEvent(char evt, uint32_t a, uint32_t b);
 // mouse target, presents on WM_PAINT, and toggles the recorder on
 // Ctrl+Shift+WM_RBUTTONDOWN. Always returns 0. @4425e0
 int dwWidget_MsgHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, LRESULT* pResult);
-
-// Note: no binary counterpart — resets the module globals/statics for
-// OpenJKDF2's soft-reset loop (closes a live recording, uninstalls a stale
-// msg handler if any widget leaked).
-void dwWidget_Startup();
 
 #endif // __cplusplus
 
