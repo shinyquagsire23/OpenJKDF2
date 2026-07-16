@@ -15,6 +15,7 @@
 #include "Dw/dwCog.h"       // dwCog_Startup
 #include "Dw/dwCamera.h"    // dwCamera_Startup
 #include "Dw/dwLaser.h"     // dwLaser_Startup
+#include "Dw/dwDroidStats.h" // dwDroidStats_Startup (C view)
 #include "stdPlatform.h"
 #include "globals.h" // pHS
 
@@ -41,12 +42,6 @@ int dwGuiDialog_RunModal(const char* pConfName, const char* pMsgKey)
 {
     stdPlatform_Printf("TODO(dw-decomp): dwGuiDialog_RunModal(%s, %s) stub -> NO (owner dwGuiMission P6)\n", pConfName, pMsgKey);
     return 5001;
-}
-// owner: dwDroidStats (P5, agent in flight) @40fae0 — random-droid generator; stub no-op.
-void dwDroidStats_AutoBuildRandom(int bodyType, dwListNode** ppWorkspaceList)
-{
-    (void)bodyType; (void)ppWorkspaceList;
-    stdPlatform_Printf("TODO(dw-decomp): dwDroidStats_AutoBuildRandom stub (owner dwDroidStats P5)\n");
 }
 // owner: dwGuiInGame (P6) — HUD voice line + Cammy caption / console line /
 // per-frame SCREEN_SIZE viewport control callback (registered by dwSith_Startup).
@@ -121,6 +116,7 @@ int dwMain_Startup()
     dwCog_Startup();
     dwCamera_Startup();
     dwLaser_Startup();
+    dwDroidStats_Startup();
     // Note: dwSound_Startup deferred to the P7 boot flow (spawns the worker
     // thread; the dwSound C API NULL-guards the manager until then).
     // Note: dwSith_Startup is NOT a statics reset — it is DW's sith engine
