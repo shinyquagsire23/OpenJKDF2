@@ -16,6 +16,12 @@
 #include "Dw/dwCamera.h"    // dwCamera_Startup
 #include "Dw/dwLaser.h"     // dwLaser_Startup
 #include "Dw/dwDroidStats.h" // dwDroidStats_Startup (C view)
+#include "Dw/dwWorkshop.h"  // dwWorkshop_Startup (C view)
+#include "Dw/dwWorkshopDroidEditor.h" // dwWorkshopDroidEditor_Startup (C view)
+#include "Dw/dwGuiMission.h" // dwGuiMission_Startup (C view)
+#include "Dw/dwGuiOptions.h" // dwGuiOptions_Startup (C view)
+#include "Dw/dwGuiCredits.h" // dwGuiCredits_Startup (C view)
+#include "Dw/dwEnding.h"    // dwEnding_Startup (C view)
 #include "stdPlatform.h"
 #include "globals.h" // pHS
 
@@ -36,13 +42,15 @@ uint8_t dwMain_bFullRedraw = 0;                             // owner: dwMain P7 
 dwListNode* dwCore_pBlueprintList = NULL;                   // owner: dw core P7 (@0x53d964); consumers (dwWcBlueprints) unreachable until the boot flow exists
 dwListNode* dwCore_pWorkspaceNodes = NULL;                  // owner: dw core P7 (@0x53d984); same
 dwListNode* dwCore_pMissionList = NULL;                     // owner: dw core P7 (@0x53d95c); consumers (dwPlayer .plr MISSIONS, dwGuiScreen cheats) NULL-guard / unreachable
-// owner: dwGuiMission (P6) @41c0f0 — modal yes/no dialog; 5000 = YES / 5001 = NO.
-// Stub answers NO (the safe default for "randomize droid?"-style confirms).
-int dwGuiDialog_RunModal(const char* pConfName, const char* pMsgKey)
-{
-    stdPlatform_Printf("TODO(dw-decomp): dwGuiDialog_RunModal(%s, %s) stub -> NO (owner dwGuiMission P6)\n", pConfName, pMsgKey);
-    return 5001;
-}
+typedef struct dwMission dwMission;                         // C++ class (Dw/dwMission.h); opaque here
+dwMission* dwCore_pCurrentMission = NULL;                   // owner: dw core P7 (@0x53d954); the selected mission record (declared in Dw/dwMission.h)
+// owner: dwGuiInGame (P6 wave 2) — mission-screen factory (returns the dwSegment
+// subobject of new(0x284) dwGuiInGame_Ctor@41f2a0) + assembled-droid check @41f6f0.
+// The wave-2 agent must export exactly these two symbols (delete these then).
+dwSegment* dwGuiInGame_New(dwMission* pMission) { (void)pMission; return NULL; }
+int dwGuiInGame_CheckDroidValid(void) { return 0; }
+typedef struct dwGuiInGame dwGuiInGame;                     // C++ class; opaque here
+dwGuiInGame* dwGuiInGame_pActive = NULL;                    // owner: dwGuiInGame P6 wave 2 (@0x53e800); running-mission screen or NULL
 // owner: dwGuiInGame (P6) — HUD voice line + Cammy caption / console line /
 // per-frame SCREEN_SIZE viewport control callback (registered by dwSith_Startup).
 void dwGuiInGame_PlayVoiceLine(const char* pCammyText, const char* pWavName, uint32_t priority)
@@ -74,12 +82,6 @@ void dwMain_MaterialCache_RecolorMasked(rdMaterial* pMaterial, int matchColor, i
 }
 void dwMain_MaterialCache_Disable(void) {}
 void dwMain_MaterialCache_Enable(void) {}
-// owner: dwGuiMission (P6) — mission-flow segment factories (link-only until
-// the dwGuiScreen msg-0x66 branch is wired; dwMissionSequence::Activate is
-// unreachable before then).
-dwSegment* dwMissionTransIn_New(dwImage* pBgImage) { (void)pBgImage; return NULL; }
-dwSegment* dwGuiMissionMap_New(dwImage* pBgImage) { (void)pBgImage; return NULL; }
-dwSegment* dwMissionTransOut_New(dwImage* pBgImage) { (void)pBgImage; return NULL; }
 // ------------------------------------------------------------------
 
 static int dwMain_bInitted = 0;
@@ -117,6 +119,12 @@ int dwMain_Startup()
     dwCamera_Startup();
     dwLaser_Startup();
     dwDroidStats_Startup();
+    dwWorkshop_Startup();
+    dwWorkshopDroidEditor_Startup();
+    dwGuiMission_Startup();
+    dwGuiOptions_Startup();
+    dwGuiCredits_Startup();
+    dwEnding_Startup();
     // Note: dwSound_Startup deferred to the P7 boot flow (spawns the worker
     // thread; the dwSound C API NULL-guards the manager until then).
     // Note: dwSith_Startup is NOT a statics reset — it is DW's sith engine

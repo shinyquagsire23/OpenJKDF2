@@ -41,12 +41,10 @@ extern "C" {
 
 extern "C" HostServices* dwMain_pHS; // the DW host-services pointer (dwMain.c)
 
-// TODO(dw-decomp): provided by dwWidget (P3). Binary @0x444d00 (currently
-// mislabeled stdBitmapRle_FUN_00444d00): the shared dwWidget OnMessage
-// dispatcher — sends pMsg to pOverrideWidget / pMsg's own widget /
-// dwWidget_pDefault via vtbl+0x1c. dwSound::Update calls it with
-// (pSample->pFinishMsg, NULL) when a voice with a finish message is reaped.
-extern "C" uint32_t dwWidget_DispatchMsg(void* pMsg, void* pOverrideWidget);
+// dwWidget (P3, landed): dwWidgetMsg + the shared OnMessage dispatcher
+// (binary @0x444d00). dwSound::Update builds a { code, pSample, 0, NULL }
+// stack msg when a voice with a finish message CODE is reaped.
+#include "Dw/dwWidget.h"
 
 // ---------------------------------------------------------------------------
 // Module state
@@ -942,7 +940,17 @@ void dwSound::Update(float clockSec_)
         {
             stdSound_BufferReset(pSample->pBuffer);
             if (pSample->pFinishMsg != NULL)
-                dwWidget_DispatchMsg(pSample->pFinishMsg, NULL); // binary @444d00
+            {
+                // binary @446093: the field is the finish message CODE (int in
+                // the pointer slot); the reap builds a stack msg with the
+                // sample as sender and dispatches THAT (not the field itself).
+                dwWidgetMsg finishMsg;
+                finishMsg.code = (int32_t)(intptr_t)pSample->pFinishMsg;
+                finishMsg.pSender = pSample;
+                finishMsg.param = 0;
+                finishMsg.pTarget = NULL;
+                dwWidget_DispatchMsg(&finishMsg, NULL); // binary @444d00
+            }
             this->activeVoices.UnlinkFreeNode(pNode);
         }
     }

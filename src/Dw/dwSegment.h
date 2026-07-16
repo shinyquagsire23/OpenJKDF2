@@ -114,6 +114,10 @@ int dwSegment_IsPlaylistEmpty(void);
 // Sets the quit flag returned by dwSegment_Tick. @433f00
 void dwSegment_SignalQuit(void);
 
+// Added: clears the quit flag (no binary function — dwGuiOptions cmd 6000+0xa
+// stores 0 straight to the flag @0x53e8ac; it is module-static here).
+void dwSegment_CancelQuit(void);
+
 // Ends the overlay (if any), deactivates + releases the active segment, then
 // pops/deactivates/releases everything still on the pending stack. @433f10
 void dwSegment_Shutdown(void);

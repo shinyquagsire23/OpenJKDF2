@@ -48,9 +48,19 @@ struct dwMissionObjective
 struct dwMission
 {
     uint8_t bUnlocked;       // 0x00: available on the map (init: missionType == DW_MISSION_NORMAL; .plr-persisted)
-    uint8_t bDone;           // 0x01: completed (.plr-persisted)
+    uint8_t bDone;           // 0x01: .plr-persisted "<done>" flag — set by
+                             //       dwGuiMissionMap msg 0xBBA when the BRIEFING
+                             //       is shown; gates deploy (BeginDeploy refuses +
+                             //       blinks the BRIEFING button while 0)
     int32_t missionType;     // 0x04: dwMissionType keyword (0 when none given)
-    uint8_t rank;            // 0x08: earned rank (.plr-persisted)
+    uint8_t rank;            // 0x08: earned rank, 0 = none / 1 = Scavenger /
+                             //       2 = Apprentice / 3 = Master (.plr-persisted;
+                             //       dwGuiObjectiveBtn's icon table order).
+                             //       DUAL USE as an index: min(rank, 2) selects
+                             //       the aRewards/REWARD slot (0xBBC handlers:
+                             //       dwGuiPartText/dwGuiDroidPreview/PARTTEXT) and
+                             //       rank < 3 selects the aVideoNames/VIDEO
+                             //       briefing (else Master.brf)
     dwString name;           // 0x0c: id token ("BEGIN <name>"; matched by dwPlayer_LoadPlr)
     dwString displayName;    // 0x18: NAME <rest of line>
     dwString briefing;       // 0x24: BRIEFING <rest of line> (.brf key)
@@ -106,6 +116,13 @@ enum dwMissionType
 // sentinel (@0x53d95c/0x53d990 region; dwList of dwMission*), filled by
 // dw_Startup from *.MIS. Declared here so consumers share one declaration.
 extern dwListNode* dwCore_pMissionList;
+
+// TODO(dw-decomp): provided by dw core (P7) — the currently selected mission
+// (@0x53d954; written by dwGuiMissionMap_SelectObjective, read by the
+// map/briefing controls, dwGuiInGame and dwGuiStatus). Declared here so
+// consumers share one declaration; defined as a dwMain.c placeholder until
+// the P7 boot flow owns it.
+extern dwMission* dwCore_pCurrentMission;
 
 // Parse ONE mission record out of pConf (positioned ON the "BEGIN <name>"
 // line: the name is the next token) until its END line. Returns pMission.

@@ -17,8 +17,8 @@
 //    computed as x + 0.5 (FSUB of a -0.5 double) before the truncation, i.e.
 //    round-half-up for positive values. Mirrored with double math + C casts.
 //  - dwGuiPartText's part-name lookups use the real dwPart layouts (P5,
-//    Dw/dwPart.h); the 0xBBC sender is viewed via dwMissionInfoView until
-//    dwGuiMission (P6) lands the real record — see the view's TODO below.
+//    Dw/dwPart.h); the 0xBBC sender is the real dwMission record (P6
+//    dwGuiMission landed it — Dw/dwMission.h).
 //  - ctype calls (toupper/isdigit/isspace) use the (unsigned char) cast per
 //    the dwFont.c/dwConfFile.cpp precedent; the binary sign-extended the
 //    char into the CRT table lookups.
@@ -34,30 +34,11 @@
 
 #include <ctype.h>
 
-#include "Dw/dwPart.h" // dwPart blueprint records + dwPart_FindBlueprint (P5)
-
-// The 0xBBC part-selection broadcast's SENDER is a dwMissionInfo record
-// (owner: dwGuiMission, P6 — dwMission_ParseInfo @41c530 parses it). Only a
-// read-only view is declared here, with the record's leading members in
-// BINARY ORDER (offsets are the 32-bit binary's).
-// TODO(dw-decomp): replace with the real dwMissionInfo when dwGuiMission
-// (P6) lands — that unit MUST declare these leading members in this order
-// (dwGuiDroidPreview's 0xBBC handler reads the same two fields).
-typedef struct dwMissionInfoView
-{
-    int32_t bValid;             // 0x00
-    int32_t missionType;        // 0x04: DEPLOYMENT=5/SECRET=1/FINAL=2/CRYSTAL=3/TGROUND=4
-    uint8_t rewardIdx;          // 0x08: selected REWARD slot (read as a byte,
-                                //       clamped to 2; Ghidra leaves it unnamed)
-    dwString name;              // 0x0c: record id
-    dwString displayName;       // 0x18: NAME keyword
-    dwString briefing;          // 0x24: BRIEFING keyword
-    dwString aRequirements[3];  // 0x30: REQUIREMENT keyword
-    dwString voiceover;         // 0x54: VOICEOVER keyword
-    dwPoint mapPoint;           // 0x60: DEPLOYMENT map point
-    dwList objectives;          // 0x64: objective records
-    dwString aRewardParts[3];   // 0x68: REWARD part blueprint names
-} dwMissionInfoView;
+#include "Dw/dwPart.h"    // dwPart blueprint records + dwPart_FindBlueprint (P5)
+#include "Dw/dwMission.h" // dwMission record — the 0xBBC broadcast's SENDER
+                          // (P6 dwGuiMission: the sender is the objective
+                          // button's dwMission*; byte 0x08 is the earned RANK,
+                          // doubling as the REWARD slot index — see dwMission.h)
 
 // ---- line-run ring helpers (binary: inlined at every use site) --------------
 
@@ -817,20 +798,20 @@ dwGuiPartText::~dwGuiPartText()
 // message keeps broadcasting).
 int dwGuiPartText::OnMessage(dwWidgetMsg* pMsg)
 {
-    dwMissionInfoView* pSender;
+    dwMission* pSender;
     dwPart* pPart;
     uint8_t slot;
 
     if (pMsg->code == 0xBBC && pMsg->pSender != NULL)
     {
-        // Binary: slot = byte @sender+0x08 clamped to 2; name = the sender's
-        // REWARD part-name array entry (dwString[3] @0x68, pBuffer read);
-        // then show the blueprint's display name.
-        pSender = (dwMissionInfoView*)pMsg->pSender;
-        slot = pSender->rewardIdx;
+        // Binary: slot = the mission's earned rank (byte @0x08) clamped to 2;
+        // name = its REWARD part-name entry (aRewards[3] @0x68, pBuffer
+        // read); then show the blueprint's display name.
+        pSender = (dwMission*)pMsg->pSender;
+        slot = pSender->rank;
         if (slot > 2)
             slot = 2;
-        pPart = dwPart_FindBlueprint(pSender->aRewardParts[slot].pBuffer);
+        pPart = dwPart_FindBlueprint(pSender->aRewards[slot].pBuffer);
         if (pPart != NULL)
         {
             this->text.Free();

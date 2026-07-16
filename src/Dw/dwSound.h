@@ -51,8 +51,9 @@ struct dwSoundSample
     // (vtable @0x00)
     dwString name;             // 0x04: the load name (also the cache hash key)
     stdSound_buffer_t* pBuffer;// 0x10: NULL when the WAV failed to load
-    void* pFinishMsg;          // 0x14: optional dwMsg*, dispatched to its widget
-                               //       by dwSound::Update when the voice ends
+    void* pFinishMsg;          // 0x14: finish message CODE (int stored in the
+                               //       pointer slot); dwSound::Update dispatches
+                               //       { code, pSample, 0, NULL } when the voice ends
     uint8_t bPlaying;          // 0x18
     uint8_t bLooping;          // 0x19
     float curVolume;           // 0x1c

@@ -242,6 +242,13 @@ void dwSegment_SignalQuit(void)
     dwSegment_bQuit = 1;
 }
 
+// Added: clear the quit flag (no binary function — dwGuiOptions_OnMessage
+// cmd 6000+0xa stores 0 straight to 0x53e8ac; the flag is static here).
+void dwSegment_CancelQuit(void)
+{
+    dwSegment_bQuit = 0;
+}
+
 // @433f10
 void dwSegment_Shutdown(void)
 {

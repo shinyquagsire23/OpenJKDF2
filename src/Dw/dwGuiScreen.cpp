@@ -45,6 +45,8 @@
 #include "Dw/dwGuiTextMisc.h" // dwGuiTextPopup/dwGuiTimer (TEXTPOPUP/TIMER)
 #include "Dw/dwGuiWidgets.h"  // dwGuiScrollBar (SCROLLBAR)
 #include "Dw/dwGuiWidgetBar.h" // dwGuiWidgetBar (WIDGETBAR)
+#include "Dw/dwMission.h"     // dwMissionSequence (msg 0x66)
+#include "Dw/dwGuiOptions.h"  // dwGuiRanking (STATS_JOB) + dwGuiOptions_NewEnterSeg (msg 0x65)
 
 #include "jk.h"
 #include "stdPlatform.h" // stdPlatform_Printf
@@ -517,10 +519,9 @@ extern "C" dwWidget* dwGuiScreen_CreateControl(char* pKeyword, dwConfFile* pConf
         dwConfFile_ParseULong(pConf, &v1);
         pTok2 = dwConfFile_NextToken(pConf);
         dwConfFile_ParseULong(pConf, &v2);
-        (void)pTok1; (void)pTok2;
-        // TODO(dw-decomp): STATS_JOB -> dwGuiRanking (unit dwGuiOptions) —
-        // binary: new(0x38) dwGuiRanking_Ctor(&rect, tok1, v1, tok2, v2)
-        return dwGuiScreen_StubControl("STATS_JOB", "dwGuiRanking", "dwGuiOptions");
+        // dwGuiRanking (unit dwGuiOptions, landed) — binary new(0x38)
+        // dwGuiRanking_Ctor(&rect, tok1, v1, tok2, v2).
+        return new dwGuiRanking(&rect, pTok1, (uint8_t)v1, pTok2, (uint8_t)v2);
     }
     if (dwString_Equals(pKeyword, "STATS_PART"))
     {
@@ -998,19 +999,15 @@ int dwGuiScreen::OnMessage(dwWidgetMsg* pMsg)
         switch (code)
         {
         case 0x65:
-            // TODO(dw-decomp): 0x65 -> dwGuiOptions enter segment (unit
-            // dwGuiOptions) — binary: new(0x1c) { dwSegment_Ctor; +0x14 = 0;
-            // +0x18 = 0; vptr = dwGuiOptions_EnterSeg_vtbl } (plays OStart.san
-            // then pushes the options screen).
-            stdPlatform_Printf("TODO(dw-decomp): dwGuiScreen msg 0x65 -> dwGuiOptions enter segment (unit dwGuiOptions) not translated yet\n");
+            // dwGuiOptions enter segment (unit dwGuiOptions, landed): plays
+            // OStart.san then pushes the options screen.
+            pSeg = dwGuiOptions_NewEnterSeg(0);
             break;
         case 0x66:
             this->pSnapshotImage = dwGuiScreen_CaptureShadedScreen();
-            // TODO(dw-decomp): 0x66 -> dwMissionSequence segment (unit
-            // dwGuiMission) — binary: new(0x1c) { dwSegment_Ctor; +0x14 =
-            // pSnapshotImage; +0x18 = 0; vptr = 0x51f7d8 (Activate =
-            // dwMissionSequence_Advance, the workshop<->mission sequencer) }.
-            stdPlatform_Printf("TODO(dw-decomp): dwGuiScreen msg 0x66 -> dwMissionSequence segment (unit dwGuiMission) not translated yet\n");
+            // dwMissionSequence (unit dwGuiMission, landed): the
+            // workshop<->mission sequencer — binary new(0x1c) + vtbl 0x51f7d8.
+            pSeg = static_cast<dwSegment*>(new dwMissionSequence(this->pSnapshotImage));
             break;
         case 0x67:
             // TODO(dw-decomp): 0x67 -> dwGuiInGame final-mission deploy (unit
