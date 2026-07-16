@@ -202,6 +202,7 @@ endif()
 file(GLOB ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/*.c
                        ${PROJECT_SOURCE_DIR}/src/*/*.c
                        ${PROJECT_SOURCE_DIR}/src/General/*.cpp
+                       ${PROJECT_SOURCE_DIR}/src/Dw/*.cpp
                        ${PROJECT_SOURCE_DIR}/src/Platform/Common/*.c
                        ${PROJECT_SOURCE_DIR}/src/Platform/Common/*.cpp)
 
@@ -229,7 +230,7 @@ endif()
 # now — retro targets can't afford the extra RAM/code and Main_bDroidWorks is
 # never set there.
 if(TARGET_TWL OR TARGET_DREAMCAST)
-    file(GLOB DW_SRCS ${PROJECT_SOURCE_DIR}/src/Dw/*.c)
+    file(GLOB DW_SRCS ${PROJECT_SOURCE_DIR}/src/Dw/*.c ${PROJECT_SOURCE_DIR}/src/Dw/*.cpp)
     if(DW_SRCS)
         list(REMOVE_ITEM ENGINE_SOURCE_FILES ${DW_SRCS})
     endif()
@@ -264,6 +265,7 @@ include(cmake_modules/precompile_globals.cmake)
 file(GLOB ENGINE_SOURCE_FILES_REGLOB ${PROJECT_SOURCE_DIR}/src/*.c
                        ${PROJECT_SOURCE_DIR}/src/*/*.c
                        ${PROJECT_SOURCE_DIR}/src/General/*.cpp
+                       ${PROJECT_SOURCE_DIR}/src/Dw/*.cpp
                        ${PROJECT_SOURCE_DIR}/src/Platform/*/*.c
                        ${PROJECT_SOURCE_DIR}/src/Platform/*/*/*.c
                        ${PROJECT_SOURCE_DIR}/src/Platform/*/*.cpp
