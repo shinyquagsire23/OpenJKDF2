@@ -77,6 +77,10 @@ void dwPlayer_SavePlr(void);
 // dwString*), then drop any entry lacking <name>\<name>.plr. @429950
 void dwPlayer_EnumProfiles(dwList* pOutList);
 
+// Added (P7 boot): build dwPlayer_basePath = (installPath||workingDir) + name + '\'.
+// See dwPlayer.cpp. Call before dwPlayer_EnumProfiles when dw_Startup hasn't run.
+void dwPlayer_SetupBasePath(const char* pPlayerDirName);
+
 #ifdef __cplusplus
 }
 #endif

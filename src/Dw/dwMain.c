@@ -8,6 +8,7 @@
 #include "Dw/dwWidget.h" // dwWidget_Startup (C view)
 #include "Dw/dwSegment.h" // dwSegment_Startup/_Shutdown/_FreePlaylist (C view)
 #include "Dw/dwColormap.h"
+#include "Dw/dwImage.h"     // dwImage_InitNullVtable (boot flow)
 #include "Dw/dwFont.h"
 #include "Dw/dwControlPanel.h" // dwControlPanel_Startup (C view)
 #include "Dw/dwPart.h"      // dwPart_Startup (C view)
@@ -119,7 +120,6 @@ void dwMain_MaterialCache_Enable(void) {}
 // ------------------------------------------------------------------
 
 static int dwMain_bInitted = 0;
-static int dwMain_bPrintedStub = 0;
 // P7 seam: the boot flow (dw_Startup) sets this after pushing the initial
 // segment(s) + dwSegment_RequestAdvance. Until then dwMain_GuiAdvance must NOT
 // call dwSegment_Tick — dwSegment_bQuit starts 0 (= quit), so ticking an
@@ -130,7 +130,6 @@ int dwMain_Startup()
 {
     // Statics reset (soft-reset loop rule)
     dwMain_bInitted = 0;
-    dwMain_bPrintedStub = 0;
     dwMain_bBooted = 0;
     dwMain_pHS = pHS; // TODO(dw-decomp): becomes the DW-owned HostServices (dw_hostServices) in P7
 
@@ -197,32 +196,76 @@ void dwMain_Shutdown()
     dwFont_Shutdown();
     inits_Shutdown();
     dwMain_bInitted = 0;
-    dwMain_bPrintedStub = 0;
+    dwMain_bBooted = 0;
+}
+
+// Added (P7): the DroidWorks app boot flow — the OpenJKDF2 mapping of the
+// binary's StartOpeningCutscenes @0x41b530 (which dwMain_Run ran after the OS
+// window was created). The engine's Main_Startup already brought up the SDL
+// window + stdDisplay, the renderer (rdStartup), the VFS (inits_Startup, via
+// dwMain_Startup) and stdSound — so this does only the DW-specific steps:
+// install the dwImage null vtable, open the DW display surface (mapped onto the
+// engine's Video buffers via dwDisplay_SetMode), set the palette, arm the
+// segment keep-running flag, and push the first app segment.
+//
+// Runs lazily on the FIRST dwMain_GuiAdvance tick (not in dwMain_Startup): by
+// then the engine's main loop + Window draw handlers are live, which
+// dwDisplay_Present's flip (stdDisplay_DDrawGdiSurfaceFlip) needs.
+static void dwMain_BootFlow(void)
+{
+    // Set first so a mid-boot failure can't respin the flow every frame.
+    dwMain_bBooted = 1;
+
+    // dwImage null-vtable (HostServices print stubs) — StartOpeningCutscenes step.
+    dwImage_InitNullVtable(dwMain_pHS);
+
+    // Bring up the DW display: a software 8bpp surface wrapped over
+    // Video_otherBuf/Video_menuBuffer + the "opening.cmp" boot colormap.
+    if (!dwDisplay_Open("opening.cmp")) {
+        stdPlatform_Printf("OpenJKDF2: dwMain_BootFlow — dwDisplay_Open(\"opening.cmp\") failed; DW display not up\n");
+    }
+    // Binary passes the BRIGHTNESS gamma index through the pointer arg.
+    dwColormap_SetDisplayPalette((void*)(intptr_t)dw_settingBrightness);
+
+    // Arm the segment loop: dwSegment_SignalQuit sets dwSegment_bQuit=1, the
+    // keep-running value dwSegment_Tick returns (StartOpeningCutscenes did this
+    // before pushing any segment).
+    dwSegment_SignalQuit();
+
+    // dw_Startup normally builds dwPlayer_basePath (profile enumeration needs
+    // it). Do the minimal construction here until the full dw_Startup lands.
+    // TODO(dw-decomp) P7: dw_Startup loads global.txt + reads PLAYER_DIR.
+    dwPlayer_SetupBasePath("Player");
+
+    // Push the first app segment + advance so the next tick activates it.
+    // TODO(dw-decomp) P7: the binary pushes the dwApp boot segment (Activate =
+    // dw_Startup @419bd0: load global.txt, enum *.PLS blueprints + *.MIS
+    // missions, push the workshop singleton, then dwGuiIntroSeg/OptionsEnterSeg)
+    // plus the droids.san/LLLogo.san opening movies. Until dw_Startup lands we
+    // push the options enter-sequencer directly so the menu flow is reachable
+    // for SDL bring-up testing.
+    dwSegment_Push(dwGuiOptions_NewEnterSeg(0));
+    dwSegment_RequestAdvance();
+
+    stdPlatform_Printf("OpenJKDF2: dwMain_BootFlow — DW display up, options enter-seg pushed (P7 boot draft)\n");
 }
 
 void dwMain_GuiAdvance()
 {
-    // Added (P7 draft — main-loop hookup): the engine's outer Window/SDL loop
-    // calls jkMain_GuiAdvance -> here once per frame (this REPLACES DroidWorks'
-    // own WinMain message pump, binary Window_sub_506FC0 driven by dwMain_Run
-    // @41b250). Body mirrors dwMain_MainLoopTick @41b6d0: tick the active
-    // segment stack for one frame; a false (0) return means quit was requested
-    // (the binary calls DestroyWindow) — we ask the engine's loop to unwind via
-    // g_should_exit instead.
+    // Added (P7 — main-loop hookup): the engine's outer Window/SDL loop calls
+    // jkMain_GuiAdvance -> here once per frame (REPLACING DroidWorks' own WinMain
+    // message pump, binary Window_sub_506FC0 driven by dwMain_Run @41b250). Body
+    // mirrors dwMain_MainLoopTick @41b6d0: tick the active segment stack for one
+    // frame; a false (0) return means quit was requested (the binary calls
+    // DestroyWindow) — we ask the engine's loop to unwind via g_should_exit.
     //
     // NOTE: input pumping + the SDL event loop are already owned by the engine
     // (Window/stdControl feed jkMain), so this side only advances the DW
-    // segment/present pipeline. dwSegment_Tick handles input-cue replay,
-    // segment Update, and presentation internally.
+    // segment/present pipeline. dwSegment_Tick handles input-cue replay, segment
+    // Update, and presentation internally.
     if (!dwMain_bBooted) {
-        // Boot flow (dw_Startup: build blueprints/missions, push the workshop +
-        // intro/options boot segments, RequestAdvance) is still P7. Until it
-        // runs there is nothing to tick and dwSegment_bQuit==0 would quit.
-        if (!dwMain_bPrintedStub) {
-            stdPlatform_Printf("OpenJKDF2: dwMain_GuiAdvance ready — awaiting P7 dw_Startup boot flow (segment stack empty)\n");
-            dwMain_bPrintedStub = 1;
-        }
-        return;
+        dwMain_BootFlow();  // opens the DW display + pushes the first segment
+        return;             // next frame begins ticking the segment stack
     }
 
     if (!dwSegment_Tick())

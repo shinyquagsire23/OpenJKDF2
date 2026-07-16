@@ -21,6 +21,7 @@
 #include "Dw/dwSound.h"
 #include "Dw/dwGuiWidgets.h" // dwGuiWidgets_Write/ReadDroidFile (WORKSPACE section)
 #include "stdPlatform.h"
+#include "General/stdFileUtil.h" // stdFileUtil_MkDir (dwPlayer_SetupBasePath; has own guards)
 
 extern "C" {
 #include "Devices/sithSoundMixer.h" // sithSoundMixer_UpdateMusicVolume (no guards of its own)
@@ -58,6 +59,22 @@ extern "C" {
 dwString dwPlayer_name;       // @0x53d900 (CRT static ctor dwCore_PlayerNameInit@4113b0)
 dwString dwPlayer_basePath;   // @0x53d8f0 (dwCore_PlayerBasePathInit@411430; dw_Startup fills it)
 dwString dwPlayer_profileDir; // @0x53d930 (dwCore_PlayerProfileDirInit@411470)
+
+// Added (P7 boot): construct dwPlayer_basePath the way dw_Startup @419bd0 does —
+// (installPath || workingDir) + the player-dir name + '\'. The binary sources
+// the dir name from global.txt's PLAYER_DIR; until the boot flow loads global.txt
+// callers pass the DW default "Player".
+// TODO(dw-decomp) P7: fold into the real dw_Startup and read PLAYER_DIR from
+// dwCore_pGlobalStrings.
+extern "C" void dwPlayer_SetupBasePath(const char* pPlayerDirName)
+{
+    dwPlayer_basePath.AssignString(&dwCore_installPath);
+    if (dwPlayer_basePath.length == 0)
+        dwPlayer_basePath.AssignString(&dwCore_workingDir);
+    dwPlayer_basePath.Append(pPlayerDirName, 0); // len 0 = strlen
+    stdFileUtil_MkDir(dwPlayer_basePath.pBuffer);
+    dwPlayer_basePath.Append("\\", 1);
+}
 
 // Shared settings — defaults from the binary's .data initializers @0x527d50.
 uint8_t dw_settingShowText = 1;      // @0x527d50
