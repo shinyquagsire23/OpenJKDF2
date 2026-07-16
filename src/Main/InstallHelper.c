@@ -50,6 +50,16 @@ const char* aRequiredAssetsMots[] = {
 
 const size_t aRequiredAssetsMots_len = sizeof(aRequiredAssetsMots) / sizeof(const char*);
 
+// TODO: Investigate full minimum assets
+const char* aRequiredAssetsDroidworks[] = {
+    "dwCD.GOB",
+    "dwHD.GOB",
+    "dwMin.GOB",
+    "dwStream.GOB",
+};
+
+const size_t aRequiredAssetsDroidworks_len = sizeof(aRequiredAssetsDroidworks) / sizeof(const char*);
+
 // Maps an asset path as it exists in an installed game directory to its
 // location within the GAMEDATA folder of an install disk.
 const char* aDiskAssetMap[] = {
@@ -81,8 +91,8 @@ const char* InstallHelper_DiskAssetPath(const char* pName)
 
 #define BUF_SIZE 65536 //2^16
 
-#define INSTALL_APPDATA_FOLDER_NAME (Main_bMotsCompat ? "openjkmots" : "openjkdf2")
-#define INSTALL_OVERRIDE_ENVVAR_NAME (Main_bMotsCompat ? "OPENJKMOTS_ROOT" : "OPENJKDF2_ROOT")
+#define INSTALL_APPDATA_FOLDER_NAME (Main_bMotsCompat ? "openjkmots" : Main_bDroidWorks ? "opendroidworks" : "openjkdf2")
+#define INSTALL_OVERRIDE_ENVVAR_NAME (Main_bMotsCompat ? "OPENJKMOTS_ROOT" : Main_bDroidWorks ? "OPENDROIDWORKS_ROOT" : "OPENJKDF2_ROOT")
 
 int InstallHelper_copy(const char* in_path, const char* out_path)
 {
@@ -691,9 +701,9 @@ const size_t aInstallOptionalAssets_len = sizeof(aInstallOptionalAssets) / sizeo
 #ifndef TARGET_ANDROID
 int InstallHelper_AttemptInstallFromExisting(char* path)
 {
-    const char** paOptionalAssets = aInstallOptionalAssets;
-    const char** paRequiredAssets = Main_bMotsCompat ? aRequiredAssetsMots : aRequiredAssets;
-    size_t paRequiredAssets_len = Main_bMotsCompat ? aRequiredAssetsMots_len : aRequiredAssets_len;
+    const char** paOptionalAssets = aOptionalAssets;
+    const char** paRequiredAssets = Main_bMotsCompat ? aRequiredAssetsMots : Main_bDroidWorks ? aRequiredAssetsDroidworks : aRequiredAssets;
+    size_t paRequiredAssets_len = Main_bMotsCompat ? aRequiredAssetsMots_len : Main_bDroidWorks ? aRequiredAssetsDroidworks_len : aRequiredAssets_len;
 
     if (path[strlen(path)-1] == '/' || path[strlen(path)-1] == '\\')
     {
