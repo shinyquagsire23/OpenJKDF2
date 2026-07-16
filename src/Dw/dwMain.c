@@ -1,6 +1,7 @@
 #include "Dw/dwMain.h"
 
 #include "Dw/dwRect.h"
+#include "Dw/dwInits.h"
 #include "stdPlatform.h"
 #include "globals.h" // pHS
 
@@ -28,6 +29,22 @@ int dwMain_Startup()
 
     stdPlatform_Printf("OpenJKDF2: %s — DroidWorks mode scaffolding (app layer not yet implemented)\n", __func__);
 
+    // Bring up the DW VFS (dwGob + inits hooked fileOpen). In the original this
+    // is the first thing dw_Startup does.
+    inits_Startup(pHS);
+
+    // Temporary P1 exercise: resolve a few known assets through the full
+    // hooked-open chain (ext table -> base paths -> GOB basename index).
+    // TODO(dw-decomp): remove once real consumers (dwConfFile/dwStringTable
+    // callers) exercise the VFS in P3+.
+    {
+        static const char* aProbes[] = { "options.cmp", "maptut.rec", "items.inv", "notafile.cmp" };
+        for (int i = 0; i < 4; i++) {
+            stdPlatform_Printf("dwMain: probe %-14s -> %s\n", aProbes[i],
+                               inits_FileExists(aProbes[i]) ? "FOUND" : "missing");
+        }
+    }
+
     dwMain_bInitted = 1;
     return 1;
 }
@@ -38,6 +55,7 @@ void dwMain_Shutdown()
         return;
 
     stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+    inits_Shutdown();
     dwMain_bInitted = 0;
     dwMain_bPrintedStub = 0;
 }

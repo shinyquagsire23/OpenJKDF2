@@ -30,9 +30,11 @@
 #include <stdarg.h>
 
 #include "jk.h"
-// Win95/stdGob.h has no extern "C" guards of its own — wrap at include site.
+#include <ctype.h>
+// Win95/stdGob.h + General/stdHashtbl.h have no extern "C" guards of their own — wrap at include site.
 extern "C" {
 #include "Win95/stdGob.h"
+#include "General/stdHashtbl.h"
 }
 
 #include <SDL3/SDL.h> // Note: SDL_Mutex replaces the original Win32 CRITICAL_SECTION (desktop-only unit)
@@ -54,10 +56,14 @@ static HostServices dwGob_baseServices;              // @0x53da70: copy of the p
 static HostServices* dwGob_pBaseServices = NULL;     // @0x53da00
 static dwGobFile dwGob_aHandles[DWGOB_MAX_HANDLES];  // @0x53db10
 static Gob* dwGob_apLoadedGobs[DWGOB_MAX_GOBS];      // @0x53e710
+static tHashTable* dwGob_apBasenameHash[DWGOB_MAX_GOBS]; // Note: added — see dwGob_BuildBasenameIndex
 static char dwGob_scratchBuf[DWGOB_SCRATCH_LEN];     // shared path/printf staging buffer
 static HostServices* dwGob_pInstalledHS = NULL;      // Note: added — which HostServices we patched (for Shutdown restore)
 static int dwGob_bInstalled = 0;                     // Note: added — guards double-install on soft reset
 static SDL_Mutex* dwGob_mtx = NULL;                  // Note: replaces dwGob_critSec@0x6b6240; lazily created, kept across soft resets
+
+static tHashTable* dwGob_BuildBasenameIndex(Gob* pGob);
+static const char* dwGob_FindMemberPath(Gob* pGob, const char* pMember);
 
 // Note: the original never enters its wrappers before InitializeCriticalSection;
 // guard on NULL so pre-Startup calls stay harmless.
@@ -98,6 +104,7 @@ int dwGob_Startup(HostServices *pHS)
     // Statics reset (the binary also zeroes the handle table + archive cache here)
     _memset(dwGob_aHandles, 0, sizeof(dwGob_aHandles));
     _memset(dwGob_apLoadedGobs, 0, sizeof(dwGob_apLoadedGobs));
+    _memset(dwGob_apBasenameHash, 0, sizeof(dwGob_apBasenameHash));
     _memset(&dwGob_baseServices, 0, sizeof(dwGob_baseServices));
     _memset(dwGob_scratchBuf, 0, sizeof(dwGob_scratchBuf));
     dwGob_pBaseServices = NULL;
@@ -158,6 +165,11 @@ void dwGob_Shutdown(void)
         {
             stdGob_Free(dwGob_apLoadedGobs[i]);
             dwGob_apLoadedGobs[i] = NULL; // Note: binary leaves the slots stale; cleared for soft-reset hygiene
+        }
+        if (dwGob_apBasenameHash[i])
+        {
+            stdHashtbl_Free(dwGob_apBasenameHash[i]);
+            dwGob_apBasenameHash[i] = NULL;
         }
     }
     stdGob_Shutdown();
@@ -257,7 +269,11 @@ dwGobFile* dwGob_OpenFromGob(const char *pPath, const char *pMode)
     if (!pGob)
         return NULL;
 
-    GobFileHandle* pHandle = stdGob_FileOpen(pGob, pSlash + 1);
+    // Bare member names resolve through the DW basename index (see
+    // dwGob_BuildBasenameIndex); fall back to the literal name so
+    // full in-archive paths keep working too.
+    const char* pFullName = dwGob_FindMemberPath(pGob, pSlash + 1);
+    GobFileHandle* pHandle = stdGob_FileOpen(pGob, pFullName ? pFullName : pSlash + 1);
     if (!pHandle)
         return NULL;
 
@@ -294,6 +310,56 @@ dwGobFile* dwGob_OpenOsFile(const char *pPath, const char *pMode)
 
 // @0x415290 — find-or-load an archive in the 12-slot cache. Case-SENSITIVE
 // strcmp against the loaded gob's fpath, as in the binary. Caller holds the lock.
+// DW's stdGob fork keys each archive's directory hashtable by entry BASENAME
+// (stdGob_LoadEntry@502740: name after the last '\', first entry wins) and
+// lowercases lookups (stdGob_FileOpen@502af0 via the tolower helper @506770).
+// That's how bare filenames like "items.inv" resolve to "misc\items.inv"
+// inside a GOB. The repo's stdGob hashes FULL paths instead, so dwGob layers
+// the basename index here rather than touching shared engine code:
+// basename -> full entry fname, then stdGob_FileOpen with the full path.
+static tHashTable* dwGob_BuildBasenameIndex(Gob* pGob)
+{
+    tHashTable* pHash = stdHashtbl_New(0x400); // DW: fixed 0x400 buckets per archive
+    if (!pHash)
+        return NULL;
+    for (uint32_t i = 0; i < pGob->numFiles; i++)
+    {
+        char* pName = pGob->entries[i].fname;
+        char* pBase = pName;
+        for (char* p = pName; *p; p++) {
+            if (*p == '\\' || *p == '/')
+                pBase = p + 1;
+        }
+        if (!stdHashtbl_Find(pHash, pBase))
+            stdHashtbl_Add(pHash, pBase, pGob->entries[i].fname);
+    }
+    return pHash;
+}
+
+// Resolve a bare member name to the archive's full entry path (or NULL).
+// Query lowercased like DW's stdGob_FileOpen; GOB entry names are lowercase
+// on disk.
+static const char* dwGob_FindMemberPath(Gob* pGob, const char* pMember)
+{
+    tHashTable* pHash = NULL;
+    for (int i = 0; i < DWGOB_MAX_GOBS; i++)
+    {
+        if (dwGob_apLoadedGobs[i] == pGob) {
+            pHash = dwGob_apBasenameHash[i];
+            break;
+        }
+    }
+    if (!pHash)
+        return NULL;
+
+    char aLower[128];
+    int n = 0;
+    for (; pMember[n] && n < 127; n++)
+        aLower[n] = (char)tolower((unsigned char)pMember[n]);
+    aLower[n] = 0;
+    return (const char*)stdHashtbl_Find(pHash, aLower);
+}
+
 Gob* dwGob_LoadArchive(char *pPath)
 {
     for (int i = 0; i < DWGOB_MAX_GOBS; i++)
@@ -304,6 +370,7 @@ Gob* dwGob_LoadArchive(char *pPath)
             if (!pGob)
                 return NULL;
             dwGob_apLoadedGobs[i] = pGob;
+            dwGob_apBasenameHash[i] = dwGob_BuildBasenameIndex(pGob);
             return pGob;
         }
         if (_strcmp(pPath, dwGob_apLoadedGobs[i]->fpath) == 0)
