@@ -621,6 +621,17 @@ void dwGuiBriefText::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
     srcStride = 0;
     pImg->Lock(&pPixels, &srcStride); // vtbl +0x0c
 
+    // Added: SW-display port divergence — compressed-RLE images (stdBitmapRle,
+    // what loads_bmp returns for RLE8 BMPs) and unlockable VBuffers hand out a
+    // NULL pixel pointer from Lock (DirectDraw surfaces always locked, so the
+    // binary never guarded). No real lock was established, so nothing to Unlock;
+    // fall back to a plain (clipped) blit instead of memcpy'ing from NULL.
+    if (pPixels == NULL)
+    {
+        pImg->Blit(pDestBits, this->left, this->top, pClipRect); // vtbl +0x04
+        return;
+    }
+
     rect.left = (int16_t)(this->anchorX - this->revealPos);
     rect.top = (int16_t)(this->anchorY - this->revealPos);
     rect.right = (int16_t)(this->anchorX + this->revealPos);
