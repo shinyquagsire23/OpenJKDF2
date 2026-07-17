@@ -143,9 +143,9 @@ dwGuiList* dwGuiList_Ctor(dwGuiList* pThis, dwRect* pRect, float a, char* pFont,
 void dwGuiList_Clear(dwGuiList* pList);
 dwGuiSpeech* dwGuiSpeech_Ctor(dwGuiSpeech* pThis, dwRect* pRect, int a, char* pFont, uint32_t c, void* pPoint);
 void dwGuiSpeech_Clear(dwGuiSpeech* pSpeech);
-// TODO(dw-decomp): dwHelp control — provided by dwHelp (P6 wave 2).
+// dwHelp control — provided by dwHelp (P6 wave 2b).
 struct dwHelp;
-dwHelp* dwHelp_Ctor(dwHelp* pThis, dwRect* pRect, int a, int speakerCode);
+dwHelp* dwHelp_Ctor(dwHelp* pThis, dwRect* pRect, char* pAnimName, int speakerCode);
 
 // Debriefing / end-game screens pushed by EndMission (sibling P6w2 / P7).
 // TODO(dw-decomp): dwGuiStatus (P6 wave 2), dwGuiOptions/Credits/dwEnding

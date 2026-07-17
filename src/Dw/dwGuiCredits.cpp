@@ -11,6 +11,7 @@
 #include "Dw/dwString.h"    // dwString (line storage) + dwString_Equals
 #include "Dw/dwFont.h"      // dwFont_Load / dwFont_DrawText* / free convention
 #include "Dw/dwWidgetGroup.h"
+#include "Dw/dwGuiList.h"   // dwGuiDroidDance (DROID_DANCE)
 
 #include "stdPlatform.h"
 
@@ -214,11 +215,9 @@ dwWidget* dwGuiCredits::CreateControl(char* pKeyword, dwConfFile* pConf)
     if (dwString_Equals(pKeyword, "DROID_DANCE"))
     {
         dwConfFile_ParseRect(pConf, &rect);
-        // TODO(dw-decomp): dwGuiDroidDance (disco droid viewer, unit
-        // dwGuiList @40ab70 — P6 wave 2). Binary: new(0x598)
-        // dwGuiDroidDance_Ctor(&rect). Loud stub until it lands.
-        stdPlatform_Printf("TODO(dw-decomp): dwGuiCredits control 'DROID_DANCE' -> dwGuiDroidDance (unit dwGuiList) not translated yet\n");
-        return NULL;
+        // dwGuiDroidDance (disco droid viewer, unit dwGuiList @40ab70, landed
+        // P6w2b). Binary: new(0x598) dwGuiDroidDance_Ctor(&rect).
+        return (dwWidget*)new dwGuiDroidDance(&rect);
     }
     if (dwString_Equals(pKeyword, "SECTION_FONT"))
     {

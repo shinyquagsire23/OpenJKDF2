@@ -31,6 +31,7 @@
 #include "Dw/dwGuiMission.h"
 
 #include "Dw/dwGuiButton.h"    // dwGuiZoomBox
+#include "Dw/dwHelp.h"         // dwHelp (HELP keyword)
 #include "Dw/dwControlPanel.h" // dwControlPanelHelpRect (MAP keyword)
 #include "Dw/dwPart.h"         // dwPart_FindBlueprint (PARTTEXT keyword)
 #include "Dw/dwGuiHypText.h"   // dwGuiPartText + stock format callbacks
@@ -1273,10 +1274,9 @@ dwWidget* dwGuiMissionMap::CreateControl(char* pKeyword, dwConfFile* pConf)
         // speaker code 0x66 (MMCP).
         dwConfFile_ParseRect(pConf, &rect);
         pTok1 = dwConfFile_NextToken(pConf);
-        (void)pTok1;
-        // TODO(dw-decomp): HELP -> dwHelp (unit dwHelp, P6) — binary:
+        // dwHelp (unit dwHelp, landed P6w2b) — binary:
         // new(0x5c) dwHelp_Ctor@418b40(&rect, pTok1, 0x66).
-        return dwGuiMission_StubControl("HELP", "dwHelp", "dwHelp");
+        return new dwHelp(&rect, pTok1, 0x66);
     }
     if (dwString_Equals(pKeyword, "JOB_DESCRIPTION") || dwString_Equals(pKeyword, "JOB_NAME"))
     {

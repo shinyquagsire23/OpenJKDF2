@@ -51,6 +51,8 @@
 #include "Dw/dwGuiStatsPart.h"  // dwGuiStatsPart (STATS_PART)
 #include "Dw/dwGuiStatsDroid.h" // dwGuiStatsDroid (STATS_DROID)
 #include "Dw/dwGuiInGame.h"    // dwGuiInGame_New/CheckDroidValid (msg 0x67 deploy)
+#include "Dw/dwHelp.h"         // dwGuiIndicator (INDICATOR)
+#include "Dw/dwGuiLoadSave.h"  // dwGuiLoadSave_New (msg 0x68)
 
 #include "jk.h"
 #include "stdPlatform.h" // stdPlatform_Printf
@@ -447,10 +449,8 @@ extern "C" dwWidget* dwGuiScreen_CreateControl(char* pKeyword, dwConfFile* pConf
         pTok1 = dwConfFile_NextToken(pConf);
         pTok2 = dwConfFile_NextToken(pConf);
         dwConfFile_ParseULong(pConf, &param);
-        (void)pTok1; (void)pTok2;
-        // TODO(dw-decomp): INDICATOR -> dwGuiIndicator (unit dwHelp) —
         // binary: new(0x48) dwGuiIndicator_Ctor(&rect, tok1, tok2, param, 1.0f)
-        return dwGuiScreen_StubControl("INDICATOR", "dwGuiIndicator", "dwHelp");
+        return new dwGuiIndicator(&rect, pTok1, pTok2, (int)param, 1.0f);
     }
     if (dwString_Equals(pKeyword, "QUICKVIEW"))
     {
@@ -1024,10 +1024,10 @@ int dwGuiScreen::OnMessage(dwWidgetMsg* pMsg)
             break;
         case 0x68:
             this->pSnapshotImage = dwGuiScreen_CaptureShadedScreen();
-            // TODO(dw-decomp): 0x68 -> dwGuiLoadSave screen (unit
-            // dwGuiLoadSave) — binary: new(0xfc) dwGuiLoadSave_Ctor(
-            // pSnapshotImage); pSeg = its dwSegment subobject (obj+0x10).
-            stdPlatform_Printf("TODO(dw-decomp): dwGuiScreen msg 0x68 -> dwGuiLoadSave screen (unit dwGuiLoadSave) not translated yet\n");
+            // dwGuiLoadSave screen (unit dwGuiLoadSave, landed P6w2b): binary
+            // new(0xfc) dwGuiLoadSave_Ctor(pSnapshotImage); pSeg = its dwSegment
+            // subobject (obj+0x10) — dwGuiLoadSave_New returns it.
+            pSeg = dwGuiLoadSave_New(this->pSnapshotImage);
             break;
         case 0x6a:
             // TODO(dw-decomp): 0x6a -> reference intro-video segment (unit

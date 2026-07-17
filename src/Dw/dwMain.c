@@ -48,14 +48,8 @@ dwMission* dwCore_pCurrentMission = NULL;                   // owner: dw core P7
 // dwGuiInGame (P6 wave 2a) landed — its 6 placeholders (dwGuiInGame_New/
 // CheckDroidValid/pActive/PlayVoiceLine/ConsolePrint/UpdateViewSize) are now
 // real in dwGuiInGame.cpp and were deleted from here.
-//
-// --- Placeholders dwGuiInGame.cpp still depends on (satisfy the link) ---------
-// Opaque handles for the not-yet-translated widgets (real types land in P6w2b).
-typedef struct dwGuiList dwGuiList;
-typedef struct dwGuiSpeech dwGuiSpeech;
-typedef struct dwGuiIndicator dwGuiIndicator;
-typedef struct dwHelp dwHelp;
-typedef struct dwRect dwRect;
+// dwGuiList/dwGuiSpeech/dwGuiIndicator/dwHelp landed in P6 wave 2b — their
+// opaque forward typedefs (and the stub bodies) were removed from here.
 
 // owner: dwMain proper (P7) — the two default DW material loader callbacks
 // re-registered by dwGuiInGame_EndMission. NULL until the material cache lands.
@@ -79,23 +73,13 @@ const char* PTR_s_GHCA048_wav_005286a8[] = { 0 };
 void sithCamera_sub_44B190(void) {}                        // DW cam-slot-7 setup
 void sithControl_FUN_00456da0(void) {}                     // DW control-fn registration
 
-// owner: dwGuiList / dwHelp (P6 wave 2b) — HUD child widgets.
-void dwGuiIndicator_SetProgress(dwGuiIndicator* pInd, float t) { (void)pInd; (void)t; }
-void dwGuiIndicator_Show(dwGuiIndicator* pInd) { (void)pInd; }
-void dwGuiIndicator_Hide(dwGuiIndicator* pInd) { (void)pInd; }
-dwGuiList* dwGuiList_Ctor(dwGuiList* pThis, dwRect* pRect, float a, char* pFont, uint8_t c, uint8_t d, void* pPoint)
-{ (void)pRect; (void)a; (void)pFont; (void)c; (void)d; (void)pPoint; return pThis; }
-void dwGuiList_Clear(dwGuiList* pList) { (void)pList; }
-dwGuiSpeech* dwGuiSpeech_Ctor(dwGuiSpeech* pThis, dwRect* pRect, int a, char* pFont, uint32_t c, void* pPoint)
-{ (void)pRect; (void)a; (void)pFont; (void)c; (void)pPoint; return pThis; }
-void dwGuiSpeech_Clear(dwGuiSpeech* pSpeech) { (void)pSpeech; }
-dwHelp* dwHelp_Ctor(dwHelp* pThis, dwRect* pRect, int a, int speakerCode)
-{ (void)pRect; (void)a; (void)speakerCode; return pThis; }
+// dwGuiIndicator_*/dwGuiList_*/dwGuiSpeech_*/dwHelp_Ctor placeholders removed:
+// their owning units (dwHelp, dwGuiList) landed in P6 wave 2b and provide the
+// real extern "C" symbols.
 
-// owner: dwGuiStatus (P6w2b) / dwGuiOptions (has NewEnterSeg, needs New) /
-// dwMain dwCompleteMovie (P7) — screens pushed by dwGuiInGame_EndMission.
-dwSegment* dwGuiStatus_New(dwMission* pMission, float itemPct, float healthPct, int32_t chargeMax)
-{ (void)pMission; (void)itemPct; (void)healthPct; (void)chargeMax; return NULL; }
+// owner: dwGuiOptions (has NewEnterSeg, needs New) / dwMain dwCompleteMovie (P7)
+// — screens pushed by dwGuiInGame_EndMission. dwGuiStatus_New placeholder removed
+// (dwGuiStatus landed in P6 wave 2b).
 dwSegment* dwGuiOptions_New(int index) { (void)index; return NULL; }
 dwSegment* dwCompleteMovie_New(int idx) { (void)idx; return NULL; }
 // owner: dwCog part 1 (P8) — the 34-verb registration table.

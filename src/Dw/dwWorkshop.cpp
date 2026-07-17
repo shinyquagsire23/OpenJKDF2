@@ -22,6 +22,7 @@
 #include "Dw/dwWorkshopDroidEditor.h"
 #include "Dw/dwWorkshopCtrl.h" // dwWcBlueprints / dwWcPalette
 #include "Dw/dwGuiButton.h"    // dwWcArrows / dwWcBuildPaintButton / dwWcCargoNormalButton
+#include "Dw/dwHelp.h"         // dwHelp (HELP keyword)
 #include "Dw/dwGuiTextEntry.h" // DROID_NAME
 #include "Dw/dwPart.h"         // dwPartNode anim control + blueprint slotMask
 #include "Dw/dwDroidView.h"    // dwDroidView (PANCONTROL)
@@ -462,10 +463,9 @@ dwWidget* dwWorkshop::CreateControl(char* pKeyword, dwConfFile* pConf)
     {
         dwConfFile_ParseRect(pConf, &rect);
         pTok = dwConfFile_NextToken(pConf);
-        (void)pTok;
-        // TODO(dw-decomp): HELP -> dwHelp (unit dwHelp) —
-        // binary: new(0x5c) dwHelp_Ctor(&rect, tok, /*speakerCode*/100) @418af0
-        return dwWorkshop_StubControl("HELP", "dwHelp", "dwHelp");
+        // dwHelp (unit dwHelp, landed P6w2b): binary new(0x5c)
+        // dwHelp_Ctor(&rect, tok, /*speakerCode*/100) @418af0
+        return new dwHelp(&rect, pTok, 100);
     }
     if (dwString_Equals(pKeyword, "PALETTE"))
     {
