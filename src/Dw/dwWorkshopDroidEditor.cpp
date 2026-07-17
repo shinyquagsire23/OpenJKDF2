@@ -42,6 +42,9 @@
 extern "C" {
 #include "Engine/rdroid.h"
 #include "Win95/stdDisplay.h"
+#ifdef RDRASTER_SW_ZBUFFER
+#include "Raster/rdZRaster.h" // SW z-buffer per-frame clear for the 3D view
+#endif
 }
 
 // dw-core workspace part-node list sentinel @0x53d984 (owner: dwMain, P7).
@@ -966,6 +969,21 @@ void dwWorkshopDroidEditor::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
     this->EnsureImages(); // virtual +0x3c
     this->dwGui3DView::Draw(pDestBits, pClipRect); // camera bring-up (binary: direct call @43b2b0)
 
+    // Added: OpenJKDF2 software-renderer bracket. DW has no HW path — the 3D view
+    // renders through the CPU rasterizer into the 8bpp back buffer. rdCache_Flush
+    // only takes its software branch when rdroid_curAcceleration<=0 (+ the
+    // r_softwareRenderer flag Main.c forces on for DW), and rdZRaster writes
+    // directly to the LOCKED canvas color VBuffer (rdCamera_g_pCurCamera->pCanvas->
+    // pVBuffer). Mirrors jkGame_Update's SW bracket. Without this the geometry went
+    // to the GL path (std3D) and never reached the DW VBuffer.
+    rdCanvas* pSwCanvas = rdCamera_g_pCurCamera->pCanvas;
+    int swSavedAccel = rdroid_curAcceleration;
+    rdroid_curAcceleration = 0;
+    stdDisplay_VBufferLock(pSwCanvas->pVBuffer);
+#ifdef RDRASTER_SW_ZBUFFER
+    rdZRaster_BeginFrame(pSwCanvas->pVBuffer);
+#endif
+
     if (!(rdGetRenterOptions() & 0x100))
         stdDisplay_VBufferFill(rdCamera_g_pCurCamera->pCanvas->d3d_vbuf, 0, NULL);
     rdAdvanceFrame();
@@ -981,6 +999,9 @@ void dwWorkshopDroidEditor::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
             pNode->Draw(); // roots/detached only — Draw recurses attached children
     }
     rdFinishFrame();
+
+    stdDisplay_VBufferUnlock(pSwCanvas->pVBuffer);
+    rdroid_curAcceleration = swSavedAccel;
 
     // Which markers blink for the dragged part (0xb never matches anything real).
     mountCompatType = DW_PARTTYPE_NONE;
