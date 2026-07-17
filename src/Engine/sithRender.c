@@ -205,6 +205,11 @@ int sithRender_Open()
         rdLight_NewEntry(&sithRender_aThingLights[i]);
     }
 
+    // Added: Debugging
+    if (!sithWorld_g_pCurrentWorld) {
+        stdPlatform_Printf("OpenJKDF2: sithWorld_g_pCurrentWorld is NULL!\n");
+    }
+
     rdColormap_SetCurrent(sithWorld_g_pCurrentWorld->colormaps);
     rdColormap_SetIdentity(sithWorld_g_pCurrentWorld->colormaps);
 

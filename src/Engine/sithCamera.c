@@ -137,17 +137,22 @@ void sithCamera_ResetAllCameras()
     rdVector3 rot; // [esp+Ch] [ebp-Ch] BYREF
 
     v0 = sithWorld_g_pCurrentWorld->pCameraFocusThing;
+    stdPlatform_Printf("TEST 2: %p\n", v0);
     sithCamera_g_stateFlags &= ~1u;
-    sithCamera_g_aCameras[0].pPrimaryFocusThing = v0;
-    sithCamera_g_aCameras[1].pPrimaryFocusThing = v0;
-    sithCamera_g_aCameras[2].pPrimaryFocusThing = v0;
-    sithCamera_g_aCameras[2].pSecondaryFocusThing = v0;
-    sithCamera_g_aCameras[4].pPrimaryFocusThing = v0;
-    sithCamera_g_aCameras[4].pSecondaryFocusThing = v0;
-    sithCamera_g_aCameras[5].pPrimaryFocusThing = v0;
-    sithCamera_g_aCameras[5].pSecondaryFocusThing = v0;
-    sithCamera_g_aCameras[6].pPrimaryFocusThing = v0;
-    sithCamera_g_aCameras[6].pSecondaryFocusThing = v0;
+    sithCamera_SetCameraFocus(&sithCamera_g_aCameras[0], v0, v0);
+    sithCamera_SetCameraFocus(&sithCamera_g_aCameras[1], v0, v0);
+    sithCamera_SetCameraFocus(&sithCamera_g_aCameras[2], v0, v0);
+    sithCamera_SetCameraFocus(&sithCamera_g_aCameras[3], v0, v0);
+    sithCamera_SetCameraFocus(&sithCamera_g_aCameras[4], v0, v0);
+    sithCamera_SetCameraFocus(&sithCamera_g_aCameras[5], v0, v0);
+    sithCamera_SetCameraFocus(&sithCamera_g_aCameras[6], v0, v0);
+#ifdef DW_CAMERA
+    sithCamera_SetCameraFocus(&sithCamera_g_aCameras[7], v0, v0);
+#endif
+
+    // TODO: DroidWorks does this? Verify if needed.
+    //sithCamera_SetCurrentCamera(sithCamera_g_aCameras + 7);
+
     sithCamera_g_bCurCameraSet = 0;
     sithCamera_g_aCameras[0].pSecondaryFocusThing = 0;
     sithCamera_g_aCameras[1].pSecondaryFocusThing = 0;

@@ -131,7 +131,6 @@ extern float _DAT_00528698, _DAT_0052869c, _DAT_005286c0, _DAT_005286d4;
 //     wires + selects camera slot 7 (the DW HUD chase cam; JK's has no slot 7).
 //   sithControl_FUN_00456da0 = DW control-function registration (registers the
 //     DW-specific control funcs 0xc/0xd/0xe with DW thresholds).
-void sithCamera_sub_44B190(void);
 void sithControl_FUN_00456da0(void);
 
 // TODO(dw-decomp): dwGuiIndicator gauges — provided by dwHelp (P6 wave 2).
@@ -351,7 +350,7 @@ int dwGuiInGame::Activate()
             sithWorld_SetLoadProgressCallback((sithWorldProgressCallback_t)dwGuiInGame_DrawLoadProgress);
             // Note: the binary here double-buffers a localized "LOADING" caption
             // over Loading.rle; omitted (cosmetic, needs a locked dwImageBits).
-            sithRender_Shutdown(); // Not sure, no-op in any case
+            sithRender_Close(); // Not sure, no-op in any case
         }
 
         dwString jklName(this->pMissionInfo->name.pBuffer, 0);
@@ -369,7 +368,7 @@ int dwGuiInGame::Activate()
                 sithRender_SetGeoMode(4);
                 sithRender_SetLightingMode(3);
                 sithRender_SetTexMode(1);
-                sithCamera_sub_44B190();
+                sithCamera_ResetAllCameras();
                 RebuildViewport();
                 sithCamera_SetCurrentCamera(&sithCamera_g_aCameras[7]);
 
@@ -773,7 +772,7 @@ void dwGuiInGame::EndMission()
     rdModel3_RegisterUnloader(NULL);
     rdKeyframe_RegisterLoader(NULL);
     rdKeyframe_RegisterUnloader(NULL);
-    sithRender_Open();
+    sithRender_Close(); // Not sure, but no-op in any case
 
     if (bMissionType)
     {
@@ -901,6 +900,7 @@ void dwGuiInGame_PlayVoiceLine(const char* pCammyText, const char* pWavName, uin
 // @4221a0
 void dwGuiInGame::PlayVoiceLineEx(uint32_t msgCode, char* pWavName, uint32_t priority, char bForce)
 {
+    return; // TODO remove
     if (this->currentVoiceWav.length != 0 && dwString_Equals(this->currentVoiceWav.pBuffer, pWavName))
     {
         if (priority > this->voicePriority)
@@ -940,6 +940,13 @@ void dwGuiInGame::ShowCammyText(uint32_t msgCode)
     void* pEntry = NULL;
     if (this->pStringTable != NULL)
         pEntry = this->pStringTable->Find(key);
+
+    // Added: nullptr check
+    if (!this->pCammyText) {
+        stdPlatform_Printf("OpenJKDF2: this->pCammyText is NULL!\n");
+        return;
+    }
+
     this->pCammyText->text.Free();
     if (pEntry != NULL)
     {
