@@ -525,6 +525,14 @@ extern "C" dwSegment* dwGuiOptions_NewEnterSeg(int screenIndex)
     return new dwGuiOptionsEnterSeg(screenIndex);
 }
 
+// Added: C factory for the options SCREEN itself. dwGuiInGame_EndMission's
+// FINAL path pushes it (binary @dwGuiInGame_EndMission: dwGuiOptions_Ctor(0) +
+// dwSegment_Push). Was a NULL link placeholder in dwMain.cpp until this landed.
+extern "C" dwSegment* dwGuiOptions_New(int index)
+{
+    return static_cast<dwSegment*>(new dwGuiOptions(index));
+}
+
 // ---------------------------------------------------------------------------
 // dwGuiLongAgo — the palette-fade intro card
 // ---------------------------------------------------------------------------

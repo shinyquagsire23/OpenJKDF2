@@ -568,13 +568,6 @@ extern "C" dwSegment* dwCompleteMovie_New(int idx)
 //  Kept placeholders (NOT P7 — owners elsewhere)
 // ==================================================================
 
-// owner: dwGuiOptions — the options SCREEN factory. dw_Startup does NOT use it
-// (it pushes the enter-seg), but dwGuiInGame_EndMission's FINAL path does
-// (dwSegment_Push(dwGuiOptions_New(0))). Left as a link placeholder; belongs in
-// dwGuiOptions.cpp as a `new dwGuiOptions(0)` factory (report).
-// C linkage: dwGuiInGame.cpp declares it inside its extern "C" block.
-extern "C" dwSegment* dwGuiOptions_New(int index) { (void)index; return NULL; }
-
 // owner: P8 sith-engine diff audit — DW-forked sith internals (no repo twin).
 // C linkage: dwGuiInGame.cpp declares them inside its extern "C" block.
 extern "C" void sithControl_FUN_00456da0(void) {} // DW control-fn registration
