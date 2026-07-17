@@ -30,12 +30,11 @@
 
 extern "C" HostServices* dwMain_pHS; // the DW host-services pointer (dwMain.c); binary global dwHS @0x6b6258
 
-// TODO(dw-decomp): provided by the stdBitmapRle2 engine-side unit (P8,
-// untranslated) — placeholder implementations at the bottom of this file.
-// The binary split each call into `operator new(0x18)` + a __thiscall ctor
+// Provided by the stdBitmapRle2 engine-side unit (P8, stdBitmapRle2.cpp). The
+// binary split each call into `operator new(0x18)` + a __thiscall ctor
 // (@442df0 / @442ec0); these 64-bit factories fold that pair.
 extern "C" dwImage* stdBitmapRle2_Instantiate(int16_t width, int16_t height, int bpp);         // @442df0
-extern "C" dwImage* stdBitmapRle2_InstantiateCopy(dwImage* pSrc, int16_t width, int16_t height); // @442ec0 (Ghidra: stdBitmapRle2_sub_442EC0)
+extern "C" dwImage* stdBitmapRle2_InstantiateCopy(dwImage* pSrc, int16_t width, int16_t height); // @442ec0
 
 // ---- dwAnimBase -------------------------------------------------------------
 
@@ -559,36 +558,4 @@ void dwGuiAnimView::InitFirstFrame()
         this->pAnimPlayer = dwAnim_Open(this->dwWidgetGroup::GetRectPtr(),
                                         pItem->animFile.pBuffer, pItem->code, 0);
     }
-}
-
-// ------------------------------------------------------------------
-// TODO(dw-decomp): temporary cross-unit placeholders — owner: the
-// stdBitmapRle2 engine-side RLE bitmap unit (P8, bounds-only in Ghidra).
-// Remove both when that unit is translated (it also owns the real
-// dwImage_LoadFile loaders, see dwImage.cpp).
-//   @442df0 stdBitmapRle2_Instantiate: construct an empty width x height
-//            8bpp RLE bitmap image (bpp arg is BITS in the binary call: 8).
-//   @442ec0 stdBitmapRle2_sub_442EC0: construct a COPY of pSrc at the given
-//            size (dwAnim uses it to carry FLC delta state frame-to-frame).
-// Both currently LOUD-stub to NULL: FLC widget anims load zero drawable
-// frames until P8 (dwAnim::Draw/FreeImages handle the NULL slots).
-// ------------------------------------------------------------------
-extern "C" dwImage* stdBitmapRle2_Instantiate(int16_t width, int16_t height, int bpp)
-{
-    static int bWarned = 0;
-    if (!bWarned)
-    {
-        stdPlatform_Printf("TODO(dw-decomp): stdBitmapRle2_Instantiate(%d, %d, %d) stubbed (P8) — FLC frames unavailable\n",
-                           width, height, bpp);
-        bWarned = 1;
-    }
-    return NULL;
-}
-
-extern "C" dwImage* stdBitmapRle2_InstantiateCopy(dwImage* pSrc, int16_t width, int16_t height)
-{
-    (void)pSrc;
-    (void)width;
-    (void)height;
-    return NULL; // stdBitmapRle2_Instantiate already warned
 }

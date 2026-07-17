@@ -41,22 +41,9 @@ extern "C" {
 
 // The 16bpp RLE image loader @444c50 (Ghidra: stdBitmapRle_FUN_00444c50) —
 // dwGuiButton loads its hit-test MASK image through it unconditionally
-// (unlike dwImage_LoadFile's bpp dispatch). Owner: the stdBitmapRle2
-// engine-side unit (P8, bounds-only in Ghidra).
-// TODO(dw-decomp): LOUD STUB below until stdBitmapRle2 lands (same pattern
-// as dwAnim.cpp's stdBitmapRle2_Instantiate stubs).
+// (unlike dwImage_LoadFile's bpp dispatch). Provided by the stdBitmapRle2
+// engine-side unit (P8, stdBitmapRle2.cpp).
 extern "C" dwImage* stdBitmapRle2_LoadFile16(char* pFilePath); // @444c50
-
-extern "C" dwImage* stdBitmapRle2_LoadFile16(char* pFilePath)
-{
-    static int bWarned = 0;
-    if (!bWarned) {
-        bWarned = 1;
-        stdPlatform_Printf("TODO(dw-decomp): stdBitmapRle2_LoadFile16(\"%s\") stubbed (P8) — button mask hit-testing unavailable\n",
-                           pFilePath ? pFilePath : "(null)");
-    }
-    return NULL;
-}
 
 // ---------------------------------------------------------------------------
 // dwGuiButton (vtbl 0x51e598)

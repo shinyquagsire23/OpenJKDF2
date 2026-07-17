@@ -89,10 +89,9 @@ extern "C" {
 #endif
 
 // Loads an image file (.BMP/.RLE) and returns a heap image object, or NULL.
-// Binary dispatch: display bpp > 8 -> stdBitmapRle_FUN_00444c50 (16bpp RLE
-// loader), else loads_bmp(pFilePath, 0). Both loaders live in the
-// NOT-YET-TRANSLATED stdBitmapRle2 engine-side unit, so this is currently a
-// LOUD STUB returning NULL — see dwImage.cpp. TODO(dw-decomp).
+// Binary dispatch: display bpp > 8 -> stdBitmapRle2_LoadFile16 (16bpp loader),
+// else loads_bmp(pFilePath, 0). Both loaders live in the stdBitmapRle2 unit
+// (stdBitmapRle2.cpp, P8). @444820
 dwImage* dwImage_LoadFile(char* pFilePath); // @444820
 
 // Color-key-0 row blit between two locked pixel views (skips source bytes of
