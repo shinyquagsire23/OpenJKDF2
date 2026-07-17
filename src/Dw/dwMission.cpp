@@ -63,6 +63,18 @@ extern "C" void dwMission_SetUnlockedByName(const char* pName, int bUnlocked)
     }
 }
 
+// SOMONEY cheat: unlock every mission on the list.
+extern "C" void dwMission_UnlockAll(void)
+{
+    if (dwCore_pMissionList == NULL)
+        return;
+    for (dwListNode* pNode = dwCore_pMissionList->pNext; pNode != dwCore_pMissionList;
+         pNode = pNode->pNext)
+    {
+        ((dwMission*)pNode->pData)->bUnlocked = 1;
+    }
+}
+
 // @41c960 (dwMission_ParseObjective) — parse "<code> <param> <label...>"
 // from the current line into pObj.
 // Note: the binary default-ctor'd pObj->label here (it received raw memory);

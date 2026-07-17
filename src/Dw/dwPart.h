@@ -118,6 +118,7 @@ dwPart* dwPart_FindBlueprint(const char* pName);
 // dwCog verb helpers (C-callable; typed access to the C++ blueprint/node structs).
 int dwPart_SetAvailableByName(const char* pName, int bAvailable); // dwenablepart/dwdisablepart
 int dwCog_WorkspaceHasPart(const char* pName);                    // dwcheckforpart
+void dwPart_SetAllAvailable(int bAvailable);                      // FITTO cheat
 
 #ifdef __cplusplus
 } // extern "C"

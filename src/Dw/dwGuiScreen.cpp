@@ -53,6 +53,9 @@
 #include "Dw/dwGuiInGame.h"    // dwGuiInGame_New/CheckDroidValid (msg 0x67 deploy)
 #include "Dw/dwHelp.h"         // dwGuiIndicator (INDICATOR)
 #include "Dw/dwGuiLoadSave.h"  // dwGuiLoadSave_New (msg 0x68)
+#include "Dw/dwGuiReference.h" // dwGuiRefTile (RECT) + dwGuiRefRadioGroup (RADIOGROUP)
+#include "Dw/dwPart.h"         // dwPart_SetAllAvailable (FITTO cheat)
+#include "Dw/dwPlayer.h"       // dwPlayer_statsFlags (MST3K cheat)
 
 #include "jk.h"
 #include "stdPlatform.h" // stdPlatform_Printf
@@ -461,23 +464,29 @@ extern "C" dwWidget* dwGuiScreen_CreateControl(char* pKeyword, dwConfFile* pConf
     }
     if (dwString_Equals(pKeyword, "RADIOGROUP"))
     {
+        // binary: new(0x18) dwGuiRefRadioGroup_Ctor(&rect), then per line:
+        // ParseRect + ParseULong(cmdId) + 4 tokens -> dwGuiRefRadioGroup_AddCategory.
         uint32_t count = 0;
         dwConfFile_ParseRect(pConf, &rect);
         dwConfFile_ParseULong(pConf, &count);
-        // TODO(dw-decomp): RADIOGROUP -> dwGuiRefRadioGroup (unit dwGuiReference) —
-        // binary: new(0x18) dwGuiRefRadioGroup_Ctor(&rect), then per line:
-        // ParseRect + ParseULong + 4 tokens -> dwGuiRefRadioGroup_AddCategory.
-        dwGuiScreen_StubControl("RADIOGROUP", "dwGuiRefRadioGroup", "dwGuiReference");
-        // Note: consume the category lines so the rest of the script still
-        // parses (mirrors the binary's alloc-failure path, which also
-        // ReadLine-drains them without token parsing).
+        dwGuiRefRadioGroup* pGroup = new dwGuiRefRadioGroup(&rect);
         for (; count != 0; count--)
         {
             if (pConf->bEof)
                 break;
             dwConfFile_ReadLine(pConf);
+            dwRect itemRect;
+            dwConfFile_ParseRect(pConf, &itemRect);
+            uint32_t cmdId = 0;
+            dwConfFile_ParseULong(pConf, &cmdId);
+            char* pImgNormal  = dwConfFile_NextToken(pConf);
+            char* pSndOff     = dwConfFile_NextToken(pConf);
+            char* pImgPressed = dwConfFile_NextToken(pConf);
+            char* pSndClick   = dwConfFile_NextToken(pConf);
+            dwGuiRefRadioGroup_AddCategory(pGroup, &itemRect, pImgNormal, pSndOff, pImgPressed,
+                                           pSndClick, (int)cmdId);
         }
-        return NULL;
+        return pGroup;
     }
     if (dwString_Equals(pKeyword, "RECT"))
     {
@@ -485,9 +494,8 @@ extern "C" dwWidget* dwGuiScreen_CreateControl(char* pKeyword, dwConfFile* pConf
         dwConfFile_ParseRect(pConf, &rect);
         dwConfFile_ParseULong(pConf, &param);
         dwConfFile_ParseULong(pConf, &param2);
-        // TODO(dw-decomp): RECT -> dwGuiRefTile (unit dwGuiReference) —
         // binary: new(0x14) dwGuiRefTile_Ctor(&rect, param, param2)
-        return dwGuiScreen_StubControl("RECT", "dwGuiRefTile", "dwGuiReference");
+        return new dwGuiRefTile(&rect, (uint8_t)param, (uint8_t)param2);
     }
     if (dwString_Equals(pKeyword, "SCROLLBAR"))
     {
@@ -1115,17 +1123,13 @@ void dwGuiScreen::CheckCheatCodes(char* pCode)
 {
     if (dwString_Equals(pCode, "SOMONEY"))
     {
-        // TODO(dw-decomp): SOMONEY -> unlock all missions (unit dwMission) —
-        // binary: for every record in dwCore_pMissionList (@0x53d990) whose
-        // rank/category int @+4 is 0/1/2/3: set the unlocked byte @+0 to 1.
-        stdPlatform_Printf("TODO(dw-decomp): cheat SOMONEY -> dwMission record pokes (unit dwMission) not translated yet\n");
+        // Unlock all missions (binary pokes each dwMission's unlocked byte).
+        dwMission_UnlockAll();
     }
     else if (dwString_Equals(pCode, "FITTO"))
     {
-        // TODO(dw-decomp): FITTO -> unlock all part blueprints (unit dwPart) —
-        // binary: for every record in dwCore_pBlueprintList (@0x53d97c): set
-        // the byte @+5 to 1.
-        stdPlatform_Printf("TODO(dw-decomp): cheat FITTO -> dwPart blueprint pokes (unit dwPart) not translated yet\n");
+        // Unlock all part blueprints (binary sets each dwPart's bAvailable).
+        dwPart_SetAllAvailable(1);
     }
     else if (dwString_Equals(pCode, "BEEFCAKE"))
     {
@@ -1146,12 +1150,9 @@ void dwGuiScreen::CheckCheatCodes(char* pCode)
     }
     else if (dwString_Equals(pCode, "MST3K"))
     {
-        // TODO(dw-decomp): MST3K -> set the low 5 bits of the shared player
-        // progress/stats bitmask (unit dwPlayer) — binary: the unnamed global
-        // @0x53d9f8 (loaded from the .plr STATS key by dwPlayer_LoadPlr; read
-        // by dwHelp/dwGuiStatus/dwGuiReference/dwWorkshop/dwGuiOptions)
-        // |= 0x1f.
-        stdPlatform_Printf("TODO(dw-decomp): cheat MST3K -> dwPlayer stats-flag poke (unit dwPlayer) not translated yet\n");
+        // Set the low 5 bits of the shared player progress/stats bitmask
+        // (.plr STATS key; read by dwHelp/dwGuiStatus/dwGuiReference/etc.).
+        dwPlayer_statsFlags |= 0x1f;
     }
 }
 

@@ -161,6 +161,21 @@ extern "C" int dwPart_SetAvailableByName(const char* pName, int bAvailable)
     return 1;
 }
 
+// Blueprint list sentinel (@0x53d964).
+extern "C" dwListNode* dwCore_pBlueprintList;
+
+// FITTO cheat: set bAvailable on every blueprint.
+extern "C" void dwPart_SetAllAvailable(int bAvailable)
+{
+    if (dwCore_pBlueprintList == NULL)
+        return;
+    for (dwListNode* pNode = dwCore_pBlueprintList->pNext; pNode != dwCore_pBlueprintList;
+         pNode = pNode->pNext)
+    {
+        ((dwPart*)pNode->pData)->bAvailable = (uint8_t)(bAvailable ? 1 : 0);
+    }
+}
+
 // C-callable helper for the dwCog dwcheckforpart verb: 1 if a part with the
 // given blueprint name is present in the current workspace droid.
 extern "C" int dwCog_WorkspaceHasPart(const char* pName)

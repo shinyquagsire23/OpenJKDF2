@@ -126,6 +126,8 @@ extern dwMission* dwCore_pCurrentMission;
 
 // dwCog dwenablemission/dwdisablemission verb helper (C-callable; typed access).
 void dwMission_SetUnlockedByName(const char* pName, int bUnlocked);
+// SOMONEY cheat: unlock every mission.
+void dwMission_UnlockAll(void);
 
 // Parse ONE mission record out of pConf (positioned ON the "BEGIN <name>"
 // line: the name is the next token) until its END line. Returns pMission.
