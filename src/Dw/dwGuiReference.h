@@ -144,13 +144,31 @@ struct dwGuiReference : dwGuiScreen
     char BuildDynamicControls(const char* pConfName, dwWidgetGroup* pGroupDefault,
                               dwWidgetGroup* pGroupHeader, dwWidgetGroup* pGroupDynamic,
                               dwWidgetGroup* pGroupUnused4, dwWidgetGroup* pGroupUnused5);
-    // Intro-video state machine (RefIntro/RefRoom/RStart .san). @42f800
-    int PlayIntroVideo();
     // Internet-launch gates (Win32 in the binary; portable stubs here). @42b7e0/@42b830/@42b920
     int HasBrowser();
     int CheckInternet();
     int ReadBrowserRegistry();
 };
+
+// ---- dwGuiRefIntroSeg --------------------------------------------------------
+//
+// Binary: new(0x18){ dwSegment_Ctor; state@0x14 = 0; vptr = 0x51f238 } — a tiny
+// dwSegment subclass spawned by dwGuiScreen msg 0x6a. Its Activate (@42f800,
+// Ghidra: dwGuiReference_PlayIntroVideo) is the reference-room intro-video state
+// machine: the segment manager re-Activates it after each movie interruption,
+// stepping RefIntro/RefRoom -> RStart -> the reference screen.
+
+struct dwGuiRefIntroSeg : dwSegment
+{
+    int32_t state; // 0x14: 0 = first movie, 1/3 = RStart next, 2 = open screen
+
+    dwGuiRefIntroSeg();
+    virtual int Activate(); // +0x00 @42f800 — the intro-video state machine
+};
+
+// Added: C factory (the binary constructed the segment inline at the msg-0x6a
+// site). Used by dwGuiScreen::OnMessage.
+extern "C" dwSegment* dwGuiReference_NewIntroSeg(void);
 
 #endif // __cplusplus
 

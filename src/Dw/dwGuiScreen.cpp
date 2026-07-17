@@ -1044,10 +1044,11 @@ int dwGuiScreen::OnMessage(dwWidgetMsg* pMsg)
             pSeg = dwGuiLoadSave_New(this->pSnapshotImage);
             break;
         case 0x6a:
-            // TODO(dw-decomp): 0x6a -> reference intro-video segment (unit
-            // dwGuiReference) — binary: new(0x18) { dwSegment_Ctor; +0x14 = 0;
-            // vptr = 0x51f238 (Activate = dwGuiReference_PlayIntroVideo) }.
-            stdPlatform_Printf("TODO(dw-decomp): dwGuiScreen msg 0x6a -> dwGuiReference intro-video segment (unit dwGuiReference) not translated yet\n");
+            // reference-room intro-video segment (unit dwGuiReference): binary
+            // new(0x18){ dwSegment_Ctor; state@0x14 = 0; vptr = 0x51f238 } — a
+            // self-advancing dwGuiRefIntroSeg that chains RefIntro/RefRoom ->
+            // RStart -> the reference screen. Same wiring as 0x65's EnterSeg.
+            pSeg = dwGuiReference_NewIntroSeg();
             break;
         default: // 0x69/0x6b/0x6c: cursor + render only
             break;

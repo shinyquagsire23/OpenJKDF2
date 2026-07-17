@@ -39,14 +39,6 @@ extern "C" void dwGuiReference_Startup(void)
     // No module statics.
 }
 
-// Shared LOUD-stub reporter for the entangled screen methods still blocked on
-// the dwGuiScreen base-internal overlay + not-yet-landed screens.
-static void dwGuiReference_StubReport(const char* pWhat)
-{
-    stdPlatform_Printf("TODO(dw-decomp): dwGuiReference::%s not translated yet "
-                       "(base-overlay ambiguity / unlanded deps)\n", pWhat);
-}
-
 // @0x53d968 — the reference-room "current topic" .plr TOPIC file (a dwString).
 // In the Ghidra decompile its pBuffer@0x53d970 appears as DAT_0053d970.
 extern dwString dwCore_currentRefFile;
@@ -913,23 +905,70 @@ char dwGuiReference::BuildDynamicControls(const char* pConfName, dwWidgetGroup* 
     return 1;
 }
 
-// @42f800 (dwGuiReference_PlayIntroVideo) — the intro-video state machine.
-// NOTE: in the binary this is the Activate of a SEPARATE tiny dwSegment
-// subclass (new(0x18){ dwSegment_Ctor; state@0x14=0; vptr=0x51f238 }), spawned
-// by dwGuiScreen msg 0x6a — NOT a dwGuiReference method; its `state` lives on
-// that segment. Full state machine (decoded, kept here for the recipe):
-//   state 0: statsFlags&0x40000000 ? OpenSeg("RefRoom.san")/state=1
-//                                   : OpenSeg("RefIntro.san")/state=3;  InterruptWith
-//   state 1: OpenSeg("RStart.san")/state=2;  InterruptWith
-//   state 3: RunModal("tutoryn_ref","DLG_ASKINDEXTUT")==5000 -> statsFlags|=0x48000000;
-//            OpenSeg("RStart.san")/state=2;  InterruptWith
-//   state 2: PushAndAdvance(new dwGuiReference(0))
-// TODO(dw-decomp): add a dwGuiRefIntroSeg (dwSegment subclass) whose Activate is
-// this body, and wire dwGuiScreen msg 0x6a to spawn it. Reached only via 0x6a.
-int dwGuiReference::PlayIntroVideo()
+// ---- dwGuiRefIntroSeg — reference-room intro-video segment (msg 0x6a) --------
+
+dwGuiRefIntroSeg::dwGuiRefIntroSeg()
 {
-    dwGuiReference_StubReport("PlayIntroVideo (needs dwGuiRefIntroSeg wrapper; msg 0x6a)");
+    this->state = 0;
+}
+
+// vtbl +0x00 @42f800 (Ghidra: dwGuiReference_PlayIntroVideo) — the intro-video
+// state machine. The segment manager re-Activates this after each movie
+// interruption, stepping the state machine. .san movies are stubbed (P8) so
+// dwMovie_OpenSeg finishes immediately, but the flow/state chain is faithful.
+//   state 0: statsFlags&0x40000000 ? RefRoom.san/state=1 : RefIntro.san/state=3
+//   state 1: RStart.san/state=2
+//   state 3: RunModal DLG_ASKINDEXTUT ==5000 -> statsFlags|=0x48000000; RStart.san/state=2
+//   state 2: PushAndAdvance(new dwGuiReference(0))
+int dwGuiRefIntroSeg::Activate()
+{
+    dwSound_SetMusic(NULL, 1);
+
+    dwSegment* pMovie = NULL;
+    bool bInterrupt = true;
+    if (this->state == 0)
+    {
+        if ((dwPlayer_statsFlags & 0x40000000) == 0)
+        {
+            pMovie = dwMovie_OpenSeg("RefIntro.san", NULL);
+            this->state = 3;
+        }
+        else
+        {
+            pMovie = dwMovie_OpenSeg("RefRoom.san", NULL);
+            this->state = 1;
+        }
+    }
+    else if (this->state == 1)
+    {
+        pMovie = dwMovie_OpenSeg("RStart.san", NULL);
+        this->state = 2;
+    }
+    else if (this->state == 3)
+    {
+        if (dwGuiDialog_RunModal("tutoryn_ref", "DLG_ASKINDEXTUT") == 5000)
+            dwPlayer_statsFlags |= 0x48000000;
+        pMovie = dwMovie_OpenSeg("RStart.san", NULL);
+        this->state = 2;
+    }
+    else // state 2: done chaining movies — open the reference screen
+    {
+        pMovie = static_cast<dwSegment*>(new dwGuiReference(NULL));
+        bInterrupt = false;
+    }
+
+    if (bInterrupt)
+        dwSegment_InterruptWith(dwSegment_pActive, pMovie);
+    else
+        dwSegment_PushAndAdvance(pMovie);
     return 1;
+}
+
+// Added: C factory (the binary constructed the segment inline at the msg-0x6a
+// site: new(0x18) + dwSegment_Ctor + state=0 + vtbl 0x51f238).
+extern "C" dwSegment* dwGuiReference_NewIntroSeg(void)
+{
+    return static_cast<dwSegment*>(new dwGuiRefIntroSeg());
 }
 
 // ---- internet-launch gates (Win32 in the binary; portable here) -----------------
