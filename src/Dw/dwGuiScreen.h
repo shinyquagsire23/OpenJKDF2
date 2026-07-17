@@ -100,6 +100,12 @@ char* dwGuiScreen_LocalizeString(char* pStr, dwStringTable* pTable);
 // function, distinct from the virtual factory slot @430a10)
 #ifdef __cplusplus
 dwWidget* dwGuiScreen_CreateControl(char* pKeyword, dwConfFile* pConf, dwStringTable* pStringTable);
+
+// Capture the active screen into a fresh image dimmed to 60% — the backdrop for
+// spawned sub-screens (0x66/0x68 commands; also dwGuiReference's dwGuiFind).
+// @inlined in the binary. C++-only (returns dwImage*).
+struct dwImage;
+dwImage* dwGuiScreen_CaptureShadedScreen();
 #else
 struct dwWidget* dwGuiScreen_CreateControl(char* pKeyword, dwConfFile* pConf, dwStringTable* pStringTable);
 #endif

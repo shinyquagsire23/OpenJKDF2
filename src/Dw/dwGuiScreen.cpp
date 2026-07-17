@@ -114,7 +114,8 @@ static dwWidget* dwGuiScreen_StubControl(const char* pKeyword, const char* pClas
 // dimmed backdrop handed to sub-screens spawned by the 0x66/0x68 commands.
 // Note: the binary inlines this twice in OnMessage; factored here verbatim.
 // The screen-image NULL guard is added (the binary assumes an open display).
-static dwImage* dwGuiScreen_CaptureShadedScreen()
+// Exported (was static) so dwGuiReference's dwGuiFind spawn reuses it.
+dwImage* dwGuiScreen_CaptureShadedScreen()
 {
     dwImage* pSnap;
     dwRect rect;

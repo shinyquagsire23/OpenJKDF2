@@ -17,6 +17,15 @@
 #include "Dw/dwList.h"
 #include "Dw/dwWidgetGroup.h"
 #include "Dw/dwImageDraw.h"    // dwGuiRefTile_Draw -> FrameRect
+#include "Dw/dwGuiScreen.h"    // dwGuiScreen_CaptureShadedScreen
+#include "Dw/dwGuiFind.h"      // dwGuiFind_New (topic-search spawn)
+#include "Dw/dwSound.h"        // dwSound_SetMusic/StopAll/PauseAll/ResumeAll
+#include "Dw/dwCursor.h"       // dwCursor_SetCursor/Redraw
+#include "Dw/dwSegment.h"      // dwSegment_RequestAdvance/InterruptWith/pActive
+#include "Dw/dwWidget.h"       // dwWidget_DispatchMsg, dwWidgetMsg
+#include "Dw/dwGuiOptions.h"   // dwMovie_OpenSeg (.san intro-video segments)
+#include "Dw/dwInits.h"        // inits_EnumFilesByExt
+#include "Dw/dwPlayer.h"       // dwPlayer_statsFlags
 
 #include "jk.h"
 #include "stdPlatform.h" // stdPlatform_Printf (LOUD-stub reporter)
@@ -36,6 +45,58 @@ static void dwGuiReference_StubReport(const char* pWhat)
 {
     stdPlatform_Printf("TODO(dw-decomp): dwGuiReference::%s not translated yet "
                        "(base-overlay ambiguity / unlanded deps)\n", pWhat);
+}
+
+// @0x53d968 — the reference-room "current topic" .plr TOPIC file (a dwString).
+// In the Ghidra decompile its pBuffer@0x53d970 appears as DAT_0053d970.
+extern dwString dwCore_currentRefFile;
+
+// --- content-group list helpers ---------------------------------------------
+// The binary rebuilds reference pages by (a) deleting every widget in a content
+// group and (b) re-appending freshly-built controls. Both the inlined clear
+// loops and the shared dwWcMaterials_ClearItems COMDAT do: unlink+free each
+// node (dwList_UnlinkFreeNode) then `delete` the child (vtbl +0x00, flag 1).
+
+static void dwGuiReference_ClearGroup(dwWidgetGroup* pGroup)
+{
+    if (pGroup == NULL)
+        return;
+    dwList* pChildren = &pGroup->children;
+    dwListNode* pSent = pChildren->pSentinel;
+    dwListNode* pNode = pSent->pNext;
+    while (pNode != pSent)
+    {
+        dwWidget* pChild = (dwWidget*)pNode->pData;
+        dwListNode* pNext = pNode->pNext;
+        pChildren->UnlinkFreeNode(pNode);
+        if (pChild)
+            delete pChild;
+        pNode = pNext;
+    }
+}
+
+// Append a built control to a group. The binary appends at the tail for most
+// keywords (InsertAfter(pSentinel->pPrev)) and at the head only for
+// BUTTONHELPRECT / the OnActivate content sub-groups.
+static void dwGuiReference_AppendBack(dwWidgetGroup* pGroup, dwWidget* pChild)
+{
+    pGroup->children.InsertAfter(pGroup->children.pSentinel->pPrev, pChild);
+}
+static void dwGuiReference_AppendFront(dwWidgetGroup* pGroup, dwWidget* pChild)
+{
+    pGroup->children.InsertAfter(pGroup->children.pSentinel, pChild);
+}
+
+// Post a widget message to the active screen (dwWidget_DispatchMsg with a
+// stack {code, pSender, param, pTarget} record and no override target).
+static void dwGuiReference_PostMsg(uint32_t code, void* pSender)
+{
+    dwWidgetMsg msg;
+    msg.code = (int32_t)code;
+    msg.pSender = pSender;
+    msg.param = 0;
+    msg.pTarget = NULL;
+    dwWidget_DispatchMsg(&msg, NULL);
 }
 
 // =================================================================================
@@ -323,9 +384,249 @@ dwWidget* dwGuiReference::CreateControl(char* pKeyword, dwConfFile* pConf)
 // build the info-card page via BuildDynamicControls, LAUNCH_URL flow), 7000
 // (set current file) and 0x96 (advance). Blocked on the dwGuiScreen embedded-
 // group overlay ambiguity + unlanded dwGuiFind; full recipe at binary @42ba30.
+// Clear a set of content groups (helper for the page-navigation cases).
+static void dwGuiReference_ClearGroups(dwWidgetGroup* a, dwWidgetGroup* b, dwWidgetGroup* c,
+                                       dwWidgetGroup* d, dwWidgetGroup* e)
+{
+    dwGuiReference_ClearGroup(a);
+    dwGuiReference_ClearGroup(b);
+    dwGuiReference_ClearGroup(c);
+    dwGuiReference_ClearGroup(d);
+    dwGuiReference_ClearGroup(e);
+}
+
+// @42ba30 (dwGuiReference_OnMessage, vtbl +0x1c). Topic navigation + the
+// reference-room command handlers. Field mapping was pinned from the
+// disassembly (direct this-relative offsets): the 5 content groups
+// (pContentGroup/pChildEc/pChildF0/pChildF4/pChildF8), menuMode (@0x10c),
+// bReloadPending (@0xd8), bReloadMaterials (@0x108), byte120 (@0x120), the
+// currentFile/scratch114 dwStrings, and the pStringTable base member. DAT_0053d970
+// is dwCore_currentRefFile.pBuffer.
 int dwGuiReference::OnMessage(dwWidgetMsg* pMsg)
 {
-    dwGuiReference_StubReport("OnMessage");
+    uint32_t code = (uint32_t)pMsg->code;
+    dwSegment* pSpawned = NULL;
+
+    if (code < 0x1b59)
+    {
+        if (code == 7000)
+        {
+            // Select a new (non-materials) topic; Update rebuilds the page.
+            char* pFile = (char*)pMsg->pSender;
+            if (this->pContentGroup != NULL &&
+                !dwString_Equals(this->scratch114.pBuffer, dwCore_currentRefFile.pBuffer) &&
+                this->byte120 == 0)
+            {
+                this->scratch114.Assign(dwCore_currentRefFile.pBuffer, 0);
+            }
+            this->currentFile.Assign(pFile, 0);
+            char* pName = pFile;
+            dwString_FindFilename(&pName);
+            dwCore_currentRefFile.Assign(pName, 0);
+            this->bReloadPending = 1;
+            if (this->byte120)
+                this->byte120 = 0;
+        }
+        else if (code == 0x96)
+        {
+            dwSegment_RequestAdvance();
+        }
+    }
+    else
+    {
+        switch (code)
+        {
+        case 0x1b5a:
+        {
+            // Refresh the current cached topic (re-post 0x1b5c/0x1b60).
+            if (this->pContentGroup != NULL)
+            {
+                dwStringTable* pTable = new dwStringTable(this->scratch114.pBuffer);
+                uint32_t next = (pTable && pTable->Find("FREQUENCY")) ? 0x1b60 : 0x1b5c;
+                dwGuiReference_PostMsg(next, this->scratch114.pBuffer);
+                if (pTable)
+                    delete pTable;
+            }
+            break;
+        }
+        case 0x1b5b:
+            // Spawn the topic-search ("Find") screen over a shaded snapshot.
+            this->pSnapshotImage = dwGuiScreen_CaptureShadedScreen();
+            this->byte120 = 1;
+            this->scratch114.Assign(dwCore_currentRefFile.pBuffer, 0);
+            dwSound_StopAll();
+            pSpawned = dwGuiFind_New(this->pSnapshotImage);
+            break;
+        case 0x1b5c:
+        {
+            // Show a topic: build ObsMenuSelect, falling back to InqMenuSelect.
+            dwCursor_SetCursor(4);
+            dwCursor_Redraw();
+            char* pTopic = (char*)pMsg->pSender;
+            char localName[128];
+            localName[0] = '\0';
+            if (pTopic)
+            {
+                _strncpy(localName, pTopic, sizeof(localName) - 1);
+                localName[sizeof(localName) - 1] = '\0';
+            }
+            if (this->pStringTable)
+                delete this->pStringTable;
+            this->pStringTable = new dwStringTable(pTopic);
+            if (!dwString_Equals(this->scratch114.pBuffer, dwCore_currentRefFile.pBuffer) &&
+                dwCore_currentRefFile.length != 0 &&
+                !dwString_Equals(dwCore_currentRefFile.pBuffer, localName) &&
+                this->byte120 == 0)
+            {
+                this->scratch114.Assign(dwCore_currentRefFile.pBuffer, 0);
+            }
+            dwCore_currentRefFile.Assign(localName, 0);
+            dwGuiReference_ClearGroups(this->pContentGroup, this->pChildEc, this->pChildF0,
+                                       this->pChildF4, this->pChildF8);
+            this->menuMode = 4;
+            char ok = this->BuildDynamicControls("ObsMenuSelect.ifc", this->pContentGroup,
+                                                 this->pChildEc, this->pChildF0,
+                                                 this->pChildF4, this->pChildF8);
+            if (ok == 0)
+            {
+                dwGuiReference_ClearGroups(this->pContentGroup, this->pChildEc, this->pChildF0,
+                                           this->pChildF4, this->pChildF8);
+                this->menuMode = 3;
+                this->BuildDynamicControls("InqMenuSelect.ifc", this->pContentGroup,
+                                           this->pChildEc, this->pChildF0,
+                                           this->pChildF4, this->pChildF8);
+            }
+            dwCursor_SetCursor(1);
+            dwCursor_Redraw();
+            if (this->byte120)
+                this->byte120 = 0;
+            break;
+        }
+        case 0x1b5d:
+            // Observation sub-page.
+            if (this->menuMode != 1 && this->menuMode != 4)
+            {
+                dwCursor_SetCursor(4);
+                dwCursor_Redraw();
+                this->menuMode = 1;
+                dwGuiReference_ClearGroup(this->pContentGroup);
+                dwGuiReference_ClearGroup(this->pChildF4);
+                dwGuiReference_ClearGroup(this->pChildF0);
+                dwGuiReference_ClearGroup(this->pChildF8);
+                this->BuildDynamicControls("Observation.ifc", this->pContentGroup,
+                                           this->pChildEc, this->pChildF0, NULL, this->pChildF8);
+                dwCursor_SetCursor(1);
+                dwCursor_Redraw();
+            }
+            break;
+        case 0x1b5e:
+            // Earthquest sub-page (single content group).
+            if (this->menuMode != 2)
+            {
+                dwCursor_SetCursor(4);
+                this->menuMode = 2;
+                dwGuiReference_ClearGroup(this->pContentGroup);
+                dwGuiReference_ClearGroup(this->pChildF0);
+                dwGuiReference_ClearGroup(this->pChildF4);
+                dwGuiReference_ClearGroup(this->pChildF8);
+                this->BuildDynamicControls("Earthquest.ifc", this->pContentGroup,
+                                           NULL, NULL, NULL, NULL);
+                dwCursor_SetCursor(1);
+            }
+            break;
+        case 0x1b5f:
+            // Definition sub-page.
+            if (this->menuMode != 0 && this->menuMode != 3)
+            {
+                dwCursor_SetCursor(4);
+                dwCursor_Redraw();
+                this->menuMode = 0;
+                dwGuiReference_ClearGroup(this->pContentGroup);
+                dwGuiReference_ClearGroup(this->pChildF4);
+                dwGuiReference_ClearGroup(this->pChildF0);
+                dwGuiReference_ClearGroup(this->pChildF8);
+                this->BuildDynamicControls("Definition.ifc", this->pContentGroup,
+                                           this->pChildEc, this->pChildF0, NULL, this->pChildF8);
+                dwCursor_SetCursor(1);
+                dwCursor_Redraw();
+            }
+            break;
+        case 0x1b60:
+        {
+            // Select a materials topic; Update rebuilds the Materials page.
+            char* pTopic = (char*)pMsg->pSender;
+            char localName[128];
+            localName[0] = '\0';
+            if (pTopic)
+            {
+                _strncpy(localName, pTopic, sizeof(localName) - 1);
+                localName[sizeof(localName) - 1] = '\0';
+            }
+            if (this->pStringTable)
+                delete this->pStringTable;
+            this->pStringTable = new dwStringTable(pTopic);
+            if (dwString_Equals(this->scratch114.pBuffer, dwCore_currentRefFile.pBuffer) ||
+                dwCore_currentRefFile.length == 0)
+            {
+                if (this->byte120)
+                    this->byte120 = 0;
+            }
+            else if (this->byte120 == 0)
+            {
+                this->scratch114.Assign(dwCore_currentRefFile.pBuffer, 0);
+            }
+            else
+            {
+                this->byte120 = 0;
+            }
+            dwCore_currentRefFile.Assign(localName, 0);
+            this->bReloadMaterials = 1;
+            break;
+        }
+        case 0x1b61:
+            // LAUNCH_URL: the parental-lockout / browser gates + a confirm dialog.
+            // The binary then WinExec()s the localized URL; there is no portable
+            // browser launcher here (mirrors HasBrowser/CheckInternet stubs), so
+            // the launch itself is a no-op with a note.
+            if (this->ReadBrowserRegistry() == 0)
+            {
+                dwGuiDialog_RunModal("gmessage", "DLG_INETLOCKOUT");
+            }
+            else if (this->HasBrowser() == 0)
+            {
+                dwGuiDialog_RunModal("gmessage", "DLG_NOBROWSER");
+            }
+            else if (dwGuiDialog_RunModal("gyesno", "DLG_INETCONNECT") == 5000)
+            {
+                dwSound_PauseAll();
+                dwSound_SetMusic(0, 1);
+                char okNet = (char)this->CheckInternet();
+                dwSound_ResumeAll();
+                dwSound_SetMusic(this->musicName.pBuffer, 1);
+                if (okNet)
+                {
+                    stdPlatform_Printf("TODO(dw-decomp): dwGuiReference LAUNCH_URL '%s' "
+                                       "(no portable browser launcher)\n",
+                                       dwGuiScreen_LocalizeString((char*)"LAUNCH_URL", NULL));
+                }
+                else
+                {
+                    dwGuiDialog_RunModal("gmessage", "DLG_NODIALUP");
+                }
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    // If a sub-screen was spawned (0x1b5b), broadcast the screen-switch and
+    // interrupt into it.
+    if (pSpawned)
+    {
+        dwGuiReference_PostMsg(0x7532, NULL);
+        dwSegment_InterruptWith(dwSegment_pActive, pSpawned);
+    }
     return dwGuiScreen::OnMessage(pMsg);
 }
 
@@ -335,9 +636,92 @@ int dwGuiReference::OnMessage(dwWidgetMsg* pMsg)
 // forwards the tick. Blocked on the same overlay ambiguity; recipe at @42ed50.
 void dwGuiReference::Update(float dt)
 {
-    if (this->bReloadPending || this->bReloadMaterials)
-        dwGuiReference_StubReport("Update(page reload)");
-    // Forward the tick to the base (embedded controls group).
+    if (this->bReloadPending == 0)
+    {
+        if (this->bReloadMaterials != 0)
+        {
+            // A material property changed: rebuild only the Materials page.
+            dwCursor_SetCursor(4);
+            dwCursor_Redraw();
+            dwGuiReference_ClearGroup(this->pChildEc);
+            dwGuiReference_ClearGroup(this->pChildF0);
+            dwGuiReference_ClearGroup(this->pChildF4);
+            dwGuiReference_ClearGroup(this->pContentGroup);
+            dwGuiReference_ClearGroup(this->pChildF8);
+            this->menuMode = 5;
+            this->BuildDynamicControls("Materials.ifc", this->pContentGroup,
+                                       this->pChildEc, this->pChildF0, NULL, NULL);
+            this->bReloadMaterials = 0;
+            dwCursor_SetCursor(1);
+            dwCursor_Redraw();
+        }
+    }
+    else
+    {
+        // A new topic was selected (7000): rebuild the whole page from its file.
+        dwCursor_SetCursor(4);
+        dwCursor_Redraw();
+        if (this->pStringTable)
+            delete this->pStringTable;
+        this->pStringTable = new dwStringTable(this->currentFile.pBuffer);
+
+        dwGuiReference_ClearGroup(this->pContentGroup);
+        dwGuiReference_ClearGroup(this->pChildEc);
+        dwGuiReference_ClearGroup(this->pChildF0);
+        dwGuiReference_ClearGroup(this->pChildF4);
+        dwGuiReference_ClearGroup(this->pChildF8);
+
+        // Read the topic's TOPIC_CATEGORY to pick the layout.
+        dwConfFile conf;
+        dwConfFile_Open(&conf, this->currentFile.pBuffer);
+        char* pCategory = NULL;
+        while (conf.bEof == 0)
+        {
+            dwConfFile_ReadLine(&conf);
+            char* pTok = dwConfFile_NextToken(&conf);
+            if (dwString_Equals(pTok, "TOPIC_CATEGORY"))
+            {
+                pCategory = dwConfFile_NextToken(&conf);
+                break;
+            }
+        }
+
+        // (The binary also forces Materials when the file's extension matches a
+        //  sentinel; the TOPIC_CATEGORY test covers the normal case.)
+        if (dwString_Equals(pCategory, "Materials"))
+        {
+            this->menuMode = 5;
+            this->BuildDynamicControls("Materials.ifc", this->pContentGroup,
+                                       this->pChildEc, this->pChildF0, NULL, NULL);
+        }
+        else
+        {
+            this->menuMode = 4;
+            char ok = this->BuildDynamicControls("ObsMenuSelect.ifc", this->pContentGroup,
+                                                 this->pChildEc, this->pChildF0,
+                                                 this->pChildF8, NULL);
+            if (ok == 0)
+            {
+                // ObsMenuSelect hit its STILL_FRAME early-out: use the inquiry menu.
+                dwGuiReference_ClearGroup(this->pContentGroup);
+                dwGuiReference_ClearGroup(this->pChildEc);
+                dwGuiReference_ClearGroup(this->pChildF0);
+                dwGuiReference_ClearGroup(this->pChildF4);
+                dwGuiReference_ClearGroup(this->pChildF8);
+                this->menuMode = 3;
+                this->BuildDynamicControls("InqMenuSelect.ifc", this->pContentGroup,
+                                           this->pChildEc, this->pChildF0,
+                                           this->pChildF4, this->pChildF8);
+            }
+        }
+
+        this->bReloadPending = 0;
+        dwCursor_SetCursor(1);
+        dwCursor_Redraw();
+        dwConfFile_Close(&conf);
+    }
+
+    // Tick the base controls group (which owns the content sub-groups).
     dwGuiScreen::Update(dt);
 }
 
@@ -348,7 +732,83 @@ void dwGuiReference::Update(float dt)
 int dwGuiReference::Activate()
 {
     int r = dwGuiScreen::Activate();
-    dwGuiReference_StubReport("Activate(build content groups + first page)");
+    dwPlayer_statsFlags |= 0x40000000;
+
+    // First activation: build the 5 content sub-groups and link them into the
+    // embedded `controls` list (head-inserted, matching the binary's
+    // dwRefGraph_ListAppend). They then tick/draw via the base controls group.
+    if (r != 0 && this->pContentGroup == NULL)
+    {
+        this->pContentGroup = new dwWidgetGroup();
+        dwGuiReference_AppendFront(&this->controls, this->pContentGroup);
+        this->pChildEc = new dwWidgetGroup();
+        dwGuiReference_AppendFront(&this->controls, this->pChildEc);
+        this->pChildF0 = new dwWidgetGroup();
+        dwGuiReference_AppendFront(&this->controls, this->pChildF0);
+        this->pChildF4 = new dwWidgetGroup();
+        dwGuiReference_AppendFront(&this->controls, this->pChildF4);
+        this->pChildF8 = new dwWidgetGroup();
+        dwGuiReference_AppendFront(&this->controls, this->pChildF8);
+    }
+
+    // Load the initial topic page. Post 0x1b5c (normal topic) or 0x1b60
+    // (materials topic, has a FREQUENCY entry) to ourselves; Update/OnMessage
+    // do the actual page build.
+    dwStringTable* pTable = NULL;
+    uint32_t msgCode = 0x1b5c;
+    char* pTopicName = NULL;
+
+    if (this->path.length == 0)
+    {
+        // No ctor sub-path: use the player's current topic, else enumerate the
+        // TPC topic files and open the first one.
+        // (The binary also treats a sentinel-valued current file as "none";
+        //  the empty-string check below covers the common case.)
+        if (dwCore_currentRefFile.length == 0 || dwCore_currentRefFile.pBuffer == NULL)
+        {
+            inits_EnumFilesByExt("TPC", &this->pTopicList);
+            dwListNode* pFirst = this->pTopicList.pSentinel->pNext;
+            if (this->scratch114.length == 0 || this->byte120 == 0)
+                this->scratch114.Assign(dwCore_currentRefFile.pBuffer, 0);
+            pTopicName = (pFirst != this->pTopicList.pSentinel && pFirst->pData)
+                             ? ((dwString*)pFirst->pData)->pBuffer
+                             : NULL;
+            pTable = new dwStringTable(pTopicName);
+            msgCode = (pTable && pTable->Find("FREQUENCY")) ? 0x1b60 : 0x1b5c;
+        }
+        else
+        {
+            pTopicName = dwCore_currentRefFile.pBuffer;
+            if (this->scratch114.length == 0 || this->byte120 == 0)
+                this->scratch114.Assign(dwCore_currentRefFile.pBuffer, 0);
+            pTable = new dwStringTable(pTopicName);
+            if (pTable && pTable->Find("FREQUENCY")) { this->byte120 = 1; msgCode = 0x1b60; }
+            else msgCode = 0x1b5c;
+        }
+    }
+    else
+    {
+        // A ctor sub-path was supplied: open it directly.
+        pTopicName = this->path.pBuffer;
+        if (!dwString_Equals(this->scratch114.pBuffer, this->path.pBuffer))
+        {
+            this->scratch114.Free();
+            this->scratch114.Assign(this->path.pBuffer, 0);
+        }
+        pTable = new dwStringTable(pTopicName);
+        msgCode = (pTable && pTable->Find("FREQUENCY")) ? 0x1b60 : 0x1b5c;
+    }
+
+    dwGuiReference_PostMsg(msgCode, pTopicName);
+    if (pTable)
+        delete pTable;
+
+    // Enter the reference tutorial the first time (statsFlags bit 0x08000000).
+    if (r != 0 && (dwPlayer_statsFlags & 0x08000000))
+    {
+        dwPlayer_statsFlags = (dwPlayer_statsFlags & ~0x08000000u) | 0x40000000;
+        dwGuiReference_PostMsg(0x792a, NULL);
+    }
     return r;
 }
 
@@ -357,22 +817,118 @@ int dwGuiReference::Activate()
 // STRIPTIMER/ICON_ANIM_PLAY/BUTTONHELPRECT/TEXTPOPUP), building each control via
 // the virtual CreateControl and prepending it into the target group. Recipe at
 // binary @42ae40. Returns 1 (the binary's success path).
-char dwGuiReference::BuildDynamicControls(dwConfFile* pConf, dwWidgetGroup* pGroupA,
-                                          dwWidgetGroup* pGroupB, dwWidgetGroup* pGroupC,
-                                          dwWidgetGroup* pGroupD)
+char dwGuiReference::BuildDynamicControls(const char* pConfName, dwWidgetGroup* pGroupDefault,
+                                          dwWidgetGroup* pGroupHeader, dwWidgetGroup* pGroupDynamic,
+                                          dwWidgetGroup* pGroupUnused4, dwWidgetGroup* pGroupUnused5)
 {
-    (void)pConf; (void)pGroupA; (void)pGroupB; (void)pGroupC; (void)pGroupD;
-    dwGuiReference_StubReport("BuildDynamicControls");
+    (void)pGroupUnused4;
+    (void)pGroupUnused5;
+    if (pGroupDefault == NULL)
+        pGroupDefault = &this->controls; // param_2 defaults to the controls group
+    if (pConfName == NULL)
+        return 1;
+
+    dwConfFile conf;
+    dwConfFile_Open(&conf, pConfName);
+    while (conf.bEof == 0)
+    {
+        dwConfFile_ReadLine(&conf);
+        char* pKeyword = dwConfFile_NextToken(&conf);
+
+        // Each keyword's guard is ANDed with the match: a keyword whose target
+        // group is NULL falls through to the default handler (append to
+        // pGroupDefault), exactly as the binary's nested if/else chain does.
+        if (dwString_Equals(pKeyword, "DYNAMIC_CONTROL") && pGroupDynamic != NULL)
+        {
+            char* pSub = dwGuiScreen_LocalizeString(dwConfFile_NextToken(&conf), this->pStringTable);
+            if (dwString_Equals(pSub, "STILL_FRAME") && this->bSuppressStill && this->menuMode == 4)
+            {
+                this->bSuppressStill = 0;
+                this->Invalidate();
+                dwConfFile_Close(&conf);
+                return 0; // early-out drives the InqMenuSelect fallback
+            }
+            dwWidget* pCtl = this->CreateControl(pSub, &conf);
+            if (pCtl)
+                dwGuiReference_AppendBack(pGroupDynamic, pCtl);
+        }
+        else if (dwString_Equals(pKeyword, "NUMERATED_HEADER_CONTROLS") && pGroupHeader != NULL)
+        {
+            int n = atoi(dwGuiScreen_LocalizeString(conf.pCursor, this->pStringTable));
+            int pad = 2 - n;
+            while (n != 0 && conf.bEof == 0)
+            {
+                n--;
+                dwConfFile_ReadLine(&conf);
+                dwWidget* pCtl = this->CreateControl(dwConfFile_NextToken(&conf), &conf);
+                if (pCtl)
+                    dwGuiReference_AppendBack(pGroupHeader, pCtl);
+            }
+            for (; pad > 0; pad--)
+                dwConfFile_ReadLine(&conf);
+        }
+        else if (dwString_Equals(pKeyword, "NUMERATED_CONTROLS") && this->pChildF8 != NULL)
+        {
+            int n = atoi(dwGuiScreen_LocalizeString(conf.pCursor, this->pStringTable));
+            int pad = 5 - n;
+            while (n != 0 && conf.bEof == 0)
+            {
+                n--;
+                dwConfFile_ReadLine(&conf);
+                dwWidget* pCtl = this->CreateControl(dwConfFile_NextToken(&conf), &conf);
+                if (pCtl)
+                    dwGuiReference_AppendBack(this->pChildF8, pCtl);
+            }
+            for (; pad > 0; pad--)
+                dwConfFile_ReadLine(&conf);
+        }
+        else if ((dwString_Equals(pKeyword, "STRIPTIMER") || dwString_Equals(pKeyword, "ICON_ANIM_PLAY"))
+                 && pGroupHeader != NULL)
+        {
+            dwWidget* pCtl = this->CreateControl(pKeyword, &conf);
+            if (pCtl)
+                dwGuiReference_AppendBack(pGroupHeader, pCtl);
+        }
+        else if (dwString_Equals(pKeyword, "BUTTONHELPRECT") && pGroupHeader != NULL)
+        {
+            dwWidget* pCtl = this->CreateControl(pKeyword, &conf);
+            if (pCtl)
+                dwGuiReference_AppendFront(pGroupHeader, pCtl); // head insert
+        }
+        else if (dwString_Equals(pKeyword, "TEXTPOPUP"))
+        {
+            dwWidget* pCtl = this->CreateControl(pKeyword, &conf);
+            if (pCtl)
+                dwGuiReference_AppendBack(this->pContentGroup, pCtl);
+        }
+        else
+        {
+            dwWidget* pCtl = this->CreateControl(pKeyword, &conf);
+            if (pCtl)
+                dwGuiReference_AppendBack(pGroupDefault, pCtl);
+        }
+    }
+    this->Invalidate();
+    dwConfFile_Close(&conf);
     return 1;
 }
 
-// @42f800 (dwGuiReference_PlayIntroVideo) — LOUD-stub. The intro-video state
-// machine: plays RefIntro.san (first visit) / RefRoom.san (returning) / RStart
-// .san, gated by the reference tutorial prompt, via jkSmack + the segment stack.
-// Blocked on jkSmack + the base video-state field; recipe at binary @42f800.
+// @42f800 (dwGuiReference_PlayIntroVideo) — the intro-video state machine.
+// NOTE: in the binary this is the Activate of a SEPARATE tiny dwSegment
+// subclass (new(0x18){ dwSegment_Ctor; state@0x14=0; vptr=0x51f238 }), spawned
+// by dwGuiScreen msg 0x6a — NOT a dwGuiReference method; its `state` lives on
+// that segment. Full state machine (decoded, kept here for the recipe):
+//   state 0: statsFlags&0x40000000 ? OpenSeg("RefRoom.san")/state=1
+//                                   : OpenSeg("RefIntro.san")/state=3;  InterruptWith
+//   state 1: OpenSeg("RStart.san")/state=2;  InterruptWith
+//   state 3: RunModal("tutoryn_ref","DLG_ASKINDEXTUT")==5000 -> statsFlags|=0x48000000;
+//            OpenSeg("RStart.san")/state=2;  InterruptWith
+//   state 2: PushAndAdvance(new dwGuiReference(0))
+// TODO(dw-decomp): add a dwGuiRefIntroSeg (dwSegment subclass) whose Activate is
+// this body, and wire dwGuiScreen msg 0x6a to spawn it. Reached only via 0x6a.
 int dwGuiReference::PlayIntroVideo()
 {
-    dwGuiReference_StubReport("PlayIntroVideo");
+    dwGuiReference_StubReport("PlayIntroVideo (needs dwGuiRefIntroSeg wrapper; msg 0x6a)");
     return 1;
 }
 

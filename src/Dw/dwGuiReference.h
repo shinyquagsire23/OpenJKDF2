@@ -22,15 +22,20 @@
 //
 // Everything verifiably C++ (two vtables, ctor/dtor pair, MSVC EH frames).
 //
-// ⚠ TRANSLATION STATUS: the data/lifecycle methods, dwGuiRefTile, the internet
-// helpers and the GRAPH/PULLDOWN_MENU/CONTROLPANEL/CAT_RADIOGROUP/BUTTONHELPRECT/
-// ICON_ANIM_PLAY factory branches are fully translated. The three giant screen
-// methods (Activate/OnMessage/Update) plus BuildAnimViewer/BuildDynamicControls
-// and the text-control CreateControl branches are LOUD-stubbed: they poke the
-// dwGuiScreen base's embedded-group internals through raw offsets that Ghidra
-// renders ambiguously, and call several not-yet-landed screens/controls
-// (dwGuiFind, dwGuiPicture, dwWcMaterials, dwGuiAnimView, dwHelp). Each stub
-// preserves the full binary recipe in a comment. See dwGuiReference.cpp.
+// ⚠ TRANSLATION STATUS (updated 2026-07-17): the three giant screen methods
+// (Activate/OnMessage/Update), BuildDynamicControls, the data/lifecycle methods,
+// dwGuiRefTile, the internet helpers and the GRAPH/PULLDOWN_MENU/CONTROLPANEL/
+// CAT_RADIOGROUP/BUTTONHELPRECT/ICON_ANIM_PLAY factory branches are now fully
+// translated. The "base-overlay ambiguity" was resolved via the disassembly:
+// scn-side methods (Activate) get the dwSegment subobject as `this` (+0x10) —
+// the C++ compiler regenerates that thunk, so real member access is exact; the
+// decompiler's `param_1_00[1].FIELD` overlay names were heuristic (no struct)
+// and the actual code uses direct this-relative offsets that match this struct.
+// REMAINING stubs: PlayIntroVideo (belongs on a small dwGuiRefIntroSeg dwSegment
+// subclass reached via dwGuiScreen msg 0x6a — recipe in .cpp) and BuildAnimViewer
+// (ANIM_VIEWER/BACKDROP/BILEVEL/STILL_FRAME CreateControl branches; the Ghidra
+// decompile is register-corrupted — needs a disasm-level pass). Both fall
+// through to the base factory today. See dwGuiReference.cpp.
 
 #include "Dw/dwTypes.h"
 #include "Dw/dwRect.h"
@@ -130,9 +135,15 @@ struct dwGuiReference : dwGuiScreen
     virtual int Activate();  // @42b300 (Ghidra: dwGuiReference_OnActivate)
 
     // ---- non-virtual helpers ----
-    // Re-parse a topic sub-section script into the 5 content groups. @42ae40
-    char BuildDynamicControls(dwConfFile* pConf, dwWidgetGroup* pGroupA, dwWidgetGroup* pGroupB,
-                              dwWidgetGroup* pGroupC, dwWidgetGroup* pGroupD);
+    // Re-parse a topic .ifc sub-section, dispatching each keyword through the
+    // virtual CreateControl and appending the result into one of the content
+    // groups. @42ae40. Callers pass 5 groups; the compiled body only reads the
+    // first three as params (pGroupDefault/pGroupHeader/pGroupDynamic) plus
+    // this->pContentGroup + this->pChildF8 — the last two params are dead but
+    // kept to match the call sites. Returns 0 only on the STILL_FRAME early-out.
+    char BuildDynamicControls(const char* pConfName, dwWidgetGroup* pGroupDefault,
+                              dwWidgetGroup* pGroupHeader, dwWidgetGroup* pGroupDynamic,
+                              dwWidgetGroup* pGroupUnused4, dwWidgetGroup* pGroupUnused5);
     // Intro-video state machine (RefIntro/RefRoom/RStart .san). @42f800
     int PlayIntroVideo();
     // Internet-launch gates (Win32 in the binary; portable stubs here). @42b7e0/@42b830/@42b920
