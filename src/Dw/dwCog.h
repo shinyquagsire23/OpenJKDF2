@@ -95,6 +95,8 @@ void dwCog_GetActivateBin(sithCog* pCtx);             // @44cb90 (verb "dwgetact
 void dwCog_SendPendingMessage();                      // @44cbb0
 void dwCog_ScanPuppetCallback(SithThing* pThing, int32_t track, uint32_t markerType); // @44cc10
 
+void dwCog_RegisterVerbs(void);
+
 #endif // PLATFORM_DROIDWORKS
 
 #ifdef __cplusplus

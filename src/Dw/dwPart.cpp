@@ -146,6 +146,40 @@ extern "C" dwPart* dwPart_FindBlueprint(const char* pName)
     return (dwPart*)stdHashtbl_Find(dwPart_hashBlueprints, pName);
 }
 
+// Workspace node list sentinel (@0x53d984), owned by dw core / dwDroidStats.
+extern "C" dwListNode* dwCore_pWorkspaceNodes;
+
+// C-callable helper for the dwCog dwenablepart/dwdisablepart verbs: set a
+// blueprint's bAvailable flag by name. Typed access (the binary's `+5` offset
+// is 32-bit-specific). Returns 1 if the blueprint was found.
+extern "C" int dwPart_SetAvailableByName(const char* pName, int bAvailable)
+{
+    dwPart* pPart = dwPart_FindBlueprint(pName);
+    if (pPart == NULL)
+        return 0;
+    pPart->bAvailable = (uint8_t)(bAvailable ? 1 : 0);
+    return 1;
+}
+
+// C-callable helper for the dwCog dwcheckforpart verb: 1 if a part with the
+// given blueprint name is present in the current workspace droid.
+extern "C" int dwCog_WorkspaceHasPart(const char* pName)
+{
+    if (dwCore_pWorkspaceNodes == NULL)
+        return 0;
+    for (dwListNode* pNode = dwCore_pWorkspaceNodes->pNext; pNode != dwCore_pWorkspaceNodes;
+         pNode = pNode->pNext)
+    {
+        dwPartNode* pPartNode = (dwPartNode*)pNode->pData;
+        if (pPartNode && pPartNode->pPart &&
+            dwString_Equals(pPartNode->pPart->name.pBuffer, pName))
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 // ---------------------------------------------------------------------------
 // dwPartNode
 // ---------------------------------------------------------------------------

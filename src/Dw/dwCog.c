@@ -466,3 +466,90 @@ void dwCog_ScanPuppetCallback(SithThing* pThing, int32_t track, uint32_t markerT
     }
     sithPuppet_DefaultCallback(pThing, track, markerType);
 }
+
+
+// =========================================================================
+// dwCog verb layer (part 1, @409360 dwCog_RegisterVerbs). Each verb is
+// `void dwCog_Verb(sithCog*)`. DW-data verbs that poke C++ structs go through
+// C-callable typed accessors (dw{Mission,Part}_*) because the binary's raw
+// field offsets are 32-bit-specific and wrong in this 64-bit port.
+// =========================================================================
+
+// Typed accessors implemented in the owning C++ modules.
+extern void dwMission_SetUnlockedByName(const char* pName, int bUnlocked);
+extern int  dwPart_SetAvailableByName(const char* pName, int bAvailable);
+extern int  dwCog_WorkspaceHasPart(const char* pName);
+
+// @409020 (dwCog_EnableMission) / @409060 — unlock/lock a mission by id name.
+void dwCog_EnableMission(sithCog* pCtx)
+{
+    dwMission_SetUnlockedByName(sithCogExec_PopString(pCtx), 1);
+}
+void dwCog_DisableMission(sithCog* pCtx)
+{
+    dwMission_SetUnlockedByName(sithCogExec_PopString(pCtx), 0);
+}
+
+// @408f60 (dwCog_EnablePart) / @408f90 — set a blueprint's bAvailable flag.
+void dwCog_EnablePart(sithCog* pCtx)
+{
+    dwPart_SetAvailableByName(sithCogExec_PopString(pCtx), 1);
+}
+void dwCog_DisablePart(sithCog* pCtx)
+{
+    dwPart_SetAvailableByName(sithCogExec_PopString(pCtx), 0);
+}
+
+// @408e50 (dwCog_CheckForPart) — 1 if the named part is in the workspace droid.
+void dwCog_CheckForPart(sithCog* pCtx)
+{
+    sithCogExec_PushInt(pCtx, dwCog_WorkspaceHasPart(sithCogExec_PopString(pCtx)));
+}
+
+// @408fd0 (dwCog_FreezePlayerVerb) / @408fe0 — thin verb wrappers over the
+// part-2 freeze/unfreeze refcounted controls-disable helpers.
+void dwCog_FreezePlayerVerb(sithCog* pCtx)
+{
+    (void)pCtx;
+    dwCog_FreezePlayer();
+}
+void dwCog_UnfreezePlayerVerb(sithCog* pCtx)
+{
+    (void)pCtx;
+    dwCog_UnfreezePlayer();
+}
+
+void dwCog_RegisterVerbs(void)
+{
+    // --- READY (wired) ---------------------------------------------------
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_GetActivateBin,   "dwgetactivatebin");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_FreezePlayerVerb, "dwfreezeplayer");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_UnfreezePlayerVerb, "dwunfreezeplayer");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_EnablePart,       "dwenablepart");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_DisablePart,      "dwdisablepart");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_EnableMission,    "dwenablemission");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_DisableMission,   "dwdisablemission");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_CheckForPart,     "dwcheckforpart");
+
+    // --- inventory verbs: the engine impls are ALREADY registered by the
+    //     sithCogFunctionThing/Player DwCompat blocks (setinv/changeinv/
+    //     setinvavailable). The DW wrappers only add a HUD-refresh dwWidget
+    //     message dispatch — re-wire once that HUD dispatch is ported. ------
+    // sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_SetInv,          "setinv");
+    // sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_ChangeInv,       "changeinv");
+    // sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_SetInvAvailable, "setinvavailable");
+
+    // --- BLOCKED (need not-yet-ported deps) ------------------------------
+    // dwGuiInGame struct fields (un-rigid in the port): dwenableescape /
+    //   dwdisableescape / dwendmission (+dwendlevel) / dwgetmissiontext.
+    // Engine field mapping to verify: dwenablejump / dwdisablejump
+    //   (playerThing actorParams flag 0x4000000), dwgetcameraposition /
+    //   dwgetcamerasector (sithCamera position@+0x64 / sector).
+    // Speech/dialog + droid-stats + one-offs: dwcleardialog,
+    //   dwplaycharacterspeech, dwplayplayerspeech, dwaddresponse,
+    //   dwgetplayerresponse, dwplayplayerresponse, dwplaycammyspeech,
+    //   dwsetmissiontext, dwgetplayerheadtype, dwcheckdroidcaps,
+    //   dwgetarmstrength, dwsetupcrystalinventory, dwflashinventory,
+    //   dwsetreftopic, dwplaymovie. See DW/decomp_tools survey.
+}
+

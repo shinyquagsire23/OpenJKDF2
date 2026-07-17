@@ -115,6 +115,10 @@ void dwPart_Startup(void);
 // @4271b0 — NULL/empty-safe stdHashtbl_Find on dwPart_hashBlueprints.
 dwPart* dwPart_FindBlueprint(const char* pName);
 
+// dwCog verb helpers (C-callable; typed access to the C++ blueprint/node structs).
+int dwPart_SetAvailableByName(const char* pName, int bAvailable); // dwenablepart/dwdisablepart
+int dwCog_WorkspaceHasPart(const char* pName);                    // dwcheckforpart
+
 #ifdef __cplusplus
 } // extern "C"
 

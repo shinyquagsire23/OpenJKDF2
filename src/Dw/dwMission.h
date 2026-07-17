@@ -124,6 +124,9 @@ extern dwListNode* dwCore_pMissionList;
 // the P7 boot flow owns it.
 extern dwMission* dwCore_pCurrentMission;
 
+// dwCog dwenablemission/dwdisablemission verb helper (C-callable; typed access).
+void dwMission_SetUnlockedByName(const char* pName, int bUnlocked);
+
 // Parse ONE mission record out of pConf (positioned ON the "BEGIN <name>"
 // line: the name is the next token) until its END line. Returns pMission.
 // @41c530 (this = pMission in the binary)

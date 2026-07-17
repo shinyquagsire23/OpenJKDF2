@@ -43,6 +43,26 @@ extern "C" dwSegment* dwMissionTransOut_New(dwImage* pBgImage);
 // Mission records
 // ------------------------------------------------------------------
 
+// C-callable helper for the dwCog dwenablemission/dwdisablemission verbs
+// (@dwCog_EnableMission/@dwCog_DisableMission): find a mission by its id name
+// (dwMission::name) on dwCore_pMissionList and set its bUnlocked flag. Typed
+// access here so the C verb layer avoids the 32-bit binary's raw field offsets.
+extern "C" void dwMission_SetUnlockedByName(const char* pName, int bUnlocked)
+{
+    if (dwCore_pMissionList == NULL)
+        return;
+    for (dwListNode* pNode = dwCore_pMissionList->pNext; pNode != dwCore_pMissionList;
+         pNode = pNode->pNext)
+    {
+        dwMission* pMission = (dwMission*)pNode->pData;
+        if (dwString_Equals(pMission->name.pBuffer, pName))
+        {
+            pMission->bUnlocked = (uint8_t)(bUnlocked ? 1 : 0);
+            return;
+        }
+    }
+}
+
 // @41c960 (dwMission_ParseObjective) — parse "<code> <param> <label...>"
 // from the current line into pObj.
 // Note: the binary default-ctor'd pObj->label here (it received raw memory);
