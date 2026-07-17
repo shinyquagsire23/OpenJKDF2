@@ -481,6 +481,19 @@ extern int  dwPart_SetAvailableByName(const char* pName, int bAvailable);
 extern int  dwCog_WorkspaceHasPart(const char* pName);
 extern void dwGuiInGame_RequestEndMission(void); // sets bEndRequested (0x124)
 extern int  dwGuiInGame_GetCammyMsgCode(void);   // reads cammyMsgCode (0x174)
+extern int  dwGuiInGame_GetDroidHeadType(void);  // droid stats voiceChars pair
+extern int  dwGuiInGame_GetDroidCaps(int mask);  // droid capFlags & mask
+extern int  dwGuiInGame_GetArmStrength(void);    // max(maxLoadLeft, maxLoadRight)
+extern void dwGuiInGame_ShowCammyTextVerb(int msgCode); // ShowCammyText(id)
+extern void dwGuiInGame_SetRefTopicVerb(char* pTopic);  // SetRefTopic(str)
+extern void dwGuiInGame_ClearDialog(void);       // clear response menu + NPC caption
+
+// dwplaymovie deps (C++ modules; all extern "C", so C linkage matches). The
+// dwSegment type stays opaque here — we only pass the pointers through.
+typedef struct dwSegment dwSegment;
+extern dwSegment* dwSegment_pActive;
+extern dwSegment* dwMovie_OpenSeg(const char* pFilename, void* pOverlayImage);
+extern void       dwSegment_InterruptWith(dwSegment* pReturnTo, dwSegment* pInterrupt);
 
 // @408fc0 (dwCog_EnableJump) / @408fb0 (dwCog_DisableJump) — toggle the actor
 // flag that gates jumping on the player thing. Verbs take no args (registered
@@ -576,6 +589,57 @@ void dwCog_UnfreezePlayerVerb(sithCog* pCtx)
     dwCog_UnfreezePlayer();
 }
 
+// @408eb0 (dwCog_GetPlayerHeadType) — push the assembled droid's head/voice code.
+void dwCog_GetPlayerHeadType(sithCog* pCtx)
+{
+    sithCogExec_PushInt(pCtx, dwGuiInGame_GetDroidHeadType());
+}
+
+// @408f60 (dwCog_CheckDroidCaps) — push (droid capFlags & poppedMask).
+void dwCog_CheckDroidCaps(sithCog* pCtx)
+{
+    int mask = sithCogExec_PopInt(pCtx);
+    sithCogExec_PushInt(pCtx, dwGuiInGame_GetDroidCaps(mask));
+}
+
+// @408f90 (dwCog_GetArmStrength) — push the droid's arm LOAD (max of the two arms).
+void dwCog_GetArmStrength(sithCog* pCtx)
+{
+    sithCogExec_PushInt(pCtx, dwGuiInGame_GetArmStrength());
+}
+
+// @408de0 (dwCog_SetMissionText) — show the Cammy caption for a message id.
+void dwCog_SetMissionText(sithCog* pCtx)
+{
+    dwGuiInGame_ShowCammyTextVerb(sithCogExec_PopInt(pCtx));
+}
+
+// @409310 (dwCog_SetRefTopic) — set the in-mission reference topic file.
+void dwCog_SetRefTopic(sithCog* pCtx)
+{
+    dwGuiInGame_SetRefTopicVerb(sithCogExec_PopString(pCtx));
+}
+
+// @408d60 (dwCog_ClearDialog) — clear the response menu + the NPC speech caption.
+void dwCog_ClearDialog(sithCog* pCtx)
+{
+    (void)pCtx;
+    dwGuiInGame_ClearDialog();
+}
+
+// @409330 (dwCog_PlayMovie) — pop a filename, open it as a movie segment and
+// interrupt the active segment with it (returns to the active seg when done).
+void dwCog_PlayMovie(sithCog* pCtx)
+{
+    char* pName = sithCogExec_PopString(pCtx);
+    if (pName != NULL && *pName != '\0')
+    {
+        dwSegment* pMovie = dwMovie_OpenSeg(pName, NULL);
+        if (pMovie != NULL)
+            dwSegment_InterruptWith(dwSegment_pActive, pMovie);
+    }
+}
+
 void dwCog_RegisterVerbs(void)
 {
     // --- READY (wired) ---------------------------------------------------
@@ -595,6 +659,16 @@ void dwCog_RegisterVerbs(void)
     sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_EndMission,       "dwendlevel");
     sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_GetMissionText,   "dwgetmissiontext");
 
+    // droid-stats-record queries (read the baked-droid stats via accessors)
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_GetPlayerHeadType,"dwgetplayerheadtype");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_CheckDroidCaps,   "dwcheckdroidcaps");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_GetArmStrength,   "dwgetarmstrength");
+    // caption / dialog / movie
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_SetMissionText,   "dwsetmissiontext");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_SetRefTopic,      "dwsetreftopic");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_ClearDialog,      "dwcleardialog");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_PlayMovie,        "dwplaymovie");
+
     // --- inventory verbs: the engine impls are ALREADY registered by the
     //     sithCogFunctionThing/Player DwCompat blocks (setinv/changeinv/
     //     setinvavailable). The DW wrappers only add a HUD-refresh dwWidget
@@ -608,11 +682,14 @@ void dwCog_RegisterVerbs(void)
     //   maps to dwGuiInGame::bConvPending (conversation state), NOT an escape
     //   flag — a real offset/semantics conflict. Left unwired until resolved
     //   (writing bConvPending here would corrupt conversation handling).
-    // Speech/dialog + droid-stats + one-offs: dwcleardialog,
-    //   dwplaycharacterspeech, dwplayplayerspeech, dwaddresponse,
-    //   dwgetplayerresponse, dwplayplayerresponse, dwplaycammyspeech,
-    //   dwsetmissiontext, dwgetplayerheadtype, dwcheckdroidcaps,
-    //   dwgetarmstrength, dwsetupcrystalinventory, dwflashinventory,
-    //   dwsetreftopic, dwplaymovie. See DW/decomp_tools survey.
+    // Still BLOCKED — the voice-PLAYBACK cluster (sets ctx->script_running +
+    //   a msec timeout from the sound length; needs dwSoundSample_GetLengthMs
+    //   + dwCog_GetPlayerSpeechPath + the dwGuiInGame_PlayVoiceLineEx/
+    //   StopVoiceLine speech helpers, none ported yet): dwplaycharacterspeech,
+    //   dwplayplayerspeech, dwaddresponse, dwgetplayerresponse,
+    //   dwplayplayerresponse, dwplaycammyspeech, dwsetupcrystalinventory
+    //   (inventory + HUD-refresh dispatch), dwflashinventory (needs the
+    //   dwWcButtonBlink control + the field_0x194 button pointer, unmodelled).
+    //   See DW/decomp_tools survey for the full per-verb dependency list.
 }
 

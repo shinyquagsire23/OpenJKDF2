@@ -197,6 +197,71 @@ extern "C" int dwGuiInGame_GetCammyMsgCode(void)
     return dwGuiInGame_pActive ? (int)dwGuiInGame_pActive->cammyMsgCode : 0;
 }
 
+// --- droid-stats-record query verbs (read pDroidStats->totals, which is
+//     byte-identical 32/64-bit — all scalar fields). All read binary offsets
+//     into field_0x10c (== pDroidStats): capFlags@0x30, maxLoadLeft@0x38,
+//     maxLoadRight@0x40, voiceChars@0x64. Return 0 when no droid is baked.
+// @408eb0 dwCog_GetPlayerHeadType — the last part VOICE pair; when the first
+// char is 'B' the second char is the answer (faithful branch).
+extern "C" int dwGuiInGame_GetDroidHeadType(void)
+{
+    if (!dwGuiInGame_pActive || !dwGuiInGame_pActive->pDroidStats)
+        return 0;
+    dwDroidStatsTotals* pT = &dwGuiInGame_pActive->pDroidStats->totals;
+    int v = (unsigned char)pT->voiceChars[0];
+    if (v == 0x42)
+        v = (unsigned char)pT->voiceChars[1];
+    return v;
+}
+
+// @408f60 dwCog_CheckDroidCaps — (droid capFlags & mask).
+extern "C" int dwGuiInGame_GetDroidCaps(int mask)
+{
+    if (!dwGuiInGame_pActive || !dwGuiInGame_pActive->pDroidStats)
+        return 0;
+    return (int)(dwGuiInGame_pActive->pDroidStats->totals.capFlags & (uint32_t)mask);
+}
+
+// @408f90 dwCog_GetArmStrength — max(maxLoadLeft, maxLoadRight).
+extern "C" int dwGuiInGame_GetArmStrength(void)
+{
+    if (!dwGuiInGame_pActive || !dwGuiInGame_pActive->pDroidStats)
+        return 0;
+    dwDroidStatsTotals* pT = &dwGuiInGame_pActive->pDroidStats->totals;
+    uint8_t l = pT->maxLoadLeft, r = pT->maxLoadRight;
+    return (int)(l < r ? r : l);
+}
+
+// --- dialog / caption verbs (wrap the already-real dwGuiInGame methods) ---
+// @408de0 dwCog_SetMissionText -> ShowCammyText(id).
+extern "C" void dwGuiInGame_ShowCammyTextVerb(int msgCode)
+{
+    if (dwGuiInGame_pActive)
+        dwGuiInGame_pActive->ShowCammyText((uint32_t)msgCode);
+}
+
+// @409310 dwCog_SetRefTopic -> SetRefTopic(str).
+extern "C" void dwGuiInGame_SetRefTopicVerb(char* pTopic)
+{
+    if (dwGuiInGame_pActive)
+        dwGuiInGame_pActive->SetRefTopic(pTopic);
+}
+
+// @408d60 dwCog_ClearDialog — clear the response menu + conversation state,
+// then (if an NPC caption exists) stop its speech sound and drop its text.
+extern "C" void dwGuiInGame_ClearDialog(void)
+{
+    if (!dwGuiInGame_pActive)
+        return;
+    dwGuiInGame_pActive->ClearPlayerSpeech();
+    dwGuiSpeech* pNpc = dwGuiInGame_pActive->pNpcSpeech;
+    if (pNpc != NULL)
+    {
+        dwGuiSpeech_Clear(pNpc);
+        pNpc->Clear();
+    }
+}
+
 // Find pWidget's node in pList and unlink+free it (widget kept). Mirrors the
 // binary's inline sentinel walks (dwGuiScreen.cpp precedent).
 static void dwGuiInGame_UnlinkWidgetNode(dwList* pList, void* pWidget)
