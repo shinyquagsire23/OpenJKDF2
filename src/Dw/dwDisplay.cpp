@@ -460,9 +460,15 @@ void dwDisplay_Present(void)
     if (dwCursor_bPrevValid)
         dwCursor_RestoreUnder(&rect);
 
-    stdDisplay_DDrawGdiSurfaceFlip(); // Note: added — pushes the front buffer to the window
-
-    // Empty the dirty list (every present clears the accumulated rects).
+    // Empty the dirty list BEFORE the flip. The accumulated rects were already
+    // painted into the back buffer by this frame's Draw (dwSegment_Tick), so
+    // they're consumed. ⚠ Note (SDL adaptation): stdDisplay_DDrawGdiSurfaceFlip
+    // pumps the SDL event queue (Window_SdlUpdate) — the binary pumped input in a
+    // separate WinMain loop. Any dirty rects that mouse-motion / input handlers
+    // add DURING that pump belong to the NEXT frame; clearing here (pre-flip)
+    // lets them survive so the next Draw actually repaints them. Clearing after
+    // the flip (as the binary did) wiped motion-driven redraws unpainted, which
+    // froze animations and dropped drag/hover updates while the mouse moved.
     dwDirtyRect* pSent = dwDisplay_pDirtyList;
     if (pSent) // Note: guard added (see dwDisplay_AddDirtyRect)
     {
@@ -478,4 +484,6 @@ void dwDisplay_Present(void)
             pNode = pNext;
         }
     }
+
+    stdDisplay_DDrawGdiSurfaceFlip(); // Note: added — pushes the front buffer to the window (pumps SDL events)
 }
