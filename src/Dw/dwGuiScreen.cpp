@@ -820,6 +820,11 @@ dwWidget* dwGuiScreen::CreateControl(char* pKeyword, dwConfFile* pConf)
             dwConfFile_ParseULong(pConf, &u3);
             pChildKeyword = dwConfFile_NextToken(pConf);
             pChild = this->CreateControl(pChildKeyword, pConf);
+            // Binary: when the item's child keyword yields no control, fall back to a plain default
+            // dwWidget so AddItem's child (which dwWcChildDecorator dereferences for its rect) is
+            // never NULL. Without this, an unrecognized/absent child keyword crashes on entry.
+            if (pChild == NULL)
+                pChild = new dwWidget();
             pBar->AddItem(pChild, pItemName, pItemText, pTok, (uint8_t)u1, (int)u2, (int)u3);
         }
         return pBar;

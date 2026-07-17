@@ -60,6 +60,8 @@ extern "C" {
 #include "General/stdFileUtil.h"
 #include "Engine/rdMaterial.h"
 #include "Engine/rdColormap.h"
+#include "Gameplay/sithInventory.h" // dw_ParseInventoryTypes -> sithInventory_RegisterType
+#include "Cog/sithCog.h"            // dw_LoadInventoryCog -> sithCog_Load
 }
 
 // ------------------------------------------------------------------
@@ -478,16 +480,59 @@ static int dwMain_InstallErrorHandlers(void)
 //  Inventory types — items.inv (dw part 2, 0x41a8c0 / 0x41a9b0)
 // ==================================================================
 
-// @0x41a8c0 (dw_ParseInventoryTypes) — parses items.inv into the DW-forked
-// sithInventory type table.
+// @0x41a89b (dw_LoadInventoryCog) — load an inventory type's COG and tag it with
+// the DW inventory-cog flag (0x40). Returns the cog (NULL if the name was empty or
+// the script failed to load).
+static sithCog* dw_LoadInventoryCog(const char* pName)
+{
+    sithCog* pCog = sithCog_Load(pName);
+    if (pCog != NULL)
+        pCog->flags = (sithCogFlags_t)(pCog->flags | 0x40);
+    return pCog;
+}
+
+// @0x41a8c0 (dw_ParseInventoryTypes) — parse items.inv (dwConfFile) and register
+// each DW inventory type with the sith inventory subsystem. Per line:
+//   id  name  iconName  min  max  hexFlags  [cogName]
+// The repo's sithInventory is compatible (SithInventoryType is DW-shaped; bin count
+// is 200). Without this every bin stays UNREGISTERED, so sithInventory_GetInventory
+// returns 0 for all bins — which made dwGuiInGame read the power gauge (bin 0x14) as
+// 0 and instantly trigger its out-of-power death, unloading the level on frame 1.
+// Note: the binary also loads a HUD icon per type (dwImage_LoadFile into
+// aTypes[id].hudBitmap) when flags&2 and iconName isn't empty. That icon is cosmetic
+// and dwImage_LoadFile is still stubbed, so the icon token is consumed but not loaded
+// (hudBitmap stays NULL). Restore alongside dwImage_LoadFile (P8).
 extern "C" void dw_ParseInventoryTypes(void)
 {
-    // TODO(dw-decomp): the faithful body needs the DW-forked sithInventory
-    // subsystem (sithInventory_RegisterType / sithInventory_g_aTypes /
-    // SithInventoryType + dw_LoadInventoryCog), which is NOT in the repo yet
-    // (part of the P8 sith-engine diff). Stubbed until then — no inventory
-    // types register, so tool/inventory verbs have no descriptors.
-    jk_printf("dw_ParseInventoryTypes: stub (needs sithInventory, P8)\n");
+    dwConfFile conf;
+    dwConfFile_Open(&conf, "items.inv");
+    if (conf.pFile == NULL)
+        return; // dwConfFile_Open already logged the missing file
+
+    while (dwConfFile_ReadLine(&conf))
+    {
+        uint32_t id = 0, flags = 0;
+        float fMin = 0.0f, fMax = 0.0f;
+
+        dwConfFile_ParseULong(&conf, &id);
+        char* pName = dwConfFile_NextToken(&conf);
+        dwConfFile_NextToken(&conf);         // iconName — consumed; icon load skipped (see note)
+        dwConfFile_ParseFloat(&conf, &fMin);
+        dwConfFile_ParseFloat(&conf, &fMax);
+        dwConfFile_ParseHex(&conf, &flags);
+        char* pCogName = dwConfFile_NextToken(&conf);
+
+        if (pName == NULL || id >= (uint32_t)SITHBIN_NUMBINS)
+            continue;
+
+        sithCog* pCog = NULL;
+        if (pCogName != NULL && *pCogName != '\0')
+            pCog = dw_LoadInventoryCog(pCogName);
+
+        sithInventory_RegisterType((int)id, pCog, pName, (flex_t)fMin, (flex_t)fMax, (int)flags);
+    }
+
+    dwConfFile_Close(&conf);
 }
 
 // @0x41a9b0 (dw_FreeInventoryIcons)
@@ -530,15 +575,8 @@ extern "C" dwSegment* dwCompleteMovie_New(int idx)
 // C linkage: dwGuiInGame.cpp declares it inside its extern "C" block.
 extern "C" dwSegment* dwGuiOptions_New(int index) { (void)index; return NULL; }
 
-// owner: dwCog part 1 (P8) — the 34-verb registration table. C linkage
-// (consumed by dwSith.c, a C file).
-extern "C" void dwCog_RegisterVerbs(void)
-{
-    jk_printf("TODO(dw-decomp): dwCog_RegisterVerbs stub (owner dwCog part 1 P8)\n");
-}
 // owner: P8 sith-engine diff audit — DW-forked sith internals (no repo twin).
 // C linkage: dwGuiInGame.cpp declares them inside its extern "C" block.
-extern "C" void sithCamera_sub_44B190(void) {}   // DW cam-slot-7 setup
 extern "C" void sithControl_FUN_00456da0(void) {} // DW control-fn registration
 
 extern "C" {
@@ -559,6 +597,9 @@ const char* PTR_s_GHCA048_wav_005286a8[] = { 0 };
 // ==================================================================
 //  dw_Startup / dw_Shutdown — the MASTER game init (dw part 2, 0x419bd0)
 // ==================================================================
+
+// Added: forward decl for the DW_AUTO_MISSION debug hook (defined in dwGuiInGame.cpp).
+extern "C" dwSegment* dwGuiInGame_New(dwMission* pMission);
 
 // @0x419bd0 (dw_Startup) — the Activate slot of the dwApp boot dwSegment.
 //
@@ -709,7 +750,25 @@ static bool dw_Startup(void)
     if (dwWorkshop_pSingleton != NULL)
         dwSegment_Push(static_cast<dwSegment*>(dwWorkshop_pSingleton));
 
+    // Added: DW_AUTO_MISSION=<profile> loads that profile's saved droid and deploys straight
+    // into a mission (debug repro under ASAN — the mission code path is where the heap overflow
+    // lives). Defaults to profile "ME" when the value is empty. No gameplay effect off-flag.
+    const char* pAutoMission = getenv("DW_AUTO_MISSION");
+    if (pAutoMission != NULL)
+    {
+        const char* pProfile = (*pAutoMission != '\0') ? pAutoMission : "ME";
+        dwPlayer_LoadPlr(pProfile); // restores dwCore_pWorkspaceNodes (the built droid)
+        if (dwCore_pCurrentMission != NULL)
+        {
+            dwSegment* pMission = dwGuiInGame_New(dwCore_pCurrentMission);
+            if (pMission != NULL)
+                dwSegment_Push(pMission); // on top of the workshop -> activates first
+        }
+    }
     // 2) intro sequencer (no profiles) OR options enter-seg (sign-in), on top.
+    // Added: DW_AUTO_WORKSHOP=1 skips the menu enter-seg and drops straight into the
+    // already-staged workshop (debug repro for crash bring-up; no gameplay effect off-flag).
+    else if (getenv("DW_AUTO_WORKSHOP") == NULL)
     {
         dwList profiles;
         dwPlayer_EnumProfiles(&profiles);

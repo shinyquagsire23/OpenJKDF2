@@ -32,6 +32,8 @@
 
 #include "Dw/dwGuiInvBar.h"    // INVENTORY factory
 #include "Dw/dwGuiHypText.h"   // CAMMY_TEXT / HELPTEXT controls + stock callbacks
+#include "Dw/dwGuiList.h"      // dwGuiList/dwGuiSpeech full defs (sizeof in PLAYERSPEECH/NPCSPEECH)
+#include "Dw/dwHelp.h"         // dwHelp full def (sizeof in HELP factory)
 #include "Dw/dwGuiMission.h"   // dwGuiDialog base + dwGuiDialog_RunModal
 #include "Dw/dwDroidStats.h"   // baked player droid record
 #include "Dw/dwCog.h"          // dwCog_droidCaps/toolCaps + dwCog_UnfreezePlayer
@@ -85,6 +87,8 @@ extern "C" {
 #include "Platform/stdControl.h"    // stdControl_MessageHandler/ToggleMouse/ReadControls
 #include "Main/sithMain.h"          // sithClose/Mode1Init/sithUpdate/sithDrawScene/sithOpenPostProcess
 #include "Main/sithCommand.h"       // sithCommand_Fly
+#include "Platform/std3D.h"         // Added: std3D_PurgeEntireTextureCache
+#include "Raster/rdZRaster.h"       // Added: rdZRaster_BeginFrame
 }
 
 #include <math.h>            // sqrtf
@@ -143,7 +147,6 @@ void dwGuiList_Clear(dwGuiList* pList);
 dwGuiSpeech* dwGuiSpeech_Ctor(dwGuiSpeech* pThis, dwRect* pRect, int a, char* pFont, uint32_t c, void* pPoint);
 void dwGuiSpeech_Clear(dwGuiSpeech* pSpeech);
 // dwHelp control — provided by dwHelp (P6 wave 2b).
-struct dwHelp;
 dwHelp* dwHelp_Ctor(dwHelp* pThis, dwRect* pRect, char* pAnimName, int speakerCode);
 
 // Debriefing / end-game screens pushed by EndMission (sibling P6w2 / P7).
@@ -221,10 +224,10 @@ static void dwGuiInGame_DrawLoadProgress(void)
 // ctor / dtor
 // ----------------------------------------------------------------------------
 
-// @41f2a0 — Note: the binary base ctor name string (@0x5287b8) was not
-// recovered; the controls .cmp is loaded from it by the base LoadControls.
+// @41f2a0 — the base ctor screen-name string @0x5287b8 is "hud" (the base
+// LoadControls loads "hud.ifc"). (Was guessed "ingame", which never resolved.)
 dwGuiInGame::dwGuiInGame(dwMission* pMission)
-    : dwGuiScreen("ingame", NULL) // TODO(dw-decomp): confirm the base screen name
+    : dwGuiScreen("hud", NULL)
 {
     this->pMissionInfo = pMission;
     this->pViewCanvas = NULL;
@@ -639,7 +642,7 @@ void dwGuiInGame::Update()
         {
             if (!(this->chatterTimerLow < _DAT_0052869c && (powerFrac > 0.15f || this->chatterTimerLow < _DAT_00528698)))
             {
-                int r = (int)(((float)_rand() / (float)0x7fff) * 3.0f);
+                int r = _rand() % 3; // Added: macOS rand() range is 0x7fffffff, not the binary's 0x7fff -> the old (rand()/0x7fff)*3 indexed the 3-element wav array wildly OOB (garbage char* -> heap corruption). Bounded to [0,2].
                 pWav = PTR_s_GHCA009_wav_00528688[r];
                 this->chatterTimerLow = 0;
                 this->chatterTimerHappy = 0;
@@ -655,7 +658,7 @@ void dwGuiInGame::Update()
     this->chatterTimerHurt += sithTime_g_frameTimeFlex;
     if (pWav == NULL && 5.0f < this->lastHealth - pThing->actorParams.health)
     {
-        int r = (int)(((float)_rand() / (float)0x7fff) * 3.0f);
+        int r = _rand() % 3; // Added: RAND_MAX fix (macOS rand()=0x7fffffff, not 0x7fff) — was OOB array index
         pWav = PTR_s_GHCA006_wav_00528678[r];
         this->chatterTimerHurt = 0;
         this->chatterTimerHappy = 0;
@@ -668,7 +671,7 @@ void dwGuiInGame::Update()
         this->chatterTimerIdle += sithTime_g_frameTimeFlex;
         if (pWav == NULL && _DAT_005286d4 <= this->chatterTimerIdle)
         {
-            int r = (int)(((float)_rand() / (float)0x7fff) * 3.0f);
+            int r = _rand() % 3; // Added: RAND_MAX fix (macOS rand()=0x7fffffff, not 0x7fff) — was OOB array index
             pWav = PTR_s_GHCA058_wav_005286c8[r];
             this->chatterTimerIdle = 0;
             this->chatterTimerHappy = 0;
@@ -680,7 +683,7 @@ void dwGuiInGame::Update()
     }
     if (pWav == NULL && healthFrac >= 0.8f && powerFrac >= 0.8f && _DAT_005286c0 <= this->chatterTimerHappy)
     {
-        int r = (int)(((float)_rand() / (float)0x7fff) * 3.0f);
+        int r = _rand() % 3; // Added: RAND_MAX fix (macOS rand()=0x7fffffff, not 0x7fff) — was OOB array index
         pWav = PTR_s_GHCA048_wav_005286a8[r];
         this->chatterTimerHappy = 0;
     }
@@ -1155,8 +1158,84 @@ void dwGuiInGame::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
     }
 
     rdAdvanceFrame();
+#ifdef RDRASTER_SOFTWARE_RENDERER
+    // Added: render the world 3D through the software (CPU) rasterizer when the r_softwareRenderer
+    // cvar is on. Acceleration is set to 0 so rdCache_Flush takes its software branch; the world +
+    // weapon draw is redirected into a dedicated full-resolution buffer (presented full-screen by
+    // std3D_DrawMenu), keeping Video_menuBuffer as the 640x480-logical HUD overlay composited on top.
+    // When the cvar is OFF, none of this runs and the normal hardware (GL) path renders the frame.
+    int rdsw_bActive = rdroid_bSoftwareRenderer;
+    int rdsw_savedAccel = rdroid_curAcceleration;
+    tVBuffer* rdsw_pWorldBuf = NULL;
+    tVBuffer* rdsw_pSavedVBuf = NULL;
+    tVBuffer* rdsw_pRenderBuf = NULL;
+    // On a hardware->software transition, free the material GL textures the hardware path uploaded:
+    // the software rasterizer samples texels from the system-RAM SDL surfaces and never touches VRAM,
+    // so those textures are dead weight while SW is active. They re-upload lazily (texture_loaded is
+    // reset) if the user switches back to hardware. (UI/HUD textures are a separate cache, untouched.)
+    static int rdsw_bWasActive = 0;
+    if (rdsw_bActive && !rdsw_bWasActive)
+        std3D_PurgeEntireTextureCache();
+    rdsw_bWasActive = rdsw_bActive;
+    if (rdsw_bActive)
+    {
+        rdroid_curAcceleration = 0;
+        // The world buffer matches the menu buffer dims, so redirecting the canvas at it leaves the
+        // canvas geometry unchanged. (std3D_DrawMenu samples only a 640x480 sub-rect of the menu
+        // buffer, which is why rendering the world there put it in a corner.)
+        rdsw_pWorldBuf = Video_swEnsureWorldBuffer();
+        rdsw_pRenderBuf = rdsw_pWorldBuf;
+        if (rdsw_pWorldBuf && Video_pCanvas)
+        {
+            rdsw_pSavedVBuf = Video_pCanvas->pVBuffer;
+            Video_pCanvas->pVBuffer = rdsw_pWorldBuf;
+            // Clear to fill color (index 0) so untouched pixels present transparent (menu shader
+            // discards index 0), matching the per-frame Video_pMenuBuffer fill for the world.
+            stdDisplay_VBufferLock(rdsw_pWorldBuf);
+            stdDisplay_VBufferFill(rdsw_pWorldBuf, Video_fillColor, 0);
+        }
+        else
+        {
+            // No world buffer yet — fall back to the menu buffer (renders into the corner, as before).
+            rdsw_pRenderBuf = Video_pMenuBuffer;
+            // The software rasterizer writes pixels directly, so the canvas surface must be
+            // locked (surface_lock_alloc is NULL otherwise on the accelerated present path).
+            stdDisplay_VBufferLock(Video_pMenuBuffer);
+        }
+#ifdef RDRASTER_SW_ZBUFFER
+        // Clear the software depth buffer for the frame BEFORE the world is drawn. This must happen
+        // here (not only via std3D_ClearZBuffer) because rdCamera_AdvanceFrame clears JK's software
+        // z-buffer by filling canvas->d3d_vbuf on the accel<=0 path, so the std3D hook never fires at
+        // scene start — leaving the depth buffer unallocated until DrawPov clears it (hence the world
+        // only appeared once a POV weapon existed).
+        rdZRaster_BeginFrame(rdsw_pRenderBuf);
+#endif
+    }
+#endif
     sithDrawScene(); // render the 3D world into the viewport
     rdFinishFrame();
+#ifdef RDRASTER_SOFTWARE_RENDERER
+    // Added: close the software-render bracket (mirrors jkGame_Update's post-DrawPov close). Unlock
+    // the world buffer, restore the canvas to the menu/HUD buffer, flag the world for present (so
+    // std3D_PresentSWWorld pushes Video_pSwWorldBuffer and std3D_DrawMenu skips its own menu quad —
+    // the HUD is folded in later by Video_swCompositeOverlaysIntoWorld in dwDisplay_Present), and
+    // restore acceleration. DW has no first-person weapon, so there is no DrawPov between the world
+    // draw and this close. Without this the world buffer never presents (blank 3D view).
+    if (rdsw_bActive)
+    {
+        if (rdsw_pWorldBuf && Video_pCanvas)
+        {
+            stdDisplay_VBufferUnlock(rdsw_pWorldBuf);
+            Video_pCanvas->pVBuffer = rdsw_pSavedVBuf; // restore the menu-buffer canvas for the HUD
+            Video_swWorldPresentPending = 1;           // world rendered this frame → present it
+        }
+        else
+        {
+            stdDisplay_VBufferUnlock(Video_pMenuBuffer);
+        }
+        rdroid_curAcceleration = rdsw_savedAccel;
+    }
+#endif
 
     dwRect clip = *pClipRect;
     dwRect_Union(&clip, &this->viewRect);
@@ -1247,7 +1326,7 @@ dwWidget* dwGuiInGame::CreateControl(char* pKeyword, dwConfFile* pConf)
     if (dwString_Equals(pKeyword, "HELP"))
     {
         dwRect r; r.left = r.top = r.right = r.bottom = 0;
-        return (dwWidget*)dwHelp_Ctor((dwHelp*)(*dwMain_pHS->alloc)(0x5c), &r, 0, 0x6b);
+        return (dwWidget*)dwHelp_Ctor((dwHelp*)(*dwMain_pHS->alloc)(sizeof(dwHelp)), &r, 0, 0x6b); // sizeof, not 32-bit 0x5c
     }
     if (dwString_Equals(pKeyword, "HELPTEXT"))
     {
@@ -1293,7 +1372,10 @@ dwWidget* dwGuiInGame::CreateControl(char* pKeyword, dwConfFile* pConf)
         dwConfFile_ParseULong(pConf, &b);
         dwConfFile_ParseULong(pConf, &c);
         dwConfFile_ParsePoint(pConf, &pt);
-        this->pPlayerSpeech = dwGuiList_Ctor((dwGuiList*)(*dwMain_pHS->alloc)(0x5c), &r, (float)a, pFontName, (uint8_t)b, (uint8_t)c, &pt);
+        // Note: alloc sizeof(dwGuiList), not the binary's 32-bit 0x5c — on 64-bit the C++ object is
+        // larger (8-byte pointers/vptr), so the hardcoded size undersized the buffer and the
+        // placement-new'd fields (pItems) overflowed it -> crash on Draw.
+        this->pPlayerSpeech = dwGuiList_Ctor((dwGuiList*)(*dwMain_pHS->alloc)(sizeof(dwGuiList)), &r, (float)a, pFontName, (uint8_t)b, (uint8_t)c, &pt);
         return (dwWidget*)this->pPlayerSpeech;
     }
     if (dwString_Equals(pKeyword, "NPCSPEECH"))
@@ -1304,7 +1386,7 @@ dwWidget* dwGuiInGame::CreateControl(char* pKeyword, dwConfFile* pConf)
         uint32_t color = 0; dwPoint pt = { 0, 0 };
         dwConfFile_ParseULong(pConf, &color);
         dwConfFile_ParsePoint(pConf, &pt);
-        this->pNpcSpeech = dwGuiSpeech_Ctor((dwGuiSpeech*)(*dwMain_pHS->alloc)(0x5c), &r, 0, pFontName, color, &pt);
+        this->pNpcSpeech = dwGuiSpeech_Ctor((dwGuiSpeech*)(*dwMain_pHS->alloc)(sizeof(dwGuiSpeech)), &r, 0, pFontName, color, &pt);
         return (dwWidget*)this->pNpcSpeech;
     }
     if (dwString_Equals(pKeyword, "CAMMY_TEXT"))

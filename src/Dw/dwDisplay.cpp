@@ -485,5 +485,14 @@ void dwDisplay_Present(void)
         }
     }
 
+#ifdef RDRASTER_SOFTWARE_RENDERER
+    // Added: fold the just-composited HUD (now in the front/menu buffer) into the software world
+    // buffer so std3D_DrawMenu presents a single software image. No-op unless dwGuiInGame's Draw
+    // rendered the world this frame (Video_swWorldPresentPending). Mirrors jkGame_Update, which calls
+    // this after its HUD draw and before std3D_DrawMenu; the DW HUD only reaches the menu buffer via
+    // the back->front copy above, so the DW analog belongs here.
+    Video_swCompositeOverlaysIntoWorld();
+#endif
+
     stdDisplay_DDrawGdiSurfaceFlip(); // Note: added — pushes the front buffer to the window (pumps SDL events)
 }

@@ -299,6 +299,16 @@ else()
     add_executable(${BIN_NAME} ${GAME_MAIN_SOURCE_FILES})
     target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_COMMON_LIBS} sith_engine)
 
+    # Added (debug): OPENJKDF2_FORCE_ASAN=1 applies ASAN to just the game code
+    # (sith_engine object lib + this exe), not the vendored deps — avoids a full
+    # dep rebuild. The env-driven OPENJKDF2_NO_ASAN block below wasn't taking on macOS.
+    if(DEFINED ENV{OPENJKDF2_FORCE_ASAN} AND "$ENV{OPENJKDF2_FORCE_ASAN}" STREQUAL "1")
+        message(STATUS ">>> FORCE ASAN on game targets")
+        target_compile_options(sith_engine PRIVATE -fsanitize=address -fno-omit-frame-pointer -g)
+        target_compile_options(${BIN_NAME} PRIVATE -fsanitize=address -fno-omit-frame-pointer -g)
+        target_link_options(${BIN_NAME} PRIVATE -fsanitize=address)
+    endif()
+
     if(TARGET_BUILD_TESTS AND TARGET_MACOS)
         if(NOT EXPERIMENTAL_FIXED_POINT)
             add_executable(rle_test src/Tests/rle_test.c)

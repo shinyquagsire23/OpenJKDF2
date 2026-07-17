@@ -217,8 +217,9 @@ char dwHelp::PlaySpeech(unsigned int msgCode, int var)
             case 0x7929:
                 if (this->currentWav.length == 0)
                 {
-                    // Note: MSVC scaled rand() to 0..3 (RAND_MAX 0x7fff).
-                    int r = (int)((float)rand() * (4.0f / 32768.0f));
+                    // Note: MSVC scaled rand() to 0..3 (RAND_MAX 0x7fff). Added: macOS rand() is
+                    // 0x7fffffff, so the old scale gave r>>3 (no case matched, speech never played).
+                    int r = rand() % 4;
                     switch (r) {
                         case 0: pWav = "GCCP001"; break;
                         case 1: pWav = "GCCP002"; break;
