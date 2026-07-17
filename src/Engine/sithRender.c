@@ -2428,7 +2428,12 @@ LABEL_150:
                 continue;
             }
 
-            if (!((sithCamera_g_pCurCamera->type & 0xFC) != 0 || i != sithCamera_g_pCurCamera->pPrimaryFocusThing)) {
+            // Added: 0x1FC (was 0xFC) so the DroidWorks third-person follow
+            // camera (type 0x100) also draws its focus thing — the player droid.
+            // Without bit 8 the DW cam is treated as first-person and the droid
+            // is hidden. 0x100 is only ever set under Main_bDwCompat, so this is
+            // a no-op for JK/MOTS/retro cameras.
+            if (!((sithCamera_g_pCurCamera->type & 0x1FC) != 0 || i != sithCamera_g_pCurCamera->pPrimaryFocusThing)) {
                 continue;
             }
 
@@ -2747,7 +2752,9 @@ void sithRender_RenderThings()
 
             if ( (thingIter->flags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_DESTROYED)) == 0
               && (thingIter->flags & SITH_TF_LEVELGEO) == 0
-              && ((sithCamera_g_pCurCamera->type & 0xFC) != 0 || thingIter != sithCamera_g_pCurCamera->pPrimaryFocusThing) )
+              // Added: 0x1FC (was 0xFC) — draw the focus thing for the DW
+              // third-person follow camera (type 0x100) too; see the note above.
+              && ((sithCamera_g_pCurCamera->type & 0x1FC) != 0 || thingIter != sithCamera_g_pCurCamera->pPrimaryFocusThing) )
             {
                 rdMatrix_TransformPoint34(&thingIter->transformedPos, &thingIter->position, &rdCamera_g_pCurCamera->orient);
                 

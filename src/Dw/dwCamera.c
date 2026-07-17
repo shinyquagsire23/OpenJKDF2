@@ -38,7 +38,6 @@ void dwCamera_Reset(SithCamera* pPrevCamera, SithCamera* pCamera)
         return;
 
     pFocus = pCamera->pPrimaryFocusThing;
-    stdPlatform_Printf("TEST: %p\n", pFocus); // TODO remove
     pCamera->lookPos = pFocus->position;
     rdVector_Zero3(&pCamera->lookPYR);
     rdMatrix_Copy34(&pCamera->orient, &pFocus->orient);
