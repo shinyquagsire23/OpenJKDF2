@@ -10,7 +10,7 @@
 
 // Un-inlined: searches semicolon-delimited directory list for a sound file.
 // Returns file handle on success, 0 on failure. outPath receives the full path found.
-static int sithSound_FindInSearchPaths(const char *filename, char *outPath, int outPathSize)
+static stdFile_t sithSound_FindInSearchPaths(const char *filename, char *outPath, int outPathSize)
 {
     char dirBuf[128];
     char *searchPaths = "sound;voice";
@@ -20,7 +20,7 @@ static int sithSound_FindInSearchPaths(const char *filename, char *outPath, int 
         if ( dirBuf[0] )
         {
             stdString_snprintf(outPath, outPathSize, "%s%c%s", dirBuf, '\\', filename);
-            int fd = pSithHS->fileOpen(outPath, "rb");
+            stdFile_t fd = pSithHS->fileOpen(outPath, "rb");
             if ( fd )
                 return fd;
         }
@@ -146,7 +146,7 @@ int sithSound_New(SithWorld *world, int num)
 
 sithSound* sithSound_Load(char *sound_fname, int a2)
 {
-    int32_t sound_file; // ebp
+    stdFile_t sound_file; // ebp
     sithSound *sound; // esi
     uint32_t v7; // eax
     uint32_t v10; // eax
@@ -266,7 +266,7 @@ int sithSound_LoadFileData(sithSound *sound)
     int32_t bufferMaxSize; // [esp+10h] [ebp-84h] BYREF
     char outstr2[128];
 
-    int fd = 0;
+    stdFile_t fd = 0;
     if (sound->isLoaded & 1)
         return 0;
 
@@ -428,7 +428,7 @@ int sithSound_FreeUpMemory(uint32_t numBytesNeeded)
 
 stdSound_buffer_t* sithSound_InitFromPath(char *path)
 {
-    int fd; // ebx
+    stdFile_t fd; // ebx
     int bufferLen; // edi
     stdSound_buffer_t *createdBuf; // eax
     stdSound_buffer_t *dsoundBuf; // esi

@@ -257,6 +257,7 @@ stdFile_t dwGob_Open(const char *pPath, const char *pMode)
     dwGobFile* pFile;
 
     dwGob_Lock();
+    //stdPlatform_Printf("DEBUG: dwGob_Open %s %s\n", pPath, pMode);
     if (dwGob_IsGobPath(pPath))
         pFile = dwGob_OpenFromGob(pPath, pMode);
     else

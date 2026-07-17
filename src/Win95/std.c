@@ -76,7 +76,7 @@ int stdCalcBitPos(signed int val)
 
 int stdReadRaw(char *fpath, void *out, signed int len)
 {
-    int fd = std_g_pHS->fileOpen(fpath, "rb");
+    stdFile_t fd = std_g_pHS->fileOpen(fpath, "rb");
     if (fd)
     {
         std_g_pHS->fileRead(fd, out, len);

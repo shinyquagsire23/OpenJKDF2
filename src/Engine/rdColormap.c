@@ -72,7 +72,7 @@ static int rdColormap_ReadAll(stdFile_t fp, void* pDst, int len)
 
 int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
 {
-    intptr_t colormap_fptr; // edi
+    stdFile_t colormap_fptr; // edi
     uint16_t *rgb16Alloc; // eax
     char *v10; // eax
     void *v11; // eax
@@ -288,7 +288,7 @@ void rdColormap_FreeEntry(rdColormap *colormap)
 // MOTS altered
 int rdColormap_Write(char *outpath, rdColormap *colormap)
 {
-    int fd;
+    stdFile_t fd;
     rdColormapHeader header;
 
     _memset(&header, 0, sizeof(header));

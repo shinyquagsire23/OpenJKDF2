@@ -159,7 +159,13 @@ int sithWorld_Load(SithWorld *pWorld, char *pFilename)
         _strncpy(pWorld->episodeName, sithWorld_episodeName, 0x1Fu);
         pWorld->episodeName[0x1F] = 0;
         sithWorld_g_pLastLoadedWorld = pWorld;
-        stdFnames_MakePath(v8, 128, "jkl", pFilename);
+        // Added: Droidworks has different paths
+        if (!Main_bDroidWorks) {
+            stdFnames_MakePath(v8, 128, "jkl", pFilename);
+        }
+        else {
+            stdFnames_MakePath(v8, 128, "mission", pFilename);
+        }
         sithWorld_some_integer_4 = 0;
         if ( !stdConffile_Open(v8) )
         {

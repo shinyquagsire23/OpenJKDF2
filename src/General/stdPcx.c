@@ -18,7 +18,7 @@ stdBitmap* stdPcx_Load(char *fpath, int create_ddraw_surface, int gpu_mem)
     tRasterInfo format;
     stdPcx_Header pcxHeader;
 
-    int hGobFile = std_g_pHS->fileOpen(fpath, "rb");
+    stdFile_t hGobFile = std_g_pHS->fileOpen(fpath, "rb");
     if ( !hGobFile )
         return 0;
 
@@ -125,7 +125,7 @@ int stdPcx_Write(char *fpath, stdBitmap *bitmap)
     _memset(&pcxHeader.width, 0, 0x38u);
     *(uint16_t*)&pcxHeader.reserved_4A[52] = 0;
     
-    int hGobFile = std_g_pHS->fileOpen(fpath, "wb");
+    stdFile_t hGobFile = std_g_pHS->fileOpen(fpath, "wb");
     if ( !hGobFile )
         return 0;
 
