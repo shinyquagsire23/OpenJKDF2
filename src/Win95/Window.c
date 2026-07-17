@@ -759,6 +759,10 @@ void Window_UpdateHeadless()
     last_jkQuakeConsole_bOpen = jkQuakeConsole_bOpen;
 }
 
+// Added: reentrancy guard for Window_SdlUpdate (file-scope so the modal pump
+// below can lift it). See the block comment in Window_SdlUpdate.
+static int Window_bInSdlUpdate = 0;
+
 void Window_SdlUpdate()
 {
     if (Main_bHeadless)
@@ -775,7 +779,6 @@ void Window_SdlUpdate()
     // the mouse stopped — and long drags risked a stack overflow. A nested call is a no-op:
     // whatever it wanted to show is composited into the front buffer already and gets presented
     // by the outer call's single tail present.
-    static int Window_bInSdlUpdate = 0;
     if (Window_bInSdlUpdate)
         return;
     Window_bInSdlUpdate = 1;
@@ -1256,6 +1259,24 @@ void Window_SdlUpdate()
 #endif
 
     Window_bInSdlUpdate = 0; // Added: release the reentrancy guard (see top of function)
+}
+
+// Added (DroidWorks): pump one host frame from inside a NESTED modal loop.
+// dwGuiDialog_RunModal spins `while (result == 0 && dwSegment_Tick())` to run a
+// Yes/No dialog, but it is entered synchronously from a mouse-event dispatch —
+// i.e. already inside Window_SdlUpdate — so the reentrancy guard makes the
+// loop's own present-path Window_SdlUpdate a no-op, the dialog never receives
+// input, and result never changes (the binary drove this from a separate WinMain
+// message pump, Window_sub_507090). This lifts the guard for ONE full
+// Window_SdlUpdate — which re-arms the guard itself for its duration, so the
+// mouse-motion present recursion the guard exists to block stays blocked — then
+// restores it. SDL's event queue is global, so nested draining loses no events.
+void Window_SdlUpdateModal()
+{
+    int saved = Window_bInSdlUpdate;
+    Window_bInSdlUpdate = 0;
+    Window_SdlUpdate();
+    Window_bInSdlUpdate = saved;
 }
 
 void Window_SdlVblank()

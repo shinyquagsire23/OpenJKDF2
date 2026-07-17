@@ -56,6 +56,10 @@ extern "C" {
 #include "Win95/stdDisplay.h" // stdDisplay_pCurVideoMode (binary 0x6478f8)
 }
 
+// Host event pump for the nested modal loop in dwGuiDialog_RunModal (defined in
+// src/Win95/Window.c; declared here to avoid pulling Window.h's Win32 types).
+extern "C" void Window_SdlUpdateModal();
+
 // ---- cross-unit externs (TODO(dw-decomp): provided by other units) ----------
 
 // The mission dwGuiInGame factory + droid validation.
@@ -334,15 +338,16 @@ extern "C" int dwGuiDialog_RunModal(const char* pConfName, const char* pMsgKey)
 
         // Binary: `while (result == 0 && dwSegment_bRunning) Window_sub_507090();`
         // where 507090 drains the Win32 message queue or, when idle, runs
-        // dwMain_MainLoopTick() (= dwSegment_Tick + window teardown). Here one
-        // dwSegment_Tick per iteration mirrors that idle path — it updates
-        // the overlay (this dialog) and returns the same app-running flag
-        // (armed by StartOpeningCutscenes, P7; pre-P7 it is 0 so the loop
-        // exits immediately with result 0 — callers treat != 5000 as NO).
-        // TODO(dw-decomp): P7 dwMain owner — route one host event-pump
-        // iteration through here so input reaches the dialog.
+        // dwMain_MainLoopTick() (= dwSegment_Tick + window teardown). Here
+        // dwSegment_Tick updates the overlay (this dialog) and returns the
+        // app-running flag; Window_SdlUpdateModal() is the port's stand-in for
+        // 507090's message drain — RunModal is entered synchronously from a
+        // mouse-event dispatch (already inside Window_SdlUpdate), so the tick's
+        // own present-path SdlUpdate is a reentrancy-guarded no-op and the
+        // dialog would never see the Yes/No click without this explicit pump.
         while (result == 0 && dwSegment_Tick())
         {
+            Window_SdlUpdateModal();
         }
 
         dwSegment_EndOverlay();

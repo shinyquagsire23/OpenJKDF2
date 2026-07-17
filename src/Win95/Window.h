@@ -67,6 +67,7 @@ int Window_Main_Linux(int argc, char** argv);
 int Window_ShowCursorUnwindowed(int a1);
 int Window_MessageLoop();
 void Window_SdlUpdate();
+void Window_SdlUpdateModal(); // Added (DroidWorks): pump one frame from a nested modal loop
 void Window_SdlVblank();
 void Window_RecreateSDL2Window();
 #endif
