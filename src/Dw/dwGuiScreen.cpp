@@ -1133,20 +1133,17 @@ void dwGuiScreen::CheckCheatCodes(char* pCode)
     }
     else if (dwString_Equals(pCode, "BEEFCAKE"))
     {
-        // TODO(dw-decomp): BEEFCAKE -> max the assembled droid's stats (unit
-        // dwPart) — binary: for every dwPartNode in dwCore_pWorkspaceNodes
-        // (@0x53d984) whose part's type int @pPart+8 != 9: set the node's
-        // current-stat short @node+0x84 to the part's max-stat short
-        // @pPart+0x5f0.
-        stdPlatform_Printf("TODO(dw-decomp): cheat BEEFCAKE -> dwPartNode stat pokes (unit dwPart) not translated yet\n");
+        // Max the assembled droid's stats: for every workspace part node whose
+        // blueprint is stat-bearing (type != 9), set its charge to the part's
+        // battery capacity (binary node+0x84 = pPart+0x5f0).
+        dwPart_MaxWorkspaceStats();
     }
     else if (dwString_Equals(pCode, "DEFCON0") || dwString_Equals(pCode, "DEFCON1")
              || dwString_Equals(pCode, "DEFCON2") || dwString_Equals(pCode, "DEFCON3"))
     {
-        // TODO(dw-decomp): DEFCONn -> set the current mission's defcon (unit
-        // dwMission) — binary: if dwCore_pCurrentMission (@0x53d9x8) is set,
-        // write n (the trailing digit) to its int @+8.
-        stdPlatform_Printf("TODO(dw-decomp): cheat %s -> dwMission defcon poke (unit dwMission) not translated yet\n", pCode);
+        // Set the current mission's earned rank to the trailing digit (binary
+        // writes n to dwCore_pCurrentMission's int @+8 = dwMission::rank).
+        dwMission_SetCurrentRank(pCode[6] - '0');
     }
     else if (dwString_Equals(pCode, "MST3K"))
     {

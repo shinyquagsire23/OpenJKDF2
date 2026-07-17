@@ -176,6 +176,22 @@ extern "C" void dwPart_SetAllAvailable(int bAvailable)
     }
 }
 
+// BEEFCAKE cheat: for every workspace part node whose blueprint is a real
+// stat-bearing part (type != 9), max its current charge to the blueprint's
+// battery capacity (binary: node+0x84 = pPart+0x5f0). Typed access.
+extern "C" void dwPart_MaxWorkspaceStats(void)
+{
+    if (dwCore_pWorkspaceNodes == NULL)
+        return;
+    for (dwListNode* pNode = dwCore_pWorkspaceNodes->pNext; pNode != dwCore_pWorkspaceNodes;
+         pNode = pNode->pNext)
+    {
+        dwPartNode* pPartNode = (dwPartNode*)pNode->pData;
+        if (pPartNode && pPartNode->pPart && pPartNode->pPart->type != 9)
+            pPartNode->slotIdx16 = (int16_t)pPartNode->pPart->battery;
+    }
+}
+
 // C-callable helper for the dwCog dwcheckforpart verb: 1 if a part with the
 // given blueprint name is present in the current workspace droid.
 extern "C" int dwCog_WorkspaceHasPart(const char* pName)

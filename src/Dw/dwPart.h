@@ -119,6 +119,7 @@ dwPart* dwPart_FindBlueprint(const char* pName);
 int dwPart_SetAvailableByName(const char* pName, int bAvailable); // dwenablepart/dwdisablepart
 int dwCog_WorkspaceHasPart(const char* pName);                    // dwcheckforpart
 void dwPart_SetAllAvailable(int bAvailable);                      // FITTO cheat
+void dwPart_MaxWorkspaceStats(void);                              // BEEFCAKE cheat
 
 #ifdef __cplusplus
 } // extern "C"

@@ -128,6 +128,8 @@ extern dwMission* dwCore_pCurrentMission;
 void dwMission_SetUnlockedByName(const char* pName, int bUnlocked);
 // SOMONEY cheat: unlock every mission.
 void dwMission_UnlockAll(void);
+// DEFCONn cheat: set the current mission's earned rank to n.
+void dwMission_SetCurrentRank(int rank);
 
 // Parse ONE mission record out of pConf (positioned ON the "BEGIN <name>"
 // line: the name is the next token) until its END line. Returns pMission.

@@ -63,6 +63,14 @@ extern "C" void dwMission_SetUnlockedByName(const char* pName, int bUnlocked)
     }
 }
 
+// DEFCONn cheat: set the current mission's earned rank to n (binary writes the
+// trailing digit to dwCore_pCurrentMission's int @+8 = dwMission::rank).
+extern "C" void dwMission_SetCurrentRank(int rank)
+{
+    if (dwCore_pCurrentMission != NULL)
+        dwCore_pCurrentMission->rank = (uint8_t)rank;
+}
+
 // SOMONEY cheat: unlock every mission on the list.
 extern "C" void dwMission_UnlockAll(void)
 {
