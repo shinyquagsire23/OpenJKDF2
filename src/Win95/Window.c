@@ -767,6 +767,19 @@ void Window_SdlUpdate()
         return;
     }
 
+    // Added: reentrancy guard. This function both drains the SDL event queue AND presents
+    // (std3D_DrawMenu + SDL_GL_SwapWindow) at its tail. DroidWorks' WM_MOUSEMOVE handler calls
+    // dwCursor_Redraw() -> stdDisplay_DDrawGdiSurfaceFlip() -> Window_SdlUpdate(), so a motion
+    // event dispatched from THIS function's drain re-enters it recursively; under continuous
+    // motion the recursion never unwound (the outer present was starved), freezing the UI until
+    // the mouse stopped — and long drags risked a stack overflow. A nested call is a no-op:
+    // whatever it wanted to show is composited into the front buffer already and gets presented
+    // by the outer call's single tail present.
+    static int Window_bInSdlUpdate = 0;
+    if (Window_bInSdlUpdate)
+        return;
+    Window_bInSdlUpdate = 1;
+
     uint16_t left, right;
     uint32_t pos, msgl, msgr;
     int hasLeft, hasRight;
@@ -1241,6 +1254,8 @@ void Window_SdlUpdate()
 #ifdef QUAKE_CONSOLE
     last_jkQuakeConsole_bOpen = jkQuakeConsole_bOpen;
 #endif
+
+    Window_bInSdlUpdate = 0; // Added: release the reentrancy guard (see top of function)
 }
 
 void Window_SdlVblank()

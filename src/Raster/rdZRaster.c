@@ -2,6 +2,7 @@
 
 #include "Engine/rdCamera.h"
 #include "Win95/stdDisplay.h"
+#include "Primitives/rdPrimit2.h" // Added: wireframe (geometryMode 2) line drawing
 #include "jk.h"
 
 #ifdef RDRASTER_SOFTWARE_RENDERER
@@ -407,6 +408,33 @@ static void rdZRaster_DispatchNGon(const rdZVertex* pVerts, int numVerts, const 
     }
 }
 
+// Port of JK's rdRaster_sub_45CC30 — the wireframe (geometryMode 2) face drawer that
+// rdCache_DrawFaceZ dispatches to (its case 2). Draws each polygon edge (consecutive projected
+// vertices, then last->first to close the loop) as a solid line in the texinfo's solidColor, via
+// rdPrimit2_DrawLine on the current camera canvas. No depth test — matches the binary; wireframe
+// overlays whatever the filled path already drew (e.g. DW's dragged-part preview). The earlier
+// decomp dropped modes 1/2, so this never rendered.
+static void rdZRaster_DrawWireframeFace(rdProcEntry* pProcEntry, rdTexinfo* pTexinfo)
+{
+    rdCanvas* pCanvas = rdCamera_g_pCurCamera->pCanvas;
+    uint8_t color = (uint8_t)pTexinfo->header.solidColor;
+    rdVector3* pV = pProcEntry->aVertices;
+    int numVerts = (int)pProcEntry->numVertices;
+    if (numVerts < 2)
+        return;
+    for (int i = 0; i < numVerts - 1; i++)
+    {
+        rdPrimit2_DrawLine(pCanvas,
+                           (int)floorf((float)pV[i].x + 0.5f),     (int)floorf((float)pV[i].y + 0.5f),
+                           (int)floorf((float)pV[i + 1].x + 0.5f), (int)floorf((float)pV[i + 1].y + 0.5f),
+                           color, -1);
+    }
+    rdPrimit2_DrawLine(pCanvas,
+                       (int)floorf((float)pV[numVerts - 1].x + 0.5f), (int)floorf((float)pV[numVerts - 1].y + 0.5f),
+                       (int)floorf((float)pV[0].x + 0.5f),            (int)floorf((float)pV[0].y + 0.5f),
+                       color, -1);
+}
+
 void rdZRaster_DrawFace(rdProcEntry* pProcEntry)
 {
     if (rdZRaster_pZBuffer == NULL)
@@ -425,8 +453,9 @@ void rdZRaster_DrawFace(rdProcEntry* pProcEntry)
     int lightingMode = pProcEntry->lightingMode;
     if (lightingMode > rdroid_g_curLightingMode)
         lightingMode = rdroid_g_curLightingMode;
-    if ((geometryMode != RD_GEOMETRY_FULL && geometryMode != RD_GEOMETRY_SOLID)
-        || (pProcEntry->extraData & 1) != 0)
+    // Faces flagged for the custom per-face hook (extraData&1) are drawn by rdCache_DrawFaceUser
+    // upstream, never the z-buffered path; drop them defensively. NONE (mode 0) draws nothing.
+    if ((pProcEntry->extraData & 1) != 0 || geometryMode == RD_GEOMETRY_NONE)
         return;
     if (lightingMode < 0 || lightingMode >= 5)
         return;
@@ -444,6 +473,17 @@ void rdZRaster_DrawFace(rdProcEntry* pProcEntry)
         cel = pMaterial->num_texinfo - 1;
     rdTexinfo* pTexinfo = pMaterial->texinfos[cel];
     if (pTexinfo == NULL)
+        return;
+
+    // Geometry-mode dispatch, mirroring JK's rdCache_DrawFaceZ switch. Wireframe (mode 2) draws the
+    // polygon outline through rdPrimit2 (JK case 2 -> rdRaster_sub_45CC30); the filled cases
+    // (SOLID/FULL) continue below. Points (mode 1, JK case 1 -> rdRaster_sub_45CB80) aren't ported.
+    if (geometryMode == RD_GEOMETRY_WIREFRAME)
+    {
+        rdZRaster_DrawWireframeFace(pProcEntry, pTexinfo);
+        return;
+    }
+    if (geometryMode != RD_GEOMETRY_FULL && geometryMode != RD_GEOMETRY_SOLID)
         return;
 
     // Decide solid vs textured. A non-"full" texture (texture_type & 8 clear) or a texinfo with no
