@@ -88,6 +88,7 @@ extern "C" uint8_t dwMain_bFullRedraw;
 // stub returning NULL, defined in dwAnim.cpp.
 // TODO(dw-decomp): provided by the stdBitmapRle2 engine-side unit (P8).
 extern "C" dwImage* stdBitmapRle2_InstantiateCopy(dwImage* pSrc, int16_t width, int16_t height); // @442ec0
+extern "C" dwImage* stdBitmapRle2_LoadFile16(char* pFilePath); // @444c50 (BACKGROUND: forces a lockable buffer)
 
 // ---- module init -------------------------------------------------------------
 
@@ -593,15 +594,17 @@ dwWidget* dwGuiScreen::CreateControl(char* pKeyword, dwConfFile* pConf)
             return NULL;
         if (!this->pBgImage)
         {
-            // Note: binary used the display-format loader @0x444c50 here;
-            // dwImage_LoadFile is the translated dispatcher of the same
-            // stdBitmapRle2 family (P8 loud stub -> NULL until it lands).
-            this->pBgImage = dwImage_LoadFile(pName);
+            // binary: the display-format loader @0x444c50 (LoadFile16), NOT the
+            // bpp dispatcher — LoadFile16 passes bIdk=1 to loads_bmp, forcing
+            // the decode-into-buffer path (LoadFormat0/ToVBuffer) so a compressed
+            // .rle background is a LOCKABLE stdBitmapRle2, not a lazy stdBitmapRle.
+            // The composite branch below Locks pBgImage, so it MUST be lockable.
+            this->pBgImage = stdBitmapRle2_LoadFile16(pName);
         }
         else
         {
             // subsequent BACKGROUND lines composite onto the existing image
-            dwImage* pOverlay = dwImage_LoadFile(pName);
+            dwImage* pOverlay = stdBitmapRle2_LoadFile16(pName);
             if (pOverlay)
             {
                 void* pPixels = NULL;
