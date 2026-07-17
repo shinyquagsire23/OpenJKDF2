@@ -479,6 +479,63 @@ void dwCog_ScanPuppetCallback(SithThing* pThing, int32_t track, uint32_t markerT
 extern void dwMission_SetUnlockedByName(const char* pName, int bUnlocked);
 extern int  dwPart_SetAvailableByName(const char* pName, int bAvailable);
 extern int  dwCog_WorkspaceHasPart(const char* pName);
+extern void dwGuiInGame_RequestEndMission(void); // sets bEndRequested (0x124)
+extern int  dwGuiInGame_GetCammyMsgCode(void);   // reads cammyMsgCode (0x174)
+
+// @408fc0 (dwCog_EnableJump) / @408fb0 (dwCog_DisableJump) — toggle the actor
+// flag that gates jumping on the player thing. Verbs take no args (registered
+// as cog funcs, so the ignored ctx is present). Guarded vs a NULL world/player.
+void dwCog_EnableJump(sithCog* pCtx)
+{
+    (void)pCtx;
+    if (sithWorld_g_pCurrentWorld && sithWorld_g_pCurrentWorld->pLocalPlayer)
+        sithWorld_g_pCurrentWorld->pLocalPlayer->actorParams.flags &= ~SITH_AF_4000000;
+}
+void dwCog_DisableJump(sithCog* pCtx)
+{
+    (void)pCtx;
+    if (sithWorld_g_pCurrentWorld && sithWorld_g_pCurrentWorld->pLocalPlayer)
+        sithWorld_g_pCurrentWorld->pLocalPlayer->actorParams.flags |= SITH_AF_4000000;
+}
+
+// @408e90 (dwCog_GetCameraPosition) — push the current camera's world position
+// (binary cam+100 = SithCamera.lookPos), or the zero vector when no camera.
+void dwCog_GetCameraPosition(sithCog* pCtx)
+{
+    if (sithCamera_g_pCurCamera)
+    {
+        sithCogExec_PushVector(pCtx, &sithCamera_g_pCurCamera->lookPos);
+        return;
+    }
+    rdVector3 zero = { 0.0, 0.0, 0.0 };
+    sithCogExec_PushVector(pCtx, &zero);
+}
+
+// @408ee0 (dwCog_GetCameraSector) — push the id of the camera's current sector
+// (binary **(cam+0x18) = SithCamera.sector->id), or 0 when no camera/sector.
+void dwCog_GetCameraSector(sithCog* pCtx)
+{
+    if (sithCamera_g_pCurCamera && sithCamera_g_pCurCamera->sector)
+    {
+        sithCogExec_PushInt(pCtx, sithCamera_g_pCurCamera->sector->id);
+        return;
+    }
+    sithCogExec_PushInt(pCtx, 0);
+}
+
+// @409010 (dwCog_EndMission, registered as BOTH dwendmission + dwendlevel) —
+// request mission end (SegUpdate acts on the flag next frame).
+void dwCog_EndMission(sithCog* pCtx)
+{
+    (void)pCtx;
+    dwGuiInGame_RequestEndMission();
+}
+
+// @408fa0 (dwCog_GetMissionText) — push the last Cammy-caption message code.
+void dwCog_GetMissionText(sithCog* pCtx)
+{
+    sithCogExec_PushInt(pCtx, dwGuiInGame_GetCammyMsgCode());
+}
 
 // @409020 (dwCog_EnableMission) / @409060 — unlock/lock a mission by id name.
 void dwCog_EnableMission(sithCog* pCtx)
@@ -530,6 +587,13 @@ void dwCog_RegisterVerbs(void)
     sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_EnableMission,    "dwenablemission");
     sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_DisableMission,   "dwdisablemission");
     sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_CheckForPart,     "dwcheckforpart");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_EnableJump,       "dwenablejump");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_DisableJump,      "dwdisablejump");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_GetCameraPosition,"dwgetcameraposition");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_GetCameraSector,  "dwgetcamerasector");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_EndMission,       "dwendmission");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_EndMission,       "dwendlevel");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_GetMissionText,   "dwgetmissiontext");
 
     // --- inventory verbs: the engine impls are ALREADY registered by the
     //     sithCogFunctionThing/Player DwCompat blocks (setinv/changeinv/
@@ -540,11 +604,10 @@ void dwCog_RegisterVerbs(void)
     // sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_SetInvAvailable, "setinvavailable");
 
     // --- BLOCKED (need not-yet-ported deps) ------------------------------
-    // dwGuiInGame struct fields (un-rigid in the port): dwenableescape /
-    //   dwdisableescape / dwendmission (+dwendlevel) / dwgetmissiontext.
-    // Engine field mapping to verify: dwenablejump / dwdisablejump
-    //   (playerThing actorParams flag 0x4000000), dwgetcameraposition /
-    //   dwgetcamerasector (sithCamera position@+0x64 / sector).
+    // dwenableescape / dwdisableescape write binary field_0x110 which the port
+    //   maps to dwGuiInGame::bConvPending (conversation state), NOT an escape
+    //   flag — a real offset/semantics conflict. Left unwired until resolved
+    //   (writing bConvPending here would corrupt conversation handling).
     // Speech/dialog + droid-stats + one-offs: dwcleardialog,
     //   dwplaycharacterspeech, dwplayplayerspeech, dwaddresponse,
     //   dwgetplayerresponse, dwplayplayerresponse, dwplaycammyspeech,

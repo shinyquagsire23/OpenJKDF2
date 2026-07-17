@@ -85,6 +85,12 @@ void dwGuiInGame_ConsolePrint(const char* pText);
 // to the active screen. Returns 0. @422a60
 int dwGuiInGame_UpdateViewSize(SithThing* pPlayer, flex_t deltaSecs);
 
+// DW COG verb accessors (the C dwCog verb layer can't reach the C++ struct
+// fields directly). @409010 dwendmission/dwendlevel request; @408fa0
+// dwgetmissiontext read. Both no-op / return 0 when no mission is live.
+void dwGuiInGame_RequestEndMission(void);
+int  dwGuiInGame_GetCammyMsgCode(void);
+
 // Note: no binary counterpart — resets dwGuiInGame_pActive for the soft-reset
 // loop (the unit's only module-level state).
 void dwGuiInGame_Startup(void);

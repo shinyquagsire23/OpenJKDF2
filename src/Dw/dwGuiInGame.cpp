@@ -183,6 +183,20 @@ extern "C" void dwGuiInGame_Startup(void)
     dwGuiInGame_pActive = NULL;
 }
 
+// DW COG verb accessors (dwCog.c is C, this struct is C++). @409010 dwCog_EndMission
+// sets field_0x124 (bEndRequested); @408fa0 dwCog_GetMissionText reads field_0x174
+// (cammyMsgCode). Both no-op / return 0 when no mission is live.
+extern "C" void dwGuiInGame_RequestEndMission(void)
+{
+    if (dwGuiInGame_pActive)
+        dwGuiInGame_pActive->bEndRequested = 1;
+}
+
+extern "C" int dwGuiInGame_GetCammyMsgCode(void)
+{
+    return dwGuiInGame_pActive ? (int)dwGuiInGame_pActive->cammyMsgCode : 0;
+}
+
 // Find pWidget's node in pList and unlink+free it (widget kept). Mirrors the
 // binary's inline sentinel walks (dwGuiScreen.cpp precedent).
 static void dwGuiInGame_UnlinkWidgetNode(dwList* pList, void* pWidget)
