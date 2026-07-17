@@ -20,6 +20,7 @@
 // dwCog_RegisterVerbs are dwCog part 1 (P8), not here.
 
 #include "Dw/dwCog.h"
+#include "Dw/dwWidget.h" // dwWidgetMsg + dwWidget_DispatchMsg (HUD refresh)
 
 #include "Cog/sithCog.h"
 #include "Cog/sithCogExec.h"
@@ -495,6 +496,18 @@ extern dwSegment* dwSegment_pActive;
 extern dwSegment* dwMovie_OpenSeg(const char* pFilename, void* pOverlayImage);
 extern void       dwSegment_InterruptWith(dwSegment* pReturnTo, dwSegment* pInterrupt);
 
+// Inventory verbs. The engine impls (defined in Cog/sithCogFunction{Thing,
+// Player}.c but not exposed in their headers) already register plain setinv/
+// changeinv/setinvavailable; the DW verbs OVERRIDE those registrations with a
+// wrapper that also broadcasts a HUD inventory-bar refresh. dwCog_RegisterVerbs
+// runs at dwSith_Startup, AFTER the engine registration, so the DW wrapper wins
+// (sithCog_RegisterFunction replaces a duplicate-named symbol's value).
+extern void sithCogFunctionThing_SetInventory(sithCog* pCtx);
+extern void sithCogFunctionThing_ChangeInventory(sithCog* pCtx);
+extern void sithCogFunctionPlayer_SetInvAvailable(sithCog* pCtx);
+// dwsetupcrystalinventory body (typed mission-list walk in dwMission.cpp).
+extern void dwMission_SetupCrystalInventory(void);
+
 // @408fc0 (dwCog_EnableJump) / @408fb0 (dwCog_DisableJump) — toggle the actor
 // flag that gates jumping on the player thing. Verbs take no args (registered
 // as cog funcs, so the ignored ctx is present). Guarded vs a NULL world/player.
@@ -640,6 +653,48 @@ void dwCog_PlayMovie(sithCog* pCtx)
     }
 }
 
+// The HUD inventory-bar refresh the DW inventory verbs issue after mutating a
+// bin: OnMessage(0x1f4b) delivered to dwWidget_pDefault (the active screen/HUD,
+// pTarget/pOverride both NULL). No-op when no screen is active or the code is
+// unhandled. Binary: each verb builds this dwWidgetMsg on the stack and calls
+// the mislabeled dwWidget_DispatchMsg@0x444d00 — factored here.
+static void dwCog_HudRefreshInventory(void)
+{
+    dwWidgetMsg msg;
+    msg.code = 0x1f4b;
+    msg.pSender = NULL;
+    msg.param = 0;
+    msg.pTarget = NULL;
+    dwWidget_DispatchMsg(&msg, NULL);
+}
+
+// @409150 (dwCog_SetInv "setinv") — engine setinv + HUD refresh.
+void dwCog_SetInv(sithCog* pCtx)
+{
+    sithCogFunctionThing_SetInventory(pCtx);
+    dwCog_HudRefreshInventory();
+}
+// @409190 (dwCog_ChangeInv "changeinv") — engine changeinv + HUD refresh.
+void dwCog_ChangeInv(sithCog* pCtx)
+{
+    sithCogFunctionThing_ChangeInventory(pCtx);
+    dwCog_HudRefreshInventory();
+}
+// @4091d0 (dwCog_SetInvAvailable "setinvavailable") — engine setinvavailable + HUD refresh.
+void dwCog_SetInvAvailable(sithCog* pCtx)
+{
+    sithCogFunctionPlayer_SetInvAvailable(pCtx);
+    dwCog_HudRefreshInventory();
+}
+// @409210 (dwCog_SetupCrystalInventory "dwsetupcrystalinventory") — grant
+// crystal inventory bins for completed crystal missions, then HUD refresh.
+void dwCog_SetupCrystalInventory(sithCog* pCtx)
+{
+    (void)pCtx;
+    dwMission_SetupCrystalInventory();
+    dwCog_HudRefreshInventory();
+}
+
 void dwCog_RegisterVerbs(void)
 {
     // --- READY (wired) ---------------------------------------------------
@@ -669,27 +724,39 @@ void dwCog_RegisterVerbs(void)
     sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_ClearDialog,      "dwcleardialog");
     sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_PlayMovie,        "dwplaymovie");
 
-    // --- inventory verbs: the engine impls are ALREADY registered by the
-    //     sithCogFunctionThing/Player DwCompat blocks (setinv/changeinv/
-    //     setinvavailable). The DW wrappers only add a HUD-refresh dwWidget
-    //     message dispatch — re-wire once that HUD dispatch is ported. ------
-    // sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_SetInv,          "setinv");
-    // sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_ChangeInv,       "changeinv");
-    // sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_SetInvAvailable, "setinvavailable");
+    // --- inventory verbs: the DW wrappers OVERRIDE the engine's plain
+    //     setinv/changeinv/setinvavailable registrations (registered earlier by
+    //     the sithCogFunctionThing/Player startup) with the same engine call
+    //     PLUS a HUD inventory-bar refresh (dwWidget_DispatchMsg 0x1f4b).
+    //     dwsetupcrystalinventory grants crystal bins from completed missions.
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_SetInv,          "setinv");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_ChangeInv,       "changeinv");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_SetInvAvailable, "setinvavailable");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_SetupCrystalInventory, "dwsetupcrystalinventory");
 
     // --- BLOCKED (need not-yet-ported deps) ------------------------------
     // dwenableescape / dwdisableescape write binary field_0x110 which the port
     //   maps to dwGuiInGame::bConvPending (conversation state), NOT an escape
     //   flag — a real offset/semantics conflict. Left unwired until resolved
     //   (writing bConvPending here would corrupt conversation handling).
-    // Still BLOCKED — the voice-PLAYBACK cluster (sets ctx->script_running +
-    //   a msec timeout from the sound length; needs dwSoundSample_GetLengthMs
-    //   + dwCog_GetPlayerSpeechPath + the dwGuiInGame_PlayVoiceLineEx/
-    //   StopVoiceLine speech helpers, none ported yet): dwplaycharacterspeech,
-    //   dwplayplayerspeech, dwaddresponse, dwgetplayerresponse,
-    //   dwplayplayerresponse, dwplaycammyspeech, dwsetupcrystalinventory
-    //   (inventory + HUD-refresh dispatch), dwflashinventory (needs the
-    //   dwWcButtonBlink control + the field_0x194 button pointer, unmodelled).
-    //   See DW/decomp_tools survey for the full per-verb dependency list.
+    // Still BLOCKED:
+    // - voice/caption playback (dwplaycharacterspeech/dwplayplayerspeech/
+    //   dwplaycammyspeech): the deps now EXIST (dwSoundSample_GetLengthMs,
+    //   dwGuiInGame::PlayVoiceLineEx/StopVoiceLine/ClearPlayerSpeech, the
+    //   dwGuiSpeech caption), BUT dwGuiInGame::PlayVoiceLineEx is currently
+    //   short-circuited (`return;`) from the in-game bring-up — un-stub + a
+    //   runtime pass is required before wiring these. Also needs a port of
+    //   dwCog_GetPlayerSpeechPath@408950 (head-type wav remapper).
+    // - conversation response menu (dwaddresponse/dwgetplayerresponse/
+    //   dwplayplayerresponse): the binary reads field_0x120 as the SELECTED
+    //   response item (+4 = id, +0x1c = wav), but the port + Ghidra ctor plate
+    //   both label 0x120 pConversationCog(sithCog*) — an unresolved offset/
+    //   semantics conflict; resolve which field holds the selected item first.
+    // - dwenableescape/dwdisableescape: binary field_0x110 maps to the port's
+    //   dwGuiInGame::bConvPending (conversation state) — writing it would
+    //   corrupt conversations. Resolve the real Esc-gating field first.
+    // - dwflashinventory: needs the dwWcButtonBlink inventory button
+    //   (field_0x194, currently unmodelled on dwGuiInGame).
+    //   See DW/decomp_tools/cog_verb_survey.md for the full per-verb deps.
 }
 

@@ -18,7 +18,15 @@
 #include "Dw/dwMission.h"
 
 #include "Dw/dwColormap.h"
+#include "Dw/dwString.h"       // dwString_Equals
 #include "stdPlatform.h"
+
+// Unguarded C engine headers — wrap for correct C++<->C linkage (matches the
+// src/Dw sibling convention, e.g. dwGuiInGame.cpp).
+extern "C" {
+#include "globals.h"           // SithThing / SithWorld / sithWorld_g_pCurrentWorld
+#include "Gameplay/sithInventory.h" // sithInventory_SetInventory[Available]
+}
 
 #include <stdlib.h>
 
@@ -59,6 +67,40 @@ extern "C" void dwMission_SetUnlockedByName(const char* pName, int bUnlocked)
         {
             pMission->bUnlocked = (uint8_t)(bUnlocked ? 1 : 0);
             return;
+        }
+    }
+}
+
+// C-callable helper for the dwCog dwsetupcrystalinventory verb
+// (@dwCog_SetupCrystalInventory@409210): walk dwCore_pMissionList and, for each
+// "crystal" mission (missionType == 1), grant the local player an inventory bin
+// starting at 0x22 — amount 1.0 + mark-available for a COMPLETED mission
+// (rank != 0, advancing the bin), or amount 0 + not-available otherwise (bin
+// not advanced, matching the binary). Typed access here keeps the raw 32-bit
+// binary field offsets out of the C verb layer; the verb layer issues the
+// HUD-refresh broadcast afterward.
+extern "C" void dwMission_SetupCrystalInventory(void)
+{
+    SithThing* pPlayer = sithWorld_g_pCurrentWorld ? sithWorld_g_pCurrentWorld->pLocalPlayer : NULL;
+    if (pPlayer == NULL || dwCore_pMissionList == NULL)
+        return;
+    int bin = 0x22;
+    for (dwListNode* pNode = dwCore_pMissionList->pNext; pNode != dwCore_pMissionList;
+         pNode = pNode->pNext)
+    {
+        dwMission* pMission = (dwMission*)pNode->pData;
+        if (pMission->missionType != 1)
+            continue;
+        if (pMission->rank == 0)
+        {
+            sithInventory_SetInventory(pPlayer, bin, 0.0f);
+            sithInventory_SetInventoryAvailable(pPlayer, bin, 0);
+        }
+        else
+        {
+            sithInventory_SetInventory(pPlayer, bin, 1.0f);
+            sithInventory_SetInventoryAvailable(pPlayer, bin, 1);
+            bin++;
         }
     }
 }
