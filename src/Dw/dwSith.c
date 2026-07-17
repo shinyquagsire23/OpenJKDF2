@@ -96,19 +96,20 @@ int dwSith_Instinct_TouchOfDeath(SithAIControlBlock* pLocal, SithAIInstinct* pIn
 int dwSith_Startup(HostServices* pHS)
 {
     int bResult = 0;
-    (void)pHS;
 
-    // Note: the binary's dwSith_Startup calls sithMain_Startup/sithCamera_Startup/
-    // sithControl_Startup here because in DroidWorks.exe dw_Startup is the ONLY
-    // sith bring-up. In OpenJKDF2, Main_Startup already boots the whole engine
-    // (sithMain_Startup et al.) BEFORE dwMain_Startup — so re-running them here
-    // would double-init the engine pools AND, now that the DW VFS is installed,
-    // re-load JK's "misc\sithStrings.uni" through dwGob (bogus handle -> crash).
-    // The engine is already up, so skip the redundant trio and keep only the
-    // DW-specific registrations below (faithful in effect).
-    sithConsole_Startup(0x40);
-    sithConsole_Open(0x10);
-    bResult = 1;
+    // The DroidWorks reduced-engine startup (Main_Startup's Main_bDroidWorks
+    // branch) brings up only the shared render layer + Video; dw_Startup owns the
+    // rest of the sith engine here. ⚠ sithCamera_Startup is NOT called here —
+    // Video_Startup (run by the reduced branch) already calls it, so re-calling
+    // would double-init (SITH_ASSERTREL sithCamera_bStartup==0). sithControl_
+    // Startup is otherwise only called by jkControl_Startup, which the reduced
+    // branch skips, so dw_Startup owns it.
+    if (sithMain_Startup(pHS) && sithControl_Startup())
+    {
+        sithConsole_Startup(0x40);
+        sithConsole_Open(0x10);
+        bResult = 1;
+    }
 
     dwCog_RegisterVerbs();
     sithAI_RegisterInstinct("touchofdeath", dwSith_Instinct_TouchOfDeath, 6, 0, SITHAI_EVENTTOUCHED);

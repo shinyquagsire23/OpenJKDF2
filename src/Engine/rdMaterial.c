@@ -85,8 +85,10 @@ rdMaterial* rdMaterial_Load(char *pFilename, int create_ddraw_surface, int gpu_m
 
 int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int create_ddraw_surface, int gpu_mem, int bDoLoad)
 {
-    int mat_file; // eax
-    int mat_file_; // ebx
+    // file handles are stdFile_t (intptr_t): an int truncates a 64-bit handle
+    // (e.g. a handle above 4GB) to 32 bits. On 32-bit targets intptr_t == int.
+    stdFile_t mat_file; // eax
+    stdFile_t mat_file_; // ebx
     int num_texinfo; // eax
     int tex_type; // edx
     int *texture_idk; // edi
@@ -102,7 +104,7 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
     rdTexinfo **v24; // ebx
     rdColor24 *colors; // eax
     char *v26; // eax
-    int mat_file__; // [esp+10h] [ebp-128h]
+    stdFile_t mat_file__; // [esp+10h] [ebp-128h]
     int tex_num; // [esp+14h] [ebp-124h]
     int tex_numa; // [esp+14h] [ebp-124h]
     rdTextureHeader tex_header_1; // [esp+20h] [ebp-118h]

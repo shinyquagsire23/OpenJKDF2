@@ -376,6 +376,36 @@ int Main_Startup(const char *cmdline)
 
     stdHttp_Startup();
 
+    // Added: DroidWorks boots a REDUCED engine. It has its own VFS (dwGob/inits),
+    // its own GUI, and its own app flow — so it must NOT run jkRes (which
+    // ref-count-toggles the shared HostServices file ops and fights the DW VFS,
+    // corrupting file handles), jkGob, the jkGui* menus, or the jk-game systems.
+    // Cmdline is already parsed (Main_ParseCmdLine @322), so branch here and bring
+    // up only the shared engine components DW needs, then hand off to the DW app
+    // layer. The sith engine itself is brought up later by dwSith_Startup (from
+    // dw_Startup), exactly as in the DroidWorks binary.
+    if (Main_bDroidWorks) {
+        Windows_Startup();
+        sithCvar_Startup();
+        if (!Windows_InitWindow())
+            return 0;
+        rdStartup(&hs);
+        Video_Startup();
+        std3D_Startup();
+#ifdef QUAKE_CONSOLE
+        // TODO: Use a droidworks font+BM in jkQuakeConsole_Startup
+        //jkQuakeConsole_Startup(); // Added
+#endif
+#ifdef RDRASTER_SOFTWARE_RENDERER
+        // Force sw renderer for Droidworks, for now
+        rdroid_bSoftwareRenderer = 1;
+#endif
+        if (!dwMain_Startup())
+            return 0;
+        Window_SetDrawHandlers(stdDisplay_DrawAndFlipGdi, stdDisplay_SetCooperativeLevel);
+        return 1;
+    }
+
     jkGob_Startup();
     jkRes_Startup(pHS);
     Windows_Startup();
@@ -456,14 +486,8 @@ int Main_Startup(const char *cmdline)
                 }
             }
 #endif
-            // Added: DroidWorks mode boots the DW app layer instead of the jk intro flow
-            if (Main_bDroidWorks) {
-                if (!dwMain_Startup()) {
-                    return 0;
-                }
-                Window_SetDrawHandlers(stdDisplay_DrawAndFlipGdi, stdDisplay_SetCooperativeLevel);
-                return 1;
-            }
+            // Note: DroidWorks (-droidworks) no longer reaches here — it branches
+            // to its reduced-engine startup right after stdHttp_Startup above.
             if (!Main_bMotsCompat) {
                 jkSmack_SmackPlay("01-02a.smk");
             }
