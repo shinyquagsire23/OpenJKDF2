@@ -334,6 +334,54 @@ extern "C" void dwGuiInGame_PlayCammySpeech(int msgCode, char* pWav, int priorit
         dwGuiInGame_pActive->PlayVoiceLineEx((uint32_t)msgCode, pWav, (uint32_t)priority, 0);
 }
 
+// --- conversation response-menu verb helpers -------------------------------
+// @408880 dwCog_AddResponse: append a response to the PLAYERSPEECH menu. The
+// item's data = the owning conversation cog (woken/notified when it is picked),
+// val = the response id, textA = the localized display text, textB = the VO wav.
+// No-op when no response menu exists (binary gates on pPlayerSpeech).
+extern "C" void dwGuiInGame_AddResponse(sithCog* pCtx, int id, char* pTextKey, char* pWav)
+{
+    if (dwGuiInGame_pActive == NULL || dwGuiInGame_pActive->pPlayerSpeech == NULL)
+        return;
+    char* pLoc = dwGuiScreen_LocalizeString(pTextKey, dwGuiInGame_pActive->pStringTable);
+    dwGuiInGame_pActive->pPlayerSpeech->AddItem((void*)pCtx, id, pLoc, pWav);
+}
+
+// @408d20 dwCog_GetPlayerResponse: the id (val) of the selected response, or 0.
+extern "C" int dwGuiInGame_GetSelectedResponseId(void)
+{
+    if (dwGuiInGame_pActive == NULL || dwGuiInGame_pActive->pSelectedResponse == NULL)
+        return 0;
+    return dwGuiInGame_pActive->pSelectedResponse->val;
+}
+
+// @408b60 dwCog_PlayPlayerResponse body: play the selected response's VO wav
+// (textB, item+0x1c). Returns its length in ms, or -1 when nothing plays (no
+// selection / empty wav / no sample).
+extern "C" int32_t dwGuiInGame_PlaySelectedResponse(void)
+{
+    if (dwGuiInGame_pActive == NULL)
+        return -1;
+    dwGuiListItem* pItem = dwGuiInGame_pActive->pSelectedResponse;
+    if (pItem == NULL)
+        return -1;
+    char* pWav = pItem->textB.pBuffer;
+    if (pWav == NULL || *pWav == '\0')
+        return -1;
+    dwSoundSample* pSample = dwSound_Play(pWav);
+    if (pSample == NULL)
+        return -1;
+    return (int32_t)pSample->GetLengthMs();
+}
+
+// @4089c0/@4089e0 dwCog_Enable/DisableEscape: gate whether the Esc key runs
+// StopSounds during a conversation (obj+0x110).
+extern "C" void dwGuiInGame_SetEscapeEnabled(int bEnabled)
+{
+    if (dwGuiInGame_pActive != NULL)
+        dwGuiInGame_pActive->bEscapeEnabled = (uint8_t)(bEnabled != 0);
+}
+
 // Find pWidget's node in pList and unlink+free it (widget kept). Mirrors the
 // binary's inline sentinel walks (dwGuiScreen.cpp precedent).
 static void dwGuiInGame_UnlinkWidgetNode(dwList* pList, void* pWidget)
@@ -385,16 +433,16 @@ dwGuiInGame::dwGuiInGame(dwMission* pMission)
     this->aimCenterX = 0;
     this->aimCenterY = 0;
     this->pDroidStats = NULL;
-    this->bConvPending = 0;
+    this->bEscapeEnabled = 1; // binary ctor: obj+0x110 = 1 (Esc enabled by default)
     this->pNpcSpeech = NULL;
     this->pPlayerSpeech = NULL;
     this->bConvActive = 0;
-    this->pConversationCog = NULL;
+    this->pSelectedResponse = NULL;
     this->bEndRequested = 0;
     this->bDying = 0;
     this->deathStartMs = 0;
     this->deathFadeHandle = -1;
-    this->field_0x130 = 0;
+    this->bHolstered = 0;
     this->viewRect.left = this->viewRect.top = this->viewRect.right = this->viewRect.bottom = 0;
     this->insetRect.left = this->insetRect.top = this->insetRect.right = this->insetRect.bottom = 0;
     this->pCammyText = NULL;
@@ -688,12 +736,20 @@ void dwGuiInGame::Deactivate()
 void dwGuiInGame::StopSounds()
 {
     StopVoiceLine();
-    if (this->pConversationCog != NULL)
+    dwGuiListItem* pItem = this->pSelectedResponse;
+    if (pItem != NULL)
     {
-        // Note: the binary stops the conversation cog's active sound + frees
-        // cached samples, then stamps the cog's cooldown; the cog-internal
-        // offsets (+0x14/+0x1c) are DW sithCog fields (P8). Kept structurally.
-        if (dwSound_pManager) dwSound_pManager->FreeAllSamples();
+        // Stop the selected response's VO wav (textB, char* at item+0x1c) and,
+        // if it owns a conversation cog (item->data), wake it now so its script
+        // stops waiting on the (now-cancelled) response.
+        if (pItem->textB.length != 0)
+        {
+            dwSound_Stop(pItem->textB.pBuffer);
+            if (dwSound_pManager) dwSound_pManager->FreeAllSamples();
+        }
+        sithCog* pCog = (sithCog*)pItem->data;
+        if (pCog != NULL)
+            pCog->msecTimerTimeout = sithTime_g_msecGameTime;
     }
     if (this->pNpcSpeech != NULL)
         dwGuiSpeech_Clear(this->pNpcSpeech);
@@ -723,10 +779,14 @@ void dwGuiInGame::Update()
 {
     SithThing* pThing = sithWorld_g_pCurrentWorld->pLocalPlayer;
 
-    if (this->pConversationCog != NULL && this->bConvPending != 0)
+    // A response was selected (bConvActive) and it carries a conversation cog:
+    // notify that cog (DW message 0x2f = 47) and clear the pending flag.
+    if (this->pSelectedResponse != NULL && this->pSelectedResponse->data != NULL
+        && this->bConvActive != 0)
     {
-        this->bConvPending = 0;
-        sithCog_SendMessage(this->pConversationCog, (SITH_MESSAGE)0x2f, 0, 0, 0, 0, 0);
+        this->bConvActive = 0;
+        sithCog_SendMessage((sithCog*)this->pSelectedResponse->data,
+                            (SITH_MESSAGE)0x2f, 0, 0, 0, 0, 0);
     }
 
     // Auto-clear a finished Cammy caption.
@@ -742,13 +802,15 @@ void dwGuiInGame::Update()
 
     stdPalEffects_UpdatePalette(stdDisplay_GetPalette());
 
-    // 'H' holster toggle latch (sithControl key 0x26).
+    // 'H' holster toggle (sithControl key 0x26): edge-toggle bHolstered — it
+    // flips on key-down while unholstered, or key-up while holstered — then set
+    // the cursor (0 = holstered; else aim/normal per the base pick mode).
     int bHolsterKey = sithControl_GetKey(0x26, NULL);
-    if ((this->pConversationCog != NULL) ? (bHolsterKey != 0) : (bHolsterKey != 0))
+    char wasHolstered = this->bHolstered;
+    if ((wasHolstered == 0) ? (bHolsterKey != 0) : (bHolsterKey == 0))
     {
-        // Note: the exact holster latch mixes pConversationCog as a bool; kept
-        // simple — toggle the cursor between aim/normal.
-        int idx = (this->pConversationCog == NULL) ? (this->bActive ? 3 : 1) : 0;
+        this->bHolstered = (wasHolstered == 0) ? 1 : 0;
+        int idx = (this->bHolstered == 0) ? (this->bActive ? 3 : 1) : 0;
         dwCursor_SetCursor(idx);
     }
 
@@ -1121,7 +1183,7 @@ void dwGuiInGame::ClearPlayerSpeech()
 {
     if (this->pPlayerSpeech != NULL)
         dwGuiList_Clear(this->pPlayerSpeech);
-    this->pConversationCog = NULL;
+    this->pSelectedResponse = NULL;
     this->bConvActive = 0;
 }
 
@@ -1196,10 +1258,10 @@ int dwGuiInGame::OnKey(int key, int repeat)
             dwSegment_InterruptWith(dwSegment_pActive, static_cast<dwSegment*>(pPause));
             break;
         }
-        case '\x1b': // Backspace? (binary: ESC alt) — training exits, else stop
+        case '\x1b': // ESC: training exits; else (if Esc enabled) stop sounds
             if (this->pMissionInfo->missionType == 5)
                 dwSegment_RequestAdvance();
-            else if (this->bConvActive != 0)
+            else if (this->bEscapeEnabled != 0)
                 StopSounds();
             break;
         case '*':
@@ -1248,9 +1310,10 @@ int dwGuiInGame::OnMessage(dwWidgetMsg* pMsg)
         dwSegment_InterruptWith(dwSegment_pActive, pSeg);
         break;
     }
-    case 8000: // store the pick focus
-        this->bActive = 1;
-        this->pPickedWidget = (dwWidget*)pMsg->pSender;
+    case 0x1f40: // (== 8000) a response menu item was clicked: remember it +
+                 // flag the conversation cog for msg 0x2f on the next SegUpdate
+        this->bConvActive = 1;
+        this->pSelectedResponse = (dwGuiListItem*)pMsg->pSender;
         break;
     case 0x1788: // set game-speed % -> rebuild the 3D viewport
         if ((uintptr_t)pMsg->pSender != dw_viewSizePct && g_sithMode != 0)

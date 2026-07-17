@@ -110,6 +110,7 @@ struct dwGuiHypText;   // Dw/dwGuiHypText.h (CAMMY_TEXT / HELPTEXT)
 struct dwGuiIndicator; // dwHelp.cpp (SPEED/DAMAGE/POWER gauges) — sibling unit
 struct dwGuiSpeech;    // dwGuiList.cpp (NPCSPEECH) — sibling unit
 struct dwGuiList;      // dwGuiList.cpp (PLAYERSPEECH) — sibling unit
+struct dwGuiListItem;  // dwGuiList.h — response menu item (pSelectedResponse)
 struct dwDroidStats;   // Dw/dwDroidStats.h (baked player droid)
 struct sithCog;        // engine (conversation cog)
 struct rdCanvas;       // engine (3D HUD viewport)
@@ -130,16 +131,18 @@ struct dwGuiInGame : dwGuiScreen
     float aimCenterX;             // 0xd4: viewport screen center (dwCamera aim)
     float aimCenterY;             // 0xd8
     dwDroidStats* pDroidStats;    // 0x10c: baked player droid (BuildDroidStats; freed in Dtor)
-    uint8_t bConvPending;         // 0x110: a conversation cog just started (ctor=1)
+    uint8_t bEscapeEnabled;       // 0x110: gates whether Esc runs StopSounds (ctor=1;
+                                  //        dwCog_Enable/DisableEscape toggle it)
     dwGuiSpeech* pNpcSpeech;      // 0x114: NPCSPEECH caption
     dwGuiList* pPlayerSpeech;     // 0x118: PLAYERSPEECH response menu
-    uint8_t bConvActive;          // 0x11c: conversation in progress
-    sithCog* pConversationCog;    // 0x120
+    uint8_t bConvActive;          // 0x11c: a response is selected + pending delivery
+    dwGuiListItem* pSelectedResponse; // 0x120: the clicked response item
+                                  //        (data=owning sithCog*, val=id, textB=wav)
     uint8_t bEndRequested;        // 0x124: mission end requested (SegUpdate ends it)
     uint8_t bDying;               // 0x125: death fade running
     uint32_t deathStartMs;        // 0x128: death fade start (sithTime ms)
     int32_t deathFadeHandle;      // 0x12c: stdPalEffects fade request (init -1)
-    uint8_t field_0x130;          // 0x130: (ctor zeroes; unread)
+    uint8_t bHolstered;           // 0x130: holster/aim cursor toggle (SegUpdate 'H' key)
     dwWidgetGroup overlayGroup;   // 0x138: OVERLAY controls (children @0x148)
     dwRect viewRect;              // 0x14c: VIEWRECT (HUD 3D viewport LTRB)
     dwRect insetRect;             // 0x154: game-speed-inset viewport LTRB (RebuildViewport)

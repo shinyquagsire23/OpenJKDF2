@@ -494,6 +494,11 @@ extern int      dwGuiInGame_HasActiveVoice(void);       // currentVoiceWav.lengt
 extern int      dwGuiInGame_GetDroidHeadChars(char* pOut2); // voiceChars[0..1]; 0 if no droid
 extern int32_t  dwGuiInGame_PlaySpeechWav(char* pWav);  // plays; ms length, -1 if none
 extern void     dwGuiInGame_PlayCammySpeech(int msgCode, char* pWav, int priority);
+// conversation response-menu + escape verb shims (dwGuiInGame.cpp):
+extern void     dwGuiInGame_AddResponse(sithCog* pCtx, int id, char* pTextKey, char* pWav);
+extern int      dwGuiInGame_GetSelectedResponseId(void);
+extern int32_t  dwGuiInGame_PlaySelectedResponse(void); // plays selected wav; ms, -1 if none
+extern void     dwGuiInGame_SetEscapeEnabled(int bEnabled);
 
 // dwplaymovie deps (C++ modules; all extern "C", so C linkage matches). The
 // dwSegment type stays opaque here — we only pass the pointers through.
@@ -626,6 +631,9 @@ void dwCog_GetArmStrength(sithCog* pCtx)
 {
     sithCogExec_PushInt(pCtx, dwGuiInGame_GetArmStrength());
 }
+
+// HUD notification dispatch (defined below with the inventory refresh helper).
+static void dwCog_HudDispatch(uint32_t code);
 
 // @408950 (dwCog_GetPlayerSpeechPath) — build the VO wav filename for a player
 // speech line. The base name is "GDxx%03lu.wav" (head-type 'B') or
@@ -775,6 +783,49 @@ void dwCog_PlayCammySpeech(sithCog* pCtx)
     dwGuiInGame_PlayCammySpeech(msgCode, pWav, priority);
 }
 
+// @408880 (dwCog_AddResponse) — append a response to the in-mission conversation
+// RESPONSE MENU (dwGuiList). Pops (index, srcName, textKey, id): builds the VO
+// wav name (head-type remap), then adds {cog, id, localized text, wav} to the
+// menu and refreshes the HUD (msg 0x1f49).
+void dwCog_AddResponse(sithCog* pCtx)
+{
+    int32_t index = sithCogExec_PopInt(pCtx);
+    char* pSrc = sithCogExec_PopString(pCtx);
+    char* pTextKey = sithCogExec_PopString(pCtx);
+    int32_t id = sithCogExec_PopInt(pCtx);
+
+    char wavName[16];
+    _strncpy(wavName, pSrc, 0xf);
+    wavName[15] = '\0';
+    dwCog_GetPlayerSpeechPath(wavName, pSrc, (uint32_t)index);
+    dwGuiInGame_AddResponse(pCtx, id, pTextKey, wavName);
+    dwCog_HudDispatch(0x1f49);
+}
+
+// @408d20 (dwCog_GetPlayerResponse) — push the id of the selected response (0 if
+// none picked yet).
+void dwCog_GetPlayerResponse(sithCog* pCtx)
+{
+    sithCogExec_PushInt(pCtx, dwGuiInGame_GetSelectedResponseId());
+}
+
+// @408b60 (dwCog_PlayPlayerResponse) — play the selected response's VO wav and
+// block the cog for its duration (+0x2ee ms trailing pad).
+void dwCog_PlayPlayerResponse(sithCog* pCtx)
+{
+    int32_t lenMs = dwGuiInGame_PlaySelectedResponse();
+    if (lenMs >= 0)
+    {
+        pCtx->script_running = 2;
+        pCtx->msecTimerTimeout = (uint32_t)lenMs + 0x2ee + sithTime_g_msecGameTime;
+    }
+}
+
+// @4089c0 (dwCog_EnableEscape) / @4089e0 (dwCog_DisableEscape) — toggle whether
+// the Esc key stops the current conversation (dwGuiInGame obj+0x110).
+void dwCog_EnableEscape(sithCog* pCtx)  { (void)pCtx; dwGuiInGame_SetEscapeEnabled(1); }
+void dwCog_DisableEscape(sithCog* pCtx) { (void)pCtx; dwGuiInGame_SetEscapeEnabled(0); }
+
 // @408de0 (dwCog_SetMissionText) — show the Cammy caption for a message id.
 void dwCog_SetMissionText(sithCog* pCtx)
 {
@@ -812,14 +863,18 @@ void dwCog_PlayMovie(sithCog* pCtx)
 // pTarget/pOverride both NULL). No-op when no screen is active or the code is
 // unhandled. Binary: each verb builds this dwWidgetMsg on the stack and calls
 // the mislabeled dwWidget_DispatchMsg@0x444d00 — factored here.
-static void dwCog_HudRefreshInventory(void)
+static void dwCog_HudDispatch(uint32_t code)
 {
     dwWidgetMsg msg;
-    msg.code = 0x1f4b;
+    msg.code = code;
     msg.pSender = NULL;
     msg.param = 0;
     msg.pTarget = NULL;
     dwWidget_DispatchMsg(&msg, NULL);
+}
+static void dwCog_HudRefreshInventory(void)
+{
+    dwCog_HudDispatch(0x1f4b);
 }
 
 // @409150 (dwCog_SetInv "setinv") — engine setinv + HUD refresh.
@@ -877,6 +932,13 @@ void dwCog_RegisterVerbs(void)
     sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_PlayPlayerSpeech, "dwplayplayerspeech");
     sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_PlayCammySpeech,  "dwplaycammyspeech");
 
+    // conversation response menu (dwGuiList) + Esc gating
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_AddResponse,      "dwaddresponse");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_GetPlayerResponse,"dwgetplayerresponse");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_PlayPlayerResponse,"dwplayplayerresponse");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_EnableEscape,     "dwenableescape");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_DisableEscape,    "dwdisableescape");
+
     // caption / dialog / movie
     sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_SetMissionText,   "dwsetmissiontext");
     sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_SetRefTopic,      "dwsetreftopic");
@@ -894,21 +956,13 @@ void dwCog_RegisterVerbs(void)
     sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_SetupCrystalInventory, "dwsetupcrystalinventory");
 
     // --- BLOCKED (need not-yet-ported deps) ------------------------------
-    // dwenableescape / dwdisableescape write binary field_0x110 which the port
-    //   maps to dwGuiInGame::bConvPending (conversation state), NOT an escape
-    //   flag — a real offset/semantics conflict. Left unwired until resolved
-    //   (writing bConvPending here would corrupt conversation handling).
-    // Still BLOCKED:
-    // - conversation response menu (dwaddresponse/dwgetplayerresponse/
-    //   dwplayplayerresponse): the binary reads field_0x120 as the SELECTED
-    //   response item (+4 = id, +0x1c = wav), but the port + Ghidra ctor plate
-    //   both label 0x120 pConversationCog(sithCog*) — an unresolved offset/
-    //   semantics conflict; resolve which field holds the selected item first.
-    // - dwenableescape/dwdisableescape: binary field_0x110 maps to the port's
-    //   dwGuiInGame::bConvPending (conversation state) — writing it would
-    //   corrupt conversations. Resolve the real Esc-gating field first.
-    // - dwflashinventory: needs the dwWcButtonBlink inventory button
-    //   (field_0x194, currently unmodelled on dwGuiInGame).
+    // The dwGuiInGame 0x110-0x130 struct region was re-derived from the binary
+    // (ctor + SegUpdate + StopSounds + OnMessage/OnKey disasm): 0x110 =
+    // bEscapeEnabled, 0x11c = bConvActive, 0x120 = pSelectedResponse
+    // (dwGuiListItem: data=owning cog, val=id, textB=wav), 0x130 = bHolstered.
+    // The response-menu + Esc verbs above are now wired against those.
+    // - dwflashinventory: still BLOCKED — needs the dwWcButtonBlink inventory
+    //   button (field_0x194, currently unmodelled on dwGuiInGame).
     //   See DW/decomp_tools/cog_verb_survey.md for the full per-verb deps.
 }
 
