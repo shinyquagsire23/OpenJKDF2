@@ -109,6 +109,12 @@ void dwGuiInvBar::Layout()
         // The icon dwImage begins with its dwImageDesc (vptr aliases
         // desc.format; width@4/height@6 — see the dwImage.h layout note).
         dwImageDesc* pIconDesc = (dwImageDesc*)dwInv_Icon(i);
+        // Added: inventory HUD icons aren't loaded yet (dwImage_LoadFile for
+        // icons is deferred, so hudBitmap == NULL). Skip un-iconed bins so we
+        // neither deref NULL here nor divide by a 0 cellWidth below. Once icons
+        // load, no bin is NULL and this guard is a no-op (matches Draw's skip).
+        if (pIconDesc == NULL)
+            continue;
         if ((uint16_t)this->cellWidth < pIconDesc->width)
             this->cellWidth = pIconDesc->width;
         if ((uint16_t)this->cellHeight < pIconDesc->height)
@@ -292,6 +298,8 @@ void dwGuiInvBar::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
             continue;
 
         dwImage* pIcon = dwInv_Icon(i);
+        if (pIcon == NULL) // Added: skip un-iconed bins to match Layout's guard
+            continue;
         if (i == this->selectedBin)
             dwImage_CallBlit(pIcon, pDestBits, cellX, rowTop, pClipRect);
         else

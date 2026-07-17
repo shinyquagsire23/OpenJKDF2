@@ -151,7 +151,12 @@ void sithCamera_ResetAllCameras()
 #endif
 
     // TODO: DroidWorks does this? Verify if needed.
-    //sithCamera_SetCurrentCamera(sithCamera_g_aCameras + 7);
+    if (Main_bDroidWorks) {
+        sithCamera_g_bCurCameraSet = 0;
+        sithCamera_SetCurrentCamera(sithCamera_g_aCameras + 7);
+        sithCamera_g_curCycleCamNum = 0;
+        return;
+    }
 
     sithCamera_g_bCurCameraSet = 0;
     sithCamera_g_aCameras[0].pSecondaryFocusThing = 0;
