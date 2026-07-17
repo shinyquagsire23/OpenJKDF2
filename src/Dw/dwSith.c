@@ -96,13 +96,19 @@ int dwSith_Instinct_TouchOfDeath(SithAIControlBlock* pLocal, SithAIInstinct* pIn
 int dwSith_Startup(HostServices* pHS)
 {
     int bResult = 0;
+    (void)pHS;
 
-    if (sithMain_Startup(pHS) && sithCamera_Startup() && sithControl_Startup())
-    {
-        sithConsole_Startup(0x40);
-        sithConsole_Open(0x10);
-        bResult = 1;
-    }
+    // Note: the binary's dwSith_Startup calls sithMain_Startup/sithCamera_Startup/
+    // sithControl_Startup here because in DroidWorks.exe dw_Startup is the ONLY
+    // sith bring-up. In OpenJKDF2, Main_Startup already boots the whole engine
+    // (sithMain_Startup et al.) BEFORE dwMain_Startup — so re-running them here
+    // would double-init the engine pools AND, now that the DW VFS is installed,
+    // re-load JK's "misc\sithStrings.uni" through dwGob (bogus handle -> crash).
+    // The engine is already up, so skip the redundant trio and keep only the
+    // DW-specific registrations below (faithful in effect).
+    sithConsole_Startup(0x40);
+    sithConsole_Open(0x10);
+    bResult = 1;
 
     dwCog_RegisterVerbs();
     sithAI_RegisterInstinct("touchofdeath", dwSith_Instinct_TouchOfDeath, 6, 0, SITHAI_EVENTTOUCHED);

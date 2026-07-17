@@ -399,7 +399,20 @@ void inits_EnumFilesByExt(const char* pExt, dwList* pOutList)
 // not already present in pOutList (dedupe via dwString_Equals).
 void inits_FindFilesInDir(const dwString* pDir, const char* pPattern, dwList* pOutList)
 {
-    stdFileSearch* pSearch = stdFileUtil_NewFind(pDir->pBuffer, 4, pPattern);
+    // Note: the repo stdFileUtil_NewFind supports modes 0-3 only (the binary's
+    // DW file enumerator used its own mode 4). Mode 3 = "filter by extension",
+    // and it builds the "*.<ext>" glob itself — so pass the bare extension, not
+    // the full "*.<ext>" pattern (mode 4 left search->path empty -> FindNext
+    // crashed on strrchr(path,'*')).
+    if (!pDir || !pDir->pBuffer) {
+        return;
+    }
+    const char* pExt = pPattern;
+    const char* pDot = _strrchr((char*)pPattern, '.');
+    if (pDot) {
+        pExt = pDot + 1;
+    }
+    stdFileSearch* pSearch = stdFileUtil_NewFind(pDir->pBuffer, 3, pExt);
     if (!pSearch) {
         return;
     }

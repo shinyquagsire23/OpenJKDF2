@@ -11,9 +11,17 @@
 #include "Dw/dwTypes.h"
 
 #ifdef PLATFORM_DROIDWORKS
+// dwMain is compiled as C++ (dwMain.cpp) but the boot seams are called from C
+// (jkMain.c) — keep C linkage so the symbols match.
+#ifdef __cplusplus
+extern "C" {
+#endif
 int  dwMain_Startup();     // called from Main_Startup when Main_bDroidWorks
 void dwMain_Shutdown();    // called from Main_Shutdown when Main_bDroidWorks
 void dwMain_GuiAdvance();  // per-frame app tick, diverted from jkMain_GuiAdvance
+#ifdef __cplusplus
+}
+#endif
 #else
 // Retro targets exclude src/Dw/*.c from the build; Main_bDroidWorks is never
 // set there, so the call sites compile to dead no-ops.
