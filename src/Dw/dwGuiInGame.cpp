@@ -815,7 +815,12 @@ void dwGuiInGame::Update()
     }
 
     float speed = 0.0f;
-    if (this->pNpcSpeech == NULL && g_sithMode != 0)
+    // Run the sith world tick (control apply -> player movement, physics, AI,
+    // sithCog_ProcessCogs) while the mission is live. ⚠ The gate is bEndRequested
+    // (obj+0x124): SegUpdate's `this` is the dwSegment subobject (obj+0x10), so
+    // the binary's `[this+0x114]` is obj+0x124, NOT pNpcSpeech (obj+0x114) — the
+    // prior mistranslation skipped the entire sim once NPCSPEECH existed.
+    if (this->bEndRequested == 0 && g_sithMode != 0)
     {
         sithUpdate();
         // TODO(dw-decomp): movement-driven servo-sound pitch/volume + energy
