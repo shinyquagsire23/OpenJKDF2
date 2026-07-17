@@ -488,6 +488,12 @@ extern int  dwGuiInGame_GetArmStrength(void);    // max(maxLoadLeft, maxLoadRigh
 extern void dwGuiInGame_ShowCammyTextVerb(int msgCode); // ShowCammyText(id)
 extern void dwGuiInGame_SetRefTopicVerb(char* pTopic);  // SetRefTopic(str)
 extern void dwGuiInGame_ClearDialog(void);       // clear response menu + NPC caption
+// voice/caption speech verb shims (dwGuiInGame.cpp):
+extern uint32_t dwGuiInGame_PlayCharacterSpeech(sithCog* pCtx, char* pWav, char* pTextKey);
+extern int      dwGuiInGame_HasActiveVoice(void);       // currentVoiceWav.length != 0
+extern int      dwGuiInGame_GetDroidHeadChars(char* pOut2); // voiceChars[0..1]; 0 if no droid
+extern int32_t  dwGuiInGame_PlaySpeechWav(char* pWav);  // plays; ms length, -1 if none
+extern void     dwGuiInGame_PlayCammySpeech(int msgCode, char* pWav, int priority);
 
 // dwplaymovie deps (C++ modules; all extern "C", so C linkage matches). The
 // dwSegment type stays opaque here — we only pass the pointers through.
@@ -621,6 +627,154 @@ void dwCog_GetArmStrength(sithCog* pCtx)
     sithCogExec_PushInt(pCtx, dwGuiInGame_GetArmStrength());
 }
 
+// @408950 (dwCog_GetPlayerSpeechPath) — build the VO wav filename for a player
+// speech line. The base name is "GDxx%03lu.wav" (head-type 'B') or
+// "IDxx%03lu.wav"; the "xx" at chars [2],[3] is overwritten with the assembled
+// droid's two head-type code chars (dwDroidStats voiceChars[0..1]). When pSrc
+// already holds a name, only the head-type chars are stamped. For the five
+// known head pairs the message index is remapped (per-head VO line renumbering).
+static void dwCog_GetPlayerSpeechPath(char* pDest, const char* pSrc, uint32_t msgIdx)
+{
+    char head[2];
+    if (!dwGuiInGame_GetDroidHeadChars(head))
+        return;                          // no baked droid
+    char h0 = head[0];
+    char h1 = head[1];
+    if (h0 == '\0')
+        return;
+
+    const char* pFormat;
+    if (h0 == 'B')
+    {
+        if (msgIdx > 499)
+            msgIdx = 0x1e;
+        pFormat = "GDxx%03lu.wav";
+    }
+    else
+    {
+        if (pSrc != NULL && *pSrc != '\0')
+        {
+            // keep the caller's name; only stamp the head-type chars.
+            pDest[2] = h0;
+            pDest[3] = h1;
+            return;
+        }
+        // per-head VO line renumbering for the five known head pairs.
+        if (msgIdx < 0x15)
+        {
+            if ((h0 == 'M' && h1 == 'M') || (h0 == 'F' && h1 == 'E') ||
+                (h0 == 'T' && h1 == 'G') || (h0 == 'E' && h1 == 'M') ||
+                (h0 == 'C' && h1 == 'M'))
+            {
+                if (msgIdx == 0x14)      msgIdx = 0xde;
+                else if (msgIdx == 10)   msgIdx = 1;
+            }
+        }
+        else if (h0 == 'M' && h1 == 'M')
+        {
+            switch (msgIdx) {
+            case 0x1f4: case 0x1f5: case 0x1f6: msgIdx = 0xa;  break;
+            case 0x1fe:                         msgIdx = 9;    break;
+            case 0x1ff:                         msgIdx = 0xf;  break;
+            case 0x200:                         msgIdx = 0x10; break;
+            }
+        }
+        else if (h0 == 'F' && h1 == 'E')
+        {
+            switch (msgIdx) {
+            case 0x1f4: case 0x1f5: case 0x1f6: msgIdx = 7;    break;
+            case 0x1fe:                         msgIdx = 0xd;  break;
+            case 0x1ff:                         msgIdx = 0xe;  break;
+            case 0x200:                         msgIdx = 0xf;  break;
+            }
+        }
+        else if (h0 == 'T' && h1 == 'G')
+        {
+            switch (msgIdx) {
+            case 0x1f4: case 0x1f5: case 0x1f6: msgIdx = 0xa;  break;
+            case 0x1fe:                         msgIdx = 0xf;  break;
+            case 0x1ff:                         msgIdx = 0x10; break;
+            case 0x200:                         msgIdx = 0x11; break;
+            }
+        }
+        else if (h0 == 'E' && h1 == 'M')
+        {
+            switch (msgIdx) {
+            case 0x1f4: case 0x1f5: case 0x1f6: msgIdx = 0xa;  break;
+            case 0x1fe:                         msgIdx = 0x10; break;
+            case 0x1ff:                         msgIdx = 0x11; break;
+            case 0x200:                         msgIdx = 0x12; break;
+            }
+        }
+        else if (h0 == 'C' && h1 == 'M')
+        {
+            switch (msgIdx) {
+            case 0x1f4: case 0x1f5: case 0x1f6: msgIdx = 0xb;  break;
+            case 0x1fe:                         msgIdx = 0xc;  break;
+            case 0x1ff:                         msgIdx = 0xf;  break;
+            case 0x200:                         msgIdx = 0x10; break;
+            }
+        }
+        pFormat = "IDxx%03lu.wav";
+    }
+
+    _sprintf(pDest, pFormat, (unsigned long)msgIdx);
+    pDest[2] = h0;
+    pDest[3] = h1;
+}
+
+// @408780 (dwCog_PlayCharacterSpeech) — play an NPC/character VO line + caption.
+// Pops (wav, textKey); the shim clears any response menu, plays the VO, shows
+// the localized caption, and returns its duration (VO length or reading-time
+// fallback). The cog then blocks for that duration (script_running=2).
+void dwCog_PlayCharacterSpeech(sithCog* pCtx)
+{
+    char* pWav = sithCogExec_PopString(pCtx);
+    char* pTextKey = sithCogExec_PopString(pCtx);
+    uint32_t lenMs = dwGuiInGame_PlayCharacterSpeech(pCtx, pWav, pTextKey);
+    if (lenMs > 0)
+    {
+        pCtx->script_running = 2;
+        pCtx->msecTimerTimeout = lenMs + sithTime_g_msecGameTime;
+    }
+}
+
+// @408ca0 (dwCog_PlayPlayerSpeech) — play a player-droid speech line by index.
+// Pops (index, srcName); skips when a VO line is already playing. The wav name
+// is built by dwCog_GetPlayerSpeechPath (head-type remap).
+void dwCog_PlayPlayerSpeech(sithCog* pCtx)
+{
+    int32_t msgIdx = sithCogExec_PopInt(pCtx);
+    char* pSrc = sithCogExec_PopString(pCtx);
+    if (dwGuiInGame_HasActiveVoice())
+        return;                              // a VO line is already playing
+
+    char wavName[16];
+    _strncpy(wavName, pSrc, 0xf);
+    wavName[15] = '\0';
+    dwCog_GetPlayerSpeechPath(wavName, pSrc, (uint32_t)msgIdx);
+    if (wavName[0] != '\0')
+    {
+        int32_t lenMs = dwGuiInGame_PlaySpeechWav(wavName);
+        if (lenMs >= 0)                      // a sample started
+        {
+            pCtx->script_running = 2;
+            pCtx->msecTimerTimeout = (uint32_t)lenMs + sithTime_g_msecGameTime;
+        }
+    }
+}
+
+// @408c60 (dwCog_PlayCammySpeech) — pop (priority, flex[discarded], wav, msgCode)
+// and show a Cammy caption + play its VO via the priority-gated voice line.
+void dwCog_PlayCammySpeech(sithCog* pCtx)
+{
+    int priority = sithCogExec_PopInt(pCtx);
+    sithCogExec_PopFlex(pCtx);               // discarded (binary pops + drops it)
+    char* pWav = sithCogExec_PopString(pCtx);
+    int msgCode = sithCogExec_PopInt(pCtx);
+    dwGuiInGame_PlayCammySpeech(msgCode, pWav, priority);
+}
+
 // @408de0 (dwCog_SetMissionText) — show the Cammy caption for a message id.
 void dwCog_SetMissionText(sithCog* pCtx)
 {
@@ -718,6 +872,11 @@ void dwCog_RegisterVerbs(void)
     sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_GetPlayerHeadType,"dwgetplayerheadtype");
     sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_CheckDroidCaps,   "dwcheckdroidcaps");
     sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_GetArmStrength,   "dwgetarmstrength");
+    // voice / caption speech playback
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_PlayCharacterSpeech,"dwplaycharacterspeech");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_PlayPlayerSpeech, "dwplayplayerspeech");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_PlayCammySpeech,  "dwplaycammyspeech");
+
     // caption / dialog / movie
     sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_SetMissionText,   "dwsetmissiontext");
     sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_SetRefTopic,      "dwsetreftopic");
@@ -740,13 +899,6 @@ void dwCog_RegisterVerbs(void)
     //   flag — a real offset/semantics conflict. Left unwired until resolved
     //   (writing bConvPending here would corrupt conversation handling).
     // Still BLOCKED:
-    // - voice/caption playback (dwplaycharacterspeech/dwplayplayerspeech/
-    //   dwplaycammyspeech): the deps now EXIST (dwSoundSample_GetLengthMs,
-    //   dwGuiInGame::PlayVoiceLineEx/StopVoiceLine/ClearPlayerSpeech, the
-    //   dwGuiSpeech caption), BUT dwGuiInGame::PlayVoiceLineEx is currently
-    //   short-circuited (`return;`) from the in-game bring-up — un-stub + a
-    //   runtime pass is required before wiring these. Also needs a port of
-    //   dwCog_GetPlayerSpeechPath@408950 (head-type wav remapper).
     // - conversation response menu (dwaddresponse/dwgetplayerresponse/
     //   dwplayplayerresponse): the binary reads field_0x120 as the SELECTED
     //   response item (+4 = id, +0x1c = wav), but the port + Ghidra ctor plate

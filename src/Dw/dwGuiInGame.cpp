@@ -262,6 +262,78 @@ extern "C" void dwGuiInGame_ClearDialog(void)
     }
 }
 
+// --- COG voice/caption verb helpers ----------------------------------------
+// The dwCog part-1 speech verbs (dwplaycharacterspeech/dwplayplayerspeech/
+// dwplaycammyspeech) reach the C++ speech objects through these extern-C shims;
+// the verbs themselves (arg popping + cog-timer arming) live in dwCog.c.
+
+// @408780 body: clear any player response menu, play an NPC/character VO line,
+// and show its localized caption on the NPCSPEECH widget. Returns the caption
+// duration in ms — the real VO wav length when one plays, else a reading-time
+// fallback (~77ms/char of the text key: strlen*1000/13, round-half-up). pCtx is
+// stored as the caption's timed-item so clearing it wakes the waiting cog early.
+extern "C" uint32_t dwGuiInGame_PlayCharacterSpeech(sithCog* pCtx, char* pWav, char* pTextKey)
+{
+    if (dwGuiInGame_pActive == NULL)
+        return 0;
+    dwGuiInGame* p = dwGuiInGame_pActive;
+    p->ClearPlayerSpeech();
+
+    int nText = (pTextKey != NULL) ? (int)_strlen(pTextKey) : 0;
+    uint32_t lenMs = (uint32_t)(int)((float)nText * 0.076923079f * 1000.0f + 0.5f);
+
+    if (pWav != NULL && *pWav != '\0')
+    {
+        p->StopVoiceLine();
+        dwSoundSample* pSample = dwSound_Play(pWav);
+        if (pSample != NULL)
+            lenMs = pSample->GetLengthMs();
+    }
+    if (p->pNpcSpeech != NULL && dw_settingShowText)
+    {
+        char* pLoc = dwGuiScreen_LocalizeString(pTextKey, p->pStringTable);
+        p->pNpcSpeech->SetText(pLoc, (void*)pCtx, pWav);
+    }
+    return lenMs;
+}
+
+// currentVoiceWav.length != 0 — a VO/caption line is currently active.
+// @408ca0 gate: dwCog_PlayPlayerSpeech only speaks when nothing is playing.
+extern "C" int dwGuiInGame_HasActiveVoice(void)
+{
+    return (dwGuiInGame_pActive != NULL && dwGuiInGame_pActive->currentVoiceWav.length != 0);
+}
+
+// The assembled droid's two head-type code chars (dwDroidStats voiceChars[0..1],
+// binary field_0x10c + 0x64/0x65). Returns 0 when no droid is baked.
+extern "C" int dwGuiInGame_GetDroidHeadChars(char* pOut2)
+{
+    if (dwGuiInGame_pActive == NULL || dwGuiInGame_pActive->pDroidStats == NULL)
+        return 0;
+    dwDroidStatsTotals* pT = &dwGuiInGame_pActive->pDroidStats->totals;
+    pOut2[0] = pT->voiceChars[0];
+    pOut2[1] = pT->voiceChars[1];
+    return 1;
+}
+
+// Play a resolved player-speech wav. Returns its length in ms, or -1 when no
+// sample started (the verb arms the cog timer whenever a sample plays).
+extern "C" int32_t dwGuiInGame_PlaySpeechWav(char* pWav)
+{
+    dwSoundSample* pSample = dwSound_Play(pWav);
+    if (pSample == NULL)
+        return -1;
+    return (int32_t)pSample->GetLengthMs();
+}
+
+// @408c60 dwCog_PlayCammySpeech -> PlayVoiceLineEx(msgCode, wav, priority, 0):
+// show a Cammy caption + play its VO, priority-gated against the running line.
+extern "C" void dwGuiInGame_PlayCammySpeech(int msgCode, char* pWav, int priority)
+{
+    if (dwGuiInGame_pActive != NULL)
+        dwGuiInGame_pActive->PlayVoiceLineEx((uint32_t)msgCode, pWav, (uint32_t)priority, 0);
+}
+
 // Find pWidget's node in pList and unlink+free it (widget kept). Mirrors the
 // binary's inline sentinel walks (dwGuiScreen.cpp precedent).
 static void dwGuiInGame_UnlinkWidgetNode(dwList* pList, void* pWidget)
@@ -982,7 +1054,10 @@ void dwGuiInGame_PlayVoiceLine(const char* pCammyText, const char* pWavName, uin
 // @4221a0
 void dwGuiInGame::PlayVoiceLineEx(uint32_t msgCode, char* pWavName, uint32_t priority, char bForce)
 {
-    return; // TODO remove
+    // Added: pWavName may be NULL (caption-only lines); the dwString_Equals
+    // fast-path below deref's it, so guard.
+    if (pWavName == NULL)
+        pWavName = (char*)"";
     if (this->currentVoiceWav.length != 0 && dwString_Equals(this->currentVoiceWav.pBuffer, pWavName))
     {
         if (priority > this->voicePriority)
