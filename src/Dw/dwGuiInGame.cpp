@@ -351,7 +351,7 @@ int dwGuiInGame::Activate()
             sithWorld_SetLoadProgressCallback((sithWorldProgressCallback_t)dwGuiInGame_DrawLoadProgress);
             // Note: the binary here double-buffers a localized "LOADING" caption
             // over Loading.rle; omitted (cosmetic, needs a locked dwImageBits).
-            sithRender_Open();
+            sithRender_Shutdown(); // Not sure, no-op in any case
         }
 
         dwString jklName(this->pMissionInfo->name.pBuffer, 0);
@@ -838,7 +838,12 @@ int dwGuiInGame::RebuildViewport()
                  this->insetRect.left, this->insetRect.top, this->insetRect.right - 1, this->insetRect.bottom - 1, 0);
     this->aimCenterX = (float)(this->insetRect.left + this->insetRect.right) * 0.5f;
     this->aimCenterY = (float)(this->insetRect.bottom + this->insetRect.top) * 0.5f;
-    return sithCamera_Open(this->pViewCanvas, *(flex_t*)(DAT_006478f8 + 4));
+    // Note: the binary reads the aspect from its stdDisplay video-mode record
+    // (DAT_006478f8+4). In OpenJKDF2 that IS the repo's stdDisplay_pCurVideoMode
+    // (dwDisplay_SetMode routes through stdDisplay_SetMode) — JK passes the same
+    // stdDisplay_pCurVideoMode->widthMaybe field here. DAT_006478f8 is an unset
+    // DW-fork placeholder, so use the real global.
+    return sithCamera_Open(this->pViewCanvas, stdDisplay_pCurVideoMode->widthMaybe);
 }
 
 // ----------------------------------------------------------------------------
