@@ -201,7 +201,28 @@ stdFile_t inits_HookedFileOpen(const char* pPath, const char* pMode)
     char* pFilenamePart = (char*)pPath;
     dwString_FindFilename(&pFilenamePart);
     if (pFilenamePart != pPath) {
-        return dwCore_pfnOrigFileOpen(pPath, pMode);
+        stdFile_t f = dwCore_pfnOrigFileOpen(pPath, pMode);
+        if (f) {
+            return f;
+        }
+        // Added: GOB-only fallback. A directory-prefixed path (e.g. the engine's
+        // "jkl\static.jkl", or "parts\parts.pls") that is neither a loose disk
+        // file nor an explicit "<archive>.GOB\member" path still resolves by its
+        // BASENAME through the ext-table search paths — the DW GOB basename index
+        // keys "static.jkl" -> its real member "mission\static.jkl" regardless of
+        // the caller's directory prefix. The DroidWorks binary relied on such
+        // files existing loose on disk; OpenJKDF2 users typically have GOB-only
+        // assets, so try the basename before giving up. Read paths only (a write
+        // to a prefixed path must stay literal). No recursion: inits_ResolveAndOpen
+        // routes to dwCore_pfnOrigFileOpen (dwGob_Open), not back through here.
+        if (pMode && (*pMode == 'r')) {
+            dwString resolvedAlt;
+            f = inits_ResolveAndOpen(pFilenamePart, pMode, &resolvedAlt);
+            if (f) {
+                return f;
+            }
+        }
+        return 0;
     }
 
     dwString resolved; // freed by the dtor (explicit Free removed)
