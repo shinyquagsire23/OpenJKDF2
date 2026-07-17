@@ -216,12 +216,26 @@ void dwGob_ListFilesByExt(char *pGobPath, char *pExt, dwList *pList)
             if (!pDot || __strcmpi(pDot + 1, pExt) != 0)
                 continue;
 
+            // Return the BASENAME, matching the binary. The binary's
+            // dwGob_ListFilesByExt walks the DW basename-index hashtable
+            // (Gob+0x8c, keyed by lowercased entry basename), so it yields
+            // "parts.pls" — NOT the full member path "parts\parts.pls". Callers
+            // reopen the bare name, which inits_HookedFileOpen then resolves
+            // through the ext-table (". dwCD.GOB dwHD.GOB ..."), i.e. it tries
+            // "<base>\dwHD.GOB\parts.pls" -> dwGob basename index -> the member.
+            // Our repo stdGob keys FULL paths (pGob->entries[i].fname carries the
+            // "parts\" prefix), so we must strip to the basename here or the
+            // directory prefix makes inits_HookedFileOpen bail past the ext-table
+            // (that was the "parts\parts.pls not found" / empty-build-menu bug).
+            char* pBase = pName;
+            dwString_FindFilename(&pBase); // basename (drop the member subdir)
+
             // Skip if an equal (case-insensitive) name is already listed
             dwListNode* pSentinel = pList->pSentinel;
             dwListNode* pNode = pSentinel->pNext;
             while (pNode != pSentinel)
             {
-                if (dwString_Equals(((dwString*)pNode->pData)->pBuffer, pName))
+                if (dwString_Equals(((dwString*)pNode->pData)->pBuffer, pBase))
                     break;
                 pNode = pNode->pNext;
             }
@@ -230,7 +244,7 @@ void dwGob_ListFilesByExt(char *pGobPath, char *pExt, dwList *pList)
 
             // binary: operator new(0xc) + ctor, then the tail insert (before
             // the sentinel) that dwList::InsertAfter implements.
-            dwString* pStr = new dwString(pName, 0);
+            dwString* pStr = new dwString(pBase, 0);
             pList->InsertAfter(pSentinel->pPrev, pStr);
         }
     }
