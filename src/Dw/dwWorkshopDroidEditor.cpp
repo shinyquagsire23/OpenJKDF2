@@ -978,15 +978,19 @@ void dwWorkshopDroidEditor::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
     // to the GL path (std3D) and never reached the DW VBuffer.
     rdCanvas* pSwCanvas = rdCamera_g_pCurCamera->pCanvas;
     int swSavedAccel = rdroid_curAcceleration;
-    rdroid_curAcceleration = 0;
     stdDisplay_VBufferLock(pSwCanvas->pVBuffer);
-#ifdef RDRASTER_SW_ZBUFFER
-    rdZRaster_BeginFrame(pSwCanvas->pVBuffer);
-#endif
 
     if (!(rdGetRenterOptions() & 0x100))
         stdDisplay_VBufferFill(rdCamera_g_pCurCamera->pCanvas->d3d_vbuf, 0, NULL);
     rdAdvanceFrame();
+    // ⚠ MUST be after rdAdvanceFrame: rdCache_AdvanceFrame force-sets
+    // rdroid_curAcceleration = 1 on SDL2_RENDER builds. Setting SW mode here (as
+    // jkGame_Update does after its frame advance) makes rdCache_Flush take the
+    // software branch so rdZRaster paints the locked 8bpp canvas.
+    rdroid_curAcceleration = 0;
+#ifdef RDRASTER_SW_ZBUFFER
+    rdZRaster_BeginFrame(pSwCanvas->pVBuffer); // SW depth clear (after the accel flip)
+#endif
     rdSetGeometryMode(4);
 
     if (this->bInTrashZone != 0 && this->pDraggedNode != NULL && this->pTrashImage != NULL)
