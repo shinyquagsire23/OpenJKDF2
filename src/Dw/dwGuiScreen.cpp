@@ -216,7 +216,8 @@ dwGuiScreen::dwGuiScreen(const char* pName, dwImage* pBgSrc)
     }
 
     if (this->scriptName.length != 0)
-        this->scriptName.Append(".cmp", 4); // binary: DAT_00528b94
+        this->scriptName.Append(".ifc", 4); // binary: DAT_00528b94 = ".ifc" (interface
+                                            // script; NOT ".cmp", which is a colormap file)
 }
 
 // @42fb30 (dwGuiScreen_Dtor; scalar-deleting wrapper @42fb10)
