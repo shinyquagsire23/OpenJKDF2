@@ -568,9 +568,8 @@ extern "C" dwSegment* dwCompleteMovie_New(int idx)
 //  Kept placeholders (NOT P7 — owners elsewhere)
 // ==================================================================
 
-// owner: P8 sith-engine diff audit — DW-forked sith internals (no repo twin).
-// C linkage: dwGuiInGame.cpp declares them inside its extern "C" block.
-extern "C" void sithControl_FUN_00456da0(void) {} // DW control-fn registration
+// (sithControl_FUN_00456da0 — the DW in-mission control bindings — is now a real
+// implementation in src/Devices/sithControl.c; the empty stub here is removed.)
 
 extern "C" {
 // owner: P8 sith-engine diff audit — DW-forked engine globals with no repo
