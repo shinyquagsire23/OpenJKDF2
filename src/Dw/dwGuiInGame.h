@@ -91,6 +91,10 @@ int dwGuiInGame_UpdateViewSize(SithThing* pPlayer, flex_t deltaSecs);
 void dwGuiInGame_RequestEndMission(void);
 int  dwGuiInGame_GetCammyMsgCode(void);
 
+// @409300 dwflashinventory: start the HUD inventory button blinking (no-op when
+// no mission is live or the HUD has no INVENTORY_BUTTON control).
+void dwGuiInGame_FlashInventoryButton(void);
+
 // Note: no binary counterpart — resets dwGuiInGame_pActive for the soft-reset
 // loop (the unit's only module-level state).
 void dwGuiInGame_Startup(void);
@@ -112,6 +116,7 @@ struct dwGuiSpeech;    // dwGuiList.cpp (NPCSPEECH) — sibling unit
 struct dwGuiList;      // dwGuiList.cpp (PLAYERSPEECH) — sibling unit
 struct dwGuiListItem;  // dwGuiList.h — response menu item (pSelectedResponse)
 struct dwDroidStats;   // Dw/dwDroidStats.h (baked player droid)
+struct dwWcButtonBlink;// Dw/dwWorkshopCtrl.h (REFERENCE/INVENTORY blink buttons)
 struct sithCog;        // engine (conversation cog)
 struct rdCanvas;       // engine (3D HUD viewport)
 
@@ -157,8 +162,8 @@ struct dwGuiInGame : dwGuiScreen
     uint32_t voicePriority;       // 0x184: its priority
     uint8_t bVoicePlaying;        // 0x188: a VO line is showing/playing
     uint32_t voiceEndMs;          // 0x18c: VO/caption auto-clear time (sithTime ms)
-    uint32_t field_0x190;         // 0x190: (ctor zeroes; unread)
-    uint32_t field_0x194;         // 0x194: (ctor zeroes; unread)
+    dwWcButtonBlink* pReferenceButton; // 0x190: REFERENCE_BUTTON (InDex; dwGuiScreen msg-0x6a)
+    dwWcButtonBlink* pInventoryButton; // 0x194: INVENTORY_BUTTON (dwflashinventory blinks it)
     uint8_t bVoiceEnabled;        // 0x198: voice/caption enabled (ctor=1)
     flex_t lastHealth;            // 0x19c: previous-frame health (hurt-chatter delta)
     float chatterTimerLow;        // 0x1a0: low-power ambient chatter accumulator

@@ -15,6 +15,7 @@
 #include "Dw/dwControlPanel.h"
 
 #include "Dw/dwWorkshopCtrl.h" // dwWorkshopCtrl (BUTTON keyword)
+#include "Dw/dwGuiReference.h" // dwGuiRefTile (RECT) + dwGuiRefRadioGroup/AddCategory (CP_RADIOGROUP)
 #include "Dw/dwGuiScreen.h"    // dwGuiScreen_LocalizeString
 #include "Dw/dwList.h"
 
@@ -45,17 +46,6 @@ extern "C" void dwControlPanel_Startup(void)
         0x1f, 0x05, 0x2c, 0x05, 0x2c, 0x53, 0x12, 0x05, 0x05, 0x39
     };
     memcpy(dw_aPartSlotColors, aInitColors, sizeof(dw_aPartSlotColors));
-}
-
-// ---- local helpers ---------------------------------------------------------------
-
-// Shared stub reporter for the two not-yet-translated dwGuiReference (P6)
-// control classes (same pattern as dwGuiScreen_StubControl).
-static dwWidget* dwControlPanel_StubControl(const char* pKeyword, const char* pClass)
-{
-    stdPlatform_Printf("TODO(dw-decomp): dwControlPanel control '%s' -> %s (unit dwGuiReference) not translated yet\n",
-                       pKeyword, pClass);
-    return NULL;
 }
 
 // ---- dwControlPanel ---------------------------------------------------------------
@@ -204,7 +194,6 @@ dwWidget* dwControlPanel::ParseControl(char* pKeyword, dwConfFile* pConf)
     if (dwString_Equals(pKeyword, "CP_RADIOGROUP"))
     {
         uint32_t nItems;
-        dwWidget* pGroup;
 
         rect.left = (int16_t)atoi(dwGuiScreen_LocalizeString(dwConfFile_NextToken(pConf), this->pStringTable));
         rect.top = (int16_t)atoi(dwGuiScreen_LocalizeString(dwConfFile_NextToken(pConf), this->pStringTable));
@@ -213,13 +202,10 @@ dwWidget* dwControlPanel::ParseControl(char* pKeyword, dwConfFile* pConf)
         nItems = 0;
         dwConfFile_ParseULong(pConf, &nItems);
 
-        // TODO(dw-decomp): CP_RADIOGROUP -> dwGuiRefRadioGroup (unit
-        // dwGuiReference, P6) — binary: new(0x18) dwGuiRefRadioGroup_Ctor
-        // @42a540(&rect), then AddCategory per item line (recipe below). The
-        // stub returns NULL, which lands on the binary's own alloc-failure
-        // path: the item lines are still DRAINED (ReadLine each) so the conf
-        // stream stays in sync, but their tokens go unparsed.
-        pGroup = dwControlPanel_StubControl("CP_RADIOGROUP", "dwGuiRefRadioGroup");
+        // binary: new(0x18) dwGuiRefRadioGroup_Ctor @42a540(&rect), then one
+        // dwGuiRefRadioGroup_AddCategory @42a6f0 per item line (@409c1c-409d19;
+        // same localized/raw token pattern as the BUTTON branch).
+        dwGuiRefRadioGroup* pGroup = new dwGuiRefRadioGroup(&rect);
 
         while (nItems != 0)
         {
@@ -227,18 +213,19 @@ dwWidget* dwControlPanel::ParseControl(char* pKeyword, dwConfFile* pConf)
             if (pConf->bEof) // faithful: tested after the decrement, before the read
                 break;
             dwConfFile_ReadLine(pConf);
-            if (pGroup != NULL)
-            {
-                // Recipe for the P6 wire-up (binary @409c1c-409d19, per item
-                // line; "loc" = localized-atoi token, "tok" = NextToken):
-                //   loc l, loc t, loc r, loc b   -> item rect
-                //   loc id                       -> category id (atoi'd)
-                //   loc tokA, tok tokB, loc tokC, tok tokD
-                //   dwGuiRefRadioGroup_AddCategory @42a6f0
-                //       (&rect, tokA, tokB, tokC, tokD, id)
-                // (unreachable until dwGuiRefRadioGroup lands — pGroup is
-                // always NULL here)
-            }
+
+            dwRect itemRect;
+            itemRect.left   = (int16_t)atoi(dwGuiScreen_LocalizeString(dwConfFile_NextToken(pConf), this->pStringTable));
+            itemRect.top    = (int16_t)atoi(dwGuiScreen_LocalizeString(dwConfFile_NextToken(pConf), this->pStringTable));
+            itemRect.right  = (int16_t)atoi(dwGuiScreen_LocalizeString(dwConfFile_NextToken(pConf), this->pStringTable));
+            itemRect.bottom = (int16_t)atoi(dwGuiScreen_LocalizeString(dwConfFile_NextToken(pConf), this->pStringTable));
+            int cmdId = atoi(dwGuiScreen_LocalizeString(dwConfFile_NextToken(pConf), this->pStringTable));
+            char* pImgNormal  = dwGuiScreen_LocalizeString(dwConfFile_NextToken(pConf), this->pStringTable);
+            char* pSndOff     = dwConfFile_NextToken(pConf); // raw (NOT localized)
+            char* pImgPressed = dwGuiScreen_LocalizeString(dwConfFile_NextToken(pConf), this->pStringTable);
+            char* pSndClick   = dwConfFile_NextToken(pConf); // raw (NOT localized)
+            dwGuiRefRadioGroup_AddCategory(pGroup, &itemRect, pImgNormal, pSndOff, pImgPressed,
+                                           pSndClick, cmdId);
         }
         return pGroup;
     }
@@ -275,12 +262,9 @@ dwWidget* dwControlPanel::ParseControl(char* pKeyword, dwConfFile* pConf)
         b = 0;
         dwConfFile_ParseULong(pConf, &a);
         dwConfFile_ParseULong(pConf, &b);
-        (void)a;
-        (void)b;
-        // TODO(dw-decomp): RECT -> dwGuiRefTile (unit dwGuiReference, P6) —
-        // binary: new(0x14) dwGuiRefTile_Ctor @42a890(&rect, a, b). Both
-        // ULongs are parsed above so the token stream stays in sync.
-        return dwControlPanel_StubControl("RECT", "dwGuiRefTile");
+        // binary: new(0x14) dwGuiRefTile_Ctor @42a890(&rect, a, b) — nested-frame
+        // decoration (color, count).
+        return new dwGuiRefTile(&rect, (uint8_t)a, (uint8_t)b);
     }
 
     if (dwString_Equals(pKeyword, "HELPRECT"))

@@ -379,15 +379,6 @@ int dwWorkshop::OnMessage(dwWidgetMsg* pMsg)
 
 // ---- control factory -----------------------------------------------------------
 
-// Shared stub reporter for not-yet-translated control classes (same pattern
-// as dwGuiScreen.cpp's file-local dwGuiScreen_StubControl).
-static dwWidget* dwWorkshop_StubControl(const char* pKeyword, const char* pClass, const char* pUnit)
-{
-    stdPlatform_Printf("TODO(dw-decomp): dwWorkshop control '%s' -> %s (unit %s) not translated yet\n",
-                       pKeyword, pClass, pUnit);
-    return NULL;
-}
-
 // @43ca70 (dwWorkshop_CreateControl — primary vtbl +0x48)
 dwWidget* dwWorkshop::CreateControl(char* pKeyword, dwConfFile* pConf)
 {

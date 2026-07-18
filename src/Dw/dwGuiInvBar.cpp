@@ -106,15 +106,18 @@ void dwGuiInvBar::Layout()
     {
         if (!dwGuiInvBar_IsUsable(pThing, i))
             continue;
-        // The icon dwImage begins with its dwImageDesc (vptr aliases
-        // desc.format; width@4/height@6 — see the dwImage.h layout note).
-        dwImageDesc* pIconDesc = (dwImageDesc*)dwInv_Icon(i);
-        // Added: inventory HUD icons aren't loaded yet (dwImage_LoadFile for
-        // icons is deferred, so hudBitmap == NULL). Skip un-iconed bins so we
-        // neither deref NULL here nor divide by a 0 cellWidth below. Once icons
-        // load, no bin is NULL and this guard is a no-op (matches Draw's skip).
-        if (pIconDesc == NULL)
+        // Binary reads the icon dims as *(ushort*)(obj+4)/(obj+6) — the 32-bit
+        // layout where the 4-byte vptr aliases desc.format. On 64-bit the vptr
+        // is 8 bytes and desc is a real member; read it directly. (The old
+        // aliased cast read the vptr bytes -> cellWidth=1/cellHeight=0 -> every
+        // icon blitted 1px apart in a zero-height grid: stacked, unselectable,
+        // and a degenerate invisible background triangle.)
+        dwImage* pIcon = dwInv_Icon(i);
+        // Added: skip un-iconed bins so we neither deref NULL here nor divide
+        // by a 0 cellWidth below (matches Draw's skip).
+        if (pIcon == NULL)
             continue;
+        dwImageDesc* pIconDesc = &pIcon->desc;
         if ((uint16_t)this->cellWidth < pIconDesc->width)
             this->cellWidth = pIconDesc->width;
         if ((uint16_t)this->cellHeight < pIconDesc->height)

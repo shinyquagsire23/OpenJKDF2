@@ -32,6 +32,10 @@
 // This engine header has no extern "C" guards of its own — wrap at include site.
 extern "C" {
 #include "Engine/rdroid.h"
+#include "Win95/stdDisplay.h"
+#ifdef RDRASTER_SW_ZBUFFER
+#include "Raster/rdZRaster.h" // SW z-buffer per-frame clear (shared bracket)
+#endif
 }
 
 // ---- ctor/dtor -----------------------------------------------------------------
@@ -153,6 +157,35 @@ void dwGui3DView::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
         pCanvas->heightMinusOne = y2;
     }
     rdSetLightingMode(3); // RD_LIGHTMODE_GOURAUD
+}
+
+// ---- Added: shared software-render bracket (see the header note) ----------------
+
+rdCanvas* dwGui3DView_BeginSwRender(int* pSavedAccel)
+{
+    rdCanvas* pSwCanvas = rdCamera_g_pCurCamera->pCanvas;
+    *pSavedAccel = rdroid_curAcceleration;
+    stdDisplay_VBufferLock(pSwCanvas->pVBuffer);
+
+    if (!(rdGetRenterOptions() & 0x100))
+        stdDisplay_VBufferFill(rdCamera_g_pCurCamera->pCanvas->d3d_vbuf, 0, NULL);
+    rdAdvanceFrame();
+    // ⚠ MUST be after rdAdvanceFrame: rdCache_AdvanceFrame force-sets
+    // rdroid_curAcceleration = 1 on SDL2_RENDER builds. Setting SW mode here (as
+    // jkGame_Update does after its frame advance) makes rdCache_Flush take the
+    // software branch so rdZRaster paints the locked 8bpp canvas.
+    rdroid_curAcceleration = 0;
+#ifdef RDRASTER_SW_ZBUFFER
+    rdZRaster_BeginFrame(pSwCanvas->pVBuffer); // SW depth clear (after the accel flip)
+#endif
+    return pSwCanvas;
+}
+
+void dwGui3DView_EndSwRender(rdCanvas* pSwCanvas, int savedAccel)
+{
+    rdFinishFrame();
+    stdDisplay_VBufferUnlock(pSwCanvas->pVBuffer);
+    rdroid_curAcceleration = savedAccel;
 }
 
 // @43b370 (Ghidra: dwGui3DView_RebuildLights) — vtbl +0x48 (NEW virtual).

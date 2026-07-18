@@ -969,28 +969,10 @@ void dwWorkshopDroidEditor::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
     this->EnsureImages(); // virtual +0x3c
     this->dwGui3DView::Draw(pDestBits, pClipRect); // camera bring-up (binary: direct call @43b2b0)
 
-    // Added: OpenJKDF2 software-renderer bracket. DW has no HW path — the 3D view
-    // renders through the CPU rasterizer into the 8bpp back buffer. rdCache_Flush
-    // only takes its software branch when rdroid_curAcceleration<=0 (+ the
-    // r_softwareRenderer flag Main.c forces on for DW), and rdZRaster writes
-    // directly to the LOCKED canvas color VBuffer (rdCamera_g_pCurCamera->pCanvas->
-    // pVBuffer). Mirrors jkGame_Update's SW bracket. Without this the geometry went
-    // to the GL path (std3D) and never reached the DW VBuffer.
-    rdCanvas* pSwCanvas = rdCamera_g_pCurCamera->pCanvas;
-    int swSavedAccel = rdroid_curAcceleration;
-    stdDisplay_VBufferLock(pSwCanvas->pVBuffer);
-
-    if (!(rdGetRenterOptions() & 0x100))
-        stdDisplay_VBufferFill(rdCamera_g_pCurCamera->pCanvas->d3d_vbuf, 0, NULL);
-    rdAdvanceFrame();
-    // ⚠ MUST be after rdAdvanceFrame: rdCache_AdvanceFrame force-sets
-    // rdroid_curAcceleration = 1 on SDL2_RENDER builds. Setting SW mode here (as
-    // jkGame_Update does after its frame advance) makes rdCache_Flush take the
-    // software branch so rdZRaster paints the locked 8bpp canvas.
-    rdroid_curAcceleration = 0;
-#ifdef RDRASTER_SW_ZBUFFER
-    rdZRaster_BeginFrame(pSwCanvas->pVBuffer); // SW depth clear (after the accel flip)
-#endif
+    // Added: software-renderer bracket (shared — dwGui3DView_BeginSwRender/
+    // EndSwRender; the original inline version documented here is in dwGui3DView.cpp).
+    int swSavedAccel = 0;
+    rdCanvas* pSwCanvas = dwGui3DView_BeginSwRender(&swSavedAccel);
     rdSetGeometryMode(4);
 
     if (this->bInTrashZone != 0 && this->pDraggedNode != NULL && this->pTrashImage != NULL)
@@ -1002,10 +984,7 @@ void dwWorkshopDroidEditor::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
         if (pNode->partType == DW_PARTTYPE_NONE || pNode->pAttachSlot == NULL)
             pNode->Draw(); // roots/detached only — Draw recurses attached children
     }
-    rdFinishFrame();
-
-    stdDisplay_VBufferUnlock(pSwCanvas->pVBuffer);
-    rdroid_curAcceleration = swSavedAccel;
+    dwGui3DView_EndSwRender(pSwCanvas, swSavedAccel);
 
     // Which markers blink for the dragged part (0xb never matches anything real).
     mountCompatType = DW_PARTTYPE_NONE;

@@ -11,6 +11,7 @@
 #include "Dw/dwWidgetGroup.h"
 #include "Dw/dwInits.h"      // inits_EnumFilesByExt / ResolveAndOpen / DeleteFile
 #include "Dw/dwPart.h"       // dwPartNode (workspace node dtor)
+#include "Dw/dwHelp.h"       // dwHelp (HELP keyword, speaker 0x68=LSCP)
 
 #include "stdPlatform.h"     // HostServices
 
@@ -27,11 +28,6 @@ extern "C" dwString dwCore_workspaceName;      // @0x53d978 (edited droid name)
 
 // The game-wide modal-dialog runner (dwGuiMission unit).
 extern "C" int dwGuiDialog_RunModal(const char* pConfName, const char* pMsgKey);
-
-// TODO(dw-decomp): provided by dwHelp (P6 wave 2b agent 3). HELP builds an
-// animated help-droid speech control; for dwGuiLoadSave the speaker code is
-// 0x68 (LSCP). Binary: new(0x5c) dwHelp_Ctor(&rect, /*pParent*/0, 0x68).
-// Loud-stubbed until dwHelp lands.
 
 // ---- dwGuiLoadSave ----------------------------------------------------------
 
@@ -344,10 +340,8 @@ dwWidget* dwGuiLoadSave::CreateControl(char* pKeyword, dwConfFile* pConf)
 
     if (dwString_Equals(pKeyword, "HELP"))
     {
-        // TODO(dw-decomp): dwHelp (P6 wave 2b agent 3). Binary: new(0x5c)
-        // dwHelp_Ctor(&rect, /*pParent*/0, /*speaker*/0x68). Loud stub.
-        stdPlatform_Printf("TODO(dw-decomp): dwGuiLoadSave control 'HELP' -> dwHelp(speaker 0x68) not translated yet\n");
-        return NULL;
+        // Binary: new(0x5c) dwHelp_Ctor(&zeroRect, /*pParent*/NULL, /*speaker*/0x68)
+        return new dwHelp(&rect, NULL, 0x68);
     }
     if (dwString_Equals(pKeyword, "SCROLLBOX"))
     {

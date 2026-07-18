@@ -31,6 +31,7 @@
 #include "Dw/dwGuiMission.h"
 
 #include "Dw/dwGuiButton.h"    // dwGuiZoomBox
+#include "Dw/dwGuiQuickView.h" // dwGuiDroidPreview (PART_BOUNDS keyword)
 #include "Dw/dwHelp.h"         // dwHelp (HELP keyword)
 #include "Dw/dwControlPanel.h" // dwControlPanelHelpRect (MAP keyword)
 #include "Dw/dwPart.h"         // dwPart_FindBlueprint (PARTTEXT keyword)
@@ -154,15 +155,6 @@ static dwImage* dwGuiMission_CaptureShadedScreen()
         pSnap->Unlock(); // vtbl +0x10
     }
     return pSnap;
-}
-
-// Shared stub reporter for not-yet-translated control classes (dwGuiScreen.cpp
-// pattern).
-static dwWidget* dwGuiMission_StubControl(const char* pKeyword, const char* pClass, const char* pUnit)
-{
-    stdPlatform_Printf("TODO(dw-decomp): dwGuiMissionMap control '%s' -> %s (unit %s) not translated yet\n",
-                       pKeyword, pClass, pUnit);
-    return NULL;
 }
 
 // ===========================================================================
@@ -1328,10 +1320,8 @@ dwWidget* dwGuiMissionMap::CreateControl(char* pKeyword, dwConfFile* pConf)
     {
         // "PART_BOUNDS <rect>": 3D preview of the selected mission's reward part.
         dwConfFile_ParseRect(pConf, &rect);
-        // TODO(dw-decomp): PART_BOUNDS -> dwGuiDroidPreview (unit
-        // dwGuiQuickView, P6) — binary: new(0x574) dwGuiDroidPreview_Ctor
-        // @429a80(&rect, NULL).
-        return dwGuiMission_StubControl("PART_BOUNDS", "dwGuiDroidPreview", "dwGuiQuickView");
+        // binary: new(0x574) dwGuiDroidPreview_Ctor @429a80(&rect, NULL)
+        return new dwGuiDroidPreview(&rect, NULL);
     }
     if (dwString_Equals(pKeyword, "PARTTEXT"))
     {

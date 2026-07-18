@@ -15,12 +15,9 @@
 //  - display bpp reads (binary global DAT_006b17e4, bits) map to
 //    stdDisplay_pCurVideoMode->format.format.bpp with a NULL guard.
 //  - the 8bpp screen-sized background/snapshot copies go through
-//    stdBitmapRle2_InstantiateCopy (P8 stub in dwAnim.cpp until the RLE unit
-//    lands — returns NULL, all uses are NULL-guarded like the binary).
+//    stdBitmapRle2_InstantiateCopy (real since the stdBitmapRle2 unit landed, P8).
 //  - BACKGROUND image loads go through dwImage_LoadFile (the translated
 //    dispatcher; the binary's first-load path used its 0x444c50 sibling).
-//  - not-yet-translated control classes are stubbed: the branch parses its
-//    tokens faithfully, logs a TODO(dw-decomp) line and returns NULL.
 //
 // Cross-unit symbols still owned elsewhere are declared extern below — see
 // the TODO(dw-decomp) block.
@@ -89,9 +86,8 @@ extern "C" int dwSegment_IsPlaylistEmpty(void);
 // global @0x53e854 (dwMain_bFullRedraw).
 extern "C" uint8_t dwMain_bFullRedraw;
 
-// 8bpp screen-sized image copy (background/snapshot). Currently a loud P8
-// stub returning NULL, defined in dwAnim.cpp.
-// TODO(dw-decomp): provided by the stdBitmapRle2 engine-side unit (P8).
+// 8bpp screen-sized image copy (background/snapshot). Real since the
+// stdBitmapRle2 unit landed (P8) — defined in stdBitmapRle2.cpp.
 extern "C" dwImage* stdBitmapRle2_InstantiateCopy(dwImage* pSrc, int16_t width, int16_t height); // @442ec0
 extern "C" dwImage* stdBitmapRle2_LoadFile16(char* pFilePath); // @444c50 (BACKGROUND: forces a lockable buffer)
 
@@ -104,14 +100,6 @@ extern "C" void dwGuiScreen_Startup(void)
 }
 
 // ---- local helpers -----------------------------------------------------------
-
-// Shared stub reporter for not-yet-translated control classes.
-static dwWidget* dwGuiScreen_StubControl(const char* pKeyword, const char* pClass, const char* pUnit)
-{
-    stdPlatform_Printf("TODO(dw-decomp): dwGuiScreen control '%s' -> %s (unit %s) not translated yet\n",
-                       pKeyword, pClass, pUnit);
-    return NULL;
-}
 
 // Capture the current screen into a new image and darken it to 60% — the
 // dimmed backdrop handed to sub-screens spawned by the 0x66/0x68 commands.

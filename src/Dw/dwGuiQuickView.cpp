@@ -193,9 +193,10 @@ void dwGuiQuickView::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     this->dwGui3DView::Draw(pDestBits, pClipRect); // camera bring-up (binary CALL 0x43b2b0)
 
-    if (!(rdGetRenterOptions() & 0x100))
-        stdDisplay_VBufferFill(rdCamera_g_pCurCamera->pCanvas->d3d_vbuf, 0, NULL);
-    rdAdvanceFrame();
+    // Added: software-renderer bracket (shared — without it the geometry takes
+    // the GL path and the preview renders nothing).
+    int swSavedAccel = 0;
+    rdCanvas* pSwCanvas = dwGui3DView_BeginSwRender(&swSavedAccel);
     rdSetGeometryMode(4);
 
     // Own droid list, or the live workspace when ours is empty.
@@ -208,7 +209,7 @@ void dwGuiQuickView::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
         if (pNode->partType == DW_PARTTYPE_NONE || pNode->pAttachSlot == NULL)
             pNode->Draw();
     }
-    rdFinishFrame();
+    dwGui3DView_EndSwRender(pSwCanvas, swSavedAccel);
 }
 
 // @42a320 (Ghidra: dwGuiQuickView_LayoutNodes).

@@ -240,8 +240,7 @@ struct dwGuiAnimView : dwAnimBase, dwWidgetGroup
 
     // @4032f0 (dwGuiAnimView_AddHypTextChild) — build a dwGuiHypText child at
     // (pos, size) relative to the group rect and push-front it onto the group
-    // children. STUBBED until the dwGuiHypText unit (P4) lands — see the
-    // TODO(dw-decomp) in dwAnim.cpp for the exact original sequence.
+    // children (un-stubbed once the dwGuiHypText unit landed, P4).
     void AddHypTextChild(char* pText, dwPoint pos, dwPoint size, int param_4, int param_5);
 
     // @4033d0 (dwGuiAnimView_InitFirstFrame) — preload the FIRST item's still

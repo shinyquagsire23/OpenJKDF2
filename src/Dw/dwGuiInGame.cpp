@@ -258,8 +258,12 @@ extern "C" void dwGuiInGame_ClearDialog(void)
     dwGuiSpeech* pNpc = dwGuiInGame_pActive->pNpcSpeech;
     if (pNpc != NULL)
     {
-        dwGuiSpeech_Clear(pNpc);
-        pNpc->Clear();
+        dwGuiSpeech_Clear(pNpc);        // @40aa30: stop its speech sound + wake the timed cog
+        pNpc->dwGuiHypText::Clear();    // @438c80: free the caption text + line runs —
+                                        // the dialog box draws while text is non-empty,
+                                        // so this is what dismisses it (binary calls
+                                        // dwGuiHypText_Clear here; dwGuiSpeech::Clear
+                                        // HIDES the base method, it must be qualified)
     }
 }
 
@@ -383,6 +387,14 @@ extern "C" void dwGuiInGame_SetEscapeEnabled(int bEnabled)
         dwGuiInGame_pActive->bEscapeEnabled = (uint8_t)(bEnabled != 0);
 }
 
+// @409300 dwCog_FlashInventory body: start the HUD inventory button blinking
+// (obj+0x194). No-op when no mission is live or the HUD has no INVENTORY_BUTTON.
+extern "C" void dwGuiInGame_FlashInventoryButton(void)
+{
+    if (dwGuiInGame_pActive != NULL && dwGuiInGame_pActive->pInventoryButton != NULL)
+        dwGuiInGame_pActive->pInventoryButton->StartBlink();
+}
+
 // Find pWidget's node in pList and unlink+free it (widget kept). Mirrors the
 // binary's inline sentinel walks (dwGuiScreen.cpp precedent).
 static void dwGuiInGame_UnlinkWidgetNode(dwList* pList, void* pWidget)
@@ -456,8 +468,8 @@ dwGuiInGame::dwGuiInGame(dwMission* pMission)
     this->voicePriority = 0;
     this->bVoicePlaying = 0;
     this->voiceEndMs = 0;
-    this->field_0x190 = 0;
-    this->field_0x194 = 0;
+    this->pReferenceButton = NULL;
+    this->pInventoryButton = NULL;
     this->bVoiceEnabled = 1;
     this->lastHealth = 0;
     this->chatterTimerLow = 0;
@@ -1666,12 +1678,16 @@ dwWidget* dwGuiInGame::CreateControl(char* pKeyword, dwConfFile* pConf)
     }
     if (dwString_Equals(pKeyword, "REFERENCE_BUTTON"))
     {
-        // Note: stored @0x190 in the binary (pReferenceButton); modelled via
-        // field_0x190 not wired — kept as the created control.
-        return dwGuiScreen::CreateControl((char*)"BUTTON_BLINK", pConf);
+        // @422370: stored @0x190 — the InDex button (dwGuiScreen msg-0x6a).
+        this->pReferenceButton = (dwWcButtonBlink*)dwGuiScreen::CreateControl((char*)"BUTTON_BLINK", pConf);
+        return (dwWidget*)this->pReferenceButton;
     }
     if (dwString_Equals(pKeyword, "INVENTORY_BUTTON"))
-        return dwGuiScreen::CreateControl((char*)"BUTTON_BLINK", pConf);
+    {
+        // @422370: stored @0x194 — dwflashinventory blinks this button.
+        this->pInventoryButton = (dwWcButtonBlink*)dwGuiScreen::CreateControl((char*)"BUTTON_BLINK", pConf);
+        return (dwWidget*)this->pInventoryButton;
+    }
     if (dwString_Equals(pKeyword, "WIDGETBAR"))
     {
         dwWidget* pW = dwGuiScreen::CreateControl(pKeyword, pConf);

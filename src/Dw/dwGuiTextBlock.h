@@ -139,8 +139,8 @@ struct dwGuiTextBlock : dwWidgetGroup, dwGuiHypText
     // @437800 — build one dwGuiTextRollover hotspot child for a link
     // (target "HL" -> command 0x1b58, "URL" -> 0x1b61; other targets are
     // dropped). The strings arrive BY VALUE (the binary copy-constructs
-    // temporaries and the callee frees them). Currently LOUD-stubbed pending
-    // dwGuiTextRollover (dwGuiWidgets unit, this wave).
+    // temporaries and the callee frees them). Wired to the real
+    // dwGuiTextRollover (dwGuiWidgets unit).
     void CreateLinkWidget(dwString anchor, dwString target, dwPoint pos);
 };
 

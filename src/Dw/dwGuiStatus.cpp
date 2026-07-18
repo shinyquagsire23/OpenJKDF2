@@ -434,10 +434,9 @@ dwWidget* dwGuiStatus::CreateControl(char* pKeyword, dwConfFile* pConf)
     }
     if (dwString_Equals(pKeyword, "HELP"))
     {
-        // TODO(dw-decomp): dwHelp (P6 wave 2b agent 3). Binary: new(0x5c)
-        // dwHelp_Ctor(&rect, /*pParent*/0, /*speaker*/0x6c). Loud stub.
-        stdPlatform_Printf("TODO(dw-decomp): dwGuiStatus control 'HELP' -> dwHelp(speaker 0x6c) not translated yet\n");
-        return NULL;
+        // Binary: new(0x5c) dwHelp_Ctor(&zeroRect, /*pParent*/NULL, /*speaker*/0x6c)
+        dwRect rect = { 0, 0, 0, 0 };
+        return new dwHelp(&rect, NULL, 0x6c);
     }
     if (dwString_Equals(pKeyword, "TYPEWRITER"))
     {

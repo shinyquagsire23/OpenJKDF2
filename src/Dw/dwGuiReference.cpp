@@ -371,11 +371,6 @@ dwWidget* dwGuiReference::CreateControl(char* pKeyword, dwConfFile* pConf)
     return dwGuiScreen::CreateControl(pKeyword, pConf);
 }
 
-// @42ba30 (dwGuiReference_OnMessage, vtbl +0x1c) — LOUD-stub. Handles the topic-
-// navigation command codes (0x1b5a-0x1b61: category select, spawn dwGuiFind,
-// build the info-card page via BuildDynamicControls, LAUNCH_URL flow), 7000
-// (set current file) and 0x96 (advance). Blocked on the dwGuiScreen embedded-
-// group overlay ambiguity + unlanded dwGuiFind; full recipe at binary @42ba30.
 // Clear a set of content groups (helper for the page-navigation cases).
 static void dwGuiReference_ClearGroups(dwWidgetGroup* a, dwWidgetGroup* b, dwWidgetGroup* c,
                                        dwWidgetGroup* d, dwWidgetGroup* e)
@@ -622,10 +617,10 @@ int dwGuiReference::OnMessage(dwWidgetMsg* pMsg)
     return dwGuiScreen::OnMessage(pMsg);
 }
 
-// @42ed50 (dwGuiReference_Update, vtbl +0x14) — LOUD-stub. Rebuilds the current
-// page's dynamic controls when bReloadPending/bReloadMaterials is set (opens the
-// topic .ifc, clears the 5 content groups, re-runs BuildDynamicControls), then
-// forwards the tick. Blocked on the same overlay ambiguity; recipe at @42ed50.
+// @42ed50 (dwGuiReference_Update, vtbl +0x14) — rebuilds the current page's
+// dynamic controls when bReloadPending/bReloadMaterials is set (opens the topic
+// .ifc, clears the 5 content groups, re-runs BuildDynamicControls), then forwards
+// the tick to the base controls group.
 void dwGuiReference::Update(float dt)
 {
     if (this->bReloadPending == 0)
@@ -717,10 +712,10 @@ void dwGuiReference::Update(float dt)
     dwGuiScreen::Update(dt);
 }
 
-// @42b300 (dwGuiReference_OnActivate, scn Activate) — LOUD-stub. Base Activate,
-// then (first time) allocate the 5 content widget-groups + append them to the
-// controls list, load the initial topic page (TPC enumeration + string table +
-// BuildDynamicControls). Blocked on the overlay ambiguity; recipe at @42b300.
+// @42b300 (dwGuiReference_OnActivate, scn Activate) — base Activate, then (first
+// time) allocates the 5 content widget-groups + prepends them into the embedded
+// controls list, loads the initial topic page (TPC enumeration + string table +
+// BuildDynamicControls).
 int dwGuiReference::Activate()
 {
     int r = dwGuiScreen::Activate();
@@ -804,11 +799,11 @@ int dwGuiReference::Activate()
     return r;
 }
 
-// @42ae40 (dwGuiReference_BuildDynamicControls) — LOUD-stub. Parses a topic sub-
-// section (DYNAMIC_CONTROL/NUMERATED_CONTROLS/NUMERATED_HEADER_CONTROLS/
-// STRIPTIMER/ICON_ANIM_PLAY/BUTTONHELPRECT/TEXTPOPUP), building each control via
-// the virtual CreateControl and prepending it into the target group. Recipe at
-// binary @42ae40. Returns 1 (the binary's success path).
+// @42ae40 (dwGuiReference_BuildDynamicControls) — parses a topic sub-section
+// (DYNAMIC_CONTROL/NUMERATED_CONTROLS/NUMERATED_HEADER_CONTROLS/STRIPTIMER/
+// ICON_ANIM_PLAY/BUTTONHELPRECT/TEXTPOPUP), building each control via the virtual
+// CreateControl and prepending it into the target group. Returns 1 (the binary's
+// success path).
 char dwGuiReference::BuildDynamicControls(const char* pConfName, dwWidgetGroup* pGroupDefault,
                                           dwWidgetGroup* pGroupHeader, dwWidgetGroup* pGroupDynamic,
                                           dwWidgetGroup* pGroupUnused4, dwWidgetGroup* pGroupUnused5)

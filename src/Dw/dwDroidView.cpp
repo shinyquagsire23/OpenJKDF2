@@ -268,9 +268,10 @@ void dwDroidView::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     this->dwGui3DView::Draw(pDestBits, pClipRect); // camera bring-up (binary CALL 0x43b2b0)
 
-    if (!(rdGetRenterOptions() & 0x100))
-        stdDisplay_VBufferFill(rdCamera_g_pCurCamera->pCanvas->d3d_vbuf, 0, NULL);
-    rdAdvanceFrame();
+    // Added: software-renderer bracket (shared — without it the geometry takes
+    // the GL path and the orbit view renders nothing).
+    int swSavedAccel = 0;
+    rdCanvas* pSwCanvas = dwGui3DView_BeginSwRender(&swSavedAccel);
     rdSetLightingMode(0);
     rdSetGeometryMode(3);
 
@@ -281,7 +282,7 @@ void dwDroidView::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
         if (pNode->partType == DW_PARTTYPE_NONE || pNode->pAttachSlot == NULL)
             pNode->DrawHighlighted();
     }
-    rdFinishFrame();
+    dwGui3DView_EndSwRender(pSwCanvas, swSavedAccel);
 
     // Green pick-selection frame around the last picked point.
     dwRect pickRect;

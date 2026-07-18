@@ -498,10 +498,11 @@ static sithCog* dw_LoadInventoryCog(const char* pName)
 // is 200). Without this every bin stays UNREGISTERED, so sithInventory_GetInventory
 // returns 0 for all bins — which made dwGuiInGame read the power gauge (bin 0x14) as
 // 0 and instantly trigger its out-of-power death, unloading the level on frame 1.
-// Note: the binary also loads a HUD icon per type (dwImage_LoadFile into
-// aTypes[id].hudBitmap) when flags&2 and iconName isn't empty. That icon is cosmetic
-// and dwImage_LoadFile is still stubbed, so the icon token is consumed but not loaded
-// (hudBitmap stays NULL). Restore alongside dwImage_LoadFile (P8).
+// Note: the binary also loads a HUD icon per type when flags&2 and iconName isn't
+// empty/"none": dwImage_LoadFile(iconName + ".rle") into aTypes[id].hudBitmap
+// (DAT_005282ec=".rle", DAT_005282f4="none"). dwImage_LoadFile is real since
+// stdBitmapRle2 landed (P8), so the icons load here; they are freed by
+// dw_FreeInventoryIcons @0x41a9b0 (dwSith.c shutdown).
 extern "C" void dw_ParseInventoryTypes(void)
 {
     dwConfFile conf;
@@ -516,7 +517,7 @@ extern "C" void dw_ParseInventoryTypes(void)
 
         dwConfFile_ParseULong(&conf, &id);
         char* pName = dwConfFile_NextToken(&conf);
-        dwConfFile_NextToken(&conf);         // iconName — consumed; icon load skipped (see note)
+        char* pIconName = dwConfFile_NextToken(&conf);
         dwConfFile_ParseFloat(&conf, &fMin);
         dwConfFile_ParseFloat(&conf, &fMax);
         dwConfFile_ParseHex(&conf, &flags);
@@ -530,15 +531,37 @@ extern "C" void dw_ParseInventoryTypes(void)
             pCog = dw_LoadInventoryCog(pCogName);
 
         sithInventory_RegisterType((int)id, pCog, pName, (flex_t)fMin, (flex_t)fMax, (int)flags);
+
+        // HUD icon (binary: read back aTypes[id].flags&2 after RegisterType — same
+        // value as the local). NULL iconName degrades to no icon.
+        if ((flags & 2) == 0 || pIconName == NULL || dwString_Equals(pIconName, "none"))
+        {
+            sithInventory_g_aTypes[id].hudBitmap = NULL;
+        }
+        else
+        {
+            char iconPath[160];
+            snprintf(iconPath, sizeof(iconPath), "%s.rle", pIconName);
+            sithInventory_g_aTypes[id].hudBitmap = (stdBitmap*)dwImage_LoadFile(iconPath);
+        }
     }
 
     dwConfFile_Close(&conf);
 }
 
-// @0x41a9b0 (dw_FreeInventoryIcons)
+// @0x41a9b0 (dw_FreeInventoryIcons) — delete every registered type's HUD icon
+// (binary: calls the dwImage's deleting vdtor via vtable[0]) and NULL the slot.
 extern "C" void dw_FreeInventoryIcons(void)
 {
-    // (see dw_ParseInventoryTypes — nothing to free while stubbed)
+    for (int i = 0; i < SITHBIN_NUMBINS; i++)
+    {
+        if ((sithInventory_g_aTypes[i].flags & SITHINVENTORY_TYPE_REGISTERED) != 0
+            && sithInventory_g_aTypes[i].hudBitmap != NULL)
+        {
+            delete (dwImage*)sithInventory_g_aTypes[i].hudBitmap;
+            sithInventory_g_aTypes[i].hudBitmap = NULL;
+        }
+    }
 }
 
 // ==================================================================

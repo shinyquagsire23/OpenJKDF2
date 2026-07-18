@@ -113,6 +113,19 @@ struct dwGui3DView : dwWidget
     void SetLight1(float x, float y, float z, float intensity, int type);
 };
 
+// ---- Added: shared software-render bracket for the DW 3D views ---------------
+// (factored out of dwWorkshopDroidEditor::Draw). DW has no HW path — the 3D
+// views render through the CPU rasterizer into the 8bpp back buffer. Call AFTER
+// the Draw's dwGui3DView::Draw camera bring-up (which makes the view's camera
+// current); Begin locks the current camera canvas VBuffer, advances the frame
+// and arms the software rasterizer (rdroid_curAcceleration=0 AFTER
+// rdAdvanceFrame, since rdCache_AdvanceFrame force-sets it =1 on SDL2_RENDER —
+// without that, rdCache_Flush takes the GL path and nothing reaches the DW
+// VBuffer), and clears the SW z-buffer. End runs rdFinishFrame, unlocks and
+// restores the accel flag saved into *pSavedAccel.
+rdCanvas* dwGui3DView_BeginSwRender(int* pSavedAccel);
+void dwGui3DView_EndSwRender(rdCanvas* pSwCanvas, int savedAccel);
+
 #endif // __cplusplus
 
 #endif // _DWGUI3DVIEW_H

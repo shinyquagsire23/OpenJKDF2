@@ -499,6 +499,7 @@ extern void     dwGuiInGame_AddResponse(sithCog* pCtx, int id, char* pTextKey, c
 extern int      dwGuiInGame_GetSelectedResponseId(void);
 extern int32_t  dwGuiInGame_PlaySelectedResponse(void); // plays selected wav; ms, -1 if none
 extern void     dwGuiInGame_SetEscapeEnabled(int bEnabled);
+extern void     dwGuiInGame_FlashInventoryButton(void); // starts the INVENTORY_BUTTON blink
 
 // dwplaymovie deps (C++ modules; all extern "C", so C linkage matches). The
 // dwSegment type stays opaque here — we only pass the pointers through.
@@ -826,6 +827,10 @@ void dwCog_PlayPlayerResponse(sithCog* pCtx)
 void dwCog_EnableEscape(sithCog* pCtx)  { (void)pCtx; dwGuiInGame_SetEscapeEnabled(1); }
 void dwCog_DisableEscape(sithCog* pCtx) { (void)pCtx; dwGuiInGame_SetEscapeEnabled(0); }
 
+// @409300 (dwCog_FlashInventory) — start the HUD inventory button (obj+0x194)
+// blinking. The binary NULL-guards the button, the shim NULL-guards the screen.
+void dwCog_FlashInventory(sithCog* pCtx) { (void)pCtx; dwGuiInGame_FlashInventoryButton(); }
+
 // @408de0 (dwCog_SetMissionText) — show the Cammy caption for a message id.
 void dwCog_SetMissionText(sithCog* pCtx)
 {
@@ -938,6 +943,7 @@ void dwCog_RegisterVerbs(void)
     sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_PlayPlayerResponse,"dwplayplayerresponse");
     sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_EnableEscape,     "dwenableescape");
     sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_DisableEscape,    "dwdisableescape");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_FlashInventory,   "dwflashinventory");
 
     // caption / dialog / movie
     sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_SetMissionText,   "dwsetmissiontext");
@@ -955,14 +961,14 @@ void dwCog_RegisterVerbs(void)
     sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_SetInvAvailable, "setinvavailable");
     sithCog_RegisterFunction(sithCog_g_pSymbolTable, dwCog_SetupCrystalInventory, "dwsetupcrystalinventory");
 
-    // --- BLOCKED (need not-yet-ported deps) ------------------------------
+    // --- ALL 34 of 34 verbs registered (2026-07-18) -----------------------
     // The dwGuiInGame 0x110-0x130 struct region was re-derived from the binary
     // (ctor + SegUpdate + StopSounds + OnMessage/OnKey disasm): 0x110 =
     // bEscapeEnabled, 0x11c = bConvActive, 0x120 = pSelectedResponse
     // (dwGuiListItem: data=owning cog, val=id, textB=wav), 0x130 = bHolstered.
-    // The response-menu + Esc verbs above are now wired against those.
-    // - dwflashinventory: still BLOCKED — needs the dwWcButtonBlink inventory
-    //   button (field_0x194, currently unmodelled on dwGuiInGame).
-    //   See DW/decomp_tools/cog_verb_survey.md for the full per-verb deps.
+    // The response-menu + Esc verbs above are wired against those; 0x190/0x194 =
+    // pReferenceButton/pInventoryButton (dwWcButtonBlink*, CreateControl stores
+    // them) — dwflashinventory starts the inventory button's blink.
+    // See DW/decomp_tools/cog_verb_survey.md for the full per-verb deps.
 }
 
