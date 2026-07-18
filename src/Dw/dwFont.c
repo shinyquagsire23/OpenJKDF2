@@ -110,9 +110,12 @@ dwFont* dwFont_Load(dwFont* pFont, const char* pName)
     aHeader[8] = lastChar;
     numGlyphs = lastChar - firstChar + 1;
 
-    // 0x35 = name NUL + u32 count + 0x30 header; 0x1a = u16 charmap entry +
-    // 0x18 glyph record.
-    char* pBlock = (char*)dwMain_pHS->alloc((uint32_t)(pixelDataSize + numGlyphs * 0x1a + 0x35 + nameLen));
+    // Binary: name NUL + u32 count + 0x30 header + per-glyph (u16 charmap +
+    // 0x18 glyph record), i.e. numGlyphs*0x1a + 0x35. Sized with sizeof here
+    // instead: on 64-bit dwFontGlyph grows to 0x20 (pPixels pointer), and the
+    // binary's constants under-allocate by 8*numGlyphs — the pixel-data fread
+    // then corrupted the heap past the block (caught by ASAN).
+    char* pBlock = (char*)dwMain_pHS->alloc((uint32_t)(pixelDataSize + numGlyphs * (2 + sizeof(dwFontGlyph)) + 5 + sizeof(dwFontHeader) + nameLen));
     if (!pBlock)
     {
         // Note: original calls JK.EXE-style jk_logtofile(); no direct analog here.

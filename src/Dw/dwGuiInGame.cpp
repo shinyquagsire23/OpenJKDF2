@@ -851,6 +851,11 @@ void dwGuiInGame::Update()
         (powerFrac > 0.3f ? dwGuiIndicator_Hide : dwGuiIndicator_Show)(this->pPowerGauge);
 
     // Ambient GHCA*.wav chatter (low power / hurt / idle / happy).
+    // Added: faithful selector — the binary computes (int)(rand() * 3.05185e-5f
+    // * count) over win32 rand() (0..0x7fff); mask to 15 bits so platform
+    // RAND_MAX differences can't index out of the table. (An earlier `% 3` fix
+    // guessed the table sizes; the real ones are 4/2/3/6 — see dwMain.cpp.)
+    #define DW_CHATTER_PICK(count) ((int)((float)(_rand() & 0x7fff) * 3.05185e-05f * (float)(count)))
     const char* pWav = NULL;
     this->chatterTimerHappy += sithTime_g_frameTimeFlex;
     this->chatterTimerLow += sithTime_g_frameTimeFlex;
@@ -861,8 +866,7 @@ void dwGuiInGame::Update()
         {
             if (!(this->chatterTimerLow < _DAT_0052869c && (powerFrac > 0.15f || this->chatterTimerLow < _DAT_00528698)))
             {
-                int r = _rand() % 3; // Added: macOS rand() range is 0x7fffffff, not the binary's 0x7fff -> the old (rand()/0x7fff)*3 indexed the 3-element wav array wildly OOB (garbage char* -> heap corruption). Bounded to [0,2].
-                pWav = PTR_s_GHCA009_wav_00528688[r];
+                pWav = PTR_s_GHCA009_wav_00528688[DW_CHATTER_PICK(4)]; // binary: ×4, 4-entry table
                 this->chatterTimerLow = 0;
                 this->chatterTimerHappy = 0;
             }
@@ -877,21 +881,23 @@ void dwGuiInGame::Update()
     this->chatterTimerHurt += sithTime_g_frameTimeFlex;
     if (pWav == NULL && 5.0f < this->lastHealth - pThing->actorParams.health)
     {
-        int r = _rand() % 3; // Added: RAND_MAX fix (macOS rand()=0x7fffffff, not 0x7fff) — was OOB array index
-        pWav = PTR_s_GHCA006_wav_00528678[r];
+        // Binary quirk: this site scales by ×1, so it effectively always plays
+        // GHCA006 (entry [1] GHCA007 is unreachable; kept for fidelity).
+        pWav = PTR_s_GHCA006_wav_00528678[DW_CHATTER_PICK(1)];
         this->chatterTimerHurt = 0;
         this->chatterTimerHappy = 0;
     }
     this->lastHealth = pThing->actorParams.health;
     if (speed == 0.0f
-        && (this->pNpcSpeech == NULL || *(char**)((char*)this->pNpcSpeech + 0x1c) == NULL || **(char**)((char*)this->pNpcSpeech + 0x1c) == '\0')
+        // Note: binary reads [pNpcSpeech+0x1c] = text (dwString @0x14) .pBuffer
+        // (@+8); the raw offset is wrong on 64-bit (crashed) — use the member.
+        && (this->pNpcSpeech == NULL || this->pNpcSpeech->text.pBuffer == NULL || *this->pNpcSpeech->text.pBuffer == '\0')
         && (this->pPlayerSpeech == NULL))
     {
         this->chatterTimerIdle += sithTime_g_frameTimeFlex;
         if (pWav == NULL && _DAT_005286d4 <= this->chatterTimerIdle)
         {
-            int r = _rand() % 3; // Added: RAND_MAX fix (macOS rand()=0x7fffffff, not 0x7fff) — was OOB array index
-            pWav = PTR_s_GHCA058_wav_005286c8[r];
+            pWav = PTR_s_GHCA058_wav_005286c8[DW_CHATTER_PICK(3)]; // binary: ×3, 3-entry table
             this->chatterTimerIdle = 0;
             this->chatterTimerHappy = 0;
         }
@@ -902,8 +908,7 @@ void dwGuiInGame::Update()
     }
     if (pWav == NULL && healthFrac >= 0.8f && powerFrac >= 0.8f && _DAT_005286c0 <= this->chatterTimerHappy)
     {
-        int r = _rand() % 3; // Added: RAND_MAX fix (macOS rand()=0x7fffffff, not 0x7fff) — was OOB array index
-        pWav = PTR_s_GHCA048_wav_005286a8[r];
+        pWav = PTR_s_GHCA048_wav_005286a8[DW_CHATTER_PICK(6)]; // binary: ×6, 6-entry table
         this->chatterTimerHappy = 0;
     }
     if (pWav != NULL && 0.0f < pThing->actorParams.health)
@@ -1132,7 +1137,8 @@ void dwGuiInGame::PlayVoiceLineEx(uint32_t msgCode, char* pWavName, uint32_t pri
             this->voicePriority = priority;
         return;
     }
-    char* pNpc = this->pNpcSpeech ? *(char**)((char*)this->pNpcSpeech + 0x1c) : NULL;
+    // Note: binary [pNpcSpeech+0x1c] = text.pBuffer; raw offset wrong on 64-bit.
+    char* pNpc = this->pNpcSpeech ? this->pNpcSpeech->text.pBuffer : NULL;
     bool bNpcIdle = (pNpc == NULL || *pNpc == '\0');
     bool bNoResponse = (this->pPlayerSpeech == NULL);
     if (this->voicePriority <= priority && bNpcIdle && bNoResponse && this->pMissionInfo->missionType != 5)

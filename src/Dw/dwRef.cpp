@@ -1007,19 +1007,17 @@ void dwRefPulldown::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
         {
             if (this->pImageNormal != NULL)
             {
-                // image Blit(dest, x, y, clip): vtbl +0x04
-                typedef void (*BlitFn)(void*, dwImageBits*, int, int, dwRect*);
-                (*(BlitFn*)((char*)*(void**)this->pImageNormal + 4))(
-                    this->pImageNormal, pDestBits, this->savedLeft, this->savedTop, pClipRect);
+                // Note: binary calls image vtbl +0x04 = Blit via a raw slot read;
+                // 64-bit slots are 8 bytes (crashed) — use the virtual call.
+                ((dwImage*)this->pImageNormal)->Blit(pDestBits, this->savedLeft, this->savedTop, pClipRect);
             }
         }
         else if (this->bIsSubmenu == 0)
         {
             if (this->pImagePressed != NULL)
             {
-                typedef void (*BlitFn)(void*, dwImageBits*, int, int, dwRect*);
-                (*(BlitFn*)((char*)*(void**)this->pImagePressed + 4))(
-                    this->pImagePressed, pDestBits, this->savedLeft, this->savedTop, pClipRect);
+                // Note: raw vtbl +0x04 slot call in the binary (see above).
+                ((dwImage*)this->pImagePressed)->Blit(pDestBits, this->savedLeft, this->savedTop, pClipRect);
             }
             // collapsed label (centered, shadowed color field_0xcd)
             dwFontHeader* pHdr = this->pFontHot ? this->pFontHot->pHeader : NULL;

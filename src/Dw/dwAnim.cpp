@@ -131,13 +131,16 @@ void dwAnim::Update(float dt)
         {
             if (this->bLoop == 0)
             {
+                // Added: Stop() broadcasts the finish msg; a handler may DELETE
+                // this widget (dwWcPalette::SetMode does on the mode-switch
+                // FLCs) — the binary kept touching freed memory here (incl. a
+                // write-after-free of bUpdatedThisFrame = real heap corruption).
+                // Do the bookkeeping first and never touch `this` after Stop().
+                this->bUpdatedThisFrame = 0;
                 this->Stop(); // virtual +0x4c (play-once reached the end)
-                frame = this->curFrame;
+                return;
             }
-            else
-            {
-                frame = frame % this->frameCount;
-            }
+            frame = frame % this->frameCount;
         }
         if (frame != this->curFrame)
         {

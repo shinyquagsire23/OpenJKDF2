@@ -119,7 +119,7 @@ void dwGuiButton::ParseBlob(char* pFilePath)
     char* pTok;
     char* pCursor;
     char buttonName[64];
-    uint32_t buttonId;
+    unsigned long buttonId; // Note: scanned via "%lu" — must be a real long on 64-bit hosts
     uint32_t i;
     const char* pErrFmt;
 
@@ -143,7 +143,12 @@ void dwGuiButton::ParseBlob(char* pFilePath)
         }
         if (dwString_Equals(pTok, "COUNT"))
         {
-            _sscanf(pCursor, "%lu", &this->numButtons);
+            // Note: original scans "%lu" straight into the 32-bit field (long ==
+            // 32-bit on x86); temp + narrow so 64-bit hosts don't write 8 bytes
+            // (see dwConfFile_ParseULong).
+            unsigned long count = 0;
+            _sscanf(pCursor, "%lu", &count);
+            this->numButtons = (int32_t)count;
             if (this->numButtons != 0)
             {
                 this->paButtonNames = (dwString**)dwMain_pHS->alloc(this->numButtons * sizeof(dwString*));
@@ -168,7 +173,7 @@ void dwGuiButton::ParseBlob(char* pFilePath)
         }
         if (dwString_Equals(pTok, "BUTTON"))
         {
-            if (_sscanf(pCursor, "%lu %s", &buttonId, buttonName) == 2)
+            if (_sscanf(pCursor, "%lu %63s", &buttonId, buttonName) == 2) // Note: width added (64-byte stack buf)
             {
                 if (buttonId != 0 && buttonId <= (uint32_t)this->numButtons)
                 {

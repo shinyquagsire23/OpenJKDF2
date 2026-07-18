@@ -149,9 +149,20 @@ void dwKeyframe_SampleJointAt(rdJoint* pJoint, uint32_t numFrames, float time,
         } while (i < numEntries);
     }
 
-    // Faithful quirk: when the scan ran off the end, pEntry points one past
-    // the array here and this reads it before stepping back below.
-    diff = pEntry->frameNum - time;
+    // Added: the binary reads the one-past-the-end entry's frameNum here and
+    // then steps back below (OOB read; trips ASAN, could fault at a page
+    // edge). Force the step-back path without the read — identical outcome
+    // unless the garbage word happened to equal `time` exactly.
+    if (numEntries != 0 && i >= numEntries)
+    {
+        pEntry = pEntry - 1;
+        i = numEntries - 1; // suppress the second step-back below
+        diff = 1.0f;        // any |diff| > 1e-5: never the exact-hit branch
+    }
+    else
+    {
+        diff = pEntry->frameNum - time;
+    }
     absDiff = diff;
     if (diff < 0.0f)
         absDiff = -diff;

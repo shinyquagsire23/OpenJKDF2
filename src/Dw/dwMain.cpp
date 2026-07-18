@@ -580,10 +580,12 @@ float _DAT_0069a658 = 0.0f;                                  // DW inventory bat
 int DAT_0054518c = 0, DAT_00545190 = 0, DAT_00545194 = 0, DAT_005b7200 = 0, DAT_00546880 = 0; // render counters
 uint32_t DAT_0053e810 = 0, DAT_0053e814 = 0;                 // DW load-progress bar bounds
 float _DAT_00528698 = 0.0f, _DAT_0052869c = 0.0f, _DAT_005286c0 = 0.0f, _DAT_005286d4 = 0.0f;  // chatter timing
-const char* PTR_s_GHCA009_wav_00528688[] = { 0 };            // ambient chatter wav tables (unrecovered)
-const char* PTR_s_GHCA006_wav_00528678[] = { 0 };
-const char* PTR_s_GHCA058_wav_005286c8[] = { 0 };
-const char* PTR_s_GHCA048_wav_005286a8[] = { 0 };
+// Ambient chatter wav tables (binary .data @0x528678-0x5286c8; sizes match the
+// per-site rand()*K selectors: 006 ×1(!), 009 ×4, 048 ×6, 058 ×3).
+const char* PTR_s_GHCA009_wav_00528688[] = { "GHCA009.wav", "GHCA010.wav", "GHCA012.wav", "GHCA030.wav" }; // low power
+const char* PTR_s_GHCA006_wav_00528678[] = { "GHCA006.wav", "GHCA007.wav" };                               // hurt
+const char* PTR_s_GHCA058_wav_005286c8[] = { "GHCA058.wav", "GHCA059.wav", "GHCA060.wav" };                // idle
+const char* PTR_s_GHCA048_wav_005286a8[] = { "GHCA048.wav", "GHCA049.wav", "GHCA050.wav", "GHCA051.wav", "GHCA055.wav", "GHCA061.wav" }; // happy
 } // extern "C"
 
 // ==================================================================

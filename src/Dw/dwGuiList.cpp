@@ -339,7 +339,9 @@ void dwGuiSpeech::Clear()
     }
     if (this->pTimedItem != NULL)
     {
-        *(uint32_t*)((char*)this->pTimedItem + 0x14) = sithTime_g_msecGameTime;
+        // Note: pTimedItem is the waiting sithCog (see dwGuiInGame_PlayCharacterSpeech);
+        // binary stamps [cog+0x14] = msecTimerTimeout — raw offset is wrong on 64-bit.
+        ((sithCog*)this->pTimedItem)->msecTimerTimeout = sithTime_g_msecGameTime;
         this->pTimedItem = NULL;
     }
 }
