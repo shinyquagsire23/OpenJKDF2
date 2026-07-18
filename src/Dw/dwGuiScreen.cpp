@@ -1027,14 +1027,25 @@ int dwGuiScreen::OnMessage(dwWidgetMsg* pMsg)
             pSeg = static_cast<dwSegment*>(new dwMissionSequence(this->pSnapshotImage));
             break;
         case 0x67:
-            // dwGuiInGame final-mission deploy. binary: if the assembled droid
-            // is valid, find the rank/category-4 mission in dwCore_pMissionList
+            // dwGuiInGame TRAINING deploy: if the assembled droid is valid,
+            // find the TGROUND (missionType 4) mission in dwCore_pMissionList
             // and new(0x284) dwGuiInGame(pMissionInfo); pSeg = its dwSegment
-            // subobject. TODO(dw-decomp): the rank-4 mission lookup needs the
-            // populated dwCore_pMissionList (P7 boot flow) — until then deploy
-            // the current mission.
-            if (dwGuiInGame_CheckDroidValid())
-                pSeg = dwGuiInGame_New(dwCore_pCurrentMission);
+            // subobject. (Binary @431... iterates the list for the type-4
+            // mission — NOT dwCore_pCurrentMission, which is the map default =
+            // the first NORMAL mission. Using the current mission launched the
+            // wrong level, e.g. Incline instead of the training ground.)
+            if (dwGuiInGame_CheckDroidValid() && dwCore_pMissionList != NULL)
+            {
+                for (dwListNode* pTgNode = dwCore_pMissionList->pNext;
+                     pTgNode != dwCore_pMissionList; pTgNode = pTgNode->pNext)
+                {
+                    if (((dwMission*)pTgNode->pData)->missionType == DW_MISSION_TGROUND)
+                    {
+                        pSeg = dwGuiInGame_New((dwMission*)pTgNode->pData);
+                        break;
+                    }
+                }
+            }
             break;
         case 0x68:
             this->pSnapshotImage = dwGuiScreen_CaptureShadedScreen();
