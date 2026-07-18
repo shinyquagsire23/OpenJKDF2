@@ -147,7 +147,7 @@ static void dwGuiOptions_BlackoutScreen(void)
 // @4029c0 (Ghidra: jkSmack_SmackPlay — VT-inherited misnomer). Physically part
 // of the dwAnim/dwMovie unit (P3, missed there); implemented here because
 // this unit and the boot flow are its callers. FLC/FLI -> dwFlicSeg,
-// SAN -> dwSmushSeg (stubbed playback finishes immediately).
+// SAN -> dwSmushSeg (libsmusher playback since P8).
 extern "C" dwSegment* dwMovie_OpenSeg(const char* pFilename, dwImage* pOverlayImage)
 {
     dwSegment* pSeg = NULL;
@@ -822,8 +822,7 @@ static void dwGuiOpening_ResampleSpan(uint8_t* pDst, int dstWidth, uint8_t* pSrc
 // 100..622; the crawl fades out from frame 590.
 // Note: the FPU expression tree is reproduced in float precision (the binary
 // evaluates parts of it at x87 double width) — flagged for re-verification
-// when SMUSH lands (P8); the path is unreachable until then (frame counter
-// pinned at 0 and pCrawlImage NULL from the P8 image-factory stub).
+// now that SMUSH playback lands the frame counter for real (P8).
 void dwGuiOpening::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     dwMovie::Draw(pDestBits, pClipRect);

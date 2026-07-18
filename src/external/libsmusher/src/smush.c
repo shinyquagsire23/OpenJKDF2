@@ -280,7 +280,13 @@ void smush_proc_fobj(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size)
         codec48_proc(ctx, data, total_size - 0xE);
     }
     else {
-        smush_error("Cannot handle codec: %u\n", fobj.codec);
+        // Added: once-per-codec latch — unsupported-codec files (e.g.
+        // DroidWorks' codec47 movies) would otherwise print this per FOBJ.
+        static uint32_t warned_codecs = 0;
+        if (!(warned_codecs & (1u << (fobj.codec & 31)))) {
+            warned_codecs |= (1u << (fobj.codec & 31));
+            smush_error("Cannot handle codec: %u\n", fobj.codec);
+        }
     }
     
 

@@ -15,12 +15,11 @@
 //              compositing over an overlay dwImage (color-0 pixels show the
 //              overlay). FULLY FUNCTIONAL (dwFlic is translated).
 //   dwSmushSeg (0x28, vtbl 0x51e070, ctor @401900) — SMUSH .san movie base:
-//              resolves the filename through the DW VFS and drives the
-//              SmushPlay/LECSmush player with the dwSmushVid_*/dwSmushAud_*
-//              callbacks. PLAYBACK IS STUBBED (SMUSH policy, see
-//              DW/DECOMP_PROGRESS.md "Architecture decisions"): Activate
-//              takes the binary's open-failure path, so the segment
-//              finishes immediately on its next Update.
+//              resolves the filename through the DW VFS and plays it through
+//              the vendored libsmusher (the binary's SmushPlay/LECSmush
+//              cluster is bounds-only in Ghidra by request; the dwMovie.cpp
+//              banner maps the pieces it absorbs). Frames pace off the
+//              segment clock; audio streams through a stdSound ring.
 //   dwMovie    (0x40, vtbl 0x51e0a0, ctor @4023c0) — concrete .san player:
 //              dwSmushSeg + a full-screen dwWidgetGroup OVERLAY drawn over
 //              every presented frame (subtitles/skip prompts) via the NEW
@@ -55,52 +54,48 @@ typedef struct dwMovie dwMovie;
 extern dwMovie* dwMovie_pActive;
 
 // Set by dwAnim_SmushStartup, cleared by dwAnim_SmushShutdown. Binary global
-// dwAnim_bSmushInitted (in the stub it just tracks the Startup/Shutdown pair).
+// dwAnim_bSmushInitted (the binary flag lived inside the SMUSH cluster; here
+// it just tracks the Startup/Shutdown pair — libsmusher needs no global init).
 extern int dwAnim_bSmushInitted;
 
 // ---- C-callable API ----------------------------------------------------------
 
 // Note: no binary counterpart — resets this module's statics
-// (dwMovie_pActive, dwAnim_bSmushInitted, the lecSmush present-disable flag)
-// for OpenJKDF2's soft-reset loop. Call from dwMain_Startup.
+// (dwMovie_pActive, dwAnim_bSmushInitted, the present-disable flag) and
+// closes any live SMUSH session for OpenJKDF2's soft-reset loop. Call from
+// dwMain_Startup.
 void dwMovie_Startup(void);
 
 // @402af0 (dwAnim_SmushStartup) — original: LECSmush_Initialize(pHS, 0) +
 // SmushPlay_Initialize(pHS, 0) + LECSmush_SysStartup() +
-// SmushPlay_SysStartup(), returning 1 only if all four succeed. STUBBED
-// (SMUSH policy): logs once, sets dwAnim_bSmushInitted and returns 1 so the
-// boot flow (StartOpeningCutscenes @41b5de) proceeds.
+// SmushPlay_SysStartup(), returning 1 only if all four succeed. libsmusher
+// needs no global init; only the binary's flag bookkeeping remains.
 int dwAnim_SmushStartup(void* pHS);
 
 // @402b30 (dwAnim_SmushShutdown) — original: smushPlay/lecSmush system
-// shutdown x4. STUBBED: clears dwAnim_bSmushInitted.
+// shutdown x4; clears dwAnim_bSmushInitted.
 void dwAnim_SmushShutdown(void);
 
-// ---- SMUSH player callbacks (ALL STUBBED — SMUSH policy) ----------------------
+// ---- SMUSH playback (libsmusher) ----------------------------------------------
 //
-// These are the video/audio callback tables the binary handed to SmushPlay
-// (smushPlay_sub_43D080 video / smushPlay_sub_43D060 audio); jkSmack drives
-// the same audio set. Signatures preserved for the future P8 wiring; each
-// stub is a LOUD no-op. The per-callback original behavior is documented at
-// the definitions in dwMovie.cpp.
+// The binary drove SmushPlay through dwSmushVid_*/dwSmushAud_* callback
+// tables (smushPlay_sub_43D080 video / smushPlay_sub_43D060 audio, jkSmack
+// drove the same audio set). Those tables have no libsmusher counterpart —
+// the glue in dwMovie.cpp absorbs their roles (see the role map in
+// dwMovie.cpp's banner).
 
-int dwSmushVid_Open(uint32_t* pCtx, uint32_t* pOut);                    // @401b90
-int dwSmushVid_Close(void);                                            // @401bf0
-int dwSmushVid_Clear(void);                                            // @401c10
-int dwSmushVid_SetPalette(uint8_t* pEntriesRGBX, int start, int count); // @401c60
-int dwSmushAud_Open(int samplesPerFrame, int numChannels, int bitsPerSample, uint32_t* pCtx); // @401cd0
-int dwSmushAud_Close(uint32_t* pCtx);                                   // @401fa0
-uint32_t dwSmushAud_GetTime(void* pCtx);                                // @401fe0
-int dwSmushAud_Stop(void* pCtx);                                        // @402160
-int dwSmushAud_Play(void* pCtx);                                        // @402190
-void dwSmushAud_Service(void* pCtx);                                    // @4021e0
+// @0x68b1c4 (lecSmush_frameNum; adopted here from the dwEnding.cpp
+// placeholder for P8) — index of the SMUSH frame currently on screen,
+// written per presented frame by dwSmushSeg::Update (0 when no movie plays).
+// Read by dwEnding + dwGuiOpening.
+extern uint32_t lecSmush_frameNum;
 
-// The dwMovie frame-present callback (replaces dwSmushVid_Close's slot in
-// the video table while a dwMovie is active): unlocks the SMUSH target
-// (back) buffer, draws dwMovie_pActive's overlay onto the screen image over
-// the just-decoded frame rect, and flips. pFrameRect is the decoded frame's
-// {x, y, width, height}. Kept functional (it only touches translated
-// pieces), though nothing calls it until SMUSH lands (P8). @4026b0
+// The dwMovie frame-present callback (the video table's present slot —
+// dwSmushVid_Close's role with the dwMovie overlay on top): draws
+// dwMovie_pActive's overlay onto the screen image over the just-blitted
+// frame rect, then presents (dwDisplay_Present). Called from
+// dwSmushSeg::Update once per due frame. pFrameRect is the decoded frame's
+// {x, y, width, height}. @4026b0
 int dwMovie_VidPresent(rdRect* pFrameRect);
 
 #ifdef __cplusplus
@@ -198,23 +193,27 @@ struct dwSmushSeg : dwAnimSeg
     // vtbl +0x14 @4019a0 (dwSmushSeg_Dtor; scalar-deleting wrapper @401980).
     virtual ~dwSmushSeg();
 
-    // vtbl +0x00 @4019b0 (dwSmushSeg_OnActivate) — STUBBED: the original
-    // installed the dwSmushVid_*/dwSmushAud_* callback tables, set the
-    // SMUSH volume from dw_settingSoundVol and opened the .san via
-    // SmushPlay (smushPlay_sub_43D0A0(path, 0, 1000000, 640, 480)), calling
-    // the base Activate only on success. The stub takes the open-failure
-    // path: bPlaying stays 0 (next Update requests the advance), returns 0.
+    // vtbl +0x00 @4019b0 (dwSmushSeg_OnActivate) — the original installed
+    // the dwSmushVid_*/dwSmushAud_* callback tables, set the SMUSH volume
+    // from dw_settingSoundVol and opened the .san via SmushPlay
+    // (smushPlay_sub_43D0A0(path, 0, 1000000, 640, 480)), calling the base
+    // Activate only on success. Here the open is dwMovie_SmushOpen
+    // (libsmusher); failure leaves bPlaying 0 (next Update requests the
+    // advance) and returns 0.
     virtual int Activate();
-    // vtbl +0x04 @401ad0 (dwSmushSeg_OnDeactivate) — original closed the
-    // SmushPlay session when bPlaying; then base Deactivate (kept).
+    // vtbl +0x04 @401ad0 (dwSmushSeg_OnDeactivate) — closes the SMUSH
+    // session when one is open; then base Deactivate.
     virtual void Deactivate();
     // vtbl +0x08 @401af0 (Ghidra: dwSmushSeg_Pause — the Suspend slot) —
-    // original paused LECSmush first and only then suspended the clock.
+    // original paused LECSmush first and only then suspended the clock
+    // (libsmusher has no codec pause; the clock suspend is kept).
     virtual void Suspend();
     // vtbl +0x0c @401b20 (Ghidra: dwSmushSeg_Resume) — mirror of Suspend.
     virtual void Resume();
-    // vtbl +0x10 @401b50 (dwSmushSeg_Update) — base Update; original then
-    // serviced SmushPlay and dropped bPlaying when the movie reported done.
+    // vtbl +0x10 @401b50 (dwSmushSeg_Update) — base Update; then the
+    // SmushPlay service call: pumps the audio ring, decodes/paces frames off
+    // the segment clock, presents due frames via dwMovie_VidPresent, and
+    // drops bPlaying (closing the session) once the last frame is shown.
     virtual void Update();
 };
 
@@ -243,8 +242,9 @@ struct dwMovie : dwSmushSeg
 
     // vtbl +0x00 @402580 (dwMovie_OnActivate) — base Activate; the original
     // then swapped the video callback table's present slot for
-    // dwMovie_VidPresent (stubbed with the rest of SMUSH); sets
-    // dwMovie_pActive = this and latches lastOverlayTimeSec = GetElapsed().
+    // dwMovie_VidPresent — here that swap is dwMovie_pActive (VidPresent
+    // draws the overlay whenever it is set); latches
+    // lastOverlayTimeSec = GetElapsed().
     virtual int Activate();
     // vtbl +0x04 @4025f0 (dwMovie_OnDeactivate) — base Deactivate; clears
     // dwMovie_pActive when it is this movie.

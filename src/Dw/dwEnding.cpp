@@ -9,7 +9,7 @@
 
 #include "Dw/dwEnding.h"
 
-#include "Dw/dwMovie.h"
+#include "Dw/dwMovie.h" // dwMovie base + lecSmush_frameNum (defined there since P8)
 #include "Dw/dwColormap.h"    // dwColormap_Load
 #include "Dw/dwConfFile.h"    // certificate.ifc parsing
 #include "Dw/dwStringTable.h" // certificate.txt (screen-local table)
@@ -22,12 +22,6 @@
 #include "Dw/dwPlayer.h"      // dwPlayer_name
 
 #include "stdPlatform.h"
-
-// TODO(dw-decomp): placeholder for the lecSmush SMUSH frame counter (binary
-// DAT_0068b1c4) — owner is the untranslated lecSmush/SmushPlay unit (P8),
-// which must adopt this definition (it stays 0 while SMUSH is stubbed, so
-// the frame-gated VO/draw paths below stay dormant).
-uint32_t lecSmush_frameNum = 0; // @0x68b1c4 (declared extern "C" in dwEnding.h)
 
 // @0x51ead8 (dwEnding_aVoiceNames): rank congratulation VO, indexed by the
 // 0-based rank.
@@ -45,7 +39,8 @@ static const char* dwEnding_aRankNames[3] = {
     "MASTER",
 };
 
-// Note: no binary counterpart — soft-reset seam for the placeholder global.
+// Note: no binary counterpart — soft-reset seam for the SMUSH frame counter
+// (owned by dwMovie.cpp since P8; kept zeroed between boots).
 extern "C" void dwEnding_Startup(void)
 {
     lecSmush_frameNum = 0;

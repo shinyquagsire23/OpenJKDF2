@@ -19,11 +19,9 @@
 // wave) and dwGuiInGame_EndMission @42092d (on completing the FINAL mission —
 // P6 wave 2); pushed onto the dwSegment stack.
 //
-// SMUSH playback is stubbed (policy, see DW/DECOMP_PROGRESS.md): the base
-// dwSmushSeg::Activate takes the open-failure path, so the segment finishes
-// on its next Update and neither the VO trigger nor the certificate draw
-// window is reached until the P8 SMUSH unit lands (they key off the SMUSH
-// frame counter below).
+// SMUSH playback runs via libsmusher (P8): the movie plays for real, and
+// both the VO trigger and the certificate draw window key off the SMUSH
+// frame counter (lecSmush_frameNum, Dw/dwMovie.h) as the binary did.
 //
 // Compiled as C++ (vtable + ctor/dtor pair + MSVC EH frame in Activate).
 
@@ -36,15 +34,13 @@ extern "C" {
 typedef struct dwEnding dwEnding; // C++ class; opaque in the C view
 #endif
 
-// TODO(dw-decomp): owned by the untranslated lecSmush/SmushPlay engine unit
-// (P8) — the SMUSH playback frame counter (binary DAT_0068b1c4, written by
-// lecSmush per decoded frame). Placeholder DEFINED in dwEnding.cpp (always 0
-// while SMUSH is stubbed); the P8 unit must adopt it and this declaration
-// should move with it. Read by dwEnding + dwGuiOpening (dwGuiOptions.cpp).
-extern uint32_t lecSmush_frameNum; // @0x68b1c4
+// lecSmush_frameNum (@0x68b1c4 — the SMUSH playback frame counter, written
+// by lecSmush per decoded frame in the binary) moved to Dw/dwMovie.h with
+// the P8 libsmusher wiring (defined in dwMovie.cpp). Read by dwEnding +
+// dwGuiOpening (dwGuiOptions.cpp); both include dwMovie.h.
 
-// Note: no binary counterpart — resets the module's placeholder global for
-// the soft-reset loop.
+// Note: no binary counterpart — resets the SMUSH frame counter (owned by
+// dwMovie.cpp) for the soft-reset loop.
 void dwEnding_Startup(void);
 
 // Added: C-callable factory — allocates the ending sequence and returns its

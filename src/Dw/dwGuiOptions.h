@@ -32,8 +32,8 @@
 //                 the options screen at a given sub-screen index. This is the
 //                 segment the dwGuiScreen msg-0x65 command constructs.
 //
-// SMUSH (.san) playback is stubbed (policy): the movie segments finish
-// immediately and the crawl never draws (frame counter stays 0) until P8.
+// SMUSH (.san) playback runs via libsmusher (P8): the movie segments play
+// for real and the crawl scrolls/fades off the frame counter.
 //
 // Compiled as C++ (vtables, ctor/dtor pairs, MSVC EH frames). The segment
 // factories keep C linkage for the C boot flow (dwMain, P7).

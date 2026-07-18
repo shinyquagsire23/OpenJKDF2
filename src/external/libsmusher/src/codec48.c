@@ -9,6 +9,9 @@ void codec48_destroy(smush_ctx* parent_ctx)
     if (!parent_ctx) return;
     codec48_ctx* ctx = parent_ctx->c48_ctx;
 
+    // Added: non-codec48 (e.g. codec47) files never allocate c48_ctx.
+    if (!ctx) return;
+
     free(ctx->delta_bufs);
     free(ctx);
 

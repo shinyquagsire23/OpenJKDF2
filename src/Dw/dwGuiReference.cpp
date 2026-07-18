@@ -909,8 +909,9 @@ dwGuiRefIntroSeg::dwGuiRefIntroSeg()
 
 // vtbl +0x00 @42f800 (Ghidra: dwGuiReference_PlayIntroVideo) — the intro-video
 // state machine. The segment manager re-Activates this after each movie
-// interruption, stepping the state machine. .san movies are stubbed (P8) so
-// dwMovie_OpenSeg finishes immediately, but the flow/state chain is faithful.
+// interruption, stepping the state machine. .san movies play via libsmusher
+// (P8), so the movie segments run for real and the flow/state chain is
+// faithful.
 //   state 0: statsFlags&0x40000000 ? RefRoom.san/state=1 : RefIntro.san/state=3
 //   state 1: RStart.san/state=2
 //   state 3: RunModal DLG_ASKINDEXTUT ==5000 -> statsFlags|=0x48000000; RStart.san/state=2

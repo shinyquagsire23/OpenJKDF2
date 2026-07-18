@@ -1048,8 +1048,8 @@ static void dwMain_BootFlow(void)
     // ONE-SHOT that got released right after advancing — running dw_Shutdown
     // (full engine teardown) immediately after boot. Calling dw_Startup directly
     // avoids that: dw_Shutdown now runs only from dwMain_Shutdown at app exit.
-    // The binary also pushed the droids.san / LLLogo.san opening movies on top;
-    // they are SMUSH-stubbed (finish immediately) and cosmetic — dropped.
+    // The binary also pushed the droids.san / LLLogo.san opening movies on
+    // top; they are cosmetic — dropped here (SMUSH itself plays since P8).
     dw_Startup();
 
     stdPlatform_Printf("OpenJKDF2: dwMain_BootFlow — DW display up, dw_Startup ran (workshop + enter-seg staged)\n");
