@@ -5,6 +5,7 @@
 #include <assert.h>
 
 #include "codec48.h"
+#include "codec47.h" // Added: DroidWorks codec47 decoder
 
 int _smush_debug_prints = 0;
 
@@ -90,6 +91,7 @@ void smush_destroy(smush_ctx* ctx) {
     if (!ctx) return;
 
     codec48_destroy(ctx);
+    codec47_destroy(ctx); // Added: DroidWorks codec47 decoder state
 
     fclose(ctx->f);
 
@@ -278,6 +280,10 @@ void smush_proc_fobj(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size)
 
     if (fobj.codec == 48) {
         codec48_proc(ctx, data, total_size - 0xE);
+    }
+    else if (fobj.codec == 47) {
+        // Added: DroidWorks codec47 decoder (derived from DroidWorks.exe)
+        codec47_proc(ctx, data, total_size - 0xE);
     }
     else {
         // Added: once-per-codec latch — unsupported-codec files (e.g.

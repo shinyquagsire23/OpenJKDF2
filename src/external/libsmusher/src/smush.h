@@ -88,6 +88,7 @@ typedef struct smush_ftch
 } smush_ftch;
 
 typedef struct codec48_ctx codec48_ctx; 
+typedef struct codec47_ctx codec47_ctx;
 typedef struct smush_ctx
 {
     char fpath[512];
@@ -105,6 +106,7 @@ typedef struct smush_ctx
     uint32_t cur_frame;
 
     codec48_ctx* c48_ctx;
+    codec47_ctx* c47_ctx; // Added: DroidWorks codec47 decoder state
     uint8_t* framebuffer;
     uint8_t* framebuffer_stor;
     int store_next;
