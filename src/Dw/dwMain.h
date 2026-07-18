@@ -19,6 +19,7 @@ extern "C" {
 int  dwMain_Startup();     // called from Main_Startup when Main_bDroidWorks
 void dwMain_Shutdown();    // called from Main_Shutdown when Main_bDroidWorks
 void dwMain_GuiAdvance();  // per-frame app tick, diverted from jkMain_GuiAdvance
+void dwMain_NotifyWindowResized(); // Added: Window.c resize hook (palette + full-screen dirty)
 #ifdef __cplusplus
 }
 #endif
@@ -28,6 +29,7 @@ void dwMain_GuiAdvance();  // per-frame app tick, diverted from jkMain_GuiAdvanc
 #define dwMain_Startup() (0)
 #define dwMain_Shutdown()
 #define dwMain_GuiAdvance()
+#define dwMain_NotifyWindowResized()
 #endif // PLATFORM_DROIDWORKS
 
 #endif // _DWMAIN_H

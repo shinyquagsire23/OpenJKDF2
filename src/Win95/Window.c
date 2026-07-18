@@ -15,6 +15,8 @@
 #include "Platform/wuRegistry.h"
 #include "Main/jkQuakeConsole.h"
 
+#include "Dw/dwMain.h" // Added: dwMain_NotifyWindowResized (no-op macro off-DW)
+
 #include "jk.h"
 
 #ifdef ARCH_WASM
@@ -394,6 +396,33 @@ int Window_menu_mouseY = 0;
 
 extern int jkGuiBuildMulti_bRendering;
 
+// Added: map raw SDL window coords into the letterboxed 640x480 canvas.
+// The same 4:3 pillarbox math the GL present side uses (std3D_DrawMenu);
+// shared by motion and button events so they can't diverge (BUG 14).
+static void Window_TranslateMouseToCanvas(int rawX, int rawY, int* pOutX, int* pOutY)
+{
+    if (!jkGame_isDDraw)
+    {
+        flex_t fX = (flex_t)rawX;
+        flex_t fY = (flex_t)rawY;
+
+        // Keep 4:3 aspect
+        flex_t menu_x = ((flex_t)Window_screenXSize - ((flex_t)Window_screenYSize * (640.0 / 480.0))) / 2.0;
+        flex_t menu_w = ((flex_t)Window_screenYSize * (640.0 / 480.0));
+
+        *pOutX = (int)(((fX - menu_x) / (flex_t)menu_w) * 640.0);
+        *pOutY = (int)((fY / (flex_t)Window_screenYSize) * 480.0);
+    }
+    else
+    {
+        *pOutX = rawX;
+        *pOutY = rawY;
+    }
+
+    if (*pOutX < 0)
+        *pOutX = 0;
+}
+
 void Window_HandleMouseMove(SDL_MouseMotionEvent *event)
 {
     int x = (int)event->x;
@@ -402,28 +431,7 @@ void Window_HandleMouseMove(SDL_MouseMotionEvent *event)
     Window_lastMouseX = Window_mouseX;
     Window_lastMouseY = Window_mouseY;
 
-    if (!jkGame_isDDraw)
-    {
-        // FLEXTODO
-        flex_t fX = (flex_t)x;
-        flex_t fY = (flex_t)y;
-
-        // Keep 4:3 aspect
-        flex_t menu_x = ((flex_t)Window_screenXSize - ((flex_t)Window_screenYSize * (640.0 / 480.0))) / 2.0;
-        flex_t menu_w = ((flex_t)Window_screenYSize * (640.0 / 480.0));
-
-        Window_mouseX = (int)(((fX - menu_x) / (flex_t)menu_w) * 640.0);
-        Window_mouseY = (int)((fY / (flex_t)Window_screenYSize) * 480.0);
-        //printf("%d %d\n", Window_mouseX, Window_mouseY);
-    }
-    else
-    {
-        Window_mouseX = x;
-        Window_mouseY = y;// - (Window_ySize - 480);
-    }
-
-    if (Window_mouseX < 0)
-        Window_mouseX = 0;
+    Window_TranslateMouseToCanvas(x, y, &Window_mouseX, &Window_mouseY);
 
     if (jkQuakeConsole_bOpen) return; // Hijack all input to console
 
@@ -697,10 +705,18 @@ void Window_UpdateHeadless()
         }
 
         jkGui_SetModeGame();
-        
+
+        // Added: -droidworks keeps its own fixed 640x480 canvas — re-push the
+        // palette + dirty the whole screen, then present it (BUG 14).
+        if (Main_bDroidWorks)
+        {
+            dwMain_NotifyWindowResized();
+            Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
+        }
+
         Window_resized = 0;
     }
-    
+
     int sampleTime_roundtrip = SDL_GetTicks() - Window_lastSampleTime;
     //printf("%u\n", sampleTime_roundtrip);
     Window_lastSampleTime = SDL_GetTicks();
@@ -1031,8 +1047,10 @@ void Window_SdlUpdate()
                 if (hasRight)
                     Window_bMouseRight = right;
 
-                Window_mouseX = (int)mevent->x;
-                Window_mouseY = (int)mevent->y;// - (Window_ySize - 480);
+                // Added: route button coords through the same letterbox
+                // transform as motion (BUG 14 — clicks landed offset from
+                // the visual widgets after a window resize).
+                Window_TranslateMouseToCanvas((int)mevent->x, (int)mevent->y, &Window_mouseX, &Window_mouseY);
 
                 pos = ((Window_mouseX) & 0xFFFF) | (((Window_mouseY) << 16) & 0xFFFF0000);
                 msgl = (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN ? WM_LBUTTONDOWN : WM_LBUTTONUP);
@@ -1149,7 +1167,15 @@ void Window_SdlUpdate()
             stdDisplay_SetMode(0, 0, 0);
             //jkMain_FixRes();
         }
-        
+
+        // Added: -droidworks keeps its own fixed 640x480 canvas — re-push the
+        // palette + dirty the whole screen, then present it (BUG 14).
+        if (Main_bDroidWorks)
+        {
+            dwMain_NotifyWindowResized();
+            Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
+        }
+
         Window_resized = 0;
     }
     

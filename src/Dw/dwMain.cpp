@@ -1077,3 +1077,25 @@ extern "C" void dwMain_GuiAdvance()
 
     dwMain_MainLoopTick();
 }
+
+// Added (BUG 14): Window.c resize hook. The DW canvas is a fixed 640x480 that
+// the SDL present scales/letterboxes; the engine's resize handling
+// (jkGui_SetModeMenu/stdDisplay_SetMode) can recreate the display surfaces
+// with a NULL palette and/or wipe the back buffer, so re-push the colormap
+// and force a full repaint of the DW screen at the next tick.
+extern "C" void dwMain_NotifyWindowResized(void)
+{
+    if (!dwMain_bBooted)
+        return;
+    if (dwColormap_pCurrent != NULL)
+        dwColormap_Apply();
+    if (dwDisplay_pScreenImage != NULL)
+    {
+        dwRect full;
+        full.left = 0;
+        full.top = 0;
+        full.right = (int16_t)dwDisplay_pScreenImage->desc.width;
+        full.bottom = (int16_t)dwDisplay_pScreenImage->desc.height;
+        dwDisplay_AddDirtyRect(&full);
+    }
+}
