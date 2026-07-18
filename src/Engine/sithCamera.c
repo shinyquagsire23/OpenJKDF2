@@ -137,7 +137,6 @@ void sithCamera_ResetAllCameras()
     rdVector3 rot; // [esp+Ch] [ebp-Ch] BYREF
 
     v0 = sithWorld_g_pCurrentWorld->pCameraFocusThing;
-    stdPlatform_Printf("TEST 2: %p\n", v0);
     sithCamera_g_stateFlags &= ~1u;
     sithCamera_SetCameraFocus(&sithCamera_g_aCameras[0], v0, v0);
     sithCamera_SetCameraFocus(&sithCamera_g_aCameras[1], v0, v0);

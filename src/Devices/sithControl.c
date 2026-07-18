@@ -21,7 +21,7 @@
 #include "Main/jkMain.h"
 #include "Dss/sithMulti.h"
 #include "General/stdMath.h"
-#include "Main/Main.h" // Added: Main_bDwCompat (DW tool-key dispatch)
+#include "Main/Main.h" // Added: Main_bDwCompat/Main_bDroidWorks (DW tool-key dispatch, idle-cam gate)
 #include "Dw/dwCog.h" // Added: DroidWorks droid-tool dispatch (no-ops off-desktop)
 #include "jk.h"
 
@@ -285,7 +285,10 @@ void sithControl_Update(flex_t secDeltaTime, int msecDeltaTime)
         if ( stdControl_bControlsIdle )
         {
             sithControl_msIdle += msecDeltaTime;
-            if ( sithControl_msIdle > 30000 && sithCamera_g_pCurCamera != &sithCamera_g_aCameras[4] )
+            // Added: DroidWorks removed the switch into the idle camera (its sithControl_Update
+            // twin @00456970 accumulates msIdle but never switches) — keep the DW follow cam.
+            if ( !Main_bDroidWorks
+              && sithControl_msIdle > 30000 && sithCamera_g_pCurCamera != &sithCamera_g_aCameras[4] )
                 sithCamera_SetCurrentCamera(&sithCamera_g_aCameras[4]);
 #ifdef QOL_IMPROVEMENTS
             else if (sithControl_msIdle < 30000 && sithCamera_g_pCurCamera == &sithCamera_g_aCameras[4] ) {

@@ -228,22 +228,8 @@ static int Linux_stdFtell(stdFile_t hGobFile)
     return ftell((FILE*)hGobFile);
 }
 
-// Under ASAN, disable the DroidWorks alloc-doubling mitigation so overflows hit
-// the redzone instead of the doubled slack.
-#if defined(__has_feature)
-#if __has_feature(address_sanitizer)
-#define STDPLATFORM_ASAN_ACTIVE 1
-#endif
-#endif
-
 static void* Linux_alloc(uint32_t len)
 {
-    // TODO: HACK, remove, fix Droidworks memory corruption
-#ifndef STDPLATFORM_ASAN_ACTIVE
-    if (Main_bDroidWorks) {
-        len = len * 2;
-    }
-#endif
     void* ret = malloc(len);
     if (ret) {
         memset(ret, 0, len);
@@ -258,13 +244,6 @@ static void Linux_free(void* ptr)
 
 static void* Linux_realloc(void* ptr, uint32_t len)
 {
-    // TODO: HACK, remove, fix Droidworks memory corruption
-#ifndef STDPLATFORM_ASAN_ACTIVE
-    if (Main_bDroidWorks) {
-        len = len * 2;
-    }
-#endif
-
     return realloc(ptr, len);
 }
 
