@@ -319,6 +319,16 @@ void dwWidget_RecordEvent(char evt, uint32_t a, uint32_t b)
 
 // ---- the shared window message pump ------------------------------------------------------
 
+// Note: no binary counterpart. The Win32 WM_CHAR/WM_KEYDOWN lParam repeat-count
+// (low word) is >=1 for any real keypress on Windows, but OpenJKDF2's SDL event
+// bridge delivers it as 0 on a fresh press. Clamp to >=1 so the DW key
+// consumers that gate on it (dwGuiTextEntry::OnKey) register real presses.
+static int dwWidget_WinKeyRepeat(LPARAM lParam)
+{
+    int repeat = (int)((uint32_t)lParam & 0xffff);
+    return repeat != 0 ? repeat : 1;
+}
+
 // @4425e0 — installed via Window_AddMsgHandler by the first widget ctor.
 // Always returns 0 and always writes *pResult = 0 (the binary never consumed
 // the message).
@@ -363,7 +373,13 @@ int dwWidget_MsgHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, LRESU
             {
                 if (dwWidget_recordFile != 0)
                     dwWidget_RecordEvent('K', (uint32_t)code, (uint32_t)lParam & 0xffff);
-                pKeyTarget->OnKey(code, (int)((uint32_t)lParam & 0xffff)); // vtbl +0x10
+                // Note: the binary received the Win32 WM_CHAR/WM_KEYDOWN lParam
+                // repeat-count, which is always >=1 for a real keypress; SDL's
+                // event bridge (Window.c) supplies it as 0 on a fresh press
+                // (SDL_EVENT_TEXT_INPUT hardcodes 0; key events pass SDL's
+                // inverted repeat flag). dwGuiTextEntry::OnKey DROPS keys with
+                // repeat==0, so force a Windows-style count of >=1 here.
+                pKeyTarget->OnKey(code, dwWidget_WinKeyRepeat(lParam)); // vtbl +0x10
             }
         }
         break;
@@ -373,7 +389,9 @@ int dwWidget_MsgHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, LRESU
         {
             if (dwWidget_recordFile != 0)
                 dwWidget_RecordEvent('K', (uint32_t)wParam, (uint32_t)lParam & 0xffff);
-            pKeyTarget->OnKey((int)wParam, (int)((uint32_t)lParam & 0xffff)); // vtbl +0x10
+            // Note: see the WM_KEYDOWN case — force a Win32-style repeat count
+            // of >=1 so dwGuiTextEntry accepts the char (SDL supplies 0).
+            pKeyTarget->OnKey((int)wParam, dwWidget_WinKeyRepeat(lParam)); // vtbl +0x10
         }
         break;
 
