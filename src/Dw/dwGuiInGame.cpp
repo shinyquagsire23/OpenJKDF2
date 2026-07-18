@@ -157,6 +157,7 @@ dwSegment* dwGuiOptions_New(int index);         // dwGuiOptions.cpp
 dwSegment* dwGuiCredits_New(void);              // dwGuiCredits.cpp
 dwSegment* dwEnding_New(void);                  // dwEnding.cpp
 dwSegment* dwCompleteMovie_New(int idx);        // dwMain (P7)
+dwSegment* dwGuiReference_NewIntroSeg(void);    // dwGuiReference.cpp (msg 0x6a)
 }
 
 // Named float constants (Ghidra DAT_<bits> labels).
@@ -1306,13 +1307,17 @@ int dwGuiInGame::OnMessage(dwWidgetMsg* pMsg)
                 || dwGuiDialog_RunModal("gyesno", "DLG_MISSIONQUIT") == 5000))
             dwSegment_RequestAdvance();
         break;
-    case 0x6a: // launch the reference-intro overlay segment
+    case 0x6a: // REFERENCE_BUTTON / InDex: launch the reference-intro segment
     {
         handled = 1;
-        // Note: the binary installs a tiny reference-intro segment (vtable
-        // @0x51f238 + a flag); kept as a bare segment overlay here.
-        dwSegment* pSeg = new dwSegment();
-        dwSegment_InterruptWith(dwSegment_pActive, pSeg);
+        // The binary installs the reference-intro segment (dwGuiRefIntroSeg,
+        // vtable 0x51f238). ⚠ A bare dwSegment here NEVER advances (its base
+        // Update is a no-op and never RequestAdvances) -> the segment stack
+        // sticks on a do-nothing overlay and the game freezes. Use the real
+        // factory so the intro -> reference-room chain runs.
+        dwSegment* pSeg = dwGuiReference_NewIntroSeg();
+        if (pSeg != NULL)
+            dwSegment_InterruptWith(dwSegment_pActive, pSeg);
         break;
     }
     case 0x1f40: // (== 8000) a response menu item was clicked: remember it +
