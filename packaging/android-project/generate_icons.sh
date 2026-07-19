@@ -9,3 +9,11 @@ convert "$base" -resize '72x72'     -unsharp 1x4 "$outdir/mipmap-hdpi/ic_launche
 convert "$base" -resize '96x96'     -unsharp 1x4 "$outdir/mipmap-xhdpi/ic_launcher.png"
 convert "$base" -resize '144x144'     -unsharp 1x4 "$outdir/mipmap-xxhdpi/ic_launcher.png"
 convert "$base" -resize '192x192'   -unsharp 1x4 "$outdir/mipmap-xxxhdpi/ic_launcher.png"
+
+base_mots=../mots_icon-256.png
+
+convert "$base_mots" -resize '48x48'     -unsharp 1x4 "$outdir/mipmap-mdpi/ic_launcher_mots.png"
+convert "$base_mots" -resize '72x72'     -unsharp 1x4 "$outdir/mipmap-hdpi/ic_launcher_mots.png"
+convert "$base_mots" -resize '96x96'     -unsharp 1x4 "$outdir/mipmap-xhdpi/ic_launcher_mots.png"
+convert "$base_mots" -resize '144x144'     -unsharp 1x4 "$outdir/mipmap-xxhdpi/ic_launcher_mots.png"
+convert "$base_mots" -resize '192x192'   -unsharp 1x4 "$outdir/mipmap-xxxhdpi/ic_launcher_mots.png"
