@@ -7,6 +7,23 @@ else {
     apply plugin: 'com.android.library'
 }
 
+// Derive versioning from git: versionCode is the total commit count
+// (monotonic, so every build counts as an update and launcher/package-info
+// caches invalidate), versionName is "<latest tag>.<commit count>".
+def gitCmd = { String... args ->
+    try {
+        def proc = args.execute(null, rootDir)
+        def out = new StringBuilder()
+        proc.consumeProcessOutput(out, null)
+        proc.waitFor()
+        return proc.exitValue() == 0 ? out.toString().trim() : null
+    } catch (Exception ignored) {
+        return null
+    }
+}
+def gitCommitCount = (gitCmd("git", "rev-list", "--count", "HEAD") ?: "1").toInteger()
+def gitLatestTag = gitCmd("git", "describe", "--tags", "--abbrev=0") ?: "untagged"
+
 android {
     if (buildAsApplication) {
         namespace "org.openjkdf2.app"
@@ -15,8 +32,8 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 34
-        versionCode 1
-        versionName "1.0"
+        versionCode gitCommitCount
+        versionName "${gitLatestTag}.${gitCommitCount}"
         externalNativeBuild {
             ndkBuild {
                 arguments "APP_PLATFORM=android-19"
