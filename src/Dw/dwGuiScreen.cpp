@@ -1153,6 +1153,64 @@ void dwGuiScreen::CheckCheatCodes(char* pCode)
     }
 }
 
+// ---- cheats ----------------------------------------------------------------------
+
+// Note: no binary counterpart — OpenJKDF2 Quake-console glue. The known DW
+// cheat codes, lowercase for console display/completion. Base (dwGuiScreen)
+// codes work on any screen; the rest are dwGuiInGame's and only take effect
+// in-mission — typed at the wrong screen they silently no-op, exactly as the
+// binary's keyboard path.
+static const char* dwGuiScreen_aCheatCodes[] = {
+    "somoney", "fitto", "beefcake",
+    "defcon0", "defcon1", "defcon2", "defcon3", "mst3k",
+    "speed2", "fly", "danke", "tuffy", "getem",
+    "console", "kingme", "tardis", "bambam",
+};
+
+extern "C" int dwGuiScreen_NumCheatCodes(void)
+{
+    return (int)(sizeof(dwGuiScreen_aCheatCodes) / sizeof(dwGuiScreen_aCheatCodes[0]));
+}
+
+extern "C" const char* dwGuiScreen_GetCheatCode(int idx)
+{
+    if (idx < 0 || idx >= dwGuiScreen_NumCheatCodes())
+        return NULL;
+    return dwGuiScreen_aCheatCodes[idx];
+}
+
+extern "C" int dwGuiScreen_ExecCheatCode(const char* pCode)
+{
+    if (!pCode || !dwWidget_pDefault)
+        return 0;
+
+    // Uppercase into the binary's 15-char cheat-ring shape; cheats take no args.
+    char code[16];
+    int i = 0;
+    for (; pCode[i] && i < 15; i++)
+    {
+        char c = pCode[i];
+        if (c == ' ' || c == '\t')
+            break;
+        code[i] = (char)toupper((unsigned char)c);
+    }
+    code[i] = '\0';
+    if (!code[0])
+        return 0;
+
+    for (int n = 0; n < dwGuiScreen_NumCheatCodes(); n++)
+    {
+        if (!__strcmpi(code, dwGuiScreen_aCheatCodes[n]))
+        {
+            // Virtual: in-mission this is dwGuiInGame's override (which chains
+            // to the base), elsewhere the base table.
+            ((dwGuiScreen*)dwWidget_pDefault)->CheckCheatCodes(code);
+            return 1;
+        }
+    }
+    return 0;
+}
+
 // ---- segment-side virtuals ---------------------------------------------------------
 
 // scn vtbl +0x00 @431b90 (Ghidra: dwGuiScreen_OnActivate)

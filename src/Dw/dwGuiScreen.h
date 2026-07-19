@@ -114,6 +114,17 @@ struct dwWidget* dwGuiScreen_CreateControl(char* pKeyword, dwConfFile* pConf, dw
 // project-wide soft-reset convention (and as the seam if statics appear).
 void dwGuiScreen_Startup(void);
 
+// Note: no binary counterpart — OpenJKDF2 Quake-console glue. Feed a console
+// command into the ACTIVE screen's cheat matcher (virtual CheckCheatCodes, so
+// in-game codes work in-mission and base codes anywhere). The code is
+// uppercased and bounded to the binary's 15-char cheat ring. Returns 1 when
+// the code is a known DW cheat (dispatched), 0 otherwise (no active screen,
+// empty/too-long/unknown code).
+int dwGuiScreen_ExecCheatCode(const char* pCode);
+// Console tab-completion source: the known DW cheat codes, lowercase.
+int dwGuiScreen_NumCheatCodes(void);
+const char* dwGuiScreen_GetCheatCode(int idx);
+
 #ifdef __cplusplus
 } // extern "C"
 

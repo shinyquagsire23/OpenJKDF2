@@ -36,7 +36,7 @@
 // able to climb, creating a barrier.
 //
 // This default is based on the boxes in Training.jkl in Droidworks
-#define CANONICAL_PHYS_TICKRATE (1.0 / 25.0)
+#define CANONICAL_PHYS_TICKRATE (Main_bDroidWorks ? (1.0 / 15.0) : (1.0 / 25.0))
 
 // Use microsecond timing to calculate sithTime_deltaSecs/etc
 #if defined(PLATFORM_POSIX) && !defined(TARGET_RETRO_HOMEBREW)

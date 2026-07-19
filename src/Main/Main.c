@@ -393,8 +393,10 @@ int Main_Startup(const char *cmdline)
         Video_Startup();
         std3D_Startup();
 #ifdef QUAKE_CONSOLE
-        // TODO: Use a droidworks font+BM in jkQuakeConsole_Startup
-        //jkQuakeConsole_Startup(); // Added
+        // The console's font/background come from DW assets (Arial12.laf +
+        // WBACKGROUND.RLE), built lazily on first render — the DW VFS and
+        // dwFont cache aren't up yet here (see jkQuakeConsole_TryLoadDwAssets).
+        jkQuakeConsole_Startup(); // Added
 #endif
 #ifdef RDRASTER_SOFTWARE_RENDERER
         // Force sw renderer for Droidworks, for now

@@ -1054,12 +1054,12 @@ void sithPhysics_UpdateAttachedThingPhysics(SithThing *pThing, flex_t secDeltaTi
             // crazy oscillations
 #ifdef FIXED_TIMESTEP_PHYS
             // Fix physics being tied to framerate?
-            if (NEEDS_STEPPED_PHYS && (secDeltaTime < CANONICAL_PHYS_TICKRATE))
-                v109 *= (secDeltaTime / CANONICAL_PHYS_TICKRATE);
+            if (NEEDS_STEPPED_PHYS && (secDeltaTime < jkPlayer_canonicalPhysTickrate))
+                v109 *= (secDeltaTime / jkPlayer_canonicalPhysTickrate);
 #endif
 #ifdef EXPERIMENTAL_FIXED_POINT
-            if (!(NEEDS_STEPPED_PHYS) && (secDeltaTime < CANONICAL_PHYS_TICKRATE))
-                v109 *= (secDeltaTime / CANONICAL_PHYS_TICKRATE);
+            if (!(NEEDS_STEPPED_PHYS) && (secDeltaTime < jkPlayer_canonicalPhysTickrate))
+                v109 *= (secDeltaTime / jkPlayer_canonicalPhysTickrate);
 #endif
             rdVector_ScaleAdd3Acc(&pThing->physicsParams.vel, &attachedNormal, -v109);
         }
@@ -1102,13 +1102,13 @@ void sithPhysics_UpdateAttachedThingPhysics(SithThing *pThing, flex_t secDeltaTi
     {
         // Fix physics being tied to framerate?
         flex_t orig_v131 = stdMath_ClampValue(v131, secDeltaTime * 0.5);
-        flex_t new_v131 = v131 * (secDeltaTime / CANONICAL_PHYS_TICKRATE);
+        flex_t new_v131 = v131 * (secDeltaTime / jkPlayer_canonicalPhysTickrate);
         new_v131 = stdMath_ClampValue(new_v131, secDeltaTime * 0.5);
 
         // If deltaSeconds is < the canonical phys tickrate, we get these
         // crazy oscillations
 #ifdef FIXED_TIMESTEP_PHYS
-        if (NEEDS_STEPPED_PHYS && secDeltaTime < CANONICAL_PHYS_TICKRATE)
+        if (NEEDS_STEPPED_PHYS && secDeltaTime < jkPlayer_canonicalPhysTickrate)
             v131 = new_v131;
         else
             v131 = orig_v131;
@@ -1116,7 +1116,7 @@ void sithPhysics_UpdateAttachedThingPhysics(SithThing *pThing, flex_t secDeltaTi
         v131 = orig_v131;
 #endif
 #ifdef EXPERIMENTAL_FIXED_POINT
-        if (secDeltaTime < CANONICAL_PHYS_TICKRATE)
+        if (secDeltaTime < jkPlayer_canonicalPhysTickrate)
             v131 = new_v131;
 #endif
 

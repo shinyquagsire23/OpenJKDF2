@@ -956,6 +956,8 @@ void sithCommand_LoadBinds()
 char sithCommand_aTmpCommandExecute[512];
 void sithCommand_HandleBinds(uint16_t key)
 {
+    if (!sithCommand_pBinds) return; // Added: sithCommand isn't started in DroidWorks mode
+
     sithCommandBind* pBindIter = sithCommand_pBinds;
     while (pBindIter = pBindIter->pNext)
     {
