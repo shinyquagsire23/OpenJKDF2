@@ -35,6 +35,7 @@
 #include "Gui/jkGUIMultiplayer.h"
 #include "Gui/jkGUIDisplay.h"
 #include "World/jkPlayer.h"
+#include "Dw/dwMain.h" // Added: DroidWorks app layer
 #include "Gameplay/jkSaber.h"
 #include "World/sithWorld.h"
 #include "Platform/stdControl.h"
@@ -216,6 +217,12 @@ void jkMain_GuiAdvance()
     void (__cdecl *v5)(int, int); // ecx
     void (__cdecl *v7)(int, int); // ecx
     void (__cdecl *v8)(int); // ecx
+
+    // Added: DroidWorks mode replaces the jk app layer wholesale
+    if (Main_bDroidWorks) {
+        dwMain_GuiAdvance();
+        return;
+    }
 
     if ( !g_app_suspended )
     {

@@ -202,6 +202,7 @@ endif()
 file(GLOB ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/*.c
                        ${PROJECT_SOURCE_DIR}/src/*/*.c
                        ${PROJECT_SOURCE_DIR}/src/General/*.cpp
+                       ${PROJECT_SOURCE_DIR}/src/Dw/*.cpp
                        ${PROJECT_SOURCE_DIR}/src/Platform/Common/*.c
                        ${PROJECT_SOURCE_DIR}/src/Platform/Common/*.cpp)
 
@@ -223,6 +224,16 @@ if(TARGET_TWL OR TARGET_DREAMCAST)
         ${PROJECT_SOURCE_DIR}/src/Raster/rdAFRaster.c
         ${PROJECT_SOURCE_DIR}/src/Raster/rdNRaster.c
         ${PROJECT_SOURCE_DIR}/src/Raster/rdZRaster.c)
+endif()
+
+# DroidWorks app layer (src/Dw/, see DW/DECOMP_PROGRESS.md) is desktop-only for
+# now — retro targets can't afford the extra RAM/code and Main_bDroidWorks is
+# never set there.
+if(TARGET_TWL OR TARGET_DREAMCAST)
+    file(GLOB DW_SRCS ${PROJECT_SOURCE_DIR}/src/Dw/*.c ${PROJECT_SOURCE_DIR}/src/Dw/*.cpp)
+    if(DW_SRCS)
+        list(REMOVE_ITEM ENGINE_SOURCE_FILES ${DW_SRCS})
+    endif()
 endif()
 
 # Remove multiplayer menus from compilation
@@ -254,6 +265,7 @@ include(cmake_modules/precompile_globals.cmake)
 file(GLOB ENGINE_SOURCE_FILES_REGLOB ${PROJECT_SOURCE_DIR}/src/*.c
                        ${PROJECT_SOURCE_DIR}/src/*/*.c
                        ${PROJECT_SOURCE_DIR}/src/General/*.cpp
+                       ${PROJECT_SOURCE_DIR}/src/Dw/*.cpp
                        ${PROJECT_SOURCE_DIR}/src/Platform/*/*.c
                        ${PROJECT_SOURCE_DIR}/src/Platform/*/*/*.c
                        ${PROJECT_SOURCE_DIR}/src/Platform/*/*.cpp
@@ -286,6 +298,16 @@ elseif(TARGET_HOOKS)
 else()
     add_executable(${BIN_NAME} ${GAME_MAIN_SOURCE_FILES})
     target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_COMMON_LIBS} sith_engine)
+
+    # Added (debug): OPENJKDF2_FORCE_ASAN=1 applies ASAN to just the game code
+    # (sith_engine object lib + this exe), not the vendored deps — avoids a full
+    # dep rebuild. The env-driven OPENJKDF2_NO_ASAN block below wasn't taking on macOS.
+    if(DEFINED ENV{OPENJKDF2_FORCE_ASAN} AND "$ENV{OPENJKDF2_FORCE_ASAN}" STREQUAL "1")
+        message(STATUS ">>> FORCE ASAN on game targets")
+        target_compile_options(sith_engine PRIVATE -fsanitize=address -fno-omit-frame-pointer -g)
+        target_compile_options(${BIN_NAME} PRIVATE -fsanitize=address -fno-omit-frame-pointer -g)
+        target_link_options(${BIN_NAME} PRIVATE -fsanitize=address)
+    endif()
 
     if(TARGET_BUILD_TESTS AND TARGET_MACOS)
         if(NOT EXPERIMENTAL_FIXED_POINT)

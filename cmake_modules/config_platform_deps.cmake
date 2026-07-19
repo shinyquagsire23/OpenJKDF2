@@ -141,7 +141,7 @@ if(TARGET_USE_LIBSMACKER)
 endif()
 
 if(TARGET_USE_LIBSMUSHER)
-    list(APPEND ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/external/libsmusher/src/smush.c ${PROJECT_SOURCE_DIR}/src/external/libsmusher/src/codec48.c)
+    list(APPEND ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/external/libsmusher/src/smush.c ${PROJECT_SOURCE_DIR}/src/external/libsmusher/src/codec48.c ${PROJECT_SOURCE_DIR}/src/external/libsmusher/src/codec47.c)
 endif()
 
 # Build SDL3 from sources (n/a for WASM)

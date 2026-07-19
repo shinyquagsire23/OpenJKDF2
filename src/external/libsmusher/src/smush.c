@@ -5,6 +5,7 @@
 #include <assert.h>
 
 #include "codec48.h"
+#include "codec47.h" // Added: DroidWorks codec47 decoder
 
 int _smush_debug_prints = 0;
 
@@ -90,6 +91,7 @@ void smush_destroy(smush_ctx* ctx) {
     if (!ctx) return;
 
     codec48_destroy(ctx);
+    codec47_destroy(ctx); // Added: DroidWorks codec47 decoder state
 
     fclose(ctx->f);
 
@@ -153,6 +155,17 @@ uint32_t smush_video_height(smush_ctx* ctx) {
 
 int smush_video_fps(smush_ctx* ctx) {
     return getle32(ctx->ahdr_ext.frame_rate);
+}
+
+// Added: expose the SAHD-declared audio rate (DroidWorks .san files declare
+// 11025 — playing their IACT PCM at jkCutscene's hardcoded 22050 runs 2x fast).
+int smush_audio_rate(smush_ctx* ctx) {
+    return getle32(ctx->ahdr_ext.audio_rate);
+}
+
+// Added: channel count from the IACT track flags (see smush_proc_iact).
+int smush_audio_channels(smush_ctx* ctx) {
+    return ctx->num_channels;
 }
 
 int smush_get_current_subtitle(smush_ctx* ctx) {
@@ -279,8 +292,18 @@ void smush_proc_fobj(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size)
     if (fobj.codec == 48) {
         codec48_proc(ctx, data, total_size - 0xE);
     }
+    else if (fobj.codec == 47) {
+        // Added: DroidWorks codec47 decoder (derived from DroidWorks.exe)
+        codec47_proc(ctx, data, total_size - 0xE);
+    }
     else {
-        smush_error("Cannot handle codec: %u\n", fobj.codec);
+        // Added: once-per-codec latch — unsupported-codec files (e.g.
+        // DroidWorks' codec47 movies) would otherwise print this per FOBJ.
+        static uint32_t warned_codecs = 0;
+        if (!(warned_codecs & (1u << (fobj.codec & 31)))) {
+            warned_codecs |= (1u << (fobj.codec & 31));
+            smush_error("Cannot handle codec: %u\n", fobj.codec);
+        }
     }
     
 

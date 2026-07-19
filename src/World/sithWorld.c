@@ -28,6 +28,7 @@
 #include "General/util.h"
 #include "Gameplay/sithPlayer.h"
 #include "Platform/std3D.h"
+#include "Dw/dwLaser.h" // Added: DroidWorks laser pool free (no-ops off-desktop)
 #include "jk.h"
 
 #ifdef TARGET_TWL
@@ -158,7 +159,13 @@ int sithWorld_Load(SithWorld *pWorld, char *pFilename)
         _strncpy(pWorld->episodeName, sithWorld_episodeName, 0x1Fu);
         pWorld->episodeName[0x1F] = 0;
         sithWorld_g_pLastLoadedWorld = pWorld;
-        stdFnames_MakePath(v8, 128, "jkl", pFilename);
+        // Added: Droidworks has different paths
+        if (!Main_bDroidWorks) {
+            stdFnames_MakePath(v8, 128, "jkl", pFilename);
+        }
+        else {
+            stdFnames_MakePath(v8, 128, "mission", pFilename);
+        }
         sithWorld_some_integer_4 = 0;
         if ( !stdConffile_Open(v8) )
         {
@@ -355,6 +362,10 @@ void sithWorld_FreeEntry(SithWorld *pWorld)
     int v2; // ebx
 
     SITH_ASSERTREL(pWorld); // Added: J3D assert
+
+#ifdef DW_LASERS
+    dwLaser_Free(pWorld); // Added: DroidWorks laser pool (binary @0x44d3d5; no-op off-desktop)
+#endif
 
     if ( pWorld->colormaps )
     {

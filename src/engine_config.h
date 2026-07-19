@@ -36,11 +36,18 @@
 // able to climb, creating a barrier.
 //
 // This default is based on the boxes in Training.jkl in Droidworks
-#define CANONICAL_PHYS_TICKRATE (1.0 / 25.0)
+#define CANONICAL_PHYS_TICKRATE (Main_bDroidWorks ? (1.0 / 15.0) : (1.0 / 25.0))
 
 // Use microsecond timing to calculate sithTime_deltaSecs/etc
 #if defined(PLATFORM_POSIX) && !defined(TARGET_RETRO_HOMEBREW)
 #define MICROSECOND_TIME
+#endif
+
+// DroidWorks app layer (src/Dw/, see DW/DECOMP_PROGRESS.md). Desktop-only for
+// now: src/Dw/*.c is excluded from retro builds in CMakeLists.txt, and dwMain.h
+// compiles the entry points down to no-ops when this is undefined.
+#if !defined(TARGET_RETRO_HOMEBREW)
+#define PLATFORM_DROIDWORKS
 #endif
 
 // Original game will speed up if framerate is over 100?
@@ -180,6 +187,9 @@
 // Backport Droidworks misc
 #ifdef QOL_IMPROVEMENTS
 #define DW_CAMERA
+#ifndef DW_LASERS
+#define DW_LASERS // Added: SithWorld laser pool fields for src/Dw/dwLaser.c (also set by -DDW_TYPES for Ghidra imports)
+#endif
 #endif
 
 #ifdef TARGET_RETRO_HOMEBREW

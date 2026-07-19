@@ -28,6 +28,8 @@
 #include "World/sithSector.h"
 #include "World/sithWorld.h"
 #include "World/sithExplosion.h"
+#include "Main/Main.h" // Added: Main_bDwCompat (DW laser pass)
+#include "Dw/dwLaser.h" // Added: DroidWorks laser pass (no-ops off-desktop)
 #include "Platform/std3D.h"
 #include "Primitives/rdMath.h"
 #include "stdPlatform.h"
@@ -201,6 +203,11 @@ int sithRender_Open()
     for (int i = 0; i < SITHREND_NUM_LIGHTS; i++)
     {
         rdLight_NewEntry(&sithRender_aThingLights[i]);
+    }
+
+    // Added: Debugging
+    if (!sithWorld_g_pCurrentWorld) {
+        stdPlatform_Printf("OpenJKDF2: sithWorld_g_pCurrentWorld is NULL!\n");
     }
 
     rdColormap_SetCurrent(sithWorld_g_pCurrentWorld->colormaps);
@@ -593,6 +600,14 @@ void sithRender_Draw()
     int testThingsEnd = stdPlatform_GetTimeMsec();
 
     int testAlpha = stdPlatform_GetTimeMsec();
+#endif
+
+#ifdef DW_LASERS
+    // Added: DroidWorks laser/beam pass (binary sithRender_DrawLasers@45e780,
+    // called between the thing passes and the alpha adjoins; body lives in
+    // src/Dw/dwLaser.c and no-ops off-desktop).
+    if ( Main_bDwCompat )
+        dwLaser_DrawAll();
 #endif
 
     // TWL: 0ms
@@ -2413,7 +2428,12 @@ LABEL_150:
                 continue;
             }
 
-            if (!((sithCamera_g_pCurCamera->type & 0xFC) != 0 || i != sithCamera_g_pCurCamera->pPrimaryFocusThing)) {
+            // Added: 0x1FC (was 0xFC) so the DroidWorks third-person follow
+            // camera (type 0x100) also draws its focus thing — the player droid.
+            // Without bit 8 the DW cam is treated as first-person and the droid
+            // is hidden. 0x100 is only ever set under Main_bDwCompat, so this is
+            // a no-op for JK/MOTS/retro cameras.
+            if (!((sithCamera_g_pCurCamera->type & 0x1FC) != 0 || i != sithCamera_g_pCurCamera->pPrimaryFocusThing)) {
                 continue;
             }
 
@@ -2732,7 +2752,9 @@ void sithRender_RenderThings()
 
             if ( (thingIter->flags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_DESTROYED)) == 0
               && (thingIter->flags & SITH_TF_LEVELGEO) == 0
-              && ((sithCamera_g_pCurCamera->type & 0xFC) != 0 || thingIter != sithCamera_g_pCurCamera->pPrimaryFocusThing) )
+              // Added: 0x1FC (was 0xFC) — draw the focus thing for the DW
+              // third-person follow camera (type 0x100) too; see the note above.
+              && ((sithCamera_g_pCurCamera->type & 0x1FC) != 0 || thingIter != sithCamera_g_pCurCamera->pPrimaryFocusThing) )
             {
                 rdMatrix_TransformPoint34(&thingIter->transformedPos, &thingIter->position, &rdCamera_g_pCurCamera->orient);
                 

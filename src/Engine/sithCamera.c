@@ -12,6 +12,7 @@
 #include "Engine/rdCamera.h"
 #include "Engine/sithRender.h"
 #include "General/stdMath.h"
+#include "Dw/dwCamera.h" // Added: DroidWorks follow camera (type 0x100; no-ops off-desktop)
 #include "jk.h"
 
 static rdVector3 sithCamera_trans = {0.0, 0.3, 0.0};
@@ -137,16 +138,25 @@ void sithCamera_ResetAllCameras()
 
     v0 = sithWorld_g_pCurrentWorld->pCameraFocusThing;
     sithCamera_g_stateFlags &= ~1u;
-    sithCamera_g_aCameras[0].pPrimaryFocusThing = v0;
-    sithCamera_g_aCameras[1].pPrimaryFocusThing = v0;
-    sithCamera_g_aCameras[2].pPrimaryFocusThing = v0;
-    sithCamera_g_aCameras[2].pSecondaryFocusThing = v0;
-    sithCamera_g_aCameras[4].pPrimaryFocusThing = v0;
-    sithCamera_g_aCameras[4].pSecondaryFocusThing = v0;
-    sithCamera_g_aCameras[5].pPrimaryFocusThing = v0;
-    sithCamera_g_aCameras[5].pSecondaryFocusThing = v0;
-    sithCamera_g_aCameras[6].pPrimaryFocusThing = v0;
-    sithCamera_g_aCameras[6].pSecondaryFocusThing = v0;
+    sithCamera_SetCameraFocus(&sithCamera_g_aCameras[0], v0, v0);
+    sithCamera_SetCameraFocus(&sithCamera_g_aCameras[1], v0, v0);
+    sithCamera_SetCameraFocus(&sithCamera_g_aCameras[2], v0, v0);
+    sithCamera_SetCameraFocus(&sithCamera_g_aCameras[3], v0, v0);
+    sithCamera_SetCameraFocus(&sithCamera_g_aCameras[4], v0, v0);
+    sithCamera_SetCameraFocus(&sithCamera_g_aCameras[5], v0, v0);
+    sithCamera_SetCameraFocus(&sithCamera_g_aCameras[6], v0, v0);
+#ifdef DW_CAMERA
+    sithCamera_SetCameraFocus(&sithCamera_g_aCameras[7], v0, v0);
+#endif
+
+    // TODO: DroidWorks does this? Verify if needed.
+    if (Main_bDroidWorks) {
+        sithCamera_g_bCurCameraSet = 0;
+        sithCamera_SetCurrentCamera(sithCamera_g_aCameras + 7);
+        sithCamera_g_curCycleCamNum = 0;
+        return;
+    }
+
     sithCamera_g_bCurCameraSet = 0;
     sithCamera_g_aCameras[0].pSecondaryFocusThing = 0;
     sithCamera_g_aCameras[1].pSecondaryFocusThing = 0;
@@ -283,6 +293,30 @@ void sithCamera_Update(SithCamera *pCamera)
             if (focusThing->sector)
                 pCamera->sector = sithCollision_FindSectorInRadius(focusThing->sector, &focusThing->position, &pCamera->orient.scale, 0.02);
             break;
+#ifdef DW_CAMERA
+        case 0x8:
+            // Added: DroidWorks scripted look-at camera (DroidWorks.exe
+            // sithCamera_Update @44b680 case 8; JK.EXE has no case 8 at all).
+            // deployment.jkl's dx_deployment.cog drives slot 2 with
+            // setcamerafocii(2, player, ghost) + setcurrentcamera(2): sit at the
+            // secondary focus (the movetoframe ghost) and watch the primary
+            // (BUG 6: no handler -> camera never updated -> black view).
+            if (Main_bDwCompat && pCamera->pPrimaryFocusThing != NULL)
+            {
+                if (pCamera->pSecondaryFocusThing == NULL)
+                {
+                    rdMatrix_LookAt(&pCamera->orient, &pCamera->lookPos,
+                                    &pCamera->pPrimaryFocusThing->position, 0.0f);
+                }
+                else
+                {
+                    rdMatrix_LookAt(&pCamera->orient, &pCamera->pSecondaryFocusThing->position,
+                                    &pCamera->pPrimaryFocusThing->position, 0.0f);
+                    pCamera->sector = pCamera->pSecondaryFocusThing->sector;
+                }
+            }
+            break;
+#endif
         case 4:
             SITH_ASSERTREL(focusThing != NULL); // Added: J3D assert
             SITH_ASSERTREL(sithThing_ValidateThingPointer(focusThing)); // Added: J3D assert
@@ -363,6 +397,13 @@ void sithCamera_Update(SithCamera *pCamera)
             rdMatrix_PostTranslate34(&pCamera->orient, &focusThing->position);
             pCamera->sector = sithCollision_FindSectorInRadius(focusThing->sector, &focusThing->position, &pCamera->orient.scale, 0.02);
             break;
+#ifdef DW_CAMERA
+        case 0x100:
+            // Added: DroidWorks collision follow camera (src/Dw/dwCamera.c;
+            // compiles to a no-op where the DW app layer is excluded).
+            dwCamera_Update(pCamera);
+            break;
+#endif
         default:
             break;
     }
@@ -557,6 +598,9 @@ int sithCamera_SetCurrentCamera(SithCamera *pCamera)
 
     if ( sithCamera_g_pCurCamera && pCamera->dword4 < sithCamera_g_pCurCamera->dword4 )
         return 0;
+#ifdef DW_CAMERA
+    SithCamera* pPrevCamera = sithCamera_g_pCurCamera; // Added: DW follow-cam reset wants the pre-switch camera
+#endif
     sithCamera_g_pCurCamera = pCamera;
     sithCamera_g_bCurCameraSet = 1;
     rdCamera_SetCurrent(&pCamera->rdCamera);
@@ -568,6 +612,12 @@ int sithCamera_SetCurrentCamera(SithCamera *pCamera)
         rot.z = 0.0;
         rdMatrix_PostRotate34(&sithCamera_idleCamOrient, &rot);
     }
+#ifdef DW_CAMERA
+    // Added: DroidWorks follow camera snap-on-switch (binary: type-0x100
+    // branch in SetCurrentCamera, before the final sithCamera_Update).
+    if ( pCamera->type == 0x100 )
+        dwCamera_Reset(pPrevCamera, pCamera);
+#endif
     sithCamera_Update(sithCamera_g_pCurCamera);
     return 1;
 }

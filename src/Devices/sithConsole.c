@@ -198,12 +198,17 @@ int sithConsole_ExeCommand(const char *pLine)
             free((void*)pCmdMutable); // Added: mutable copy of cmd
             return 0;
         }
-        DebugGui_some_num_lines = (DebugGui_some_num_lines + 1) % DebugGui_maxLines;
-        if ( DebugGui_some_num_lines == DebugGui_some_line_amt )
-            DebugGui_some_line_amt = (DebugGui_some_line_amt + 1) % DebugGui_maxLines;
+        // Added: guard the ring-buffer write when sithConsole_Open never ran
+        // (DroidWorks mode) — DebugGui_maxLines is 0 there (div-by-zero).
+        if ( DebugGui_maxLines > 0 )
+        {
+            DebugGui_some_num_lines = (DebugGui_some_num_lines + 1) % DebugGui_maxLines;
+            if ( DebugGui_some_num_lines == DebugGui_some_line_amt )
+                DebugGui_some_line_amt = (DebugGui_some_line_amt + 1) % DebugGui_maxLines;
 
-        stdString_SafeStrCopy(&DebugLog_buffer[128 * DebugGui_some_num_lines], std_g_genBuffer, 0x80);
-        DebugGui_aIdk[DebugGui_some_num_lines] = stdPlatform_GetTimeMsec();
+            stdString_SafeStrCopy(&DebugLog_buffer[128 * DebugGui_some_num_lines], std_g_genBuffer, 0x80);
+            DebugGui_aIdk[DebugGui_some_num_lines] = stdPlatform_GetTimeMsec();
+        }
     }
     free((void*)pCmdMutable); // Added: mutable copy of cmd
     return 0;

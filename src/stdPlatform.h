@@ -173,12 +173,12 @@ uint32_t stdPlatform_AllocSize(void* p);
 #define RDLOG_DEBUG(fmt, ...)      stdPrintf(rdroid_g_pHS->debugPrint,   __FILE__, __LINE__, (fmt), ##__VA_ARGS__)
 // Added: the `(hs->assert)` parens keep the member name from being expanded as the
 // <assert.h> `assert` macro in any TU that includes it (e.g. stdDisplay.c).
-#define SITH_ASSERT(cond)          do { if (!(cond)) (pSithHS->assert)(#cond, __FILE__, __LINE__); } while (0)
-#define STD_ASSERT(cond)           do { if (!(cond)) (std_g_pHS->assert)(#cond, __FILE__, __LINE__); } while (0)
-#define RD_ASSERT(cond)            do { if (!(cond)) (rdroid_g_pHS->assert)(#cond, __FILE__, __LINE__); } while (0)
-#define SITH_ASSERTREL(cond)       do { if (!(cond)) (pSithHS->assert)(#cond, __FILE__, __LINE__); } while (0)
-#define STD_ASSERTREL(cond)        do { if (!(cond)) (std_g_pHS->assert)(#cond, __FILE__, __LINE__); } while (0)
-#define RD_ASSERTREL(cond)         do { if (!(cond)) (rdroid_g_pHS->assert)(#cond, __FILE__, __LINE__); } while (0)
+#define SITH_ASSERT(cond)          do { if (!(cond) && pSithHS->assert) (pSithHS->assert)(#cond, __FILE__, __LINE__); } while (0)
+#define STD_ASSERT(cond)           do { if (!(cond) && std_g_pHS->assert) (std_g_pHS->assert)(#cond, __FILE__, __LINE__); } while (0)
+#define RD_ASSERT(cond)            do { if (!(cond) && rdroid_g_pHS->assert) (rdroid_g_pHS->assert)(#cond, __FILE__, __LINE__); } while (0)
+#define SITH_ASSERTREL(cond)       do { if (!(cond) && pSithHS->assert) (pSithHS->assert)(#cond, __FILE__, __LINE__); } while (0)
+#define STD_ASSERTREL(cond)        do { if (!(cond) && std_g_pHS->assert) (std_g_pHS->assert)(#cond, __FILE__, __LINE__); } while (0)
+#define RD_ASSERTREL(cond)         do { if (!(cond) && rdroid_g_pHS->assert) (rdroid_g_pHS->assert)(#cond, __FILE__, __LINE__); } while (0)
 #endif
 
 void stdPlatform_Memcpy32(void* dst, const void* src, uint32_t len);

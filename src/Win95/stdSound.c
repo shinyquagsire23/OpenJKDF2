@@ -405,6 +405,23 @@ int stdSound_BufferQueueAfterAnother(stdSound_buffer_t* bufPrev, stdSound_buffer
     return 1;
 }
 
+// Added: detach every already-played buffer from buf's source queue. A chunk
+// buffer that is still attached (queued or playing) silently ignores
+// alBufferData, so stream refills must unqueue BEFORE re-uploading (BUG 13).
+void stdSound_BufferUnqueueProcessed(stdSound_buffer_t* buf)
+{
+    ALint processed = 0;
+    if (Main_bHeadless) return;
+    if (!buf || !buf->source) return;
+
+    alGetSourcei(buf->source, AL_BUFFERS_PROCESSED, &processed);
+    while (processed > 0) {
+        ALuint unused;
+        alSourceUnqueueBuffers(buf->source, 1, &unused);
+        processed--;
+    }
+}
+
 void stdSound_BufferRelease(stdSound_buffer_t* sound)
 {
     ALint source_state;
@@ -725,6 +742,10 @@ int stdSound_BufferPlay(stdSound_buffer_t* buf, int loop)
 int stdSound_BufferQueueAfterAnother(stdSound_buffer_t* bufPrev, stdSound_buffer_t* bufNext)
 {
     return 1;
+}
+
+void stdSound_BufferUnqueueProcessed(stdSound_buffer_t* buf)
+{
 }
 
 void stdSound_BufferRelease(stdSound_buffer_t* sound)

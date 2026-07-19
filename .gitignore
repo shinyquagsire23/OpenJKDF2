@@ -17,7 +17,7 @@ DF2
 DF2_res
 MOTS
 TPM
-DW
+/DW/
 Pinball
 DF2-demo
 JK.asm
@@ -127,4 +127,4 @@ build_openjkdf2_venv/*
 graphify-out/
 AGENTS.md
 .blocksds
-packaging/dreamcast/disc/*
+packaging/dreamcast/disc/*CLAUDE.md
