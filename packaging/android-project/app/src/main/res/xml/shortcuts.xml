@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Static app shortcuts: long-pressing the OpenJKDF2 launcher icon offers
+     OpenMoTS, which supporting launchers can also pin/drag out as its own
+     icon. This covers launchers that only surface one LAUNCHER activity per
+     package. -->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="mots"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher_mots"
+        android:shortcutShortLabel="@string/app_name_mots"
+        android:shortcutLongLabel="@string/app_name_mots">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="org.openjkdf2.app"
+            android:targetClass="org.openjkdf2.app.MotsActivity" />
+    </shortcut>
+</shortcuts>

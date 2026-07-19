@@ -93,6 +93,8 @@
                 <data android:mimeType="*/*" />
             </intent-filter>
             -->
+            <!-- Long-press app shortcuts (see res/xml/shortcuts.xml) -->
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
         </activity>
 
         <!-- MoTS launcher entry. Runs in a separate process because SDL only
@@ -113,6 +115,9 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+                <!-- Some shortcut-maker tools only resolve activities that
+                     also declare DEFAULT -->
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <!-- Let Android know that we can handle some USB devices and should receive this event -->
             <intent-filter>
