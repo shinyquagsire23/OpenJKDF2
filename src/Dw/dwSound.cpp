@@ -7,7 +7,7 @@
 //   stdSound_FUN_00500c30 (IDSB::Stop + SetCurrentPosition 0) -> stdSound_BufferReset
 //   stdSound_FUN_00500c70 (IDSB::Stop only, i.e. pause)       -> stdSound_BufferStop
 //   stdSound_FUN_00500d50 (IDSB::Lock at a ring offset)       -> no positional lock in
-//       the OpenAL stdSound: each 0x2000 ring half is staged in its own chunk
+//       the OpenAL stdSound: each 0x2000 ring slice is staged in its own chunk
 //       buffer and queued with stdSound_BufferQueueAfterAnother (the
 //       jkCutscene streaming pattern); see dwSoundSampleStream::FillRing.
 //   IDSB::GetFormat + GetCaps (sample length)                 -> stdSound_buffer_t fields
@@ -39,7 +39,11 @@ extern "C" {
 
 #include <SDL3/SDL.h> // Note: SDL thread/mutex/delay replace the Win32 worker thread bits (desktop-only unit)
 
+#include <stdlib.h> // getenv (DW_VOICE_DEBUG diagnostics)
+#include "stdPlatform.h" // stdPlatform_Printf (DW_VOICE_DEBUG diagnostics)
+
 extern "C" HostServices* dwMain_pHS; // the DW host-services pointer (dwMain.c)
+extern "C" int dwGuiInGame_VoiceDebug(void); // dwGuiInGame.cpp (DW_VOICE_DEBUG gate)
 
 // dwWidget (P3, landed): dwWidgetMsg + the shared OnMessage dispatcher
 // (binary @0x444d00). dwSound::Update builds a { code, pSample, 0, NULL }
@@ -319,6 +323,8 @@ dwSoundSampleStream::dwSoundSampleStream(const char* pName)
     this->bytesRemaining = 0;
     this->apChunks[0] = NULL;
     this->apChunks[1] = NULL;
+    this->apChunks[2] = NULL;
+    this->apChunks[3] = NULL;
     this->chunkFlip = 0;
     this->fChunkSec = 0.0f;
     this->fQueueEndSec = 0.0f;
@@ -337,12 +343,15 @@ dwSoundSampleStream::dwSoundSampleStream(const char* pName)
             this->bytesRemaining = (int)dataLen;
 
             // Note: adaptation — the binary streamed into one 0x4000 DSound
-            // ring via positional Lock; here the two 0x2000 ring halves are
+            // ring via positional Lock; here the 0x2000 ring slices are
             // separate chunk buffers queued onto pBuffer's source, and
             // consumption is tracked by wall-clock (no play cursor in the
-            // OpenAL stdSound).
+            // OpenAL stdSound). Four chunks (not two) so the slice being
+            // refilled is always long detached from the source (BUG 13).
             this->apChunks[0] = stdSound_BufferCreate(bStereo, nSamplesPerSec, (uint16_t)bitsPerSample, DWSOUND_STREAM_CHUNK_LEN);
             this->apChunks[1] = stdSound_BufferCreate(bStereo, nSamplesPerSec, (uint16_t)bitsPerSample, DWSOUND_STREAM_CHUNK_LEN);
+            this->apChunks[2] = stdSound_BufferCreate(bStereo, nSamplesPerSec, (uint16_t)bitsPerSample, DWSOUND_STREAM_CHUNK_LEN);
+            this->apChunks[3] = stdSound_BufferCreate(bStereo, nSamplesPerSec, (uint16_t)bitsPerSample, DWSOUND_STREAM_CHUNK_LEN);
             uint32_t bytesPerSec = nSamplesPerSec * (bStereo ? 2u : 1u) * ((uint32_t)bitsPerSample / 8u);
             if (bytesPerSec != 0)
                 this->fChunkSec = (float)DWSOUND_STREAM_CHUNK_LEN / (float)bytesPerSec;
@@ -358,10 +367,11 @@ dwSoundSampleStream::~dwSoundSampleStream()
         dwMain_pHS->fileClose(this->hFile);
     // Note: adaptation — release the chunk buffers (the binary had no
     // per-chunk objects; the ring died with pBuffer in the base dtor).
-    if (this->apChunks[0] != NULL)
-        stdSound_BufferRelease(this->apChunks[0]);
-    if (this->apChunks[1] != NULL)
-        stdSound_BufferRelease(this->apChunks[1]);
+    for (int i = 0; i < 4; i++)
+    {
+        if (this->apChunks[i] != NULL)
+            stdSound_BufferRelease(this->apChunks[i]);
+    }
 }
 
 // @445380 — stage the next 0x2000 bytes from the file (wrapping to
@@ -384,7 +394,12 @@ void dwSoundSampleStream::FillRing()
     pChunk = this->apChunks[this->chunkFlip];
     if (this->hFile != 0 && pChunk != NULL)
     {
-        this->chunkFlip ^= 1;
+        // Note: added (BUG 13) — detach already-played chunks from the source
+        // BEFORE re-uploading. alBufferData on a still-queued/playing buffer
+        // is a silent OpenAL no-op, so without this the chunk kept its first
+        // fill forever and the stream looped the first 0x4000 bytes.
+        stdSound_BufferUnqueueProcessed(this->pBuffer);
+        this->chunkFlip = (this->chunkFlip + 1) & 3;
         maxSize = 0;
         pDst = (uint8_t*)stdSound_BufferSetData(pChunk, DWSOUND_STREAM_CHUNK_LEN, &maxSize);
         if (pDst != NULL)
@@ -437,16 +452,21 @@ void dwSoundSampleStream::Update()
 {
     // The binary read the play cursor out of stdSound_IsPlaying and refilled
     // when fewer than 0x2000 valid bytes remained ahead of it. The repo
-    // stdSound has no play cursor, so the same "less than one chunk left"
-    // test is done against the manager clock.
+    // stdSound has no play cursor, so the same test is done against the
+    // manager clock — topped up to TWO chunks ahead (not one) so the chunk
+    // being refilled has already rotated off the source (BUG 13).
     if (stdSound_IsPlaying(this->pBuffer, NULL) == 0)
     {
         this->bPlaying = 0;
     }
-    else if (this->fChunkSec > 0.0f && dwSound_pManagerCached != NULL &&
-             (this->fQueueEndSec - dwSound_pManagerCached->clockSec) < this->fChunkSec)
+    else if (this->fChunkSec > 0.0f && dwSound_pManagerCached != NULL)
     {
-        this->FillRing();
+        int guard = 4; // bounded: never queue more chunks than we own
+        while (guard-- > 0 &&
+               (this->fQueueEndSec - dwSound_pManagerCached->clockSec) < 2.0f * this->fChunkSec)
+        {
+            this->FillRing();
+        }
     }
     this->ProcessFade();
 }
@@ -682,6 +702,9 @@ dwSoundSampleStream* dwSound::StartMusicStream(const char* pName, float volume)
         {
             if (pStream->pBuffer != NULL)
             {
+                // Prime two chunks (the binary filled the whole 0x4000 ring
+                // before playing); Update keeps the queue topped up.
+                pStream->FillRing();
                 pStream->FillRing();
                 this->pMusicVoice->ApplyVolume(volume);
                 // Note: with the queue adaptation the source is already
@@ -938,6 +961,8 @@ void dwSound::Update(float clockSec_)
             pSample->Update(); // vtbl +4
         if (pSample->bPlaying == 0)
         {
+            if (dwGuiInGame_VoiceDebug())
+                stdPlatform_Printf("DWSOUND: reap %s\n", pSample->name.pBuffer ? pSample->name.pBuffer : "?");
             stdSound_BufferReset(pSample->pBuffer);
             if (pSample->pFinishMsg != NULL)
             {

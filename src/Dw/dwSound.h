@@ -93,14 +93,14 @@ struct dwSoundSampleStream : dwSoundSample
     int bytesRemaining;        // 0x40: unread bytes until the loop wrap
 
     // Note: adaptation fields (OpenAL queue streaming; see dwSound.cpp):
-    stdSound_buffer_t* apChunks[2]; // the two 0x2000 ring halves as own buffers
+    stdSound_buffer_t* apChunks[4]; // ring halves as own buffers (2 -> 4 for refill margin, BUG 13)
     int chunkFlip;                  // next chunk index to fill
     float fChunkSec;                // seconds of audio per chunk
     float fQueueEndSec;             // manager clockSec when queued audio runs out
 
     dwSoundSampleStream(const char* pName); // @445240
     virtual ~dwSoundSampleStream();         // @445320 (DtorDelete @445300)
-    virtual void Update();                  // @4454c0: refill when < one chunk ahead
+    virtual void Update();                  // @4454c0: refill to stay >= two chunks ahead
     void FillRing();                        // @445380: stage+queue the next 0x2000
 };
 

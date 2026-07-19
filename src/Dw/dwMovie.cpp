@@ -777,16 +777,22 @@ static int dwMovie_SmushOpen(const char* pPath)
                        aPath, dwMovie_smushW, dwMovie_smushH,
                        smush_num_frames(dwMovie_pSmush), dwMovie_smushFps);
 
-    // Audio: 32 x 0x8000-byte stdSound buffers — stereo 22050 Hz 16-bit
-    // (libsmusher's IACT decode format, jkCutscene's choice) — primed with
-    // silence. Volume: binary set the SmushPlay volume to
+    // Audio: 32 x 0x8000-byte stdSound buffers. Binary format (lecSmush_sub_43DD40
+    // @43dd33: audio setup called with (0x2b11, 2, 0x10)): **stereo 11025 Hz
+    // 16-bit, hardcoded** — every DroidWorks .san's SAHD declares 11025 and the
+    // IACT stream is stereo-interleaved. (jkCutscene's stereo 22050 ran 2x
+    // fast = BUG 16; mono 11025 misread the interleave and ran 2x slow.)
+    // Primed with silence. Volume: binary set the SmushPlay volume to
     // dw_settingSoundVol*127/100 (0..127); the stdSound float is 0..1.
+    int audioRate = smush_audio_rate(dwMovie_pSmush);
+    if (audioRate <= 0) // Note: guard added (audio-less file, e.g. Droids.san)
+        audioRate = 11025; // the binary's hardcoded rate
     flex_t volume = (flex_t)dw_settingSoundVol * (flex_t)0.01;
     for (int i = 0; i < DWMOVIE_AUDIO_NUM_STDBUFS; i++)
     {
         int32_t len = 0;
         uint8_t* stream;
-        dwMovie_audio[i] = stdSound_BufferCreate(1, 22050, 16, DWMOVIE_AUDIO_BUFS_DEPTH);
+        dwMovie_audio[i] = stdSound_BufferCreate(1, (uint32_t)audioRate, 16, DWMOVIE_AUDIO_BUFS_DEPTH);
         stdSound_BufferSetVolume(dwMovie_audio[i], volume);
         stream = (uint8_t*)stdSound_BufferSetData(dwMovie_audio[i], DWMOVIE_AUDIO_BUFS_DEPTH, &len);
         memset(stream, 0, len);

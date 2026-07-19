@@ -513,14 +513,16 @@ void dwRefPulldown::EnsureImages()
 // @418980 (dwRefPulldown_FreeImages) — delete via each image's vtbl slot 0.
 void dwRefPulldown::FreeImages()
 {
+    // Binary calls vtbl slot 0 with the scalar-deleting flag (1) and `this` in
+    // ECX, i.e. a virtual `delete`.
     if (this->pImageNormal != NULL)
     {
-        (**(void (***)(int))this->pImageNormal)(1);
+        delete (dwImage*)this->pImageNormal;
         this->pImageNormal = NULL;
     }
     if (this->pImagePressed != NULL)
     {
-        (**(void (***)(int))this->pImagePressed)(1);
+        delete (dwImage*)this->pImagePressed;
         this->pImagePressed = NULL;
     }
 }

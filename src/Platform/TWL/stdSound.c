@@ -344,6 +344,10 @@ int stdSound_BufferQueueAfterAnother(stdSound_buffer_t* bufPrev, stdSound_buffer
     return stdSound_BufferPlay(bufNext, 0); // TODO
 }
 
+void stdSound_BufferUnqueueProcessed(stdSound_buffer_t* buf)
+{
+}
+
 void stdSound_BufferRelease(stdSound_buffer_t* sound)
 {   
     stdSound_BufferStop(sound);

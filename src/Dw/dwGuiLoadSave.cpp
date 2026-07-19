@@ -12,6 +12,7 @@
 #include "Dw/dwInits.h"      // inits_EnumFilesByExt / ResolveAndOpen / DeleteFile
 #include "Dw/dwPart.h"       // dwPartNode (workspace node dtor)
 #include "Dw/dwHelp.h"       // dwHelp (HELP keyword, speaker 0x68=LSCP)
+#include "Dw/dwImage.h"      // dwImage::Lock/Unlock + dwImageBits (DROIDBOX bake)
 
 #include "stdPlatform.h"     // HostServices
 
@@ -183,8 +184,34 @@ void dwGuiLoadSave::Update(float dt)
                 if (this->bEditNameMode != 0)
                     this->pNameEntry->BeginEdit();
 
+                // Settle the controls group to (0,0) FIRST (binary @40bcb1:
+                // Move(-left,-top) inside the completion block). Without this
+                // the DROIDBOX bake below lands one slide-step (~20px at low
+                // fps) too low — the controls then rest above the baked chrome
+                // (BUG 18).
+                this->controls.Move((int16_t)(-this->controls.left), (int16_t)(-this->controls.top));
+
+                // Bake the DROIDBOX chrome into the screen background BEFORE
+                // detaching it (binary @40bcc9-40bd60: pBgImage->Lock, then
+                // pDroidBoxImage->DrawChild into the locked bg bits, Unlock).
+                // Without the bake the whole window frame/list/buttons vanish
+                // when the post-slide repaint draws the bare snapshot bg
+                // (BUG 15).
+                if (this->pDroidBoxImage != NULL && this->pBgImage != NULL)
+                {
+                    void* pPixels = NULL;
+                    int stride = 0;
+                    dwImageBits bits;
+                    this->pBgImage->Lock(&pPixels, &stride); // vtbl +0x0c
+                    bits.pDesc = &this->pBgImage->desc;      // binary: obj-as-desc alias
+                    bits.pPixels = pPixels;
+                    bits.stride = stride;
+                    this->pDroidBoxImage->DrawChild(&bits, NULL);
+                    this->pBgImage->Unlock(); // vtbl +0x10
+                }
+
                 // Detach the DROIDBOX snapshot from `controls` (it was only
-                // shown during the transition).
+                // shown during the transition; its pixels are now baked).
                 if (this->pDroidBoxImage != NULL)
                 {
                     dwListNode* pSent = this->controls.children.pSentinel;
@@ -564,6 +591,24 @@ void dwGuiLoadSave::RefreshWidgets()
 // @40bdc0 (dwGuiLoadSave_StartSlideOut)
 void dwGuiLoadSave::StartSlideOut()
 {
+    // Un-bake the DROIDBOX chrome from the background FIRST (binary
+    // @40bdc0-40bdf5: pBgImage->Lock [vtbl+0x0c], pSnapshot->Blit into the
+    // locked bg bits [vtbl+0x04], Unlock [vtbl+0x10]) — restores the pristine
+    // dimmed snapshot so no ghost of the window sticks around as the panel
+    // slides away (BUG 20).
+    if (this->pSnapshot != NULL && this->pBgImage != NULL)
+    {
+        void* pPixels = NULL;
+        int stride = 0;
+        dwImageBits bits;
+        this->pBgImage->Lock(&pPixels, &stride); // vtbl +0x0c
+        bits.pDesc = &this->pBgImage->desc;      // binary: obj-as-desc alias
+        bits.pPixels = pPixels;
+        bits.stride = stride;
+        this->pSnapshot->Blit(&bits, 0, 0, NULL); // vtbl +0x04 (this = SOURCE)
+        this->pBgImage->Unlock(); // vtbl +0x10
+    }
+
     // Re-attach the DROIDBOX snapshot to `controls` so it is drawn while the
     // panel slides away. (The binary also prepares a snapshot rect via two
     // GetRect/blit-style calls before this; those were EH-frame-corrupted in

@@ -876,18 +876,11 @@ void sithCogFunction_SetCameraMode(sithCog *pCog)
 
     camIdx = sithCogExec_PopInt(pCog);
 
-#ifdef QOL_IMPROVEMENTS
-    // Droidworks tmp
-    if (camIdx == 7)
-    {
-        camIdx = 0;
-        sithCamera_SetCameraFocus(&sithCamera_g_aCameras[camIdx], sithPlayer_g_pLocalPlayerThing, 0);
-    }
-#endif
-
-    //printf("%u -> %u\n", sithCamera_g_pCurCamera - sithCamera_g_aCameras, camIdx);
-    
-    if ( camIdx > -1 && camIdx < 7 )
+    // DroidWorks: the binary's twin accepts slots 0..7 (the DW slot-7 follow
+    // cam exists); JK clamps to < 7. Replaces the old 7->0 "Droidworks tmp"
+    // hack (BUG 21: cutscene camera restores went to first-person).
+    int camMax = Main_bDwCompat ? 8 : 7;
+    if ( camIdx > -1 && camIdx < camMax )
         sithCamera_SetCurrentCamera(&sithCamera_g_aCameras[camIdx]);
 }
 
@@ -895,7 +888,8 @@ void sithCogFunction_GetCameraMode(sithCog *pCog)
 {
     int camIdx; // edx
 
-    if ( sithCamera_g_pCurCamera && (camIdx = sithCamera_g_pCurCamera - sithCamera_g_aCameras, camIdx < 7) )
+    // DroidWorks: the binary's twin reports slots 0..7 (BUG 21).
+    if ( sithCamera_g_pCurCamera && (camIdx = sithCamera_g_pCurCamera - sithCamera_g_aCameras, camIdx < (Main_bDwCompat ? 8 : 7)) )
         sithCogExec_PushInt(pCog, camIdx);
     else
         sithCogExec_PushInt(pCog, -1);
@@ -1551,15 +1545,12 @@ void sithCogFunction_SetCameraFocii(sithCog *pCog)
     SithThing* focusThing = sithCogExec_PopThing(pCog);
     int camIdx = sithCogExec_PopInt(pCog);
 
-#ifdef QOL_IMPROVEMENTS
-    // Droidworks tmp
-    if (camIdx == 7)
-        camIdx = 0;
-#endif
-
-    if ( camIdx > -1 && camIdx < 7 ) // TODO macro this 7?
+    // DroidWorks: the binary's twin accepts slots 0..7 AND requires both foci
+    // (BUG 21; replaces the old 7->0 "Droidworks tmp" hack).
+    int camMax = Main_bDwCompat ? 8 : 7;
+    if ( camIdx > -1 && camIdx < camMax )
     {
-        if ( focusThing )
+        if ( focusThing && (!Main_bDwCompat || focusThing2) )
             sithCamera_SetCameraFocus(&sithCamera_g_aCameras[camIdx], focusThing, focusThing2);
     }
 }

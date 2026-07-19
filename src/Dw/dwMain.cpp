@@ -60,6 +60,7 @@ extern "C" {
 #include "General/stdFileUtil.h"
 #include "Engine/rdMaterial.h"
 #include "Engine/rdColormap.h"
+#include "Win95/stdDisplay.h"          // stdDisplay_VBufferLock/Unlock (texel access)
 #include "Gameplay/sithInventory.h" // dw_ParseInventoryTypes -> sithInventory_RegisterType
 #include "Cog/sithCog.h"            // dw_LoadInventoryCog -> sithCog_Load
 }
@@ -138,22 +139,63 @@ static dwMaterialCache* dwMain_pMaterialCache = NULL;
 // should use for an entry.
 static rdMaterial* dwMain_MaterialCache_GetRecolored(dwMaterialCache* pCache, dwMaterialCacheEntry* pEntry)
 {
-    // TODO(dw-decomp): the enabled + has-variant path rebuilds a fresh
-    // per-texel team-color-remapped copy of pBaseMaterial each call (Ghidra
-    // @41bd80: allocs a material, rdMaterial_LoadEntry, then remaps every
-    // texel through pCache->pColormap + pColorVariant via the DW-binary
-    // texture lock/unlock helpers stdDisplay_FUN_004fdf70/fdfc0). That texel
-    // loop depends on DW-binary rdMaterial/rdTexture struct offsets that need
-    // per-field verification against the repo's rd structs — deferred. We
-    // return the cached variant (or base), so parts render with their base
-    // texture (untinted), matching the documented P4 fallback behavior.
     if (!pCache->bEnabled || pEntry->pColorVariant == NULL)
     {
         if (pEntry->pColorVariant != NULL)
             return pEntry->pColorVariant;
         return pEntry->pBaseMaterial;
     }
-    return pEntry->pColorVariant; // (see TODO: should be a fresh recolored copy)
+
+    // Enabled + has variant: build a FRESH copy of the BASE material, then remap
+    // every texel through the cache colormap (textures.cmp): the base texel's
+    // palette green channel picks the light-ramp row (shade), the variant (mask)
+    // texel picks the column — so the part keeps its base luminance detail but
+    // takes the mask's team color. Caller-owned copy (the Unload hook's
+    // "neither variant nor base" branch frees it).
+    if (pCache->pColormap == NULL) // Added: guard (binary would deref NULL)
+        return pEntry->pColorVariant;
+    rdMaterial* pFresh = (rdMaterial*)dwMain_pHS->alloc(sizeof(rdMaterial));
+    if (pFresh == NULL)
+        return NULL; // binary: returns the failed-alloc NULL
+    if (rdMaterial_LoadEntry(pEntry->pBaseMaterial->mat_fpath, pFresh, 0, 0) == 0)
+    {
+        dwMain_pHS->free(pFresh);
+        return NULL;
+    }
+
+    rdColormap* pCmp = pCache->pColormap;
+    // Faithful quirk: the variant mask is ALWAYS read through texture 0 (the
+    // binary never advances its variant texture pointer, even for multi-texture
+    // materials — DW part mats are single-texture in practice).
+    tVBuffer* pVarBuf = (pEntry->pColorVariant->num_textures > 0)
+                      ? pEntry->pColorVariant->textures[0].texture_struct[0] : NULL;
+    for (uint32_t t = 0; t < pFresh->num_textures; t++)
+    {
+        tVBuffer* pFreshBuf = pFresh->textures[t].texture_struct[0];
+        tVBuffer* pBaseBuf = pEntry->pBaseMaterial->textures[t].texture_struct[0];
+        if (pFreshBuf == NULL || pBaseBuf == NULL || pVarBuf == NULL)
+            continue;
+        stdDisplay_VBufferLock(pFreshBuf); // binary: stdDisplay_FUN_004fdf70
+        stdDisplay_VBufferLock(pVarBuf);
+        stdDisplay_VBufferLock(pBaseBuf);
+        uint8_t* pOut = (uint8_t*)pFreshBuf->surface_lock_alloc;
+        const uint8_t* pMask = (const uint8_t*)pVarBuf->surface_lock_alloc;
+        const uint8_t* pBase = (const uint8_t*)pBaseBuf->surface_lock_alloc;
+        uint32_t count = (pFresh->textures[t].width_minus_1 + 1)
+                       * (pFresh->textures[t].height_minus_1 + 1);
+        if (pOut != NULL && pMask != NULL && pBase != NULL)
+        {
+            for (uint32_t i = 0; i < count; i++)
+            {
+                uint32_t shade = ((uint32_t)pCmp->colors[pBase[i]].g * 63) / 255;
+                pOut[i] = pCmp->lightlevel[shade * 256 + pMask[i]];
+            }
+        }
+        stdDisplay_VBufferUnlock(pFreshBuf); // binary: stdDisplay_FUN_004fdfc0
+        stdDisplay_VBufferUnlock(pVarBuf);
+        stdDisplay_VBufferUnlock(pBaseBuf);
+    }
+    return pFresh;
 }
 
 // @0x41bd60 (dwMain_MaterialCache_Find) — name -> entry.
@@ -375,17 +417,57 @@ extern "C" void dwMain_MaterialCache_Disable(void)
         dwMain_pMaterialCache->bEnabled = 0;
 }
 
-// @0x41bf70 (dwMain_MaterialCache_RecolorMasked) — paint a masked region of a
-// part material with a team color.
+// @0x41bf70 (dwMain_MaterialCache_RecolorMasked) — repaint the mask region
+// `matchColor` of a recolored part material with `newColor`, in place (the
+// workshop paint mode). Same remap as GetRecolored: mask texels matching
+// `matchColor` become the base-luminance-shaded `newColor`.
 extern "C" void dwMain_MaterialCache_RecolorMasked(rdMaterial* pMaterial, int matchColor, int newColor)
 {
-    // TODO(dw-decomp): the faithful body (@41bf70) locks the material's texture
-    // surfaces and remaps every texel whose mask-texture value == matchColor to
-    // the colormap-shaded newColor. It depends on the DW-binary rdMaterial /
-    // rdTexture struct offsets + stdDisplay_FUN_004fdf70/fdfc0 texel lock
-    // helpers (same deferral as GetRecolored). No-op = parts keep their base
-    // texture (untinted), which is the documented acceptable fallback.
-    (void)pMaterial; (void)matchColor; (void)newColor;
+    if (dwMain_pMaterialCache == NULL || pMaterial == NULL)
+        return;
+    dwMaterialCache* pCache = dwMain_pMaterialCache;
+    if (pCache->pColormap == NULL) // Added: guard (binary would deref NULL)
+        return;
+    dwMaterialCacheEntry* pEntry = dwMain_MaterialCache_Find(pCache, pMaterial->mat_fpath);
+    if (pEntry == NULL || pEntry->pColorVariant == NULL || pEntry->pBaseMaterial == NULL)
+        return;
+
+    rdColormap* pCmp = pCache->pColormap;
+    // Same faithful quirk as GetRecolored: the mask always comes from variant
+    // texture 0.
+    tVBuffer* pVarBuf = (pEntry->pColorVariant->num_textures > 0)
+                      ? pEntry->pColorVariant->textures[0].texture_struct[0] : NULL;
+    if (pVarBuf == NULL)
+        return;
+    for (uint32_t t = 0; t < pMaterial->num_textures; t++)
+    {
+        tVBuffer* pMatBuf = pMaterial->textures[t].texture_struct[0];
+        tVBuffer* pBaseBuf = pEntry->pBaseMaterial->textures[t].texture_struct[0];
+        if (pMatBuf == NULL || pBaseBuf == NULL)
+            continue;
+        stdDisplay_VBufferLock(pMatBuf); // binary: stdDisplay_FUN_004fdf70
+        stdDisplay_VBufferLock(pVarBuf);
+        stdDisplay_VBufferLock(pBaseBuf);
+        uint8_t* pOut = (uint8_t*)pMatBuf->surface_lock_alloc;
+        const uint8_t* pMask = (const uint8_t*)pVarBuf->surface_lock_alloc;
+        const uint8_t* pBase = (const uint8_t*)pBaseBuf->surface_lock_alloc;
+        uint32_t count = (pMaterial->textures[t].width_minus_1 + 1)
+                       * (pMaterial->textures[t].height_minus_1 + 1);
+        if (pOut != NULL && pMask != NULL && pBase != NULL)
+        {
+            for (uint32_t i = 0; i < count; i++)
+            {
+                if (pMask[i] == (uint8_t)matchColor)
+                {
+                    uint32_t shade = ((uint32_t)pCmp->colors[pBase[i]].g * 63) / 255;
+                    pOut[i] = pCmp->lightlevel[shade * 256 + (uint8_t)newColor];
+                }
+            }
+        }
+        stdDisplay_VBufferUnlock(pMatBuf); // binary: stdDisplay_FUN_004fdfc0
+        stdDisplay_VBufferUnlock(pVarBuf);
+        stdDisplay_VBufferUnlock(pBaseBuf);
+    }
 }
 
 // ==================================================================
@@ -602,7 +684,12 @@ int _DAT_006915f0 = 0, _DAT_00691528 = 0, _DAT_0069158c = 0; // DW sith control 
 float _DAT_0069a658 = 0.0f;                                  // DW inventory battery-capacity global
 int DAT_0054518c = 0, DAT_00545190 = 0, DAT_00545194 = 0, DAT_005b7200 = 0, DAT_00546880 = 0; // render counters
 uint32_t DAT_0053e810 = 0, DAT_0053e814 = 0;                 // DW load-progress bar bounds
-float _DAT_00528698 = 0.0f, _DAT_0052869c = 0.0f, _DAT_005286c0 = 0.0f, _DAT_005286d4 = 0.0f;  // chatter timing
+// Ambient-chatter timing thresholds, seeded from the binary's .data values
+// (@0x528698=20.0 low1, @0x52869c=45.0 low2, @0x5286c0=240.0 happy,
+// @0x5286d4=300.0 idle). Zero-init made the chatter gates fire EVERY tick —
+// each line killed the previous one mid-phoneme and churned sample reloads
+// (BUG 23).
+float _DAT_00528698 = 20.0f, _DAT_0052869c = 45.0f, _DAT_005286c0 = 240.0f, _DAT_005286d4 = 300.0f;  // chatter timing
 // Ambient chatter wav tables (binary .data @0x528678-0x5286c8; sizes match the
 // per-site rand()*K selectors: 006 ×1(!), 009 ×4, 048 ×6, 058 ×3).
 const char* PTR_s_GHCA009_wav_00528688[] = { "GHCA009.wav", "GHCA010.wav", "GHCA012.wav", "GHCA030.wav" }; // low power

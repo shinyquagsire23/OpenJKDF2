@@ -1941,7 +1941,11 @@ void dwWcCargoNormalButton::OnButtonPressed(int buttonId)
     if (confirmed)
     {
         msg.code = 0x7e4;
-        msg.pSender = (void*)(intptr_t)((buttonId == 1) ? 1 : 2);
+        // Binary @4066b2: the button requests the OTHER body type (button 1
+        // asks for 2=cargo, matching its DLG_BUILDBIPED "switch to treads"
+        // text) — the inverted 1:1 mapping here made the toggle ask for the
+        // type already active, so the switch never happened (BUG 22).
+        msg.pSender = (void*)(intptr_t)((buttonId == 1) ? 2 : 1);
         msg.param = 0;
         msg.pTarget = NULL;
         dwWidget_DispatchMsg(&msg, NULL);

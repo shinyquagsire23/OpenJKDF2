@@ -170,6 +170,9 @@ static const float DWF_FOV_NARROW = 90.0f;// 0x42b40000
 static void dwGuiInGame_HelpTextLayout(dwString* pText, dwFont* pFont, int width, dwGuiHypTextRun** ppRuns);
 static void dwGuiInGame_HelpTextDraw(dwImageBits* pBits, dwPoint* pPos, dwFont* pFont, uint8_t color, dwGuiHypTextRun* pRun, dwRect* pClip);
 
+// DW_VOICE_DEBUG gate (defined with PlayVoiceLineEx below; also used by dwSound.cpp).
+extern "C" int dwGuiInGame_VoiceDebug(void);
+
 // The pause dialog.s shared modal-result slot (binary DAT_0053e808).
 static int dwGuiInGamePause_result = 0;
 
@@ -613,6 +616,12 @@ int dwGuiInGame::Activate()
                     dwCog_toolCaps2 = pStats->totals.toolCapsLeft;
                     dwCog_toolCaps1 = pStats->totals.toolCapsRight;
 
+                    // Head-aim clamp: the binary writes -60/+60 through the
+                    // weaponParams union view (typeParams+0x44/0x48), which
+                    // aliases actorParams min/maxHeadPitch.
+                    pThing->actorParams.minHeadPitch = DWF_NEG60;
+                    pThing->actorParams.maxHeadPitch = -DWF_NEG60;
+
                     // Camera FOV by capability.
                     float fov = DWF_FOV_NARROW;
                     if (dwCog_droidCaps & 0x80)
@@ -621,8 +630,12 @@ int dwGuiInGame::Activate()
                         fov = DWF_FOV_MED;
                     rdCamera_SetFOV(&sithCamera_g_aCameras[7].rdCamera, fov);
 
-                    // Droid height from the workspace bbox.
-                    float half = pStats->size.z * 0.5f;
+                    // Droid height: half the largest workspace bbox axis (or,
+                    // with cap 0x80000, the smallest), floored at 0.05. The
+                    // binary max/mins the FULL sizes first and halves LAST —
+                    // halving size.z up front here made taller legs not raise
+                    // the stand height (BUG 8).
+                    float half = pStats->size.z;
                     if ((dwCog_droidCaps & 0x80000) == 0)
                     {
                         if (half < pStats->size.x) half = pStats->size.x;
@@ -635,6 +648,42 @@ int dwGuiInGame::Activate()
                     }
                     float newHeight = half * 0.5f;
                     if (newHeight < 0.05f) newHeight = 0.05f;
+
+                    // Bounding-radius writeback into the merged model.
+                    pStats->model.radius = sqrtf(pStats->size.x * pStats->size.x
+                                                 + pStats->size.y * pStats->size.y
+                                                 + pStats->size.z * pStats->size.z) * 0.5f;
+
+                    // z-rebase the merged model + every merged rdKeyframe by the
+                    // height delta, so the visual mesh lines up with the new
+                    // collision height (binary StartMission; BUG 8 legs-sink).
+                    float dz = newHeight - pStats->model.insertOffset.z;
+                    if (fabsf(dz) <= 1e-5f)
+                        dz = 0.0f;
+                    if (dz != 0.0f)
+                    {
+                        pStats->model.insertOffset.z = newHeight;
+                        if (pStats->model.aHierarchyNodes != NULL) // Added: NULL guard
+                            pStats->model.aHierarchyNodes[0].pos.z -= dz;
+                        pStats->eyeOffset.z -= dz;
+                        for (int i = 0; i < 24; i++)
+                        {
+                            rdKeyframe* pKf = pStats->apMergedKeyframes[i];
+                            if (pKf == NULL || pKf->aNodes == NULL)
+                                continue;
+                            rdJoint* pJoint = pKf->aNodes; // root joint only (binary: aNodes[0])
+                            if (pJoint->numEntries == 0)
+                            {
+                                // Binary allocates one scratch rdAnimEntry it never
+                                // writes (freed later with the joint's entries); its
+                                // alloc-failure path then writes through NULL (a
+                                // Win9x zero-page write) — that path is not kept.
+                                pJoint->aEntries = (rdAnimEntry*)(*dwMain_pHS->alloc)(sizeof(rdAnimEntry));
+                            }
+                            for (uint32_t j = 0; j < pJoint->numEntries; j++)
+                                pJoint->aEntries[j].pos.z -= dz;
+                        }
+                    }
 
                     // Physics tuning from the baked stats (repo SithThing fields).
                     float posZ = pThing->position.z;
@@ -651,24 +700,24 @@ int dwGuiInGame::Activate()
                         pflags |= 0x10;
                     pThing->physicsParams.flags = pflags;
                     float maxThrust0 = pThing->actorParams.maxThrust;
-                    pThing->physicsParams.airDrag = pStats->totals.drag;
+                    pThing->physicsParams.surfDrag = pStats->totals.drag; // binary: surfDrag (+0x210), not airDrag
                     pThing->physicsParams.staticDrag = pStats->totals.staticFriction;
                     float thrust = pStats->totals.power / pStats->totals.mass;
                     pThing->actorParams.maxThrust = thrust;
-                    pThing->physicsParams.maxVelocity = thrust / pThing->physicsParams.airDrag;
+                    // Binary retunes jump speed by the thrust gain, x1.21, clamped.
+                    float newJump = (pThing->actorParams.jumpSpeed * thrust / maxThrust0) * 1.21f;
+                    pThing->physicsParams.maxVelocity = thrust / pThing->physicsParams.surfDrag;
+                    pThing->actorParams.jumpSpeed = newJump;
+                    if (newJump < 0.95f)
+                        pThing->actorParams.jumpSpeed = 0.95f;
+                    if (pThing->actorParams.jumpSpeed > 1.6f)
+                        pThing->actorParams.jumpSpeed = 1.6f;
                     float maxHp = pStats->totals.durability * 0.2f * pThing->actorParams.maxHealth;
                     pThing->actorParams.maxHealth = maxHp;
                     pThing->actorParams.health = maxHp;
                     pThing->actorParams.eyeOffset.x = pStats->eyeOffset.x;
                     pThing->actorParams.eyeOffset.y = pStats->eyeOffset.y;
                     pThing->actorParams.eyeOffset.z = pStats->eyeOffset.z;
-                    // TODO(dw-decomp): the binary also (a) bit-pokes DW-forked
-                    // weaponParams aim/deflection floats (@typeParams+0x44/48/64),
-                    // (b) tunes jumpSpeed via maxThrust ratio + 1.21 factor, and
-                    // (c) z-rebases the merged model + every merged rdKeyframe by
-                    // the height delta (record scan 0..0x4ac). These depend on
-                    // the DW SithThing/rdKeyframe layouts (P8 sith diff audit).
-                    (void)maxThrust0; (void)DWF_NEG60;
 
                     if ((pStats->totals.capFlags & 1) == 0)
                         _DAT_006915f0 = 0;
@@ -693,6 +742,8 @@ int dwGuiInGame::Activate()
                 else
                 {
                     sithInventory_SetInventoryAvailable(pThing, 0xb, 1);
+                    // Binary: weaponParams+0x64 = 1.0f aliases actorParams.lightIntensity.
+                    pThing->actorParams.lightIntensity = 1.0f;
                     pThing->actorParams.lightOffset.x = 0.0f;
                     pThing->actorParams.lightOffset.y = 0.0f;
                     pThing->actorParams.lightOffset.z = 0.0f;
@@ -808,6 +859,8 @@ void dwGuiInGame::Update()
         char* pCammy = this->pCammyText ? this->pCammyText->text.pBuffer : NULL;
         if (pCammy == NULL || *pCammy == '\0')
         {
+            if (dwGuiInGame_VoiceDebug())
+                stdPlatform_Printf("VOICE: autoclear (voiceEndMs=%u now=%u)\n", this->voiceEndMs, (uint32_t)sithTime_g_msecGameTime);
             this->bVoicePlaying = 0;
             ClearCammyText();
         }
@@ -1136,6 +1189,16 @@ void dwGuiInGame_PlayVoiceLine(const char* pCammyText, const char* pWavName, uin
         dwGuiInGame_pActive->PlayVoiceLineEx((uint32_t)(uintptr_t)pCammyText, (char*)pWavName, priority, 0);
 }
 
+// Added: env-gated voice-path diagnostics (DW_VOICE_DEBUG=1), cached once —
+// used to pin BUG 23 (ambient-chatter spam killing VO lines).
+int dwGuiInGame_bVoiceDebug = -1;
+extern "C" int dwGuiInGame_VoiceDebug(void)
+{
+    if (dwGuiInGame_bVoiceDebug < 0)
+        dwGuiInGame_bVoiceDebug = (getenv("DW_VOICE_DEBUG") != NULL);
+    return dwGuiInGame_bVoiceDebug;
+}
+
 // @4221a0
 void dwGuiInGame::PlayVoiceLineEx(uint32_t msgCode, char* pWavName, uint32_t priority, char bForce)
 {
@@ -1152,9 +1215,19 @@ void dwGuiInGame::PlayVoiceLineEx(uint32_t msgCode, char* pWavName, uint32_t pri
     // Note: binary [pNpcSpeech+0x1c] = text.pBuffer; raw offset wrong on 64-bit.
     char* pNpc = this->pNpcSpeech ? this->pNpcSpeech->text.pBuffer : NULL;
     bool bNpcIdle = (pNpc == NULL || *pNpc == '\0');
-    bool bNoResponse = (this->pPlayerSpeech == NULL);
+    // Binary gate: [pPlayerSpeech+0x48] = pItems sentinel; empty response list
+    // iff sentinel->pNext == sentinel — NOT pPlayerSpeech == NULL (the HUD
+    // response widget always exists, so the NULL check muted Cammy forever —
+    // BUG 19).
+    bool bNoResponse = (this->pPlayerSpeech == NULL)
+        || (this->pPlayerSpeech->pItems->pNext == this->pPlayerSpeech->pItems);
+    if (dwGuiInGame_VoiceDebug())
+        stdPlatform_Printf("VOICE: try msg=%u wav=%s pri=%u gate(voicePri=%u npcIdle=%d noResp=%d)\n",
+                           msgCode, pWavName, priority, this->voicePriority, (int)bNpcIdle, (int)bNoResponse);
     if (this->voicePriority <= priority && bNpcIdle && bNoResponse && this->pMissionInfo->missionType != 5)
     {
+        if (dwGuiInGame_VoiceDebug())
+            stdPlatform_Printf("VOICE: play msg=%u wav=%s pri=%u (voicePri=%u)\n", msgCode, pWavName, priority, this->voicePriority);
         if (this->currentVoiceWav.length != 0 && (this->bVoiceEnabled != 0 || bForce != 0))
             ClearCammyText();
         ShowCammyText(msgCode);

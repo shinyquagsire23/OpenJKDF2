@@ -157,6 +157,17 @@ int smush_video_fps(smush_ctx* ctx) {
     return getle32(ctx->ahdr_ext.frame_rate);
 }
 
+// Added: expose the SAHD-declared audio rate (DroidWorks .san files declare
+// 11025 — playing their IACT PCM at jkCutscene's hardcoded 22050 runs 2x fast).
+int smush_audio_rate(smush_ctx* ctx) {
+    return getle32(ctx->ahdr_ext.audio_rate);
+}
+
+// Added: channel count from the IACT track flags (see smush_proc_iact).
+int smush_audio_channels(smush_ctx* ctx) {
+    return ctx->num_channels;
+}
+
 int smush_get_current_subtitle(smush_ctx* ctx) {
     return ctx->current_sub;
 }

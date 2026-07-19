@@ -293,6 +293,30 @@ void sithCamera_Update(SithCamera *pCamera)
             if (focusThing->sector)
                 pCamera->sector = sithCollision_FindSectorInRadius(focusThing->sector, &focusThing->position, &pCamera->orient.scale, 0.02);
             break;
+#ifdef DW_CAMERA
+        case 0x8:
+            // Added: DroidWorks scripted look-at camera (DroidWorks.exe
+            // sithCamera_Update @44b680 case 8; JK.EXE has no case 8 at all).
+            // deployment.jkl's dx_deployment.cog drives slot 2 with
+            // setcamerafocii(2, player, ghost) + setcurrentcamera(2): sit at the
+            // secondary focus (the movetoframe ghost) and watch the primary
+            // (BUG 6: no handler -> camera never updated -> black view).
+            if (Main_bDwCompat && pCamera->pPrimaryFocusThing != NULL)
+            {
+                if (pCamera->pSecondaryFocusThing == NULL)
+                {
+                    rdMatrix_LookAt(&pCamera->orient, &pCamera->lookPos,
+                                    &pCamera->pPrimaryFocusThing->position, 0.0f);
+                }
+                else
+                {
+                    rdMatrix_LookAt(&pCamera->orient, &pCamera->pSecondaryFocusThing->position,
+                                    &pCamera->pPrimaryFocusThing->position, 0.0f);
+                    pCamera->sector = pCamera->pSecondaryFocusThing->sector;
+                }
+            }
+            break;
+#endif
         case 4:
             SITH_ASSERTREL(focusThing != NULL); // Added: J3D assert
             SITH_ASSERTREL(sithThing_ValidateThingPointer(focusThing)); // Added: J3D assert

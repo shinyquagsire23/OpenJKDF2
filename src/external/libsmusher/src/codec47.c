@@ -97,14 +97,13 @@ enum
     C47_FILL_RIGHT
 };
 
-// Resolved from smushFrame_sub_43F040's disassembly (truth table).
 static const uint8_t codec47_fill_dir[5][5] = {
-    // cj:   0              1                2                3                4
-    /* 0 */ { C47_FILL_UP,    C47_FILL_RIGHT, C47_FILL_UP,    C47_FILL_UP,    C47_FILL_UP    },
-    /* 1 */ { C47_FILL_RIGHT, C47_FILL_DOWN,  C47_FILL_DOWN,  C47_FILL_DOWN,  C47_FILL_DOWN  },
-    /* 2 */ { C47_FILL_UP,    C47_FILL_DOWN,  C47_FILL_LEFT,  C47_FILL_UP,    C47_FILL_LEFT  },
-    /* 3 */ { C47_FILL_UP,    C47_FILL_DOWN,  C47_FILL_RIGHT, C47_FILL_UP,    C47_FILL_RIGHT },
-    /* 4 */ { C47_FILL_UP,    C47_FILL_DOWN,  C47_FILL_LEFT,  C47_FILL_NEXT,  C47_FILL_NEXT  }
+    // cj:   0(B)           1(T)            2(L)             3(R)             4(N)
+    /* 0 B */ { C47_FILL_UP,    C47_FILL_RIGHT, C47_FILL_UP,    C47_FILL_UP,    C47_FILL_UP    },
+    /* 1 T */ { C47_FILL_RIGHT, C47_FILL_DOWN,  C47_FILL_DOWN,  C47_FILL_DOWN,  C47_FILL_DOWN  },
+    /* 2 L */ { C47_FILL_UP,    C47_FILL_DOWN,  C47_FILL_LEFT,  C47_FILL_UP,    C47_FILL_LEFT  },
+    /* 3 R */ { C47_FILL_UP,    C47_FILL_DOWN,  C47_FILL_UP,    C47_FILL_RIGHT, C47_FILL_RIGHT },
+    /* 4 N */ { C47_FILL_UP,    C47_FILL_DOWN,  C47_FILL_LEFT,  C47_FILL_RIGHT, C47_FILL_NEXT  }
 };
 
 // ---------------------------------------------------------------------------

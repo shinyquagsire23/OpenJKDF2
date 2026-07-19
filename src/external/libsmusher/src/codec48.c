@@ -46,7 +46,14 @@ void codec48_proc(smush_ctx* parent_ctx, const uint8_t* data, size_t data_len)
     uint32_t flags = getle32(hdr->flags);
     uint32_t unk2 = getle32(hdr->unk2);
     uint32_t unk3 = getle32(hdr->unk3);
-    
+
+    // Added: clear both delta buffers whenever the sequence restarts (matches
+    // ScummVM/smushplay). The initial alloc already zeroes them, so this only
+    // bites a movie that loops its sequence back to 0 without a teardown.
+    if (seq_num == 0) {
+        memset(ctx->delta_buf[0], 0, ctx->frame_size * 2);
+    }
+
     smush_debug("  Codec 48:\n");
     smush_debug("    Type: 0x%02x\n", hdr->type);
     smush_debug("    Table Idx: 0x%02x\n", hdr->table_index);

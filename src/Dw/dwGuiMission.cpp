@@ -37,6 +37,7 @@
 #include "Dw/dwPart.h"         // dwPart_FindBlueprint (PARTTEXT keyword)
 #include "Dw/dwGuiHypText.h"   // dwGuiPartText + stock format callbacks
 #include "Dw/dwImage.h"        // dwImage_LoadFile
+#include "Dw/stdBitmapRle2.h"  // stdBitmapRle2_LoadFile16 (dwGuiBriefText caption images)
 #include "Dw/dwImageDraw.h"    // dwImageDraw_ShadeRect
 #include "Dw/dwDisplay.h"      // dwDisplay_pScreenImage/AddDirtyRect
 #include "Dw/dwCursor.h"       // dwCursor_SetCursor/dwCursor_curIdx
@@ -543,7 +544,12 @@ void dwGuiBriefText::Update(float dt)
         {
             if (this->pCurImage != NULL)
                 delete this->pCurImage;
-            this->pCurImage = dwImage_LoadFile(pLine->imageName.pBuffer);
+            // Binary loads via stdBitmapRle2_LoadFile16 (@444c50) — the
+            // LOCKABLE loader (8bpp: loads_bmp bForceDecompress=1). The
+            // Draw's reveal-circle row copy Locks the image; dwImage_LoadFile
+            // would hand back the lazy stdBitmapRle whose Lock is inert
+            // (BUG 17: full-image fallback blit, no iris wipe).
+            this->pCurImage = stdBitmapRle2_LoadFile16(pLine->imageName.pBuffer);
             this->pCurLineNode = this->pCurLineNode->pNext;
             this->Invalidate(); // vtbl +0x34
         }
@@ -565,7 +571,7 @@ void dwGuiBriefText::Play()
         if (this->pCurImage != NULL)
             delete this->pCurImage;
         pLine = (dwGuiBriefTextLine*)this->pCurLineNode->pData;
-        this->pCurImage = dwImage_LoadFile(pLine->imageName.pBuffer);
+        this->pCurImage = stdBitmapRle2_LoadFile16(pLine->imageName.pBuffer); // binary: @444c50 (see Update)
         this->pCurLineNode = this->pCurLineNode->pNext;
         this->Invalidate(); // vtbl +0x34
     }
