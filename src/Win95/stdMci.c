@@ -600,15 +600,35 @@ MIX_Audio* stdMci_music;
 static MIX_Mixer* stdMci_pMixer;
 static MIX_Track* stdMci_pTrack;
 
+// Unlike Mix_HookMusicFinished, MIX_TrackStoppedCallback fires on EXPLICIT
+// stops too (synchronously, from inside MIX_StopTrack) -- not just on natural
+// completion. Every intentional stop below must inhibit the callback, or it
+// would "helpfully" advance to the next track and restart playback (this made
+// music keep playing after exiting a level).
+static int stdMci_bStopInhibit;
+
 void stdMci_trackStart(int track);
 
 static void stdMci_TrackStoppedCallback(void* userdata, MIX_Track* track)
 {
+    if (stdMci_bStopInhibit)
+        return;
+
     stdMci_trackCurrent++;
     if (stdMci_trackCurrent > stdMci_trackTo)
         stdMci_Stop();
     else
         stdMci_trackStart(stdMci_trackCurrent);
+}
+
+// Stop the track without letting the stopped-callback advance to the next song.
+static void stdMci_StopTrackNoAdvance()
+{
+    if (stdMci_pTrack) {
+        stdMci_bStopInhibit = 1;
+        MIX_StopTrack(stdMci_pTrack, 0);
+        stdMci_bStopInhibit = 0;
+    }
 }
 
 int stdMci_Startup()
@@ -644,6 +664,9 @@ void stdMci_Shutdown()
 {
     stdMci_bInitted = 0;
 
+    // A playing track is stopped as part of destruction, which would fire the
+    // stopped-callback and try to start the next song mid-teardown.
+    stdMci_bStopInhibit = 1;
     if (stdMci_pTrack) {
         MIX_DestroyTrack(stdMci_pTrack);
         stdMci_pTrack = NULL;
@@ -652,6 +675,7 @@ void stdMci_Shutdown()
         MIX_DestroyMixer(stdMci_pMixer);
         stdMci_pMixer = NULL;
     }
+    stdMci_bStopInhibit = 0;
     MIX_Quit();
 
     // Added: Clean reset
@@ -703,8 +727,7 @@ void stdMci_trackStart(int track)
     char tmp[256];
 
     if (stdMci_music) {
-        if (stdMci_pTrack)
-            MIX_StopTrack(stdMci_pTrack, 0);
+        stdMci_StopTrackNoAdvance();
         MIX_DestroyAudio(stdMci_music);
         stdMci_music = NULL;
     }
@@ -788,7 +811,7 @@ done:
 
     stdMci_trackCurrent = track;
     if (stdMci_pTrack) {
-        MIX_StopTrack(stdMci_pTrack, 0);
+        stdMci_StopTrackNoAdvance();
         if (!MIX_SetTrackAudio(stdMci_pTrack, stdMci_music) || !MIX_PlayTrack(stdMci_pTrack, 0)) {
             stdPlatform_Printf("stdMci: Error in MIX_PlayTrack, %s\n", SDL_GetError());
         }
@@ -822,8 +845,7 @@ void stdMci_Stop()
     stdPlatform_Printf("stdMci: stop music\n");
 
     if (stdMci_music) {
-        if (stdMci_pTrack)
-            MIX_StopTrack(stdMci_pTrack, 0);
+        stdMci_StopTrackNoAdvance();
         MIX_DestroyAudio(stdMci_music);
         stdMci_music = NULL;
     }
