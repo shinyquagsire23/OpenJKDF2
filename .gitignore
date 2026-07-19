@@ -10,8 +10,8 @@ episode
 DroidWorks.*
 .qmake.stash
 player
-openjkdf2
-openjkdf2-64
+/openjkdf2
+/openjkdf2-64
 moc*.h
 DF2
 DF2_res
