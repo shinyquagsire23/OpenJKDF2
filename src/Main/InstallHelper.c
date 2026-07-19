@@ -19,7 +19,13 @@
 #include <dirent.h>
 #endif
 
-#if defined(SDL2_RENDER) && !defined(ARCH_WASM) && !defined(TARGET_ANDROID)
+#if defined(SDL2_RENDER) && !defined(ARCH_WASM)
+
+#ifndef TARGET_ANDROID
+#include "nfd.h"
+#else
+#include <jni.h>
+#endif
 
 const char* aRequiredAssets[] = {
     "episode/JK1.gob",
@@ -43,6 +49,35 @@ const char* aRequiredAssetsMots[] = {
 };
 
 const size_t aRequiredAssetsMots_len = sizeof(aRequiredAssetsMots) / sizeof(const char*);
+
+// Maps an asset path as it exists in an installed game directory to its
+// location within the GAMEDATA folder of an install disk.
+const char* aDiskAssetMap[] = {
+    // JK CD
+    "resource/Res1hi.gob",      "MININSTALL/RES1HI.GOB",
+    "resource/Res1low.gob",     "MININSTALL/RES1LOW.GOB",
+    "JK.EXE",                   "EXE/JK.EXE",
+
+    // MOTS CD
+    "JKM.EXE",                  "EXE/JKM.EXE",
+    "resource/JKMsndLO.goo",    "MININSTALL/JKMSNDLO.GOO",
+
+    "END", "END"
+
+};
+const size_t aDiskAssetMap_len = sizeof(aDiskAssetMap) / sizeof(const char*);
+
+// Returns the install-disk path (relative to GAMEDATA/) for an asset name.
+const char* InstallHelper_DiskAssetPath(const char* pName)
+{
+    for (size_t i = 0; i < aDiskAssetMap_len; i += 2)
+    {
+        if (!strcmp(pName, aDiskAssetMap[i])) {
+            return aDiskAssetMap[i+1];
+        }
+    }
+    return pName;
+}
 
 #define BUF_SIZE 65536 //2^16
 
@@ -132,35 +167,8 @@ int InstallHelper_CopyFileDisk(const char* pFolder, const char* pName)
     strncpy(tmp, pFolder, sizeof(tmp)-1);
     strncat(tmp, "/GAMEDATA/", sizeof(tmp)-1);
 
-    const char* aAssetMap[] = {
-        // JK CD
-        "resource/Res1hi.gob",      "MININSTALL/RES1HI.GOB",
-        "resource/Res1low.gob",     "MININSTALL/RES1LOW.GOB",
-        "JK.EXE",                   "EXE/JK.EXE",
-
-        // MOTS CD
-        "JKM.EXE",                  "EXE/JKM.EXE",
-        "resource/JKMsndLO.goo",    "MININSTALL/JKMSNDLO.GOO",
-
-        "END", "END"
-
-    };
-    const size_t aAssetMap_len = sizeof(aAssetMap) / sizeof(const char*);
-
-    int bFound = 0;
-    for (size_t i = 0; i < aAssetMap_len; i += 2)
-    {
-        stdPlatform_Printf("%s %s %s\n", pName, aAssetMap[i], aAssetMap[i+1]);
-        if (!strcmp(pName, aAssetMap[i])) {
-            strncat(tmp, aAssetMap[i+1], sizeof(tmp)-1);
-            bFound = 1;
-            break;
-        }
-    }
-
-    if (!bFound) {
-        strncat(tmp, pName, sizeof(tmp)-1);
-    }
+    const char* pDiskPath = InstallHelper_DiskAssetPath(pName);
+    strncat(tmp, pDiskPath, sizeof(tmp)-1);
 
     strncpy(tmpTo, pName, sizeof(tmpTo)-1);
 
@@ -259,7 +267,25 @@ int InstallHelper_GetLocalDataDir(char* pOut, size_t pOut_sz, int bChdir)
         pOut_sz = sizeof(fname);
     }
 
-#if defined(MACOS) || defined(LINUX)
+#if defined(TARGET_ANDROID)
+    // NB: this branch must come first -- Android builds also define LINUX,
+    // which would otherwise route through the desktop path below and end up
+    // in SDL_GetPrefPath (app-private internal storage, invisible to the
+    // DocumentProvider and to file managers).
+    const char* base_path = SDL_GetAndroidExternalStoragePath();
+    if (base_path) {
+        // NB: SetCwd runs before Main_Startup parses the cmdline, so
+        // Main_bMotsCompat isn't set from -motsCompat yet on first launch --
+        // check openjkdf2_bOrigWasDF2 (set from argv in main()) as well.
+        int bMots = Main_bMotsCompat || !openjkdf2_bOrigWasDF2;
+        stdFnames_MakePath(fname, sizeof(fname), base_path, bMots ? "mots" : "jk1");
+        stdFileUtil_MkDir(fname);
+        if (bChdir) {
+            chdir(fname);
+            stdPlatform_Printf("Using Android data dir: %s\n", fname);
+        }
+    }
+#elif defined(MACOS) || defined(LINUX)
     char* data_home;
     if ((data_home = getenv(INSTALL_OVERRIDE_ENVVAR_NAME)) != NULL) {
 
@@ -428,9 +454,9 @@ int InstallHelper_UseLocalData()
     return InstallHelper_GetLocalDataDir(NULL, 0, 1);
 }
 
-int InstallHelper_AttemptInstallFromExisting(nfdu8char_t* path)
-{
-    const char* aOptionalAssets[] = {
+// Optional assets copied when installing from an existing game directory.
+// Shared by the desktop (fopen) and Android (SAF) install paths.
+const char* aInstallOptionalAssets[] = {
         "JK.EXE",
         "JKM.EXE",
 
@@ -658,9 +684,14 @@ int InstallHelper_AttemptInstallFromExisting(nfdu8char_t* path)
         "Controls/XBOX 360 Controller for Windows.ctm",
 
         // MoTS demo assets TODO
-    };
+};
 
-    const char** paOptionalAssets = aOptionalAssets;
+const size_t aInstallOptionalAssets_len = sizeof(aInstallOptionalAssets) / sizeof(const char*);
+
+#ifndef TARGET_ANDROID
+int InstallHelper_AttemptInstallFromExisting(char* path)
+{
+    const char** paOptionalAssets = aInstallOptionalAssets;
     const char** paRequiredAssets = Main_bMotsCompat ? aRequiredAssetsMots : aRequiredAssets;
     size_t paRequiredAssets_len = Main_bMotsCompat ? aRequiredAssetsMots_len : aRequiredAssets_len;
 
@@ -669,7 +700,7 @@ int InstallHelper_AttemptInstallFromExisting(nfdu8char_t* path)
         path[strlen(path)-1] = 0;
     }
 
-    const size_t aOptionalAssets_len = sizeof(aOptionalAssets) / sizeof(const char*);
+    const size_t aOptionalAssets_len = aInstallOptionalAssets_len;
 
     InstallHelper_UseLocalData();
     stdFileUtil_MkDir("episode");
@@ -708,7 +739,7 @@ int InstallHelper_AttemptInstallFromExisting(nfdu8char_t* path)
     return 1;
 }
 
-int InstallHelper_AttemptInstallFromDisk(nfdu8char_t* path)
+int InstallHelper_AttemptInstallFromDisk(char* path)
 {
     bool isTwoPartCD = false;
 
@@ -925,6 +956,130 @@ final_check:
 
     return 1;
 }
+#endif // !TARGET_ANDROID
+
+#ifdef TARGET_ANDROID
+static SDL_AtomicInt androidSafInstallState; // 0 = pending, 1 = ok, -1 = cancel/error
+
+JNIEXPORT void JNICALL Java_org_openjkdf2_app_InstallHelperSAF_nativeInstallDone(JNIEnv* env, jclass cls, jint status)
+{
+    (void)env; (void)cls;
+    SDL_SetAtomicInt(&androidSafInstallState, (int)status);
+}
+
+// Android has no SDL folder picker, so the Java side presents a SAF folder
+// picker (ACTION_OPEN_DOCUMENT_TREE) and copies the given files out of the
+// picked tree (content URIs can't be fopen()'d). For each asset, Java tries
+// the existing-install path first, then the install-disk (GAMEDATA/) path.
+int InstallHelper_AttemptInstallViaSAF()
+{
+    const char** paRequiredAssets = Main_bMotsCompat ? aRequiredAssetsMots : Main_bDroidWorks ? aRequiredAssetsDroidworks : aRequiredAssets;
+    size_t paRequiredAssets_len = Main_bMotsCompat ? aRequiredAssetsMots_len : Main_bDroidWorks ? aRequiredAssetsDroidworks_len : aRequiredAssets_len;
+    size_t totalAssets = paRequiredAssets_len + aInstallOptionalAssets_len;
+
+    // Install destination: the app-specific data dir (jk1/ or mots/).
+    char destRoot[512];
+    InstallHelper_GetLocalDataDir(destRoot, sizeof(destRoot), 1);
+    stdFileUtil_MkDir("episode");
+    stdFileUtil_MkDir("MUSIC");
+    stdFileUtil_MkDir("MUSIC/1");
+    stdFileUtil_MkDir("MUSIC/2");
+    stdFileUtil_MkDir("player");
+    stdFileUtil_MkDir("resource");
+    stdFileUtil_MkDir("resource/shaders");
+    stdFileUtil_MkDir("resource/video");
+
+    JNIEnv* env = (JNIEnv*)SDL_GetAndroidJNIEnv();
+    jobject activity = (jobject)SDL_GetAndroidActivity();
+    if (!env || !activity) {
+        return 0;
+    }
+
+    if ((*env)->PushLocalFrame(env, 32) < 0) {
+        return 0;
+    }
+
+    int bOk = 0;
+    jclass stringClass = (*env)->FindClass(env, "java/lang/String");
+    jobjectArray jDst = (*env)->NewObjectArray(env, (jsize)totalAssets, stringClass, NULL);
+    jobjectArray jSrcExisting = (*env)->NewObjectArray(env, (jsize)totalAssets, stringClass, NULL);
+    jobjectArray jSrcDisk = (*env)->NewObjectArray(env, (jsize)totalAssets, stringClass, NULL);
+    (*env)->DeleteLocalRef(env, stringClass);
+
+    // Build (dst, srcExisting, srcDisk) lists for the Java side.
+    char tmpDisk[4096];
+    size_t idx = 0;
+    for (size_t list = 0; list < 2; list++)
+    {
+        const char** paAssets = (list == 0) ? paRequiredAssets : aInstallOptionalAssets;
+        size_t paAssets_len = (list == 0) ? paRequiredAssets_len : aInstallOptionalAssets_len;
+        for (size_t i = 0; i < paAssets_len; i++, idx++)
+        {
+            jstring jPath = (*env)->NewStringUTF(env, paAssets[i]);
+            (*env)->SetObjectArrayElement(env, jDst, (jsize)idx, jPath);
+            (*env)->SetObjectArrayElement(env, jSrcExisting, (jsize)idx, jPath);
+
+            snprintf(tmpDisk, sizeof(tmpDisk), "GAMEDATA/%s", InstallHelper_DiskAssetPath(paAssets[i]));
+            jstring jDiskPath = (*env)->NewStringUTF(env, tmpDisk);
+            (*env)->SetObjectArrayElement(env, jSrcDisk, (jsize)idx, jDiskPath);
+
+            (*env)->DeleteLocalRef(env, jPath);
+            (*env)->DeleteLocalRef(env, jDiskPath);
+        }
+    }
+
+    jclass cls = (*env)->FindClass(env, "org/openjkdf2/app/InstallHelperSAF");
+    jmethodID mid = cls ? (*env)->GetStaticMethodID(env, cls, "startInstall", "(Landroid/app/Activity;Ljava/lang/String;[Ljava/lang/String;[Ljava/lang/String;[Ljava/lang/String;)V") : NULL;
+    if (!cls || !mid || (*env)->ExceptionCheck(env)) {
+        (*env)->ExceptionClear(env);
+        goto done;
+    }
+
+    jstring jDestRoot = (*env)->NewStringUTF(env, destRoot);
+    SDL_SetAtomicInt(&androidSafInstallState, 0);
+    (*env)->CallStaticVoidMethod(env, cls, mid, activity, jDestRoot, jDst, jSrcExisting, jSrcDisk);
+    (*env)->DeleteLocalRef(env, jDestRoot);
+    if ((*env)->ExceptionCheck(env)) {
+        (*env)->ExceptionClear(env);
+        goto done;
+    }
+
+    // Wait for the Java side to finish picking + copying.
+    while (!SDL_GetAtomicInt(&androidSafInstallState)) {
+        SDL_Delay(50);
+    }
+    if (SDL_GetAtomicInt(&androidSafInstallState) != 1) {
+        goto done;
+    }
+
+    // Verify requireds (jk_.cd excluded: it's our own marker, written below)
+    int bMissing = 0;
+    for (size_t i = 0; i < paRequiredAssets_len; i++)
+    {
+        if (!strcmp(paRequiredAssets[i], "resource/jk_.cd")) continue;
+        if (!util_FileExists(paRequiredAssets[i])) {
+            bMissing = 1;
+            break;
+        }
+    }
+    if (bMissing) {
+        InstallHelper_CheckRequiredAssets(0);
+        goto done;
+    }
+
+    uint32_t magic = JKRES_MAGIC_1;
+    FILE* f = fopen("resource/jk_.cd", "wb");
+    if (f) {
+        fwrite(&magic, 1, sizeof(magic), f);
+        fclose(f);
+    }
+    bOk = 1;
+
+done:
+    (*env)->PopLocalFrame(env, NULL);
+    return bOk;
+}
+#endif // TARGET_ANDROID
 
 int InstallHelper_AttemptInstall()
 {
@@ -975,7 +1130,10 @@ int InstallHelper_AttemptInstall()
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "OpenJKDF2 Install Helper", "Please select your existing JKMOTS installation, or an install disk mount.", NULL);
     else
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "OpenJKDF2 Install Helper", "Please select your existing JKDF2 installation, or an install disk mount.", NULL);
-    
+
+#ifdef TARGET_ANDROID
+    return InstallHelper_AttemptInstallViaSAF();
+#else
     if (NFD_Init() != NFD_OKAY) {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to initialize file chooser", NULL);
         return 0;
@@ -1006,6 +1164,7 @@ int InstallHelper_AttemptInstall()
     }
 
     return InstallHelper_AttemptInstallFromExisting(path);
+#endif // TARGET_ANDROID
 }
 
 void InstallHelper_CheckRequiredAssets(int doInstall)
@@ -1060,10 +1219,7 @@ void InstallHelper_CheckRequiredAssets(int doInstall)
 
 void InstallHelper_SetCwd()
 {
-#if (defined(MACOS) || defined(LINUX) || defined(WIN32)) && defined(SDL2_RENDER) && !defined(ARCH_WASM) && !defined(TARGET_ANDROID)
-    const char *homedir;
-    char fname[256];
-
+#if (defined(MACOS) || defined(LINUX) || defined(WIN32) || defined(TARGET_ANDROID)) && defined(SDL2_RENDER) && !defined(ARCH_WASM)
 #if defined(MACOS)
     // Default working directory to the folder the .app bundle is in.
     // SDL_GetBasePath() returns an internally-cached, non-owned string as of SDL3 -- must not SDL_free() it.
@@ -1073,7 +1229,14 @@ void InstallHelper_SetCwd()
 #endif
 
     int found_override = 0;
-    
+
+#if defined(TARGET_ANDROID)
+    // Android always runs from the app-specific data dir (jk1/ or mots/).
+    InstallHelper_UseLocalData();
+    found_override = 1;
+#else
+    const char *homedir;
+    char fname[256];
     char data_home[256];
     found_override = InstallHelper_GetLocalDataDir(data_home, sizeof(data_home), 0);
 
@@ -1084,6 +1247,7 @@ void InstallHelper_SetCwd()
         InstallHelper_UseLocalData();
         found_override = 1;
     }
+#endif
 
     if (!found_override) {
         stdPlatform_Printf("Running from current working directory.\n");
@@ -1108,9 +1272,9 @@ void InstallHelper_SetCwd()
         }
     }
 
-#endif // (defined(MACOS) || defined(LINUX) || defined(WIN32)) && defined(SDL2_RENDER) && !defined(ARCH_WASM)
+#endif // (defined(MACOS) || defined(LINUX) || defined(WIN32) || defined(TARGET_ANDROID)) && defined(SDL2_RENDER) && !defined(ARCH_WASM)
 
-#if defined(SDL2_RENDER) && !defined(ARCH_WASM) && !defined(TARGET_ANDROID)
+#if defined(SDL2_RENDER) && !defined(ARCH_WASM)
     /*if (!util_FileExists("resource/jk_.cd")) {
         // TODO: polyglot
         //SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "OpenJKDF2 could not find any game assets (`resource/jk_.cd` is missing). Would you like to install assets now?", NULL);
@@ -1128,15 +1292,7 @@ void InstallHelper_SetCwd()
 #else
 void InstallHelper_SetCwd()
 {
-#if defined(TARGET_ANDROID)
-    chdir(SDL_GetAndroidExternalStoragePath());
-    if (!Main_bMotsCompat) {
-        chdir("jk1/");
-    }
-    else {
-        chdir("mots/");
-    }
-#elif defined(TARGET_DREAMCAST)
+#if defined(TARGET_DREAMCAST)
     // Added: assets stay read-only on the GD-ROM (/cd/jk1 or /cd/mots); the CWD
     // becomes writable storage (SD card, else RAM disk) so player/, saves, and
     // config JSON can be written. dcStorage routes relative asset reads back to
@@ -1170,4 +1326,4 @@ void InstallHelper_SetCwd()
 
     stdPlatform_Printf("Running from: %s\n", tmpCwd);
 }
-#endif // defined(SDL2_RENDER) && !defined(ARCH_WASM) && !defined(TARGET_ANDROID)
+#endif // defined(SDL2_RENDER) && !defined(ARCH_WASM)
