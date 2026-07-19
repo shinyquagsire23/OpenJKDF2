@@ -701,7 +701,7 @@ const size_t aInstallOptionalAssets_len = sizeof(aInstallOptionalAssets) / sizeo
 #ifndef TARGET_ANDROID
 int InstallHelper_AttemptInstallFromExisting(char* path)
 {
-    const char** paOptionalAssets = aOptionalAssets;
+    const char** paOptionalAssets = aInstallOptionalAssets;
     const char** paRequiredAssets = Main_bMotsCompat ? aRequiredAssetsMots : Main_bDroidWorks ? aRequiredAssetsDroidworks : aRequiredAssets;
     size_t paRequiredAssets_len = Main_bMotsCompat ? aRequiredAssetsMots_len : Main_bDroidWorks ? aRequiredAssetsDroidworks_len : aRequiredAssets_len;
 
