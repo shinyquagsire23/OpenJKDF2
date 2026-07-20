@@ -1,4 +1,4 @@
-name: Windows SDL2
+name: Windows SDL3
 
 on:
   push:
