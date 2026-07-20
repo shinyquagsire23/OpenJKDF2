@@ -29,7 +29,7 @@
           libGLU
           glew
 
-          # X11 (SDL2 compile-time headers)
+          # X11 (SDL3 compile-time headers)
           libx11
           libxext
           libxcursor
@@ -38,8 +38,12 @@
           libxrandr
           libxscrnsaver
           libxxf86vm
+          # SDL3 (unlike SDL2) hard-requires XTEST and Xfixes for its X11 backend
+          # and errors out at configure time if they're missing.
+          libxtst
+          libxfixes
 
-          # Wayland (SDL2 compile-time)
+          # Wayland (SDL3 compile-time)
           wayland
           wayland-protocols
           wayland-scanner
@@ -95,8 +99,8 @@
                 --replace-fail 'set(TARGET_USE_GAMENETWORKINGSOCKETS TRUE)' \
                                'set(TARGET_USE_GAMENETWORKINGSOCKETS FALSE)'
               substituteInPlace cmake_modules/build_sdl_mixer.cmake \
-                --replace-fail '-DSDL2MIXER_VENDORED:BOOL=TRUE' \
-                               '-DSDL2MIXER_VENDORED:BOOL=FALSE'
+                --replace-fail '-DSDLMIXER_VENDORED:BOOL=TRUE' \
+                               '-DSDLMIXER_VENDORED:BOOL=FALSE'
               # When using system ogg/vorbis/opus, the vendored static lib paths
               # from SDL_MIXER_DEPS don't exist. Replace the entire if/else block
               # with a simple set. Use ''$ to produce literal $ in nix strings.
