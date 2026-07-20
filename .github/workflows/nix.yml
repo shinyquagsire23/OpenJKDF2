@@ -1,0 +1,39 @@
+name: Nix Flake
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    # Builds SDL3, OpenAL, protobuf and friends from source; expect 30-90+ min.
+    timeout-minutes: 180
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          # The git+file: fetcher below re-resolves the repo from git history;
+          # a shallow clone (checkout's default depth 1) is not enough for it.
+          fetch-depth: 0
+        name: Checkout
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      # ?submodules=1 is mandatory and is the invocation documented in flake.nix:
+      # a bare .#default resolves the git tree WITHOUT submodules, and the build
+      # then dies in build_glew.cmake with "No download info given for 'GLEW'".
+      # TODO: add binary caching (actions/cache on /nix/store) if CI time hurts.
+      - name: Build
+        run: nix build 'git+file:.?submodules=1#default' --print-build-logs
+      - name: Verify Binary
+        run: test -x result/bin/openjkdf2
