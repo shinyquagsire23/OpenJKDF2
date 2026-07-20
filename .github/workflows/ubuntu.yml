@@ -1,4 +1,4 @@
-name: Ubuntu 22.04 SDL3
+name: Ubuntu 24.04 SDL3
 
 on:
   push:
@@ -11,14 +11,14 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     env:
       OPENJKDF2_BUILD_DIR: /tmp/OpenJKDF2/Linux/x86_64/Debug
       CC: clang
       CXX: clang++
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
         name: Checkout
