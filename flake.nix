@@ -1,11 +1,18 @@
-# Build:  nix build 'git+file:.?submodules=1'
-# Shell:  nix develop 'git+file:.?submodules=1'
-# The ?submodules=1 is required because the build uses vendored deps from
-# git submodules (SDL2, OpenAL, zlib, libpng, GLEW, PhysFS, freeglut).
+# Build:  nix build
+# Shell:  nix develop
+#
+# The build uses vendored deps from git submodules (SDL, OpenAL, zlib,
+# libpng, GLEW, PhysFS, freeglut). `inputs.self.submodules = true` below
+# makes a bare `.` flake ref fetch them, so no ?submodules=1 is needed.
+#
+# Requires Nix >= 2.28. On Lix, `self` attributes are gated behind an
+# experimental feature and evaluation fails without it:
+#   nix build --extra-experimental-features flake-self-attrs
 {
   description = "OpenJKDF2 - Function-by-function reimplementation of Jedi Knight: Dark Forces II";
 
   inputs = {
+    self.submodules = true;
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
