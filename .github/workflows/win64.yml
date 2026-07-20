@@ -1,4 +1,4 @@
-name: Windows SDL2
+name: Windows SDL3
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
     env:
       OPENJKDF2_BUILD_DIR: /tmp/OpenJKDF2
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
         name: Checkout
