@@ -27,13 +27,16 @@ jobs:
       - name: Install Nix
         uses: cachix/install-nix-action@v27
         with:
+          # inputs.self.submodules in flake.nix needs Nix >= 2.28; pin so the
+          # action's default version can't silently drop below that.
+          install_url: https://releases.nixos.org/nix/nix-2.34.8/install
           extra_nix_config: |
             experimental-features = nix-command flakes
-      # ?submodules=1 is mandatory and is the invocation documented in flake.nix:
-      # a bare .#default resolves the git tree WITHOUT submodules, and the build
-      # then dies in build_glew.cmake with "No download info given for 'GLEW'".
+      # Builds the bare ref on purpose: inputs.self.submodules in flake.nix is
+      # what makes this fetch submodules, and that is the invocation the header
+      # comment tells users to run, so it is the one worth regression-testing.
       # TODO: add binary caching (actions/cache on /nix/store) if CI time hurts.
       - name: Build
-        run: nix build 'git+file:.?submodules=1#default' --print-build-logs
+        run: nix build --print-build-logs
       - name: Verify Binary
         run: test -x result/bin/openjkdf2
