@@ -12,7 +12,7 @@
 #include "Engine/rdCamera.h"
 #include "Engine/sithRender.h"
 #include "General/stdMath.h"
-#include "Dw/dwCamera.h" // Added: DroidWorks follow camera (type 0x100; no-ops off-desktop)
+#include "Dw/dwCamera.h"
 #include "jk.h"
 
 static rdVector3 sithCamera_trans = {0.0, 0.3, 0.0};
@@ -295,12 +295,10 @@ void sithCamera_Update(SithCamera *pCamera)
             break;
 #ifdef DW_CAMERA
         case 0x8:
-            // Added: DroidWorks scripted look-at camera (DroidWorks.exe
-            // sithCamera_Update @44b680 case 8; JK.EXE has no case 8 at all).
+            // Added: DroidWorks scripted look-at camera
             // deployment.jkl's dx_deployment.cog drives slot 2 with
             // setcamerafocii(2, player, ghost) + setcurrentcamera(2): sit at the
             // secondary focus (the movetoframe ghost) and watch the primary
-            // (BUG 6: no handler -> camera never updated -> black view).
             if (Main_bDwCompat && pCamera->pPrimaryFocusThing != NULL)
             {
                 if (pCamera->pSecondaryFocusThing == NULL)
@@ -399,8 +397,7 @@ void sithCamera_Update(SithCamera *pCamera)
             break;
 #ifdef DW_CAMERA
         case 0x100:
-            // Added: DroidWorks collision follow camera (src/Dw/dwCamera.c;
-            // compiles to a no-op where the DW app layer is excluded).
+            // Added: DroidWorks collision follow camera
             dwCamera_Update(pCamera);
             break;
 #endif
@@ -613,8 +610,7 @@ int sithCamera_SetCurrentCamera(SithCamera *pCamera)
         rdMatrix_PostRotate34(&sithCamera_idleCamOrient, &rot);
     }
 #ifdef DW_CAMERA
-    // Added: DroidWorks follow camera snap-on-switch (binary: type-0x100
-    // branch in SetCurrentCamera, before the final sithCamera_Update).
+    // Added: DroidWorks follow camera snap-on-switch
     if ( pCamera->type == 0x100 )
         dwCamera_Reset(pPrevCamera, pCamera);
 #endif

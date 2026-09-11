@@ -15,8 +15,8 @@
 #include "Cog/sithCog.h"
 #include "Dss/sithDSSThing.h"
 #include "World/sithWeapon.h"
-#include "Main/Main.h" // Added: Main_bDwCompat (DW activate dispatch)
-#include "Dw/dwCog.h" // Added: DroidWorks droid-tool activate dispatch (no-ops off-desktop)
+#include "Main/Main.h"
+#include "Dw/dwCog.h"
 #include "jk.h"
 
 static int lastDoorOpenTime = 0;
@@ -33,7 +33,7 @@ void sithPlayerActions_Activate(SithThing *thing)
 
 #ifdef PLATFORM_DROIDWORKS
     // Added: DroidWorks routes the player's Activate through the droid-tool
-    // interaction dispatch (binary @47399d, prepended to this function).
+    // interaction dispatch
     if ( Main_bDwCompat && sithWorld_g_pCurrentWorld && thing == sithWorld_g_pCurrentWorld->pLocalPlayer )
     {
         dwCog_ActivateTool(thing, 0);

@@ -9,7 +9,7 @@ void codec48_destroy(smush_ctx* parent_ctx)
     if (!parent_ctx) return;
     codec48_ctx* ctx = parent_ctx->c48_ctx;
 
-    // Added: non-codec48 (e.g. codec47) files never allocate c48_ctx.
+    // Non-codec48 (e.g. codec47) files never allocate c48_ctx.
     if (!ctx) return;
 
     free(ctx->delta_bufs);
@@ -47,7 +47,7 @@ void codec48_proc(smush_ctx* parent_ctx, const uint8_t* data, size_t data_len)
     uint32_t unk2 = getle32(hdr->unk2);
     uint32_t unk3 = getle32(hdr->unk3);
 
-    // Added: clear both delta buffers whenever the sequence restarts (matches
+    // Clear both delta buffers whenever the sequence restarts (matches
     // ScummVM/smushplay). The initial alloc already zeroes them, so this only
     // bites a movie that loops its sequence back to 0 without a teardown.
     if (seq_num == 0) {

@@ -104,8 +104,8 @@ int32_t Main_bHeadless = 0;
 int32_t Main_bVerboseNetworking = 0;
 int32_t Main_bMotsCompat = 0;
 int32_t Main_bDwCompat = 0;
-int32_t Main_bDroidWorks = 0; // Added: full DroidWorks game mode (implies Main_bDwCompat)
-int32_t Main_bDwCogVerbs = 0; // Added: import DW COG verbs into JK/MOTS
+int32_t Main_bDroidWorks = 0; // full DroidWorks game mode (implies Main_bDwCompat)
+int32_t Main_bDwCogVerbs = 0; // import DW COG verbs into JK/MOTS
 int32_t Main_bEnhancedCogVerbs = 0;
 char Main_strEpisode[129];
 char Main_strMap[128+4];
@@ -376,14 +376,9 @@ int Main_Startup(const char *cmdline)
 
     stdHttp_Startup();
 
-    // Added: DroidWorks boots a REDUCED engine. It has its own VFS (dwGob/inits),
-    // its own GUI, and its own app flow — so it must NOT run jkRes (which
-    // ref-count-toggles the shared HostServices file ops and fights the DW VFS,
-    // corrupting file handles), jkGob, the jkGui* menus, or the jk-game systems.
-    // Cmdline is already parsed (Main_ParseCmdLine @322), so branch here and bring
-    // up only the shared engine components DW needs, then hand off to the DW app
-    // layer. The sith engine itself is brought up later by dwSith_Startup (from
-    // dw_Startup), exactly as in the DroidWorks binary.
+    // Added: DroidWorks boots a reduced engine. 
+    // It has its own VFS (dwGob/inits), its own GUI, and its own app flow.
+    // The sith engine itself is brought up later by dwSith_Startup from dw_Startup
     if (Main_bDroidWorks) {
         Windows_Startup();
         sithCvar_Startup();
@@ -393,9 +388,6 @@ int Main_Startup(const char *cmdline)
         Video_Startup();
         std3D_Startup();
 #ifdef QUAKE_CONSOLE
-        // The console's font/background come from DW assets (Arial12.laf +
-        // WBACKGROUND.RLE), built lazily on first render — the DW VFS and
-        // dwFont cache aren't up yet here (see jkQuakeConsole_TryLoadDwAssets).
         jkQuakeConsole_Startup(); // Added
 #endif
 #ifdef RDRASTER_SOFTWARE_RENDERER
@@ -488,8 +480,6 @@ int Main_Startup(const char *cmdline)
                 }
             }
 #endif
-            // Note: DroidWorks (-droidworks) no longer reaches here — it branches
-            // to its reduced-engine startup right after stdHttp_Startup above.
             if (!Main_bMotsCompat) {
                 jkSmack_SmackPlay("01-02a.smk");
             }

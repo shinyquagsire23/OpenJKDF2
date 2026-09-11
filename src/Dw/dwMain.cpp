@@ -673,7 +673,7 @@ extern "C" dwSegment* dwCompleteMovie_New(int idx)
 //  Kept placeholders (NOT P7 — owners elsewhere)
 // ==================================================================
 
-// (sithControl_FUN_00456da0 — the DW in-mission control bindings — is now a real
+// (sithControl_MapDefaultsDroidworks — the DW in-mission control bindings — is now a real
 // implementation in src/Devices/sithControl.c; the empty stub here is removed.)
 
 extern "C" {

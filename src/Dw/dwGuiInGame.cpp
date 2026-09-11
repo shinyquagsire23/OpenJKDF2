@@ -133,9 +133,9 @@ extern float _DAT_00528698, _DAT_0052869c, _DAT_005286c0, _DAT_005286d4;
 // TODO(dw-decomp): DW-forked, no repo twin (P8 sith-engine diff audit).
 //   sithCamera_sub_44B190  = DW variant of sithCamera_ResetAllCameras that also
 //     wires + selects camera slot 7 (the DW HUD chase cam; JK's has no slot 7).
-//   sithControl_FUN_00456da0 = DW control-function registration (registers the
+//   sithControl_MapDefaultsDroidworks = DW control-function registration (registers the
 //     DW-specific control funcs 0xc/0xd/0xe with DW thresholds).
-void sithControl_FUN_00456da0(void);
+void sithControl_MapDefaultsDroidworks(void);
 
 // TODO(dw-decomp): dwGuiIndicator gauges — provided by dwHelp (P6 wave 2).
 void dwGuiIndicator_SetProgress(dwGuiIndicator* pInd, float t);
@@ -544,7 +544,7 @@ int dwGuiInGame::Activate()
         stdPlatform_Printf("Starting mission: %s\n", this->pMissionInfo->name.pBuffer);
         jkPlayer_setDiff = (this->pMissionInfo->rank < 3) ? this->pMissionInfo->rank : 2;
 
-        sithControl_FUN_00456da0();
+        sithControl_MapDefaultsDroidworks();
         Window_AddMsgHandler(stdControl_MessageHandler);
         stdControl_ToggleMouse();
         this->bEndRequested = 0;

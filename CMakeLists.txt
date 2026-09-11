@@ -226,9 +226,7 @@ if(TARGET_TWL OR TARGET_DREAMCAST)
         ${PROJECT_SOURCE_DIR}/src/Raster/rdZRaster.c)
 endif()
 
-# DroidWorks app layer (src/Dw/, see DW/DECOMP_PROGRESS.md) is desktop-only for
-# now — retro targets can't afford the extra RAM/code and Main_bDroidWorks is
-# never set there.
+# DroidWorks app layer (src/Dw/...) is desktop-only for now
 if(TARGET_TWL OR TARGET_DREAMCAST)
     file(GLOB DW_SRCS ${PROJECT_SOURCE_DIR}/src/Dw/*.c ${PROJECT_SOURCE_DIR}/src/Dw/*.cpp)
     if(DW_SRCS)
@@ -299,7 +297,7 @@ else()
     add_executable(${BIN_NAME} ${GAME_MAIN_SOURCE_FILES})
     target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_COMMON_LIBS} sith_engine)
 
-    # Added (debug): OPENJKDF2_FORCE_ASAN=1 applies ASAN to just the game code
+    # OPENJKDF2_FORCE_ASAN=1 applies ASAN to just the game code
     # (sith_engine object lib + this exe), not the vendored deps — avoids a full
     # dep rebuild. The env-driven OPENJKDF2_NO_ASAN block below wasn't taking on macOS.
     if(DEFINED ENV{OPENJKDF2_FORCE_ASAN} AND "$ENV{OPENJKDF2_FORCE_ASAN}" STREQUAL "1")

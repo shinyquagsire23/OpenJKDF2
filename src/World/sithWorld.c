@@ -28,7 +28,7 @@
 #include "General/util.h"
 #include "Gameplay/sithPlayer.h"
 #include "Platform/std3D.h"
-#include "Dw/dwLaser.h" // Added: DroidWorks laser pool free (no-ops off-desktop)
+#include "Dw/dwLaser.h"
 #include "jk.h"
 
 #ifdef TARGET_TWL
@@ -364,7 +364,7 @@ void sithWorld_FreeEntry(SithWorld *pWorld)
     SITH_ASSERTREL(pWorld); // Added: J3D assert
 
 #ifdef DW_LASERS
-    dwLaser_Free(pWorld); // Added: DroidWorks laser pool (binary @0x44d3d5; no-op off-desktop)
+    dwLaser_Free(pWorld); // Added: DroidWorks laser pool
 #endif
 
     if ( pWorld->colormaps )

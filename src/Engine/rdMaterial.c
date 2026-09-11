@@ -85,8 +85,6 @@ rdMaterial* rdMaterial_Load(char *pFilename, int create_ddraw_surface, int gpu_m
 
 int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int create_ddraw_surface, int gpu_mem, int bDoLoad)
 {
-    // file handles are stdFile_t (intptr_t): an int truncates a 64-bit handle
-    // (e.g. a handle above 4GB) to 32 bits. On 32-bit targets intptr_t == int.
     stdFile_t mat_file; // eax
     stdFile_t mat_file_; // ebx
     int num_texinfo; // eax

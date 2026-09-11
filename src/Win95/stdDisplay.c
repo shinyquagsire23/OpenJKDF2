@@ -497,16 +497,7 @@ tVBuffer* stdDisplay_VBufferConvertColorFormat(void* a, tVBuffer* b)
     return b;
 }
 
-// Added: DroidWorks-only palette pusher (binary @0x4fe3b0), called by dwColormap_Load/Apply
-// immediately after stdDisplay_SetMasterPalette(colormap). Its job is to publish the freshly
-// loaded colormap into stdDisplay_gammaPalette — the "base" palette that stdDisplay_GetPalette()
-// returns and that stdPalEffects_UpdatePalette() reads each frame as the un-effected source.
-// While this was a no-op stub, gammaPalette stayed frozen at the boot colormap, so the per-frame
-// stdPalEffects pass copied that stale palette back into the master palette (~half the entries
-// wrong vs the level's mission.cmp) — the in-mission palette looked subtly off vs the paused view,
-// which reloads the colormap. Copying master->gamma here (master == the clean colormap at every
-// call site) keeps gammaPalette a stable, correct base. a1 is the DW brightness setting; gamma/
-// brightness shaping is not modeled yet (the stub never applied it either), so it is ignored.
+// TODO: actually correct gamma
 int stdDisplay_GammaCorrect3(int a1)
 {
     (void)a1;

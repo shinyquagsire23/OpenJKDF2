@@ -462,8 +462,8 @@ extern int32_t openjkdf2_bIsExtraLowMemoryPlatform;
 extern char openjkdf2_aRestartPath[256];
 extern int32_t Main_bMotsCompat;
 extern int32_t Main_bDwCompat;
-extern int32_t Main_bDroidWorks; // Added: full DroidWorks game mode (implies Main_bDwCompat)
-extern int32_t Main_bDwCogVerbs; // Added: import DW COG verbs into JK/MOTS (analog of -enhancedCogVerbs)
+extern int32_t Main_bDroidWorks;
+extern int32_t Main_bDwCogVerbs;
 extern char* openjkdf2_pExecutablePath;
 
 // All the typedefs
@@ -1662,10 +1662,7 @@ typedef struct rdFace
     rdVector3 normal;
 } rdFace;
 
-// Added: DroidWorks rdRaycast hit record (DW binary: 0x38 bytes; see
-// src/Primitives/rdRaycast.c). Filled by rdRaycast_RayPlane/RayFace/RayMesh;
-// distance is the ray parameter t of the current best hit (callers seed it
-// with a ~FLT_MAX sentinel).
+// DroidWorks rdRaycast hit record filled by rdRaycast_RayPlane/RayFace/RayMesh
 typedef struct rdRaycastHit
 {
     rdMesh* pMesh;          // +0x00: mesh containing the best hit face
@@ -2356,7 +2353,7 @@ typedef struct sithArchLight
 typedef void (__cdecl *sithWorldProgressCallback_t)(flex_t);
 
 typedef struct sDwLaser tDwLaser;
-typedef struct sDwLaser sDwLaser; // Added: plain-name alias (SithWorld uses sDwLaser*)
+typedef struct sDwLaser sDwLaser;
 
 typedef struct SithWorld
 {
@@ -2443,20 +2440,12 @@ typedef struct SithWorld
     sithArchLight* aArchlights;
 #endif
 #ifdef DW_LASERS
-    // Added: DroidWorks per-world laser/beam pool (owner: src/Dw/dwLaser.c).
-    // The DW binary's Ghidra field names were swapped vs their real roles
-    // ('paLasers' held the count, 'pLastLaser' the base pointer); renamed
-    // here to match what they actually are.
-    int32_t numDwLasers;   // DW binary SithWorld field 'paLasers' (pool slot count)
-    sDwLaser* aDwLasers;   // DW binary SithWorld field 'pLastLaser' (pool base pointer)
+    int32_t numDwLasers;
+    sDwLaser* aDwLasers;
 #endif
 } SithWorld;
 
-// Added: DroidWorks laser/beam pool entry (DW binary: 0xe4 bytes/slot; see
-// src/Dw/dwLaser.c). The tail of the binary entry is an INLINE solid-color
-// rdMaterial (+0x10) whose texinfos[0] points at the INLINE rdTexinfo
-// (+0xc4, header.solidColor = beam palette color). dwLaser_Add re-points
-// material.texinfos[0] after every pool realloc.
+// DroidWorks laser/beam pool entry
 typedef struct sDwLaser
 {
     uint32_t id;             // +0x00: from dwLaser_nextId (getlaserid COG verb result)

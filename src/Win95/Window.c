@@ -15,7 +15,7 @@
 #include "Platform/wuRegistry.h"
 #include "Main/jkQuakeConsole.h"
 
-#include "Dw/dwMain.h" // Added: dwMain_NotifyWindowResized (no-op macro off-DW)
+#include "Dw/dwMain.h"
 
 #include "jk.h"
 
@@ -396,9 +396,8 @@ int Window_menu_mouseY = 0;
 
 extern int jkGuiBuildMulti_bRendering;
 
-// Added: map raw SDL window coords into the letterboxed 640x480 canvas.
-// The same 4:3 pillarbox math the GL present side uses (std3D_DrawMenu);
-// shared by motion and button events so they can't diverge (BUG 14).
+// map raw SDL window coords into the letterboxed 640x480 canvas.
+// The same 4:3 pillarbox math the GL present side uses (std3D_DrawMenu)
 static void Window_TranslateMouseToCanvas(int rawX, int rawY, int* pOutX, int* pOutY)
 {
     if (!jkGame_isDDraw)
@@ -706,8 +705,7 @@ void Window_UpdateHeadless()
 
         jkGui_SetModeGame();
 
-        // Added: -droidworks keeps its own fixed 640x480 canvas — re-push the
-        // palette + dirty the whole screen, then present it (BUG 14).
+        // -droidworks keeps its own fixed 640x480 canvas, re-push the palette + dirty the whole screen
         if (Main_bDroidWorks)
         {
             dwMain_NotifyWindowResized();
@@ -775,8 +773,7 @@ void Window_UpdateHeadless()
     last_jkQuakeConsole_bOpen = jkQuakeConsole_bOpen;
 }
 
-// Added: reentrancy guard for Window_SdlUpdate (file-scope so the modal pump
-// below can lift it). See the block comment in Window_SdlUpdate.
+// reentrancy guard for Window_SdlUpdate
 static int Window_bInSdlUpdate = 0;
 
 void Window_SdlUpdate()
@@ -787,14 +784,10 @@ void Window_SdlUpdate()
         return;
     }
 
-    // Added: reentrancy guard. This function both drains the SDL event queue AND presents
+    // reentrancy guard. This function both drains the SDL event queue AND presents
     // (std3D_DrawMenu + SDL_GL_SwapWindow) at its tail. DroidWorks' WM_MOUSEMOVE handler calls
     // dwCursor_Redraw() -> stdDisplay_DDrawGdiSurfaceFlip() -> Window_SdlUpdate(), so a motion
-    // event dispatched from THIS function's drain re-enters it recursively; under continuous
-    // motion the recursion never unwound (the outer present was starved), freezing the UI until
-    // the mouse stopped — and long drags risked a stack overflow. A nested call is a no-op:
-    // whatever it wanted to show is composited into the front buffer already and gets presented
-    // by the outer call's single tail present.
+    // event dispatched from this function's drain re-enters it recursively
     if (Window_bInSdlUpdate)
         return;
     Window_bInSdlUpdate = 1;
@@ -1061,9 +1054,7 @@ void Window_SdlUpdate()
                 if (hasRight)
                     Window_bMouseRight = right;
 
-                // Added: route button coords through the same letterbox
-                // transform as motion (BUG 14 — clicks landed offset from
-                // the visual widgets after a window resize).
+                // route button coords through the same letterbox transform as motion
                 Window_TranslateMouseToCanvas((int)mevent->x, (int)mevent->y, &Window_mouseX, &Window_mouseY);
 
                 pos = ((Window_mouseX) & 0xFFFF) | (((Window_mouseY) << 16) & 0xFFFF0000);
@@ -1147,7 +1138,7 @@ void Window_SdlUpdate()
                 }
                 break;
             case SDL_EVENT_GAMEPAD_AXIS_MOTION:
-                //stdPlatform_Printf("Controller %d Axis %d moved to %d\n", 
+                //stdPlatform_Printf("Controller %d Axis %d moved to %d\n",
                 //       event.caxis.which, event.caxis.axis, event.caxis.value);
                 break;
 
@@ -1182,8 +1173,7 @@ void Window_SdlUpdate()
             //jkMain_FixRes();
         }
 
-        // Added: -droidworks keeps its own fixed 640x480 canvas — re-push the
-        // palette + dirty the whole screen, then present it (BUG 14).
+        // -droidworks keeps its own fixed 640x480 canvas, re-push the palette + dirty the whole screen
         if (Main_bDroidWorks)
         {
             dwMain_NotifyWindowResized();
@@ -1298,19 +1288,9 @@ void Window_SdlUpdate()
     last_jkQuakeConsole_bOpen = jkQuakeConsole_bOpen;
 #endif
 
-    Window_bInSdlUpdate = 0; // Added: release the reentrancy guard (see top of function)
+    Window_bInSdlUpdate = 0; // release the reentrancy guard
 }
 
-// Added (DroidWorks): pump one host frame from inside a NESTED modal loop.
-// dwGuiDialog_RunModal spins `while (result == 0 && dwSegment_Tick())` to run a
-// Yes/No dialog, but it is entered synchronously from a mouse-event dispatch —
-// i.e. already inside Window_SdlUpdate — so the reentrancy guard makes the
-// loop's own present-path Window_SdlUpdate a no-op, the dialog never receives
-// input, and result never changes (the binary drove this from a separate WinMain
-// message pump, Window_sub_507090). This lifts the guard for ONE full
-// Window_SdlUpdate — which re-arms the guard itself for its duration, so the
-// mouse-motion present recursion the guard exists to block stays blocked — then
-// restores it. SDL's event queue is global, so nested draining loses no events.
 void Window_SdlUpdateModal()
 {
     int saved = Window_bInSdlUpdate;

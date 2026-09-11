@@ -405,9 +405,7 @@ int stdSound_BufferQueueAfterAnother(stdSound_buffer_t* bufPrev, stdSound_buffer
     return 1;
 }
 
-// Added: detach every already-played buffer from buf's source queue. A chunk
-// buffer that is still attached (queued or playing) silently ignores
-// alBufferData, so stream refills must unqueue BEFORE re-uploading (BUG 13).
+// Added: detach every already-played buffer from buf's source queue
 void stdSound_BufferUnqueueProcessed(stdSound_buffer_t* buf)
 {
     ALint processed = 0;

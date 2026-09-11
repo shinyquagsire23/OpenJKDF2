@@ -28,8 +28,8 @@
 #include "World/sithSector.h"
 #include "World/sithWorld.h"
 #include "World/sithExplosion.h"
-#include "Main/Main.h" // Added: Main_bDwCompat (DW laser pass)
-#include "Dw/dwLaser.h" // Added: DroidWorks laser pass (no-ops off-desktop)
+#include "Main/Main.h"
+#include "Dw/dwLaser.h"
 #include "Platform/std3D.h"
 #include "Primitives/rdMath.h"
 #include "stdPlatform.h"
@@ -603,9 +603,7 @@ void sithRender_Draw()
 #endif
 
 #ifdef DW_LASERS
-    // Added: DroidWorks laser/beam pass (binary sithRender_DrawLasers@45e780,
-    // called between the thing passes and the alpha adjoins; body lives in
-    // src/Dw/dwLaser.c and no-ops off-desktop).
+    // Added: DroidWorks laser/beam pass
     if ( Main_bDwCompat )
         dwLaser_DrawAll();
 #endif
@@ -2429,9 +2427,8 @@ LABEL_150:
             }
 
             // Added: 0x1FC (was 0xFC) so the DroidWorks third-person follow
-            // camera (type 0x100) also draws its focus thing — the player droid.
-            // Without bit 8 the DW cam is treated as first-person and the droid
-            // is hidden. 0x100 is only ever set under Main_bDwCompat, so this is
+            // camera (type 0x100) also draws its focus thing.
+            // 0x100 is only ever set under Main_bDwCompat, so this is
             // a no-op for JK/MOTS/retro cameras.
             if (!((sithCamera_g_pCurCamera->type & 0x1FC) != 0 || i != sithCamera_g_pCurCamera->pPrimaryFocusThing)) {
                 continue;

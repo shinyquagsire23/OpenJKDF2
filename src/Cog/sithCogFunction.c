@@ -876,9 +876,7 @@ void sithCogFunction_SetCameraMode(sithCog *pCog)
 
     camIdx = sithCogExec_PopInt(pCog);
 
-    // DroidWorks: the binary's twin accepts slots 0..7 (the DW slot-7 follow
-    // cam exists); JK clamps to < 7. Replaces the old 7->0 "Droidworks tmp"
-    // hack (BUG 21: cutscene camera restores went to first-person).
+    // DroidWorks added: cam indices
     int camMax = Main_bDwCompat ? 8 : 7;
     if ( camIdx > -1 && camIdx < camMax )
         sithCamera_SetCurrentCamera(&sithCamera_g_aCameras[camIdx]);
@@ -888,7 +886,7 @@ void sithCogFunction_GetCameraMode(sithCog *pCog)
 {
     int camIdx; // edx
 
-    // DroidWorks: the binary's twin reports slots 0..7 (BUG 21).
+    // DroidWorks added: cam indices
     if ( sithCamera_g_pCurCamera && (camIdx = sithCamera_g_pCurCamera - sithCamera_g_aCameras, camIdx < (Main_bDwCompat ? 8 : 7)) )
         sithCogExec_PushInt(pCog, camIdx);
     else
@@ -1539,14 +1537,13 @@ void sithCogFunction_AutoSavegame(sithCog *pCog)
     sithGamesave_Save(tmp, 1, 0, 0);
 }
 
+// Droidworks added
 void sithCogFunction_SetCameraFocii(sithCog *pCog)
 {
     SithThing* focusThing2 = sithCogExec_PopThing(pCog);
     SithThing* focusThing = sithCogExec_PopThing(pCog);
     int camIdx = sithCogExec_PopInt(pCog);
 
-    // DroidWorks: the binary's twin accepts slots 0..7 AND requires both foci
-    // (BUG 21; replaces the old 7->0 "Droidworks tmp" hack).
     int camMax = Main_bDwCompat ? 8 : 7;
     if ( camIdx > -1 && camIdx < camMax )
     {

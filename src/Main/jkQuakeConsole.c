@@ -33,8 +33,6 @@
 #include "Dw/dwConsoleAssets.h"
 #include "../jk.h"
 
-// Cross-unit externs (DroidWorks; same pattern as dwSith.c) — the DW cheat
-// matcher (dwGuiScreen.cpp) and the HUD console ring (dwGuiInGame.cpp).
 #ifdef PLATFORM_DROIDWORKS
 #include "Dw/dwGuiScreen.h"
 extern void dwGuiInGame_ConsolePrint(const char* pText);
@@ -50,10 +48,6 @@ int jkQuakeConsole_bOnce = 0;
 int jkQuakeConsole_bInitted = 0;
 stdFont* jkQuakeConsole_pFont = NULL;
 
-// Added (DroidWorks): the console's assets are built from DW resources
-// (Arial12.laf font-strip + WBACKGROUND.RLE shade) lazily on the first render
-// — the DW VFS (dwMain_Startup) and the dwFont cache (dw_Startup, first frame)
-// don't exist yet at Main_Startup time.
 stdBitmap* jkQuakeConsole_pDwBg = NULL;
 int jkQuakeConsole_bDwAssetsTried = 0;
 
@@ -89,11 +83,6 @@ const char* jkQuakeConsole_aSortTmp[JKQUAKECONSOLE_SORTED_LIMIT];
 void jkQuakeConsole_ResetShade();
 
 #ifdef PLATFORM_DROIDWORKS
-// Added (DroidWorks): DebugConsolePrintFunc_t shim so sithConsole command
-// feedback ("x = y", "command not recognized") lands in the Quake console —
-// jkDev_Startup (which registers jkDev_DebugLog) never runs in DW mode. Also
-// chained into the DW in-game HUD console ring (dwGuiInGame_ConsolePrint),
-// which dwSith_Startup's own print hook (dwGuiInGame_SithPrintHook) feeds.
 static int jkQuakeConsole_PrintLineCb(const char* pLine)
 {
     jkQuakeConsole_PrintLine(pLine);
@@ -101,9 +90,6 @@ static int jkQuakeConsole_PrintLineCb(const char* pLine)
     return 0;
 }
 
-// Added (DroidWorks): one-shot DW asset bring-up. Called every render frame
-// until the DW app layer is far enough up (dwConsoleAssets_Ready) — then the
-// attempt is latched either way so a missing GOB doesn't spam retries.
 static void jkQuakeConsole_TryLoadDwAssets()
 {
     if (jkQuakeConsole_bDwAssetsTried)
@@ -120,11 +106,7 @@ static void jkQuakeConsole_TryLoadDwAssets()
 
     sithConsole_RegisterPrintFunctions(jkQuakeConsole_PrintLineCb, NULL);
 
-    // Added (DroidWorks): the OpenJKDF2-added cheats, registered as console
-    // commands (jkDev_Startup never runs in DW mode, so the jkDev cheat table
-    // doesn't exist; the sithConsole table does — dwSith_Startup starts it).
-    // The engine console commands (npc spawn, thing spawn, fly, warp, ...) are
-    // already registered there via sithCommand_Startup.
+    // Register QOL/OpenJKDF2 cheats in Droidworks as well
 #ifdef QOL_IMPROVEMENTS
     sithConsole_RegisterCommand(jkDev_CmdNoclip, "noclip", 0);
     sithConsole_RegisterCommand(jkDev_Custom_CmdJumpNextCheckpoint, "checkmate", 0);
@@ -143,7 +125,7 @@ void jkQuakeConsole_Startup()
 {
     if (Main_bDroidWorks)
     {
-        // Added (DroidWorks): DW has no ui\sft fonts or .bm bitmaps — the
+        // DW has no ui\sft fonts or .bm bitmaps, the
         // console font/background are built from DW assets lazily on the
         // first render (jkQuakeConsole_TryLoadDwAssets).
     }
@@ -212,7 +194,7 @@ void jkQuakeConsole_Shutdown()
     jkQuakeConsole_pFont = NULL;
 
 #ifdef PLATFORM_DROIDWORKS
-    // Added (DroidWorks): drop the DW-derived assets + the print hook.
+    // drop the DW-derived assets + the print hook.
     if (jkQuakeConsole_pDwBg)
     {
         stdBitmap_Free(jkQuakeConsole_pDwBg);
@@ -254,12 +236,11 @@ void jkQuakeConsole_Render()
     if (!jkQuakeConsole_bInitted) return;
 
 #ifdef PLATFORM_DROIDWORKS
-    // Added (DroidWorks): the DW font/background are built lazily here (see
-    // jkQuakeConsole_TryLoadDwAssets) — they need the DW VFS + dwFont cache.
+    // the DW font/background are built lazily here
     if (Main_bDroidWorks)
         jkQuakeConsole_TryLoadDwAssets();
 #endif
-    if (!jkQuakeConsole_pFont) return; // Added: don't deref a missing font
+    if (!jkQuakeConsole_pFont) return;
 
     int64_t deltaUs = Linux_TimeUs() - jkQuakeConsole_lastTimeUs;
     jkQuakeConsole_lastTimeUs = Linux_TimeUs();
@@ -290,7 +271,7 @@ void jkQuakeConsole_Render()
         jkQuakeConsole_updateTextWidth = stdFont_Draw1GPU(jkQuakeConsole_pFont, 0, 0, screenW, tmp, 1, jkPlayer_hudScale);
         
 #if !defined(PLATFORM_LINUX)
-        // Added (DroidWorks): jkStrings isn't started in DW mode.
+        // jkStrings isn't started in DW mode.
         if (!jkQuakeConsole_bClickedUpdate && !Main_bDroidWorks) {
             stdFont_Draw1GPU(jkQuakeConsole_pFont, 0, fontHeight, screenW, jkStrings_GetUniStringWithFallback("GUIEXT_UPDATE_CLICK_TO_DL"), 1, jkPlayer_hudScale);
         }
@@ -337,7 +318,7 @@ void jkQuakeConsole_Render()
     flex_t realShadeY = -(screenH / 2) + jkQuakeConsole_shadeY;
     flex_t realShadeBottom = realShadeY + (screenH / 2);
 
-    // Added (DroidWorks): in DW mode the shade comes from the DW-loaded
+    // in DW mode the shade comes from the DW-loaded
     // background (WBACKGROUND.RLE) instead of the jkGui main-menu BM.
     stdBitmap* pBgBitmap = Main_bDroidWorks ? jkQuakeConsole_pDwBg : jkGui_stdBitmaps[JKGUI_BM_BK_MAIN];
     if (pBgBitmap) {
@@ -423,7 +404,7 @@ int jkQuakeConsole_AutocompleteCvars()
 int jkQuakeConsole_AutocompleteCheats()
 {
     if (!jkQuakeConsole_pTabPos) return 0;
-    if (!jkDev_cheatHashtable) return 0; // Added: not started in DroidWorks mode
+    if (!jkDev_cheatHashtable) return 0; // not started in DroidWorks mode
 
     int bPrintOnce = 0;
     for (int i = 0; i < jkDev_cheatHashtable->numNodes; i++)
@@ -449,7 +430,7 @@ int jkQuakeConsole_AutocompleteCheats()
 int jkQuakeConsole_AutocompleteConsoleCmds()
 {
     if (!jkQuakeConsole_pTabPos) return 0;
-    if (!sithConsole_pCmdHashtable) return 0; // Added: not started in DroidWorks mode
+    if (!sithConsole_pCmdHashtable) return 0; // not started in DroidWorks mode
 
     int bPrintOnce = 0;
     for (int i = 0; i < sithConsole_pCmdHashtable->numNodes; i++)
@@ -472,9 +453,6 @@ int jkQuakeConsole_AutocompleteConsoleCmds()
     return bPrintOnce;
 }
 
-// Added (DroidWorks): tab-complete the DW cheat codes (SOMONEY/FLY/...) in DW
-// mode — they aren't in any engine hashtable, they dispatch to the active
-// screen's CheckCheatCodes (dwGuiScreen_ExecCheatCode).
 int jkQuakeConsole_AutocompleteDwCheats()
 {
 #ifdef PLATFORM_DROIDWORKS
@@ -550,8 +528,8 @@ void jkQuakeConsole_ExecuteCommand(const char* pCmd)
     else if ( !jkDev_TryCommand(pCmd) )
     {
 #ifdef PLATFORM_DROIDWORKS
-        // Added (DroidWorks): route unmatched commands through the DW cheat
-        // matcher (somoney/beefcake/fly/...) before the engine command table.
+        // Route unmatched commands through the DW cheat matcher
+        // before the engine command table.
         if (Main_bDroidWorks && dwGuiScreen_ExecCheatCode(pCmd))
             return;
 #endif
@@ -692,9 +670,6 @@ void jkQuakeConsole_SendInput(WPARAM wParam, int bIsChar)
         }
         else if ( wParam == VK_TAB )
         {
-            // Added: don't require the jkDev cheat table here — it doesn't
-            // exist in DroidWorks mode, and every autocomplete source guards
-            // itself (this killed ALL tab completion in DW mode).
             if (jkQuakeConsole_bHasTabbed) {
                 if (jkQuakeConsole_chatStrPos) {
                     jkQuakeConsole_chatStr[jkQuakeConsole_chatStrPos-1] = 0;
@@ -733,7 +708,7 @@ void jkQuakeConsole_SendInput(WPARAM wParam, int bIsChar)
                 bPrintOnce |= jkQuakeConsole_AutocompleteCvars();
                 bPrintOnce |= jkQuakeConsole_AutocompleteCheats();
                 bPrintOnce |= jkQuakeConsole_AutocompleteConsoleCmds();
-                bPrintOnce |= jkQuakeConsole_AutocompleteDwCheats(); // Added (DroidWorks)
+                bPrintOnce |= jkQuakeConsole_AutocompleteDwCheats();
             }
             
             // TODO proper command db
@@ -839,7 +814,7 @@ int jkQuakeConsole_WmHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT 
             else if ((wParam == VK_OEM_3 || (wParam == VK_ESCAPE && jkQuakeConsole_bShiftHeld)) && !repeats && (!sithNet_isMulti || jkQuakeConsole_bShiftHeld)) // `/~ key
             {
                 jkQuakeConsole_bOpen = !jkQuakeConsole_bOpen;
-                // Added (DroidWorks): don't toggle SDL text input with the
+                // Don't toggle SDL text input with the
                 // console in DW mode — DW textboxes rely on the boot-time
                 // SDL_StartTextInput and have no Show/Hide flow of their own,
                 // so stopping it on console close kills letter input in every

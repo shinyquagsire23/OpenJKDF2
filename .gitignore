@@ -127,4 +127,5 @@ build_openjkdf2_venv/*
 graphify-out/
 AGENTS.md
 .blocksds
-packaging/dreamcast/disc/*CLAUDE.md
+packaging/dreamcast/disc/*
+CLAUDE.md

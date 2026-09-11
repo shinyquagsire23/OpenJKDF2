@@ -199,7 +199,7 @@ int sithConsole_ExeCommand(const char *pLine)
             return 0;
         }
         // Added: guard the ring-buffer write when sithConsole_Open never ran
-        // (DroidWorks mode) — DebugGui_maxLines is 0 there (div-by-zero).
+        // (DroidWorks mode) to avoid div by zero
         if ( DebugGui_maxLines > 0 )
         {
             DebugGui_some_num_lines = (DebugGui_some_num_lines + 1) % DebugGui_maxLines;

@@ -21,8 +21,8 @@
 #include "Main/jkMain.h"
 #include "Dss/sithMulti.h"
 #include "General/stdMath.h"
-#include "Main/Main.h" // Added: Main_bDwCompat/Main_bDroidWorks (DW tool-key dispatch, idle-cam gate)
-#include "Dw/dwCog.h" // Added: DroidWorks droid-tool dispatch (no-ops off-desktop)
+#include "Main/Main.h"
+#include "Dw/dwCog.h"
 #include "jk.h"
 
 // Added
@@ -285,8 +285,7 @@ void sithControl_Update(flex_t secDeltaTime, int msecDeltaTime)
         if ( stdControl_bControlsIdle )
         {
             sithControl_msIdle += msecDeltaTime;
-            // Added: DroidWorks removed the switch into the idle camera (its sithControl_Update
-            // twin @00456970 accumulates msIdle but never switches) — keep the DW follow cam.
+            // Added: DroidWorks removed the switch into the idle camera
             if ( !Main_bDroidWorks
               && sithControl_msIdle > 30000 && sithCamera_g_pCurCamera != &sithCamera_g_aCameras[4] )
                 sithCamera_SetCurrentCamera(&sithCamera_g_aCameras[4]);
@@ -1045,11 +1044,9 @@ LABEL_39:
                     sithControl_FreeCam(player);
 
 #ifdef PLATFORM_DROIDWORKS
-                // Added: DroidWorks tool-key dispatch (binary sithControl_FUN_004579f0,
-                // called from DW's HandlePlayer where stock JK handles the activate key):
-                // SELECT1 -> tool arm slot 2, SELECT2 -> tool arm slot 1, ACTIVATE ->
-                // body slot 0; first pressed wins. Replaces the stock activate handling
-                // (dwCog_ActivateTool is also where sithPlayerActions_Activate diverts).
+                // Added: DroidWorks tool-key dispatch
+                // SELECT1 -> tool arm slot 2, SELECT2 -> tool arm slot 1, ACTIVATE -> body slot 0.
+                // Replaces the stock activate handling
                 if ( Main_bDwCompat )
                 {
                     sithControl_GetKey(INPUT_FUNC_SELECT1, &input_read);
@@ -1940,78 +1937,74 @@ void sithControl_DefaultInit()
 #endif // TARGET_RETRO_HOMEBREW
 }
 
-// Added: DroidWorks in-mission control bindings. Faithful port of the binary's
-// sithControl_FUN_00456da0 (@0x456da0) + FUN_00457000 + FUN_00457330. DW uses an
-// arrow-key / numpad movement layout (NOT JK's WASD) plus droid tool selects;
-// the joystick + mouse axis binds are identical to JK's defaults. Installed
-// per-mission by dwGuiInGame::StartMission (the reduced DW startup never runs
-// jkControl, so nothing else binds movement). The binary's debug-only alternate
-// binds (g_debugModeFlags & 0x100 -> WASD + alternate pitch keys) are omitted;
-// this is the normal (non-debug) DW control scheme. DIK scancodes kept raw.
-void sithControl_FUN_00456da0(void)
+// Added: DroidWorks in-mission control bindings (DW FUN_00456da0 + FUN_00457000 +
+// FUN_00457330). Arrow-key/numpad movement + droid tool selects, then the
+// joystick button/hat + axis defaults and the mouse-look axes. The binary's
+// debug-only WASD binds (g_debugModeFlags & 0x100) are omitted.
+void sithControl_MapDefaultsDroidworks(void)
 {
     stdControlKeyInfoEntry* pEntry;
 
-    sithControl_Reset();               // = sub_4D7C30 (clear binding table + stdControl_Reset)
-    sithWeapon_controlOptions = 0x24;  // DAT_00691440: mouse + extended keys enabled
+    sithControl_Reset();
+    sithWeapon_controlOptions = 0x24;
 
-    // --- keyboard (binary FUN_00457000, non-debug layout; flag 4 = reversed dir) ---
-    sithControl_BindControl(INPUT_FUNC_TALK,        0x2f, 0); // V
-    sithControl_BindControl(INPUT_FUNC_TURN,        0xcb, 0); // Left
-    sithControl_BindControl(INPUT_FUNC_TURN,        0xcd, 4); // Right
-    sithControl_BindControl(INPUT_FUNC_TURN,        0x4b, 0); // NumPad4
-    sithControl_BindControl(INPUT_FUNC_TURN,        0x4d, 4); // NumPad6
-    sithControl_BindControl(INPUT_FUNC_FORWARD,     0xc8, 0); // Up
-    sithControl_BindControl(INPUT_FUNC_FORWARD,     0xd0, 4); // Down
-    sithControl_BindControl(INPUT_FUNC_FORWARD,     0x48, 0); // NumPad8
-    sithControl_BindControl(INPUT_FUNC_FORWARD,     0x50, 4); // NumPad2
-    sithControl_BindControl(INPUT_FUNC_SLIDE,       0x4f, 4); // NumPad1
-    sithControl_BindControl(INPUT_FUNC_SLIDE,       0x51, 0); // NumPad3
-    sithControl_BindControl(INPUT_FUNC_JUMP,        0x4e, 0); // NumPad+
-    sithControl_BindControl(INPUT_FUNC_JUMP,        0x2d, 0); // X
-    sithControl_BindControl(INPUT_FUNC_ACTIVATE,    0x39, 0); // Space
-    sithControl_BindControl(INPUT_FUNC_ACTIVATE,    0x52, 0); // NumPad0
-    sithControl_BindControl(INPUT_FUNC_SLIDETOGGLE, 0xb8, 0); // RAlt
-    sithControl_BindControl(INPUT_FUNC_SLIDETOGGLE, 0x38, 0); // LAlt
-    sithControl_BindControl(INPUT_FUNC_SLOW,        0x2a, 0); // LShift
-    sithControl_BindControl(INPUT_FUNC_SLOW,        0x36, 0); // RShift
-    sithControl_BindControl(INPUT_FUNC_PITCH,       0xc9, 0); // PageUp
-    sithControl_BindControl(INPUT_FUNC_PITCH,       0x12, 0); // E
-    sithControl_BindControl(INPUT_FUNC_PITCH,       0xd1, 4); // PageDown
-    sithControl_BindControl(INPUT_FUNC_PITCH,       0x2e, 4); // C
-    sithControl_BindControl(INPUT_FUNC_CENTER,      0xc7, 0); // Home
-    sithControl_BindControl(INPUT_FUNC_CENTER,      0x20, 0); // D
-    sithControl_BindControl(INPUT_FUNC_CENTER,      0x4c, 0); // NumPad5
-    sithControl_BindControl(INPUT_FUNC_DEBUG,       0x0b, 0); // 0
-    sithControl_BindControl(INPUT_FUNC_SELECT3,     0x02, 0); // 1
-    sithControl_BindControl(INPUT_FUNC_SELECT4,     0x03, 0); // 2
-    sithControl_BindControl(INPUT_FUNC_SELECT5,     0x04, 0); // 3
-    sithControl_BindControl(INPUT_FUNC_SELECT6,     0x05, 0); // 4
-    sithControl_BindControl(INPUT_FUNC_SELECT7,     0x06, 0); // 5
-    sithControl_BindControl(INPUT_FUNC_SELECT8,     0x07, 0); // 6
-    sithControl_BindControl(INPUT_FUNC_SELECT9,     0x08, 0); // 7
-    sithControl_BindControl(INPUT_FUNC_SELECT0,     0x09, 0); // 8
-    sithControl_BindControl(INPUT_FUNC_GAMESAVE,    0x0a, 0); // 9
-    sithControl_BindControl(INPUT_FUNC_MLOOK,       0x0d, 0); // =
-    sithControl_BindControl(INPUT_FUNC_CAMERAMODE,  0x0c, 0); // -
-    sithControl_BindControl(INPUT_FUNC_SELECT1,     0x1e, 0); // A
-    sithControl_BindControl(INPUT_FUNC_SELECT1,     0x26, 0); // L
-    sithControl_BindControl(INPUT_FUNC_SELECT1,     0x47, 0); // NumPad7
-    sithControl_BindControl(INPUT_FUNC_SELECT2,     0x1f, 0); // S
-    sithControl_BindControl(INPUT_FUNC_SELECT2,     0x13, 0); // R
-    sithControl_BindControl(INPUT_FUNC_SELECT2,     0x49, 0); // NumPad9
+    // keyboard buttons (DIK scancodes)
+    sithControl_BindControl(INPUT_FUNC_TALK,        DIK_V,       0);
+    sithControl_BindControl(INPUT_FUNC_TURN,        DIK_LEFT,    0);
+    sithControl_BindControl(INPUT_FUNC_TURN,        DIK_RIGHT,   4);
+    sithControl_BindControl(INPUT_FUNC_TURN,        DIK_NUMPAD4, 0);
+    sithControl_BindControl(INPUT_FUNC_TURN,        DIK_NUMPAD6, 4);
+    sithControl_BindControl(INPUT_FUNC_FORWARD,     DIK_UP,      0);
+    sithControl_BindControl(INPUT_FUNC_FORWARD,     DIK_DOWN,    4);
+    sithControl_BindControl(INPUT_FUNC_FORWARD,     DIK_NUMPAD8, 0);
+    sithControl_BindControl(INPUT_FUNC_FORWARD,     DIK_NUMPAD2, 4);
+    sithControl_BindControl(INPUT_FUNC_SLIDE,       DIK_NUMPAD1, 4);
+    sithControl_BindControl(INPUT_FUNC_SLIDE,       DIK_NUMPAD3, 0);
+    sithControl_BindControl(INPUT_FUNC_JUMP,        DIK_ADD,     0);
+    sithControl_BindControl(INPUT_FUNC_JUMP,        DIK_X,       0);
+    sithControl_BindControl(INPUT_FUNC_ACTIVATE,    DIK_SPACE,   0);
+    sithControl_BindControl(INPUT_FUNC_ACTIVATE,    DIK_NUMPAD0, 0);
+    sithControl_BindControl(INPUT_FUNC_SLIDETOGGLE, DIK_RMENU,   0);
+    sithControl_BindControl(INPUT_FUNC_SLIDETOGGLE, DIK_LMENU,   0);
+    sithControl_BindControl(INPUT_FUNC_SLOW,        DIK_LSHIFT,  0);
+    sithControl_BindControl(INPUT_FUNC_SLOW,        DIK_RSHIFT,  0);
+    sithControl_BindControl(INPUT_FUNC_PITCH,       DIK_PRIOR,   0);
+    sithControl_BindControl(INPUT_FUNC_PITCH,       DIK_E,       0);
+    sithControl_BindControl(INPUT_FUNC_PITCH,       DIK_NEXT,    4);
+    sithControl_BindControl(INPUT_FUNC_PITCH,       DIK_C,       4);
+    sithControl_BindControl(INPUT_FUNC_CENTER,      DIK_HOME,    0);
+    sithControl_BindControl(INPUT_FUNC_CENTER,      DIK_D,       0);
+    sithControl_BindControl(INPUT_FUNC_CENTER,      DIK_NUMPAD5, 0);
+    sithControl_BindControl(INPUT_FUNC_DEBUG,       DIK_0,       0);
+    sithControl_BindControl(INPUT_FUNC_SELECT3,     DIK_1,       0);
+    sithControl_BindControl(INPUT_FUNC_SELECT4,     DIK_2,       0);
+    sithControl_BindControl(INPUT_FUNC_SELECT5,     DIK_3,       0);
+    sithControl_BindControl(INPUT_FUNC_SELECT6,     DIK_4,       0);
+    sithControl_BindControl(INPUT_FUNC_SELECT7,     DIK_5,       0);
+    sithControl_BindControl(INPUT_FUNC_SELECT8,     DIK_6,       0);
+    sithControl_BindControl(INPUT_FUNC_SELECT9,     DIK_7,       0);
+    sithControl_BindControl(INPUT_FUNC_SELECT0,     DIK_8,       0);
+    sithControl_BindControl(INPUT_FUNC_GAMESAVE,    DIK_9,       0);
+    sithControl_BindControl(INPUT_FUNC_MLOOK,       DIK_EQUALS,  0);
+    sithControl_BindControl(INPUT_FUNC_CAMERAMODE,  DIK_MINUS,   0);
+    sithControl_BindControl(INPUT_FUNC_SELECT1,     DIK_A,       0);
+    sithControl_BindControl(INPUT_FUNC_SELECT1,     DIK_L,       0);
+    sithControl_BindControl(INPUT_FUNC_SELECT1,     DIK_NUMPAD7, 0);
+    sithControl_BindControl(INPUT_FUNC_SELECT2,     DIK_S,       0);
+    sithControl_BindControl(INPUT_FUNC_SELECT2,     DIK_R,       0);
+    sithControl_BindControl(INPUT_FUNC_SELECT2,     DIK_NUMPAD9, 0);
 
-    // --- mouse buttons (binary FUN_00457330; stdControl extended-key codes) ---
-    sithControl_BindControl(INPUT_FUNC_FIRE1,       0x100, 0);
-    sithControl_BindControl(INPUT_FUNC_FIRE2,       0x101, 0);
-    sithControl_BindControl(INPUT_FUNC_ACTIVATE,    0x102, 0);
-    sithControl_BindControl(INPUT_FUNC_JUMP,        0x103, 0);
-    sithControl_BindControl(INPUT_FUNC_PITCH,       0x109, 4);
-    sithControl_BindControl(INPUT_FUNC_PITCH,       0x10b, 0);
-    sithControl_BindControl(INPUT_FUNC_SLIDE,       0x108, 4);
-    sithControl_BindControl(INPUT_FUNC_SLIDE,       0x10a, 0);
+    // joystick buttons + hat
+    sithControl_BindControl(INPUT_FUNC_FIRE1,       KEY_JOY1_B1,    0);
+    sithControl_BindControl(INPUT_FUNC_FIRE2,       KEY_JOY1_B2,    0);
+    sithControl_BindControl(INPUT_FUNC_ACTIVATE,    KEY_JOY1_B3,    0);
+    sithControl_BindControl(INPUT_FUNC_JUMP,        KEY_JOY1_B4,    0);
+    sithControl_BindControl(INPUT_FUNC_PITCH,       KEY_JOY1_HUP,   4);
+    sithControl_BindControl(INPUT_FUNC_PITCH,       KEY_JOY1_HDOWN, 0);
+    sithControl_BindControl(INPUT_FUNC_SLIDE,       KEY_JOY1_HLEFT, 4);
+    sithControl_BindControl(INPUT_FUNC_SLIDE,       KEY_JOY1_HRIGHT, 0);
 
-    // --- axes: joystick (FUN_00457330) + mouse look w/ sensitivity (FUN_00456da0) ---
+    // axes
     sithControl_BindAxis(INPUT_FUNC_FORWARD, AXIS_JOY1_Y, INPUT_MAPPING_FLAG_AXIS_REVERSED);
     sithControl_BindAxis(INPUT_FUNC_TURN,    AXIS_JOY1_X, INPUT_MAPPING_FLAG_AXIS_REVERSED);
     pEntry = sithControl_BindAxis(INPUT_FUNC_TURN,  AXIS_MOUSE_X, INPUT_MAPPING_FLAG_AXIS_REVERSED | INPUT_MAPPING_FLAG_RAW_AXIS);

@@ -43,9 +43,7 @@
 #define MICROSECOND_TIME
 #endif
 
-// DroidWorks app layer (src/Dw/, see DW/DECOMP_PROGRESS.md). Desktop-only for
-// now: src/Dw/*.c is excluded from retro builds in CMakeLists.txt, and dwMain.h
-// compiles the entry points down to no-ops when this is undefined.
+// Droidworks app layer (src/Dw/...), desktop-only for now
 #if !defined(TARGET_RETRO_HOMEBREW)
 #define PLATFORM_DROIDWORKS
 #endif
@@ -188,7 +186,7 @@
 #ifdef QOL_IMPROVEMENTS
 #define DW_CAMERA
 #ifndef DW_LASERS
-#define DW_LASERS // Added: SithWorld laser pool fields for src/Dw/dwLaser.c (also set by -DDW_TYPES for Ghidra imports)
+#define DW_LASERS
 #endif
 #endif
 

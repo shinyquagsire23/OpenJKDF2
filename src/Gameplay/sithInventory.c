@@ -869,11 +869,8 @@ LABEL_16:
     }
 
 #ifdef DEBUG_QOL_CHEATS
-    // Added: never grant JK's default Jedi loadout in DroidWorks. DW reuses the
-    // same inventory bin numbers for entirely different things (bin 10 = infrared
-    // goggles, not SITHBIN_LIGHTSABER; bin 20 = battery power, not SITHBIN_JEDI_RANK,
-    // etc.), so these cheats spoof "owns infrared + has power" at level entry and
-    // auto-fire cap_infrared.cog (which corrupts the level palette). See DECOMP_PROGRESS BUG 4/4b.
+    // Never grant JK's default Jedi loadout in DroidWorks. DW reuses the
+    // same inventory bin numbers for entirely different things
     if (!sithNet_isMulti && !Main_bDroidWorks) {
         sithInventory_SetInventory(pThing, SITHBIN_JEDI_RANK, 7.0);
         jkPlayer_SetRank(7);

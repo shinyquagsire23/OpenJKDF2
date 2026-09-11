@@ -408,12 +408,8 @@ static void rdZRaster_DispatchNGon(const rdZVertex* pVerts, int numVerts, const 
     }
 }
 
-// Port of JK's rdRaster_sub_45CC30 — the wireframe (geometryMode 2) face drawer that
-// rdCache_DrawFaceZ dispatches to (its case 2). Draws each polygon edge (consecutive projected
-// vertices, then last->first to close the loop) as a solid line in the texinfo's solidColor, via
-// rdPrimit2_DrawLine on the current camera canvas. No depth test — matches the binary; wireframe
-// overlays whatever the filled path already drew (e.g. DW's dragged-part preview). The earlier
-// decomp dropped modes 1/2, so this never rendered.
+// Wireframe (geometryMode 2) face drawer that rdCache_DrawFaceZ dispatches to (its case 2). 
+// Draws each polygon edge as a solid line in the texinfo's solidColor
 static void rdZRaster_DrawWireframeFace(rdProcEntry* pProcEntry, rdTexinfo* pTexinfo)
 {
     rdCanvas* pCanvas = rdCamera_g_pCurCamera->pCanvas;
@@ -440,9 +436,6 @@ void rdZRaster_DrawFace(rdProcEntry* pProcEntry)
     if (rdZRaster_pZBuffer == NULL)
         return;
 
-    // Handles the two filled geometry modes JK's DrawFaceZ rasterizes: RD_GEOMETRY_FULL (textured)
-    // and RD_GEOMETRY_SOLID (flat solid fill). Wireframe (mode 2) / points (mode 1) are left to the
-    // affine path; the target must be the 8bpp canvas (16bpp is unreachable via the menu buffer).
     tVBuffer* pVBuffer = rdCamera_g_pCurCamera->pCanvas->pVBuffer;
     if (pVBuffer->surface_lock_alloc == NULL || pVBuffer->format.format.is16bit)
         return;
@@ -453,8 +446,8 @@ void rdZRaster_DrawFace(rdProcEntry* pProcEntry)
     int lightingMode = pProcEntry->lightingMode;
     if (lightingMode > rdroid_g_curLightingMode)
         lightingMode = rdroid_g_curLightingMode;
+
     // Faces flagged for the custom per-face hook (extraData&1) are drawn by rdCache_DrawFaceUser
-    // upstream, never the z-buffered path; drop them defensively. NONE (mode 0) draws nothing.
     if ((pProcEntry->extraData & 1) != 0 || geometryMode == RD_GEOMETRY_NONE)
         return;
     if (lightingMode < 0 || lightingMode >= 5)
@@ -475,9 +468,6 @@ void rdZRaster_DrawFace(rdProcEntry* pProcEntry)
     if (pTexinfo == NULL)
         return;
 
-    // Geometry-mode dispatch, mirroring JK's rdCache_DrawFaceZ switch. Wireframe (mode 2) draws the
-    // polygon outline through rdPrimit2 (JK case 2 -> rdRaster_sub_45CC30); the filled cases
-    // (SOLID/FULL) continue below. Points (mode 1, JK case 1 -> rdRaster_sub_45CB80) aren't ported.
     if (geometryMode == RD_GEOMETRY_WIREFRAME)
     {
         rdZRaster_DrawWireframeFace(pProcEntry, pTexinfo);
@@ -555,11 +545,7 @@ void rdZRaster_DrawFace(rdProcEntry* pProcEntry)
         pLightBase = pProcEntry->colormap->lightlevel;
 
     // Translucent faces (type & 2) blend the lit source over the destination through a 256x256
-    // palette transparency LUT (matches JK's TGAT/translucent scanlines). Only a colormap with a
-    // transparency section (flags & 1) allocates the table — the `transparency` pointer is
-    // UNINITIALIZED otherwise, so gate on the flag, not just non-NULL (a NULL check alone crashed
-    // on translucent faces whose colormap has no table). Prefer the proc's own colormap; fall back
-    // to the identity map.
+    // palette transparency LUT (matches JK's TGAT/translucent scanlines).
     const uint8_t* pTransTable = NULL;
     if (pProcEntry->type & 2)
         pTransTable = rdZRaster_ResolveTransTable(pProcEntry->colormap);
@@ -600,8 +586,7 @@ void rdZRaster_DrawFace(rdProcEntry* pProcEntry)
     if (textureMode > rdroid_curTextureMode)
         textureMode = rdroid_curTextureMode;
     // JK's rdCache_DrawFaceZ selects affine (AT, textureMode 0, sub_45F040 — pure linear u/v, no
-    // per-pixel divide) vs perspective (IT, textureMode 1). Dispatch faithfully; whether a face is
-    // affine or perspective is decided upstream by whatever sets its textureMode.
+    // per-pixel divide) vs perspective (IT, textureMode 1).
     int affine = (textureMode == 0);
 
     // Build the per-vertex attribute array.

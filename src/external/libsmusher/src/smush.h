@@ -106,7 +106,7 @@ typedef struct smush_ctx
     uint32_t cur_frame;
 
     codec48_ctx* c48_ctx;
-    codec47_ctx* c47_ctx; // Added: DroidWorks codec47 decoder state
+    codec47_ctx* c47_ctx;
     uint8_t* framebuffer;
     uint8_t* framebuffer_stor;
     int store_next;
@@ -163,8 +163,8 @@ uint8_t* smush_get_video(smush_ctx* ctx);
 uint32_t smush_video_width(smush_ctx* ctx);
 uint32_t smush_video_height(smush_ctx* ctx);
 int smush_video_fps(smush_ctx* ctx);
-int smush_audio_rate(smush_ctx* ctx);     // Added: SAHD-declared audio rate (11025 for DroidWorks)
-int smush_audio_channels(smush_ctx* ctx); // Added: IACT channel count (1 = mono)
+int smush_audio_rate(smush_ctx* ctx);     // SAHD-declared audio rate (11025 for DroidWorks)
+int smush_audio_channels(smush_ctx* ctx); // IACT channel count (1 = mono)
 int smush_get_current_subtitle(smush_ctx* ctx);
 
 void smush_audio_flush(smush_ctx* ctx);
