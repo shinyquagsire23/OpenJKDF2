@@ -826,14 +826,28 @@ void Window_SdlUpdate()
         switch (event.type)
         {
             case SDL_EVENT_JOYSTICK_ADDED: {
+                stdPlatform_Printf("[ev] JOYSTICK_ADDED %d\n", (int)event.jdevice.which); // Added: field-debug
                 stdControl_bReadJoysticks = 1;
                 stdControl_InitSdlJoysticks();
                 break;
             }
             case SDL_EVENT_JOYSTICK_REMOVED: {
+                stdPlatform_Printf("[ev] JOYSTICK_REMOVED %d\n", (int)event.jdevice.which); // Added: field-debug
                 stdControl_InitSdlJoysticks();
                 break;
             }
+            // Added: field-debug (Ayn Thor axes-dead hunt) — gamepad-layer events;
+            // removal/disconnect wedges axis reads while buttons kept working.
+            case SDL_EVENT_GAMEPAD_ADDED:
+                stdPlatform_Printf("[ev] GAMEPAD_ADDED %d\n", (int)event.gdevice.which);
+                break;
+            case SDL_EVENT_GAMEPAD_REMOVED:
+                stdPlatform_Printf("[ev] GAMEPAD_REMOVED %d\n", (int)event.gdevice.which);
+                stdControl_InitSdlJoysticks();
+                break;
+            case SDL_EVENT_GAMEPAD_REMAPPED:
+                stdPlatform_Printf("[ev] GAMEPAD_REMAPPED %d\n", (int)event.gdevice.which);
+                break;
 
             case SDL_EVENT_TEXT_INPUT:
                 for (int i = 0; i < _strlen(event.text.text); i++)
