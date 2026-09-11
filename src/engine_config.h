@@ -36,11 +36,16 @@
 // able to climb, creating a barrier.
 //
 // This default is based on the boxes in Training.jkl in Droidworks
-#define CANONICAL_PHYS_TICKRATE (1.0 / 25.0)
+#define CANONICAL_PHYS_TICKRATE (Main_bDroidWorks ? (1.0 / 15.0) : (1.0 / 25.0))
 
 // Use microsecond timing to calculate sithTime_deltaSecs/etc
 #if defined(PLATFORM_POSIX) && !defined(TARGET_RETRO_HOMEBREW)
 #define MICROSECOND_TIME
+#endif
+
+// Droidworks app layer (src/Dw/...), desktop-only for now
+#if !defined(TARGET_RETRO_HOMEBREW)
+#define PLATFORM_DROIDWORKS
 #endif
 
 // Original game will speed up if framerate is over 100?
@@ -180,6 +185,9 @@
 // Backport Droidworks misc
 #ifdef QOL_IMPROVEMENTS
 #define DW_CAMERA
+#ifndef DW_LASERS
+#define DW_LASERS
+#endif
 #endif
 
 #ifdef TARGET_RETRO_HOMEBREW

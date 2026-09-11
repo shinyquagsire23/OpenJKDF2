@@ -1370,7 +1370,7 @@ int stdFont_Write(const char *fpath, stdFont *font)
     }
     header.numCharsets = numCharsets;
 
-    int hGobFile = std_g_pHS->fileOpen(fpath, "wb");
+    stdFile_t hGobFile = std_g_pHS->fileOpen(fpath, "wb");
     if ( !hGobFile )
         return 0;
 

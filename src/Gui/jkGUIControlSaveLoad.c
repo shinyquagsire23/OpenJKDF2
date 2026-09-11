@@ -106,7 +106,7 @@ int jkGuiControlSaveLoad_ConfirmDelete(jkGuiElement *pElement, jkGuiMenu *pMenu,
 void jkGuiControlSaveLoad_FindFile()
 {
     stdFileSearch *v0; // esi
-    int v1; // ebx
+    stdFile_t v1; // ebx
     jkGuiControlInfo *v2; // ebp
     stdFileSearch *v3; // [esp+4h] [ebp-214h]
     char fpath[128]; // [esp+8h] [ebp-210h] BYREF

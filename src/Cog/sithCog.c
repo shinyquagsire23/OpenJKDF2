@@ -315,7 +315,7 @@ int32_t sithCog_StartupEnhanced()
         sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_GetOpenFrames,"jkgetopenframes");
     }
     
-    if (!Main_bDwCompat) {
+    if (!Main_bDwCompat && Main_bDwCogVerbs) { // Added: DW verb import into JK/MOTS is opt-in via -dwCogVerbs
         // Added for droidwork tests
         sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_dwGetActivateBin, "dwGetActivateBin");
         sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_stub1Args, "dwsetreftopic");

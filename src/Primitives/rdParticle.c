@@ -251,7 +251,7 @@ done:
 
 int rdParticle_Write(char *pFilename, rdParticle *pParticle, char *pCreatedName)
 {
-    int v3; // ebx
+    stdFile_t v3; // ebx
     unsigned int v4; // edi
     int v6; // [esp+28h] [ebp-4h]
 

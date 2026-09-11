@@ -305,7 +305,7 @@ int stdConffile_ReadLine()
   return 1;
 }
 
-int stdConffile_GetFileHandle()
+stdFile_t stdConffile_GetFileHandle()
 {
   return openFile;
 }

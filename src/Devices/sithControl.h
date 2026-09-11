@@ -56,6 +56,8 @@ MATH_FUNC void sithControl_FreeCam(SithThing *player);
 
 stdControlKeyInfoEntry* sithControl_BindControl(int functionId, int controlId, int flags);
 stdControlKeyInfoEntry* sithControl_BindAxis(int functionId, int axis, uint32_t flags);
+// Added: DroidWorks in-mission control bindings
+void sithControl_MapDefaultsDroidworks(void);
 void sithControl_UnbindFunctionIndex(int funcId, unsigned int bindIndex);
 void sithControl_UnbindControl(int flags, int controlId);
 int sithControl_ReadConf();

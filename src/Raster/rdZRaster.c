@@ -2,6 +2,7 @@
 
 #include "Engine/rdCamera.h"
 #include "Win95/stdDisplay.h"
+#include "Primitives/rdPrimit2.h" // Added: wireframe (geometryMode 2) line drawing
 #include "jk.h"
 
 #ifdef RDRASTER_SOFTWARE_RENDERER
@@ -407,14 +408,34 @@ static void rdZRaster_DispatchNGon(const rdZVertex* pVerts, int numVerts, const 
     }
 }
 
+// Wireframe (geometryMode 2) face drawer that rdCache_DrawFaceZ dispatches to (its case 2). 
+// Draws each polygon edge as a solid line in the texinfo's solidColor
+static void rdZRaster_DrawWireframeFace(rdProcEntry* pProcEntry, rdTexinfo* pTexinfo)
+{
+    rdCanvas* pCanvas = rdCamera_g_pCurCamera->pCanvas;
+    uint8_t color = (uint8_t)pTexinfo->header.solidColor;
+    rdVector3* pV = pProcEntry->aVertices;
+    int numVerts = (int)pProcEntry->numVertices;
+    if (numVerts < 2)
+        return;
+    for (int i = 0; i < numVerts - 1; i++)
+    {
+        rdPrimit2_DrawLine(pCanvas,
+                           (int)floorf((float)pV[i].x + 0.5f),     (int)floorf((float)pV[i].y + 0.5f),
+                           (int)floorf((float)pV[i + 1].x + 0.5f), (int)floorf((float)pV[i + 1].y + 0.5f),
+                           color, -1);
+    }
+    rdPrimit2_DrawLine(pCanvas,
+                       (int)floorf((float)pV[numVerts - 1].x + 0.5f), (int)floorf((float)pV[numVerts - 1].y + 0.5f),
+                       (int)floorf((float)pV[0].x + 0.5f),            (int)floorf((float)pV[0].y + 0.5f),
+                       color, -1);
+}
+
 void rdZRaster_DrawFace(rdProcEntry* pProcEntry)
 {
     if (rdZRaster_pZBuffer == NULL)
         return;
 
-    // Handles the two filled geometry modes JK's DrawFaceZ rasterizes: RD_GEOMETRY_FULL (textured)
-    // and RD_GEOMETRY_SOLID (flat solid fill). Wireframe (mode 2) / points (mode 1) are left to the
-    // affine path; the target must be the 8bpp canvas (16bpp is unreachable via the menu buffer).
     tVBuffer* pVBuffer = rdCamera_g_pCurCamera->pCanvas->pVBuffer;
     if (pVBuffer->surface_lock_alloc == NULL || pVBuffer->format.format.is16bit)
         return;
@@ -425,8 +446,9 @@ void rdZRaster_DrawFace(rdProcEntry* pProcEntry)
     int lightingMode = pProcEntry->lightingMode;
     if (lightingMode > rdroid_g_curLightingMode)
         lightingMode = rdroid_g_curLightingMode;
-    if ((geometryMode != RD_GEOMETRY_FULL && geometryMode != RD_GEOMETRY_SOLID)
-        || (pProcEntry->extraData & 1) != 0)
+
+    // Faces flagged for the custom per-face hook (extraData&1) are drawn by rdCache_DrawFaceUser
+    if ((pProcEntry->extraData & 1) != 0 || geometryMode == RD_GEOMETRY_NONE)
         return;
     if (lightingMode < 0 || lightingMode >= 5)
         return;
@@ -444,6 +466,14 @@ void rdZRaster_DrawFace(rdProcEntry* pProcEntry)
         cel = pMaterial->num_texinfo - 1;
     rdTexinfo* pTexinfo = pMaterial->texinfos[cel];
     if (pTexinfo == NULL)
+        return;
+
+    if (geometryMode == RD_GEOMETRY_WIREFRAME)
+    {
+        rdZRaster_DrawWireframeFace(pProcEntry, pTexinfo);
+        return;
+    }
+    if (geometryMode != RD_GEOMETRY_FULL && geometryMode != RD_GEOMETRY_SOLID)
         return;
 
     // Decide solid vs textured. A non-"full" texture (texture_type & 8 clear) or a texinfo with no
@@ -515,11 +545,7 @@ void rdZRaster_DrawFace(rdProcEntry* pProcEntry)
         pLightBase = pProcEntry->colormap->lightlevel;
 
     // Translucent faces (type & 2) blend the lit source over the destination through a 256x256
-    // palette transparency LUT (matches JK's TGAT/translucent scanlines). Only a colormap with a
-    // transparency section (flags & 1) allocates the table — the `transparency` pointer is
-    // UNINITIALIZED otherwise, so gate on the flag, not just non-NULL (a NULL check alone crashed
-    // on translucent faces whose colormap has no table). Prefer the proc's own colormap; fall back
-    // to the identity map.
+    // palette transparency LUT (matches JK's TGAT/translucent scanlines).
     const uint8_t* pTransTable = NULL;
     if (pProcEntry->type & 2)
         pTransTable = rdZRaster_ResolveTransTable(pProcEntry->colormap);
@@ -560,8 +586,7 @@ void rdZRaster_DrawFace(rdProcEntry* pProcEntry)
     if (textureMode > rdroid_curTextureMode)
         textureMode = rdroid_curTextureMode;
     // JK's rdCache_DrawFaceZ selects affine (AT, textureMode 0, sub_45F040 — pure linear u/v, no
-    // per-pixel divide) vs perspective (IT, textureMode 1). Dispatch faithfully; whether a face is
-    // affine or perspective is decided upstream by whatever sets its textureMode.
+    // per-pixel divide) vs perspective (IT, textureMode 1).
     int affine = (textureMode == 0);
 
     // Build the per-vertex attribute array.

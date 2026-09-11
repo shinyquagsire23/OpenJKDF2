@@ -272,7 +272,7 @@ open_fail:
 
 int rdKeyframe_Write(char *out_fpath, rdKeyframe *keyframe, char *creation_method)
 {
-    int fd;
+    stdFile_t fd;
     int totalAnimEntries;
     rdJoint *joint_iter;
     rdAnimEntry *animEntry_iter;

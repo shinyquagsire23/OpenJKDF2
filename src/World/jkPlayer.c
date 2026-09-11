@@ -68,7 +68,7 @@ flex_t jkPlayer_hudScale = 2.0;
 flex_t jkPlayer_crosshairLineWidth = 1.0;
 flex_t jkPlayer_crosshairScale = 1.0;
 flex_t jkPlayer_canonicalCogTickrate = CANONICAL_COG_TICKRATE;
-flex_t jkPlayer_canonicalPhysTickrate = CANONICAL_PHYS_TICKRATE;
+flex_t jkPlayer_canonicalPhysTickrate = 1.0 / 25.0;
 
 int jkPlayer_setCrosshairOnLightsaber = 1;
 int jkPlayer_setCrosshairOnFist = 1;

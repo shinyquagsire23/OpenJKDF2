@@ -876,18 +876,9 @@ void sithCogFunction_SetCameraMode(sithCog *pCog)
 
     camIdx = sithCogExec_PopInt(pCog);
 
-#ifdef QOL_IMPROVEMENTS
-    // Droidworks tmp
-    if (camIdx == 7)
-    {
-        camIdx = 0;
-        sithCamera_SetCameraFocus(&sithCamera_g_aCameras[camIdx], sithPlayer_g_pLocalPlayerThing, 0);
-    }
-#endif
-
-    //printf("%u -> %u\n", sithCamera_g_pCurCamera - sithCamera_g_aCameras, camIdx);
-    
-    if ( camIdx > -1 && camIdx < 7 )
+    // DroidWorks added: cam indices
+    int camMax = Main_bDwCompat ? 8 : 7;
+    if ( camIdx > -1 && camIdx < camMax )
         sithCamera_SetCurrentCamera(&sithCamera_g_aCameras[camIdx]);
 }
 
@@ -895,7 +886,8 @@ void sithCogFunction_GetCameraMode(sithCog *pCog)
 {
     int camIdx; // edx
 
-    if ( sithCamera_g_pCurCamera && (camIdx = sithCamera_g_pCurCamera - sithCamera_g_aCameras, camIdx < 7) )
+    // DroidWorks added: cam indices
+    if ( sithCamera_g_pCurCamera && (camIdx = sithCamera_g_pCurCamera - sithCamera_g_aCameras, camIdx < (Main_bDwCompat ? 8 : 7)) )
         sithCogExec_PushInt(pCog, camIdx);
     else
         sithCogExec_PushInt(pCog, -1);
@@ -1545,21 +1537,17 @@ void sithCogFunction_AutoSavegame(sithCog *pCog)
     sithGamesave_Save(tmp, 1, 0, 0);
 }
 
+// Droidworks added
 void sithCogFunction_SetCameraFocii(sithCog *pCog)
 {
     SithThing* focusThing2 = sithCogExec_PopThing(pCog);
     SithThing* focusThing = sithCogExec_PopThing(pCog);
     int camIdx = sithCogExec_PopInt(pCog);
 
-#ifdef QOL_IMPROVEMENTS
-    // Droidworks tmp
-    if (camIdx == 7)
-        camIdx = 0;
-#endif
-
-    if ( camIdx > -1 && camIdx < 7 ) // TODO macro this 7?
+    int camMax = Main_bDwCompat ? 8 : 7;
+    if ( camIdx > -1 && camIdx < camMax )
     {
-        if ( focusThing )
+        if ( focusThing && (!Main_bDwCompat || focusThing2) )
             sithCamera_SetCameraFocus(&sithCamera_g_aCameras[camIdx], focusThing, focusThing2);
     }
 }

@@ -709,7 +709,7 @@ int rdModel3_Write(char *pFilename, rdModel3 *pModel, char *pCratedName)
     int siblingIdx;
     int parentIdx;
     int childIdx;
-    int fd;
+    stdFile_t fd;
 
     fd = rdroid_g_pHS->fileOpen(pFilename, "wt+");
     if (!fd)

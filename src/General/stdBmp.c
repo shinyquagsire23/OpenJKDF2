@@ -29,7 +29,7 @@ int stdBmp_LoadEntryFromFile(const char *fpath, stdBitmap *bitmap, int create_dd
     tRasterInfo format;
     const char *fname;
 
-    int hGobFile = std_g_pHS->fileOpen(fpath, "rb");
+    stdFile_t hGobFile = std_g_pHS->fileOpen(fpath, "rb");
     if ( !hGobFile )
         return 0;
 
@@ -247,7 +247,7 @@ int stdBmp_Write(const char *fpath, stdBitmap *bitmap)
     bmpHeader.dataOffset = paletteSize + sizeof(stdBmp_Header) + sizeof(stdBmp_InfoHeader);
     bmpHeader.fileSize = rowBytes + bmpHeader.dataOffset;
 
-    int hGobFile = std_g_pHS->fileOpen(fpath, "wb");
+    stdFile_t hGobFile = std_g_pHS->fileOpen(fpath, "wb");
     if ( !hGobFile )
     {
         stdPrintf(std_g_pHS->errorPrint, ".\\General\\stdBmp.c", 0x1FB,

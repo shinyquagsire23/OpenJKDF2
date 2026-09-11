@@ -40,7 +40,7 @@ MATH_FUNC flex_t stdControl_ReadKeyAsAxis(int keyNum);
 MATH_FUNC int stdControl_ReadAxisAsKey(int axisNum);
 MATH_FUNC int stdControl_ReadKey(int keyNum, int *pOut);
 void stdControl_FinishRead();
-int stdControl_MessageHandler(HWND hWnd, UINT Msg, WPARAM wParam, HWND lParam, LRESULT* unused);
+int stdControl_MessageHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, LRESULT* unused);
 void stdControl_SetMouseSensitivity(flex_t xSensitivity, flex_t ySensitivity);
 void stdControl_UpdateKeyState(int keyNum, int bDown, uint32_t readTime);
 void stdControl_SetSDLKeydown(int keyNum, int bDown, uint32_t readTime);
@@ -77,6 +77,6 @@ BOOL stdControl_IsSystemKeyboardShowing();
 extern const stdControlDikStrToNum stdControl_aDikNumToStr[JK_TOTAL_NUM_KEYS];
 extern const char *stdControl_aAxisNames[JK_NUM_AXES+1];
 
-//static int (*stdControl_MessageHandler)(HWND a1, UINT a2, WPARAM a3, HWND a4, LRESULT *a5) = (void*)stdControl_MessageHandler_ADDR;;
+//static int (*stdControl_MessageHandler)(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5) = (void*)stdControl_MessageHandler_ADDR;;
 
 #endif // _STDCONTROL_H

@@ -40,6 +40,6 @@ int stdConffile_Read(void* pData, int size);
 int stdConffile_ReadArgsFromStr(char *pStr);
 int stdConffile_ReadArgs();
 int stdConffile_ReadLine();
-int stdConffile_GetFileHandle();
+stdFile_t stdConffile_GetFileHandle();
 
 #endif // _STDCONFFILE_H

@@ -9,7 +9,7 @@ static char16_t stdStrTable_tmpBuf[64];
 int stdStrTable_Load(stdStrTable *pStrTable, char *pFilename)
 {
     int v2; // edi
-    int hGobFile; // ebp
+    stdFile_t hGobFile; // ebp
     char *i; // esi
     char v6; // al
     int v11; // ebx

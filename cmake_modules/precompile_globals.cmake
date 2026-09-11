@@ -9,7 +9,12 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/generated)
 
 if(NOT PLAT_MSVC)
     set(PYTHON_EXE "${CMAKE_CURRENT_BINARY_DIR}/cogapp_venv/bin/python3")
-    set(COGAPP_DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/cogapp_venv/bin/cog")
+    # We invoke cog via `python3 -m cogapp`, never the `cog` console-script (which
+    # newer cogapp/Python combos don't reliably install). Use an explicit stamp file
+    # as the install command's output so it always exists after a successful install;
+    # pointing at bin/cog made the command perpetually dirty (missing output), which
+    # cascaded into regenerating globals.h/globals.c and recompiling the engine every build.
+    set(COGAPP_DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/cogapp_venv/.cogapp_installed.stamp")
 else()
     find_package(Python3 COMPONENTS Interpreter REQUIRED)
 
@@ -36,6 +41,7 @@ if(NOT PLAT_MSVC)
     add_custom_command(
         OUTPUT ${COGAPP_DEPENDS}
         COMMAND ${PYTHON_EXE} -m pip install cogapp
+        COMMAND ${CMAKE_COMMAND} -E touch ${COGAPP_DEPENDS}
         DEPENDS ${PYTHON_EXE}
     )
 endif()

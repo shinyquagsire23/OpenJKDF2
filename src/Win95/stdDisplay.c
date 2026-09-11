@@ -497,9 +497,11 @@ tVBuffer* stdDisplay_VBufferConvertColorFormat(void* a, tVBuffer* b)
     return b;
 }
 
+// TODO: actually correct gamma
 int stdDisplay_GammaCorrect3(int a1)
 {
-    jk_printf("STUB: stdDisplay_GammaCorrect3\n");
+    (void)a1;
+    _memcpy(stdDisplay_gammaPalette, stdDisplay_masterPalette, sizeof(stdDisplay_gammaPalette));
     return 1;
 }
 
