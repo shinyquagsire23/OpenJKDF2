@@ -117,6 +117,11 @@ MSGS 102          # <--- DON'T FORGET TO UPDATE THIS COUNT
    "KEY_JOY1_B25"                               0 "Joy 1 Button 25"
    "KEY_JOY1_B26"                               0 "Joy 1 Button 26"
    "KEY_JOY1_B27"                               0 "Joy 1 Button 27"
+   "KEY_JOY1_B28"                               0 "Joy 1 Button 28"
+   "KEY_JOY1_B29"                               0 "Joy 1 Button 29"
+   "KEY_JOY1_B30"                               0 "Joy 1 Button 30"
+   "KEY_JOY1_B31"                               0 "Joy 1 Button 31"
+   "KEY_JOY1_B32"                               0 "Joy 1 Button 32"
 
    "KEY_JOY2_B9"                                0 "Joy 2 Button 9"
    "KEY_JOY2_B10"                               0 "Joy 2 Button 10"
@@ -137,6 +142,11 @@ MSGS 102          # <--- DON'T FORGET TO UPDATE THIS COUNT
    "KEY_JOY2_B25"                               0 "Joy 2 Button 25"
    "KEY_JOY2_B26"                               0 "Joy 2 Button 26"
    "KEY_JOY2_B27"                               0 "Joy 2 Button 27"
+   "KEY_JOY2_B28"                               0 "Joy 2 Button 28"
+   "KEY_JOY2_B29"                               0 "Joy 2 Button 29"
+   "KEY_JOY2_B30"                               0 "Joy 2 Button 30"
+   "KEY_JOY2_B31"                               0 "Joy 2 Button 31"
+   "KEY_JOY2_B32"                               0 "Joy 2 Button 32"
 
    "KEY_MOUSE_B5"                               0 "Mouse Button 5"
    "KEY_MOUSE_B6"                               0 "Mouse Button 6"
