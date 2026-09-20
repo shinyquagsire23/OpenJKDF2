@@ -106,8 +106,15 @@ int sithWorld_Startup()
 
 void sithWorld_Shutdown()
 {
-    if ( sithWorld_g_pCurrentWorld )
+    if ( sithWorld_g_pCurrentWorld ) {
+#ifdef NO_JK_MMAP
+        /* Normal close already releases the world. The shutdown fallback must
+         * also detach its model pages before the world address can be reused. */
+        if (sithWorld_g_pCurrentWorld->aModels)
+            sithModel_FreeWorldModels(sithWorld_g_pCurrentWorld);
+#endif
         SITH_FREE(sithWorld_g_pCurrentWorld);
+    }
     if ( sithWorld_g_pStaticWorld ) {
         //SITH_FREE(sithWorld_g_pStaticWorld); // Added: Actually free everything
         sithWorld_FreeEntry(sithWorld_g_pStaticWorld); // Added: Actually free everything
@@ -925,7 +932,7 @@ void sithWorld_GetMemoryUsage(SithWorld *pWorld, int *aMemUsed, int *aCount)
     aCount[10] = pWorld->numModels;
     for (int i = 0; i < pWorld->numModels; i++)
     {
-        aMemUsed[10] += sithModel_GetModelMemUsage(&pWorld->aModels[i]);
+        aMemUsed[10] += sithModel_GetModelMemUsage(sithModel_GetWorldModelByIndex(pWorld, i));
     }
     aCount[11] = pWorld->numKeyframes;
     for (int i = 0; i < pWorld->numKeyframes; i++)
