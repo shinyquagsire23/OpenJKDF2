@@ -19,6 +19,7 @@
 #include "Main/jkHudCameraView.h"
 #include "Main/jkDev.h"
 #include "Main/jkQuakeConsole.h"
+#include "Main/jkTouchControls.h"
 #include "Engine/rdColormap.h"
 #include "Engine/sithCamera.h"
 #include "General/stdString.h"
@@ -394,6 +395,11 @@ int jkGame_Update()
 #if defined(SDL2_RENDER)
     jkQuakeConsole_Render();
 #endif
+
+    // Added: on-screen gamepad for touch-only devices. This call site is what
+    // scopes the overlay to gameplay -- jkGame_Update only runs while the world
+    // is being drawn, so the menus never see it.
+    jkTouchControls_Render();
 
 #ifdef RDRASTER_SOFTWARE_RENDERER
     // Software renderer: fold the 2D overlays (HUD + map) into the world buffer so the whole frame is

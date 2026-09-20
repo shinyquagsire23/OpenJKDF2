@@ -738,6 +738,12 @@ int jkPlayer_ReadConf(char16_t *name)
 #ifdef TARGET_RETRO_HOMEBREW
         sithControl_DefaultInit();
 #endif
+#if defined(TARGET_IOS) || defined(TARGET_ANDROID)
+        // Added: ReadConf above wiped every binding and restored only the
+        // key/button ones, so the on-screen pad's sticks would be left unbound.
+        // Narrower than the RETRO hack: it keeps the profile's own key binds.
+        sithControl_RestoreAxisBindings();
+#endif
         if ( stdConffile_ReadArgs() )
         {
             if ( stdConffile_g_entry.numArgs >= 1u

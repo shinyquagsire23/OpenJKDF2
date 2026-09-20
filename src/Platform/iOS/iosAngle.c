@@ -1,4 +1,4 @@
-// Added: entire file. See iosAngle.h for why iOS does not use SDL_GL_*.
+// See iosAngle.h for why iOS does not use SDL_GL_*.
 
 #include "Platform/iOS/iosAngle.h"
 

@@ -4,6 +4,7 @@
 #include "Win95/Window.h"
 #include "stdPlatform.h"
 #include "Main/jkQuakeConsole.h"
+#include "Main/jkTouchControls.h"
 
 #include <SDL3/SDL.h>
 
@@ -287,9 +288,14 @@ void stdControl_SetSDLKeydown(int keyNum, int bDown, uint32_t readTime)
     stdControl_UpdateKeyState(stdControl_aSdlToDik[keyNum], bDown, readTime);
 }
 
+// Added: see stdControl.h -- tracks real hardware separately from
+// stdControl_aJoystickExists, which touch builds populate for the virtual pad.
+int stdControl_bHasPhysicalJoystick = 0;
+
 void stdControl_FreeSdlJoysticks()
 {
     stdPlatform_Printf("Free SDL joysticks...\n");
+    stdControl_bHasPhysicalJoystick = 0; // Added:
     for (int i = 0; i < JK_NUM_JOYSTICKS; i++) {
         if (pJoysticks[i])
             SDL_CloseJoystick(pJoysticks[i]);
@@ -378,6 +384,7 @@ void stdControl_InitSdlJoysticks()
         stdControl_aJoystickQuirks[i] = quirks;
         stdControl_aJoystickExists[i] = 1;
         stdControl_aJoystickEnabled[i] = 1;
+        stdControl_bHasPhysicalJoystick = 1; // Added:
         stdControl_aJoystickMaxButtons[i] = numButtons;
         stdControl_aJoystickNumAxes[i] = numAxes;
         for (int j = 0; j < numAxes; j++) {
@@ -385,6 +392,37 @@ void stdControl_InitSdlJoysticks()
         }
     }
     SDL_free(aJoystickIds);
+
+#if defined(TARGET_IOS) || defined(TARGET_ANDROID)
+    // Added: with no physical pad, touch devices advertise joystick 0 as a
+    // "virtual" Xbox-style pad for the on-screen controls (jkTouchControls) to
+    // report through.
+    //
+    // This has to happen HERE, not in jkTouchControls_Startup(), because
+    // sithControl_BindAxis() bails out unless the axis is already registered
+    // (`if ((stdControl_aAxes[axis].flags & 1) == 0) return 0;`). Register later
+    // than sithControl_DefaultInit() and the stick bindings are silently never
+    // created -- the buttons work, the sticks read as permanently centred.
+    //
+    // The three descriptor arrays below are what jkGuiJoystick_PopulateList()
+    // filters its bindings list on -- aJoystickExists gates the axis rows,
+    // aJoystickMaxButtons the button rows, aJoystickEnabled the hat rows -- so
+    // leaving them clear makes the controls menu report no pad at all and offer
+    // nothing to bind.
+    if (!stdControl_bHasPhysicalJoystick) {
+        stdControl_aJoystickExists[0] = 1;
+        stdControl_aJoystickEnabled[0] = 1;
+        stdControl_aJoystickNumAxes[0] = 4;
+        // Highest button the overlay emits is KEY_JOY1_B17 (right trigger),
+        // which the menu indexes as 16; the list shows buttons < this bound.
+        stdControl_aJoystickMaxButtons[0] = 17;
+
+        stdControl_RegisterAxis(AXIS_JOY1_X, -0x7FFF, 0x7FFF, 0.0);
+        stdControl_RegisterAxis(AXIS_JOY1_Y, -0x7FFF, 0x7FFF, 0.0);
+        stdControl_RegisterAxis(AXIS_JOY1_Z, -0x7FFF, 0x7FFF, 0.0);
+        stdControl_RegisterAxis(AXIS_JOY1_R, -0x7FFF, 0x7FFF, 0.0);
+    }
+#endif
 }
 
 int stdControl_Startup()
@@ -991,6 +1029,10 @@ void stdControl_ReadControls()
             stdControl_UpdateKeyState((JK_JOYSTICK_BUTTON_STRIDE*i) + KEY_JOY1_HDOWN, !!(hatState & SDL_HAT_DOWN) /* button val */, stdControl_curReadTime);
         }
     }
+    // Added: fold the on-screen touch pad in before the mouse read -- it feeds
+    // look deltas into the same Window_lastXRel/YRel that ReadMouse consumes.
+    jkTouchControls_ReadControls();
+
     stdControl_ReadMouse();
     stdControl_lastReadTime = stdControl_curReadTime;
 }

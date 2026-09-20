@@ -58,6 +58,7 @@
 #include "Main/smack.h"
 #include "Main/jkMain.h"
 #include "Main/jkQuakeConsole.h"
+#include "Main/jkTouchControls.h"
 #include "Engine/rdroid.h"
 #include "Main/sithMain.h"
 #include "Dss/sithMulti.h"
@@ -390,6 +391,7 @@ int Main_Startup(const char *cmdline)
 #ifdef QUAKE_CONSOLE
         jkQuakeConsole_Startup(); // Added
 #endif
+        jkTouchControls_Startup(); // Added
 #ifdef RDRASTER_SOFTWARE_RENDERER
         // Force sw renderer for Droidworks, for now
         rdroid_bSoftwareRenderer = 1;
@@ -469,6 +471,7 @@ int Main_Startup(const char *cmdline)
 #ifdef QUAKE_CONSOLE
         jkQuakeConsole_Startup(); // Added
 #endif
+        jkTouchControls_Startup(); // Added
 
         if (jkRes_LoadCD(0))
         {
@@ -545,6 +548,7 @@ void Main_Shutdown()
     jkCredits_Shutdown();
     jkCutscene_Shutdown();
     jkDSS_Shutdown();
+    jkTouchControls_Shutdown(); // Added
     jkControl_Shutdown(); // Added
     jkHudInv_Shutdown();
     if ( jkCutscene_isRendering )

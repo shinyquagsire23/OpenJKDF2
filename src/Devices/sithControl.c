@@ -2364,6 +2364,45 @@ LABEL_17:
 }
 
 // Added
+// Added: re-establishes ONLY the joystick stick-axis bindings.
+//
+// sithControl_ReadConf() starts by zeroing sithControl_aInputFuncToKeyinfo and
+// then restores just the key/button binds: axis binds are never written by
+// sithControl_WriteConf() in the first place, and ReadConf's "axis" branch
+// parses its two values and throws them away. So every profile load silently
+// drops the stick bindings. On desktop that goes unnoticed because the mouse
+// carries look; on a touch device the on-screen pad's sticks ARE joystick axes,
+// so they come back dead. Mirrors the axis half of
+// sithControl_MapDefaultsJoystick() and leaves button binds untouched.
+void sithControl_RestoreAxisBindings()
+{
+    stdControlKeyInfoEntry* pMapped;
+
+    pMapped = sithControl_BindAxis(INPUT_FUNC_FORWARD, AXIS_JOY1_Y, 4u);
+    if (pMapped) {
+        pMapped->binaryAxisVal = 1.0;
+    }
+
+    if (Main_bMotsCompat) {
+        pMapped = sithControl_BindAxis(INPUT_FUNC_SLIDE, AXIS_JOY1_X, 4u);
+    }
+    else {
+        pMapped = sithControl_BindAxis(INPUT_FUNC_SLIDE, AXIS_JOY1_X, 0u);
+    }
+    if (pMapped) {
+        pMapped->binaryAxisVal = 1.0;
+    }
+
+    pMapped = sithControl_BindAxis(INPUT_FUNC_PITCH, AXIS_JOY1_R, 4u);
+    if (pMapped) {
+        pMapped->binaryAxisVal = 1.25;
+    }
+    pMapped = sithControl_BindAxis(INPUT_FUNC_TURN, AXIS_JOY1_Z, 4u);
+    if (pMapped) {
+        pMapped->binaryAxisVal = 1.5;
+    }
+}
+
 void sithControl_MapDefaultsJoystick() {
 #if !defined(TARGET_RETRO_HOMEBREW) && defined(QOL_IMPROVEMENTS)
     stdControlKeyInfoEntry* mapped;

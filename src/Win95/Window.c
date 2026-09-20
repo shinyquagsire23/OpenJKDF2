@@ -14,6 +14,7 @@
 #include "Devices/sithConsole.h"
 #include "Platform/wuRegistry.h"
 #include "Main/jkQuakeConsole.h"
+#include "Main/jkTouchControls.h"
 
 #include "Dw/dwMain.h"
 
@@ -815,6 +816,37 @@ void Window_SdlUpdate()
         int bIsOdin = 0;
         int bIsGamepad = 0;
 
+        // Added: route touches to the on-screen pad first; it returns 1 when it
+        // has claimed the finger.
+        if (jkTouchControls_HandleSdlEvent(&event)) {
+            continue;
+        }
+
+        // Added: any real hardware input retires the on-screen pad. Mouse
+        // events synthesized from touches carry SDL_TOUCH_MOUSEID and must not
+        // count, or the pad would hide itself the instant it was used.
+        switch (event.type)
+        {
+            case SDL_EVENT_KEY_DOWN:
+            case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
+            case SDL_EVENT_GAMEPAD_AXIS_MOTION:
+            case SDL_EVENT_JOYSTICK_BUTTON_DOWN:
+                jkTouchControls_NotifyPhysicalInput();
+                break;
+            case SDL_EVENT_MOUSE_BUTTON_DOWN:
+                if (event.button.which != SDL_TOUCH_MOUSEID) {
+                    jkTouchControls_NotifyPhysicalInput();
+                }
+                break;
+            case SDL_EVENT_MOUSE_MOTION:
+                if (event.motion.which != SDL_TOUCH_MOUSEID) {
+                    jkTouchControls_NotifyPhysicalInput();
+                }
+                break;
+            default:
+                break;
+        }
+
         if (event.type == SDL_EVENT_JOYSTICK_BUTTON_DOWN || event.type == SDL_EVENT_JOYSTICK_BUTTON_UP) {
             const char* name = SDL_GetJoystickNameForID(event.jbutton.which);
             bIsOdin = name && strcmp(name, "Odin Controller") == 0;
@@ -1024,10 +1056,33 @@ void Window_SdlUpdate()
                 stdControl_SetSDLKeydown(event.key.scancode, 0, (uint32_t)(event.key.timestamp / 1000000));
                 break;
             case SDL_EVENT_MOUSE_MOTION:
+                // Added: while the on-screen pad owns the screen, drop the mouse
+                // events SDL synthesizes from touches -- otherwise a thumbstick
+                // drag also warps the cursor and holds fire (KEY_MOUSE_B1 is
+                // bound to INPUT_FUNC_FIRE1 by default).
+                //
+                // This deliberately filters the events rather than switching
+                // SDL_HINT_TOUCH_MOUSE_EVENTS off: SDL tracks finger_touching /
+                // track_fingerid *inside* the same `if (touch_mouse_events)`
+                // block that emits the events, so flipping the hint mid-gesture
+                // strands that state -- the synthetic button-up never fires
+                // (stuck firing) and finger_touching stays true forever, after
+                // which no tap ever produces a click again (dead menus, and
+                // cutscenes that cannot be skipped).
+                if (jkTouchControls_IsShown() && event.motion.which == SDL_TOUCH_MOUSEID) {
+                    break;
+                }
                 Window_HandleMouseMove(&event.motion);
                 break;
             case SDL_EVENT_MOUSE_BUTTON_DOWN:
             case SDL_EVENT_MOUSE_BUTTON_UP:
+                // Added: as above -- but a button-UP is always let through, so
+                // that a press which began before the pad came up can never stay
+                // latched down.
+                if (jkTouchControls_IsShown() && event.button.which == SDL_TOUCH_MOUSEID
+                    && event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+                    break;
+                }
 
                 mevent = (SDL_MouseButtonEvent*)&event;
                 left = 0;
@@ -1531,6 +1586,15 @@ int Window_Main_Linux(int argc, char** argv)
 #if defined(TARGET_IOS)
     SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
     SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI, "1");
+    // Added: deliberately do NOT set SDL_HINT_AUDIO_CATEGORY here. Its "playback"
+    // value makes SDL want Playback + DuckOthers alone (0x2), but iOS implicitly
+    // adds MixWithOthers whenever DuckOthers is set, so a live session ALWAYS
+    // reports 0x3 -- a value that hint can never match. SDL's UpdateAudioSession
+    // would then take its mismatch branch every time and call [session
+    // setActive:NO], permanently stopping OpenAL's RemoteIO unit (music, which is
+    // SDL's own device, keeps playing while every sound effect goes silent).
+    // Left unset, SDL derives MixWithOthers|DuckOthers == 0x3, which is exactly
+    // what iosAudioSession_Initialize() installs, so SDL leaves the session alone.
 #endif
 
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_GAMEPAD);
@@ -1661,6 +1725,17 @@ int Window_Main_Linux(int argc, char** argv)
     if (jkPlayer_bHasLoadedSettingsOnce) {
         jkPlayer_WriteConf(jkPlayer_playerShortName);
     }
+
+#if defined(TARGET_IOS) || defined(TARGET_ANDROID)
+    // Added: settings are already flushed above, so quit hard rather than
+    // unwinding. Two things make the orderly path hang here: UIKit owns the run
+    // loop, so returning out of main never terminates the process, and
+    // Main_Shutdown() tears down ANGLE/OpenAL/SDL while the platform still holds
+    // references to them. _Exit rather than exit deliberately -- exit() would
+    // still run atexit handlers and the libraries' static destructors, which is
+    // the teardown being avoided.
+    _Exit(0);
+#endif
 
     Main_Shutdown();
     return 1;

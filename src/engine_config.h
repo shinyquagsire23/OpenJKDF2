@@ -555,4 +555,13 @@ extern FAST_FUNC void* __aeabi_memcpy8(void* dst, const void* src, size_t len);*
 #define UNLIKELY(cond) (cond)
 #endif
 
+// How long the nested-menu loop (jkGuiRend_DisplayAndReturnClicked) tolerates a
+// latched jkGuiRend_thing_four/thing_five pair before force-unwinding itself.
+// Long enough that the single-frame transient behind the jkGUISingleTally ESC
+// flicker never trips it, short enough that a real deadlock is not felt as a
+// hang. Only used on the SDL/retro paths, which skip the immediate unwind.
+#ifndef JKGUIREND_NESTED_UNWIND_MS
+#define JKGUIREND_NESTED_UNWIND_MS (500)
+#endif
+
 #endif // _OPENJKDF2_ENGINE_CONFIG_H

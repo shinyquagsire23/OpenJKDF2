@@ -734,6 +734,21 @@ int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5)
         case WM_SETCURSOR:
             jk_SetCursor(0);
             return 1;
+#if defined(TARGET_IOS) || defined(TARGET_ANDROID)
+        // Added: a tap has to be the skip gesture on touch-only devices. There
+        // is no keyboard to press Escape with, and the on-screen pad is not up
+        // during a cutscene -- it only exists while the world is being drawn --
+        // so the tap arrives here as a left click via SDL's touch-to-mouse
+        // synthesis. Deliberately on BUTTON_DOWN rather than UP: the click that
+        // started the cutscene from a menu can still have its UP in flight when
+        // this handler gets registered, and that would skip instantly.
+        case WM_LBUTTONDOWN:
+            if ( jkCutscene_isRendering )
+            {
+                return jkCutscene_sub_421410();
+            }
+            return 0;
+#endif
         case WM_CHAR:
             if ( a3 == VK_ESCAPE )
             {

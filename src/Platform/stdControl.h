@@ -77,6 +77,12 @@ BOOL stdControl_IsSystemKeyboardShowing();
 extern const stdControlDikStrToNum stdControl_aDikNumToStr[JK_TOTAL_NUM_KEYS];
 extern const char *stdControl_aAxisNames[JK_NUM_AXES+1];
 
+// Added: nonzero when a real, physical pad was enumerated by SDL. Touch targets
+// advertise a virtual joystick 0 (so the controls menu can bind it), which means
+// stdControl_aJoystickExists no longer distinguishes "has hardware" -- the
+// on-screen pad keys off this instead to decide whether to hide itself.
+extern int stdControl_bHasPhysicalJoystick;
+
 //static int (*stdControl_MessageHandler)(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5) = (void*)stdControl_MessageHandler_ADDR;;
 
 #endif // _STDCONTROL_H

@@ -330,22 +330,51 @@ int32_t jkGuiRend_DisplayAndReturnClicked(jkGuiMenu *menu)
 #endif
 
     jkGuiRend_SetCursorVisible(1);
+#if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
+    uint32_t stuckSinceMs = 0; // Added: see the watchdog below
+#endif
     while ( !menu->lastClicked )
     {
         msgret = Window_MessageLoop();
+
+        // Added: hoisted out of the else below. A quit request has to be honored
+        // whichever branch runs, or asking to quit from inside a nested menu
+        // (main menu -> confirm dialog) latches thing_four and leaves this loop
+        // spinning forever with g_should_exit set but never looked at.
+        if ( g_should_exit )
+            jk_exit(msgret);
+
         if ( jkGuiRend_thing_four && jkGuiRend_thing_five )
         { 
             // Added: this makes the menu that appears when pressing ESC in jkGUISingleTally flicker,
             //        I think due to how we handle window message emulation.
 #if !defined(SDL2_RENDER) && !defined(TARGET_RETRO_HOMEBREW)
             menu->lastClicked = -1;
+#else
+            // Added: leaving the unwind out entirely deadlocks. thing_four is
+            // only ever cleared by the else branch here or by jkMain_GuiAdvance
+            // when !thing_five, so once a state change is requested while a
+            // nested menu is up, both conditions latch and neither clears --
+            // the menu stops responding permanently (every nested Yes/No dialog:
+            // Restore Defaults, quit confirm). Unwinding immediately is what
+            // causes the jkGUISingleTally flicker, so only do it once the pair
+            // has stayed latched long enough to be a genuine deadlock rather
+            // than the single-frame transient the flicker comes from.
+            {
+                uint32_t nowMs = stdPlatform_GetTimeMsec();
+                if ( !stuckSinceMs )
+                    stuckSinceMs = nowMs;
+                else if ( nowMs - stuckSinceMs >= JKGUIREND_NESTED_UNWIND_MS )
+                    menu->lastClicked = -1;
+            }
 #endif
         }
         else
         {
+#if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
+            stuckSinceMs = 0; // Added:
+#endif
             jkGuiRend_thing_four = 0;
-            if ( g_should_exit )
-                jk_exit(msgret);
             if ( menu->idkFunc && !menu->lastClicked )
                 menu->idkFunc(menu);
         }

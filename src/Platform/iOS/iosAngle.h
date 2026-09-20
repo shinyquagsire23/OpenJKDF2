@@ -1,7 +1,7 @@
 #ifndef _OPENJKDF2_IOS_ANGLE_H
 #define _OPENJKDF2_IOS_ANGLE_H
 
-// Added: iOS renders GLES3 through ANGLE (Metal backend) instead of through
+// iOS renders GLES3 through ANGLE (Metal backend) instead of through
 // SDL's GL context. SDL3's UIKit video backend only knows EAGL -- Apple's
 // deprecated in-OS GLES -- and offers no EGL at all, so the engine would have
 // had to be ported off GLSL ES entirely. Driving ANGLE directly keeps

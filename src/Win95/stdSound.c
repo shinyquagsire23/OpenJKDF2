@@ -7,6 +7,10 @@
 
 #include <stdio.h>
 
+#ifdef TARGET_IOS
+#include "Platform/iOS/iosAudioSession.h"
+#endif
+
 #include "jk.h"
 
 flex_t stdSound_fMenuVolume = 1.0f;
@@ -101,6 +105,14 @@ int stdSound_Startup()
 	ALint source_state;
 
 	printf("Using OpenAL+ALUT as audio backend\n");
+
+#ifdef TARGET_IOS
+    // Added: iOS silently mutes a process that never configures an
+    // AVAudioSession whenever the ring/silent switch is engaged. Must run
+    // before alcOpenDevice() -- OpenAL's CoreAudio backend starts its audio unit
+    // there, and starting it under the wrong category is what goes quiet.
+    iosAudioSession_Initialize();
+#endif
 
 	enumeration = alcIsExtensionPresent(NULL, "ALC_ENUMERATION_EXT");
 	if (enumeration == AL_FALSE)
@@ -401,7 +413,7 @@ int stdSound_BufferQueueAfterAnother(stdSound_buffer_t* bufPrev, stdSound_buffer
     if (source_state != AL_PLAYING) {
         alSourcePlay(bufPrev->source);
     }
-    
+
     return 1;
 }
 
