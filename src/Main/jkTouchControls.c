@@ -75,28 +75,28 @@ typedef struct jkTouchButton
 // arrangement plus the familiar ABXY colours is the whole affordance.
 static const jkTouchButton jkTouchControls_aButtons[JKTOUCH_MAX_BUTTONS] = {
     // ABXY diamond, upper right, above the right stick.
-    { 0.895f, 0.400f, 0.060f, KEY_JOY1_B1,     0x6C, 0xC2, 0x4A }, // A  green   use last selected
-    { 0.948f, 0.290f, 0.060f, KEY_JOY1_B2,     0xE0, 0x2B, 0x2B }, // B  red     duck
-    { 0.842f, 0.290f, 0.060f, KEY_JOY1_B3,     0x3A, 0x7B, 0xD5 }, // X  blue    activate
-    { 0.895f, 0.180f, 0.060f, KEY_JOY1_B4,     0xF2, 0xC5, 0x11 }, // Y  yellow  jump
+    { 0.895f, 0.600f, 0.060f, KEY_JOY1_B1,     0x6C, 0xC2, 0x4A }, // A  green   use last selected
+    { 0.948f, 0.490f, 0.060f, KEY_JOY1_B2,     0xE0, 0x2B, 0x2B }, // B  red     duck
+    { 0.842f, 0.490f, 0.060f, KEY_JOY1_B3,     0x3A, 0x7B, 0xD5 }, // X  blue    activate
+    { 0.895f, 0.380f, 0.060f, KEY_JOY1_B4,     0xF2, 0xC5, 0x11 }, // Y  yellow  jump
 
     // D-pad, upper left, above the left stick: inventory and Force cycling.
-    { 0.105f, 0.180f, 0.048f, KEY_JOY1_HUP,    0x78, 0x78, 0x78 }, // up     next inv
-    { 0.105f, 0.400f, 0.048f, KEY_JOY1_HDOWN,  0x78, 0x78, 0x78 }, // down   prev inv
-    { 0.052f, 0.290f, 0.048f, KEY_JOY1_HLEFT,  0x78, 0x78, 0x78 }, // left   prev skill
-    { 0.158f, 0.290f, 0.048f, KEY_JOY1_HRIGHT, 0x78, 0x78, 0x78 }, // right  next skill
+    { 0.105f, 0.380f, 0.048f, KEY_JOY1_HUP,    0x78, 0x78, 0x78 }, // up     next inv
+    { 0.105f, 0.600f, 0.048f, KEY_JOY1_HDOWN,  0x78, 0x78, 0x78 }, // down   prev inv
+    { 0.052f, 0.490f, 0.048f, KEY_JOY1_HLEFT,  0x78, 0x78, 0x78 }, // left   prev skill
+    { 0.158f, 0.490f, 0.048f, KEY_JOY1_HRIGHT, 0x78, 0x78, 0x78 }, // right  next skill
 
     // Triggers and shoulders along the top edge. The right trigger is primary
     // fire and gets the biggest target, being the most used control in the game.
-    { 0.957f, 0.075f, 0.058f, KEY_JOY1_B17,    0xC8, 0xC8, 0xC8 }, // RT  fire 1
-    { 0.858f, 0.075f, 0.044f, KEY_JOY1_B11,    0x90, 0x90, 0x90 }, // RB  next weapon
-    { 0.043f, 0.075f, 0.058f, KEY_JOY1_B16,    0xC8, 0xC8, 0xC8 }, // LT  fire 2
-    { 0.142f, 0.075f, 0.044f, KEY_JOY1_B10,    0x90, 0x90, 0x90 }, // LB  prev weapon
+    { 0.930f, 0.90f, 0.058f, KEY_JOY1_B17,    0xC8, 0xC8, 0xC8 }, // RT  fire 1
+    { 0.930f, 0.75f, 0.044f, KEY_JOY1_B11,    0x90, 0x90, 0x90 }, // RB  next weapon
+    { 0.070f, 0.90f, 0.058f, KEY_JOY1_B16,    0xC8, 0xC8, 0xC8 }, // LT  fire 2
+    { 0.070f, 0.75f, 0.044f, KEY_JOY1_B10,    0x90, 0x90, 0x90 }, // LB  prev weapon
 
     // Back/Start, tucked inboard of the sticks along the bottom so they clear
     // both the level title at the top centre and the home indicator.
-    { 0.255f, 0.900f, 0.038f, KEY_JOY1_B5,     0x88, 0x88, 0x88 }, // Back
-    { 0.745f, 0.900f, 0.038f, KEY_JOY1_B7,     0x88, 0x88, 0x88 }, // Start (menu)
+    { 0.455f, 0.900f, 0.038f, KEY_JOY1_B5,     0x88, 0x88, 0x88 }, // Back
+    { 0.545f, 0.900f, 0.038f, KEY_JOY1_B7,     0x88, 0x88, 0x88 }, // Start (menu)
 };
 
 // Index of Start in the table above; it additionally drives the shared
@@ -105,10 +105,10 @@ static const jkTouchButton jkTouchControls_aButtons[JKTOUCH_MAX_BUTTONS] = {
 #define JKTOUCH_BTN_START       (13)
 
 // Sticks, same normalization as the buttons.
-#define JKTOUCH_LSTICK_NX       (0.105f)
-#define JKTOUCH_LSTICK_NY       (0.700f)
-#define JKTOUCH_RSTICK_NX       (0.895f)
-#define JKTOUCH_RSTICK_NY       (0.700f)
+#define JKTOUCH_LSTICK_NX       (0.205f)
+#define JKTOUCH_LSTICK_NY       (0.800f)
+#define JKTOUCH_RSTICK_NX       (0.795f)
+#define JKTOUCH_RSTICK_NY       (0.800f)
 #define JKTOUCH_STICK_NR        (0.185f)
 
 typedef struct jkTouchFinger
@@ -197,29 +197,88 @@ static void jkTouchControls_StickRect(int bRight, flex_t* pCx, flex_t* pCy, flex
     *pR  = JKTOUCH_STICK_NR * jkTouchControls_screenH;
 }
 
-// Filled disc, rasterized as contiguous horizontal bands. std3D's UI layer only
-// offers axis-aligned rects, so the disc is scanned out in strips; each strip
-// starts exactly where the previous one ended (integer y throughout) because
-// computing the strips in float and truncating independently leaves visible
-// 1px seams through the middle of every button.
+// Alpha levels for the whole overlay, 0..1. The pad sits on top of live
+// gameplay, so it is deliberately faint -- enough to find a thumb by, not
+// enough to hide what is being shot at.
+#define JKTOUCH_ALPHA_STICK_BASE    (0.32f)
+#define JKTOUCH_ALPHA_STICK_KNOB    (0.42f)
+#define JKTOUCH_ALPHA_BUTTON        (0.38f)
+#define JKTOUCH_ALPHA_BUTTON_HELD   (0.55f)
+
+// Horizontal bands a disc is split into. Bands stay one pixel tall until a disc
+// needs more than this, then thicken; the edge feather below hides the banding,
+// and the cap keeps the biggest disc (a stick base, ~355px tall in the 960-high
+// UI space) from flooding the shared UI vertex batch.
+#define JKTOUCH_CIRCLE_MAX_BANDS    (64)
+
+// One overlay rect. alpha is 0..1 and the colour is premultiplied by it here:
+// the UI render list blends with (GL_ONE, GL_ONE_MINUS_SRC_ALPHA) and the UI
+// shader does not premultiply, so handing it a straight colour at half alpha
+// would add the colour at full brightness and merely let more background
+// through -- a bright haze rather than a translucent pad.
+static void jkTouchControls_FillRect(int x, int y, int w, int h,
+                                     uint8_t cr, uint8_t cg, uint8_t cb, flex_t alpha)
+{
+    if (w <= 0 || h <= 0) {
+        return;
+    }
+    if (alpha > 1.0f) {
+        alpha = 1.0f;
+    }
+    // Below this the premultiplied colour quantizes to nothing anyway.
+    if (alpha < (1.0f / 255.0f)) {
+        return;
+    }
+
+    rdRect rect;
+    rect.x      = x;
+    rect.y      = y;
+    rect.width  = w;
+    rect.height = h;
+
+    std3D_DrawUIClearedRectRGBA((uint8_t)((flex_t)cr * alpha),
+                                (uint8_t)((flex_t)cg * alpha),
+                                (uint8_t)((flex_t)cb * alpha),
+                                (uint8_t)(alpha * 255.0f),
+                                &rect);
+}
+
+// Half-width of a disc of radius r at vertical distance dy from its centre.
+static flex_t jkTouchControls_CircleHalfWidth(flex_t r, flex_t dy)
+{
+    flex_t inner = (r * r) - (dy * dy);
+    if (inner <= 0.0f) {
+        return 0.0f;
+    }
+    return stdMath_Sqrt(inner);
+}
+
+// Filled disc. std3D's UI layer only offers axis-aligned integer rects, so the
+// disc is scanned out as horizontal bands -- and a stack of bands is a
+// staircase, which is what made the pad look so ragged.
+//
+// Each band is therefore drawn as an inscribed core at the band's alpha plus a
+// "feather" rect on either side whose alpha carries exactly the fractional
+// coverage the core could not reach. Because the feather spreads the band's
+// leftover *area* (Simpson-averaged half-width minus the core), the edge reads
+// as antialiased rather than merely blurred, and partially-filled cap bands
+// scale their alpha by how much of the band is actually inside the disc.
 static void jkTouchControls_FillCircle(flex_t cx, flex_t cy, flex_t r,
-                                       uint8_t cr, uint8_t cg, uint8_t cb, uint8_t ca)
+                                       uint8_t cr, uint8_t cg, uint8_t cb, flex_t alpha)
 {
     if (r <= 1.0f) {
         return;
     }
 
-    int top = (int)(cy - r);
-    int bot = (int)(cy + r);
+    int top = (int)stdMath_Floor(cy - r);
+    int bot = (int)stdMath_Ceil(cy + r);
     if (bot <= top) {
         return;
     }
 
-    // ~3px strips keep even the large stick base looking round, with an upper
-    // bound on strip count so a huge radius cannot spam the UI batch.
-    int step = (bot - top) / 64;
-    if (step < 3) {
-        step = 3;
+    int step = ((bot - top) + (JKTOUCH_CIRCLE_MAX_BANDS - 1)) / JKTOUCH_CIRCLE_MAX_BANDS;
+    if (step < 1) {
+        step = 1;
     }
 
     for (int y = top; y < bot; y += step)
@@ -229,28 +288,82 @@ static void jkTouchControls_FillCircle(flex_t cx, flex_t cy, flex_t r,
             yEnd = bot;
         }
 
-        // Half-width is taken at whichever edge of the strip is further from the
-        // centre line, so strips stay inscribed rather than bulging out.
-        flex_t dTop = (flex_t)y - cy;
-        flex_t dBot = (flex_t)yEnd - cy;
-        flex_t d = (stdMath_Fabs(dTop) > stdMath_Fabs(dBot)) ? dTop : dBot;
-
-        flex_t inner = (r * r) - (d * d);
-        if (inner <= 0.0f) {
+        // Clamped to the disc, so a cap band measures only the slice of itself
+        // that is actually inside it.
+        flex_t yTop = (flex_t)y;
+        flex_t yBot = (flex_t)yEnd;
+        if (yTop < cy - r) {
+            yTop = cy - r;
+        }
+        if (yBot > cy + r) {
+            yBot = cy + r;
+        }
+        if (yBot <= yTop) {
             continue;
         }
 
-        flex_t halfWidth = stdMath_Sqrt(inner);
-        rdRect rect;
-        rect.x      = (int)(cx - halfWidth);
-        rect.y      = y;
-        rect.width  = (int)(halfWidth * 2.0f);
-        rect.height = yEnd - y;
+        flex_t bandA = alpha * ((yBot - yTop) / (flex_t)(yEnd - y));
 
-        if (rect.width <= 0 || rect.height <= 0) {
+        flex_t wTop = jkTouchControls_CircleHalfWidth(r, yTop - cy);
+        flex_t wBot = jkTouchControls_CircleHalfWidth(r, yBot - cy);
+        flex_t wMid = jkTouchControls_CircleHalfWidth(r, (0.5f * (yTop + yBot)) - cy);
+
+        // Narrowest half-width is covered across the band's whole height; the
+        // widest bounds the feather. A band straddling the equator is widest at
+        // the equator itself rather than at either of its edges.
+        flex_t wIn  = (wTop < wBot) ? wTop : wBot;
+        flex_t wOut = (wTop > wBot) ? wTop : wBot;
+        if (yTop <= cy && cy <= yBot) {
+            wOut = r;
+        }
+
+        // Simpson's rule: the height-averaged half-width, i.e. the band's area
+        // over its height. Core plus feathers distribute exactly this much.
+        flex_t wAvg = (wTop + (4.0f * wMid) + wBot) / 6.0f;
+
+        int h    = yEnd - y;
+        int xIn0 = (int)stdMath_Ceil(cx - wIn);
+        int xIn1 = (int)stdMath_Floor(cx + wIn);
+
+        if (xIn1 <= xIn0)
+        {
+            // Cap band: too thin to inscribe a core, so the whole band is one
+            // rect carrying its area.
+            int x0 = (int)stdMath_Floor(cx - wOut);
+            int x1 = (int)stdMath_Ceil(cx + wOut);
+            if (x1 <= x0) {
+                x0 = (int)cx;
+                x1 = x0 + 1;
+            }
+            jkTouchControls_FillRect(x0, y, x1 - x0, h, cr, cg, cb,
+                                     bandA * ((2.0f * wAvg) / (flex_t)(x1 - x0)));
             continue;
         }
-        std3D_DrawUIClearedRectRGBA(cr, cg, cb, ca, &rect);
+
+        jkTouchControls_FillRect(xIn0, y, xIn1 - xIn0, h, cr, cg, cb, bandA);
+
+        // Feathers: as wide as whatever the core left over (at least one pixel,
+        // so the near-vertical sides of a big disc still get an edge), carrying
+        // the leftover area spread across that width.
+        int fwL = xIn0 - (int)stdMath_Floor(cx - wOut);
+        if (fwL < 1) {
+            fwL = 1;
+        }
+        flex_t restL = wAvg - (cx - (flex_t)xIn0);
+        if (restL > 0.0f) {
+            jkTouchControls_FillRect(xIn0 - fwL, y, fwL, h, cr, cg, cb,
+                                     bandA * (restL / (flex_t)fwL));
+        }
+
+        int fwR = (int)stdMath_Ceil(cx + wOut) - xIn1;
+        if (fwR < 1) {
+            fwR = 1;
+        }
+        flex_t restR = wAvg - ((flex_t)xIn1 - cx);
+        if (restR > 0.0f) {
+            jkTouchControls_FillRect(xIn1, y, fwR, h, cr, cg, cb,
+                                     bandA * (restR / (flex_t)fwR));
+        }
     }
 }
 
@@ -259,13 +372,13 @@ static void jkTouchControls_DrawStick(int bRight, flex_t deflectX, flex_t deflec
     flex_t cx, cy, r;
     jkTouchControls_StickRect(bRight, &cx, &cy, &r);
 
-    jkTouchControls_FillCircle(cx, cy, r, 0x20, 0x20, 0x20, 0x50);
+    jkTouchControls_FillCircle(cx, cy, r, 0x30, 0x30, 0x30, JKTOUCH_ALPHA_STICK_BASE);
 
     flex_t knobR = r * 0.42f;
     flex_t knobX = cx + (deflectX * (r - knobR));
     flex_t knobY = cy + (deflectY * (r - knobR));
 
-    jkTouchControls_FillCircle(knobX, knobY, knobR, 0xD0, 0xD0, 0xD0, 0xA0);
+    jkTouchControls_FillCircle(knobX, knobY, knobR, 0xE0, 0xE0, 0xE0, JKTOUCH_ALPHA_STICK_KNOB);
 }
 
 static void jkTouchControls_ReleaseAll(void)
@@ -650,7 +763,8 @@ void jkTouchControls_Render(void)
         jkTouchControls_ButtonRect(&jkTouchControls_aButtons[i], &cx, &cy, &r);
 
         const jkTouchButton* pBtn = &jkTouchControls_aButtons[i];
-        uint8_t alpha = jkTouchControls_aButtonHeld[i] ? 0xE0 : 0x88;
+        flex_t alpha = jkTouchControls_aButtonHeld[i] ? JKTOUCH_ALPHA_BUTTON_HELD
+                                                      : JKTOUCH_ALPHA_BUTTON;
 
         jkTouchControls_FillCircle(cx, cy, r, pBtn->r, pBtn->g, pBtn->b, alpha);
     }
