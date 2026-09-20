@@ -747,7 +747,7 @@ sithSound* sithCogExec_PopSound(sithCog *pCog)
     
     if ( world && idx >= 0 && idx < world->numSoundsLoaded )
     {
-        return &world->sounds[idx];
+        return sithSound_GetWorldSoundByIndex(world, idx);
     }
 
     return NULL;

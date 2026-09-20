@@ -18,6 +18,10 @@
 #define sithSound_FreeUpMemory_ADDR (0x004EF6C0)
 #define sithSound_InitFromPath_ADDR (0x004EF7E0)
 
+// 0x8000 tags static IDs; leave 0xffff available for the -1 wire sentinel.
+#define SITHSOUND_MAX_RECORDS 32767
+#define SITHSOUND_PAGE_RECORDS 256
+
 int sithSound_Startup();
 int sithSound_Shutdown();
 int sithSound_ReadSoundsListText(SithWorld *pWorld, int bSkip);
@@ -25,6 +29,7 @@ void sithSound_FreeWorldSounds(SithWorld *pWorld);
 int sithSound_New(SithWorld *world, int num);
 sithSound* sithSound_Load(char *sound_fname, int a2);
 sithSound* sithSound_GetFromIdx(int idx);
+sithSound* sithSound_GetWorldSoundByIndex(SithWorld *world, int idx);
 int sithSound_LoadFileData(sithSound *sound);
 int sithSound_UnloadData(sithSound *sound);
 stdSound_buffer_t* sithSound_LoadData(sithSound *sound);
