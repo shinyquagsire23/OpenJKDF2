@@ -656,10 +656,10 @@ jkCutscene_dword_55AA50 0x0055AA50 int
 jkCutscene_55AA54 0x0055AA54 int
 
 jkMain_aLevelJklFname 0x005528D0 char[128]
-thing_nine 0x0052552C int = 1
+jkMain_bAppResumed 0x0052552C int = 1 // focus-regain work (unpause/re-activate controls) has been applied
 jkMain_bInit 0x00552B80 int
-thing_six 0x00552B90 int
-thing_eight 0x00552B94 int
+jkMain_bInModalGui 0x00552B90 int // a blocking menu/dialog is up over gameplay; skip the sith tick
+jkMain_bLevelActive 0x00552B94 int // a level is loaded and the video mode is set, so gameplay may tick
 jkMain_dword_552B98 0x00552B98 int
 jkMain_lastTickMs 0x00552B9C int
 idx_13b4_related 0x008C4BD8 int

@@ -49,8 +49,8 @@ int jkSmack_SmackPlay(const char *fname)
     if ( stdComm_EarlyInit() || jkPlayer_setDisableCutscenes )
 #endif
     {
-        if ( jkGuiRend_thing_five )
-            jkGuiRend_thing_four = 1;
+        if ( jkGuiRend_menuNestDepth )
+            jkGuiRend_bStateChangePending = 1;
 
         jkSmack_stopTick = 1;
         jkSmack_nextGuiState = JK_GAMEMODE_TITLE;
@@ -69,8 +69,8 @@ int jkSmack_SmackPlay(const char *fname)
 
     if ( !util_FileExists(std_g_genBuffer) )
     {
-        if ( jkGuiRend_thing_five )
-            jkGuiRend_thing_four = 1;
+        if ( jkGuiRend_menuNestDepth )
+            jkGuiRend_bStateChangePending = 1;
 
         jkSmack_stopTick = 1;
         jkSmack_nextGuiState = JK_GAMEMODE_TITLE;
@@ -78,8 +78,8 @@ int jkSmack_SmackPlay(const char *fname)
     }
     jkRes_FileExists(std_g_genBuffer, jkMain_aLevelJklFname, 128);
 
-    if ( jkGuiRend_thing_five )
-        jkGuiRend_thing_four = 1;
+    if ( jkGuiRend_menuNestDepth )
+        jkGuiRend_bStateChangePending = 1;
 
     jkSmack_stopTick = 1;
     jkSmack_nextGuiState = JK_GAMEMODE_VIDEO;

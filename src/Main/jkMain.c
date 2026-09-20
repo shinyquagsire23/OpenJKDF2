@@ -128,13 +128,13 @@ int jkMain_SetVideoMode()
         goto LABEL_12;
     if ( !sithNet_isMulti )
     {
-        thing_six = 1;
+        jkMain_bInModalGui = 1;
         sithControl_Close();
         v3 = jkStrings_GetUniStringWithFallback("ERR_CHANGING_VIDEO_DESC");
         v1 = jkStrings_GetUniStringWithFallback("ERR_CHANGING_VIDEO_MODE");
         jkGuiDialog_ErrorDialog(v1, v3);
         sithControl_Open();
-        thing_six = 0;
+        jkMain_bInModalGui = 0;
     }
     _memcpy(&Video_modeStruct, &Video_modeStruct2, sizeof(Video_modeStruct));
     jkGuiDisplay_sub_4149C0();
@@ -150,8 +150,8 @@ LABEL_12:
         jkPlayer_Close();
         if ( sithControl_IsOpen() )
             sithControl_Close();
-        if ( jkGuiRend_thing_five )
-            jkGuiRend_thing_four = 1;
+        if ( jkGuiRend_menuNestDepth )
+            jkGuiRend_bStateChangePending = 1;
         jkSmack_stopTick = 1;
         jkSmack_nextGuiState = 3;
         v4 = jkStrings_GetUniStringWithFallback("ERR_CHANGING_VIDEO_ABORT");
@@ -186,8 +186,8 @@ int jkMain_SwitchTo5_2()
     result = 1;
     jkSmack_gameMode = 4;
     jkPlayer_bLoadingSomething = 1;
-    if ( jkGuiRend_thing_five )
-        jkGuiRend_thing_four = 1;
+    if ( jkGuiRend_menuNestDepth )
+        jkGuiRend_bStateChangePending = 1;
     jkSmack_stopTick = 1;
     jkSmack_nextGuiState = 5;
     return result;
@@ -201,8 +201,8 @@ int jkMain_SwitchTo5(char *pJklFname)
     jkMain_aLevelJklFname[127] = 0;
     jkSmack_gameMode = 3;
     result = 1;
-    if ( jkGuiRend_thing_five )
-        jkGuiRend_thing_four = 1;
+    if ( jkGuiRend_menuNestDepth )
+        jkGuiRend_bStateChangePending = 1;
     jkSmack_stopTick = 1;
     jkSmack_nextGuiState = 5;
     return result;
@@ -226,11 +226,11 @@ void jkMain_GuiAdvance()
 
     if ( !g_app_suspended )
     {
-        if ( thing_nine )
+        if ( jkMain_bAppResumed )
             stdControl_SetActivation(0);
-        if ( thing_eight )
+        if ( jkMain_bLevelActive )
         {
-            if ( sithNet_isMulti && !thing_six)
+            if ( sithNet_isMulti && !jkMain_bInModalGui)
             {
                 v1 = stdPlatform_GetTimeMsec();
                 
@@ -242,11 +242,11 @@ void jkMain_GuiAdvance()
                 
                 if ( g_sithMode == 5 )
                 {
-                    if ( jkGuiRend_thing_five )
-                        jkGuiRend_thing_four = 1;
+                    if ( jkGuiRend_menuNestDepth )
+                        jkGuiRend_bStateChangePending = 1;
                     jkSmack_stopTick = 1;
                     jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
-                    thing_nine = 0;
+                    jkMain_bAppResumed = 0;
                     return;
                 }
                 if ( sithMulti_bTimelimitMet )
@@ -274,11 +274,11 @@ void jkMain_GuiAdvance()
                 jkGame_updateMsecsTotal += stdPlatform_GetTimeMsec() - v3;
             }
         }
-        thing_nine = 0;
+        jkMain_bAppResumed = 0;
         return;
     }
 
-    if ( !thing_nine )
+    if ( !jkMain_bAppResumed )
     {
         switch ( jkSmack_currentGuiState )
         {
@@ -297,11 +297,11 @@ void jkMain_GuiAdvance()
                 break;
         }
         stdControl_Flush();
-        thing_nine = 1;
+        jkMain_bAppResumed = 1;
     }
-    if ( jkSmack_stopTick && !jkGuiRend_thing_five )
+    if ( jkSmack_stopTick && !jkGuiRend_menuNestDepth )
     {
-        jkGuiRend_thing_four = 0;
+        jkGuiRend_bStateChangePending = 0;
         v4 = jkSmack_currentGuiState;
         v5 = jkMain_aGuiStateFuncs[jkSmack_currentGuiState].leaveFunc;
         if ( v5 )
@@ -349,11 +349,11 @@ void jkMain_EscapeMenuTick(int a2)
         return;
     }
 
-    if (thing_six) {
+    if (jkMain_bInModalGui) {
         return;
     }
     
-    if (!thing_eight) {
+    if (!jkMain_bLevelActive) {
         return;
     }
 
@@ -367,8 +367,8 @@ void jkMain_EscapeMenuTick(int a2)
     
     if ( g_sithMode == 5 )
     {
-        if ( jkGuiRend_thing_five )
-            jkGuiRend_thing_four = 1;
+        if ( jkGuiRend_menuNestDepth )
+            jkGuiRend_bStateChangePending = 1;
         jkSmack_stopTick = 1;
         jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
     }
@@ -428,11 +428,11 @@ void jkMain_EscapeMenuLeave(int a2, int a3)
             jkPlayer_Shutdown();
             sithClose();
             jkMain_bInit = 0;
-            thing_eight = 0;
+            jkMain_bLevelActive = 0;
         }
         if ( sithNet_isMulti && a3 != JK_GAMEMODE_ESCAPE )
         {
-            thing_eight = 0;
+            jkMain_bLevelActive = 0;
             if ( a3 == 3 ) {
                 // MOTS added
                 if (Main_bMotsCompat) {
@@ -445,14 +445,14 @@ void jkMain_EscapeMenuLeave(int a2, int a3)
             }
             if ( sithNet_isServer )
                 DirectPlay_SetSessionFlagidk(0);
-            thing_six = 1;
+            jkMain_bInModalGui = 1;
             v3 = jkGuiMultiTally_Show(sithNet_isMulti);
-            thing_six = 0;
+            jkMain_bInModalGui = 0;
             if ( v3 == -1 )
             {
                 sithMulti_Shutdown();
-                if ( jkGuiRend_thing_five )
-                    jkGuiRend_thing_four = 1;
+                if ( jkGuiRend_menuNestDepth )
+                    jkGuiRend_bStateChangePending = 1;
                 jkSmack_stopTick = 1;
                 jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
             }
@@ -493,8 +493,8 @@ void jkMain_EndLevelScreenShow(int a1, int a2)
         }
     }
 
-    if ( jkGuiRend_thing_five )
-        jkGuiRend_thing_four = 1;
+    if ( jkGuiRend_menuNestDepth )
+        jkGuiRend_bStateChangePending = 1;
     jkSmack_stopTick = 1;
     jkSmack_nextGuiState = 3;
     return;
@@ -592,8 +592,8 @@ void jkMain_GameplayShow(int a1, int a2)
                 jkPlayer_Close();
                 jkGame_isDDraw = 0;
             }
-            if ( jkGuiRend_thing_five )
-                jkGuiRend_thing_four = 1;
+            if ( jkGuiRend_menuNestDepth )
+                jkGuiRend_bStateChangePending = 1;
             jkSmack_stopTick = 1;
             jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
             v6 = jkStrings_GetUniStringWithFallback("ERR_CANNOT_LOAD_LEVEL");
@@ -647,23 +647,23 @@ LABEL_28:
             }
         }
         else {
-            thing_six = 1;
+            jkMain_bInModalGui = 1;
             stdControl_SetActivation(0);
 #if !defined(TARGET_NO_MULTIPLAYER_MENUS)
             if ( jkGuiMultiplayer_ShowSynchronizing() == 1 )
             {
-                thing_six = 0;
+                jkMain_bInModalGui = 0;
                 stdControl_SetActivation(1);
                 goto LABEL_28;
             }
 #endif
             sithClose();
             sithMulti_Shutdown();
-            if ( jkGuiRend_thing_five )
-                jkGuiRend_thing_four = 1;
+            if ( jkGuiRend_menuNestDepth )
+                jkGuiRend_bStateChangePending = 1;
             jkSmack_stopTick = 1;
             jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
-            thing_six = 0;
+            jkMain_bInModalGui = 0;
             return;
         }
 
@@ -672,8 +672,8 @@ LABEL_28:
             if (jkMain_motsIdk[0] != 0) {
                 stdString_SafeStrCopy(jkMain_aLevelJklFnameMots, jkMain_aLevelJklFname,128);
                 stdString_SafeStrCopy(jkMain_aLevelJklFname,jkMain_motsIdk,128);
-                if (jkGuiRend_thing_five != 0) {
-                    jkGuiRend_thing_four = 1;
+                if (jkGuiRend_menuNestDepth != 0) {
+                    jkGuiRend_bStateChangePending = 1;
                 }
                 jkMain_aLevelJklFname[127] = '\0';
                 jkSmack_stopTick = 1;
@@ -688,14 +688,14 @@ LABEL_28:
         stdControl_SetActivation(1);
         stdControl_Flush();
         jkGame_Update();
-        thing_eight = 1;
+        jkMain_bLevelActive = 1;
     }
     else
     {
-        if ( jkGuiRend_thing_five )
-            jkGuiRend_thing_four = 1;
+        if ( jkGuiRend_menuNestDepth )
+            jkGuiRend_bStateChangePending = 1;
         jkSmack_stopTick = 1;
-        thing_eight = 1;
+        jkMain_bLevelActive = 1;
         jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
     }
 }
@@ -705,11 +705,11 @@ void jkMain_GameplayTick(int a2)
     unsigned int v1; // esi
     int v3; // esi
 
-    if (thing_six) {
+    if (jkMain_bInModalGui) {
         return;
     }
 
-    if (!thing_eight) {
+    if (!jkMain_bLevelActive) {
         return;
     }
 
@@ -745,8 +745,8 @@ void jkMain_GameplayTick(int a2)
     
     if ( g_sithMode == 5 )
     {
-        if ( jkGuiRend_thing_five )
-            jkGuiRend_thing_four = 1;
+        if ( jkGuiRend_menuNestDepth )
+            jkGuiRend_bStateChangePending = 1;
         jkSmack_stopTick = 1;
         jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
     }
@@ -803,11 +803,11 @@ void jkMain_GameplayLeave(int a2, int a3)
         jkPlayer_Shutdown();
         sithClose();
         jkMain_bInit = 0;
-        thing_eight = 0;
+        jkMain_bLevelActive = 0;
     }
     if ( sithNet_isMulti && a3 != 6 )
     {
-        thing_eight = 0;
+        jkMain_bLevelActive = 0;
         if ( a3 == 3 ) {
             // MOTS added
             if (Main_bMotsCompat) {
@@ -820,14 +820,14 @@ void jkMain_GameplayLeave(int a2, int a3)
         }
         if ( sithNet_isServer )
             DirectPlay_SetSessionFlagidk(0);
-        thing_six = 1;
+        jkMain_bInModalGui = 1;
         v3 = jkGuiMultiTally_Show(sithNet_isMulti);
-        thing_six = 0;
+        jkMain_bInModalGui = 0;
         if ( v3 == -1 )
         {
             sithMulti_Shutdown();
-            if ( jkGuiRend_thing_five )
-                jkGuiRend_thing_four = 1;
+            if ( jkGuiRend_menuNestDepth )
+                jkGuiRend_bStateChangePending = 1;
             jkSmack_stopTick = 1;
             jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
         }
@@ -844,8 +844,8 @@ void jkMain_TitleShow(int a1, int a2)
 void jkMain_TitleTick(int a1)
 {
     jkGuiTitle_LoadingFinalize();
-    if ( jkGuiRend_thing_five )
-        jkGuiRend_thing_four = 1;
+    if ( jkGuiRend_menuNestDepth )
+        jkGuiRend_bStateChangePending = 1;
     jkSmack_stopTick = 1;
     jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
 }
@@ -878,8 +878,8 @@ void jkMain_ChoiceShow(int a1, int a2)
 
     if ( jkGuiForce_Show(0, 0.0, 1, 0, &v1, 1) == -1 )
     {
-        if ( jkGuiRend_thing_five )
-            jkGuiRend_thing_four = 1;
+        if ( jkGuiRend_menuNestDepth )
+            jkGuiRend_bStateChangePending = 1;
         jkSmack_stopTick = 1;
         jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
     }
@@ -919,8 +919,8 @@ void jkMain_UnkTick(int a1)
     jkEpisode_Load(&jkEpisode_mLoad);
 
     jkSmack_gameMode = 1;
-    if ( jkGuiRend_thing_five )
-        jkGuiRend_thing_four = 1;
+    if ( jkGuiRend_menuNestDepth )
+        jkGuiRend_bStateChangePending = 1;
     jkSmack_stopTick = 1;
     jkSmack_nextGuiState = JK_GAMEMODE_GAMEPLAY;
 }
@@ -939,8 +939,8 @@ int jkMain_sub_403470(char *a1)
     result = 0;
     jkMain_aLevelJklFname[127] = 0;
     jkSmack_gameMode = 0;
-    if ( jkGuiRend_thing_five )
-        jkGuiRend_thing_four = 1;
+    if ( jkGuiRend_menuNestDepth )
+        jkGuiRend_bStateChangePending = 1;
     jkSmack_stopTick = 1;
     jkSmack_nextGuiState = JK_GAMEMODE_GAMEPLAY;
     return result;
@@ -1002,8 +1002,8 @@ int jkMain_loadFile2(char *pGobPath, char *pEpisodeName)
     {
         result = 1;
         jkPlayer_bLoadingSomething = 1;
-        if ( jkGuiRend_thing_five )
-            jkGuiRend_thing_four = 1;
+        if ( jkGuiRend_menuNestDepth )
+            jkGuiRend_bStateChangePending = 1;
         jkSmack_stopTick = 1;
         jkSmack_nextGuiState = 5;
     }
@@ -1044,8 +1044,8 @@ int jkMain_LoadLevelSingleplayer(char *pGobPath, char *pEpisodeName)
     {
         result = 1;
         jkPlayer_bLoadingSomething = 1;
-        if ( jkGuiRend_thing_five )
-            jkGuiRend_thing_four = 1;
+        if ( jkGuiRend_menuNestDepth )
+            jkGuiRend_bStateChangePending = 1;
         jkSmack_stopTick = 1;
         jkSmack_nextGuiState = 5;
     }
@@ -1070,9 +1070,9 @@ int jkMain_StartNextLevelInEpisode(int a1, int bIsAPath)
 
     if ( !jkEpisode_mLoad.numSeq )
     {
-        if ( jkGuiRend_thing_five )
+        if ( jkGuiRend_menuNestDepth )
         {
-            jkGuiRend_thing_four = 1;
+            jkGuiRend_bStateChangePending = 1;
         }
         jkSmack_stopTick = 1;
         jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
@@ -1101,17 +1101,17 @@ int jkMain_StartNextLevelInEpisode(int a1, int bIsAPath)
     }
     if ( !v2 )
     {
-        v4 = jkGuiRend_thing_five;
+        v4 = jkGuiRend_menuNestDepth;
         if ( v3->gotoA == -1 )
         {
-            if ( jkGuiRend_thing_five )
-                jkGuiRend_thing_four = 1;
+            if ( jkGuiRend_menuNestDepth )
+                jkGuiRend_bStateChangePending = 1;
             jkSmack_stopTick = 1;
             jkSmack_nextGuiState = JK_GAMEMODE_CREDITS;
             return 1;
         }
         if ( v4 )
-            jkGuiRend_thing_four = 1;
+            jkGuiRend_bStateChangePending = 1;
 
         jkSmack_stopTick = 1;
         jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
@@ -1119,10 +1119,10 @@ int jkMain_StartNextLevelInEpisode(int a1, int bIsAPath)
     }
     if ( sithNet_isMulti && (sithNet_MultiModeFlags & MULTIMODEFLAG_SINGLE_LEVEL) != 0 )
     {
-        v4 = jkGuiRend_thing_five;
+        v4 = jkGuiRend_menuNestDepth;
         
         if ( v4 )
-            jkGuiRend_thing_four = 1;
+            jkGuiRend_bStateChangePending = 1;
         jkSmack_stopTick = 1;
         jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
         return 0;
@@ -1131,8 +1131,8 @@ int jkMain_StartNextLevelInEpisode(int a1, int bIsAPath)
     {
         if ( v2->type == 1 && jkSmack_currentGuiState == JK_GAMEMODE_GAMEPLAY )
         {
-            if ( jkGuiRend_thing_five )
-                jkGuiRend_thing_four = 1;
+            if ( jkGuiRend_menuNestDepth )
+                jkGuiRend_bStateChangePending = 1;
             jkSmack_stopTick = 1;
             jkSmack_nextGuiState = JK_GAMEMODE_CD_SWITCH;
             result = 1;
@@ -1146,8 +1146,8 @@ int jkMain_StartNextLevelInEpisode(int a1, int bIsAPath)
     }
     else
     {
-        if ( jkGuiRend_thing_five )
-            jkGuiRend_thing_four = 1;
+        if ( jkGuiRend_menuNestDepth )
+            jkGuiRend_bStateChangePending = 1;
         jkSmack_stopTick = 1;
         jkSmack_nextGuiState = JK_GAMEMODE_ENDLEVEL;
         result = 1;
@@ -1189,8 +1189,8 @@ int jkMain_cd_swap_reverify(jkEpisodeEntry *ent)
             {
                 if ( !v6 )
                 {
-                    if ( jkGuiRend_thing_five )
-                        jkGuiRend_thing_four = 1;
+                    if ( jkGuiRend_menuNestDepth )
+                        jkGuiRend_bStateChangePending = 1;
                     jkSmack_stopTick = 1;
                     jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
                     return 1;
@@ -1200,8 +1200,8 @@ int jkMain_cd_swap_reverify(jkEpisodeEntry *ent)
         }
         stdString_SafeStrCopy(jkMain_aLevelJklFname, ent->fileName, 128);
         jkSmack_gameMode = sithNet_isMulti != 0 ? 2 : 0;
-        if ( jkGuiRend_thing_five )
-            jkGuiRend_thing_four = 1;
+        if ( jkGuiRend_menuNestDepth )
+            jkGuiRend_bStateChangePending = 1;
         jkSmack_stopTick = 1;
         jkSmack_nextGuiState = JK_GAMEMODE_GAMEPLAY;
         return 1;
@@ -1211,8 +1211,8 @@ int jkMain_cd_swap_reverify(jkEpisodeEntry *ent)
     {
         if ( v2 == 1 )
         {
-            if ( jkGuiRend_thing_five )
-                jkGuiRend_thing_four = 1;
+            if ( jkGuiRend_menuNestDepth )
+                jkGuiRend_bStateChangePending = 1;
             jkSmack_stopTick = 1;
             jkSmack_nextGuiState = JK_GAMEMODE_CHOICE; // force select/choice?
             return 1;
@@ -1253,8 +1253,8 @@ int jkMain_cd_swap_reverify(jkEpisodeEntry *ent)
     {
         case 3:
         case 9:
-            if ( jkGuiRend_thing_five )
-                jkGuiRend_thing_four = 1;
+            if ( jkGuiRend_menuNestDepth )
+                jkGuiRend_bStateChangePending = 1;
             jkSmack_stopTick = 1;
             jkSmack_nextGuiState = JK_GAMEMODE_VIDEO4;
             result = 1;
@@ -1262,8 +1262,8 @@ int jkMain_cd_swap_reverify(jkEpisodeEntry *ent)
         case 5:
         case 7:
         case 8:
-            if ( jkGuiRend_thing_five )
-                jkGuiRend_thing_four = 1;
+            if ( jkGuiRend_menuNestDepth )
+                jkGuiRend_bStateChangePending = 1;
             jkSmack_stopTick = 1;
             jkSmack_nextGuiState = JK_GAMEMODE_VIDEO3;
             result = 1;
@@ -1284,8 +1284,8 @@ void jkMain_do_guistate6()
 {
     if ( !jkSmack_stopTick )
     {
-        if ( jkGuiRend_thing_five )
-            jkGuiRend_thing_four = 1;
+        if ( jkGuiRend_menuNestDepth )
+            jkGuiRend_bStateChangePending = 1;
         jkSmack_stopTick = 1;
         jkSmack_nextGuiState = JK_GAMEMODE_ESCAPE;
     }
@@ -1304,8 +1304,8 @@ int jkMain_sub_4034D0(char *a1, char *a2, char *a3, char16_t *a4)
 
     jkMain_wstrIdk[127] = 0;
     jkPlayer_bLoadingSomething = 1;
-    if ( jkGuiRend_thing_five )
-        jkGuiRend_thing_four = 1;
+    if ( jkGuiRend_menuNestDepth )
+        jkGuiRend_bStateChangePending = 1;
     jkSmack_stopTick = 1;
     jkSmack_nextGuiState = JK_GAMEMODE_UNK;
     return 1;
@@ -1316,8 +1316,8 @@ int jkMain_MissionReload()
     signed int result; // eax
 
     result = 1;
-    if ( jkGuiRend_thing_five )
-        jkGuiRend_thing_four = 1;
+    if ( jkGuiRend_menuNestDepth )
+        jkGuiRend_bStateChangePending = 1;
     jkSmack_stopTick = 1;
     jkSmack_nextGuiState = JK_GAMEMODE_GAMEPLAY;
     return result;
@@ -1328,8 +1328,8 @@ int jkMain_MenuReturn()
     signed int result; // eax
 
     result = 1;
-    if ( jkGuiRend_thing_five )
-        jkGuiRend_thing_four = 1;
+    if ( jkGuiRend_menuNestDepth )
+        jkGuiRend_bStateChangePending = 1;
     jkSmack_stopTick = 1;
     jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
     return result;
@@ -1388,15 +1388,15 @@ void jkMain_VideoShow(int a1, int a2)
         {
             case JK_GAMEMODE_VIDEO:
                 result = 1;
-                if ( jkGuiRend_thing_five )
-                    jkGuiRend_thing_four = 1;
+                if ( jkGuiRend_menuNestDepth )
+                    jkGuiRend_bStateChangePending = 1;
                 jkSmack_stopTick = 1;
                 jkSmack_nextGuiState = JK_GAMEMODE_TITLE;
                 break;
             case JK_GAMEMODE_VIDEO2:
                 result = 1;
-                if ( jkGuiRend_thing_five )
-                    jkGuiRend_thing_four = 1;
+                if ( jkGuiRend_menuNestDepth )
+                    jkGuiRend_bStateChangePending = 1;
                 jkSmack_stopTick = 1;
                 jkSmack_nextGuiState = JK_GAMEMODE_CUTSCENE;
                 break;
@@ -1405,16 +1405,16 @@ void jkMain_VideoShow(int a1, int a2)
                 result = jkMain_StartNextLevelInEpisode(0, 1);
                 break;
             case JK_GAMEMODE_MOTS_CUTSCENE: // MOTS added
-                if (jkGuiRend_thing_five != 0) {
-                    jkGuiRend_thing_four = 1;
+                if (jkGuiRend_menuNestDepth != 0) {
+                    jkGuiRend_bStateChangePending = 1;
                 }
                 jkSmack_stopTick = 1;
                 jkSmack_nextGuiState = JK_GAMEMODE_GAMEPLAY;
                 return;
             default:
                 result = 1;
-                if ( jkGuiRend_thing_five )
-                    jkGuiRend_thing_four = 1;
+                if ( jkGuiRend_menuNestDepth )
+                    jkGuiRend_bStateChangePending = 1;
                 jkSmack_stopTick = 1;
                 jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
                 break;
@@ -1435,30 +1435,30 @@ void jkMain_VideoTick(int a2)
         {
             case JK_GAMEMODE_VIDEO:
                 result = 1;
-                if ( jkGuiRend_thing_five )
-                    jkGuiRend_thing_four = 1;
+                if ( jkGuiRend_menuNestDepth )
+                    jkGuiRend_bStateChangePending = 1;
                 jkSmack_stopTick = 1;
                 jkSmack_nextGuiState = JK_GAMEMODE_TITLE;
                 break;
             case JK_GAMEMODE_VIDEO2:
                 result = 1;
-                if ( jkGuiRend_thing_five )
-                    jkGuiRend_thing_four = 1;
+                if ( jkGuiRend_menuNestDepth )
+                    jkGuiRend_bStateChangePending = 1;
                 jkSmack_stopTick = 1;
                 jkSmack_nextGuiState = JK_GAMEMODE_CUTSCENE;
                 break;
             case JK_GAMEMODE_VIDEO3:
                 result = 1;
-                if ( jkGuiRend_thing_five )
-                    jkGuiRend_thing_four = 1;
+                if ( jkGuiRend_menuNestDepth )
+                    jkGuiRend_bStateChangePending = 1;
                 jkSmack_stopTick = 1;
                 jkSmack_nextGuiState = JK_GAMEMODE_ENDLEVEL;
                 break;
             case JK_GAMEMODE_VIDEO4:
             case JK_GAMEMODE_MOTS_CUTSCENE: // MOTS added
                 result = 1;
-                if ( jkGuiRend_thing_five )
-                    jkGuiRend_thing_four = 1;
+                if ( jkGuiRend_menuNestDepth )
+                    jkGuiRend_bStateChangePending = 1;
                 jkSmack_stopTick = 1;
                 jkSmack_nextGuiState = JK_GAMEMODE_GAMEPLAY;
                 break;
@@ -1484,8 +1484,8 @@ void jkMain_CreditsShow(int a1, int a2)
 {
     if ( !jkCredits_Show() )
     {
-        if ( jkGuiRend_thing_five )
-            jkGuiRend_thing_four = 1;
+        if ( jkGuiRend_menuNestDepth )
+            jkGuiRend_bStateChangePending = 1;
         jkSmack_stopTick = 1;
         jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
     }
@@ -1495,8 +1495,8 @@ void jkMain_CreditsTick(int a1)
 {
     if ( jkCredits_Tick() )
     {
-        if ( jkGuiRend_thing_five )
-            jkGuiRend_thing_four = 1;
+        if ( jkGuiRend_menuNestDepth )
+            jkGuiRend_bStateChangePending = 1;
         jkSmack_stopTick = 1;
         jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
     }
@@ -1527,8 +1527,8 @@ int jkMain_SwitchTo13()
     signed int result; // eax
 
     result = 1;
-    if ( jkGuiRend_thing_five )
-        jkGuiRend_thing_four = 1;
+    if ( jkGuiRend_menuNestDepth )
+        jkGuiRend_bStateChangePending = 1;
     jkSmack_stopTick = 1;
     jkSmack_nextGuiState = JK_GAMEMODE_CREDITS;
     return result;
@@ -1539,8 +1539,8 @@ int jkMain_SwitchTo12()
     signed int result; // eax
 
     result = 1;
-    if ( jkGuiRend_thing_five )
-        jkGuiRend_thing_four = 1;
+    if ( jkGuiRend_menuNestDepth )
+        jkGuiRend_bStateChangePending = 1;
     jkSmack_stopTick = 1;
     jkSmack_nextGuiState = JK_GAMEMODE_CUTSCENE;
     return result;
@@ -1552,8 +1552,8 @@ int jkMain_SwitchTo4(const char *pFpath)
 
     jkRes_FileExists(pFpath, jkMain_aLevelJklFname, 128);
     result = 1;
-    if ( jkGuiRend_thing_five )
-        jkGuiRend_thing_four = 1;
+    if ( jkGuiRend_menuNestDepth )
+        jkGuiRend_bStateChangePending = 1;
     jkSmack_stopTick = 1;
     jkSmack_nextGuiState = JK_GAMEMODE_VIDEO2;
     return result;
@@ -1672,13 +1672,13 @@ int jkMain_SetVideoMode()
     
     /*if ( !sithNet_isMulti )
     {
-        thing_six = 1;
+        jkMain_bInModalGui = 1;
         //sithControl_Close();
         v3 = jkStrings_GetUniStringWithFallback("ERR_CHANGING_VIDEO_DESC");
         v1 = jkStrings_GetUniStringWithFallback("ERR_CHANGING_VIDEO_MODE");
         jkGuiDialog_ErrorDialog(v1, v3);
         //sithControl_Open();
-        thing_six = 0;
+        jkMain_bInModalGui = 0;
     }*/
     
     sithControl_Open();
