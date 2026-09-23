@@ -1789,10 +1789,14 @@ int sithAICmd_Charge(SithAIControlBlock *pActor, SithAIInstinct *pAiclass, SithA
 
     if (flags != 0) {
         if (flags == 4) {
-            if (pActor->moveSpeed != 1313.0) {
+            if (pActor->moveSpeed != 1313.0)
                 return 0;
-            }
+
             sithAI_FireWeapon(pActor, 0.0, 0.0, 0.0, 0.0, 1, 8);
+
+            // Added: Prevent repeated damage from subsequent collisions during this Charge.
+            pActor->moveSpeed = 0.0;
+
             return 0;
         }
         if (flags != 0x100) {
