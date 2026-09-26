@@ -14,6 +14,9 @@
 #include "General/stdString.h"
 #include "Main/jkDev.h"
 
+#define SITHINVENTORY_NUM_USABLE_POWERKEYBINDS \
+    (SITHINVENTORY_NUM_POWERKEYBINDS - 1)
+
 // MOTS added
 static int sithInventory_008d60f8;
 static int sithInventory_008d60fc;
@@ -1157,7 +1160,7 @@ int sithInventory_HandleInvSkillKeys(SithThing *player, flex_t deltaSecs)
             }
             v2++;
         }
-        while ( (intptr_t)v2 < (intptr_t)&sithInventory_powerKeybinds[20] );
+        while (v2 < &sithInventory_powerKeybinds[SITHINVENTORY_NUM_USABLE_POWERKEYBINDS]);
         if ( sithInventory_g_bSendDeactivateMessage == 1 )
         {
             sithInventory_g_bSendDeactivateMessage = 0;
@@ -1400,7 +1403,7 @@ skip_cog:
             v20++;
             ++v40;
         }
-        while ( (intptr_t)v20 < (intptr_t)&sithInventory_powerKeybinds[20].idk );
+        while (v20 < &sithInventory_powerKeybinds[SITHINVENTORY_NUM_USABLE_POWERKEYBINDS]);
 
         sithControl_GetKey(INPUT_FUNC_NEXTINV, &keyRead);
         while (keyRead--)
@@ -1546,22 +1549,23 @@ int sithInventory_KeybindInit()
     int v0; // ebx
 
     v0 = 0;
-    for (int i = 0; i < 20; i++)
+    for (int i = 0; i < SITHINVENTORY_NUM_USABLE_POWERKEYBINDS; i++)
     {
         sithInventory_powerKeybinds[i].enabled = 0;
+        sithInventory_powerKeybinds[i].idk = 0;
     }
 
     for (int i = 0; i < SITHBIN_NUMBINS; i++)
     {
         if ( (sithInventory_g_aTypes[i].flags & 0x100) != 0 )
         {
-            sithControl_RegisterKeyFunction(v0 + 42);
+            sithControl_RegisterKeyFunction(v0 + INPUT_FUNC_ACTIVATE0);
             sithInventory_powerKeybinds[v0].enabled = 1;
             sithInventory_powerKeybinds[v0].binding = i;
             sithInventory_powerKeybinds[v0].idk = 0;
             ++v0;
             
-            if (v0 >= 20)
+            if (v0 >= SITHINVENTORY_NUM_USABLE_POWERKEYBINDS)
             {
                 break;
             }
