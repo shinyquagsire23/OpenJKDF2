@@ -1067,6 +1067,19 @@ void Window_SdlUpdate()
                 msgl = (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN ? WM_LBUTTONDOWN : WM_LBUTTONUP);
                 msgr = (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN ? WM_RBUTTONDOWN : WM_RBUTTONUP);
 
+                // Middle mouse button activates the highlighted menu item.
+                if (mevent->button == SDL_BUTTON_MIDDLE &&
+                    jkGuiRend_IsMenuActive())
+                {
+                    if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
+                        !jkQuakeConsole_bOpen)
+                    {
+                        Window_msg_main_handler(g_hWnd, WM_MBUTTONDOWN, 0, 0);
+                    }
+
+                    break;
+                }
+
                 if (jkQuakeConsole_bOpen) break; // Hijack all input to console
                 
                 if (hasLeft)
@@ -1079,11 +1092,32 @@ void Window_SdlUpdate()
 
                 break;
             case SDL_EVENT_MOUSE_WHEEL:
-                Window_mouseWheelY = (int)event.wheel.y;
+            {
+                int wheelY = (int)event.wheel.y;
+
+                Window_mouseWheelY = wheelY;
                 Window_mouseWheelX = (int)event.wheel.x;
 
-                if (jkQuakeConsole_bOpen) break; // Hijack all input to console
+                // Preserve console scrolling.
+                if (jkQuakeConsole_bOpen)
+                    break;
+
+                // Send wheel movement to the active game menu.
+                if (jkGuiRend_IsMenuActive())
+                {
+                    int steps = wheelY > 0 ? wheelY : -wheelY;
+                    int key = wheelY > 0 ? VK_UP : VK_DOWN;
+
+                    for (int i = 0; i < steps; i++)
+                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, key, 0);
+
+                    // Prevent menu scrolling from reaching gameplay.
+                    Window_mouseWheelY = 0;
+                    Window_mouseWheelX = 0;
+                }
+
                 break;
+            }
 
             // HACK: Escape key for controllers
             case SDL_EVENT_JOYSTICK_BUTTON_DOWN:
@@ -1159,6 +1193,11 @@ void Window_SdlUpdate()
                 exit(-1);
                 break;
             default:
+                if (event.type >= SDL_EVENT_WINDOW_FIRST &&
+                    event.type <= SDL_EVENT_WINDOW_LAST)
+                {
+                    Window_HandleWindowEvent(&event);
+                }
                 break;
         }
     }

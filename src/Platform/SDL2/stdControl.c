@@ -1001,6 +1001,19 @@ void stdControl_ReadMouse()
         return;
     if (jkQuakeConsole_bOpen) return; // Hijack input to console
 
+    // Treat mouse wheel movement as two virtual buttons.
+    stdControl_UpdateKeyState(
+        KEY_MOUSE_WHEELUP,
+        Window_mouseWheelY > 0,
+        stdControl_curReadTime
+    );
+
+    stdControl_UpdateKeyState(
+        KEY_MOUSE_WHEELDOWN,
+        Window_mouseWheelY < 0,
+        stdControl_curReadTime
+    );
+
     stdControl_aAxes[AXIS_MOUSE_X].dwYoffs = 0;
     stdControl_aAxes[AXIS_MOUSE_X].uMaxVal = (__int64)(250.0 * (640.0 / Window_screenXSize));
     stdControl_aAxes[AXIS_MOUSE_X].uMinVal = -stdControl_aAxes[AXIS_MOUSE_X].uMaxVal;

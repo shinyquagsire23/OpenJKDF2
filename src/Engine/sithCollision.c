@@ -886,32 +886,72 @@ LABEL_81:
         }
     }
 
-    for ( i = v5->pAttachedThing; i; i = i->pNextAttachedThing )
+    // Restore ordinary attached children when the parent's movement
+    // was completely blocked. The children may have moved before
+    // the parent's collision was resolved.
+    if (v5->moveType == SITH_MT_PHYSICS && v64 == 0.0)
     {
-        if (!(i->attach_flags & SITH_ATTACH_NOMOVE)) continue;
-        rdMatrix_TransformVector34(&i->position, &i->field_4C, &v5->orient);
+        for (i = v5->pAttachedThing; i; i = i->pNextAttachedThing)
+        {
+            if ((i->attach_flags & SITH_ATTACH_THING) == 0)
+                continue;
+
+            if (i->attach_flags & SITH_ATTACH_NOMOVE)
+                continue;
+
+            rdMatrix_TransformVector34(
+                &i->position,
+                &i->field_4C,
+                &v5->orient
+            );
+            rdVector_Add3Acc(&i->position, &v5->position);
+
+            if (i->sector != v5->sector)
+                sithThing_SetSector(i, v5->sector, 0);
+        }
+    }
+
+    for (i = v5->pAttachedThing; i; i = i->pNextAttachedThing)
+    {
+        if (!(i->attach_flags & SITH_ATTACH_NOMOVE))
+            continue;
+
+        rdMatrix_TransformVector34(
+            &i->position,
+            &i->field_4C,
+            &v5->orient
+        );
         rdVector_Add3Acc(&i->position, &v5->position);
-        if ( i->sector != v5->sector )
+
+        if (i->sector != v5->sector)
             sithThing_SetSector(i, v5->sector, 0);
     }
-    if ( v5->moveType == SITH_MT_PHYSICS )
+
+    if (v5->moveType == SITH_MT_PHYSICS)
     {
-        if ( v64 == 0.0 )
+        if (v64 == 0.0)
+        {
             return 0.0;
+        }
+
         if (!(flags & RAYCAST_40))
         {
-            // A floor-sticking thing only re-finds/attaches to the floor when it's
-            // descending slowly, i.e. vel.z in [-2.0, 0.2].
-            if ( (v5->attach_flags) != 0 && !(v5->attach_flags & SITH_ATTACH_NOMOVE)
-              || (v5->physicsParams.flags & SITH_PF_FLOORSTICK) != 0
-              && (v5->physicsParams.vel.z >= -2.0 && v5->physicsParams.vel.z <= 0.2) )
+            // A floor-sticking thing only re-finds/attaches to the floor
+            // when it's descending slowly, i.e. vel.z in [-2.0, 0.2].
+            if ((v5->attach_flags != 0 &&
+                !(v5->attach_flags & SITH_ATTACH_NOMOVE))
+                || ((v5->physicsParams.flags & SITH_PF_FLOORSTICK) != 0
+                    && v5->physicsParams.vel.z >= -2.0
+                    && v5->physicsParams.vel.z <= 0.2))
             {
                 sithPhysics_FindFloor(v5, 0);
             }
         }
     }
+
     return v64;
 }
+
 
 int sithCollision_HandleThingHitSurface(SithThing *pThing, SithSurface *pSurface, SithCollision *pCollision)
 {

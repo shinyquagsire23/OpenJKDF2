@@ -36,6 +36,10 @@ static int32_t jkGuiRend_bIsSurfaceValid = 0;
 static int32_t jkGuiRend_bInitted = 0;
 static int32_t jkGuiRend_bOpen = 0;
 static int32_t jkGuiRend_HandlerIsSet = 0;
+int jkGuiRend_IsMenuActive(void)
+{
+    return jkGuiRend_HandlerIsSet > 0;
+}
 static int32_t jkGuiRend_fillColor = 0;
 static int32_t jkGuiRend_paletteChecksum = 0;
 static int32_t jkGuiRend_dword_85620C = 0;
@@ -1720,6 +1724,74 @@ int jkGuiRend_WindowHandler(HWND hWnd, UINT a2, WPARAM wParam, LPARAM lParam, LR
             if ( jkGuiRend_activeMenu->lastMouseDownClickable )
                 jkGuiRend_InvokeEvent(jkGuiRend_activeMenu->lastMouseDownClickable, jkGuiRend_activeMenu, JKGUI_EVENT_MOUSEMOVED, wParam);
             return 1;
+
+        case WM_MBUTTONDOWN:
+        {
+            jkGuiMenu* menu = jkGuiRend_activeMenu;
+            jkGuiElement* target = menu->lastMouseOverClickable;
+
+            // Prefer the element under the mouse.
+            if (!target || !target->bIsVisible || target->enableHover)
+            {
+                target = NULL;
+            }
+
+            // If the mouse is outside clickable elements, activate
+            // the currently focused list box instead.
+            if (!target)
+            {
+                jkGuiElement* focused = menu->focusedElement;
+
+                if (focused &&
+                    focused->type == ELEMENT_LISTBOX &&
+                    focused->bIsVisible &&
+                    !focused->enableHover)
+                {
+                    target = focused;
+                }
+            }
+
+            if (!target)
+                return 1;
+
+            if (target->type == ELEMENT_LISTBOX)
+            {
+                if (target->clickHandlerFunc)
+                {
+                    // Controls lists: activate the highlighted entry.
+                    jkGuiRend_InvokeEvent(
+                        target,
+                        menu,
+                        JKGUI_EVENT_KEYDOWN,
+                        VK_RETURN
+                    );
+                }
+                else
+                {
+                    // Profile and level lists: use normal Enter behavior.
+                    jkGuiRend_WindowHandler(
+                        hWnd,
+                        WM_KEYFIRST,
+                        VK_RETURN,
+                        0,
+                        unused
+                    );
+                }
+            }
+            else
+            {
+                // Ordinary buttons.
+                jkGuiRend_InvokeClicked(
+                    target,
+                    menu,
+                    jkGuiRend_mouseX,
+                    jkGuiRend_mouseY,
+                    1
+                );
+            }
+
+            return 1;
+        }
 
         case WM_KEYFIRST:
             if ( wParam == VK_SHIFT || wParam == VK_LSHIFT || wParam == VK_RSHIFT )
