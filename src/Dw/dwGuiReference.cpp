@@ -41,7 +41,7 @@ extern "C" void dwGuiReference_Startup(void)
 
 // @0x53d968 — the reference-room "current topic" .plr TOPIC file (a dwString).
 // In the Ghidra decompile its pBuffer@0x53d970 appears as DAT_0053d970.
-extern dwString dwCore_currentRefFile;
+extern "C" dwString dwCore_currentRefFile;
 
 // --- content-group list helpers ---------------------------------------------
 // The binary rebuilds reference pages by (a) deleting every widget in a content

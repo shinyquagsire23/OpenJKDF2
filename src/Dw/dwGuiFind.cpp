@@ -25,7 +25,7 @@
 // dwInits.cpp (parked there until dwGuiReference/dw core claims it). The
 // QUERY factory seeds the box with this file's TOPIC_NAME; the confirm-selection
 // messages write the picked result here.
-extern dwString dwCore_currentRefFile;
+extern "C" dwString dwCore_currentRefFile;
 
 // The empty-query sentinel string (binary DAT_00527d4c = a single space).
 static const char dwGuiFind_emptyQueryMark[] = " ";

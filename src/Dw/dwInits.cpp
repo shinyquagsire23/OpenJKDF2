@@ -26,7 +26,12 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
-#include <unistd.h> // Note: getcwd replaces GetCurrentDirectoryA
+#ifdef _WIN32
+#include <direct.h>
+#define getcwd _getcwd
+#else
+#include <unistd.h>
+#endif
 
 // ------------------------------------------------------------------
 // Unit-owned globals
