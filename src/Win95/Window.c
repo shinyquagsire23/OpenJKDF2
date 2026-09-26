@@ -854,9 +854,6 @@ void Window_SdlUpdate()
                     Window_msg_main_handler(g_hWnd, WM_CHAR, event.text.text[i], 0);
                 }
                 break;
-            case SDL_EVENT_WINDOW_FIRST ... SDL_EVENT_WINDOW_LAST:
-                Window_HandleWindowEvent(&event);
-                break;
             case SDL_EVENT_KEY_DOWN:
                 //stdPlatform_Printf("scancode %d\n", event.key.scancode);
                 //handleKey(&event.key.keysym, WM_KEYDOWN, 0x1);
@@ -1159,6 +1156,11 @@ void Window_SdlUpdate()
                 exit(-1);
                 break;
             default:
+                if (event.type >= SDL_EVENT_WINDOW_FIRST &&
+                    event.type <= SDL_EVENT_WINDOW_LAST)
+                {
+                    Window_HandleWindowEvent(&event);
+                }
                 break;
         }
     }

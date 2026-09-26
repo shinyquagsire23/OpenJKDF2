@@ -99,8 +99,8 @@ uint8_t dwMain_bFullRedraw = 0;
 // attributes dwCore_workspaceName @0x53d978 + dwCore_currentRefFile @0x53d968
 // to the dw-core static ctors in this unit — see report; kept in dwInits.cpp
 // for now to avoid a cross-file edit). dwPlayer_name comes from dwPlayer.h.
-extern dwString dwCore_workspaceName;
-extern dwString dwCore_currentRefFile;
+extern "C" dwString dwCore_workspaceName;
+extern "C" dwString dwCore_currentRefFile;
 
 // dw_bStarted @0x53e8xx — set once dwSith/MaterialCache/dwFont bring-up
 // succeeds inside dw_Startup; gates dw_Shutdown teardown.

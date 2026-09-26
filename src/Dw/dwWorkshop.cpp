@@ -46,7 +46,7 @@ extern "C" dwListNode* dwCore_pWorkspaceNodes;
 extern "C" int dwGuiDialog_RunModal(const char* pConfName, const char* pMsgKey);
 // The workspace droid's display name @0x53d978 (currently dwInits.cpp,
 // P7-owned) — the DROID_NAME entry edits it in place.
-extern dwString dwCore_workspaceName;
+extern "C" dwString dwCore_workspaceName;
 // The currently-selected mission record @0x53d954 (dwMissionInfo*; owner:
 // dw core, P7) — broadcast as the 0xbbc "show reward part" sender.
 // TODO(dw-decomp): provided by dwMain/dwGuiMission (dwMain.c placeholder).
