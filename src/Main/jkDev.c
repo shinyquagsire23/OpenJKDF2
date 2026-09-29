@@ -6,6 +6,7 @@
 #include "General/stdString.h"
 #include "General/stdFnames.h"
 #include "Devices/sithConsole.h"
+#include "Engine/sithRender.h"
 #include "Win95/stdDisplay.h"
 #include "Win95/WinIdk.h"
 #include "Gameplay/sithInventory.h"
@@ -98,7 +99,8 @@ void jkDev_Startup()
 
 #ifdef QOL_IMPROVEMENTS
     jkDev_RegisterCmd(jkDev_CmdNoclip, "noclip", "Noclip", 0);
-	jkDev_RegisterCmd(jkDev_Custom_CmdJumpNextCheckpoint, "checkmate", "", 0);  // cycles to next auto-restart checkpoint
+    jkDev_RegisterCmd(jkDev_CmdFullbright, "fullbright", "Fullbright", 0);
+    jkDev_RegisterCmd(jkDev_Custom_CmdJumpNextCheckpoint, "checkmate", "", 0);  // cycles to next auto-restart checkpoint
 #endif
 
     jkDev_bInitted = 1;
@@ -625,6 +627,21 @@ int jkDev_CmdFly(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
         sithCommand_Fly(pCmd, pArgStr);
+    return 1;
+}
+
+int jkDev_CmdFullbright(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+{
+    if (!sithNet_isMulti)
+    {
+        sithRender_bFullbright = !sithRender_bFullbright;
+
+        if (sithRender_bFullbright)
+            sithConsole_PrintString("Fullbright ON");
+        else
+            sithConsole_PrintString("Fullbright OFF");
+    }
+
     return 1;
 }
 
