@@ -182,6 +182,9 @@ void sithRender_RenderDebugLights()
 }
 #endif
 
+// Added: Fullbright console cheat
+int sithRender_bFullbright = 0;
+
 int sithRender_Startup()
 {
     rdMaterial_RegisterLoader(sithMaterial_Load);
@@ -353,10 +356,14 @@ void sithRender_Draw()
         return;
 
     rdSetGeometryMode(sithRender_geoMode);
-    if ( sithRender_lightingIRMode )
+
+    if (sithRender_bFullbright)
+        rdSetLightingMode(RD_LIGHTMODE_FULLYLIT);
+    else if (sithRender_lightingIRMode)
         rdSetLightingMode(2);
     else
         rdSetLightingMode(sithRender_lightMode);
+
     rdSetTextureMode(sithRender_texMode);
     rdSetRenderOptions(rdGetRenterOptions() | 2);
 

@@ -72,6 +72,7 @@ int jkDev_CmdSkipToLevel(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int jkDev_Custom_CmdJumpNextCheckpoint(stdDebugConsoleCmd* pCmd, const char* pArgStr);// strike added
 int jkDev_CmdDebugFlags(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int jkDev_CmdFly(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int jkDev_CmdFullbright(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int jkDev_CmdDebugFlags2(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int jkDev_CmdWarp(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int jkDev_CmdActivate(stdDebugConsoleCmd *pCmd, const char *pArgStr);

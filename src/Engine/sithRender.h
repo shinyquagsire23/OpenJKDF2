@@ -54,6 +54,9 @@ MATH_FUNC void sithRender_RenderAlphaAdjoins();
 int sithRender_SetExtraThingRenderFunc(sithRender_weapRendFunc_t pfFunc);
 void sithRender_WorldFlash(flex_t arg1,flex_t arg2);
 
+// Fullbright console cheat
+extern int sithRender_bFullbright;
+
 // Added
 void sithRender_RenderDebugLight(flex_t intensity, rdVector3* pos);
 
