@@ -19,6 +19,48 @@ static int sithInventory_008d60f8;
 static int sithInventory_008d60fc;
 static const int sithInventory_aMotsForcePowerBins[18] = {0, SITHBIN_F_JUMP, SITHBIN_F_SPEED, SITHBIN_F_SEEING, SITHBIN_F_PROJECT, SITHBIN_F_PUSH, SITHBIN_F_PULL, SITHBIN_F_GRIP, SITHBIN_F_FARSIGHT, SITHBIN_F_SABERTHROW, SITHBIN_F_HEALING, SITHBIN_F_PERSUASION, SITHBIN_F_BLINDING, SITHBIN_F_CHAINLIGHT, SITHBIN_F_ABSORB, SITHBIN_F_PROTECTION, SITHBIN_F_DESTRUCTION, SITHBIN_F_DEADLYSIGHT};
 
+// Added: Unlimited resources console cheat
+static int sithInventory_IsUnlimitedResourceBin(int typeId)
+{
+    switch (typeId)
+    {
+    case SITHBIN_ENERGY:
+    case SITHBIN_POWER:
+    case SITHBIN_BATTERY:
+    case SITHBIN_FORCEMANA:
+    case SITHBIN_RAILCHARGES:
+    case SITHBIN_THERMAL_DETONATOR:
+    case SITHBIN_SEQUENCER_CHARGE:
+
+        // MOTS ammo
+    case SITHBIN_CARBPELLETS:
+    case SITHBIN_SEEKRAILS:
+    case SITHBIN_EWEB_ROUNDS:
+    case SITHBIN_MOTS_THERMAL_DETONATOR:
+    case SITHBIN_MOTS_SEQUENCER_CHARGE:
+    case SITHBIN_MOTS_FLASH_BOMB:
+        return 1;
+
+    default:
+        return 0;
+    }
+}
+
+void sithInventory_EnsureUnlimitedBattery(SithThing* pThing)
+{
+    if (!pThing || pThing->type != SITH_THING_PLAYER)
+        return;
+
+    if (sithInventory_GetInventory(pThing, SITHBIN_BATTERY) <= 0.0)
+    {
+        sithInventory_SetInventory(
+            pThing,
+            SITHBIN_BATTERY,
+            sithInventory_GetInventoryMaximum(pThing, SITHBIN_BATTERY)
+        );
+    }
+}
+
 void sithInventory_RegisterType(int binIdx, sithCog *cog, char *name, flex_t min, flex_t max, int flags)
 {
     // Added: OpenJones3D asserts
@@ -524,6 +566,16 @@ flex_t sithInventory_ChangeInventory(SithThing *pThing, int typeId, flex_t amoun
         return 0.0;
 
     info = &pThing->actorParams.pPlayer->aItems[typeId];
+
+    // Added: Unlimited resources console cheat
+    if (jkDev_bUnlimitedResources
+        && pThing == sithPlayer_g_pLocalPlayerThing
+        && amount < 0.0
+        && sithInventory_IsUnlimitedResourceBin(typeId))
+    {
+        return info->amount;
+    }
+
     return sithInventory_SetInventory(pThing, typeId, info->amount + amount);
 }
 

@@ -4,6 +4,9 @@
 #include "types.h"
 #include "globals.h"
 
+// Added: Unlimited resources console cheat
+extern int jkDev_bUnlimitedResources;
+
 #define jkDev_Startup_ADDR (0x0041F100)
 #define jkDev_Shutdown_ADDR (0x0041F6A0)
 #define jkDev_Open_ADDR (0x0041F6E0)
@@ -89,6 +92,7 @@ int jkDev_CmdHeal(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int jkDev_CmdAllMap(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int jkDev_CmdMana(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int jkDev_CmdTeam(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int jkDev_CmdUnlimited(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 
 int jkDev_UpdateEntries();
 

@@ -98,6 +98,10 @@ void sithInventory_BinSendDeactivate(SithThing *player, int senderIndex);
 flex_t sithInventory_ChangeInventory(SithThing *pThing, int typeId, flex_t amount);
 flex_t sithInventory_GetInventory(SithThing *pThing, int typeId);
 flex_t sithInventory_SetInventory(SithThing *pThing, int typeId, flex_t amount);
+
+// Added: Unlimited resources console cheat
+void sithInventory_EnsureUnlimitedBattery(SithThing* pThing);
+
 void sithInventory_SetInventoryActivated(SithThing *pThing, int typeId, int bActivated);
 int sithInventory_IsInventoryActivated(SithThing *pThing, int typeId);
 void sithInventory_SetInventoryAvailable(SithThing *pThing, int typeId, int bAvailable);
