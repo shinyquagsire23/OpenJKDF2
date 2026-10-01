@@ -25,6 +25,7 @@
 #include "Dss/sithGamesave.h"
 #include "Dss/jkDSS.h"
 #include "../jk.h"
+#include "Primitives/rdModel3.h"
 
 // Added: Unlimited resources console cheat
 int jkDev_bUnlimitedResources = 0;
@@ -101,6 +102,7 @@ void jkDev_Startup()
 
 #ifdef QOL_IMPROVEMENTS
     jkDev_RegisterCmd(jkDev_CmdNoclip, "noclip", "Noclip", 0);
+    jkDev_RegisterCmd(jkDev_CmdBigHead, "bighead", "Big Head Mode", 0);
     jkDev_RegisterCmd(jkDev_CmdFullbright, "fullbright", "Fullbright", 0);
     jkDev_RegisterCmd(jkDev_CmdUnlimited, "unlimited", "Unlimited Resources", 0);
     jkDev_RegisterCmd(jkDev_Custom_CmdJumpNextCheckpoint, "checkmate", "", 0);
@@ -630,6 +632,26 @@ int jkDev_CmdFly(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
         sithCommand_Fly(pCmd, pArgStr);
+    return 1;
+}
+
+// Added: Big Head Mode console cheat
+int jkDev_CmdBigHead(stdDebugConsoleCmd* pCmd, const char* pArgStr)
+{
+    if (!sithNet_isMulti)
+    {
+        rdModel3_bBigHeadMode = !rdModel3_bBigHeadMode;
+
+        if (rdModel3_bBigHeadMode)
+        {
+            sithConsole_PrintString("Big Head Mode ON");
+        }
+        else
+        {
+            sithConsole_PrintString("Big Head Mode OFF");
+        }
+    }
+
     return 1;
 }
 
