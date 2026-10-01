@@ -188,6 +188,9 @@ typedef struct rdMesh
 } rdMesh;
 #endif
 
+// Added: Big Head Mode console cheat
+extern int rdModel3_bBigHeadMode;
+
 model3Loader_t rdModel3_RegisterLoader(model3Loader_t pfFunc);
 model3Unloader_t rdModel3_RegisterUnloader(model3Unloader_t pfFunc);
 void rdModel3_ClearFrameCounters();

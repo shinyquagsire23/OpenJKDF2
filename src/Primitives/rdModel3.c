@@ -27,6 +27,9 @@
 #include "Primitives/rdPrimit3.h"
 #include "Primitives/rdDebug.h"
 
+// Added: Big Head Mode console cheat
+int rdModel3_bBigHeadMode = 0;
+
 model3Loader_t rdModel3_RegisterLoader(model3Loader_t pfFunc)
 {
     model3Loader_t result = pModel3Loader;
@@ -1433,7 +1436,7 @@ int rdModel3_Draw(rdThing *pThing, rdMatrix34 *pPlacement)
             }
         }
     }
-    
+
     // JKDF2 inlined
     rdModel3_DrawHNode(pCurModel3->aHierarchyNodes);
 #if 0
@@ -1443,6 +1446,54 @@ int rdModel3_Draw(rdThing *pThing, rdMatrix34 *pPlacement)
     return 1;
 }
 
+// Added: Big Head Mode - identify head and attached facial hierarchy nodes
+static int rdModel3_IsHeadNode(const char* name)
+{
+    if (!name)
+        return 0;
+
+    for (int i = 0; name[i]; i++)
+    {
+        // head
+        if ((name[i] == 'h' || name[i] == 'H') &&
+            (name[i + 1] == 'e' || name[i + 1] == 'E') &&
+            (name[i + 2] == 'a' || name[i + 2] == 'A') &&
+            (name[i + 3] == 'd' || name[i + 3] == 'D'))
+            return 1;
+
+        // hair
+        if ((name[i] == 'h' || name[i] == 'H') &&
+            (name[i + 1] == 'a' || name[i + 1] == 'A') &&
+            (name[i + 2] == 'i' || name[i + 2] == 'I') &&
+            (name[i + 3] == 'r' || name[i + 3] == 'R'))
+            return 1;
+
+        // jaw
+        if ((name[i] == 'j' || name[i] == 'J') &&
+            (name[i + 1] == 'a' || name[i + 1] == 'A') &&
+            (name[i + 2] == 'w' || name[i + 2] == 'W'))
+            return 1;
+
+        // eye
+        if ((name[i] == 'e' || name[i] == 'E') &&
+            (name[i + 1] == 'y' || name[i + 1] == 'Y') &&
+            (name[i + 2] == 'e' || name[i + 2] == 'E'))
+            return 1;
+
+        // ear / ears - must be at the end of the node name
+        if ((name[i] == 'e' || name[i] == 'E') &&
+            (name[i + 1] == 'a' || name[i + 1] == 'A') &&
+            (name[i + 2] == 'r' || name[i + 2] == 'R') &&
+            (name[i + 3] == '\0' ||
+                ((name[i + 3] == 's' || name[i + 3] == 'S') &&
+                    name[i + 4] == '\0')))
+        {
+            return 1;
+        }
+    }
+
+    return 0;
+}
 // MOTS altered (RGB aLights)
 void rdModel3_DrawHNode(rdHierarchyNode *pNode)
 {
@@ -1468,7 +1519,27 @@ void rdModel3_DrawHNode(rdHierarchyNode *pNode)
             curGeometryMode = RD_GEOMETRY_SOLID;
         }
 #endif
-        rdModel3_DrawMesh(&rdModel3_pCurGeoset->aMeshes[pNode->meshIdx], &pCurThing->paJointMatrices[pNode->idx]);
+        // Added: Big Head Mode
+        if (rdModel3_bBigHeadMode && rdModel3_IsHeadNode(pNode->name))
+        {
+            rdMatrix34 bigHeadMatrix;
+            rdVector3 bigHeadScale = { 2.5, 2.5, 2.5 };
+
+            rdMatrix_Copy34(&bigHeadMatrix, &pCurThing->paJointMatrices[pNode->idx]);
+            rdMatrix_PreScale34(&bigHeadMatrix, &bigHeadScale);
+
+            rdModel3_DrawMesh(
+                &rdModel3_pCurGeoset->aMeshes[pNode->meshIdx],
+                &bigHeadMatrix
+            );
+        }
+        else
+        {
+            rdModel3_DrawMesh(
+                &rdModel3_pCurGeoset->aMeshes[pNode->meshIdx],
+                &pCurThing->paJointMatrices[pNode->idx]
+            );
+        }
 
 #ifdef TARGET_TWL
         curGeometryMode = geoMode;
