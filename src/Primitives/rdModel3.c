@@ -30,6 +30,42 @@
 // Added: Big Head Mode console cheat
 int rdModel3_bBigHeadMode = 0;
 
+// Added: DK Mode console cheat
+int rdModel3_bDKMode = 0;
+
+// Added: Identify first-person rendering
+int rdModel3_bRenderingPOV = 0;
+
+// Added: DK Mode - adjusted attachment matrices
+static rdThing* rdModel3_pDKAttachmentThing = NULL;
+static rdMatrix34* rdModel3_aDKAttachmentMatrices = NULL;
+static int rdModel3_numDKAttachmentMatrices = 0;
+
+// Added: DK Mode - identify captured attachment matrices
+static unsigned char* rdModel3_aDKAttachmentValid = NULL;
+
+// Added: DK Mode - retrieve adjusted attachment matrix
+int rdModel3_GetDKHandMatrix(rdThing * pThing, int nodeNum, rdMatrix34 * pMatrix)
+{
+    if (!rdModel3_bDKMode || !pMatrix || !pThing)
+        return 0;
+
+    if (pThing != rdModel3_pDKAttachmentThing)
+        return 0;
+
+    if (!rdModel3_aDKAttachmentMatrices ||
+        !rdModel3_aDKAttachmentValid ||
+        nodeNum < 0 ||
+        nodeNum >= rdModel3_numDKAttachmentMatrices)
+        return 0;
+
+    if (!rdModel3_aDKAttachmentValid[nodeNum])
+        return 0;
+
+    rdMatrix_Copy34(pMatrix, &rdModel3_aDKAttachmentMatrices[nodeNum]);
+    return 1;
+}
+
 model3Loader_t rdModel3_RegisterLoader(model3Loader_t pfFunc)
 {
     model3Loader_t result = pModel3Loader;
@@ -1357,6 +1393,50 @@ int rdModel3_Draw(rdThing *pThing, rdMatrix34 *pPlacement)
     pCurThing = pThing;
     pCurModel3 = pThing->model3;
 
+    // Added: DK Mode - invalidate previous attachments
+    rdModel3_pDKAttachmentThing = NULL;
+
+    if (rdModel3_bDKMode && !rdModel3_bRenderingPOV)
+    {
+        int requiredNodes = pCurModel3->numHNodes;
+
+        if (requiredNodes > rdModel3_numDKAttachmentMatrices)
+        {
+            // Release the previous buffers before resizing.
+            if (rdModel3_aDKAttachmentMatrices)
+                RDROID_FREE(rdModel3_aDKAttachmentMatrices);
+
+            if (rdModel3_aDKAttachmentValid)
+                RDROID_FREE(rdModel3_aDKAttachmentValid);
+
+            rdModel3_aDKAttachmentMatrices = NULL;
+            rdModel3_aDKAttachmentValid = NULL;
+            rdModel3_numDKAttachmentMatrices = 0;
+
+            rdModel3_aDKAttachmentMatrices =
+                (rdMatrix34*)RDROID_ALLOC(sizeof(rdMatrix34) * requiredNodes);
+
+            rdModel3_aDKAttachmentValid =
+                (unsigned char*)RDROID_ALLOC(requiredNodes);
+
+            if (rdModel3_aDKAttachmentMatrices &&
+                rdModel3_aDKAttachmentValid)
+            {
+                rdModel3_numDKAttachmentMatrices = requiredNodes;
+            }
+        }
+
+        if (rdModel3_aDKAttachmentMatrices &&
+            rdModel3_aDKAttachmentValid &&
+            rdModel3_numDKAttachmentMatrices >= requiredNodes)
+        {
+            memset(rdModel3_aDKAttachmentValid, 0,
+                rdModel3_numDKAttachmentMatrices);
+
+            rdModel3_pDKAttachmentThing = pThing;
+        }
+    }
+
     if (rdroid_curCullFlags & 2) {
         rdVector3 vertex_out;
         rdClipFrustum* pThingFrustum = rdCamera_g_pCurCamera->pClipFrustum;
@@ -1480,6 +1560,13 @@ static int rdModel3_IsHeadNode(const char* name)
             (name[i + 2] == 'e' || name[i + 2] == 'E'))
             return 1;
 
+        // horn
+        if ((name[i] == 'h' || name[i] == 'H') &&
+            (name[i + 1] == 'o' || name[i + 1] == 'O') &&
+            (name[i + 2] == 'r' || name[i + 2] == 'R') &&
+            (name[i + 3] == 'n' || name[i + 3] == 'N'))
+            return 1;
+
         // ear / ears - must be at the end of the node name
         if ((name[i] == 'e' || name[i] == 'E') &&
             (name[i + 1] == 'a' || name[i + 1] == 'A') &&
@@ -1494,52 +1581,154 @@ static int rdModel3_IsHeadNode(const char* name)
 
     return 0;
 }
-// MOTS altered (RGB aLights)
-void rdModel3_DrawHNode(rdHierarchyNode *pNode)
+
+// Added: DK Mode - identify arm hierarchy nodes
+static int rdModel3_IsDKArmNode(const char* name)
 {
-    rdHierarchyNode *iter;
+    if (!name)
+        return 0;
 
-    if ( pNode->meshIdx != -1 ) {
+    if (strstr(name, "shouldr") ||
+        strstr(name, "shoulder") ||
+        strstr(name, "forearm") ||
+        strstr(name, "hand") ||
+        strstr(name, "4arm"))
+        return 1;
 
+    // Greedo's upper arms
+    if (!strcmp(name, "larm") || !strcmp(name, "rarm"))
+        return 1;
+
+    return 0;
+}
+
+// Added: DK Mode - recursively render adjusted hierarchy
+static void rdModel3_DrawHNodeAdjusted(rdHierarchyNode* pNode, const rdMatrix34* parentOriginal, const rdMatrix34* parentAdjusted, float parentScale)
+{
+    rdHierarchyNode* iter;
+    rdMatrix34 adjustedMatrix;
+    rdMatrix34 originalMatrix;
+    rdVector3 scaleVector;
+    float scale = 1.0f;
+    int isHead = rdModel3_IsHeadNode(pNode->name);
+    int isArm = rdModel3_IsDKArmNode(pNode->name);
+    int isShoulder = strstr(pNode->name, "shouldr") ||
+        strstr(pNode->name, "shoulder") ||
+        !strcmp(pNode->name, "larm") ||
+        !strcmp(pNode->name, "rarm");
+    int dkActive = rdModel3_bDKMode && !rdModel3_bRenderingPOV;
+
+    rdMatrix_Copy34(&originalMatrix, &pCurThing->paJointMatrices[pNode->idx]);
+    rdMatrix_Copy34(&adjustedMatrix, &originalMatrix);
+
+    if (dkActive) {
+        if (isHead || isArm)
+            scale = 2.0f;
+    }
+    else if (!rdModel3_bRenderingPOV && rdModel3_bBigHeadMode && isHead) {
+        scale = 2.5f;
+    }
+
+    // Added: DK Mode - inherit displacement and limb extension
+    if (dkActive && parentOriginal && parentAdjusted) {
+        rdVector3 relative;
+        rdVector3 transformed;
+
+        rdVector_Sub3(&relative, &originalMatrix.scale, &parentOriginal->scale);
+        rdVector_Scale3Acc(&relative, parentScale - 1.0f);
+        rdMatrix_TransformVector34(&transformed, &relative, parentOriginal);
+
+        // Use original world-space displacement for the inherited extension.
+        rdVector_Sub3(&transformed, &originalMatrix.scale, &parentOriginal->scale);
+        rdVector_Scale3Acc(&transformed, parentScale - 1.0f);
+
+        rdVector_Add3(&adjustedMatrix.scale, &originalMatrix.scale, &transformed);
+
+        rdVector_Sub3(&transformed, &parentAdjusted->scale, &parentOriginal->scale);
+        rdVector_Add3Acc(&adjustedMatrix.scale, &transformed);
+    }
+
+    // Preserve existing Big Head facial attachments.
+    if (!dkActive && scale != 1.0f && pNode->parent &&
+        rdModel3_IsHeadNode(pNode->parent->name) && isHead) {
+        rdVector3 offset;
+
+        rdVector_Sub3(&offset, &originalMatrix.scale,
+            &pCurThing->paJointMatrices[pNode->parent->idx].scale);
+        rdVector_Scale3Acc(&offset, scale - 1.0f);
+        rdVector_Add3Acc(&adjustedMatrix.scale, &offset);
+    }
+
+    // Added: DK Mode - preserve finalized shoulder positioning
+    if (dkActive && isShoulder) {
+        rdVector3 pivotOffset;
+        rdVector3 worldOffset;
+        rdVector3 anchor = { 0.0f, 0.0f, 0.0340f };
+
+        rdVector_Scale3(&pivotOffset, &pNode->pivot, 1.0f - scale);
+        rdMatrix_TransformVector34(&worldOffset, &pivotOffset, &adjustedMatrix);
+        rdVector_Add3Acc(&adjustedMatrix.scale, &worldOffset);
+
+        if (strstr(pNode->name, "lshouldr") ||
+            strstr(pNode->name, "lshoulder") ||
+            !strcmp(pNode->name, "larm"))
+            anchor.x = 0.015f;
+        else if (strstr(pNode->name, "rshouldr") ||
+            strstr(pNode->name, "rshoulder") ||
+            !strcmp(pNode->name, "rarm"))
+            anchor.x = -0.015f;
+
+        rdVector_Scale3(&pivotOffset, &anchor, 1.0f - scale);
+        rdMatrix_TransformVector34(&worldOffset, &pivotOffset, &adjustedMatrix);
+        rdVector_Add3Acc(&adjustedMatrix.scale, &worldOffset);
+    }
+
+    // Added: DK Mode - capture adjusted attachment matrices
+    if (dkActive &&
+        pCurThing == rdModel3_pDKAttachmentThing &&
+        rdModel3_aDKAttachmentMatrices &&
+        rdModel3_aDKAttachmentValid &&
+        pNode->idx >= 0 &&
+        pNode->idx < rdModel3_numDKAttachmentMatrices)
+    {
+        rdMatrix_Copy34(
+            &rdModel3_aDKAttachmentMatrices[pNode->idx],
+            &adjustedMatrix
+        );
+
+        rdModel3_aDKAttachmentValid[pNode->idx] = 1;
+    }
+
+    if (pNode->meshIdx != -1) {
         // MOTS added:
         if (pNode->flags & 2) {
             rdHierarchyNode* pParent = pNode->parent;
-            while (pParent && pParent->flags & 2) {  // Added: nullptr check
+            while (pParent && pParent->flags & 2)
                 pParent = pParent->parent;
-            }
+
             rdModel3_pCurGeoset->aMeshes[pNode->meshIdx].lightingMode = RD_LIGHTMODE_6_UNK;
-            if (pParent) // Added: nullptr check
-                rdModel3_pCurGeoset->aMeshes[pNode->meshIdx].radius = rdModel3_pCurGeoset->aMeshes[pParent->meshIdx].radius;
+            if (pParent)
+                rdModel3_pCurGeoset->aMeshes[pNode->meshIdx].radius =
+                rdModel3_pCurGeoset->aMeshes[pParent->meshIdx].radius;
         }
 
 #ifdef TARGET_TWL
-        // Added: HACK: Force enemy weapons to not have textures
         int geoMode = curGeometryMode;
-        if (!strcmp(pNode->name, "weapon")) {
+        if (!strcmp(pNode->name, "weapon"))
             curGeometryMode = RD_GEOMETRY_SOLID;
-        }
 #endif
-        // Added: Big Head Mode
-        if (rdModel3_bBigHeadMode && rdModel3_IsHeadNode(pNode->name))
-        {
-            rdMatrix34 bigHeadMatrix;
-            rdVector3 bigHeadScale = { 2.5, 2.5, 2.5 };
 
-            rdMatrix_Copy34(&bigHeadMatrix, &pCurThing->paJointMatrices[pNode->idx]);
-            rdMatrix_PreScale34(&bigHeadMatrix, &bigHeadScale);
+        rdMatrix34 drawMatrix;
+        rdMatrix_Copy34(&drawMatrix, &adjustedMatrix);
 
-            rdModel3_DrawMesh(
-                &rdModel3_pCurGeoset->aMeshes[pNode->meshIdx],
-                &bigHeadMatrix
-            );
+        if (scale != 1.0f) {
+            scaleVector.x = scale;
+            scaleVector.y = scale;
+            scaleVector.z = scale;
+            rdMatrix_PreScale34(&drawMatrix, &scaleVector);
         }
-        else
-        {
-            rdModel3_DrawMesh(
-                &rdModel3_pCurGeoset->aMeshes[pNode->meshIdx],
-                &pCurThing->paJointMatrices[pNode->idx]
-            );
-        }
+
+        rdModel3_DrawMesh(&rdModel3_pCurGeoset->aMeshes[pNode->meshIdx], &drawMatrix);
 
 #ifdef TARGET_TWL
         curGeometryMode = geoMode;
@@ -1547,13 +1736,21 @@ void rdModel3_DrawHNode(rdHierarchyNode *pNode)
     }
 
     iter = pNode->child;
-    for (int i = 0; i < pNode->numChildren; i++)
-    {
-        if ( !pCurThing->paJointAmputationFlags[iter->idx] )
-            rdModel3_DrawHNode(iter);
+    for (int i = 0; i < pNode->numChildren; i++) {
+        if (!pCurThing->paJointAmputationFlags[iter->idx])
+            rdModel3_DrawHNodeAdjusted(iter, &originalMatrix, &adjustedMatrix, scale);
         iter = iter->nextSibling;
     }
 }
+
+// MOTS altered (RGB aLights)
+void rdModel3_DrawHNode(rdHierarchyNode* pNode)
+{
+    rdModel3_DrawHNodeAdjusted(pNode, NULL, NULL, 1.0f);
+}
+
+// Added: DK Mode - temporary adjusted rendering matrices
+static rdMatrix34* rdModel3_pDKMatrices = NULL;
 
 // MOTS altered (RGB aLights)
 void rdModel3_DrawMesh(rdMesh *pMesh, rdMatrix34 *orient)
