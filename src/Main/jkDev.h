@@ -95,6 +95,8 @@ int jkDev_CmdTeam(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int jkDev_CmdUnlimited(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 // Added: Big Head Mode console cheat
 int jkDev_CmdBigHead(stdDebugConsoleCmd* pCmd, const char* pArgStr);
+// Added: DK Mode console cheat
+int jkDev_CmdDKMode(stdDebugConsoleCmd* pCmd, const char* pArgStr);
 
 int jkDev_UpdateEntries();
 

@@ -190,6 +190,12 @@ typedef struct rdMesh
 
 // Added: Big Head Mode console cheat
 extern int rdModel3_bBigHeadMode;
+extern int rdModel3_bRenderingPOV;
+// Added: DK Mode
+extern int rdModel3_bDKMode;
+
+// Added: DK Mode - adjusted weapon-hand attachment
+int rdModel3_GetDKHandMatrix(rdThing* pThing, int nodeNum, rdMatrix34* pMatrix);
 
 model3Loader_t rdModel3_RegisterLoader(model3Loader_t pfFunc);
 model3Unloader_t rdModel3_RegisterUnloader(model3Unloader_t pfFunc);

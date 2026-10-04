@@ -28,6 +28,7 @@
 #include "World/sithWorld.h"
 #include "World/sithSector.h"
 #include "Primitives/rdMatrix.h"
+#include "Primitives/rdModel3.h" // Added: DK Mode POV rendering flag
 #include "Devices/sithControl.h"
 #include "Main/jkHudInv.h"
 #include "Main/jkGame.h"
@@ -952,11 +953,10 @@ void jkPlayer_DrawPov()
         }
 #endif
         
-        //printf("pov in\n");
-        //jkPlayer_checkPov = 1;
+        // Added: Identify first-person rendering
+        rdModel3_bRenderingPOV = 1;
         rdThing_Draw(&playerThings[playerThingIdx].povModel, &orient);
-        //jkPlayer_checkPov = 0;
-        //printf("pov done\n");
+        rdModel3_bRenderingPOV = 0;
 
         // DSi doesn't really have Z buffer stuff so just batch everything
 #ifndef TARGET_TWL
@@ -1025,6 +1025,13 @@ void jkPlayer_renderSaberWeaponMesh(SithThing *thing)
 
     rdMatrix34* primaryMat = &thing->renderData.paJointMatrices[primary_mesh];
     rdMatrix34* secondaryMat = &thing->renderData.paJointMatrices[secondary_mesh];
+
+    // Added: DK Mode - attach replacement hand to adjusted wrist
+    rdMatrix34 dkPrimaryMat;
+
+    if (rdModel3_GetDKHandMatrix(&thing->renderData, primary_mesh, &dkPrimaryMat)) {
+        primaryMat = &dkPrimaryMat;
+    }
 
     if (thing->jkFlags & JKFLAG_PERSUASION)
     {
