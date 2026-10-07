@@ -7,6 +7,120 @@
 #include "Engine/rdThing.h"
 #include "stdPlatform.h"
 #include "jk.h"
+#include <stdint.h>
+#include <stdlib.h>
+#include <limits.h>
+
+// Handles greater than 3 are reserved for protected COG tracks.
+// Normal engine track indices remain 0 through 3.
+
+typedef struct ProtectedTrackHandle
+{
+    rdPuppet* puppet;
+    int track;
+    int handle;
+    struct ProtectedTrackHandle* next;
+} ProtectedTrackHandle;
+
+static ProtectedTrackHandle* g_protectedTracks = NULL;
+static int g_nextProtectedHandle = 4;
+
+
+// Remove protected handles associated with a particular slot.
+void rdPuppet_InvalidateProtectedHandles(rdPuppet* puppet, int track)
+{
+    ProtectedTrackHandle** link = &g_protectedTracks;
+
+    while (*link)
+    {
+        ProtectedTrackHandle* entry = *link;
+
+        if (entry->puppet == puppet && entry->track == track)
+        {
+            *link = entry->next;
+            free(entry);
+        }
+        else
+        {
+            link = &entry->next;
+        }
+    }
+}
+
+void rdPuppet_ClearProtectedHandles(rdPuppet* puppet)
+{
+    if (!puppet)
+        return;
+
+    for (int i = 0; i < RDPUPPET_MAX_TRACKS; i++)
+    {
+        rdPuppet_InvalidateProtectedHandles(puppet, i);
+    }
+}
+
+// Return a unique handle for an active animation slot.
+// -1 means no protected handle could be created.
+int rdPuppet_CreateProtectedHandle(rdPuppet* puppet, int track)
+{
+    if (!puppet || track < 0 || track >= RDPUPPET_MAX_TRACKS)
+        return -1;
+
+    if (!puppet->aTracks[track].status ||
+        !puppet->aTracks[track].keyframe)
+        return -1;
+
+    // Prevent invalid handles and signed integer overflow.
+    if (g_nextProtectedHandle < 4 ||
+        g_nextProtectedHandle == INT_MAX)
+    {
+        return -1;
+    }
+
+    ProtectedTrackHandle* entry =
+        (ProtectedTrackHandle*)malloc(sizeof(*entry));
+
+    if (!entry)
+        return -1;
+
+    entry->puppet = puppet;
+    entry->track = track;
+    entry->handle = g_nextProtectedHandle++;
+    entry->next = g_protectedTracks;
+
+    g_protectedTracks = entry;
+
+    return entry->handle;
+}
+
+
+// Return the actual track slot if the handle is still valid.
+int rdPuppet_ResolveProtectedHandle(rdPuppet* puppet, int handle)
+{
+    ProtectedTrackHandle* entry = g_protectedTracks;
+
+    while (entry)
+    {
+        if (entry->handle == handle)
+        {
+            if (entry->puppet != puppet)
+                return -1;
+
+            if (entry->track < 0 ||
+                entry->track >= RDPUPPET_MAX_TRACKS)
+                return -1;
+
+            if (!puppet->aTracks[entry->track].status ||
+                !puppet->aTracks[entry->track].keyframe)
+                return -1;
+
+            return entry->track;
+        }
+
+        entry = entry->next;
+    }
+
+    return -1;
+}
 
 // Un-inlined: Clear track node flags with bounds check (added in Grim Fandango).
 static void rdPuppet_ClearTrackNodes(rdPuppet *puppet, int trackNum)
@@ -46,10 +160,14 @@ rdPuppet* rdPuppet_New(rdThing *pParent)
     return puppet;
 }
 
-void rdPuppet_Free(rdPuppet *pPuppet)
+void rdPuppet_Free(rdPuppet* pPuppet)
 {
     // Moved: no nullptr deref
     if (!pPuppet) return;
+
+    // Added: invalidate all protected animation handles
+    // before the puppet is destroyed.
+    rdPuppet_ClearProtectedHandles(pPuppet);
 
     // Added: prevent UAFs
     for (int i = 0; i < RDPUPPET_MAX_TRACKS; i++)
@@ -58,7 +176,7 @@ void rdPuppet_Free(rdPuppet *pPuppet)
         pPuppet->aTracks[i].keyframe = NULL;
         pPuppet->aTracks[i].callback = NULL;
     }
-    
+
     RDROID_FREE(pPuppet);
 }
 
@@ -487,6 +605,13 @@ int rdPuppet_AddTrack(rdPuppet *pPuppet, rdKeyframe *pKFTrack, int lowPriority, 
 
         rdPuppet_RemoveTrack(pPuppet, newTrackIdx);
     }
+
+    // The slot is being assigned to a new animation.
+    // Any previous protected handle for this slot is now stale.
+    rdPuppet_InvalidateProtectedHandles(pPuppet, newTrackIdx);
+
+    newTrack = &pPuppet->aTracks[newTrackIdx];
+    newTrack->speed = pKFTrack->fps;
     
     newTrack = &pPuppet->aTracks[newTrackIdx];
     newTrack->speed = pKFTrack->fps;
@@ -693,11 +818,16 @@ void rdPuppet_ResetTrack(rdPuppet *pPuppet, int track)
     v2->status = 3;
 }
 
-int rdPuppet_NewEntry(rdPuppet *pPuppet, rdThing *parent)
+int rdPuppet_NewEntry(rdPuppet* pPuppet, rdThing* parent)
 {
     RD_ASSERTREL(pPuppet != NULL); // Added
+
+    // Invalidate protected handles before resetting all tracks.
+    rdPuppet_ClearProtectedHandles(pPuppet);
+
     pPuppet->bPaused = 0;
     pPuppet->renderData = parent;
+
     for (int i = 0; i < RDPUPPET_MAX_TRACKS; i++)
     {
         pPuppet->aTracks[i].field_120 = 0.0;

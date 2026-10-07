@@ -13,6 +13,7 @@
 #include "World/sithSurface.h"
 #include "Engine/sithPuppet.h"
 #include "Gameplay/sithTime.h"
+#include "General/stdHashtbl.h"
 #include "Engine/sithAnimClass.h"
 #include "Engine/sithPhysics.h"
 //#include "Engine/rdSurface.h"
@@ -1060,6 +1061,43 @@ void sithCogFunctionThing_PlayMode(sithCog *pCog)
     }
 }
 
+static int IsPlayerBlockKey(const rdKeyframe* key)
+{
+    if (!key || !sithPuppet_pKeyHashtable)
+        return 0;
+
+    return key == (rdKeyframe*)stdHashtbl_Find(
+        sithPuppet_pKeyHashtable, "kyblock0.key")
+        || key == (rdKeyframe*)stdHashtbl_Find(
+            sithPuppet_pKeyHashtable, "kyblock1.key")
+        || key == (rdKeyframe*)stdHashtbl_Find(
+            sithPuppet_pKeyHashtable, "kyblock2.key");
+}
+
+static void ClearPreviousPlayerBlocks(rdPuppet* puppet)
+{
+    if (!puppet)
+        return;
+
+    for (int i = 0; i < RDPUPPET_MAX_TRACKS; i++)
+    {
+        rdPuppetTrack* track = &puppet->aTracks[i];
+
+        if (!track->status || !track->keyframe)
+            continue;
+
+        if (!IsPlayerBlockKey(track->keyframe))
+            continue;
+
+        // Prevent an old protected handle from stopping
+        // whatever animation later occupies this slot.
+        rdPuppet_InvalidateProtectedHandles(puppet, i);
+
+        // Remove the old block immediately.
+        rdPuppet_RemoveTrack(puppet, i);
+    }
+}
+
 void sithCogFunctionThing_PlayKey(sithCog *pCog)
 {
     int trackNum = sithCogExec_PopInt(pCog);
@@ -1086,11 +1124,38 @@ void sithCogFunctionThing_PlayKey(sithCog *pCog)
     if (!keyframe) {
        goto fail;
     }
+
+    if (pThing == sithPlayer_g_pLocalPlayerThing &&
+        IsPlayerBlockKey(keyframe))
+    {
+        ClearPreviousPlayerBlocks(puppet);
+    }
     
     track = sithPuppet_PlayKey(puppet, keyframe, popInt, popInt + 2, trackNum, 0);
-    if ( track >= 0 )
+#ifdef SITH_DEBUG_STRUCT_NAMES
+    if (pThing == sithPlayer_g_pLocalPlayerThing &&
+        IsPlayerBlockKey(keyframe))
     {
-        sithCogExec_PushInt(pCog, track);
+        for (int i = 0; i < RDPUPPET_MAX_TRACKS; i++)
+        {
+            rdPuppetTrack* t = &puppet->aTracks[i];
+        }
+    }
+#endif
+    if (track >= 0)
+    {
+        int cogHandle = track;
+
+        if (IsPlayerBlockKey(keyframe))
+        {
+            // Invalidate older handles even if sithPuppet_PlayKey()
+            // restarted the same keyframe without calling AddTrack().
+            rdPuppet_InvalidateProtectedHandles(puppet, track);
+
+            cogHandle = rdPuppet_CreateProtectedHandle(puppet, track);
+        }
+
+        sithCogExec_PushInt(pCog, cogHandle);
         if ( pThing->moveType == SITH_MT_PATH )
         {
             if ( pThing->trackParams.flags )
@@ -1108,27 +1173,83 @@ fail:
     sithCogExec_PushInt(pCog, -1);
 }
 
-void sithCogFunctionThing_StopKey(sithCog *pCog)
+void sithCogFunctionThing_StopKey(sithCog* pCog)
 {
     cog_flex_t poppedFlex = sithCogExec_PopFlex(pCog);
-    int track = sithCogExec_PopInt(pCog);
+    int handle = sithCogExec_PopInt(pCog);
     SithThing* pThing = sithCogExec_PopThing(pCog);
-    if (!pThing)
+
+    if (!pThing || poppedFlex < 0.0)
         return;
 
     rdPuppet* puppet = pThing->renderData.puppet;
+
     if (!puppet)
         return;
 
-    if ( track >= 0 && track < 4 && poppedFlex >= 0.0 )
+    int track = -1;
+
+    if (handle >= 0 && handle < RDPUPPET_MAX_TRACKS)
     {
-        int v6 = puppet->aTracks[track].field_130;
-        if ( sithPuppet_StopKey(puppet, track, poppedFlex) )
+        // Legacy COG behavior: ordinary raw track number.
+        track = handle;
+    }
+    else if (handle >= RDPUPPET_MAX_TRACKS)
+    {
+        track = rdPuppet_ResolveProtectedHandle(puppet, handle);
+
+#ifdef SITH_DEBUG_STRUCT_NAMES
+        if (pThing == sithPlayer_g_pLocalPlayerThing)
         {
-            if (COG_SHOULD_SYNC(pCog))
+            jk_printf(
+                "[BLOCK STOP] handle=%d resolved=%d\n",
+                handle,
+                track
+            );
+
+            for (int i = 0; i < RDPUPPET_MAX_TRACKS; i++)
             {
-                sithDSSThing_StopKey(pThing, v6, poppedFlex, -1, 255);
+                rdPuppetTrack* t = &puppet->aTracks[i];
+
+                if (t->status && t->keyframe)
+                {
+                    jk_printf(
+                        "  slot=%d key=%s status=0x%X weight=%.3f\n",
+                        i,
+                        t->keyframe->name,
+                        (unsigned int)t->status,
+                        (double)t->playSpeed
+                    );
+                }
             }
+        }
+#endif
+
+        if (track < 0)
+            return;
+    }
+
+    if (track < 0 || track >= RDPUPPET_MAX_TRACKS)
+        return;
+
+    int syncId = puppet->aTracks[track].field_130;
+
+    if (sithPuppet_StopKey(puppet, track, poppedFlex))
+    {
+        // A second stop using this handle must not affect
+        // the track after it has been released or restarted.
+        if (handle >= RDPUPPET_MAX_TRACKS)
+            rdPuppet_InvalidateProtectedHandles(puppet, track);
+
+        if (COG_SHOULD_SYNC(pCog))
+        {
+            sithDSSThing_StopKey(
+                pThing,
+                syncId,
+                poppedFlex,
+                -1,
+                255
+            );
         }
     }
 }
