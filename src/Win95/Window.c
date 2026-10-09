@@ -1845,6 +1845,10 @@ int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, voi
 
 int Window_MessageLoop()
 {
+    // Recursion guard
+    int bWasInSdlUpdate = Window_bInSdlUpdate;
+    Window_bInSdlUpdate = 0;
+
     // Added: controller menuing
     jkGuiRend_UpdateController();
 
@@ -1852,6 +1856,8 @@ int Window_MessageLoop()
     Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
     
     //Window_SdlUpdate();
+
+    Window_bInSdlUpdate = bWasInSdlUpdate;
     return 0;
 }
 
