@@ -6,6 +6,7 @@
 
 #ifdef TARGET_ANDROID
 #include "Main/InstallHelper.h"
+#include "Win95/stdSound.h"
 #endif
 
 #ifdef FS_POSIX
@@ -643,7 +644,18 @@ int stdMci_Startup()
         return 1;
     }
 
+#ifdef TARGET_ANDROID
+    // Added: a NULL spec opens at SDL3's 44100 default, which Android denies the
+    // low-latency fast track whenever the output runs at another rate (48 kHz on
+    // effectively every device). Open at the rate the OS reports instead.
+    SDL_AudioSpec spec;
+    spec.format = SDL_AUDIO_F32;
+    spec.channels = 2;
+    spec.freq = stdSound_GetNativeOutputRate();
+    stdMci_pMixer = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec);
+#else
     stdMci_pMixer = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, NULL);
+#endif
     if (!stdMci_pMixer) {
         stdPlatform_Printf("stdMci: Failed MIX_CreateMixerDevice? %s\n", SDL_GetError());
         return 1;

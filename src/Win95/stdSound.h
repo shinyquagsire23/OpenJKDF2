@@ -213,4 +213,9 @@ int stdSound_IsPlaying(stdSound_buffer_t* a1, rdVector3 *pos);
 void stdSound_3DBufferRelease(stdSound_3dBuffer_t* p3DBuffer);
 #endif
 
+#ifdef TARGET_ANDROID
+// Added: the output's native sample rate (AudioManager PROPERTY_OUTPUT_SAMPLE_RATE).
+int stdSound_GetNativeOutputRate();
+#endif
+
 #endif // _STDSOUND_H
