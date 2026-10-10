@@ -102,6 +102,7 @@ void jkDev_Startup()
 
 #ifdef QOL_IMPROVEMENTS
     jkDev_RegisterCmd(jkDev_CmdNoclip, "noclip", "Noclip", 0);
+    jkDev_RegisterCmd(jkDev_CmdSaberColor, "sabercolor", "Saber Color", 0);
     jkDev_RegisterCmd(jkDev_CmdBigHead, "bighead", "Big Head Mode", 0);
     jkDev_RegisterCmd(jkDev_CmdDKMode, "dkmode", "DK Mode", 0);
     jkDev_RegisterCmd(jkDev_CmdFullbright, "fullbright", "Fullbright", 0);
@@ -633,6 +634,116 @@ int jkDev_CmdFly(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
         sithCommand_Fly(pCmd, pArgStr);
+    return 1;
+}
+
+// Added: Saber Color console cheat
+int jkDev_CmdSaberColor(stdDebugConsoleCmd* pCmd, const char* pArgStr)
+{
+    // Single-player only
+    if (sithNet_isMulti)
+        return 1;
+
+    typedef struct
+    {
+        const char* name;
+        const char* sideMat;
+        const char* tipMat;
+    } SaberColorEntry;
+
+    static const SaberColorEntry colors[] = {
+        { "blue",    "saberblue1.mat",   "saberblue0.mat" },
+        { "darkred", "saberdred1.mat",   "saberdred0.mat" },
+        { "green",   "sabergreen1.mat",  "sabergreen0.mat" },
+        { "orange",  "saberorange1.mat", "saberorange0.mat" },
+        { "purple",  "saberpurple1.mat", "saberpurple0.mat" },
+        { "red",     "saberred1.mat",    "saberred0.mat" },
+        { "yellow",  "saberyellow1.mat", "saberyellow0.mat" }
+    };
+
+    // Extract the color name, ignoring leading/trailing whitespace.
+    // This also handles the space appended by TAB completion.
+    char colorArg[32] = { 0 };
+
+    if (pArgStr)
+        sscanf(pArgStr, "%31s", colorArg);
+
+    if (!colorArg[0])
+    {
+        sithConsole_PrintString(
+            "Usage: sabercolor [blue|darkred|green|orange|red|purple|yellow]"
+        );
+        return 1;
+    }
+
+    // Find the requested color.
+    const SaberColorEntry* selected = NULL;
+
+    for (int i = 0; i < sizeof(colors) / sizeof(colors[0]); i++)
+    {
+        if (!__strcmpi(colorArg, colors[i].name))
+        {
+            selected = &colors[i];
+            break;
+        }
+    }
+
+    if (!selected)
+    {
+        sithConsole_PrintString("Invalid saber color.");
+        return 1;
+    }
+
+    // Get the local player.
+    SithThing* player = sithPlayer_g_pLocalPlayerThing;
+
+    if (!player || !player->playerInfo)
+    {
+        sithConsole_PrintString("No active player.");
+        return 1;
+    }
+
+    jkPlayerInfo* info = player->playerInfo;
+
+    if (!info->polylineThing.polyline)
+    {
+        sithConsole_PrintString("Saber is not initialized.");
+        return 1;
+    }
+
+    // Preserve the current saber configuration before rebuilding it.
+    flex_t baseRadius = info->polyline.baseRadius;
+    flex_t tipRadius = info->polyline.tipRadius;
+    flex_t saberLength = info->length;
+
+    SithThing* wallSparks = info->wall_sparks;
+    SithThing* bloodSparks = info->blood_sparks;
+    SithThing* saberSparks = info->saber_sparks;
+
+    // Reinitialize the blade using the selected original materials.
+    jkSaber_InitializeSaberInfo(
+        player,
+        (char*)selected->sideMat,
+        (char*)selected->tipMat,
+        baseRadius,
+        tipRadius,
+        saberLength,
+        wallSparks,
+        bloodSparks,
+        saberSparks
+    );
+
+    // Confirm the color change.
+    char msg[80];
+    stdString_snprintf(
+        msg,
+        sizeof(msg),
+        "Saber color changed to %s.",
+        selected->name
+    );
+
+    sithConsole_PrintString(msg);
+
     return 1;
 }
 
