@@ -255,6 +255,11 @@ void sithControl_RegisterControlFunctions()
     sithControl_inputFuncToControlType[INPUT_FUNC_GAMMA] = 4 | 1;
     sithControl_inputFuncToControlType[INPUT_FUNC_SCREENSHOT] = 4 | 1;
     sithControl_inputFuncToControlType[INPUT_FUNC_TALLY] = 4 | 1;
+    // Added: Register user-defined hotkeys as bindable controls.
+    for (int i = INPUT_FUNC_ACTIVATE0; i <= INPUT_FUNC_ACTIVATE31; i++)
+    {
+        sithControl_inputFuncToControlType[i] = 4 | 1;
+    }
     if ( (g_debugmodeFlags & DEBUGFLAG_IN_EDITOR) != 0 )
         sithControl_inputFuncToControlType[INPUT_FUNC_DEBUG] = 4 | 1;
 #ifdef QOL_IMPROVEMENTS
