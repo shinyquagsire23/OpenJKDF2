@@ -602,6 +602,9 @@ void jkMain_GameplayShow(int a1, int a2)
             return;
         }
 
+        // Reset crouch toggle when entering a newly loaded level.
+        sithControl_ResetCrouchToggle();
+
         // MOTS added:
         //sithWorld_GetMemoryUsage(sithWorld_g_pCurrentWorld,local_44,local_88);
 

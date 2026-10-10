@@ -1,4 +1,4 @@
-MSGS 102          # <--- DON'T FORGET TO UPDATE THIS COUNT
+MSGS 104          # <--- DON'T FORGET TO UPDATE THIS COUNT
 
 #  "<key>"     <unused number>   "<string>"
 
@@ -98,6 +98,8 @@ MSGS 102          # <--- DON'T FORGET TO UPDATE THIS COUNT
 #******************************
 #  Controls
 #******************************
+   "GUI_CROUCHTOGGLE"							0 "Toggle Crouch"
+   "GUI_CROUCHTOGGLE_HINT"						0 "Press Crouch once to stay crouched; press again to stand."
    "KEY_JOY1_B9"                                0 "Joy 1 Button 9"
    "KEY_JOY1_B10"                               0 "Joy 1 Button 10"
    "KEY_JOY1_B11"                               0 "Joy 1 Button 11"
