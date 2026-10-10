@@ -467,10 +467,21 @@ flex_t sithPuppet_UpdateThingMove(SithThing *pThing)
         }
         if ( pThing->moveType == SITH_MT_PHYSICS && pThing->attach_flags && (pThing->physicsParams.flags & (SITH_PF_200000|SITH_PF_CROUCHING)) )
         {
-            if ( v3 == SITH_ANIM_STAND && thinga < 0.0 )
+            if (v3 == SITH_ANIM_STAND && stdMath_Fabs(thinga) <= 0.02)
+            {
+                if (pThing->puppet->currentAnimation == SITH_ANIM_CROUCHBACK)
+                    anim = SITH_ANIM_CROUCHBACK;
+                else
+                    anim = SITH_ANIM_CROUCHFORWARD;
+            }
+            else if (v3 == SITH_ANIM_STAND && thinga < 0.0)
+            {
                 anim = SITH_ANIM_CROUCHBACK;
+            }
             else
+            {
                 anim = SITH_ANIM_CROUCHFORWARD;
+            }
             goto LABEL_51;
         }
     }
@@ -546,6 +557,7 @@ LABEL_51:
     v18->currentAnimation = anim;
 
     v19 = &v11->modes[v18->majorMode].keyframe[anim];
+
     if ( v19 != v18->playingAnim )
     {
         if ( anim == SITH_ANIM_FALL )
