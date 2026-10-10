@@ -10,6 +10,7 @@
 #include "Gameplay/sithPlayer.h"
 #include "World/jkPlayer.h"
 #include "Devices/sithConsole.h"
+#include "Devices/sithControl.h"
 #include "World/sithTemplate.h"
 #include "Devices/sithSound.h"
 #include "Gameplay/sithTime.h"
@@ -21,6 +22,10 @@
 #include <string.h>
 #include <stdint.h>
 #include <math.h>
+
+// Added: For cancelling crouch toggle after force jump
+static sithCog* sithCogExec_forceJumpCog = NULL;
+static SithThing* sithCogExec_forceJumpPlayer = NULL;
 
 // MOTS added
 int32_t sithCogExec_009d39b0 = 0;
@@ -286,6 +291,29 @@ void sithCogExec_Execute(sithCog *pCog)
     }
 }
 
+void sithCogExec_MarkForceJump(sithCog* pCog, SithThing* player)
+{
+    if (player == sithPlayer_g_pLocalPlayerThing)
+    {
+        sithCogExec_forceJumpCog = pCog;
+        sithCogExec_forceJumpPlayer = player;
+    }
+}
+
+void sithCogExec_CheckForceJumpVelocity(sithCog* pCog, SithThing* player, const rdVector3* velocity)
+{
+    if (pCog == sithCogExec_forceJumpCog &&
+        player == sithCogExec_forceJumpPlayer &&
+        velocity->z > player->physicsParams.vel.z)
+    {
+        sithControl_ResetCrouchToggle();
+
+        // Consume the successful Force Jump.
+        sithCogExec_forceJumpCog = NULL;
+        sithCogExec_forceJumpPlayer = NULL;
+    }
+}
+
 void sithCogExec_ExecuteMessage(sithCog *pCog, int32_t handlerNum)
 {
     int32_t trigPc;
@@ -314,7 +342,14 @@ void sithCogExec_ExecuteMessage(sithCog *pCog, int32_t handlerNum)
 #endif
         }
         sithCogExec_Execute(pCog);
-        if ( pCog->script_running == 4 )
+
+        if (sithCogExec_forceJumpCog == pCog)
+        {
+            sithCogExec_forceJumpCog = NULL;
+            sithCogExec_forceJumpPlayer = NULL;
+        }
+
+        if (pCog->script_running == 4)
             pCog->script_running = 1;
     }
 }

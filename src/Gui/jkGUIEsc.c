@@ -20,6 +20,7 @@
 #include "Main/jkStrings.h"
 #include "Main/jkMain.h"
 #include "Dss/sithMulti.h"
+#include "Devices/sithControl.h"
 
 enum jkGuiEscButton_t
 {
@@ -146,6 +147,7 @@ void jkGuiEsc_Show()
                 if ( !jkGuiDialog_YesNoDialog(jkStrings_GetUniStringWithFallback("GUI_RESTART_MISSION"), jkStrings_GetUniStringWithFallback("GUI_CONFIRM_RESTART")) )
                     continue;
                 jkPlayer_LoadAutosave();
+                sithControl_ResetCrouchToggle();
                 jkMain_MissionReload();
                 jkGuiRend_UpdateSurface();
                 return;

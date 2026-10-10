@@ -516,6 +516,12 @@ void sithCogFunctionPlayer_DeactivateBin(sithCog *pCog)
         && player->actorParams.pPlayer)
     {
         cog_flex_t ret = sithInventory_DeactivateBin(player, pCog, binIdx);
+
+        if (binIdx == 21)
+        {
+            sithCogExec_MarkForceJump(pCog, player);
+        }
+
         sithCogExec_PushFlex(pCog, ret);
     }
     else

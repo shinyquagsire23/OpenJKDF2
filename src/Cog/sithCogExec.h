@@ -49,6 +49,8 @@ extern int32_t sithCog_actionCogIdk;
 
 void sithCogExec_Execute(sithCog *pCog);
 void sithCogExec_ExecuteMessage(sithCog *pCog, int32_t handlerNum);
+void sithCogExec_MarkForceJump(sithCog* pCog, SithThing* player);
+void sithCogExec_CheckForceJumpVelocity(sithCog* pCog, SithThing* player, const rdVector3* velocity);
 int32_t sithCogExec_PopSymbol(sithCog *pCog, SithCogSymbolValue *pVal);
 cog_flex_t sithCogExec_PopFlex(sithCog *pCog);
 int32_t sithCogExec_PopInt(sithCog *pCog);
