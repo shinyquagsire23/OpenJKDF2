@@ -307,6 +307,10 @@ void sithCogExec_CheckForceJumpVelocity(sithCog* pCog, SithThing* player, const 
         velocity->z > player->physicsParams.vel.z)
     {
         sithControl_ResetCrouchToggle();
+
+        // Consume the successful Force Jump.
+        sithCogExec_forceJumpCog = NULL;
+        sithCogExec_forceJumpPlayer = NULL;
     }
 }
 
