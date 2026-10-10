@@ -877,21 +877,26 @@ int __strcmpi(const char *a, const char *b)
     return ca - cb;
 }
 
-int __strnicmp(const char *a, const char *b, size_t c)
+int __strnicmp(const char* a, const char* b, size_t c)
 {
     int ca, cb, n;
 
+    // Comparing zero characters always produces a match.
+    if (c == 0)
+        return 0;
+
     n = 0;
-    do 
+    do
     {
-        if (n >= c) break;
-        ca = (unsigned char) *a++;
-        cb = (unsigned char) *b++;
+        if (n >= c)
+            break;
+
+        ca = (unsigned char)*a++;
+        cb = (unsigned char)*b++;
         ca = tolower(toupper(ca));
         cb = tolower(toupper(cb));
         n++;
-    }
-    while (ca == cb && ca != '\0');
+    } while (ca == cb && ca != '\0');
 
     return ca - cb;
 }
