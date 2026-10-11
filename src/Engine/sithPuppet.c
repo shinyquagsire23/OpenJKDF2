@@ -214,8 +214,28 @@ int sithPuppet_PlayMode(SithThing *pThing, signed int submode, rdPuppetTrackCall
     }
     
     result = sithPuppet_PlayKey(pThing->renderData.puppet, keyframe, lowPri, highPri, flags, pfCallback);
-    if ( result < 0 )
+    if (result < 0)
         return -1;
+
+    // Added: Turbo Mode doubles AI firing animation speed.
+    extern int jkDev_bTurbo;
+
+    if (!sithNet_isMulti
+        && jkDev_bTurbo
+        && pThing->type == SITH_THING_ACTOR
+        && pThing->controlType == SITH_CT_AI)
+    {
+        if (submode == SITH_ANIM_FIRE
+            || submode == SITH_ANIM_FIRE2
+            || submode == SITH_ANIM_FIRE3
+            || submode == SITH_ANIM_FIRE4
+            || submode == SITH_ANIM_CHARGE
+            || submode == SITH_ANIM_JUMP)
+        {
+            pThing->renderData.puppet->aTracks[result].speed *= 2.0f;
+        }
+    }
+
     return result;
 }
 
@@ -404,6 +424,18 @@ flex_t sithPuppet_UpdateThingMove(SithThing *pThing)
     else
     {
         rdMatrix_TransformVectorOrtho34(&a1a, &pThing->physicsParams.vel, &pThing->orient);
+
+        // Added: Turbo Mode animation synchronization.
+        extern int jkDev_bTurbo;
+
+        if (!sithNet_isMulti
+            && jkDev_bTurbo
+            && pThing->type == SITH_THING_ACTOR
+            && pThing->controlType == SITH_CT_AI)
+        {
+            rdVector_Scale3Acc(&a1a, 2.0f);
+        }
+
         if ( pThing->attach_flags || (pThing->physicsParams.flags & SITH_PF_FLY) != 0 || (pThing->sector->flags & SITH_ANIM_WALK) != 0 )
         {
             v2 = a1a.y;
@@ -928,6 +960,18 @@ void sithPuppet_advanceidk(SithThing *pThing, flex_t a2)
                 if ( v8 < 0.0 )
                     v8 = -v8;
                 a3 = v8 * 280.0;
+
+                // Added: Synchronize AI movement animations with Turbo Mode.
+                extern int jkDev_bTurbo;
+
+                if (!sithNet_isMulti
+                    && jkDev_bTurbo
+                    && pThing->type == SITH_THING_ACTOR
+                    && pThing->controlType == SITH_CT_AI)
+                {
+                    a3 *= 2.0f;
+                }
+
                 rdPuppet_AdvanceTrack(pThing->renderData.puppet, v6, a3);
             }
         }

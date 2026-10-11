@@ -28,6 +28,7 @@
 #include "World/sithWorld.h"
 #include "World/sithSector.h"
 #include "Primitives/rdMatrix.h"
+#include "Primitives/rdModel3.h" // Added: DK Mode POV rendering flag
 #include "Devices/sithControl.h"
 #include "Main/jkHudInv.h"
 #include "Main/jkGame.h"
@@ -36,6 +37,9 @@
 #include "General/stdJSON.h"
 #include "Platform/std3D.h"
 #include "Main/sithCvar.h"
+// Added: Custom RGB lightsaber rendering state.
+extern int jkSaber_rgbEnabled;
+extern int jkSaber_rgbDrawActive;
 
 // DSi has *plenty* of time to read the text.
 #ifdef TARGET_RETRO_HOMEBREW
@@ -958,11 +962,10 @@ void jkPlayer_DrawPov()
         }
 #endif
         
-        //printf("pov in\n");
-        //jkPlayer_checkPov = 1;
+        // Added: Identify first-person rendering
+        rdModel3_bRenderingPOV = 1;
         rdThing_Draw(&playerThings[playerThingIdx].povModel, &orient);
-        //jkPlayer_checkPov = 0;
-        //printf("pov done\n");
+        rdModel3_bRenderingPOV = 0;
 
         // DSi doesn't really have Z buffer stuff so just batch everything
 #ifndef TARGET_TWL
@@ -1032,6 +1035,13 @@ void jkPlayer_renderSaberWeaponMesh(SithThing *thing)
     rdMatrix34* primaryMat = &thing->renderData.paJointMatrices[primary_mesh];
     rdMatrix34* secondaryMat = &thing->renderData.paJointMatrices[secondary_mesh];
 
+    // Added: DK Mode - attach replacement hand to adjusted wrist
+    rdMatrix34 dkPrimaryMat;
+
+    if (rdModel3_GetDKHandMatrix(&thing->renderData, primary_mesh, &dkPrimaryMat)) {
+        primaryMat = &dkPrimaryMat;
+    }
+
     if (thing->jkFlags & JKFLAG_PERSUASION)
     {
         if ( sithPlayer_g_pLocalPlayer->aItems[SITHBIN_F_SEEING].state & SITHINVENTORY_ITEM_ACTIVATED )
@@ -1059,9 +1069,21 @@ void jkPlayer_renderSaberWeaponMesh(SithThing *thing)
             if (thing->jkFlags & JKFLAG_SABERON)
             {
                 jkSaber_PolylineRand(&playerInfo->polylineThing);
+
+                // Added: Apply custom RGB only to the local player's saber.
+                jkSaber_rgbDrawActive =
+                    jkSaber_rgbEnabled &&
+                    (thing == sithPlayer_g_pLocalPlayerThing);
+
                 rdThing_Draw(&playerInfo->polylineThing, primaryMat);
-                if ( thing->jkFlags & JKFLAG_DUALSABERS)
+
+                if (thing->jkFlags & JKFLAG_DUALSABERS)
+                {
                     rdThing_Draw(&playerInfo->polylineThing, secondaryMat);
+                }
+
+                // Restore normal rendering for other objects.
+                jkSaber_rgbDrawActive = 0;
             }
         }
         else
@@ -1077,9 +1099,21 @@ void jkPlayer_renderSaberWeaponMesh(SithThing *thing)
         if (thing->jkFlags & JKFLAG_SABERON)
         {
             jkSaber_PolylineRand(&playerInfo->polylineThing);
+
+            // Added: Apply custom RGB only to the local player's saber.
+            jkSaber_rgbDrawActive =
+                jkSaber_rgbEnabled &&
+                (thing == sithPlayer_g_pLocalPlayerThing);
+
             rdThing_Draw(&playerInfo->polylineThing, primaryMat);
+
             if (thing->jkFlags & JKFLAG_DUALSABERS)
+            {
                 rdThing_Draw(&playerInfo->polylineThing, secondaryMat);
+            }
+
+            // Restore normal rendering for other objects.
+            jkSaber_rgbDrawActive = 0;
         }
     }
 }

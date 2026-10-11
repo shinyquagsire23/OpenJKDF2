@@ -19,6 +19,15 @@
 
 #include "jk.h"
 
+// Custom RGB saber rendering state.
+// These values are controlled by the saberrgb console command.
+int jkSaber_rgbEnabled = 0;
+int jkSaber_rgbDrawActive = 0;
+
+float jkSaber_rgbRed = 1.0f;
+float jkSaber_rgbGreen = 1.0f;
+float jkSaber_rgbBlue = 1.0f;
+
 #define JKSABER_EXTENDTIME (0.3000000)
 #define JKSABER_LENGTHCHANGE (0.6000000)
 
@@ -75,23 +84,40 @@ void jkSaber_PolylineRand(rdThing *thing)
     }
 }
 
-void jkSaber_Draw(rdMatrix34 *posRotMat)
+void jkSaber_Draw(rdMatrix34* posRotMat)
 {
-    if ( playerThings[playerThingIdx].actorThing->jkFlags & JKFLAG_SABERON
-      && playerThings[playerThingIdx].povModel.model3
-      && playerThings[playerThingIdx].polylineThing.model3 )
+    if (playerThings[playerThingIdx].actorThing->jkFlags & JKFLAG_SABERON
+        && playerThings[playerThingIdx].povModel.model3
+        && playerThings[playerThingIdx].polylineThing.model3)
     {
-        if ( playerThings[playerThingIdx].povModel.rdFrameNum != rdroid_frameTrue )
+        if (playerThings[playerThingIdx].povModel.rdFrameNum != rdroid_frameTrue)
         {
             rdPuppet_BuildJointMatrices(&playerThings[playerThingIdx].povModel, posRotMat);
         }
 
         jkSaber_PolylineRand(&playerThings[playerThingIdx].polylineThing);
-        rdThing_Draw(&playerThings[playerThingIdx].polylineThing, &playerThings[playerThingIdx].povModel.paJointMatrices[5]); // aaaaa hardcoded K_Rhand
-        
+
+        // Added: Mark the player's saber for custom RGB rendering.
+        jkSaber_rgbDrawActive = jkSaber_rgbEnabled;
+
+        // Right-hand saber
+        rdThing_Draw(
+            &playerThings[playerThingIdx].polylineThing,
+            &playerThings[playerThingIdx].povModel.paJointMatrices[5]
+        );
+
         // Added: Dual sabers
         if (playerThings[playerThingIdx].actorThing->jkFlags & JKFLAG_DUALSABERS)
-            rdThing_Draw(&playerThings[playerThingIdx].polylineThing, &playerThings[playerThingIdx].povModel.paJointMatrices[2]); // K_Lhand
+        {
+            // Left-hand saber
+            rdThing_Draw(
+                &playerThings[playerThingIdx].polylineThing,
+                &playerThings[playerThingIdx].povModel.paJointMatrices[2]
+            );
+        }
+
+        // Restore normal rendering for everything else.
+        jkSaber_rgbDrawActive = 0;
     }
 }
 
