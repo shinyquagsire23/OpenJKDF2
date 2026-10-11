@@ -93,6 +93,9 @@ int jkDev_CmdAllMap(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int jkDev_CmdMana(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int jkDev_CmdTeam(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int jkDev_CmdUnlimited(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+// Added: One-hit kill/death console cheat
+int jkDev_CmdInstakill(stdDebugConsoleCmd* pCmd, const char* pArgStr);
+int jkDev_CmdInstadeath(stdDebugConsoleCmd* pCmd, const char* pArgStr);
 // Added: True invincibility console cheat
 int jkDev_CmdInvincible(stdDebugConsoleCmd* pCmd, const char* pArgStr);
 // Added: Saber color console cheat
