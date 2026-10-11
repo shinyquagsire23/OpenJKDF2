@@ -103,6 +103,7 @@ void jkDev_Startup()
 #ifdef QOL_IMPROVEMENTS
     jkDev_RegisterCmd(jkDev_CmdNoclip, "noclip", "Noclip", 0);
     jkDev_RegisterCmd(jkDev_CmdSaberColor, "sabercolor", "Saber Color", 0);
+    jkDev_RegisterCmd(jkDev_CmdSaberRGB, "saberrgb", "Custom RGB Saber Color", 0);
     jkDev_RegisterCmd(jkDev_CmdBigHead, "bighead", "Big Head Mode", 0);
     jkDev_RegisterCmd(jkDev_CmdDKMode, "dkmode", "DK Mode", 0);
     jkDev_RegisterCmd(jkDev_CmdFullbright, "fullbright", "Fullbright", 0);
@@ -637,6 +638,85 @@ int jkDev_CmdFly(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return 1;
 }
 
+// Added: Custom RGB lightsaber console cheat.
+// Usage: saberrgb R G B
+//        saberrgb reset
+int jkDev_CmdSaberRGB(stdDebugConsoleCmd* pCmd, const char* pArgStr)
+{
+    // Single-player only.
+    if (sithNet_isMulti)
+        return 1;
+
+    // RGB rendering state defined in jkSaber.c.
+    extern int jkSaber_rgbEnabled;
+    extern float jkSaber_rgbRed;
+    extern float jkSaber_rgbGreen;
+    extern float jkSaber_rgbBlue;
+
+    char command[32] = { 0 };
+
+    if (!pArgStr || sscanf(pArgStr, "%31s", command) != 1)
+    {
+        sithConsole_PrintString("Usage: saberrgb R G B | saberrgb reset");
+        return 1;
+    }
+
+    // Restore the original saber appearance.
+    if (!__strcmpi(command, "reset"))
+    {
+        jkSaber_rgbEnabled = 0;
+
+        jkSaber_rgbRed = 1.0f;
+        jkSaber_rgbGreen = 1.0f;
+        jkSaber_rgbBlue = 1.0f;
+
+        sithConsole_PrintString("Custom RGB saber color disabled.");
+        return 1;
+    }
+
+    int red, green, blue;
+    char extra;
+
+    // Require exactly three integer values.
+    if (sscanf(pArgStr, " %d %d %d %c", &red, &green, &blue, &extra) != 3)
+    {
+        sithConsole_PrintString("Usage: saberrgb R G B | saberrgb reset");
+        return 1;
+    }
+
+    // Validate RGB range.
+    if (red < 0 || red > 255 ||
+        green < 0 || green > 255 ||
+        blue < 0 || blue > 255)
+    {
+        sithConsole_PrintString("RGB values must be between 0 and 255.");
+        return 1;
+    }
+
+    // Normalize RGB values for the OpenGL shader.
+    jkSaber_rgbRed = (float)red / 255.0f;
+    jkSaber_rgbGreen = (float)green / 255.0f;
+    jkSaber_rgbBlue = (float)blue / 255.0f;
+
+    // Enable custom RGB saber rendering.
+    jkSaber_rgbEnabled = 1;
+
+    char message[128];
+
+    stdString_snprintf(
+        message,
+        sizeof(message),
+        "Custom saber RGB set to %d %d %d.",
+        red,
+        green,
+        blue
+    );
+
+    sithConsole_PrintString(message);
+
+    return 1;
+}
+
 // Added: Saber Color console cheat
 int jkDev_CmdSaberColor(stdDebugConsoleCmd* pCmd, const char* pArgStr)
 {
@@ -703,7 +783,21 @@ int jkDev_CmdSaberColor(stdDebugConsoleCmd* pCmd, const char* pArgStr)
         return 1;
     }
 
+    // Added: Disable custom RGB when selecting an original saber color.
+    extern int jkSaber_rgbEnabled;
+    extern float jkSaber_rgbRed;
+    extern float jkSaber_rgbGreen;
+    extern float jkSaber_rgbBlue;
+
+    jkSaber_rgbEnabled = 0;
+    jkSaber_rgbRed = 1.0f;
+    jkSaber_rgbGreen = 1.0f;
+    jkSaber_rgbBlue = 1.0f;
+
     jkPlayerInfo* info = player->playerInfo;
+
+    rdMaterial* sideMat = info->polyline.face.material;
+    rdMaterial* tipMat = info->polyline.tipFace.material;
 
     if (!info->polylineThing.polyline)
     {

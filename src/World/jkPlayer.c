@@ -37,6 +37,9 @@
 #include "General/stdJSON.h"
 #include "Platform/std3D.h"
 #include "Main/sithCvar.h"
+// Added: Custom RGB lightsaber rendering state.
+extern int jkSaber_rgbEnabled;
+extern int jkSaber_rgbDrawActive;
 
 // DSi has *plenty* of time to read the text.
 #ifdef TARGET_RETRO_HOMEBREW
@@ -1060,9 +1063,21 @@ void jkPlayer_renderSaberWeaponMesh(SithThing *thing)
             if (thing->jkFlags & JKFLAG_SABERON)
             {
                 jkSaber_PolylineRand(&playerInfo->polylineThing);
+
+                // Added: Apply custom RGB only to the local player's saber.
+                jkSaber_rgbDrawActive =
+                    jkSaber_rgbEnabled &&
+                    (thing == sithPlayer_g_pLocalPlayerThing);
+
                 rdThing_Draw(&playerInfo->polylineThing, primaryMat);
-                if ( thing->jkFlags & JKFLAG_DUALSABERS)
+
+                if (thing->jkFlags & JKFLAG_DUALSABERS)
+                {
                     rdThing_Draw(&playerInfo->polylineThing, secondaryMat);
+                }
+
+                // Restore normal rendering for other objects.
+                jkSaber_rgbDrawActive = 0;
             }
         }
         else
@@ -1078,9 +1093,21 @@ void jkPlayer_renderSaberWeaponMesh(SithThing *thing)
         if (thing->jkFlags & JKFLAG_SABERON)
         {
             jkSaber_PolylineRand(&playerInfo->polylineThing);
+
+            // Added: Apply custom RGB only to the local player's saber.
+            jkSaber_rgbDrawActive =
+                jkSaber_rgbEnabled &&
+                (thing == sithPlayer_g_pLocalPlayerThing);
+
             rdThing_Draw(&playerInfo->polylineThing, primaryMat);
+
             if (thing->jkFlags & JKFLAG_DUALSABERS)
+            {
                 rdThing_Draw(&playerInfo->polylineThing, secondaryMat);
+            }
+
+            // Restore normal rendering for other objects.
+            jkSaber_rgbDrawActive = 0;
         }
     }
 }

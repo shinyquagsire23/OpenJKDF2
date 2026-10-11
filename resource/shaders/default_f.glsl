@@ -65,6 +65,10 @@ uniform float displacement_factor;
 uniform float light_mult;
 uniform vec2 iResolution;
 
+// Added: Custom RGB lightsaber rendering.
+uniform int saberRgbEnabled;
+uniform vec3 saberRgbColor;
+
 in vec4 f_color;
 in float f_light;
 in vec2 f_uv;
@@ -370,6 +374,38 @@ void main(void)
         color_add_emiss.rgb += sampledEmiss.rgb * 0.1;
     }
 
+    // Added: Custom RGB saber color with preserved white core.
+if (saberRgbEnabled != 0)
+{
+    vec3 originalColor = main_color.rgb;
+
+    float brightness = max(
+        originalColor.r,
+        max(originalColor.g, originalColor.b)
+    );
+
+    float lowestChannel = min(
+        originalColor.r,
+        min(originalColor.g, originalColor.b)
+    );
+
+    // White and nearly white pixels have very little saturation.
+    float saturation = (brightness > 0.001)
+        ? (brightness - lowestChannel) / brightness
+        : 0.0;
+
+    // Preserve nearly white pixels and recolor saturated pixels.
+    float recolorAmount = smoothstep(0.08, 0.40, saturation);
+
+    vec3 customColor = saberRgbColor * brightness;
+
+    main_color.rgb = mix(
+        originalColor,
+        customColor,
+        recolorAmount
+    );
+}
+
     fragColor = main_color + effectAdd_color;// + color_add;
 
     color_add.a = orig_alpha;
@@ -419,7 +455,20 @@ void main(void)
         //should_write_normals = 1.0 - should_write_normals;
     }
 
-    fragColorEmiss = color_add_emiss + color_add;
+    // Added: Apply the same RGB override to the saber's glow.
+vec4 finalEmiss = color_add_emiss + color_add;
+
+if (saberRgbEnabled != 0)
+{
+    float emissBrightness = max(
+        finalEmiss.r,
+        max(finalEmiss.g, finalEmiss.b)
+    );
+
+    finalEmiss.rgb = saberRgbColor * emissBrightness;
+}
+
+fragColorEmiss = finalEmiss;
 
     //fragColor = vec4(face_normals_parallax.x, face_normals_parallax.y, face_normals_parallax.z, 1.0);
     //fragColor = vec4(face_normals*0.5 + 0.5,1.0);

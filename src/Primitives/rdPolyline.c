@@ -12,6 +12,10 @@
 #include "Primitives/rdDebug.h"
 #include <math.h>
 
+extern int jkSaber_rgbDrawActive;
+
+#define RD_PROC_FLAG_SABER_RGB 0x40000000u
+
 static rdVector3 polylineVerts[32]; // idk the size on this
 static rdVector3 rdPolyline_FaceVerts[32];
 
@@ -467,7 +471,9 @@ void rdPolyline_DrawFace(rdThing *pLine, rdFace *pFace, rdVector3 *aVertices, rd
     if ( procEntry->lightingMode >= 3 )
         procFaceFlags |= 4u;
 
-    procEntry->light_flags = 0;
+    procEntry->light_flags = jkSaber_rgbDrawActive
+        ? RD_PROC_FLAG_SABER_RGB
+        : 0;
     procEntry->wallCel = pLine->wallCel;
     procEntry->type = pFace->type;
     procEntry->extralight = pFace->extraLight;
