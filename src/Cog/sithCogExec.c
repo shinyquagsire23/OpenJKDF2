@@ -291,6 +291,7 @@ void sithCogExec_Execute(sithCog *pCog)
     }
 }
 
+// Added
 void sithCogExec_MarkForceJump(sithCog* pCog, SithThing* player)
 {
     if (player == sithPlayer_g_pLocalPlayerThing)
@@ -300,6 +301,7 @@ void sithCogExec_MarkForceJump(sithCog* pCog, SithThing* player)
     }
 }
 
+// Added
 void sithCogExec_CheckForceJumpVelocity(sithCog* pCog, SithThing* player, const rdVector3* velocity)
 {
     if (pCog == sithCogExec_forceJumpCog &&
@@ -343,6 +345,7 @@ void sithCogExec_ExecuteMessage(sithCog *pCog, int32_t handlerNum)
         }
         sithCogExec_Execute(pCog);
 
+        // Added: crouch toggle jump cancelling
         if (sithCogExec_forceJumpCog == pCog)
         {
             sithCogExec_forceJumpCog = NULL;
