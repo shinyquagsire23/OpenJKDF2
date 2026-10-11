@@ -1061,6 +1061,7 @@ void sithCogFunctionThing_PlayMode(sithCog *pCog)
     }
 }
 
+// Added: Helper fn
 static int IsPlayerBlockKey(const rdKeyframe* key)
 {
     if (!key || !sithPuppet_pKeyHashtable)
@@ -1074,6 +1075,7 @@ static int IsPlayerBlockKey(const rdKeyframe* key)
             sithPuppet_pKeyHashtable, "kyblock2.key");
 }
 
+// Added: Helper fn
 static void ClearPreviousPlayerBlocks(rdPuppet* puppet)
 {
     if (!puppet)
@@ -1125,6 +1127,7 @@ void sithCogFunctionThing_PlayKey(sithCog *pCog)
        goto fail;
     }
 
+    // Added: Fix saber block transitions
     if (pThing == sithPlayer_g_pLocalPlayerThing &&
         IsPlayerBlockKey(keyframe))
     {
@@ -1132,6 +1135,8 @@ void sithCogFunctionThing_PlayKey(sithCog *pCog)
     }
     
     track = sithPuppet_PlayKey(puppet, keyframe, popInt, popInt + 2, trackNum, 0);
+
+    // Added: Fix saber block transitions
 #ifdef SITH_DEBUG_STRUCT_NAMES
     if (pThing == sithPlayer_g_pLocalPlayerThing &&
         IsPlayerBlockKey(keyframe))
@@ -1179,6 +1184,7 @@ void sithCogFunctionThing_StopKey(sithCog* pCog)
     int handle = sithCogExec_PopInt(pCog);
     SithThing* pThing = sithCogExec_PopThing(pCog);
 
+    // Added: Fix saber block transitions
     if (!pThing || poppedFlex < 0.0)
         return;
 
@@ -1189,6 +1195,7 @@ void sithCogFunctionThing_StopKey(sithCog* pCog)
 
     int track = -1;
 
+    // Added: Fix saber block transitions
     if (handle >= 0 && handle < RDPUPPET_MAX_TRACKS)
     {
         // Legacy COG behavior: ordinary raw track number.
@@ -1229,6 +1236,7 @@ void sithCogFunctionThing_StopKey(sithCog* pCog)
             return;
     }
 
+    // Added: Fix saber block transitions
     if (track < 0 || track >= RDPUPPET_MAX_TRACKS)
         return;
 
