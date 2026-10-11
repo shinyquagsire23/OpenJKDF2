@@ -147,7 +147,7 @@ void jkGuiEsc_Show()
                 if ( !jkGuiDialog_YesNoDialog(jkStrings_GetUniStringWithFallback("GUI_RESTART_MISSION"), jkStrings_GetUniStringWithFallback("GUI_CONFIRM_RESTART")) )
                     continue;
                 jkPlayer_LoadAutosave();
-                sithControl_ResetCrouchToggle();
+                sithControl_ResetCrouchToggle(); // Added: Toggle crouch state
                 jkMain_MissionReload();
                 jkGuiRend_UpdateSurface();
                 return;
