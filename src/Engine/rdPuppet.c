@@ -11,9 +11,9 @@
 #include <stdlib.h>
 #include <limits.h>
 
+// Added: Fix saber block transitions
 // Handles greater than 3 are reserved for protected COG tracks.
 // Normal engine track indices remain 0 through 3.
-
 typedef struct ProtectedTrackHandle
 {
     rdPuppet* puppet;
@@ -26,6 +26,7 @@ static ProtectedTrackHandle* g_protectedTracks = NULL;
 static int g_nextProtectedHandle = 4;
 
 
+// Added: helper fn
 // Remove protected handles associated with a particular slot.
 void rdPuppet_InvalidateProtectedHandles(rdPuppet* puppet, int track)
 {
@@ -47,6 +48,7 @@ void rdPuppet_InvalidateProtectedHandles(rdPuppet* puppet, int track)
     }
 }
 
+// Added: helper fn
 void rdPuppet_ClearProtectedHandles(rdPuppet* puppet)
 {
     if (!puppet)
@@ -58,6 +60,7 @@ void rdPuppet_ClearProtectedHandles(rdPuppet* puppet)
     }
 }
 
+// Added: helper fn
 // Return a unique handle for an active animation slot.
 // -1 means no protected handle could be created.
 int rdPuppet_CreateProtectedHandle(rdPuppet* puppet, int track)
@@ -92,7 +95,7 @@ int rdPuppet_CreateProtectedHandle(rdPuppet* puppet, int track)
     return entry->handle;
 }
 
-
+// Added: helper fn
 // Return the actual track slot if the handle is still valid.
 int rdPuppet_ResolveProtectedHandle(rdPuppet* puppet, int handle)
 {
@@ -606,10 +609,10 @@ int rdPuppet_AddTrack(rdPuppet *pPuppet, rdKeyframe *pKFTrack, int lowPriority, 
         rdPuppet_RemoveTrack(pPuppet, newTrackIdx);
     }
 
+    // Added: Fix saber block transitions
     // The slot is being assigned to a new animation.
     // Any previous protected handle for this slot is now stale.
     rdPuppet_InvalidateProtectedHandles(pPuppet, newTrackIdx);
-
     newTrack = &pPuppet->aTracks[newTrackIdx];
     newTrack->speed = pKFTrack->fps;
     
@@ -822,6 +825,7 @@ int rdPuppet_NewEntry(rdPuppet* pPuppet, rdThing* parent)
 {
     RD_ASSERTREL(pPuppet != NULL); // Added
 
+    // Added: Fix saber block transitions
     // Invalidate protected handles before resetting all tracks.
     rdPuppet_ClearProtectedHandles(pPuppet);
 
