@@ -467,6 +467,7 @@ flex_t sithPuppet_UpdateThingMove(SithThing *pThing)
         }
         if ( pThing->moveType == SITH_MT_PHYSICS && pThing->attach_flags && (pThing->physicsParams.flags & (SITH_PF_200000|SITH_PF_CROUCHING)) )
         {
+            // Added: Fix crouch animation base pose glitch when moving against walls (previously `thinga < 0.0`)
             if (v3 == SITH_ANIM_STAND && stdMath_Fabs(thinga) <= 0.02)
             {
                 if (pThing->puppet->currentAnimation == SITH_ANIM_CROUCHBACK)
