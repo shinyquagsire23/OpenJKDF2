@@ -464,6 +464,7 @@ int jkQuakeConsole_AutocompleteSaberColors()
         "darkred",
         "green",
         "orange",
+        "pink",
         "purple",
         "red",
         "yellow"
@@ -473,6 +474,10 @@ int jkQuakeConsole_AutocompleteSaberColors()
 
     for (int i = 0; i < sizeof(colors) / sizeof(colors[0]); i++)
     {
+        // Added: Pink is exclusive to Mysteries of the Sith.
+        if (!Main_bMotsCompat && !__strcmpi(colors[i], "pink"))
+            continue;
+
         if (!__strnicmp(jkQuakeConsole_pTabPos, colors[i],
             strlen(jkQuakeConsole_pTabPos)))
         {

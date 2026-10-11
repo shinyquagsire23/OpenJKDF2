@@ -761,6 +761,7 @@ int jkDev_CmdSaberColor(stdDebugConsoleCmd* pCmd, const char* pArgStr)
         { "darkred", "saberdred1.mat",   "saberdred0.mat" },
         { "green",   "sabergreen1.mat",  "sabergreen0.mat" },
         { "orange",  "saberorange1.mat", "saberorange0.mat" },
+        { "pink",    "psabersd.mat",     "psabertp.mat" },
         { "purple",  "saberpurple1.mat", "saberpurple0.mat" },
         { "red",     "saberred1.mat",    "saberred0.mat" },
         { "yellow",  "saberyellow1.mat", "saberyellow0.mat" }
@@ -775,9 +776,15 @@ int jkDev_CmdSaberColor(stdDebugConsoleCmd* pCmd, const char* pArgStr)
 
     if (!colorArg[0])
     {
-        sithConsole_PrintString(
-            "Usage: sabercolor [blue|darkred|green|orange|red|purple|yellow]"
-        );
+        if (Main_bMotsCompat)
+            sithConsole_PrintString(
+                "Usage: sabercolor [blue|darkred|green|orange|pink|purple|red|yellow]"
+            );
+        else
+            sithConsole_PrintString(
+                "Usage: sabercolor [blue|darkred|green|orange|purple|red|yellow]"
+            );
+
         return 1;
     }
 
@@ -796,6 +803,13 @@ int jkDev_CmdSaberColor(stdDebugConsoleCmd* pCmd, const char* pArgStr)
     if (!selected)
     {
         sithConsole_PrintString("Invalid saber color.");
+        return 1;
+    }
+
+    // Added: Pink saber materials are exclusive to Mysteries of the Sith.
+    if (!__strcmpi(selected->name, "pink") && !Main_bMotsCompat)
+    {
+        sithConsole_PrintString("Pink saber color is only available in Mysteries of the Sith.");
         return 1;
     }
 
