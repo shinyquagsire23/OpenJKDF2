@@ -99,6 +99,7 @@ int32_t jkGuiRend_Menuidk();
 void jkGuiRend_sub_50FDB0();
 void jkGuiRend_Startup();
 void jkGuiRend_Shutdown();
+int jkGuiRend_IsMenuActive(void);
 void jkGuiRend_Open(tVBuffer *menuBuffer, tVBuffer *otherBuf, int32_t fillColor);
 void jkGuiRend_Close();
 jkGuiElement* jkGuiRend_MenuGetClickableById(jkGuiMenu *menu, int32_t id);
