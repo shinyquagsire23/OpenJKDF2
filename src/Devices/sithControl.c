@@ -44,6 +44,7 @@ static int sithControl_crouchToggled = 0;
 static int sithControl_crouchWasPressed = 0;
 // Returns the effective crouch state for normal player movement.
 
+// Added: Toggle crouch state
 static int sithControl_GetCrouchState(void)
 {
     int pressed = sithControl_GetKey(INPUT_FUNC_DUCK, 0) != 0;
@@ -233,6 +234,7 @@ void sithControl_RegisterAxisFunction(int functionId, uint32_t flag)
     sithControl_inputFuncToControlType[functionId] = flag | 3;
 }
 
+// Added: Toggle crouch state
 void sithControl_ResetCrouchToggle(void)
 {
     sithControl_crouchWasSpecialMovement = 0;
@@ -246,6 +248,7 @@ void sithControl_Reset()
     _memset(sithControl_aInputFuncToKeyinfo, 0, sizeof(sithControl_aInputFuncToKeyinfo));
     stdControl_Reset();
 
+    // Added: Toggle crouch state
     sithControl_crouchToggled = 0;
     sithControl_crouchWasPressed = 0;
 }
@@ -1011,6 +1014,7 @@ int sithControl_HandlePlayer(SithThing *player, flex_t deltaSecs)
     {
         if (player->flags & SITH_TF_DEAD)
         {
+            // Added: Toggle crouch state
             // Reset toggle crouch on death.
             // Preserve the current key state to prevent an accidental
             // toggle if crouch is held during respawn.
@@ -1083,6 +1087,7 @@ LABEL_39:
                     sithControl_PlayerLook(player, deltaSecs);
                 }
 
+                // Added: Toggle crouch state
                 // Cancel toggle crouch when entering water, noclip,
                 // or becoming airborne while fly mode is enabled.
                 int isUnderwater = player->sector &&
@@ -1102,6 +1107,7 @@ LABEL_39:
                 }
 
                 sithControl_crouchWasSpecialMovement = isSpecialMovement;
+                // End Added: Toggle crouch state
 
                 if ( player->attach_flags )
                     sithControl_PlayerMovement(player);
@@ -1413,7 +1419,7 @@ void sithControl_PlayerMovementMots(SithThing *player)
     }
     thing->physicsParams.flags =
          thing->physicsParams.flags & ~SITH_PF_CROUCHING;
-    iVar2 = sithControl_GetCrouchState();
+    iVar2 = sithControl_GetCrouchState(); // Added: Toggle crouch state
     if (iVar2 == 0) {
         if (sithControl_008d7f58 != 0) {
             sithThing_MotsTick(1,0,0.0);
@@ -1615,7 +1621,7 @@ void sithControl_PlayerMovement(SithThing *player)
     if ( sithControl_GetKey(INPUT_FUNC_SLOW, 0) )
         move_multiplier = move_multiplier * 0.5;
     int old_state = player->physicsParams.flags;
-    if (!sithControl_GetCrouchState())
+    if (!sithControl_GetCrouchState()) // Added: Toggle crouch state
     {
         new_state = old_state & ~SITH_PF_CROUCHING;
     }
