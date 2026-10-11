@@ -21,7 +21,7 @@
 // in dwImage_Blit/dwImage_BlitColorMap).
 
 #include "Dw/dwImage.h"
-#include "Dw/stdBitmapRle2.h" // loads_bmp / stdBitmapRle2_LoadFile16 (P8)
+#include "Dw/stdBitmapRle2.h" // stdBitmapRle2_LoadFile8 / stdBitmapRle2_LoadFile16 (P8)
 
 #include "stdPlatform.h"
 
@@ -327,7 +327,7 @@ void dwImage::BlitColorMap(dwImageBits* pDestBits, int x, int y, dwRect* pClipRe
 // Binary:
 //   if (<display tRasterInfo @0x6b17cc>.format.bpp > 8)   // = DAT_006b17e4
 //       return stdBitmapRle_FUN_00444c50(pFilePath);       // 16bpp RLE loader
-//   return loads_bmp(pFilePath, 0);                        // 8bpp BMP/RLE loader
+//   return stdBitmapRle2_LoadFile8(pFilePath, 0);                        // 8bpp BMP/RLE loader
 // Both loaders (@0x444850/@0x444c50) live in the stdBitmapRle2 unit
 // (stdBitmapRle2.cpp, P8). The display-depth global DAT_006b17e4 maps to
 // stdDisplay_pCurVideoMode->format.format.bpp; a NULL video mode is treated as
@@ -338,7 +338,7 @@ extern "C" dwImage* dwImage_LoadFile(char* pFilePath)
     int displayBpp = stdDisplay_pCurVideoMode ? (int)stdDisplay_pCurVideoMode->format.format.bpp : 8;
     if (displayBpp > 8)
         return stdBitmapRle2_LoadFile16(pFilePath);
-    return loads_bmp(pFilePath, 0);
+    return stdBitmapRle2_LoadFile8(pFilePath, 0);
 }
 
 // ---------------------------------------------------------------------------

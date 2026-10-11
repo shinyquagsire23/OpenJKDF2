@@ -21,7 +21,10 @@
 
 #ifdef __cplusplus
 #ifdef EXPERIMENTAL_FIXED_POINT
+// fixed.h is C++-only, and globals.h includes this header inside extern "C"
+extern "C++" {
 #include "fixed.h"
+}
 #endif
 #endif
 

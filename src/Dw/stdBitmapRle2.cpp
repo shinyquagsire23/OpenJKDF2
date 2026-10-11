@@ -746,7 +746,7 @@ static dwImage* stdBitmapRle_LoadEntry(char* pFilePath, int bForceDecompress)
 }
 
 // 8bpp image file loader. @444850
-extern "C" dwImage* loads_bmp(char* pFilePath, int bForceDecompress)
+extern "C" dwImage* stdBitmapRle2_LoadFile8(char* pFilePath, int bForceDecompress)
 {
     if (pFilePath == NULL)
         return NULL;
@@ -782,9 +782,9 @@ extern "C" dwImage* stdBitmapRle2_LoadFile16(char* pFilePath)
     // video mode is treated as the 8bpp path (DW's default software display).
     int displayBpp = stdDisplay_pCurVideoMode ? (int)stdDisplay_pCurVideoMode->format.format.bpp : 8;
     if (displayBpp < 9)
-        return loads_bmp(pFilePath, 1);
+        return stdBitmapRle2_LoadFile8(pFilePath, 1);
 
-    dwImage* pSrc = loads_bmp(pFilePath, 0);
+    dwImage* pSrc = stdBitmapRle2_LoadFile8(pFilePath, 0);
     if (pSrc)
     {
         dwImage* pResult = dwImageVBuf_NewFromImage(pSrc, (uint8_t)displayBpp);

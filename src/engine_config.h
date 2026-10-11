@@ -43,10 +43,8 @@
 #define MICROSECOND_TIME
 #endif
 
-// Droidworks app layer (src/Dw/...), desktop-only for now
-#if !defined(TARGET_RETRO_HOMEBREW)
-#define PLATFORM_DROIDWORKS
-#endif
+// Droidworks app layer (src/Dw/...): PLATFORM_DROIDWORKS is defined by CMake
+// (TARGET_CAN_DROIDWORKS && OPENJKDF2_DROIDWORKS), never on TARGET_RETRO_HOMEBREW
 
 // Original game will speed up if framerate is over 100?
 #ifndef QOL_IMPROVEMENTS

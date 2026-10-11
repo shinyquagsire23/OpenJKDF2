@@ -43,6 +43,10 @@ if (TARGET_NO_MULTIPLAYER_MENUS)
     add_definitions(-DTARGET_NO_MULTIPLAYER_MENUS)
 endif()
 
+if (TARGET_DROIDWORKS)
+    add_compile_definitions(PLATFORM_DROIDWORKS)
+endif()
+
 # Enables all force powers by default, useful for debugging.
 if(DEBUG_QOL_CHEATS)
     add_definitions(-DDEBUG_QOL_CHEATS)

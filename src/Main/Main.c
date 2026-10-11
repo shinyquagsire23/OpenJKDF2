@@ -758,12 +758,14 @@ void Main_ParseCmdLine(char *cmdline)
         {
             Main_bDwCompat = 1;
         }
+#ifdef PLATFORM_DROIDWORKS
         else if (!__strcmpi(pArgTok, "-droidworks") || !__strcmpi(pArgTok, "/droidworks"))
         {
             // Full DroidWorks game mode: DW app layer replaces the jk GUI flow.
             Main_bDroidWorks = 1;
             Main_bDwCompat = 1;
         }
+#endif
         else if (!__strcmpi(pArgTok, "-dwCogVerbs") || !__strcmpi(pArgTok, "/dwCogVerbs"))
         {
             // DW COG verb import into JK/MOTS games (analog of -enhancedCogVerbs).

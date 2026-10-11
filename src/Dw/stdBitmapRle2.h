@@ -27,7 +27,7 @@ extern "C" {
 // file through dwMain_pHS. bForceDecompress != 0 forces a BI_RLE8 file to be
 // fully decoded into an uncompressed stdBitmapRle2 (used by the mask loader).
 // Returns a heap dwImage (stdBitmapRle2 or stdBitmapRle), or NULL. @444850
-dwImage* loads_bmp(char* pFilePath, int bForceDecompress);
+dwImage* stdBitmapRle2_LoadFile8(char* pFilePath, int bForceDecompress);
 
 // Allocate an empty width x height stdBitmapRle2 at the given bpp (BITS: 8/16).
 // (Binary: operator new(0x18) + stdBitmapRle2_Ctor @442df0.)

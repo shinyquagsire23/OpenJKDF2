@@ -71,7 +71,9 @@ set(TARGET_HOOKS FALSE)
 set(TARGET_NO_BLOBS FALSE)
 set(TARGET_CAN_JKGM FALSE)
 set(TARGET_NO_MULTIPLAYER_MENUS FALSE)
+set(TARGET_CAN_DROIDWORKS TRUE)
 set(OPENJKDF2_USE_BLOBS FALSE CACHE BOOL "Use blobs")
+option(OPENJKDF2_DROIDWORKS "Build the DroidWorks app layer (src/Dw, -droidworks) on platforms that support it" ON)
 
 # Options for compiling
 if(DEFINED ENV{TARGET_BUILD_TESTS})
@@ -164,6 +166,13 @@ endif()
 # Establishes compile options, binary/library names, defines, etc
 plat_initialize()
 
+if(TARGET_CAN_DROIDWORKS AND OPENJKDF2_DROIDWORKS)
+    set(TARGET_DROIDWORKS TRUE)
+else()
+    set(TARGET_DROIDWORKS FALSE)
+endif()
+message(STATUS "DroidWorks app layer: ${TARGET_DROIDWORKS}")
+
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
@@ -230,8 +239,8 @@ if(TARGET_TWL OR TARGET_DREAMCAST)
         ${PROJECT_SOURCE_DIR}/src/Raster/rdZRaster.c)
 endif()
 
-# DroidWorks app layer (src/Dw/...) is desktop-only for now
-if(TARGET_TWL OR TARGET_DREAMCAST)
+# DroidWorks app layer (src/Dw/...), see OPENJKDF2_DROIDWORKS/TARGET_CAN_DROIDWORKS
+if(NOT TARGET_DROIDWORKS)
     file(GLOB DW_SRCS ${PROJECT_SOURCE_DIR}/src/Dw/*.c ${PROJECT_SOURCE_DIR}/src/Dw/*.cpp)
     if(DW_SRCS)
         list(REMOVE_ITEM ENGINE_SOURCE_FILES ${DW_SRCS})
