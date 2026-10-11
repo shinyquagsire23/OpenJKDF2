@@ -95,6 +95,7 @@ int jkDev_CmdTeam(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int jkDev_CmdUnlimited(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 // Added: Saber color console cheat
 int jkDev_CmdSaberColor(stdDebugConsoleCmd* pCmd, const char* pArgStr);
+int jkDev_CmdSaberRGB(stdDebugConsoleCmd* pCmd, const char* pArgStr);
 // Added: Big Head Mode console cheat
 int jkDev_CmdBigHead(stdDebugConsoleCmd* pCmd, const char* pArgStr);
 // Added: DK Mode console cheat
