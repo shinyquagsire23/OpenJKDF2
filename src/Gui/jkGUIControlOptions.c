@@ -32,7 +32,7 @@ static jkGuiElement jkGuiControlOptions_buttons[20] = {
     {ELEMENT_CHECKBOX, 0, 0, "GUI_FREELOOK", 0, {40, 230, 360, 20}, 1,  0, "GUI_FREELOOK_HINT", 0, 0, 0, {0}, 0},
     {ELEMENT_CHECKBOX, 0, 0, "GUI_VIEWCENTER", 0, {40, 260, 360, 20},  1, 0, "GUI_VIEWCENTER_HINT", 0, 0, 0, {0}, 0},
     {ELEMENT_CHECKBOX, 0, 0, "GUI_ALWAYSRUN", 0, {40, 290, 360, 20}, 1, 0, "GUI_ALWAYSRUN_HINT", 0, 0, 0, {0}, 0},
-    {ELEMENT_CHECKBOX, 0, 0, "GUI_CROUCHTOGGLE", 0, {40, 320, 360, 20}, 1, 0, "GUI_CROUCHTOGGLE_HINT", 0, 0, 0, {0}, 0},
+    {ELEMENT_CHECKBOX, 0, 0, "GUI_CROUCHTOGGLE", 0, {40, 320, 360, 20}, 1, 0, "GUI_CROUCHTOGGLE_HINT", 0, 0, 0, {0}, 0}, // Added: Toggle crouch state
     {ELEMENT_TEXTBUTTON, 4445, 2, "GUI_LOADCONFIG", 3, {0, 170, 320, 50}, 1, 0, "GUI_LOADCONFIG_HINT", 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 4444, 2, "GUI_SAVECONFIG", 3, {320, 170, 320,  50}, 1, 0, "GUI_SAVECONFIG_HINT", 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 1, 2, "GUI_OK", 3, {440, 430, 200, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
@@ -65,8 +65,9 @@ int jkGuiControlOptions_Show()
     jkGuiControlOptions_buttons[11].boxChecked = sithWeapon_controlOptions & 4;
     jkGuiControlOptions_buttons[12].boxChecked = sithWeapon_controlOptions & 0x10;
     jkGuiControlOptions_buttons[13].boxChecked = sithWeapon_controlOptions & 2;
-    jkGuiControlOptions_buttons[14].boxChecked = sithWeapon_controlOptions & 0x40;
+    jkGuiControlOptions_buttons[14].boxChecked = sithWeapon_controlOptions & 0x40; // Added: Toggle crouch state
 
+    // Added
     jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiControlOptions_menu, &jkGuiControlOptions_buttons[17]);
     jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiControlOptions_menu, &jkGuiControlOptions_buttons[18]);
     jkGuiSetup_sub_412EF0(&jkGuiControlOptions_menu, 1);
