@@ -874,8 +874,11 @@ void sithCogFunctionThing_SetThingVel(sithCog *pCog)
 
     sithCogExec_PopVector(pCog, &poppedVec);
     SithThing* pThing = sithCogExec_PopThing(pCog);
-    if ( pThing && pThing->moveType == SITH_MT_PHYSICS)
+    if (pThing && pThing->moveType == SITH_MT_PHYSICS)
     {
+        // Added: cancel force jump with crouch toggle
+        sithCogExec_CheckForceJumpVelocity(pCog, pThing, &poppedVec);
+
         rdVector_Copy3(&pThing->physicsParams.vel, &poppedVec);
         if (COG_SHOULD_SYNC(pCog))
         {
