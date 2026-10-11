@@ -31,6 +31,9 @@
 int jkDev_bInvincible = 0;
 // Added: Unlimited resources console cheat
 int jkDev_bUnlimitedResources = 0;
+// Added: One-hit kill/death console cheat
+int jkDev_bInstakill = 0;
+int jkDev_bInstadeath = 0;
 
 void jkDev_DrawEntriesGPU();
 void jkDev_BlitLogToScreenGPU();
@@ -104,6 +107,8 @@ void jkDev_Startup()
 
 #ifdef QOL_IMPROVEMENTS
     jkDev_RegisterCmd(jkDev_CmdNoclip, "noclip", "Noclip", 0);
+    jkDev_RegisterCmd(jkDev_CmdInstakill, "instakill", "Instant Kill", 0);
+    jkDev_RegisterCmd(jkDev_CmdInstadeath, "instadeath", "Instant Death", 0);
     jkDev_RegisterCmd(jkDev_CmdInvincible, "invincible", "Invincible", 0);
     jkDev_RegisterCmd(jkDev_CmdSaberColor, "sabercolor", "Saber Color", 0);
     jkDev_RegisterCmd(jkDev_CmdSaberRGB, "saberrgb", "Custom RGB Saber Color", 0);
@@ -638,6 +643,54 @@ int jkDev_CmdFly(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
         sithCommand_Fly(pCmd, pArgStr);
+    return 1;
+}
+
+// Added: Instant kill cheat
+int jkDev_CmdInstakill(stdDebugConsoleCmd* pCmd, const char* pArgStr)
+{
+    if (sithNet_isMulti)
+        return 1;
+
+    if (pArgStr && !__strcmpi(pArgStr, "on"))
+    {
+        jkDev_bInstakill = 1;
+        sithConsole_PrintString("Instakill enabled: Your attacks kill enemies in one hit.");
+    }
+    else if (pArgStr && !__strcmpi(pArgStr, "off"))
+    {
+        jkDev_bInstakill = 0;
+        sithConsole_PrintString("Instakill disabled.");
+    }
+    else
+    {
+        sithConsole_PrintString("Usage: instakill [on|off]");
+    }
+
+    return 1;
+}
+
+// Added: Instant death cheat
+int jkDev_CmdInstadeath(stdDebugConsoleCmd* pCmd, const char* pArgStr)
+{
+    if (sithNet_isMulti)
+        return 1;
+
+    if (pArgStr && !__strcmpi(pArgStr, "on"))
+    {
+        jkDev_bInstadeath = 1;
+        sithConsole_PrintString("Instadeath enabled: Enemy attacks kill you in one hit.");
+    }
+    else if (pArgStr && !__strcmpi(pArgStr, "off"))
+    {
+        jkDev_bInstadeath = 0;
+        sithConsole_PrintString("Instadeath disabled.");
+    }
+    else
+    {
+        sithConsole_PrintString("Usage: instadeath [on|off]");
+    }
+
     return 1;
 }
 
