@@ -30,6 +30,9 @@
 #include "Dss/sithMulti.h"
 #include "jk.h"
 
+// Added: Turbo Mode cheat state.
+extern int jkDev_bTurbo;
+
 tHashTable* sithAI_commandsHashmap = NULL;
 uint32_t sithAI_maxActors = 0;
 int sithAI_actorInitted[SITHAI_MAX_ACTORS] = {0};
@@ -1828,7 +1831,11 @@ LAB_0053a691:
         fVar3 = (pDistractorThing->position).y - (pActorThing->position).y;
         fVar4 = (pDistractorThing->position).z - (pActorThing->position).z;
 
-        pActor->field_28C = sithTime_g_msecGameTime + 2000;
+        // Added: Turbo Mode shortens the AI charge duration.
+        extern int jkDev_bTurbo;
+
+        pActor->field_28C = sithTime_g_msecGameTime
+            + ((!sithNet_isMulti && jkDev_bTurbo) ? 1000 : 2000);
         pActor->moveSpeed = 1313.0;
         pActor->flags &= ~(SITHAI_MODE_TURNING | SITHAI_MODE_MOVING);
         pActor->attackError.x = xDist;
@@ -1919,7 +1926,18 @@ LAB_0053a3b9:
         fVar8 = (flex_d_t)(pDistractorThing->position).z - (flex_d_t)(pActorThing->position).z;
         
         fVar9 = stdMath_Sqrt(fVar8 * (flex_d_t)(flex_t)fVar8 + fVar7 * fVar7 + xDist * (flex_d_t)(flex_t)xDist); // FLEXTODO
-        fVar10 = fVar9 / (flex_d_t)leapSpeed - (flex_d_t) - 0.2;
+
+        // Added: Turbo Mode adjusts leap timing for doubled movement speed.
+        extern int jkDev_bTurbo;
+
+        flex_d_t effectiveLeapSpeed = (flex_d_t)leapSpeed;
+
+        if (!sithNet_isMulti && jkDev_bTurbo)
+        {
+            effectiveLeapSpeed *= 2.0;
+        }
+
+        fVar10 = fVar9 / effectiveLeapSpeed + 0.2;
         fVar1 = sithWorld_g_pCurrentWorld->gravity;
         (pActor->attackError).x = (flex_t)xDist; // FLEXTODO
         (pActor->attackError).y = (flex_t)fVar7; // FLEXTODO
@@ -1958,7 +1976,8 @@ LAB_0053a3b9:
             if (fVar1 <= 1.0 - minDot) {
                 if (thing->actorParams.flags & SITH_AF_DELAYFIRE) 
                 {
-                    pActor->field_28C = sithTime_g_msecGameTime + 300;
+                    pActor->field_28C = sithTime_g_msecGameTime
+                        + ((!sithNet_isMulti && jkDev_bTurbo) ? 150 : 300);
                     pActor->field_268 = param_7 | 8;
                     pActor->field_264 = leapSpeed;
                     pActor->field_26C = param_5;

@@ -27,6 +27,8 @@
 #include "../jk.h"
 #include "Primitives/rdModel3.h"
 
+// Added: Turbo Mode cheat
+int jkDev_bTurbo = 0;
 // Added: True invincibility cheat.
 int jkDev_bInvincible = 0;
 // Added: Unlimited resources console cheat
@@ -107,6 +109,7 @@ void jkDev_Startup()
 
 #ifdef QOL_IMPROVEMENTS
     jkDev_RegisterCmd(jkDev_CmdNoclip, "noclip", "Noclip", 0);
+    jkDev_RegisterCmd(jkDev_CmdTurbo, "turbo", "Turbo Mode", 0);
     jkDev_RegisterCmd(jkDev_CmdInstakill, "instakill", "Instant Kill", 0);
     jkDev_RegisterCmd(jkDev_CmdInstadeath, "instadeath", "Instant Death", 0);
     jkDev_RegisterCmd(jkDev_CmdInvincible, "invincible", "Invincible", 0);
@@ -643,6 +646,30 @@ int jkDev_CmdFly(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
         sithCommand_Fly(pCmd, pArgStr);
+    return 1;
+}
+
+// Added: Turbo Mode cheat
+int jkDev_CmdTurbo(stdDebugConsoleCmd* pCmd, const char* pArgStr)
+{
+    if (sithNet_isMulti)
+        return 1;
+
+    if (pArgStr && !__strcmpi(pArgStr, "on"))
+    {
+        jkDev_bTurbo = 1;
+        sithConsole_PrintString("Turbo Mode enabled: Actors move at double speed.");
+    }
+    else if (pArgStr && !__strcmpi(pArgStr, "off"))
+    {
+        jkDev_bTurbo = 0;
+        sithConsole_PrintString("Turbo Mode disabled.");
+    }
+    else
+    {
+        sithConsole_PrintString("Usage: turbo [on|off]");
+    }
+
     return 1;
 }
 
