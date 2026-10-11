@@ -517,6 +517,7 @@ void sithCogFunctionPlayer_DeactivateBin(sithCog *pCog)
     {
         cog_flex_t ret = sithInventory_DeactivateBin(player, pCog, binIdx);
 
+        // Added: cancel force jump with crouch toggle
         if (binIdx == 21)
         {
             sithCogExec_MarkForceJump(pCog, player);
