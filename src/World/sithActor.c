@@ -87,6 +87,16 @@ flex_t sithActor_DamageActor(SithThing *pActor, SithThing *pThing, flex_t damage
     SITH_ASSERTREL(pActor && (damage > 0.0f));
     SITH_ASSERTREL(pActor->type == SITH_THING_ACTOR || pActor->type == SITH_THING_PLAYER);
 
+    // Added: True invincibility for the local player.
+    extern int jkDev_bInvincible;
+
+    if (!sithNet_isMulti
+        && jkDev_bInvincible
+        && pActor == sithPlayer_g_pLocalPlayerThing)
+    {
+        return 0.0f;
+    }
+
     if ( sithNet_isMulti && (pActor->flags & SITH_TF_INVULN) != 0 )
     {
         receiver_ = pThing;

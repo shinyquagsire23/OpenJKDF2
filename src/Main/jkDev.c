@@ -27,6 +27,8 @@
 #include "../jk.h"
 #include "Primitives/rdModel3.h"
 
+// Added: True invincibility cheat.
+int jkDev_bInvincible = 0;
 // Added: Unlimited resources console cheat
 int jkDev_bUnlimitedResources = 0;
 
@@ -102,6 +104,7 @@ void jkDev_Startup()
 
 #ifdef QOL_IMPROVEMENTS
     jkDev_RegisterCmd(jkDev_CmdNoclip, "noclip", "Noclip", 0);
+    jkDev_RegisterCmd(jkDev_CmdInvincible, "invincible", "Invincible", 0);
     jkDev_RegisterCmd(jkDev_CmdSaberColor, "sabercolor", "Saber Color", 0);
     jkDev_RegisterCmd(jkDev_CmdSaberRGB, "saberrgb", "Custom RGB Saber Color", 0);
     jkDev_RegisterCmd(jkDev_CmdBigHead, "bighead", "Big Head Mode", 0);
@@ -635,6 +638,28 @@ int jkDev_CmdFly(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
         sithCommand_Fly(pCmd, pArgStr);
+    return 1;
+}
+
+// Added: True invincibility cheat.
+int jkDev_CmdInvincible(stdDebugConsoleCmd* pCmd, const char* pArgStr)
+{
+    if (sithNet_isMulti)
+        return 1;
+
+    if (pArgStr)
+    {
+        if (!__strcmpi(pArgStr, "on") || !__strcmpi(pArgStr, "1"))
+            jkDev_bInvincible = 1;
+        else if (!__strcmpi(pArgStr, "off") || !__strcmpi(pArgStr, "0"))
+            jkDev_bInvincible = 0;
+    }
+
+    if (jkDev_bInvincible)
+        sithConsole_PrintString("Invincibility On");
+    else
+        sithConsole_PrintString("Invincibility Off");
+
     return 1;
 }
 
