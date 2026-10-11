@@ -42,6 +42,11 @@ int rdPuppet_SetStatus(rdPuppet *pPuppet, int track, int status);
 int rdPuppet_PlayTrack(rdPuppet *pPuppet, int track);
 void rdPuppet_ResetTrack(rdPuppet *pPuppet, int track);
 int rdPuppet_NewEntry(rdPuppet *pPuppet, rdThing *parent);
+// Protected COG animation handles.
+int rdPuppet_CreateProtectedHandle(rdPuppet* puppet, int track);
+int rdPuppet_ResolveProtectedHandle(rdPuppet* puppet, int handle);
+void rdPuppet_InvalidateProtectedHandles(rdPuppet* puppet, int track);
+void rdPuppet_ClearProtectedHandles(rdPuppet* puppet);
 
 //static void (*rdPuppet_ResetTrack)(rdPuppet *a1, int a2) = (void*)rdPuppet_ResetTrack_ADDR;
 //static int (*rdPuppet_AddTrack)(rdPuppet *puppet, rdKeyframe *keyframe, int a3, int a4) = (void*)rdPuppet_AddTrack_ADDR;
