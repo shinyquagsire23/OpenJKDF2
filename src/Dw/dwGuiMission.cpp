@@ -5,9 +5,9 @@
 // dwGuiRefRadioButton pair (owner dwGuiReference P6; landed here early, see
 // the ownership note in Dw/dwGuiMission.h).
 //
-// Decompiled from DroidWorks.exe unit range 0x41c0f0-0x41f16f (the unit's
+// Decompiled from DroidWorks.exe (the unit's
 // dwMission_* record functions and dwMissionSequence live in dwMission.cpp;
-// the radio pair is 0x42a540-0x42a87f). Per-function @addresses below.
+// the radio pair is). Per-function @addresses below.
 //
 // Translation notes:
 //  - The screens' dwSegment-slot bodies (Activate/Deactivate) take the
@@ -55,7 +55,7 @@
 
 // These engine headers have no extern "C" guards of their own — wrap at include site.
 extern "C" {
-#include "Win95/stdDisplay.h" // stdDisplay_pCurVideoMode (binary 0x6478f8)
+#include "Win95/stdDisplay.h" // stdDisplay_pCurVideoMode
 }
 
 // Host event pump for the nested modal loop in dwGuiDialog_RunModal (defined in
@@ -66,9 +66,9 @@ extern "C" void Window_SdlUpdateModal();
 
 // The mission dwGuiInGame factory + droid validation.
 // TODO(dw-decomp): provided by dwGuiInGame (P6 wave 2). Binary: BeginDeploy
-// news the 0x284 screen via dwGuiInGame_Ctor@41f2a0(pMission) and pushes its
+// news the 0x284 screen via dwGuiInGame_Ctor(pMission) and pushes its
 // dwSegment subobject (obj+0x10) — the factory returns that segment;
-// dwGuiInGame_CheckDroidValid @41f6f0. Until that unit lands the orchestrator
+// dwGuiInGame_CheckDroidValid. Until that unit lands the orchestrator
 // keeps `return NULL;` / `return 0;` placeholders in dwMain.c.
 extern "C" dwSegment* dwGuiInGame_New(dwMission* pMission);
 extern "C" int dwGuiInGame_CheckDroidValid(void);
@@ -76,21 +76,21 @@ extern "C" int dwGuiInGame_CheckDroidValid(void);
 // 8bpp screen-sized image copy (the dialog's shaded-snapshot background).
 // Currently a loud P8 stub returning NULL, defined in dwAnim.cpp.
 // TODO(dw-decomp): provided by the stdBitmapRle2 engine-side unit (P8).
-extern "C" dwImage* stdBitmapRle2_InstantiateCopy(dwImage* pSrc, int16_t width, int16_t height); // @442ec0
+extern "C" dwImage* stdBitmapRle2_InstantiateCopy(dwImage* pSrc, int16_t width, int16_t height);
 
 // ---- const tables ------------------------------------------------------------
 
 // dwGuiObjectiveBtn NORMAL-mission marker icon by earned rank (binary string
-// table @0x51ef88, indexed by dwMission::rank 0-3: unranked / Scavenger /
+// table dwGuiObjectiveBtn_aRankIcons, indexed by dwMission::rank 0-3: unranked / Scavenger /
 // Apprentice / Master).
 static const char* dwGuiObjectiveBtn_aRankIcons[4] = {
-    "mbmission.rle",       // 0x5284cc
-    "MScavenger_Icon.rle", // 0x5284b8
-    "MApprentice_Icon.rle",// 0x5284a0
-    "MMaster_Icon.rle",    // 0x52848c
+    "mbmission.rle",
+    "MScavenger_Icon.rle",
+    "MApprentice_Icon.rle",
+    "MMaster_Icon.rle",
 };
 
-// dwGuiBriefText reveal-circle edge wobble (binary int16 table @0x51ef20,
+// dwGuiBriefText reveal-circle edge wobble (binary int16 table dwGuiBriefText_aWobble,
 // cycled per scanline: radius - {0, 4, 8, 4}).
 static const int16_t dwGuiBriefText_aWobble[4] = { 0, 4, 8, 4 };
 
@@ -121,8 +121,8 @@ static void dwGuiMission_UnlinkWidgetNode(dwList* pList, void* pWidget)
 }
 
 // Capture the current screen into a new image and darken it to 60% — the
-// dialog's dimmed backdrop. The binary inlines this in dwGuiDialog_Ctor
-// (@41c260-41c315); it is byte-for-byte the dwGuiScreen 0x66/0x68 snapshot
+// dialog's dimmed backdrop. The binary inlines this in dwGuiDialog_Ctor;
+// it is byte-for-byte the dwGuiScreen 0x66/0x68 snapshot
 // (see dwGuiScreen_CaptureShadedScreen — static there, replicated verbatim).
 // The screen-image NULL guard is added (the binary assumes an open display).
 static dwImage* dwGuiMission_CaptureShadedScreen()
@@ -141,7 +141,7 @@ static dwImage* dwGuiMission_CaptureShadedScreen()
     rect.right = (int16_t)stdDisplay_pCurVideoMode->format.width;
     rect.bottom = (int16_t)stdDisplay_pCurVideoMode->format.height;
 
-    // Note: binary @0x442ec0 ctor takes (pSrcImage, pRect) with rect always
+    // Note: binary stdBitmapRle2_ToVBuffer ctor takes (pSrcImage, pRect) with rect always
     // {0,0,w,h}; the P8 placeholder signature takes width/height directly.
     pSnap = stdBitmapRle2_InstantiateCopy((dwImage*)dwDisplay_pScreenImage, rect.right, rect.bottom);
     if (pSnap)
@@ -162,21 +162,21 @@ static dwImage* dwGuiMission_CaptureShadedScreen()
 // dwGuiRefRadioGroup / dwGuiRefRadioButton (owner dwGuiReference P6)
 // ===========================================================================
 
-// @42a540 (dwGuiRefRadioGroup_Ctor)
+// dwGuiRefRadioGroup_Ctor
 dwGuiRefRadioGroup::dwGuiRefRadioGroup(dwRect* pRect)
     : dwWidgetGroup(pRect)
     , pSelected(NULL)
 {
 }
 
-// @42a580 (dwGuiRefRadioGroup_Dtor; scalar-deleting wrapper @42a560) — the
+// dwGuiRefRadioGroup_Dtor (scalar-deleting wrapper dwGuiRefRadioGroup_DtorDelete) — the
 // binary body is the re-inlined dwWidgetGroup dtor (FreeChildImages + delete
 // children + free list); all of that runs in the base dtor here.
 dwGuiRefRadioGroup::~dwGuiRefRadioGroup()
 {
 }
 
-// @42a6a0 (dwGuiRefRadioGroup_AddButton) — quirk preserved: the FIRST button
+// dwGuiRefRadioGroup_AddButton — quirk preserved: the FIRST button
 // is Select()ed BEFORE it is inserted.
 void dwGuiRefRadioGroup::AddButton(dwGuiRefRadioButton* pBtn)
 {
@@ -187,7 +187,7 @@ void dwGuiRefRadioGroup::AddButton(dwGuiRefRadioButton* pBtn)
     this->children.InsertAfter(this->children.pSentinel->pPrev, pBtn);
 }
 
-// @42a770 (dwGuiRefRadioGroup_SetSelected)
+// dwGuiRefRadioGroup_SetSelected
 void dwGuiRefRadioGroup::SetSelected(dwGuiRefRadioButton* pBtn)
 {
     if (pBtn != NULL && this->pSelected != pBtn && this->pSelected != NULL)
@@ -195,7 +195,7 @@ void dwGuiRefRadioGroup::SetSelected(dwGuiRefRadioButton* pBtn)
     this->pSelected = pBtn;
 }
 
-// @42a7a0 (dwGuiRefRadioButton_Ctor)
+// dwGuiRefRadioButton_Ctor
 dwGuiRefRadioButton::dwGuiRefRadioButton(dwGuiRefRadioGroup* pGroup, dwRect* pRect,
                                          char* pImgNormal, char* pSndOff, char* pImgPressed,
                                          char* pSndClick, int cmdId)
@@ -204,12 +204,12 @@ dwGuiRefRadioButton::dwGuiRefRadioButton(dwGuiRefRadioGroup* pGroup, dwRect* pRe
 {
 }
 
-// @42a800 (dwGuiRefRadioButton_Dtor; scalar-deleting wrapper @42a7e0)
+// dwGuiRefRadioButton_Dtor (scalar-deleting wrapper dwGuiRefRadioButton_DtorDelete)
 dwGuiRefRadioButton::~dwGuiRefRadioButton()
 {
 }
 
-// vtbl +0x08 @42a810
+// vtbl +0x08 dwGuiRefRadioButton_OnMouseDown
 int dwGuiRefRadioButton::OnMouseDown(int16_t x, int16_t y)
 {
     int ret;
@@ -222,7 +222,7 @@ int dwGuiRefRadioButton::OnMouseDown(int16_t x, int16_t y)
     return ret;
 }
 
-// @42a860 (dwGuiRefRadioButton_Select)
+// dwGuiRefRadioButton_Select
 void dwGuiRefRadioButton::Select()
 {
     if (this->bHot == 0)
@@ -234,7 +234,7 @@ void dwGuiRefRadioButton::Select()
     }
 }
 
-// @42a850 (dwGuiRefRadioButton_Deselect)
+// dwGuiRefRadioButton_Deselect
 void dwGuiRefRadioButton::Deselect()
 {
     this->bPressed = 0;
@@ -246,7 +246,7 @@ void dwGuiRefRadioButton::Deselect()
 // dwGuiDialog + dwGuiDialog_RunModal
 // ===========================================================================
 
-// @41c200 (dwGuiDialog_Ctor)
+// dwGuiDialog_Ctor
 dwGuiDialog::dwGuiDialog(const char* pConfName, const char* pMsgKey, int* pResult)
     : dwGuiScreen(pConfName, NULL)
     , msgKey(pMsgKey, 0)
@@ -257,13 +257,13 @@ dwGuiDialog::dwGuiDialog(const char* pConfName, const char* pMsgKey, int* pResul
     this->pBgImage = dwGuiMission_CaptureShadedScreen();
 }
 
-// @41c350 (dwGuiDialog_Dtor; scalar-deleting wrapper @41c330) — msgKey free
+// dwGuiDialog_Dtor (scalar-deleting wrapper dwGuiDialog_DtorDelete) — msgKey free
 // (member dtor) + base dtor.
 dwGuiDialog::~dwGuiDialog()
 {
 }
 
-// vtbl +0x1c @41c4d0 (dwGuiDialog_OnMessage)
+// vtbl +0x1c dwGuiDialog_OnMessage
 int dwGuiDialog::OnMessage(dwWidgetMsg* pMsg)
 {
     if (pMsg->code != 5000 && pMsg->code != 0x1389) // 5000 YES / 5001 NO
@@ -272,7 +272,7 @@ int dwGuiDialog::OnMessage(dwWidgetMsg* pMsg)
     return 1;
 }
 
-// vtbl +0x48 @41c3a0 (dwGuiDialog_CreateControl)
+// vtbl +0x48 dwGuiDialog_CreateControl
 dwWidget* dwGuiDialog::CreateControl(char* pKeyword, dwConfFile* pConf)
 {
     dwRect rect;
@@ -295,15 +295,15 @@ dwWidget* dwGuiDialog::CreateControl(char* pKeyword, dwConfFile* pConf)
         pTextCtrl = new dwGuiHypText(&rect, NULL, pFontName, (uint8_t)color,
                                      dwGuiHypText_HAlignLeft, dwGuiHypText_VAlignTop,
                                      dwGuiHypText_WrapWords, dwGuiHypText_DrawGlyphsNormal,
-                                     NULL); // @438540 (dwGuiHypText_CtorEx)
+                                     NULL); // dwGuiHypText_CtorEx
         pTextCtrl->text.Free();
         pTextCtrl->SetText(pText); // vtbl +0x48 (SetText APPENDS — hence the Free)
         return pTextCtrl;
     }
-    return dwGuiScreen::CreateControl(pKeyword, pConf); // @430a10
+    return dwGuiScreen::CreateControl(pKeyword, pConf);
 }
 
-// @41c0f0 (dwGuiDialog_RunModal) — THE modal message-box runner.
+// dwGuiDialog_RunModal — THE modal message-box runner.
 extern "C" int dwGuiDialog_RunModal(const char* pConfName, const char* pMsgKey)
 {
     int result;
@@ -330,11 +330,11 @@ extern "C" int dwGuiDialog_RunModal(const char* pConfName, const char* pMsgKey)
         dwSegment_BeginOverlay(static_cast<dwSegment*>(pDlg));
 
         // Binary: `while (result == 0 && dwSegment_bRunning) Window_sub_507090();`
-        // where 507090 drains the Win32 message queue or, when idle, runs
+        // where drains the Win32 message queue or, when idle, runs
         // dwMain_MainLoopTick() (= dwSegment_Tick + window teardown). Here
         // dwSegment_Tick updates the overlay (this dialog) and returns the
         // app-running flag; Window_SdlUpdateModal() is the port's stand-in for
-        // 507090's message drain — RunModal is entered synchronously from a
+        // 's message drain — RunModal is entered synchronously from a
         // mouse-event dispatch (already inside Window_SdlUpdate), so the tick's
         // own present-path SdlUpdate is a reentrancy-guarded no-op and the
         // dialog would never see the Yes/No click without this explicit pump.
@@ -355,7 +355,7 @@ extern "C" int dwGuiDialog_RunModal(const char* pConfName, const char* pMsgKey)
 // dwGuiBriefText
 // ===========================================================================
 
-// @41c9e0 (dwGuiBriefText_Ctor)
+// dwGuiBriefText_Ctor
 dwGuiBriefText::dwGuiBriefText(dwRect* pRect, dwPoint* pAnchor, const char* pConfName, int msgCode)
     : dwAnimBase(pRect, msgCode, /*bLoop*/0)
 {
@@ -424,7 +424,7 @@ dwGuiBriefText::dwGuiBriefText(dwRect* pRect, dwPoint* pAnchor, const char* pCon
     dwConfFile_Close(&conf);
 }
 
-// @41cc20 (dwGuiBriefText_Dtor; scalar-deleting wrapper @41cc00)
+// dwGuiBriefText_Dtor (scalar-deleting wrapper dwGuiBriefText_DtorDelete)
 dwGuiBriefText::~dwGuiBriefText()
 {
     dwListNode* pNode;
@@ -433,7 +433,7 @@ dwGuiBriefText::~dwGuiBriefText()
 
     if (this->state == 1)
         this->state = 2;
-    this->Stop();          // @41d000, called directly (not through the vtable)
+    this->Stop();          // , called directly (not through the vtable)
     dwAnimBase::Play();    // faithful binary quirk: bPlaying = 1 + Invalidate
     if (this->soundName.pBuffer != NULL) // Note: guard added (empty conf -> NULL name)
         dwSound_Stop(this->soundName.pBuffer);
@@ -456,7 +456,7 @@ dwGuiBriefText::~dwGuiBriefText()
     // soundName freed by the member dtor; dwAnimBase/dwWidget dtors implicit.
 }
 
-// vtbl +0x10 @41d050 (dwGuiBriefText_OnKey)
+// vtbl +0x10 dwGuiBriefText_OnKey
 int dwGuiBriefText::OnKey(int key, int repeat)
 {
     (void)repeat;
@@ -465,7 +465,7 @@ int dwGuiBriefText::OnKey(int key, int repeat)
     return 0;
 }
 
-// vtbl +0x1c @41d070 (dwGuiBriefText_OnMessage)
+// vtbl +0x1c dwGuiBriefText_OnMessage
 int dwGuiBriefText::OnMessage(dwWidgetMsg* pMsg)
 {
     if (pMsg->code == 0xC1D) // VO sample finished
@@ -473,7 +473,7 @@ int dwGuiBriefText::OnMessage(dwWidgetMsg* pMsg)
     return dwAnimBase::OnMessage(pMsg); // msgCode toggle (Play/Stop)
 }
 
-// vtbl +0x14 @41cd80 (dwGuiBriefText_Update)
+// vtbl +0x14 dwGuiBriefText_Update
 void dwGuiBriefText::Update(float dt)
 {
     dwSoundSample* pSample;
@@ -544,7 +544,7 @@ void dwGuiBriefText::Update(float dt)
         {
             if (this->pCurImage != NULL)
                 delete this->pCurImage;
-            // Binary loads via stdBitmapRle2_LoadFile16 (@444c50) — the
+            // Binary loads via stdBitmapRle2_LoadFile16 — the
             // LOCKABLE loader (8bpp: loads_bmp bForceDecompress=1). The
             // Draw's reveal-circle row copy Locks the image; dwImage_LoadFile
             // would hand back the lazy stdBitmapRle whose Lock is inert
@@ -556,7 +556,7 @@ void dwGuiBriefText::Update(float dt)
     }
 }
 
-// vtbl +0x48 @41cf80 (dwGuiBriefText_Play)
+// vtbl +0x48 dwGuiBriefText_Play
 void dwGuiBriefText::Play()
 {
     dwGuiBriefTextLine* pLine;
@@ -571,7 +571,7 @@ void dwGuiBriefText::Play()
         if (this->pCurImage != NULL)
             delete this->pCurImage;
         pLine = (dwGuiBriefTextLine*)this->pCurLineNode->pData;
-        this->pCurImage = stdBitmapRle2_LoadFile16(pLine->imageName.pBuffer); // binary: @444c50 (see Update)
+        this->pCurImage = stdBitmapRle2_LoadFile16(pLine->imageName.pBuffer); // binary (see Update)
         this->pCurLineNode = this->pCurLineNode->pNext;
         this->Invalidate(); // vtbl +0x34
     }
@@ -581,7 +581,7 @@ void dwGuiBriefText::Play()
     dwAnimBase::Play();
 }
 
-// vtbl +0x4c @41d000 (dwGuiBriefText_Stop)
+// vtbl +0x4c dwGuiBriefText_Stop
 void dwGuiBriefText::Stop()
 {
     if (this->state != 3)
@@ -596,7 +596,7 @@ void dwGuiBriefText::Stop()
     }
 }
 
-// vtbl +0x44 @41d0a0 (dwGuiBriefText_Draw)
+// vtbl +0x44 dwGuiBriefText_Draw
 void dwGuiBriefText::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     dwImage* pImg;
@@ -677,7 +677,7 @@ void dwGuiBriefText::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 // dwGuiObjectiveBtn
 // ===========================================================================
 
-// @41d390 (dwGuiObjectiveBtn_Ctor)
+// dwGuiObjectiveBtn_Ctor
 dwGuiObjectiveBtn::dwGuiObjectiveBtn(dwGuiRefRadioGroup* pGroup, dwRect* pRect, dwMission* pMission)
     : dwGuiRefRadioButton(pGroup, pRect, NULL, NULL, NULL, NULL, /*cmdId*/0x791f)
     , pMission(pMission)
@@ -689,7 +689,7 @@ dwGuiObjectiveBtn::dwGuiObjectiveBtn(dwGuiRefRadioGroup* pGroup, dwRect* pRect, 
     this->sndClick.Assign("WMissionLocate.wav", 0x12);
 }
 
-// @41d460 (dwGuiObjectiveBtn_Dtor; scalar-deleting wrapper @41d440)
+// dwGuiObjectiveBtn_Dtor (scalar-deleting wrapper dwGuiObjectiveBtn_DtorDelete)
 dwGuiObjectiveBtn::~dwGuiObjectiveBtn()
 {
     dwGuiObjectiveBtn::FreeImages(); // binary calls FreeImage directly
@@ -702,7 +702,7 @@ dwGuiObjectiveBtn::~dwGuiObjectiveBtn()
     }
 }
 
-// vtbl +0x04 @41d650 (undetected fn, recovered from the vtable @0x51ef98)
+// vtbl +0x04 dwGuiObjectiveBtn_OnMouseMove (undetected fn, recovered from the dwGuiObjectiveBtn_vtbl)
 int dwGuiObjectiveBtn::OnMouseMove(int16_t x, int16_t y)
 {
     dwWidgetMsg msg;
@@ -717,7 +717,7 @@ int dwGuiObjectiveBtn::OnMouseMove(int16_t x, int16_t y)
     return 1;
 }
 
-// vtbl +0x08 @41d6a0 (undetected fn, recovered from the vtable @0x51ef98)
+// vtbl +0x08 dwGuiObjectiveBtn_OnMouseDown (undetected fn, recovered from the dwGuiObjectiveBtn_vtbl)
 int dwGuiObjectiveBtn::OnMouseDown(int16_t x, int16_t y)
 {
     dwWidgetMsg msg;
@@ -735,7 +735,7 @@ int dwGuiObjectiveBtn::OnMouseDown(int16_t x, int16_t y)
     return ret;
 }
 
-// vtbl +0x3c @41d6f0 (Ghidra: dwGuiObjectiveBtn_LoadImage — the EnsureImages slot)
+// vtbl +0x3c (Ghidra: dwGuiObjectiveBtn_LoadImage — the EnsureImages slot)
 void dwGuiObjectiveBtn::EnsureImages()
 {
     dwImage* pImg;
@@ -770,7 +770,7 @@ void dwGuiObjectiveBtn::EnsureImages()
     this->pImagePressed = pImg;
 }
 
-// vtbl +0x40 @41d7c0 (Ghidra: dwGuiObjectiveBtn_FreeImage — the FreeImages slot)
+// vtbl +0x40 (Ghidra: dwGuiObjectiveBtn_FreeImage — the FreeImages slot)
 void dwGuiObjectiveBtn::FreeImages()
 {
     if (this->pImagePressed != NULL)
@@ -781,7 +781,7 @@ void dwGuiObjectiveBtn::FreeImages()
     }
 }
 
-// vtbl +0x44 @41d4d0 (dwGuiObjectiveBtn_Draw)
+// vtbl +0x44 dwGuiObjectiveBtn_Draw
 void dwGuiObjectiveBtn::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     char* pText;
@@ -790,7 +790,7 @@ void dwGuiObjectiveBtn::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
     int w;
     uint32_t i;
 
-    dwWorkshopCtrl::Draw(pDestBits, pClipRect); // @407580 (marker image)
+    dwWorkshopCtrl::Draw(pDestBits, pClipRect); // marker image
 
     if (this->pFont == NULL || this->pFont->pHeader == NULL) // Note: pHeader guard added (font load can fail)
         return;
@@ -833,21 +833,21 @@ void dwGuiObjectiveBtn::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 // dwGuiBriefTextElem
 // ===========================================================================
 
-// @41d7e0 (dwGuiBriefTextElem_Ctor)
+// dwGuiBriefTextElem_Ctor
 dwGuiBriefTextElem::dwGuiBriefTextElem(float revealDuration)
     : dwGuiHypText_ElemT(revealDuration)
 {
 }
 
-// @41d820 (dwGuiBriefTextElem_Dtor; scalar-deleting wrapper @41d800; the
-// base-dtor COMDATs @41d880/@41db00 are the compiler's dwGuiHypTextElem
+// dwGuiBriefTextElem_Dtor (scalar-deleting wrapper dwGuiBriefTextElem_DtorDelete; the
+// base-dtor COMDATs dwGuiBriefTextElem_BaseDtor/dwGuiBriefTextElem_BaseDtorDelete are the compiler's dwGuiHypTextElem
 // base-dtor pair) — silence the typewriter tick instantly.
 dwGuiBriefTextElem::~dwGuiBriefTextElem()
 {
     dwSound_SetSampleVolume("WTextAppear.wav", 0.0f, 0.0f);
 }
 
-// vtbl +0x04 @41d890 (undetected fn, recovered from the vtable @0x51efe8) —
+// vtbl +0x04 dwGuiBriefTextElem_Update (undetected fn, recovered from the dwGuiBriefTextElem_vtbl) —
 // base typewriter reveal + loop "WTextAppear.wav" while it runs.
 void dwGuiBriefTextElem::Update(dwGuiHypText* pOwner, float dt, dwGuiHypTextRun** ppRuns)
 {
@@ -868,7 +868,7 @@ void dwGuiBriefTextElem::Update(dwGuiHypText* pOwner, float dt, dwGuiHypTextRun*
 // dwGuiBriefLine
 // ===========================================================================
 
-// @41d910 (dwGuiBriefLine_Ctor)
+// dwGuiBriefLine_Ctor
 dwGuiBriefLine::dwGuiBriefLine(dwRect* pRect, void* pNotify, char* pFontName, uint8_t color,
                                char* pFormat, char* pModeText, dwMission* pMission)
     : dwGuiHypText(pRect, pNotify, pFontName, color, pFormat)
@@ -895,13 +895,13 @@ dwGuiBriefLine::dwGuiBriefLine(dwRect* pRect, void* pNotify, char* pFontName, ui
     }
 }
 
-// @41da40 (dwGuiBriefLine_Dtor; scalar-deleting wrapper @41da20)
+// dwGuiBriefLine_Dtor (scalar-deleting wrapper dwGuiBriefLine_DtorDelete)
 dwGuiBriefLine::~dwGuiBriefLine()
 {
     // modeText freed by the member dtor; base dtor implicit.
 }
 
-// vtbl +0x1c @41da90 (undetected fn, recovered from the vtable @0x51f008)
+// vtbl +0x1c dwGuiBriefLine_OnMessage (undetected fn, recovered from the dwGuiBriefLine_vtbl)
 int dwGuiBriefLine::OnMessage(dwWidgetMsg* pMsg)
 {
     dwMission* pMission;
@@ -929,9 +929,9 @@ int dwGuiBriefLine::OnMessage(dwWidgetMsg* pMsg)
 // dwGuiMissionMap
 // ===========================================================================
 
-// @41db20 (dwGuiMissionMap_Ctor)
+// dwGuiMissionMap_Ctor
 dwGuiMissionMap::dwGuiMissionMap(dwImage* pBgImage)
-    : dwGuiScreen("map", pBgImage) // binary string @0x528558
+    : dwGuiScreen("map", pBgImage)
 {
     this->mapRect.left = 0;
     this->mapRect.top = 0;
@@ -950,7 +950,7 @@ dwGuiMissionMap::dwGuiMissionMap(dwImage* pBgImage)
     this->pBriefingBlink = NULL;
 }
 
-// @41dbd0 (dwGuiMissionMap_Dtor; scalar-deleting wrapper @41dbb0)
+// dwGuiMissionMap_Dtor (scalar-deleting wrapper dwGuiMissionMap_DtorDelete)
 dwGuiMissionMap::~dwGuiMissionMap()
 {
     dwGuiMissionMap::FreeImages(); // binary calls its own slot body directly
@@ -959,7 +959,7 @@ dwGuiMissionMap::~dwGuiMissionMap()
     // its dtor)
 }
 
-// scn vtbl +0x00 @41ddb0 (dwGuiMissionMap_OnActivate; binary this = obj+0x10)
+// scn vtbl +0x00 dwGuiMissionMap_OnActivate (binary this = obj+0x10)
 int dwGuiMissionMap::Activate()
 {
     dwListNode* pNode;
@@ -969,7 +969,7 @@ int dwGuiMissionMap::Activate()
     dwWidgetMsg msg;
     int ret;
 
-    ret = dwGuiScreen::Activate(); // @431b90 (lazy LoadControls etc.)
+    ret = dwGuiScreen::Activate(); // lazy LoadControls etc.
     if (ret)
     {
         // Rebuild the objective radio group from scratch.
@@ -1012,7 +1012,7 @@ int dwGuiMissionMap::Activate()
     return ret;
 }
 
-// scn vtbl +0x04 @41dfd0 (dwGuiMissionMap_OnDeactivate; binary this = obj+0x10)
+// scn vtbl +0x04 dwGuiMissionMap_OnDeactivate (binary this = obj+0x10)
 void dwGuiMissionMap::Deactivate()
 {
     dwWidgetMsg msg;
@@ -1033,10 +1033,10 @@ void dwGuiMissionMap::Deactivate()
     if (this->pJawaAnim != NULL)
         this->pJawaAnim->Stop(); // virtual +0x4c
     dwSound_Stop("WTextAppear.wav");
-    dwGuiScreen::Deactivate(); // @431c30
+    dwGuiScreen::Deactivate();
 }
 
-// @41dc30 (dwGuiMissionMap_SelectObjective)
+// dwGuiMissionMap_SelectObjective
 void dwGuiMissionMap::SelectObjective(dwMission* pMission)
 {
     dwCore_pCurrentMission = pMission;
@@ -1055,13 +1055,13 @@ void dwGuiMissionMap::SelectObjective(dwMission* pMission)
     if (this->pBriefingBlink != NULL)
     {
         if (pMission->bDone == 0)
-            this->pBriefingBlink->StartBlink(); // @405d90
+            this->pBriefingBlink->StartBlink();
         else
-            this->pBriefingBlink->StopBlink(); // @405db0
+            this->pBriefingBlink->StopBlink();
     }
 
     if (this->pZoomBox == NULL)
-        this->pZoomBox = new dwGuiZoomBox(&this->mapRect, 500.0f, 0x53); // @4081d0
+        this->pZoomBox = new dwGuiZoomBox(&this->mapRect, 500.0f, 0x53);
     if (this->pZoomBox != NULL)
     {
         // Re-append the zoom box at the children tail (drawn on top).
@@ -1069,11 +1069,11 @@ void dwGuiMissionMap::SelectObjective(dwMission* pMission)
         this->controls.children.InsertAfter(this->controls.children.pSentinel->pPrev,
                                             this->pZoomBox);
         this->pZoomBox->Enable(); // virtual +0x20
-        this->pZoomBox->SetTarget(&pMission->mapPos); // @408240
+        this->pZoomBox->SetTarget(&pMission->mapPos);
     }
 }
 
-// @41e0b0 (dwGuiMissionMap_BeginDeploy)
+// dwGuiMissionMap_BeginDeploy
 void dwGuiMissionMap::BeginDeploy()
 {
     dwWidgetMsg msg;
@@ -1110,10 +1110,10 @@ void dwGuiMissionMap::BeginDeploy()
         return;
     }
 
-    if (!dwGuiInGame_CheckDroidValid()) // @41f6f0 (dwGuiInGame P6w2)
+    if (!dwGuiInGame_CheckDroidValid()) // dwGuiInGame P6w2
         return;
 
-    pMissionSeg = dwGuiInGame_New(dwCore_pCurrentMission); // new(0x284) @41f2a0
+    pMissionSeg = dwGuiInGame_New(dwCore_pCurrentMission); // new(0x284)
     // A DEPLOYMENT-type mission (missionType 5) plays before the real one.
     pDeploySeg = NULL;
     if (dwCore_pMissionList != NULL) // Note: guard added
@@ -1148,7 +1148,7 @@ void dwGuiMissionMap::BeginDeploy()
     }
 }
 
-// vtbl +0x1c @41e320 (dwGuiMissionMap_OnMessage)
+// vtbl +0x1c dwGuiMissionMap_OnMessage
 int dwGuiMissionMap::OnMessage(dwWidgetMsg* pMsg)
 {
     uint32_t code;
@@ -1194,7 +1194,7 @@ int dwGuiMissionMap::OnMessage(dwWidgetMsg* pMsg)
         if (rank < 3)
             pBrfName = dwCore_pCurrentMission->aVideoNames[rank].pBuffer;
         else
-            pBrfName = (char*)"Master.brf"; // binary string @0x52855c
+            pBrfName = (char*)"Master.brf";
 
         if (pBrfName != NULL && *pBrfName != '\0')
         {
@@ -1214,7 +1214,7 @@ int dwGuiMissionMap::OnMessage(dwWidgetMsg* pMsg)
             }
         }
         if (this->pJawaAnim != NULL)
-            this->pJawaAnim->Play(1); // @401190 (non-virtual overload, skip-next-update)
+            this->pJawaAnim->Play(1); // non-virtual overload, skip-next-update
         break;
     }
 
@@ -1262,11 +1262,11 @@ int dwGuiMissionMap::OnMessage(dwWidgetMsg* pMsg)
     }
 
     if (!handled)
-        return dwGuiScreen::OnMessage(pMsg); // @4312d0
+        return dwGuiScreen::OnMessage(pMsg);
     return handled;
 }
 
-// vtbl +0x48 @41e630 (dwGuiMissionMap_CreateControl)
+// vtbl +0x48 dwGuiMissionMap_CreateControl
 dwWidget* dwGuiMissionMap::CreateControl(char* pKeyword, dwConfFile* pConf)
 {
     dwRect rect;
@@ -1289,7 +1289,7 @@ dwWidget* dwGuiMissionMap::CreateControl(char* pKeyword, dwConfFile* pConf)
         dwConfFile_ParseRect(pConf, &rect);
         pTok1 = dwConfFile_NextToken(pConf);
         // dwHelp (unit dwHelp, landed P6w2b) — binary:
-        // new(0x5c) dwHelp_Ctor@418b40(&rect, pTok1, 0x66).
+        // new(0x5c) dwHelp_Ctor(&rect, pTok1, 0x66).
         return new dwHelp(&rect, pTok1, 0x66);
     }
     if (dwString_Equals(pKeyword, "JOB_DESCRIPTION") || dwString_Equals(pKeyword, "JOB_NAME"))
@@ -1304,7 +1304,7 @@ dwWidget* dwGuiMissionMap::CreateControl(char* pKeyword, dwConfFile* pConf)
         dwConfFile_ParseULong(pConf, &color);
         return new dwGuiBriefLine(&rect, /*pNotify*/(void*)(intptr_t)0x791e, pTok2,
                                   (uint8_t)color, pTok1, pConf->pCursor,
-                                  dwCore_pCurrentMission); // @41d910
+                                  dwCore_pCurrentMission);
     }
     if (dwString_Equals(pKeyword, "JAWA_ANIM"))
     {
@@ -1315,7 +1315,7 @@ dwWidget* dwGuiMissionMap::CreateControl(char* pKeyword, dwConfFile* pConf)
         this->pJawaAnim = (dwAnim*)pCtrl; // binary type-puns identically
         return pCtrl;
     }
-    if (dwString_Equals(pKeyword, "MAP")) // binary string @0x52846c
+    if (dwString_Equals(pKeyword, "MAP"))
     {
         // "MAP <rect>": latches the galaxy-map rect and covers it with a
         // help-code hotspot (inlined dwControlPanelHelpRect ctor, code 0x791f).
@@ -1326,7 +1326,7 @@ dwWidget* dwGuiMissionMap::CreateControl(char* pKeyword, dwConfFile* pConf)
     {
         // "PART_BOUNDS <rect>": 3D preview of the selected mission's reward part.
         dwConfFile_ParseRect(pConf, &rect);
-        // binary: new(0x574) dwGuiDroidPreview_Ctor @429a80(&rect, NULL)
+        // binary: new(0x574) dwGuiDroidPreview_Ctor(&rect, NULL)
         return new dwGuiDroidPreview(&rect, NULL);
     }
     if (dwString_Equals(pKeyword, "PARTTEXT"))
@@ -1346,7 +1346,7 @@ dwWidget* dwGuiMissionMap::CreateControl(char* pKeyword, dwConfFile* pConf)
         pBlueprint = dwPart_FindBlueprint(dwCore_pCurrentMission->aRewards[slot].pBuffer);
         if (pBlueprint == NULL)
             return NULL;
-        return new dwGuiPartText(&rect, NULL, pTok2, (uint8_t)color, pTok1, pBlueprint); // @439050
+        return new dwGuiPartText(&rect, NULL, pTok2, (uint8_t)color, pTok1, pBlueprint);
     }
     if (dwString_Equals(pKeyword, "BRIEFING_BUTTON"))
     {
@@ -1356,23 +1356,23 @@ dwWidget* dwGuiMissionMap::CreateControl(char* pKeyword, dwConfFile* pConf)
         this->pBriefingBlink = (dwWcButtonBlink*)pCtrl; // binary type-puns identically
         return pCtrl;
     }
-    return dwGuiScreen::CreateControl(pKeyword, pConf); // @430a10
+    return dwGuiScreen::CreateControl(pKeyword, pConf);
 }
 
-// vtbl +0x3c @41e9f0 (dwGuiMissionMap_EnsureImages)
+// vtbl +0x3c dwGuiMissionMap_EnsureImages
 void dwGuiMissionMap::EnsureImages()
 {
-    dwGuiScreen::EnsureImages(); // @432150
+    dwGuiScreen::EnsureImages();
     if (this->pBriefText != NULL)
         this->pBriefText->EnsureImages(); // virtual +0x3c
     if (this->pJawaAnim != NULL)
         this->pJawaAnim->EnsureImages(); // virtual +0x3c
 }
 
-// vtbl +0x40 @41ea20 (dwGuiMissionMap_FreeImages)
+// vtbl +0x40 dwGuiMissionMap_FreeImages
 void dwGuiMissionMap::FreeImages()
 {
-    dwGuiScreen::FreeImages(); // @432170
+    dwGuiScreen::FreeImages();
     if (this->pBriefText != NULL)
         this->pBriefText->FreeImages(); // virtual +0x40
     if (this->pJawaAnim != NULL)
@@ -1383,19 +1383,19 @@ void dwGuiMissionMap::FreeImages()
 // dwMissionTransIn / dwMissionTransOut
 // ===========================================================================
 
-// @41eb90 (dwMissionTransIn_Ctor)
+// dwMissionTransIn_Ctor
 dwMissionTransIn::dwMissionTransIn(dwImage* pBgImage)
     : dwFlicSeg("TransToM.flc", pBgImage)
     , cueState(0)
 {
 }
 
-// shared @41ee90 (dwMissionTrans_Dtor — vptr repoint + dwFlicSeg dtor)
+// shared (dwMissionTrans_Dtor — vptr repoint + dwFlicSeg dtor)
 dwMissionTransIn::~dwMissionTransIn()
 {
 }
 
-// scn vtbl +0x00 @41ebc0 (Ghidra: dwMissionTransIn_PreloadSounds)
+// scn vtbl +0x00 (Ghidra: dwMissionTransIn_PreloadSounds)
 int dwMissionTransIn::Activate()
 {
     if (dwSound_pManager) // Note: guard added (manager exists from P7)
@@ -1407,10 +1407,10 @@ int dwMissionTransIn::Activate()
         dwSound_pManager->GetOrLoadSample("MPanelEnd.wav");
         dwSound_pManager->GetOrLoadSample("MScreenAppear.wav");
     }
-    return dwFlicSeg::Activate(); // @401470
+    return dwFlicSeg::Activate();
 }
 
-// scn vtbl +0x04 @41ec30 (Ghidra: dwMissionTransIn_StopSounds)
+// scn vtbl +0x04 (Ghidra: dwMissionTransIn_StopSounds)
 void dwMissionTransIn::Deactivate()
 {
     dwSound_SetSampleVolume("MPanelBegin.wav", 0.0f, 0.1f);
@@ -1420,14 +1420,14 @@ void dwMissionTransIn::Deactivate()
     dwSound_SetSampleVolume("MPanelEnd.wav", 0.0f, 0.1f);
     if (dwSound_pManager) // Note: guard added
         dwSound_pManager->FreeAllSamples();
-    dwFlicSeg::Deactivate(); // @401620
+    dwFlicSeg::Deactivate();
 }
 
-// scn vtbl +0x10 @41ecc0 (dwMissionTransIn_Update) — frame-cued sounds over
+// scn vtbl +0x10 dwMissionTransIn_Update — frame-cued sounds over
 // the base FLC playback.
 void dwMissionTransIn::Update()
 {
-    dwFlicSeg::Update(); // @401640
+    dwFlicSeg::Update();
     if (this->cueState == 0)
     {
         dwSound_Play("MPanelBegin.wav");
@@ -1466,19 +1466,19 @@ void dwMissionTransIn::Update()
     }
 }
 
-// @41ee60 (dwMissionTransOut_Ctor)
+// dwMissionTransOut_Ctor
 dwMissionTransOut::dwMissionTransOut(dwImage* pBgImage)
     : dwFlicSeg("TransFromM.flc", pBgImage)
     , cueState(0)
 {
 }
 
-// shared @41ee90 (dwMissionTrans_Dtor)
+// shared dwMissionTrans_Dtor
 dwMissionTransOut::~dwMissionTransOut()
 {
 }
 
-// scn vtbl +0x00 @41eec0 (Ghidra: dwMissionTransOut_PreloadSounds)
+// scn vtbl +0x00 (Ghidra: dwMissionTransOut_PreloadSounds)
 int dwMissionTransOut::Activate()
 {
     if (dwSound_pManager) // Note: guard added
@@ -1490,10 +1490,10 @@ int dwMissionTransOut::Activate()
         dwSound_pManager->GetOrLoadSample("MPanelEnd.wav");
         dwSound_pManager->GetOrLoadSample("MScreenVanish.wav");
     }
-    return dwFlicSeg::Activate(); // @401470
+    return dwFlicSeg::Activate();
 }
 
-// scn vtbl +0x04 @41ef30 (Ghidra: dwMissionTransOut_StopSounds)
+// scn vtbl +0x04 (Ghidra: dwMissionTransOut_StopSounds)
 void dwMissionTransOut::Deactivate()
 {
     dwSound_SetSampleVolume("MPanelMove1.wav", 0.0f, 0.1f);
@@ -1503,14 +1503,14 @@ void dwMissionTransOut::Deactivate()
     dwSound_SetSampleVolume("MScreenVanish.wav", 0.0f, 0.1f);
     if (dwSound_pManager) // Note: guard added
         dwSound_pManager->FreeAllSamples();
-    dwFlicSeg::Deactivate(); // @401620
+    dwFlicSeg::Deactivate();
 }
 
-// scn vtbl +0x10 @41efc0 (dwMissionTransOut_Update) — the TransIn cue machine
+// scn vtbl +0x10 dwMissionTransOut_Update — the TransIn cue machine
 // mirrored (the panel slides back, so the states run 6 -> 1).
 void dwMissionTransOut::Update()
 {
-    dwFlicSeg::Update(); // @401640
+    dwFlicSeg::Update();
     if (this->cueState == 0)
     {
         dwSound_Play("MScreenVanish.wav");
@@ -1553,20 +1553,20 @@ void dwMissionTransOut::Update()
 // dwMissionSequence phase factories (Dw/dwMission.h contract)
 // ===========================================================================
 
-// Bundles dwMissionSequence::Activate's `new(0x3d0) + Ctor@41eb90` pair.
+// Bundles dwMissionSequence::Activate's `new(0x3d0) + Ctor` pair.
 extern "C" dwSegment* dwMissionTransIn_New(dwImage* pBgImage)
 {
     return new dwMissionTransIn(pBgImage);
 }
 
-// Bundles the sequencer's `new(0xf4) + Ctor@41db20` pair; returns the
+// Bundles the sequencer's `new(0xf4) + Ctor` pair; returns the
 // screen's dwSegment subobject (binary: obj+0x10).
 extern "C" dwSegment* dwGuiMissionMap_New(dwImage* pBgImage)
 {
     return static_cast<dwSegment*>(new dwGuiMissionMap(pBgImage));
 }
 
-// Bundles the sequencer's `new(0x3d0) + Ctor@41ee60` pair.
+// Bundles the sequencer's `new(0x3d0) + Ctor` pair.
 extern "C" dwSegment* dwMissionTransOut_New(dwImage* pBgImage)
 {
     return new dwMissionTransOut(pBgImage);

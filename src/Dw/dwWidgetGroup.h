@@ -5,10 +5,10 @@
 // list of child widgets, with every input/tick/paint virtual forwarding to
 // the children. Screens, panels and every composite control derive from it.
 //
-// Decompiled from DroidWorks.exe, unit range 0x444320-0x44481x, plus the
-// dtor pair @0x402870/0x402890 (mis-binned in the dwAnim range) and the
-// FreeImages broadcast @0x43c040 (shared with the dwList COMDAT cluster).
-// vtable @0x51e0c0 (dwWidgetGroup_vtbl).
+// Decompiled from DroidWorks.exe, plus the
+// dtor pair dwWidgetGroup_DtorDelete/dwWidgetGroup_Dtor (mis-binned in the dwAnim range) and the
+// FreeImages broadcast dwWidgetGroup_FreeChildImages (shared with the dwList COMDAT cluster).
+// dwWidgetGroup_vtbl.
 //
 // Binary layout: { dwWidget base @0x00 (0xe); dwListNode* pChildren @0x10 }
 // — sizeof 0x14. pChildren is the sentinel pointer of a circular dwList
@@ -43,28 +43,28 @@ struct dwWidgetGroup : dwWidget
                      // node->pData = child dwWidget*
 
     // Full-screen group (the binary built the mode-sized rect inline and
-    // called the rect ctor — identical to the dwWidget default ctor). @444320
+    // called the rect ctor — identical to the dwWidget default ctor).
     dwWidgetGroup();
-    // Group covering *pRect. @4443b0
+    // Group covering *pRect.
     dwWidgetGroup(dwRect* pRect);
 
     // FreeImages on every child, then DELETE every child (virtual dtor) and
-    // free the list nodes + sentinel. @402870 (DtorDelete) / @402890 (body;
+    // free the list nodes + sentinel. (DtorDelete and the body are
     // both mis-binned in the dwAnim range)
     virtual ~dwWidgetGroup();
 
-    virtual int OnMouseMove(int16_t x, int16_t y);    // vtbl +0x04 @444450 — enabled + containing child, until handled
-    virtual int OnMouseDown(int16_t x, int16_t y);    // vtbl +0x08 @4444d0 — enabled + containing child, until handled
-    virtual int OnMouseUp(int16_t x, int16_t y);      // vtbl +0x0c @444550 — enabled + containing child, until handled
-    virtual int OnKey(int key, int repeat);           // vtbl +0x10 @4445d0 — enabled children, until handled
-    virtual void Update(float dt);                    // vtbl +0x14 @444620 — tick broadcast to enabled children
-    virtual int OnHover(int16_t x, int16_t y);        // vtbl +0x18 @444670 — containing child (NO enabled check), until handled
-    virtual int OnMessage(dwWidgetMsg* pMsg);         // vtbl +0x1c @4446e0 — enabled children, until handled
-    virtual void Move(int16_t dx, int16_t dy);        // vtbl +0x28 @444780 — translate own rect + all children
-    virtual dwWidget* HitTest(dwPoint* pPt);          // vtbl +0x38 @444410 — first child HitTest hit (no checks, no self)
-    virtual void EnsureImages();                      // vtbl +0x3c @4447e0 — broadcast to ALL children
-    virtual void FreeImages();                        // vtbl +0x40 @43c040 (Ghidra: dwWidgetGroup_FreeChildImages) — broadcast to ALL children
-    virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect); // vtbl +0x44 @444730 — DrawChild on ALL children (clip handling per child)
+    virtual int OnMouseMove(int16_t x, int16_t y);    // vtbl +0x04 dwWidgetGroup_OnMouseMove — enabled + containing child, until handled
+    virtual int OnMouseDown(int16_t x, int16_t y);    // vtbl +0x08 dwWidgetGroup_OnMouseDown — enabled + containing child, until handled
+    virtual int OnMouseUp(int16_t x, int16_t y);      // vtbl +0x0c dwWidgetGroup_OnMouseUp — enabled + containing child, until handled
+    virtual int OnKey(int key, int repeat);           // vtbl +0x10 dwWidgetGroup_OnKey — enabled children, until handled
+    virtual void Update(float dt);                    // vtbl +0x14 dwWidgetGroup_Update — tick broadcast to enabled children
+    virtual int OnHover(int16_t x, int16_t y);        // vtbl +0x18 dwWidgetGroup_OnHover — containing child (NO enabled check), until handled
+    virtual int OnMessage(dwWidgetMsg* pMsg);         // vtbl +0x1c dwWidgetGroup_OnMessage — enabled children, until handled
+    virtual void Move(int16_t dx, int16_t dy);        // vtbl +0x28 dwWidgetGroup_Move — translate own rect + all children
+    virtual dwWidget* HitTest(dwPoint* pPt);          // vtbl +0x38 dwWidgetGroup_HitTest — first child HitTest hit (no checks, no self)
+    virtual void EnsureImages();                      // vtbl +0x3c dwWidgetGroup_EnsureImages — broadcast to ALL children
+    virtual void FreeImages();                        // vtbl +0x40 (Ghidra: dwWidgetGroup_FreeChildImages) — broadcast to ALL children
+    virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect); // vtbl +0x44 dwWidgetGroup_Draw — DrawChild on ALL children (clip handling per child)
 
     // Inherited from dwWidget (not overridden in the binary vtable):
     // Enable/Disable/ContainsPoint/GetRect/Invalidate.

@@ -3,10 +3,10 @@
 
 // dwMission — mission-record parsing (.MIS master list) + the workshop<->
 // mission panel-slide sequencer.
-// DroidWorks.exe: dwMission_ParseInfo@41c530 / ParseObjective@41c960 /
-// ClearObjectives@41c920 (in the 0x41c0f0 dwGuiMission unit) +
-// dwMission_FreeInfo@41a530 (dw part2 range) + dwMissionSequence
-// Reset@41ea50 / Advance@41ea60 (vtbl 0x51f7d8).
+// DroidWorks.exe: dwMission_ParseInfo / ParseObjective /
+// ClearObjectives (in the dwGuiMission unit) +
+// dwMission_FreeInfo (dw part2 range) + dwMissionSequence
+// Reset / Advance (dwMissionSequence_vtbl).
 //
 // dw_Startup enumerates *.MIS, scans each for a "BEGIN <name>" line and
 // dwMission_ParseInfo's one record per BEGIN into the global mission list
@@ -41,7 +41,7 @@ struct dwMissionObjective
 }; // sizeof 0x18 in the binary
 
 // One mission record. Binary: 0x8c-byte malloc'd record (dw_Startup
-// `alloc(0x8c)` @419f7d), ctor'd by dwMission_ParseInfo.
+// `alloc(0x8c)`), ctor'd by dwMission_ParseInfo.
 // NOTE (translation): records must be created via dwMission_New (or C++
 // `new dwMission` + dwMission_ParseInfo) — the binary ctor'd raw memory, the
 // translation relies on the default-constructed dwString members instead.
@@ -76,7 +76,7 @@ struct dwMission
 // interrupts the flow with the TransToM.flc slide-in anim (returning here),
 // phase 1 with the dwGuiMissionMap screen, phase 2 pushes the TransFromM.flc
 // slide-out and retires itself. Constructed inline by dwGuiScreen_OnMessage
-// msg 0x65+1 (@43146x: alloc 0x1c, vtbl 0x51f7d8, pBgImage = the screen's
+// msg 0x65+1 (alloc 0x1c, dwMissionSequence_vtbl, pBgImage = the screen's
 // dimmed background snapshot); dwGuiStatus_OnMessage calls Reset to replay.
 struct dwMissionSequence : dwSegment
 {
@@ -86,10 +86,10 @@ struct dwMissionSequence : dwSegment
     // (ctor inlined at the dwGuiScreen_OnMessage construction site)
     dwMissionSequence(dwImage* pBgImage);
 
-    // vtbl +0x00 @41ea60 (dwMissionSequence_Advance)
+    // vtbl +0x00 dwMissionSequence_Advance
     virtual int Activate();
 
-    // @41ea50 (dwMissionSequence_Reset) — restart the sequence at phase 0
+    // dwMissionSequence_Reset — restart the sequence at phase 0
     void Reset();
 };
 
@@ -113,12 +113,12 @@ enum dwMissionType
 };
 
 // TODO(dw-decomp): provided by dw core (P7) — the global mission list
-// sentinel (@0x53d95c/0x53d990 region; dwList of dwMission*), filled by
+// sentinel (dwCore_pMissionList/ region; dwList of dwMission*), filled by
 // dw_Startup from *.MIS. Declared here so consumers share one declaration.
 extern dwListNode* dwCore_pMissionList;
 
 // TODO(dw-decomp): provided by dw core (P7) — the currently selected mission
-// (@0x53d954; written by dwGuiMissionMap_SelectObjective, read by the
+// (dwCore_pCurrentMission; written by dwGuiMissionMap_SelectObjective, read by the
 // map/briefing controls, dwGuiInGame and dwGuiStatus). Declared here so
 // consumers share one declaration; defined as a dwMain.c placeholder until
 // the P7 boot flow owns it.
@@ -133,19 +133,19 @@ void dwMission_SetCurrentRank(int rank);
 
 // Parse ONE mission record out of pConf (positioned ON the "BEGIN <name>"
 // line: the name is the next token) until its END line. Returns pMission.
-// @41c530 (this = pMission in the binary)
+// (this = pMission in the binary)
 dwMission* dwMission_ParseInfo(dwMission* pMission, dwConfFile* pConf);
 
 // Parse one GOAL/REQUIREMENT payload: <code> <param> <label...>. Does not
 // set bRequirement=1 (the REQUIREMENT branch of ParseInfo does). Returns
-// pObj. @41c960
+// pObj.
 dwMissionObjective* dwMission_ParseObjective(dwMissionObjective* pObj, dwConfFile* pConf);
 
-// Zero every objective's runtime bFlag. @41c920
+// Zero every objective's runtime bFlag.
 void dwMission_ClearObjectives(dwMission* pMission);
 
 // Free the record's strings + objective list (the record itself is NOT
-// freed, matching the binary — dw_Shutdown frees it after). @41a530
+// freed, matching the binary — dw_Shutdown frees it after).
 void dwMission_FreeInfo(dwMission* pMission);
 
 // C-side creation/destruction shims (no single binary counterpart — they

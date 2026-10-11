@@ -1,8 +1,8 @@
 // dwDroidStats — assembled-droid stat baking + merged model/keyframes + the
 // random-droid generator.
 //
-// Decompiled from DroidWorks.exe @0x40eb60-0x40fdff (the dwGuiStatsDroid
-// widget at 0x40fe00+ in the same compile unit is P6). See dwDroidStats.h for
+// Decompiled from DroidWorks.exe (the dwGuiStatsDroid
+// widget at dwGuiStatsDroid_Ctor+ in the same compile unit is P6). See dwDroidStats.h for
 // the record layout/aliasing notes.
 //
 // Engine mapping (verified against the repo twins):
@@ -15,7 +15,7 @@
 //                              writes mesh->field_64 where the DW binary
 //                              writes mesh->radius)
 //   stdBitmapRle_FUN_00444d00 -> dwWidget_DispatchMsg (mislabeled shared COMDAT)
-//   dwHS @0x6b6258          -> dwMain_pHS
+//   dwHS          -> dwMain_pHS
 //
 // Allocators: the binary allocates everything through dwHS. Kept as
 // dwMain_pHS->alloc (dwKeyframe.cpp precedent); the merged keyframes are later
@@ -45,14 +45,14 @@ extern "C" {
 #include "World/sithSoundClass.h"
 }
 
-extern "C" HostServices* dwMain_pHS; // the DW host-services pointer (dwMain.c); binary global dwHS @0x6b6258
+extern "C" HostServices* dwMain_pHS; // the DW host-services pointer (dwMain.c); binary global dwHS
 
 // Workspace part-node list + blueprint registry list (dwList sentinels).
 // Defined by the dwMain.c placeholder block until the dw core (P7) lands.
-extern "C" dwListNode* dwCore_pWorkspaceNodes; // @0x53d984
-extern "C" dwListNode* dwCore_pBlueprintList;  // @0x53d964
+extern "C" dwListNode* dwCore_pWorkspaceNodes;
+extern "C" dwListNode* dwCore_pBlueprintList;
 
-// Anim-slot name table (binary rdata @0x52bc78; same 24 entries as
+// Anim-slot name table (binary rdata dwDroidStats_aAnimNames; same 24 entries as
 // dwPart_aAnimKeywords — [0] is the binary's "--RESERVED--" placeholder,
 // never hit because no blueprint fills aAnimNames[0]).
 static const char* dwDroidStats_aAnimNames[24] = {
@@ -97,7 +97,7 @@ extern "C" void dwDroidStats_Startup(void)
 // dwDroidStatsTotals
 // ---------------------------------------------------------------------------
 
-// @40eb60 — zero every field EXCEPT voiceChars (the binary's field-by-field
+// zero every field EXCEPT voiceChars (the binary's field-by-field
 // clear stops at the anim-flag array; faithful).
 void dwDroidStatsTotals::ClearTotals()
 {
@@ -124,7 +124,7 @@ void dwDroidStatsTotals::ClearTotals()
     _memset(this->aAnimPresent, 0, sizeof(this->aAnimPresent));
 }
 
-// @40ebb0 — accumulate one part node's blueprint stats + model counts.
+// accumulate one part node's blueprint stats + model counts.
 void dwDroidStatsTotals::AccumulatePart(dwPartNode* pNode, int bRecurse)
 {
     dwPart* pBp = pNode->pPart;
@@ -209,7 +209,7 @@ void dwDroidStatsTotals::AccumulatePart(dwPartNode* pNode, int bRecurse)
 // merged-keyframe helpers (unit-internal)
 // ---------------------------------------------------------------------------
 
-// @40f8e0 — initialize one merged anim keyframe: name, flags 3, 15 fps,
+// initialize one merged anim keyframe: name, flags 3, 15 fps,
 // numFrames 0, and a zeroed numNodes-joint track. Note: the binary leaves the
 // header's other fields (id, marker arrays) UNINITIALIZED after the raw
 // alloc — faithful (Build's callers never read them before they're written).
@@ -232,7 +232,7 @@ static void dwDroidStats_InitAnimEntry(rdKeyframe* pEntry, const char* pName, in
     _memset(pEntry->aNodes, 0, numNodes * sizeof(rdJoint));
 }
 
-// @40fa50 — rescale a keyframe's joint entries from its current numFrames to
+// rescale a keyframe's joint entries from its current numFrames to
 // numFrames (single-entry joints snap to frame 0) and rebuild the deltas.
 // The caller updates pKeyframe->numFrames afterwards.
 static void dwDroidStats_GrowKeyframe(rdKeyframe* pKeyframe, uint32_t numFrames)
@@ -256,7 +256,7 @@ static void dwDroidStats_GrowKeyframe(rdKeyframe* pKeyframe, uint32_t numFrames)
     }
 }
 
-// @40f950 — merge a part's loaded keyframe into a merged track: equalize
+// merge a part's loaded keyframe into a merged track: equalize
 // frame counts, copy the joints in at jointBase (re-basing nodeNum and
 // STEALING the entry arrays so rdKeyframe_FreeEntry on the source skips
 // them), OR the flags/type, and append the markers (8-slot cap).
@@ -333,7 +333,6 @@ static void dwDroidStats_CalcMergedRadii(rdModel3* pModel)
 // dwDroidStats
 // ---------------------------------------------------------------------------
 
-// @40f4c0
 void dwDroidStats::MergeGeometry(dwPartNode* pNode, dwPartNode** ppTorsoNode,
                                  int parentNodeIdx, int materialBase)
 {
@@ -470,7 +469,6 @@ void dwDroidStats::MergeGeometry(dwPartNode* pNode, dwPartNode** ppTorsoNode,
     }
 }
 
-// @40ef00
 dwDroidStats* dwDroidStats::Build(dwPartNode* pRoot)
 {
     uint32_t slot;
@@ -672,7 +670,6 @@ dwDroidStats* dwDroidStats::Build(dwPartNode* pRoot)
     return this;
 }
 
-// @40f420
 void dwDroidStats::Free()
 {
     if (this->model.aGeos[0].aMeshes)
@@ -707,7 +704,7 @@ void dwDroidStats::Free()
 // player-droid soundclass (dwGuiInGame_StartMission)
 // ---------------------------------------------------------------------------
 
-// @40edd0 — see the header comment. droidCapFlags is dead (kept for ABI).
+// see the header comment. droidCapFlags is dead (kept for ABI).
 extern "C" void dwDroidStats_BuildSoundList(sithSoundClass* pSoundClass, uint32_t droidCapFlags)
 {
     (void)droidCapFlags;
@@ -764,7 +761,7 @@ extern "C" void dwDroidStats_BuildSoundList(sithSoundClass* pSoundClass, uint32_
 // random-droid generator
 // ---------------------------------------------------------------------------
 
-// @40fc10 — pick a random OWNED blueprint accepting slot type `type` and
+// pick a random OWNED blueprint accepting slot type `type` and
 // body-slot mask `bodyType`. ⚠ Faithful: loops forever (and takes rand()%0)
 // when no counted/available blueprint matches — the shipping data always has
 // at least one available part per slot type.
@@ -835,7 +832,7 @@ static dwPart* dwDroidStats_PickRandomPart(int type, uint32_t bodyType)
     return pResult;
 }
 
-// @40fd40 — fill each of pParent's attach slots with a random compatible
+// fill each of pParent's attach slots with a random compatible
 // part, appending every created node to the workspace list, then recurse.
 static void dwDroidStats_AutoAttachChildren(dwPartNode* pParent, uint32_t bodyType,
                                             dwListNode** ppWorkspaceList)
@@ -861,7 +858,7 @@ static void dwDroidStats_AutoAttachChildren(dwPartNode* pParent, uint32_t bodyTy
     }
 }
 
-// @40fae0 — see the header comment. Exact signature shared with the
+// see the header comment. Exact signature shared with the
 // dwWorkshopCtrl.cpp consumer (and formerly the dwMain.c placeholder).
 extern "C" void dwDroidStats_AutoBuildRandom(int bodyType, dwListNode** ppWorkspaceList)
 {

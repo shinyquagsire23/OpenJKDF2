@@ -1,20 +1,20 @@
 // dwWorkshopDroidEditor — the workshop DROID_EDITOR control (3D droid
 // assembly view: drag/attach/detach/paint parts). See dwWorkshopDroidEditor.h.
 //
-// Decompiled from DroidWorks.exe, unit range 0x40cea0-0x40eb5f
-// (vtable @0x51e9b8). ⚠ EnsureImages/FreeImages/ContainsPoint
-// @40eab0/40eaf0/40eb10 belong here (old dwDroidStats Ghidra labels wrong).
+// Decompiled from DroidWorks.exe
+// (dwWorkshopDroidEditor_vtbl). ⚠ EnsureImages/FreeImages/ContainsPoint
+// dwWorkshopDroidEditor_EnsureImages/dwWorkshopDroidEditor_FreeImages/dwWorkshopDroidEditor_ContainsPoint belong here (old dwDroidStats Ghidra labels wrong).
 //
 // Engine mapping (DW-binary label -> repo):
 //   rd_FUN_0047ebd0 / rd_FUN_0047ebf0 -> rdAdvanceFrame / rdFinishFrame
 //     (the DW fork's rdAdvanceFrame ALSO clears the pick buffer when render
-//     option 0x100 is set — rdRaycast_ClearPickBuffer@47f560, untranslated;
+//     option 0x100 is set — rdRaycast_ClearPickBuffer, untranslated;
 //     the manual stdDisplay_VBufferFill(canvas->d3d_vbuf) calls below are the
 //     binary's own "option not set" fallback and fully cover this widget's
 //     use, since it never sets option 0x100)
 //   stdDisplay_FUN_004fe010 -> stdDisplay_VBufferFill
 //   DAT_005542cc            -> rdCamera_g_pCurCamera
-//   dwHS->getTimerTick (@0x6b6258 +0x2c) -> dwMain_pHS->getTimerTick
+//   dwHS->getTimerTick (+0x2c) -> dwMain_pHS->getTimerTick
 //   DAT_7f7fc99e (immediate) -> 3.4e38f hit-record init (dwDroidStats precedent)
 //
 // No module statics — dwWorkshopDroidEditor_Startup is a documented no-op.
@@ -47,14 +47,14 @@ extern "C" {
 #endif
 }
 
-// dw-core workspace part-node list sentinel @0x53d984 (owner: dwMain, P7).
+// dw-core workspace part-node list sentinel dwCore_pWorkspaceNodes (owner: dwMain, P7).
 // TODO(dw-decomp): provided by dwMain.
 extern "C" dwListNode* dwCore_pWorkspaceNodes;
 // The DW host-services pointer (dwMain.c).
 extern "C" HostServices* dwMain_pHS;
 
 // PALETTE paint-color slot -> DW palette color index (binary byte table
-// @0x51e987, indexed by the msg-0x7d3 payload; slot 0 = none).
+// dwWorkshopDroidEditor_aPaintColors, indexed by the msg-0x7d3 payload; slot 0 = none).
 static const uint8_t dwWorkshopDroidEditor_aPaintColors[10] = {
     0, 18, 83, 5, 44, 96, 70, 31, 57, 105
 };
@@ -89,7 +89,7 @@ static void dwWorkshopDroidEditor_GetMountPosition(dwPartNode* pNode, rdVector3*
     pNode->GetSlotPosition(&mountSlot, pOut);
 }
 
-// @40e180 (dwWorkshopDroidEditor_DestroyPartSubtree) — recursively delete
+// dwWorkshopDroidEditor_DestroyPartSubtree — recursively delete
 // pNode and its attached children, unlinking each from the workspace list;
 // ends with a { 0x7dd, pNode } broadcast (pSender = the just-deleted node,
 // exactly as the binary — receivers only match the code).
@@ -123,7 +123,7 @@ static void dwWorkshopDroidEditor_DestroyPartSubtree(dwPartNode* pNode)
     dwWidget_DispatchMsg(&msg, NULL);
 }
 
-// @40df00 (dwWorkshopDroidEditor_FindBatteryTarget) — recursive: find a node
+// dwWorkshopDroidEditor_FindBatteryTarget — recursive: find a node
 // in pNode's assembly whose blueprint has battery capacity. Batteries
 // themselves never match; the walk climbs to the parent (unless this is a
 // NORMAL-mode torso or an unattached root) and descends into the torso
@@ -160,7 +160,7 @@ static dwPartNode* dwWorkshopDroidEditor_FindBatteryTarget(dwPartNode* pNode)
 
 // ---- ctor/dtor -----------------------------------------------------------------
 
-// @40cea0 (dwWorkshopDroidEditor_Ctor)
+// dwWorkshopDroidEditor_Ctor
 dwWorkshopDroidEditor::dwWorkshopDroidEditor(dwRect* pRect, dwRect* pTrashRect, char* pTrashImageName)
     : dwGuiViewBox(pRect, 1)
 {
@@ -188,7 +188,7 @@ dwWorkshopDroidEditor::dwWorkshopDroidEditor(dwRect* pRect, dwRect* pTrashRect, 
     this->EnsureImages();
 }
 
-// @40cf90 (dwWorkshopDroidEditor_Dtor; scalar-deleting wrapper @40cf70)
+// dwWorkshopDroidEditor_Dtor (scalar-deleting wrapper dwWorkshopDroidEditor_DtorDelete)
 dwWorkshopDroidEditor::~dwWorkshopDroidEditor()
 {
     this->FreeImages();
@@ -197,7 +197,7 @@ dwWorkshopDroidEditor::~dwWorkshopDroidEditor()
 
 // ---- input ---------------------------------------------------------------------
 
-// @40e370 (dwWorkshopDroidEditor_OnMouseMove)
+// dwWorkshopDroidEditor_OnMouseMove
 int dwWorkshopDroidEditor::OnMouseMove(int16_t x, int16_t y)
 {
     dwPoint pt;
@@ -248,7 +248,7 @@ int dwWorkshopDroidEditor::OnMouseMove(int16_t x, int16_t y)
     return 1;
 }
 
-// @40e260 (dwWorkshopDroidEditor_OnMouseDown)
+// dwWorkshopDroidEditor_OnMouseDown
 int dwWorkshopDroidEditor::OnMouseDown(int16_t x, int16_t y)
 {
     dwPoint pt;
@@ -275,7 +275,7 @@ int dwWorkshopDroidEditor::OnMouseDown(int16_t x, int16_t y)
     return bInRect;
 }
 
-// @40e310 (dwWorkshopDroidEditor_OnMouseUp)
+// dwWorkshopDroidEditor_OnMouseUp
 int dwWorkshopDroidEditor::OnMouseUp(int16_t x, int16_t y)
 {
     dwPoint pt;
@@ -291,7 +291,7 @@ int dwWorkshopDroidEditor::OnMouseUp(int16_t x, int16_t y)
     return 1;
 }
 
-// @40e510 (dwWorkshopDroidEditor_OnHover)
+// dwWorkshopDroidEditor_OnHover
 int dwWorkshopDroidEditor::OnHover(int16_t x, int16_t y)
 {
     dwListNode* pIter;
@@ -365,7 +365,7 @@ int dwWorkshopDroidEditor::OnHover(int16_t x, int16_t y)
 
 // ---- tick / messages -------------------------------------------------------------
 
-// @40cff0 (dwWorkshopDroidEditor_Update)
+// dwWorkshopDroidEditor_Update
 void dwWorkshopDroidEditor::Update(float dt)
 {
     dwListNode* pIter;
@@ -417,7 +417,7 @@ void dwWorkshopDroidEditor::Update(float dt)
     }
 }
 
-// @40d1e0 (dwWorkshopDroidEditor_OnMessage)
+// dwWorkshopDroidEditor_OnMessage
 int dwWorkshopDroidEditor::OnMessage(dwWidgetMsg* pMsg)
 {
     dwListNode* pIter;
@@ -598,7 +598,7 @@ int dwWorkshopDroidEditor::OnMessage(dwWidgetMsg* pMsg)
 
 // ---- picking / drag ---------------------------------------------------------------
 
-// @40d180 (dwWorkshopDroidEditor_RefreshPartAnims)
+// dwWorkshopDroidEditor_RefreshPartAnims
 void dwWorkshopDroidEditor::RefreshPartAnims()
 {
     dwListNode* pIter;
@@ -616,7 +616,7 @@ void dwWorkshopDroidEditor::RefreshPartAnims()
     }
 }
 
-// @40d740 (dwWorkshopDroidEditor_RaycastPickNode)
+// dwWorkshopDroidEditor_RaycastPickNode
 dwPartNode* dwWorkshopDroidEditor::RaycastPickNode(dwPoint* pPt, rdRaycastHit* pHit)
 {
     dwListNode* pIter;
@@ -639,7 +639,7 @@ dwPartNode* dwWorkshopDroidEditor::RaycastPickNode(dwPoint* pPt, rdRaycastHit* p
     return pHitNode;
 }
 
-// @40d7f0 (dwWorkshopDroidEditor_BeginDragOrDetach)
+// dwWorkshopDroidEditor_BeginDragOrDetach
 int dwWorkshopDroidEditor::BeginDragOrDetach(dwPoint* pPt)
 {
     dwPartNode* pNode;
@@ -705,7 +705,7 @@ int dwWorkshopDroidEditor::BeginDragOrDetach(dwPoint* pPt)
     return this->pDraggedNode != NULL;
 }
 
-// @40d950 (dwWorkshopDroidEditor_DropDraggedPart)
+// dwWorkshopDroidEditor_DropDraggedPart
 void dwWorkshopDroidEditor::DropDraggedPart(dwPoint* pPt)
 {
     dwListNode* pIter;
@@ -882,7 +882,7 @@ void dwWorkshopDroidEditor::DropDraggedPart(dwPoint* pPt)
         dwSound_PlayRestart(pSound);
 }
 
-// @40dfc0 (dwWorkshopDroidEditor_PaintPickedPart)
+// dwWorkshopDroidEditor_PaintPickedPart
 int dwWorkshopDroidEditor::PaintPickedPart(dwPoint* pPt)
 {
     dwPartNode* pPicked;
@@ -954,7 +954,7 @@ int dwWorkshopDroidEditor::PaintPickedPart(dwPoint* pPt)
 
 // ---- paint/draw -----------------------------------------------------------------
 
-// @40e770 (dwWorkshopDroidEditor_Draw)
+// dwWorkshopDroidEditor_Draw
 void dwWorkshopDroidEditor::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     dwListNode* pIter;
@@ -967,7 +967,7 @@ void dwWorkshopDroidEditor::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
     int i;
 
     this->EnsureImages(); // virtual +0x3c
-    this->dwGui3DView::Draw(pDestBits, pClipRect); // camera bring-up (binary: direct call @43b2b0)
+    this->dwGui3DView::Draw(pDestBits, pClipRect); // camera bring-up (binary: direct call)
 
     // Added: software-renderer bracket (shared — dwGui3DView_BeginSwRender/
     // EndSwRender; the original inline version documented here is in dwGui3DView.cpp).
@@ -1040,14 +1040,14 @@ void dwWorkshopDroidEditor::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
     }
 }
 
-// @40eab0 (dwWorkshopDroidEditor_EnsureImages — was mislabeled dwDroidStats)
+// (dwWorkshopDroidEditor_EnsureImages — was mislabeled dwDroidStats)
 void dwWorkshopDroidEditor::EnsureImages()
 {
     if (this->pTrashImage == NULL && this->trashImageName.length != 0)
         this->pTrashImage = dwImage_LoadFile(this->trashImageName.pBuffer); // NULL until stdBitmapRle2 (P8)
 }
 
-// @40eaf0 (dwWorkshopDroidEditor_FreeImages — was mislabeled dwDroidStats)
+// (dwWorkshopDroidEditor_FreeImages — was mislabeled dwDroidStats)
 void dwWorkshopDroidEditor::FreeImages()
 {
     if (this->pTrashImage != NULL)
@@ -1057,7 +1057,7 @@ void dwWorkshopDroidEditor::FreeImages()
     }
 }
 
-// @40eb10 (dwWorkshopDroidEditor_ContainsPoint — was mislabeled dwDroidStats)
+// (dwWorkshopDroidEditor_ContainsPoint — was mislabeled dwDroidStats)
 int dwWorkshopDroidEditor::ContainsPoint(dwPoint* pPt)
 {
     if (this->pDraggedNode == NULL)

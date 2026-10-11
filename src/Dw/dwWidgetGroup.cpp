@@ -1,9 +1,9 @@
 // dwWidgetGroup — the DroidWorks container widget base (child list + input/
 // tick/paint forwarding).
 //
-// Decompiled from DroidWorks.exe, unit range 0x444320-0x44481x + the dtor
-// pair @0x402870/0x402890 (mis-binned in the dwAnim range) + the FreeImages
-// broadcast @0x43c040. vtable @0x51e0c0. See dwWidgetGroup.h for the
+// Decompiled from DroidWorks.exe + the dtor
+// pair dwWidgetGroup_DtorDelete/dwWidgetGroup_Dtor (mis-binned in the dwAnim range) + the FreeImages
+// broadcast dwWidgetGroup_FreeChildImages. dwWidgetGroup_vtbl. See dwWidgetGroup.h for the
 // forwarding-quirk summary.
 //
 // Iteration pattern (everywhere below): the children dwList is a circular
@@ -23,7 +23,7 @@
 
 // ---- ctors/dtor ---------------------------------------------------------------
 
-// @444320 (Ghidra: dwWidgetGroup_CtorDefault) — the binary built the
+// (Ghidra: dwWidgetGroup_CtorDefault) — the binary built the
 // (0, 0, mode width, mode height) rect inline and called the dwWidget rect
 // ctor; that is exactly what the dwWidget default ctor does, so delegate.
 // The children dwList member ctor allocates the empty (self-linked) sentinel.
@@ -32,13 +32,13 @@ dwWidgetGroup::dwWidgetGroup()
 {
 }
 
-// @4443b0 (Ghidra: dwWidgetGroup_Ctor)
+// (Ghidra: dwWidgetGroup_Ctor)
 dwWidgetGroup::dwWidgetGroup(dwRect* pRect)
     : dwWidget(pRect)
 {
 }
 
-// @402890 (Ghidra: dwWidgetGroup_Dtor; scalar-deleting wrapper @402870).
+// (Ghidra: dwWidgetGroup_Dtor; scalar-deleting wrapper dwWidgetGroup_DtorDelete).
 // Binary order: re-point vptr at the group vtable (compiler does this),
 // FreeChildImages (direct, non-virtual call), then the inlined
 // children.FreeOwnedNodes(): unlink+free each node THEN delete its child,
@@ -53,7 +53,7 @@ dwWidgetGroup::~dwWidgetGroup()
     dwListNode* pNext;
     dwWidget* pChild;
 
-    dwWidgetGroup::FreeImages(); // @43c040, called directly in the binary
+    dwWidgetGroup::FreeImages(); // , called directly in the binary
 
     pSent = this->children.pSentinel;
     pNode = pSent->pNext;
@@ -80,7 +80,7 @@ dwWidgetGroup::~dwWidgetGroup()
 
 // ---- input forwarding ------------------------------------------------------------
 
-// @444450 — first ENABLED child whose rect contains (x, y), until handled.
+// first ENABLED child whose rect contains (x, y), until handled.
 int dwWidgetGroup::OnMouseMove(int16_t x, int16_t y)
 {
     dwListNode* pNode;
@@ -104,7 +104,7 @@ int dwWidgetGroup::OnMouseMove(int16_t x, int16_t y)
     return handled;
 }
 
-// @4444d0 — same walk as OnMouseMove, forwarding OnMouseDown.
+// same walk as OnMouseMove, forwarding OnMouseDown.
 int dwWidgetGroup::OnMouseDown(int16_t x, int16_t y)
 {
     dwListNode* pNode;
@@ -128,7 +128,7 @@ int dwWidgetGroup::OnMouseDown(int16_t x, int16_t y)
     return handled;
 }
 
-// @444550 — same walk as OnMouseMove, forwarding OnMouseUp.
+// same walk as OnMouseMove, forwarding OnMouseUp.
 int dwWidgetGroup::OnMouseUp(int16_t x, int16_t y)
 {
     dwListNode* pNode;
@@ -152,7 +152,7 @@ int dwWidgetGroup::OnMouseUp(int16_t x, int16_t y)
     return handled;
 }
 
-// @4445d0 — every ENABLED child (no containment test), until handled.
+// every ENABLED child (no containment test), until handled.
 int dwWidgetGroup::OnKey(int key, int repeat)
 {
     dwListNode* pNode;
@@ -173,7 +173,7 @@ int dwWidgetGroup::OnKey(int key, int repeat)
     return handled;
 }
 
-// @444620 — per-frame tick broadcast to every ENABLED child (no early out).
+// per-frame tick broadcast to every ENABLED child (no early out).
 void dwWidgetGroup::Update(float dt)
 {
     dwListNode* pNode;
@@ -191,7 +191,7 @@ void dwWidgetGroup::Update(float dt)
     }
 }
 
-// @444670 — first child whose rect contains (x, y), until handled. Binary
+// first child whose rect contains (x, y), until handled. Binary
 // quirk kept: NO bEnabled check on this path (unlike the mouse buttons).
 int dwWidgetGroup::OnHover(int16_t x, int16_t y)
 {
@@ -216,7 +216,7 @@ int dwWidgetGroup::OnHover(int16_t x, int16_t y)
     return handled;
 }
 
-// @4446e0 — every ENABLED child, until one handles the message; returns the
+// every ENABLED child, until one handles the message; returns the
 // last handler result (0 when nobody handled it).
 int dwWidgetGroup::OnMessage(dwWidgetMsg* pMsg)
 {
@@ -240,7 +240,7 @@ int dwWidgetGroup::OnMessage(dwWidgetMsg* pMsg)
 
 // ---- geometry / hit testing --------------------------------------------------------
 
-// @444780 — translate the group's own rect, then every child (no checks).
+// translate the group's own rect, then every child (no checks).
 void dwWidgetGroup::Move(int16_t dx, int16_t dy)
 {
     dwListNode* pNode;
@@ -257,7 +257,7 @@ void dwWidgetGroup::Move(int16_t dx, int16_t dy)
     }
 }
 
-// @444410 — first child HitTest hit (no enabled/containment pre-checks; the
+// first child HitTest hit (no enabled/containment pre-checks; the
 // group never returns itself).
 dwWidget* dwWidgetGroup::HitTest(dwPoint* pPt)
 {
@@ -276,7 +276,7 @@ dwWidget* dwWidgetGroup::HitTest(dwPoint* pPt)
 
 // ---- image lifetime / paint ----------------------------------------------------------
 
-// @4447e0 — broadcast to ALL children (no enabled check).
+// broadcast to ALL children (no enabled check).
 void dwWidgetGroup::EnsureImages()
 {
     dwListNode* pNode;
@@ -289,7 +289,7 @@ void dwWidgetGroup::EnsureImages()
     }
 }
 
-// @43c040 (Ghidra: dwWidgetGroup_FreeChildImages) — broadcast to ALL
+// (Ghidra: dwWidgetGroup_FreeChildImages) — broadcast to ALL
 // children (no enabled check). Sits at vtbl +0x40 (FreeImages) and is also
 // called directly by the dtor.
 void dwWidgetGroup::FreeImages()
@@ -304,7 +304,7 @@ void dwWidgetGroup::FreeImages()
     }
 }
 
-// @444730 — DrawChild on ALL children (enabled or not — visibility is the
+// DrawChild on ALL children (enabled or not — visibility is the
 // dirty-rect/clip machinery's problem): each child clips itself against the
 // destination bounds ∩ pClipRect ∩ its own rect and paints via its Draw.
 void dwWidgetGroup::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
@@ -314,7 +314,7 @@ void dwWidgetGroup::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
     pNode = this->children.pSentinel->pNext;
     while (pNode != this->children.pSentinel)
     {
-        ((dwWidget*)pNode->pData)->DrawChild(pDestBits, pClipRect); // @4424b0
+        ((dwWidget*)pNode->pData)->DrawChild(pDestBits, pClipRect);
         pNode = pNode->pNext; // binary reads the link AFTER the call
     }
 }

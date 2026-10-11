@@ -4,8 +4,8 @@
 // dwGuiInGame — the IN-GAME HUD / live-gameplay MISSION SCREEN (the screen that
 // runs the sith engine live) + its nested dwGuiInGamePause dialog.
 //
-// dwGuiScreen subclass, MSVC multiple inheritance (primary vtbl 0x51f180,
-// segment/scn vtbl 0x51f168). IS a dwSegment: dwGuiMissionMap deploy news the
+// dwGuiScreen subclass, MSVC multiple inheritance (primary dwGuiInGame_vtbl,
+// segment/scn dwGuiInGame_scn_vtbl). IS a dwSegment: dwGuiMissionMap deploy news the
 // screen and pushes its dwSegment subobject onto the segment stack. While it is
 // the active segment the world is open: StartMission (the Activate slot) opens
 // the world + builds the player droid from the assembled workshop parts (via
@@ -14,12 +14,12 @@
 // GHCA*.wav chatter + energy drain + the death fade; EndMission tears the world
 // down and pushes the dwGuiStatus debriefing.
 //
-// Decompiled from DroidWorks.exe unit range 0x41f2a0-0x42317f. Two functions in
-// that window belong to dwSith.c (dwGuiInGame_SithPrintHook @0x423070 and
-// dwSith_Instinct_TouchOfDeath @0x4230a0) and dwMain.c (dwMain_Run @0x41b250,
-// dwMain_VerifyInstallation @0x41b280) and are NOT translated here.
+// Decompiled from DroidWorks.exe. Two functions in
+// that window belong to dwSith.c (dwGuiInGame_SithPrintHook and
+// dwSith_Instinct_TouchOfDeath) and dwMain.c (dwMain_Run,
+// dwMain_VerifyInstallation) and are NOT translated here.
 //
-// GLOBAL dwGuiInGame_pActive @0x53e800 = the running-mission screen (obj+0) or
+// GLOBAL dwGuiInGame_pActive = the running-mission screen (obj+0) or
 // NULL. Cross-unit: dwHelp speaker-code 0x6b routes player speech here; the HUD
 // voice line + Cammy caption + console print are exported as C shims below
 // (dwCog.c / dwSith.c call them). dwGuiMissionMap deploy + dwGuiScreen msg-0x67
@@ -55,43 +55,43 @@ typedef struct dwSegment dwSegment;
 // dwImageDesc gives the icon dims); dwGuiInGame/dwGuiInvBar cast it.
 
 // ---- the running-mission screen (0 when no mission is live) ------------------
-// (real definition of the placeholder previously in dwMain.c) @0x53e800
+// (real definition of the placeholder previously in dwMain.c)
 extern dwGuiInGame* dwGuiInGame_pActive;
 
 // ---- C-linkage API (shims C units call; own the ex-dwMain.c placeholders) ---
 
 // Mission-screen factory: `new dwGuiInGame(pMission)`, returning the screen's
 // dwSegment subobject (dwGuiMissionMap deploy + dwGuiScreen msg-0x67 push this).
-// @41f2a0 (bundles the binary's new(0x284) + Ctor).
+// (bundles the binary's new(0x284) + Ctor).
 dwSegment* dwGuiInGame_New(dwMission* pMission);
 
 // Validate the assembled workshop droid before deploy: runs a stats pass over
 // dwCore_pWorkspaceNodes and, on failure, shows the matching gmessage dialog
 // (DLG_EMPTY/DLG_NOLOCO/DLG_DETACHED/DLG_NOPOWER/DLG_NOEYES/DLG_MULTIPLE) and
-// returns 0; returns 1 when the droid is deployable. @41f6f0
+// returns 0; returns 1 when the droid is deployable.
 int dwGuiInGame_CheckDroidValid(void);
 
 // HUD voice line: shows a Cammy caption (msgCode) and/or plays a VO wav, gated
 // by priority against the currently-playing line. pCammyText is the message
-// code (as in the binary's PlayVoiceLine signature). @422180
+// code (as in the binary's PlayVoiceLine signature).
 void dwGuiInGame_PlayVoiceLine(const char* pCammyText, const char* pWavName, uint32_t priority);
 
 // HUD console print: appends pText to the on-screen console ring (only when the
-// console cheat is enabled). @423020
+// console cheat is enabled).
 void dwGuiInGame_ConsolePrint(const char* pText);
 
 // Per-frame sithControl callback (registered by dwSith_Startup): reads the
 // grow/shrink-viewport keys and broadcasts the SCREEN_SIZE change (msg 0x1788)
-// to the active screen. Returns 0. @422a60
+// to the active screen. Returns 0.
 int dwGuiInGame_UpdateViewSize(SithThing* pPlayer, flex_t deltaSecs);
 
 // DW COG verb accessors (the C dwCog verb layer can't reach the C++ struct
-// fields directly). @409010 dwendmission/dwendlevel request; @408fa0
+// fields directly). dwCog_EnableJump dwendmission/dwendlevel request;
 // dwgetmissiontext read. Both no-op / return 0 when no mission is live.
 void dwGuiInGame_RequestEndMission(void);
 int  dwGuiInGame_GetCammyMsgCode(void);
 
-// @409300 dwflashinventory: start the HUD inventory button blinking (no-op when
+// dwflashinventory: start the HUD inventory button blinking (no-op when
 // no mission is live or the HUD has no INVENTORY_BUTTON control).
 void dwGuiInGame_FlashInventoryButton(void);
 
@@ -181,51 +181,51 @@ struct dwGuiInGame : dwGuiScreen
     dwString consoleLines[0xf];   // 0x1d0: 15-line console ring (0xc each)
     // binary sizeof 0x284
 
-    // @41f2a0 (dwGuiInGame_Ctor) — dwGuiScreen("gameplay"-cmp base, NULL);
+    // dwGuiInGame_Ctor — dwGuiScreen("gameplay"-cmp base, NULL);
     // stores pMission; zeroes the HUD state; loads the Arial12 console font.
     dwGuiInGame(dwMission* pMission);
 
-    // @41f4a0 (dwGuiInGame_Dtor; scalar-deleting wrapper @41f480; scn thunk
-    // @423160) — EndMission if active, FreeImages, free the droid stats, unlink
+    // dwGuiInGame_Dtor (scalar-deleting wrapper dwGuiInGame_DtorDelete; scn thunk
+    // dwGuiInGame_ScnDtorThunk) — EndMission if active, FreeImages, free the droid stats, unlink
     // + delete the CAMMY/HELP controls, free the voice/console strings + overlay.
     virtual ~dwGuiInGame();
 
-    // ---- dwWidget-side overrides (primary vtbl @0x51f180) ----
-    virtual int OnMouseMove(int16_t x, int16_t y);               // +0x04 @421540 — velocity cursor, then base
-    virtual int OnMouseUp(int16_t x, int16_t y);                 // +0x0c @4209e0 — pick-mode dispatch, then base
-    virtual int OnKey(int key, int repeat);                      // +0x10 @421630 — Esc/P pause dialog, H holster
-    virtual int OnMessage(dwWidgetMsg* pMsg);                    // +0x1c @4218d0 — HUD command routing
-    virtual void EnsureImages();                                 // +0x3c @421fd0 — overlay + CAMMY/HELP images
-    virtual void FreeImages();                                   // +0x40 @422010
-    virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect);// +0x44 @421ca0 — viewport border + 3D + debug/console overlay
-    virtual dwWidget* CreateControl(char* pKeyword, dwConfFile* pConf); // +0x48 @422370 — HUD control factory
-    virtual void CheckCheatCodes(char* pCode);                   // +0x4c @422ae0 — FLY/DANKE/BEEFCAKE/... in-game cheats
+    // ---- dwWidget-side overrides (primary dwGuiInGame_vtbl) ----
+    virtual int OnMouseMove(int16_t x, int16_t y);               // +0x04 dwGuiInGame_OnMouseMove — velocity cursor, then base
+    virtual int OnMouseUp(int16_t x, int16_t y);                 // +0x0c dwGuiInGame_OnMouseUp — pick-mode dispatch, then base
+    virtual int OnKey(int key, int repeat);                      // +0x10 dwGuiInGame_OnKey — Esc/P pause dialog, H holster
+    virtual int OnMessage(dwWidgetMsg* pMsg);                    // +0x1c dwGuiInGame_OnMessage — HUD command routing
+    virtual void EnsureImages();                                 // +0x3c dwGuiInGame_EnsureImages — overlay + CAMMY/HELP images
+    virtual void FreeImages();                                   // +0x40 dwGuiInGame_FreeImages
+    virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect);// +0x44 dwGuiInGame_Draw — viewport border + 3D + debug/console overlay
+    virtual dwWidget* CreateControl(char* pKeyword, dwConfFile* pConf); // +0x48 dwGuiInGame_CreateControl — HUD control factory
+    virtual void CheckCheatCodes(char* pCode);                   // +0x4c dwGuiInGame_CheckCheatCodes — FLY/DANKE/BEEFCAKE/... in-game cheats
 
-    // ---- dwSegment-side overrides (scn vtbl @0x51f168) ----
-    virtual int Activate();    // +0x00 @41f9e0 (StartMission) — open the world + build the player droid
-    virtual void Deactivate(); // +0x04 @420410 (OnHide) — stop sounds, fade to transparent, base OnHide
-    virtual void Suspend();    // +0x08 @420be0 (Pause) — pause time + mixer, base Suspend
-    virtual void Resume();     // +0x0c @420c00 (Resume) — resume mixer + time, base Resume
-    virtual void Update();     // +0x10 @420c20 (SegUpdate) — gauges + chatter + energy drain + death fade
+    // ---- dwSegment-side overrides (scn dwGuiInGame_scn_vtbl) ----
+    virtual int Activate();    // +0x00 StartMission — open the world + build the player droid
+    virtual void Deactivate(); // +0x04 OnHide — stop sounds, fade to transparent, base OnHide
+    virtual void Suspend();    // +0x08 Pause — pause time + mixer, base Suspend
+    virtual void Resume();     // +0x0c Resume — resume mixer + time, base Resume
+    virtual void Update();     // +0x10 SegUpdate — gauges + chatter + energy drain + death fade
 
     // ---- non-virtual methods ----
-    void EndMission();         // @4205e0 — evaluate win/lose, tear down the world, push the debriefing
-    void StopSounds();         // @420580 — stop the VO + conversation sounds + speech
-    void StopVoiceLine();      // @422100 — stop the current VO wav
-    void ClearCammyText();     // @422160 — stop VO + clear the Cammy caption
-    void ClearPlayerSpeech();  // @4214d0 — clear the response menu + conversation state
-    void SetRefTopic(char* pTopic); // @421510 — set the reference topic + blink the reference button
-    void ShowCammyText(uint32_t msgCode); // @4222e0 — localize + show the Cammy caption
-    void PlayVoiceLineEx(uint32_t msgCode, char* pWavName, uint32_t priority, char bForce); // @4221a0
-    void BuildDroidStats(SithThing* pPlayer); // @422050 — bake the workspace droid into pDroidStats
-    int RebuildViewport();     // @420a70 — build the HUD 3D viewport canvas + camera from viewRect
+    void EndMission();         // evaluate win/lose, tear down the world, push the debriefing
+    void StopSounds();         // stop the VO + conversation sounds + speech
+    void StopVoiceLine();      // stop the current VO wav
+    void ClearCammyText();     // stop VO + clear the Cammy caption
+    void ClearPlayerSpeech();  // clear the response menu + conversation state
+    void SetRefTopic(char* pTopic); // set the reference topic + blink the reference button
+    void ShowCammyText(uint32_t msgCode); // localize + show the Cammy caption
+    void PlayVoiceLineEx(uint32_t msgCode, char* pWavName, uint32_t priority, char bForce);
+    void BuildDroidStats(SithThing* pPlayer); // bake the workspace droid into pDroidStats
+    int RebuildViewport();     // build the HUD 3D viewport canvas + camera from viewRect
 };
 
 // ---- dwGuiInGamePause --------------------------------------------------------
 //
 // The "DLG_PAUSED" pause dialog (a dwGuiDialog subclass built inline by OnKey on
 // P/Esc). Binary: dwGuiDialog @0x00 (0xd8) + no own fields — sizeof 0xd8. vtbls
-// @0x51f1e8 (primary) / @0x51f1d0 (scn) override only OnKey/OnMessage/dtor.
+// primary / scn override only OnKey/OnMessage/dtor.
 
 struct dwGuiInGamePause : dwGuiDialog
 {
@@ -234,13 +234,13 @@ struct dwGuiInGamePause : dwGuiDialog
     // the two vtables — modelled here as a thin ctor.
     dwGuiInGamePause();
 
-    // @421880 (dwGuiInGamePause_Dtor; scalar-deleting wrapper @421860; scn thunk
-    // @423170) — base dwGuiDialog dtor.
+    // dwGuiInGamePause_Dtor (scalar-deleting wrapper dwGuiInGamePause_DtorDelete; scn thunk
+    // dwGuiInGamePause_ScnDtorThunk) — base dwGuiDialog dtor.
     virtual ~dwGuiInGamePause();
 
-    // vtbl +0x10 @421840 — any key resumes: RequestAdvance, then base OnKey.
+    // vtbl +0x10 dwGuiInGamePause_OnKey — any key resumes: RequestAdvance, then base OnKey.
     virtual int OnKey(int key, int repeat);
-    // vtbl +0x1c @421810 — OK (5000) resumes: RequestAdvance, then base OnMessage.
+    // vtbl +0x1c dwGuiInGamePause_OnMessage — OK (5000) resumes: RequestAdvance, then base OnMessage.
     virtual int OnMessage(dwWidgetMsg* pMsg);
 };
 

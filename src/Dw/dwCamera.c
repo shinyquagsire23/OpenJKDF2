@@ -1,7 +1,7 @@
 // dwCamera — DroidWorks collision-aware follow camera (see dwCamera.h).
 //
-// Ghidra (DroidWorks.exe): dwCamera_Reset@0x4655e0, dwCamera_Update@0x4656c0,
-// dwCamera_TryPosition@0x465a00. Driven by the engine's camera slot 7
+// Ghidra (DroidWorks.exe): dwCamera_Reset, dwCamera_Update,
+// dwCamera_TryPosition. Driven by the engine's camera slot 7
 // (SithCamera type 0x100): sithCamera_Update case 0x100 -> dwCamera_Update,
 // sithCamera_SetCurrentCamera type-0x100 branch -> dwCamera_Reset.
 
@@ -13,12 +13,12 @@
 #include "Primitives/rdMatrix.h"
 #include "Primitives/rdVector.h"
 
-// Candidate rings, degrees (binary: .data 0x52d608 / 0x52d630; never written).
+// Candidate rings, degrees (binary: .data dwCamera_aYawOffsets / dwCamera_aPitchOffsets; never written).
 flex_t dwCamera_aYawOffsets[9] = { 0.0, 10.0, 20.0, 40.0, 60.0, 90.0, 110.0, 140.0, 180.0 };
 flex_t dwCamera_aPitchOffsets[8] = { -20.0, -10.0, 0.0, -40.0, -50.0, -60.0, 20.0, 40.0 };
 
-flex_t dwCamera_curYaw = 0.0;   // binary: .bss 0x5470b8
-flex_t dwCamera_curPitch = 0.0; // binary: .bss 0x5470b4
+flex_t dwCamera_curYaw = 0.0;   // binary: .bss
+flex_t dwCamera_curPitch = 0.0; // binary: .bss
 
 // Note: no binary counterpart — statics reset for the soft-reset loop only.
 void dwCamera_Startup()
@@ -27,7 +27,6 @@ void dwCamera_Startup()
     dwCamera_curPitch = 0.0;
 }
 
-// @0x4655e0
 void dwCamera_Reset(SithCamera* pPrevCamera, SithCamera* pCamera)
 {
     SithThing* pFocus;
@@ -56,7 +55,6 @@ void dwCamera_Reset(SithCamera* pPrevCamera, SithCamera* pCamera)
     rdMatrix_ExtractAngles34(&pCamera->orient, &pCamera->lookPYR);
 }
 
-// @0x4656c0
 void dwCamera_Update(SithCamera* pCamera)
 {
     SithThing* pFocus;
@@ -170,7 +168,6 @@ void dwCamera_Update(SithCamera* pCamera)
     }
 }
 
-// @0x465a00
 int dwCamera_TryPosition(SithCamera* pCamera, flex_t pitch, flex_t yaw, SithThing* pFocusThing, const rdMatrix34* pBaseOrient, flex_t wantDist, flex_t minDist, flex_t maxDist, rdVector3* pOutPos, flex_t* pOutClampedDist, rdVector3* pOutMoveDir, flex_t* pOutMoveDist)
 {
     rdMatrix34 mat;

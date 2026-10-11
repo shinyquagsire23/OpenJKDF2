@@ -1,10 +1,10 @@
 // DroidWorks app-layer core.
 //
-// Ghidra source: dwMain part 1 (0x410d60-0x411550) — dwCompleteMovie, the
+// Ghidra source: dwMain part 1 — dwCompleteMovie, the
 // error/fatal-UI HostServices hooks, the dw-core/dwPlayer dwString static
-// ctors; and dw part 2 (0x419bd0-0x41c0ef) — the MASTER boot dw_Startup /
+// ctors; and dw part 2 — the MASTER boot dw_Startup /
 // dw_Shutdown, the material-recolor cache, items.inv parse, dwMain_MainLoopTick
-// and the dwApp boot dwSegment (vtbl dwApp_vtbl @0x51ee40).
+// and the dwApp boot dwSegment (dwApp_vtbl).
 //
 // LANGUAGE: this file is C++ (was dwMain.c). dwMain parts 1 & 2 are verifiably
 // C++ in the binary (MSVC EH frames / ExceptionList around dwString /
@@ -73,7 +73,7 @@ extern "C" {
 // C++ regardless, but this makes the linkage explicit).
 extern "C" {
 
-// The DW host-services pointer. Binary global dw_hostServices @0x53d988 is the
+// The DW host-services pointer. Binary global dw_hostServices is the
 // DW app's OWN inline copy of HostServices; here we alias the engine's shared
 // pHS (set in dwMain_Startup). See report note.
 HostServices* dwMain_pHS = NULL;
@@ -82,32 +82,32 @@ HostServices* dwMain_pHS = NULL;
 // iterate `for (n = list->pNext; n != list; n = n->pNext)` and wrap them as
 // `(dwList*)&dwCore_pXxx`). Sentinels are created once in dwMain_Startup; the
 // blueprint/mission contents are filled by dw_Startup and freed by dw_Shutdown.
-dwListNode* dwCore_pBlueprintList = NULL; // @0x53d964: *.PLS blueprints (dwPart*)
-dwListNode* dwCore_pMissionList   = NULL; // @0x53d95c: *.MIS missions (dwMission*)
-dwListNode* dwCore_pWorkspaceNodes = NULL; // @0x53d984: workspace droid (dwPartNode*)
+dwListNode* dwCore_pBlueprintList = NULL; // *.PLS blueprints (dwPart*)
+dwListNode* dwCore_pMissionList   = NULL; // *.MIS missions (dwMission*)
+dwListNode* dwCore_pWorkspaceNodes = NULL; // workspace droid (dwPartNode*)
 
-// @0x53d958 — global.txt localized-string table (dwGuiScreen_LocalizeString).
+// global.txt localized-string table (dwGuiScreen_LocalizeString).
 dwStringTable* dwCore_pGlobalStrings = NULL;
-// @0x53d954 — the selected mission record (first parsed *.MIS at boot).
+// the selected mission record (first parsed *.MIS at boot).
 dwMission* dwCore_pCurrentMission = NULL;
-// @0x53e854 — 0 = dirty-rect draws (faithful default); 1 = full redraw.
+// 0 = dirty-rect draws (faithful default); 1 = full redraw.
 uint8_t dwMain_bFullRedraw = 0;
 
 } // extern "C"
 
 // Persistent dw-core dwStrings currently OWNED by dwInits.cpp (the binary
-// attributes dwCore_workspaceName @0x53d978 + dwCore_currentRefFile @0x53d968
+// attributes dwCore_workspaceName + dwCore_currentRefFile
 // to the dw-core static ctors in this unit — see report; kept in dwInits.cpp
 // for now to avoid a cross-file edit). dwPlayer_name comes from dwPlayer.h.
 extern "C" dwString dwCore_workspaceName;
 extern "C" dwString dwCore_currentRefFile;
 
-// dw_bStarted @0x53e8xx — set once dwSith/MaterialCache/dwFont bring-up
+// dw_bStarted — set once dwSith/MaterialCache/dwFont bring-up
 // succeeds inside dw_Startup; gates dw_Shutdown teardown.
 static char dw_bStarted = 0;
 
 // ==================================================================
-//  Material-recolor cache (dw part 2, 0x41b870-0x41bfff)
+//  Material-recolor cache (dw part 2)
 //
 //  DroidWorks droid-part team-color painting cache. struct 0x187c: a colormap
 //  (textures.cmp), an enable flag, a 0x209-slot round-robin entry table
@@ -135,7 +135,7 @@ struct dwMaterialCache
 // @dwMain_pMaterialCache — the cache singleton (NULL until dw_Startup).
 static dwMaterialCache* dwMain_pMaterialCache = NULL;
 
-// @0x41bd80 (dwMain_MaterialCache_GetRecolored) — return the material a caller
+// dwMain_MaterialCache_GetRecolored — return the material a caller
 // should use for an entry.
 static rdMaterial* dwMain_MaterialCache_GetRecolored(dwMaterialCache* pCache, dwMaterialCacheEntry* pEntry)
 {
@@ -198,13 +198,13 @@ static rdMaterial* dwMain_MaterialCache_GetRecolored(dwMaterialCache* pCache, dw
     return pFresh;
 }
 
-// @0x41bd60 (dwMain_MaterialCache_Find) — name -> entry.
+// dwMain_MaterialCache_Find — name -> entry.
 static dwMaterialCacheEntry* dwMain_MaterialCache_Find(dwMaterialCache* pCache, const char* pName)
 {
     return (dwMaterialCacheEntry*)stdHashtbl_Find(pCache->pByName, pName);
 }
 
-// @0x41ba60 (dwMain_MaterialCache_Load) — the rdMaterial loader hook. Miss ->
+// dwMain_MaterialCache_Load — the rdMaterial loader hook. Miss ->
 // round-robin free slot, rdMaterial_LoadEntry (fallback dflt.mat), build the
 // "<name>COLOR.mat" variant, hash-add keyed by the stored material name.
 static rdMaterial* dwMain_MaterialCache_Load(dwMaterialCache* pCache, const char* pName, int a3, int a4)
@@ -289,7 +289,7 @@ static rdMaterial* dwMain_MaterialCache_Load(dwMaterialCache* pCache, const char
     return dwMain_MaterialCache_GetRecolored(pCache, pEntry);
 }
 
-// @0x41bcb0 (dwMain_MaterialCache_Unload) — the rdMaterial unloader hook.
+// dwMain_MaterialCache_Unload — the rdMaterial unloader hook.
 static void dwMain_MaterialCache_Unload(dwMaterialCache* pCache, rdMaterial* pMaterial)
 {
     dwMaterialCacheEntry* pEntry = dwMain_MaterialCache_Find(pCache, pMaterial->mat_fpath);
@@ -323,7 +323,7 @@ static void dwMain_MaterialCache_Unload(dwMaterialCache* pCache, rdMaterial* pMa
 
 // The registered loader/unloader function-pointer callbacks. Kept as VARIABLES
 // (consumers extern them as `rdMaterialLoader_t dwMain_MaterialLoaderCb`), each
-// pointing at a thin dispatch onto the singleton. @0x41b870 / @0x41b890.
+// pointing at a thin dispatch onto the singleton. dwMain_MaterialLoaderCb / dwMain_MaterialUnloaderCb.
 static rdMaterial* dwMain_MaterialCache_LoaderFn(const char* pName, int a2, int a3)
 {
     return dwMain_MaterialCache_Load(dwMain_pMaterialCache, pName, a2, a3);
@@ -339,7 +339,7 @@ rdMaterialLoader_t   dwMain_MaterialLoaderCb   = &dwMain_MaterialCache_LoaderFn;
 rdMaterialUnloader_t dwMain_MaterialUnloaderCb = &dwMain_MaterialCache_UnloaderFn;
 }
 
-// @0x41b970 (dwMain_MaterialCache_Ctor)
+// dwMain_MaterialCache_Ctor
 static void dwMain_MaterialCache_Ctor(dwMaterialCache* pCache)
 {
     pCache->pColormap = NULL;
@@ -355,7 +355,7 @@ static void dwMain_MaterialCache_Ctor(dwMaterialCache* pCache)
     pCache->pColormap = rdColormap_Load((char*)"textures.cmp");
 }
 
-// @0x41b9c0 (dwMain_MaterialCache_Dtor)
+// dwMain_MaterialCache_Dtor
 static void dwMain_MaterialCache_Dtor(dwMaterialCache* pCache)
 {
     for (int i = 0; i < 0x209; i++)
@@ -377,7 +377,7 @@ static void dwMain_MaterialCache_Dtor(dwMaterialCache* pCache)
         rdColormap_Free(pCache->pColormap);
 }
 
-// @0x41b8b0 (dwMain_MaterialCache_Startup)
+// dwMain_MaterialCache_Startup
 static int dwMain_MaterialCache_Startup(void)
 {
     dwMain_pMaterialCache = (dwMaterialCache*)dwMain_pHS->alloc(sizeof(dwMaterialCache));
@@ -392,7 +392,7 @@ static int dwMain_MaterialCache_Startup(void)
     return dwMain_pMaterialCache != NULL;
 }
 
-// @0x41b930 (dwMain_MaterialCache_Shutdown)
+// dwMain_MaterialCache_Shutdown
 static void dwMain_MaterialCache_Shutdown(void)
 {
     rdMaterial_RegisterLoader(NULL);
@@ -405,7 +405,7 @@ static void dwMain_MaterialCache_Shutdown(void)
     dwMain_pMaterialCache = NULL;
 }
 
-// @0x41ba40 / @0x41ba50 — the runtime enable/disable (dwPart tinting) — C shims.
+// the runtime enable/disable (dwPart tinting) — C shims.
 extern "C" void dwMain_MaterialCache_Enable(void)
 {
     if (dwMain_pMaterialCache != NULL)
@@ -417,7 +417,7 @@ extern "C" void dwMain_MaterialCache_Disable(void)
         dwMain_pMaterialCache->bEnabled = 0;
 }
 
-// @0x41bf70 (dwMain_MaterialCache_RecolorMasked) — repaint the mask region
+// dwMain_MaterialCache_RecolorMasked — repaint the mask region
 // `matchColor` of a recolored part material with `newColor`, in place (the
 // workshop paint mode). Same remap as GetRecolored: mask texels matching
 // `matchColor` become the base-luminance-shaded `newColor`.
@@ -471,7 +471,7 @@ extern "C" void dwMain_MaterialCache_RecolorMasked(rdMaterial* pMaterial, int ma
 }
 
 // ==================================================================
-//  Error / fatal-UI HostServices hooks (dwMain part 1, 0x411160-0x411430)
+//  Error / fatal-UI HostServices hooks (dwMain part 1)
 //
 //  Translated for completeness. NOT installed by default: in OpenJKDF2 the DW
 //  layer aliases the ENGINE's shared HostServices (dwMain_pHS == pHS), so
@@ -483,7 +483,7 @@ extern "C" void dwMain_MaterialCache_RecolorMasked(rdMaterial* pMaterial, int ma
 static dwStringTable* dwMain_pErrorStrings = NULL;
 static char dwMain_bAborting = 0;
 
-// @0x411360 (dwMain_ShowErrorBox) — binary: MessageBoxA "Fatal Error".
+// dwMain_ShowErrorBox — binary: MessageBoxA "Fatal Error".
 static void dwMain_ShowErrorBox(const char* pMsg)
 {
     // Note: Win32 MessageBoxA -> portable print (no modal UI in OpenJKDF2).
@@ -497,7 +497,7 @@ static void dwMain_ShowErrorBox(const char* pMsg)
     jk_printf("DroidWorks [%s]: %s\n", pTitle, pMsg);
 }
 
-// @0x4111e0 (dwMain_FreeErrorStrings)
+// dwMain_FreeErrorStrings
 static void dwMain_FreeErrorStrings(void)
 {
     if (dwMain_pErrorStrings != NULL)
@@ -507,7 +507,7 @@ static void dwMain_FreeErrorStrings(void)
     }
 }
 
-// @0x41b6a0 (dwMain_ShutdownSubsystems) — the fatal-exit teardown.
+// dwMain_ShutdownSubsystems — the fatal-exit teardown.
 static void dwMain_ShutdownSubsystems(void)
 {
     dwSegment_Shutdown();
@@ -519,7 +519,7 @@ static void dwMain_ShutdownSubsystems(void)
     inits_Shutdown();
 }
 
-// @0x411210 (dwMain_FatalExit)
+// dwMain_FatalExit
 static void dwMain_FatalExit(void)
 {
     if (dwMain_bAborting == 0)
@@ -530,7 +530,7 @@ static void dwMain_FatalExit(void)
     abort();
 }
 
-// @0x411160 (dwMain_InstallErrorHandlers) — loads errors.txt; the binary also
+// dwMain_InstallErrorHandlers — loads errors.txt; the binary also
 // swapped HostServices alloc(+0x20)/fileOpen(+0x30) for AllocOrDie /
 // OpenFileOrPromptCD wrappers (omitted here — shared engine pHS, see banner).
 static int dwMain_InstallErrorHandlers(void)
@@ -539,7 +539,7 @@ static int dwMain_InstallErrorHandlers(void)
     return 1;
 }
 
-// @0x411230 (dwMain_AllocOrDie) — translated; not wired (see banner).
+// dwMain_AllocOrDie — translated; not wired (see banner).
 [[maybe_unused]] static void* dwMain_AllocOrDie(int size)
 {
     void* p = dwMain_pHS->alloc(size);
@@ -559,10 +559,10 @@ static int dwMain_InstallErrorHandlers(void)
 }
 
 // ==================================================================
-//  Inventory types — items.inv (dw part 2, 0x41a8c0 / 0x41a9b0)
+//  Inventory types — items.inv (dw part 2, / dw_FreeInventoryIcons)
 // ==================================================================
 
-// @0x41a89b (dw_LoadInventoryCog) — load an inventory type's COG and tag it with
+// dw_LoadInventoryCog — load an inventory type's COG and tag it with
 // the DW inventory-cog flag (0x40). Returns the cog (NULL if the name was empty or
 // the script failed to load).
 static sithCog* dw_LoadInventoryCog(const char* pName)
@@ -573,7 +573,7 @@ static sithCog* dw_LoadInventoryCog(const char* pName)
     return pCog;
 }
 
-// @0x41a8c0 (dw_ParseInventoryTypes) — parse items.inv (dwConfFile) and register
+// dw_ParseInventoryTypes — parse items.inv (dwConfFile) and register
 // each DW inventory type with the sith inventory subsystem. Per line:
 //   id  name  iconName  min  max  hexFlags  [cogName]
 // The repo's sithInventory is compatible (SithInventoryType is DW-shaped; bin count
@@ -584,7 +584,7 @@ static sithCog* dw_LoadInventoryCog(const char* pName)
 // empty/"none": dwImage_LoadFile(iconName + ".rle") into aTypes[id].hudBitmap
 // (DAT_005282ec=".rle", DAT_005282f4="none"). dwImage_LoadFile is real since
 // stdBitmapRle2 landed (P8), so the icons load here; they are freed by
-// dw_FreeInventoryIcons @0x41a9b0 (dwSith.c shutdown).
+// dw_FreeInventoryIcons (dwSith.c shutdown).
 extern "C" void dw_ParseInventoryTypes(void)
 {
     dwConfFile conf;
@@ -631,7 +631,7 @@ extern "C" void dw_ParseInventoryTypes(void)
     dwConfFile_Close(&conf);
 }
 
-// @0x41a9b0 (dw_FreeInventoryIcons) — delete every registered type's HUD icon
+// dw_FreeInventoryIcons — delete every registered type's HUD icon
 // (binary: calls the dwImage's deleting vdtor via vtable[0]) and NULL the slot.
 extern "C" void dw_FreeInventoryIcons(void)
 {
@@ -647,14 +647,14 @@ extern "C" void dw_FreeInventoryIcons(void)
 }
 
 // ==================================================================
-//  dwCompleteMovie — end-of-mission win movie (dwMain part 1, 0x410d60)
+//  dwCompleteMovie — end-of-mission win movie (dwMain part 1, dwCompleteMovie_Ctor)
 // ==================================================================
 
 // dwCompleteMovie_New(idx) — pushed by dwGuiInGame_EndMission on a win.
 // C linkage: dwGuiInGame.cpp declares it inside its extern "C" block.
 extern "C" dwSegment* dwCompleteMovie_New(int idx)
 {
-    // TODO(dw-decomp): the faithful dwCompleteMovie (@410d60) is a dwMovie
+    // TODO(dw-decomp): the faithful dwCompleteMovie (dwCompleteMovie_Ctor) is a dwMovie
     // subclass that plays one of 3 end-of-mission .san clips (name table I
     // could not read out of the binary data section) AND overlays a rendered
     // droid snapshot (dwGuiQuickView -> stdBitmapRle2). SMUSH playback is
@@ -685,12 +685,12 @@ float _DAT_0069a658 = 0.0f;                                  // DW inventory bat
 int DAT_0054518c = 0, DAT_00545190 = 0, DAT_00545194 = 0, DAT_005b7200 = 0, DAT_00546880 = 0; // render counters
 uint32_t DAT_0053e810 = 0, DAT_0053e814 = 0;                 // DW load-progress bar bounds
 // Ambient-chatter timing thresholds, seeded from the binary's .data values
-// (@0x528698=20.0 low1, @0x52869c=45.0 low2, @0x5286c0=240.0 happy,
-// @0x5286d4=300.0 idle). Zero-init made the chatter gates fire EVERY tick —
+// (20.0 low1, 45.0 low2, 240.0 happy,
+// 300.0 idle). Zero-init made the chatter gates fire EVERY tick —
 // each line killed the previous one mid-phoneme and churned sample reloads
 // (BUG 23).
 float _DAT_00528698 = 20.0f, _DAT_0052869c = 45.0f, _DAT_005286c0 = 240.0f, _DAT_005286d4 = 300.0f;  // chatter timing
-// Ambient chatter wav tables (binary .data @0x528678-0x5286c8; sizes match the
+// Ambient chatter wav tables (binary .data; sizes match the
 // per-site rand()*K selectors: 006 ×1(!), 009 ×4, 048 ×6, 058 ×3).
 const char* PTR_s_GHCA009_wav_00528688[] = { "GHCA009.wav", "GHCA010.wav", "GHCA012.wav", "GHCA030.wav" }; // low power
 const char* PTR_s_GHCA006_wav_00528678[] = { "GHCA006.wav", "GHCA007.wav" };                               // hurt
@@ -699,13 +699,13 @@ const char* PTR_s_GHCA048_wav_005286a8[] = { "GHCA048.wav", "GHCA049.wav", "GHCA
 } // extern "C"
 
 // ==================================================================
-//  dw_Startup / dw_Shutdown — the MASTER game init (dw part 2, 0x419bd0)
+//  dw_Startup / dw_Shutdown — the MASTER game init (dw part 2)
 // ==================================================================
 
 // Added: forward decl for the DW_AUTO_MISSION debug hook (defined in dwGuiInGame.cpp).
 extern "C" dwSegment* dwGuiInGame_New(dwMission* pMission);
 
-// @0x419bd0 (dw_Startup) — the Activate slot of the dwApp boot dwSegment.
+// dw_Startup — the Activate slot of the dwApp boot dwSegment.
 //
 // ⭐ THE HANG FIX: this stages the dwWorkshop singleton on the segment stack
 // (BOTTOM) UNDER the intro/options enter-seg. dwGuiOptions case 0xc does
@@ -915,7 +915,7 @@ static bool dw_Startup(void)
     return dw_bStarted != 0;
 }
 
-// @0x41a7d0 (dw_Shutdown) — the Destroy slot of the dwApp boot dwSegment.
+// dw_Shutdown — the Destroy slot of the dwApp boot dwSegment.
 static void dw_Shutdown(void)
 {
     jk_printf("Shutting Down DroidWorks...\n");
@@ -996,7 +996,7 @@ static void dw_Shutdown(void)
 }
 
 // Note: the binary modeled dw_Startup/dw_Shutdown as the Activate/Destroy slots
-// of a persistent dwApp ROOT segment (vtbl dwApp_vtbl @0x51ee40) that stays at
+// of a persistent dwApp ROOT segment (dwApp_vtbl) that stays at
 // the bottom of the stack for the whole app lifetime. In OpenJKDF2, dwMain_
 // BootFlow calls dw_Startup directly and dwMain_Shutdown calls dw_Shutdown at
 // app exit — so no throwaway boot segment is needed (one would self-destruct
@@ -1094,7 +1094,7 @@ extern "C" void dwMain_Shutdown()
 }
 
 // Added (P7): the DroidWorks app boot flow — the OpenJKDF2 mapping of the
-// binary's StartOpeningCutscenes @0x41b530. The engine's Main_Startup already
+// binary's StartOpeningCutscenes. The engine's Main_Startup already
 // brought up the SDL window + stdDisplay, the renderer (rdStartup), the VFS
 // (inits_Startup, via dwMain_Startup) and stdSound — so this does the
 // DW-specific bring-up (dwImage null vtable, DW display surface, palette, arm
@@ -1142,7 +1142,7 @@ static void dwMain_BootFlow(void)
     stdPlatform_Printf("OpenJKDF2: dwMain_BootFlow — DW display up, dw_Startup ran (workshop + enter-seg staged)\n");
 }
 
-// @0x41b6d0 (dwMain_MainLoopTick) — tick the segment stack once; a false return
+// dwMain_MainLoopTick — tick the segment stack once; a false return
 // means quit was requested (binary DestroyWindow -> here g_should_exit).
 static void dwMain_MainLoopTick(void)
 {

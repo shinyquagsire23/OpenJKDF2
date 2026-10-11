@@ -2,12 +2,12 @@
 #define _DWGUICREDITS_H
 
 // dwGuiCredits — the 'credits' end-credits SCROLL SCREEN.
-// DroidWorks.exe unit range: 0x40af10-0x40b93f (plus the compiler-generated
-// secondary dtor thunk @40ba60 and the shared screen-OnHover COMDAT @40ba70,
+// DroidWorks.exe unit range: (plus the compiler-generated
+// secondary dtor thunk dwGuiCredits_ScnDtorThunk and the shared screen-OnHover COMDAT dwGuiScreen_OnHover,
 // which belongs to dwGuiScreen).
 //
-// MSVC MI (binary): primary dwGuiCredits_vtbl @0x51e8c0 (dwGuiScreen shape),
-// secondary dwGuiCredits_scn_vtbl @0x51e8a8 (dwSegment lifecycle) — in this
+// MSVC MI (binary): primary dwGuiCredits_vtbl (dwGuiScreen shape),
+// secondary dwGuiCredits_scn_vtbl (dwSegment lifecycle) — in this
 // translation simply `struct dwGuiCredits : dwGuiScreen`.
 //
 // The credits.cmp CREDITS keyword loads the scroll-line list; each line is
@@ -55,8 +55,8 @@ struct dwSegment* dwGuiCredits_New(void);
 #include "Dw/dwFont.h"
 
 // Binary layout: dwGuiScreen base @0x00 (0xc8) + own fields below — sizeof
-// 0xf4. Primary vtbl @0x51e8c0 overrides dtor/OnKey(+0x10)/Update(+0x14)/
-// Draw(+0x44)/CreateControl(+0x48); secondary @0x51e8a8 overrides
+// 0xf4. Primary dwGuiCredits_vtbl overrides dtor/OnKey(+0x10)/Update(+0x14)/
+// Draw(+0x44)/CreateControl(+0x48); secondary dwGuiCredits_scn_vtbl overrides
 // Activate(+0x00) (Deactivate stays the dwGuiScreen base).
 struct dwGuiCredits : dwGuiScreen
 {
@@ -77,38 +77,38 @@ struct dwGuiCredits : dwGuiScreen
     int16_t scrollY;          // 0xf0: pCurrentLine's y relative to creditsRect
     int16_t scrollBaseline;   // 0xf2: last frame's bottom-anchored scroll pos
 
-    // @40af10 (dwGuiCredits_Ctor) — dwGuiScreen("credits", NULL) + zeroed
+    // dwGuiCredits_Ctor — dwGuiScreen("credits", NULL) + zeroed
     // fields (pCurrentLine starts NULL until the CREDITS keyword parses).
     dwGuiCredits();
 
-    // @40b000 (dwGuiCredits_Dtor; scalar-deleting wrapper @40afe0; secondary
-    // thunk @40ba60) — frees the three fonts + every credit line string/node.
+    // dwGuiCredits_Dtor (scalar-deleting wrapper dwGuiCredits_DtorDelete; secondary
+    // thunk dwGuiCredits_ScnDtorThunk) — frees the three fonts + every credit line string/node.
     virtual ~dwGuiCredits();
 
-    // ---- dwWidget/dwGuiScreen overrides (primary vtbl @0x51e8c0) -----------
-    // vtbl +0x10 @40b1b0 — ESC requests the segment advance; returns 0
+    // ---- dwWidget/dwGuiScreen overrides (primary dwGuiCredits_vtbl) -----------
+    // vtbl +0x10 dwGuiCredits_OnKey — ESC requests the segment advance; returns 0
     // (REPLACES the base cheat-code OnKey).
     virtual int OnKey(int key, int repeat);
-    // vtbl +0x14 @40b1d0 — scroll: rebase scrollY from scrollSpeed *
+    // vtbl +0x14 dwGuiCredits_Update — scroll: rebase scrollY from scrollSpeed *
     // scrollAccum, retire lines fully above the top, advance the segment
     // when the list is exhausted and the tail passed the top; Invalidate +
     // tick the controls group (the droid-dance child).
     virtual void Update(float dt);
-    // vtbl +0x44 @40b340 — base screen draw, then the visible credit lines
+    // vtbl +0x44 dwGuiCredits_Draw — base screen draw, then the visible credit lines
     // (font by line prefix; '!' centered / '/' two-column) clipped to the
     // widget rect; one-shot music fade when the tail crosses the middle.
     virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect);
-    // vtbl +0x48 @40b580 — DROID_DANCE/SECTION_FONT/NAME_FONT/TITLE_FONT/
+    // vtbl +0x48 dwGuiCredits_CreateControl — DROID_DANCE/SECTION_FONT/NAME_FONT/TITLE_FONT/
     // CREDITS keywords; falls back to the base factory.
     virtual dwWidget* CreateControl(char* pKeyword, dwConfFile* pConf);
 
-    // ---- dwSegment overrides (secondary vtbl @0x51e8a8) --------------------
-    // +0x00 @40b170 — base screen Activate (hide cursor on success), restart
+    // ---- dwSegment overrides (secondary dwGuiCredits_scn_vtbl) --------------------
+    // +0x00 dwGuiCredits_OnActivate — base screen Activate (hide cursor on success), restart
     // the segment clock, start DiscoBaby.wav.
     virtual int Activate();
 
     // ---- non-virtual ----------------------------------------------------------
-    // @40b300 — font for a credit line by its first char ('S'/'N'/'T';
+    // font for a credit line by its first char ('S'/'N'/'T';
     // default + NULL/empty = title font).
     dwFont* GetLineFont(char* pLineText);
 };

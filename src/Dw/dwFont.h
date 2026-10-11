@@ -13,7 +13,7 @@
 // color over the dest, 2 = blend the dest over the draw color (both via the
 // current colormap's transparency table); any other byte is written raw.
 //
-// Ghidra (DroidWorks.exe) 0x447f20-0x448d5x, 18 functions (see the
+// Ghidra (DroidWorks.exe), 18 functions (see the
 // per-function @addresses below). Genuinely-C unit: the glyph/measure entry
 // points are __thiscall over the plain dwFont handle struct, but there are no
 // ctors/dtors/vtables/EH frames — translated as pure C with the handle as the
@@ -72,48 +72,48 @@ typedef struct dwFont
     uint8_t* pPixelData;
 } dwFont;
 
-// name -> cached font block (binary: 0x541d38).
+// name -> cached font block (binary: dwFont_pCache).
 extern tHashTable* dwFont_pCache;
 
-// @447f20 — creates the cache; returns nonzero on success.
+// creates the cache; returns nonzero on success.
 int dwFont_Startup();
-// @447f40 — frees every cached font block, then the cache itself.
+// frees every cached font block, then the cache itself.
 void dwFont_Shutdown();
 
-// @447fa0 — fill *pFont for pName (loads "<pName>.laf" via dwMain_pHS on a
+// fill *pFont for pName (loads "<pName>.laf" via dwMain_pHS on a
 // cache miss). On failure the handle's pointers stay NULL. Returns pFont.
 dwFont* dwFont_Load(dwFont* pFont, const char* pName);
 
-// @448390 — advance width of ch (0 when outside [firstChar, lastChar]).
+// advance width of ch (0 when outside [firstChar, lastChar]).
 int dwFont_GetCharWidth(dwFont* pFont, char ch);
-// @4483c0 — summed advance of up to len chars (len 0 = strlen), stops at NUL.
+// summed advance of up to len chars (len 0 = strlen), stops at NUL.
 int dwFont_MeasureString(dwFont* pFont, const char* pStr, int len);
 
-// @448410 / @448520 / @448530 — draw one glyph at *pPos (unclipped) and
+// draw one glyph at *pPos (unclipped) and
 // advance pPos->x; the plain entry dispatches on the surface bpp.
 void dwFont_DrawGlyph8(dwFont* pFont, dwImageBits* pBits, dwPoint* pPos, char ch, uint8_t color);
 void dwFont_DrawGlyph16(dwFont* pFont, dwImageBits* pBits, dwPoint* pPos, char ch, uint8_t color); // no-op stub
 void dwFont_DrawGlyph(dwFont* pFont, dwImageBits* pBits, dwPoint* pPos, char ch, uint8_t color);
 
-// @448580 / @448730 / @448740 — clipped variant; also clamps pPos->x to
+// clipped variant; also clamps pPos->x to
 // pClip->right after advancing.
 void dwFont_DrawGlyphClipped8(dwFont* pFont, dwImageBits* pBits, dwPoint* pPos, char ch, uint8_t color, dwRect* pClip);
 void dwFont_DrawGlyphClipped16(dwFont* pFont, dwImageBits* pBits, dwPoint* pPos, char ch, uint8_t color, dwRect* pClip); // no-op stub
 void dwFont_DrawGlyphClipped(dwFont* pFont, dwImageBits* pBits, dwPoint* pPos, char ch, uint8_t color, dwRect* pClip);
 
-// @448790 — word-wrap up to maxChars of pStr into pRect's width; *pOut gets
+// word-wrap up to maxChars of pStr into pRect's width; *pOut gets
 // (left + last-line width, top + summed line heights).
 void dwFont_MeasureWrappedExtent(dwPoint* pOut, dwFont* pFont, dwRect* pRect, const char* pStr, unsigned int maxChars);
-// @448850 — chars of pStr (up to '\n'/NUL) that fit in maxWidth px, backing
+// chars of pStr (up to '\n'/NUL) that fit in maxWidth px, backing
 // up to the previous whitespace when the line overflows.
 int dwFont_FindLineBreak(dwFont* pFont, const char* pStr, unsigned int maxWidth);
 
-// @4488c0 — single-line draw at *pPos, truncated at both ends against pClip
+// single-line draw at *pPos, truncated at both ends against pClip
 // with a 2x'W'-width soft margin (used by scrolling name fields).
 void dwFont_DrawStringClipped(dwImageBits* pBits, dwFont* pFont, dwPoint* pPos, const char* pStr, uint8_t color, dwRect* pClip);
 
-// @448a60 — word-wrapped multiline draw into pRect (bCentered: center each
-// line); @448b90 — same with align 1/2/3 x-adjust per line; @448d00/@448d30
+// word-wrapped multiline draw into pRect (bCentered: center each
+// line); dwFont_DrawTextAligned — same with align 1/2/3 x-adjust per line; dwFont_DrawText/dwFont_DrawTextCentered
 // — DrawTextWrapped wrappers (left / centered).
 void dwFont_DrawTextWrapped(dwImageBits* pBits, dwFont* pFont, dwRect* pRect, const char* pStr, uint8_t color, dwRect* pClip, int bCentered);
 void dwFont_DrawTextAligned(dwImageBits* pBits, dwFont* pFont, dwRect* pRect, const char* pStr, uint8_t color, dwRect* pClip, int align);

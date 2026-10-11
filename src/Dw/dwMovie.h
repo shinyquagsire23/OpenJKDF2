@@ -2,25 +2,25 @@
 #define _DWMOVIE_H
 
 // dwMovie — the DroidWorks full-screen movie SEGMENT family (the segment
-// half of the dwAnim compile unit, 0x401000-0x404010):
+// half of the dwAnim compile unit):
 //
-//   dwAnimSeg  (0x28, vtbl 0x51e108, ctor @402b50) — abstract media-segment
+//   dwAnimSeg  (0x28, dwAnimSeg_vtbl, ctor dwAnimSeg_Ctor) — abstract media-segment
 //              base: dwSegment + bPlaying + a per-subclass context pointer +
 //              the movie filename; installs a window-message handler on
 //              Activate so ESC skips the movie (dwSegment_RequestAdvance),
 //              and its Update requests the advance once bPlaying drops.
-//   dwFlicSeg  (0x3cc, vtbl 0x51e050, ctor @401410) — full-screen FLC movie:
+//   dwFlicSeg  (0x3cc, dwFlicSeg_vtbl, ctor dwFlicSeg_Ctor) — full-screen FLC movie:
 //              embeds a dwFlic decode context BY VALUE and decodes frames
 //              straight into dwDisplay_pScreenImage at 15 fps, optionally
 //              compositing over an overlay dwImage (color-0 pixels show the
 //              overlay). FULLY FUNCTIONAL (dwFlic is translated).
-//   dwSmushSeg (0x28, vtbl 0x51e070, ctor @401900) — SMUSH .san movie base:
+//   dwSmushSeg (0x28, dwSmushSeg_vtbl, ctor dwSmushSeg_Ctor) — SMUSH .san movie base:
 //              resolves the filename through the DW VFS and plays it through
 //              the vendored libsmusher (the binary's SmushPlay/LECSmush
 //              cluster is bounds-only in Ghidra by request; the dwMovie.cpp
 //              banner maps the pieces it absorbs). Frames pace off the
 //              segment clock; audio streams through a stdSound ring.
-//   dwMovie    (0x40, vtbl 0x51e0a0, ctor @4023c0) — concrete .san player:
+//   dwMovie    (0x40, dwMovie_vtbl, ctor dwMovie_Ctor) — concrete .san player:
 //              dwSmushSeg + a full-screen dwWidgetGroup OVERLAY drawn over
 //              every presented frame (subtitles/skip prompts) via the NEW
 //              +0x18 virtual Draw called from the dwMovie_VidPresent
@@ -50,7 +50,7 @@ typedef struct dwMovie dwMovie;
 // ---- module globals ---------------------------------------------------------
 
 // The dwMovie currently activated (NULL outside playback); read by the
-// dwMovie_VidPresent SMUSH callback. Binary: 0x53d6b0.
+// dwMovie_VidPresent SMUSH callback. Binary: dwMovie_pActive.
 extern dwMovie* dwMovie_pActive;
 
 // Set by dwAnim_SmushStartup, cleared by dwAnim_SmushShutdown. Binary global
@@ -66,13 +66,13 @@ extern int dwAnim_bSmushInitted;
 // dwMain_Startup.
 void dwMovie_Startup(void);
 
-// @402af0 (dwAnim_SmushStartup) — original: LECSmush_Initialize(pHS, 0) +
+// dwAnim_SmushStartup — original: LECSmush_Initialize(pHS, 0) +
 // SmushPlay_Initialize(pHS, 0) + LECSmush_SysStartup() +
 // SmushPlay_SysStartup(), returning 1 only if all four succeed. libsmusher
 // needs no global init; only the binary's flag bookkeeping remains.
 int dwAnim_SmushStartup(void* pHS);
 
-// @402b30 (dwAnim_SmushShutdown) — original: smushPlay/lecSmush system
+// dwAnim_SmushShutdown — original: smushPlay/lecSmush system
 // shutdown x4; clears dwAnim_bSmushInitted.
 void dwAnim_SmushShutdown(void);
 
@@ -84,7 +84,7 @@ void dwAnim_SmushShutdown(void);
 // the glue in dwMovie.cpp absorbs their roles (see the role map in
 // dwMovie.cpp's banner).
 
-// @0x68b1c4 (lecSmush_frameNum; adopted here from the dwEnding.cpp
+// lecSmush_frameNum (adopted here from the dwEnding.cpp
 // placeholder for P8) — index of the SMUSH frame currently on screen,
 // written per presented frame by dwSmushSeg::Update (0 when no movie plays).
 // Read by dwEnding + dwGuiOpening.
@@ -95,7 +95,7 @@ extern uint32_t lecSmush_frameNum;
 // dwMovie_pActive's overlay onto the screen image over the just-blitted
 // frame rect, then presents (dwDisplay_Present). Called from
 // dwSmushSeg::Update once per due frame. pFrameRect is the decoded frame's
-// {x, y, width, height}. @4026b0
+// {x, y, width, height}.
 int dwMovie_VidPresent(rdRect* pFrameRect);
 
 #ifdef __cplusplus
@@ -110,7 +110,7 @@ int dwMovie_VidPresent(rdRect* pFrameRect);
 //
 // Binary layout: dwSegment @0x00 (0x14) + pCallbacks@0x14 + bPlaying@0x18 +
 // bKeyHandlerInstalled@0x19 + filename dwString@0x1c — sizeof 0x28. vtable
-// @0x51e108 (dwAnimSeg_vtbl, 6 slots — pins the dwSegment slot count).
+// dwAnimSeg_vtbl (6 slots — pins the dwSegment slot count).
 
 struct dwAnimSeg : dwSegment
 {
@@ -121,33 +121,33 @@ struct dwAnimSeg : dwSegment
     uint8_t bKeyHandlerInstalled; // 0x19 (Ghidra: field_0x19): ESC handler is live
     dwString filename;            // 0x1c: movie filename
 
-    // @402b50 (dwAnimSeg_Ctor)
+    // dwAnimSeg_Ctor
     dwAnimSeg(const char* pFilename, void* pCallbacks);
 
-    // vtbl +0x00 @402c20 (dwAnimSeg_OnActivate) — install the ESC key
+    // vtbl +0x00 dwAnimSeg_OnActivate — install the ESC key
     // handler, bPlaying = 1, unpause the segment clock, hide the cursor
     // (dwCursor_SetCursor(0)); returns 1.
     virtual int Activate();
-    // vtbl +0x04 @402c50 (dwAnimSeg_OnDeactivate) — remove the ESC handler
+    // vtbl +0x04 dwAnimSeg_OnDeactivate — remove the ESC handler
     // if installed.
     virtual void Deactivate();
     // (vtbl +0x08/+0x0c keep the dwSegment Suspend/Resume bases.)
-    // vtbl +0x10 @402c70 (dwAnimSeg_Update) — when bPlaying == 0:
+    // vtbl +0x10 dwAnimSeg_Update — when bPlaying == 0:
     // dwSegment_RequestAdvance().
     virtual void Update();
-    // vtbl +0x14 @402bd0 (dwAnimSeg_Dtor; scalar-deleting wrapper @402bb0).
+    // vtbl +0x14 dwAnimSeg_Dtor (scalar-deleting wrapper dwAnimSeg_DtorDelete).
     virtual ~dwAnimSeg();
 };
 
 // The ESC-skip window-message handler (WindowHandler_t; installed by
 // dwAnimSeg::Activate): WM_KEYDOWN + VK_ESCAPE -> dwSegment_RequestAdvance.
-// Always returns 0 with *pResult = 0 (message not consumed). @402c80
+// Always returns 0 with *pResult = 0 (message not consumed).
 extern "C" int dwAnimSeg_KeyMsgHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 
 // ---- dwFlicSeg -------------------------------------------------------------
 //
 // Binary layout: dwAnimSeg @0x00 + dwFlic movie@0x28 BY VALUE + curFrame@
-// 0x3c8 — sizeof 0x3cc. vtable @0x51e050: overrides Activate/Deactivate/
+// 0x3c8 — sizeof 0x3cc. dwFlicSeg_vtbl: overrides Activate/Deactivate/
 // Update.
 
 struct dwFlicSeg : dwAnimSeg
@@ -155,20 +155,20 @@ struct dwFlicSeg : dwAnimSeg
     dwFlic movie;      // 0x28: FLC decode context (embedded)
     uint32_t curFrame; // 0x3c8: frames shown (lags movie.curFrame by one)
 
-    // @401410 (dwFlicSeg_Ctor) — pOverlayImage (may be NULL) lands in
+    // dwFlicSeg_Ctor — pOverlayImage (may be NULL) lands in
     // pCallbacks: pixels that decode to color 0 show this image instead.
     dwFlicSeg(const char* pFilename, dwImage* pOverlayImage);
 
-    // vtbl +0x14 @401460 (dwFlicSeg_Dtor; scalar-deleting wrapper @401440).
+    // vtbl +0x14 dwFlicSeg_Dtor (scalar-deleting wrapper dwFlicSeg_DtorDelete).
     virtual ~dwFlicSeg();
 
-    // vtbl +0x00 @401470 (dwFlicSeg_OnActivate) — open the FLC, base
+    // vtbl +0x00 dwFlicSeg_OnActivate — open the FLC, base
     // Activate, decode + present the first frame.
     virtual int Activate();
-    // vtbl +0x04 @401620 (dwFlicSeg_OnDeactivate) — close the FLC when it
+    // vtbl +0x04 dwFlicSeg_OnDeactivate — close the FLC when it
     // was playing, then the base Deactivate.
     virtual void Deactivate();
-    // vtbl +0x10 @401640 (dwFlicSeg_Update) — while playing and unpaused:
+    // vtbl +0x10 dwFlicSeg_Update — while playing and unpaused:
     // when GetElapsed()*15 has passed curFrame, decode the next frame into
     // the screen image (with overlay compositing) and present; bPlaying
     // drops when the decoder reaches numFrames. Calls the base Update both
@@ -179,21 +179,21 @@ struct dwFlicSeg : dwAnimSeg
 // ---- dwSmushSeg -------------------------------------------------------------
 //
 // Binary layout: dwAnimSeg alias (no own fields) — sizeof 0x28. vtable
-// @0x51e070: overrides all six slots.
+// overrides all six slots.
 
 struct dwSmushSeg : dwAnimSeg
 {
-    // @401900 (dwSmushSeg_Ctor) — base ctor, then re-resolves pFilename
+    // dwSmushSeg_Ctor — base ctor, then re-resolves pFilename
     // through the DW VFS (inits_ResolveAndOpen) into this->filename so the
     // external SMUSH library can open it with plain OS I/O; the probe handle
     // is closed immediately. On resolve failure filename becomes "" (which
     // is what makes Activate bail).
     dwSmushSeg(const char* pFilename, void* pCallbacks);
 
-    // vtbl +0x14 @4019a0 (dwSmushSeg_Dtor; scalar-deleting wrapper @401980).
+    // vtbl +0x14 dwSmushSeg_Dtor (scalar-deleting wrapper dwSmushSeg_DtorDelete).
     virtual ~dwSmushSeg();
 
-    // vtbl +0x00 @4019b0 (dwSmushSeg_OnActivate) — the original installed
+    // vtbl +0x00 dwSmushSeg_OnActivate — the original installed
     // the dwSmushVid_*/dwSmushAud_* callback tables, set the SMUSH volume
     // from dw_settingSoundVol and opened the .san via SmushPlay
     // (smushPlay_sub_43D0A0(path, 0, 1000000, 640, 480)), calling the base
@@ -201,16 +201,16 @@ struct dwSmushSeg : dwAnimSeg
     // (libsmusher); failure leaves bPlaying 0 (next Update requests the
     // advance) and returns 0.
     virtual int Activate();
-    // vtbl +0x04 @401ad0 (dwSmushSeg_OnDeactivate) — closes the SMUSH
+    // vtbl +0x04 dwSmushSeg_OnDeactivate — closes the SMUSH
     // session when one is open; then base Deactivate.
     virtual void Deactivate();
-    // vtbl +0x08 @401af0 (Ghidra: dwSmushSeg_Pause — the Suspend slot) —
+    // vtbl +0x08 (Ghidra: dwSmushSeg_Pause — the Suspend slot) —
     // original paused LECSmush first and only then suspended the clock
     // (libsmusher has no codec pause; the clock suspend is kept).
     virtual void Suspend();
-    // vtbl +0x0c @401b20 (Ghidra: dwSmushSeg_Resume) — mirror of Suspend.
+    // vtbl +0x0c (Ghidra: dwSmushSeg_Resume) — mirror of Suspend.
     virtual void Resume();
-    // vtbl +0x10 @401b50 (dwSmushSeg_Update) — base Update; then the
+    // vtbl +0x10 dwSmushSeg_Update — base Update; then the
     // SmushPlay service call: pumps the audio ring, decodes/paces frames off
     // the segment clock, presents due frames via dwMovie_VidPresent, and
     // drops bPlaying (closing the session) once the last frame is shown.
@@ -220,7 +220,7 @@ struct dwSmushSeg : dwAnimSeg
 // ---- dwMovie -------------------------------------------------------------------
 //
 // Binary layout: dwSmushSeg @0x00 + lastOverlayTimeSec@0x28 + dwWidgetGroup
-// overlay@0x2c BY VALUE — sizeof 0x40. vtable @0x51e0a0 (7 slots): overrides
+// overlay@0x2c BY VALUE — sizeof 0x40. dwMovie_vtbl (7 slots): overrides
 // Activate/Deactivate/Update and APPENDS the +0x18 Draw virtual.
 
 struct dwMovie : dwSmushSeg
@@ -230,33 +230,33 @@ struct dwMovie : dwSmushSeg
     dwWidgetGroup overlay;    // 0x2c: full-screen overlay widgets, drawn over
                               //      each presented frame
 
-    // @4023c0 (dwMovie_Ctor) — dwSmushSeg(pFilename, NULL) + default
+    // dwMovie_Ctor — dwSmushSeg(pFilename, NULL) + default
     // (full-screen) overlay group.
     // Note: lastOverlayTimeSec is uninitialized in the binary until
     // Activate; zero-initialized here.
     dwMovie(const char* pFilename);
 
-    // vtbl +0x14 @402440 (dwMovie_Dtor; scalar-deleting wrapper @402420) —
+    // vtbl +0x14 dwMovie_Dtor (scalar-deleting wrapper dwMovie_DtorDelete) —
     // overlay teardown + base dtors, all implicit.
     virtual ~dwMovie();
 
-    // vtbl +0x00 @402580 (dwMovie_OnActivate) — base Activate; the original
+    // vtbl +0x00 dwMovie_OnActivate — base Activate; the original
     // then swapped the video callback table's present slot for
     // dwMovie_VidPresent — here that swap is dwMovie_pActive (VidPresent
     // draws the overlay whenever it is set); latches
     // lastOverlayTimeSec = GetElapsed().
     virtual int Activate();
-    // vtbl +0x04 @4025f0 (dwMovie_OnDeactivate) — base Deactivate; clears
+    // vtbl +0x04 dwMovie_OnDeactivate — base Deactivate; clears
     // dwMovie_pActive when it is this movie.
     virtual void Deactivate();
-    // vtbl +0x10 @402610 (dwMovie_Update) — throttled overlay tick: when
+    // vtbl +0x10 dwMovie_Update — throttled overlay tick: when
     // more than 0.022 s of clock advanced since the last tick (deltas
     // <= 1e-5 s snap to 0), Update the overlay group with the delta; always
     // chains to the base Update.
     virtual void Update();
 
     // NEW virtual — appended after the dwSegment dtor slot.
-    // vtbl +0x18 @402690 (dwMovie_Draw) — overlay.DrawChild(pDestBits,
+    // vtbl +0x18 dwMovie_Draw — overlay.DrawChild(pDestBits,
     // pClipRect); called by dwMovie_VidPresent over each presented frame.
     virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect);
 };

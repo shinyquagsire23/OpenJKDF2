@@ -1,7 +1,7 @@
 // dwGuiStatus — mission STATUS / debriefing screen (dwGuiScreen subclass) +
-// the shared dwGuiPicture control. DroidWorks.exe 0x434d50-0x436d7f, vtbls
-// 0x51fa80 (primary) / 0x51fa68 (segment); dwGuiPicture @0x4365d0 vtbl
-// 0x51fad0. See Dw/dwGuiStatus.h for the class notes.
+// the shared dwGuiPicture control. DroidWorks.exe, vtbls
+// primary / segment; dwGuiPicture dwGuiPicture_Ctor vtbl
+// dwGuiPicture_vtbl. See Dw/dwGuiStatus.h for the class notes.
 
 #include "Dw/dwGuiStatus.h"
 
@@ -30,9 +30,9 @@
 // ---- cross-unit symbols -----------------------------------------------------
 
 // The global mission + workspace state (owned by the dw core unit, P7).
-extern "C" dwListNode* dwCore_pMissionList;    // @0x53d95c (dwMission list sentinel)
+extern "C" dwListNode* dwCore_pMissionList;    // dwMission list sentinel
 extern "C" dwMission*  dwCore_pCurrentMission; // @0x53d... (selected mission)
-extern "C" dwString    dwCore_workspaceName;   // @0x53d978 (droid name)
+extern "C" dwString    dwCore_workspaceName;   // droid name
 
 // The game-wide modal-dialog runner (dwGuiMission unit).
 extern "C" int dwGuiDialog_RunModal(const char* pConfName, const char* pMsgKey);
@@ -49,7 +49,7 @@ extern "C" int dwGuiDialog_RunModal(const char* pConfName, const char* pMsgKey);
 // during a session; reset by dwGuiStatus_Startup for the soft-reset loop.
 static uint32_t dwGuiStatus_achieveFlags = 0;
 
-// Rank-icon RLE filenames indexed by rankImageIdx (binary table @0x51fa28,
+// Rank-icon RLE filenames indexed by rankImageIdx (binary table dwGuiStatus_rankImages,
 // dwGuiImage_vtbl[idx + 0x12]). Index 0 = unranked (no image; the binary's
 // entry is a zero-initialized .data slot, i.e. an empty string).
 static const char* const dwGuiStatus_rankImages[6] = {
@@ -61,7 +61,7 @@ static const char* const dwGuiStatus_rankImages[6] = {
     "YRDataDisk.RLE",
 };
 
-// Rank-name localization KEYS indexed by rank tier (binary table @0x51fa40,
+// Rank-name localization KEYS indexed by rank tier (binary table dwGuiStatus_rankNames,
 // dwGuiImage_vtbl[tier + 0x18]).
 static const char* const dwGuiStatus_rankNames[4] = {
     "UNRANKED",
@@ -74,7 +74,7 @@ static const char* const dwGuiStatus_rankNames[4] = {
 //  dwGuiPicture — shared id-keyed picture box (dwWidgetGroup subclass)
 // ============================================================================
 
-// @4365d0 (dwGuiPicture_Ctor) — pRect (Ghidra mislabeled the arg "pParent";
+// dwGuiPicture_Ctor — pRect (Ghidra mislabeled the arg "pParent";
 // every caller passes a rect).
 dwGuiPicture::dwGuiPicture(dwRect* pRect, const char* pImageName, int32_t posPair)
     : dwWidgetGroup(pRect)
@@ -93,7 +93,7 @@ dwWidget* dwGuiPicture_New(dwRect* pRect, const char* pImgName, int posPair)
     return new dwGuiPicture(pRect, pImgName, posPair);
 }
 
-// @436690 (dwGuiPicture_Dtor)
+// dwGuiPicture_Dtor
 dwGuiPicture::~dwGuiPicture()
 {
     this->FreeImages(); // deletes pImage
@@ -113,7 +113,7 @@ dwGuiPicture::~dwGuiPicture()
     // (imageName auto-freed; base ~dwWidgetGroup deletes the caption children)
 }
 
-// vtbl +0x18 @436b60 (dwGuiPicture_OnHover)
+// vtbl +0x18 dwGuiPicture_OnHover
 int dwGuiPicture::OnHover(int16_t x, int16_t y)
 {
     (void)x; (void)y;
@@ -122,7 +122,7 @@ int dwGuiPicture::OnHover(int16_t x, int16_t y)
     return 1;
 }
 
-// vtbl +0x1c @4368c0 (dwGuiPicture_OnMessage)
+// vtbl +0x1c dwGuiPicture_OnMessage
 int dwGuiPicture::OnMessage(dwWidgetMsg* pMsg)
 {
     dwListNode* pSent = this->items.pSentinel;
@@ -146,7 +146,7 @@ int dwGuiPicture::OnMessage(dwWidgetMsg* pMsg)
     return dwWidgetGroup::OnMessage(pMsg);
 }
 
-// vtbl +0x3c @436bd0 (dwGuiPicture_EnsureLoaded)
+// vtbl +0x3c dwGuiPicture_EnsureLoaded
 void dwGuiPicture::EnsureImages()
 {
     if (this->pImage == NULL && this->imageName.length != 0)
@@ -154,7 +154,7 @@ void dwGuiPicture::EnsureImages()
     dwWidgetGroup::EnsureImages();
 }
 
-// vtbl +0x40 @436c00 (dwGuiPicture_FreeImage)
+// vtbl +0x40 dwGuiPicture_FreeImage
 void dwGuiPicture::FreeImages()
 {
     if (this->pImage != NULL)
@@ -165,7 +165,7 @@ void dwGuiPicture::FreeImages()
     dwWidgetGroup::FreeImages();
 }
 
-// vtbl +0x44 @436b90 (dwGuiPicture_Draw)
+// vtbl +0x44 dwGuiPicture_Draw
 void dwGuiPicture::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     if (this->bEnabled != 0)
@@ -177,7 +177,7 @@ void dwGuiPicture::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
     }
 }
 
-// @436960 (dwGuiPicture_AddImage)
+// dwGuiPicture_AddImage
 void dwGuiPicture::AddImage(char* pImageName, uint32_t id)
 {
     dwGuiPictureItem* pItem = new dwGuiPictureItem(pImageName, (int)id);
@@ -185,7 +185,7 @@ void dwGuiPicture::AddImage(char* pImageName, uint32_t id)
     this->items.InsertAfter(this->items.pSentinel, pItem);
 }
 
-// @436a00 (dwGuiPicture_AddText) — spawn a positioned dwGuiHypText caption.
+// dwGuiPicture_AddText — spawn a positioned dwGuiHypText caption.
 // The binary packs the position/size as two short pairs; reproduced here.
 void dwGuiPicture::AddText(char* pText, int x, int y, int color, char* pFont)
 {
@@ -207,7 +207,7 @@ void dwGuiPicture::AddText(char* pText, int x, int y, int color, char* pFont)
     this->children.InsertAfter(this->children.pSentinel, pHyp);
 }
 
-// @436ae0 (dwGuiPicture_SelectById)
+// dwGuiPicture_SelectById
 void dwGuiPicture::SelectById(int id)
 {
     dwListNode* pSent = this->items.pSentinel;
@@ -234,7 +234,7 @@ void dwGuiPicture::SelectById(int id)
 //  dwGuiStatus — mission debrief screen
 // ============================================================================
 
-// @434d50 (dwGuiStatus_Ctor)
+// dwGuiStatus_Ctor
 dwGuiStatus::dwGuiStatus(dwMission* pContextArg, float itemPctArg, float healthPctArg, int chargeMaxArg)
     : dwGuiScreen("Status", NULL)
 {
@@ -260,7 +260,7 @@ dwGuiStatus::dwGuiStatus(dwMission* pContextArg, float itemPctArg, float healthP
     this->chargeMax = chargeMaxArg;
 }
 
-// @434ee0 (dwGuiStatus_Dtor)
+// dwGuiStatus_Dtor
 dwGuiStatus::~dwGuiStatus()
 {
     this->FreeImages();
@@ -269,7 +269,7 @@ dwGuiStatus::~dwGuiStatus()
     // (sound/speech auto-freed; base ~dwGuiScreen tears the rest down)
 }
 
-// primary vtbl +0x14 @436400 (dwGuiStatus_Update)
+// primary vtbl +0x14 dwGuiStatus_Update
 void dwGuiStatus::Update(float dt)
 {
     // tick the controls group first (the binary forwards through the embedded
@@ -286,7 +286,7 @@ void dwGuiStatus::Update(float dt)
     }
 }
 
-// primary vtbl +0x1c @435180 (dwGuiStatus_OnMessage)
+// primary vtbl +0x1c dwGuiStatus_OnMessage
 int dwGuiStatus::OnMessage(dwWidgetMsg* pMsg)
 {
     if (pMsg->code == 30000 && this->speech.length != 0)
@@ -326,7 +326,7 @@ int dwGuiStatus::OnMessage(dwWidgetMsg* pMsg)
     return dwGuiScreen::OnMessage(pMsg);
 }
 
-// primary vtbl +0x3c @436520 (dwGuiStatus_EnsureLoaded)
+// primary vtbl +0x3c dwGuiStatus_EnsureLoaded
 void dwGuiStatus::EnsureImages()
 {
     dwGuiScreen::EnsureImages();
@@ -338,7 +338,7 @@ void dwGuiStatus::EnsureImages()
         this->pGroup->EnsureImages();
 }
 
-// primary vtbl +0x40 @436570 (dwGuiStatus_FreeImages)
+// primary vtbl +0x40 dwGuiStatus_FreeImages
 void dwGuiStatus::FreeImages()
 {
     dwGuiScreen::FreeImages();
@@ -353,7 +353,7 @@ void dwGuiStatus::FreeImages()
         this->pGroup->FreeImages();
 }
 
-// primary vtbl +0x44 @436480 (dwGuiStatus_Draw)
+// primary vtbl +0x44 dwGuiStatus_Draw
 void dwGuiStatus::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     dwGuiScreen::Draw(pDestBits, pClipRect);
@@ -367,7 +367,7 @@ void dwGuiStatus::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
     }
 }
 
-// primary vtbl +0x48 @4352e0 (dwGuiStatus_CreateControl)
+// primary vtbl +0x48 dwGuiStatus_CreateControl
 dwWidget* dwGuiStatus::CreateControl(char* pKeyword, dwConfFile* pConf)
 {
     if (dwString_Equals(pKeyword, "NAMETEXT"))
@@ -457,7 +457,7 @@ dwWidget* dwGuiStatus::CreateControl(char* pKeyword, dwConfFile* pConf)
     return dwGuiScreen::CreateControl(pKeyword, pConf);
 }
 
-// segment vtbl +0x00 @434ff0 (dwGuiStatus_OnActivate)
+// segment vtbl +0x00 dwGuiStatus_OnActivate
 int dwGuiStatus::Activate()
 {
     int ret = dwGuiScreen::Activate();
@@ -484,7 +484,7 @@ int dwGuiStatus::Activate()
     return ret;
 }
 
-// segment vtbl +0x04 @435120 (dwGuiStatus_OnDeactivate)
+// segment vtbl +0x04 dwGuiStatus_OnDeactivate
 void dwGuiStatus::Deactivate()
 {
     if (this->speech.length != 0)
@@ -497,7 +497,7 @@ void dwGuiStatus::Deactivate()
     dwPlayer_SavePlr();
 }
 
-// @4356f0 (dwGuiStatus_BuildControls)
+// dwGuiStatus_BuildControls
 void dwGuiStatus::BuildControls()
 {
     dwMission* m = this->pContext;

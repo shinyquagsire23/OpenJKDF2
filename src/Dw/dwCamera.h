@@ -4,10 +4,10 @@
 // dwCamera — DroidWorks collision-aware follow camera (SithCamera type
 // 0x100, camera slot 7).
 //
-// Ghidra (DroidWorks.exe) 0x4655e0-0x465c6x, 3 functions:
-//   dwCamera_Reset@0x4655e0        (from sithCamera_SetCurrentCamera, type 0x100 branch)
-//   dwCamera_Update@0x4656c0       (from sithCamera_Update, case 0x100)
-//   dwCamera_TryPosition@0x465a00
+// Ghidra (DroidWorks.exe), 3 functions:
+//   dwCamera_Reset        (from sithCamera_SetCurrentCamera, type 0x100 branch)
+//   dwCamera_Update       (from sithCamera_Update, case 0x100)
+//   dwCamera_TryPosition
 //
 // The engine side already registers the extra camera slot (see the
 // DW_CAMERA blocks in src/Engine/sithCamera.c); these functions implement
@@ -40,15 +40,15 @@ extern "C" {
 #define dwCamera_Update(pCamera)
 #else
 
-// Candidate yaw offsets, degrees (binary: 0x52d608). The first-chance sweep
+// Candidate yaw offsets, degrees (binary: dwCamera_aYawOffsets). The first-chance sweep
 // uses entries [0..5]; the widened retry sweep uses all 9.
 extern flex_t dwCamera_aYawOffsets[9];
 
-// Candidate pitch offsets, degrees (binary: 0x52d630).
+// Candidate pitch offsets, degrees (binary: dwCamera_aPitchOffsets).
 extern flex_t dwCamera_aPitchOffsets[8];
 
 // Angles of the placement chosen by the last successful sweep
-// (binary: 0x5470b8 / 0x5470b4). Seeded from the rings' first entries by
+// (binary: dwCamera_curYaw / dwCamera_curPitch). Seeded from the rings' first entries by
 // dwCamera_Reset; also feed the no-candidate fallback placement.
 extern flex_t dwCamera_curYaw;
 extern flex_t dwCamera_curPitch;
@@ -61,11 +61,11 @@ void dwCamera_Startup();
 // sithTime_g_frameTimeFlex temporarily inflated by +1s so the ease-in jumps
 // straight to the chosen placement. pPrevCamera is the camera that was
 // current before the switch; the reset is skipped when it is non-NULL and
-// still the current camera (re-selecting the active camera). @0x4655e0
+// still the current camera (re-selecting the active camera).
 void dwCamera_Reset(SithCamera* pPrevCamera, SithCamera* pCamera);
 
 // Per-frame follow-cam update for a type-0x100 camera (the sithCamera_Update
-// case 0x100 body). @0x4656c0
+// case 0x100 body).
 void dwCamera_Update(SithCamera* pCamera);
 
 // Test one (pitch, yaw) candidate: rotates pBaseOrient by the angles,
@@ -74,7 +74,7 @@ void dwCamera_Update(SithCamera* pCamera);
 // rejects if the move from the camera's current position to the candidate is
 // blocked. On success writes the candidate position (pOutPos), the move
 // direction (pOutMoveDir) and move distance (pOutMoveDist);
-// pOutClampedDist always receives the clamped backward distance. @0x465a00
+// pOutClampedDist always receives the clamped backward distance.
 int dwCamera_TryPosition(SithCamera* pCamera, flex_t pitch, flex_t yaw, SithThing* pFocusThing, const rdMatrix34* pBaseOrient, flex_t wantDist, flex_t minDist, flex_t maxDist, rdVector3* pOutPos, flex_t* pOutClampedDist, rdVector3* pOutMoveDir, flex_t* pOutMoveDist);
 
 #endif // PLATFORM_DROIDWORKS

@@ -1,7 +1,7 @@
 #ifndef _DWINITS_H
 #define _DWINITS_H
 
-// DroidWorks "inits" unit (0x411560-0x41237f): the DW VFS / file-resolution
+// DroidWorks "inits" unit: the DW VFS / file-resolution
 // layer. Installs a hooked HostServices fileOpen that maps bare filenames to
 // their real location via a 27-entry extension->searchpath table, searching
 // installPath/workingDir/sourcePath base dirs x {plain dirs, GOB archives}.

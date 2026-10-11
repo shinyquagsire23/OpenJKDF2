@@ -4,18 +4,18 @@
 // dwDisplay — DroidWorks display/backbuffer manager: display bring-up, the
 // dirty-rect repaint list, the wrapped screen image, and frame present.
 //
-// Ghidra (DroidWorks.exe) 0x443920-0x4442ff:
-//   dwDisplay_InitDirtyList@0x443920      dwDisplay_FreeDirtyList@0x443960
-//   dwDisplay_Open@0x4439c0               dwDisplay_CreateCursorSprites@0x443cb0
-//   dwDisplay_Shutdown@0x443d80           dwDisplay_FreeCursors@0x443e00
-//   dwDisplay_SetMode@0x443e60            dwDisplay_AddDirtyRect@0x443fa0
-//   dwDisplay_Present@0x444050            dwDisplay_InsertDirtyNode@0x444140
-//   (the dwRect_Overlaps/Clip/Union helpers @0x4441xx live in dwRect.c)
+// Ghidra (DroidWorks.exe):
+//   dwDisplay_InitDirtyList      dwDisplay_FreeDirtyList
+//   dwDisplay_Open               dwDisplay_CreateCursorSprites
+//   dwDisplay_Shutdown           dwDisplay_FreeCursors
+//   dwDisplay_SetMode            dwDisplay_AddDirtyRect
+//   dwDisplay_Present            dwDisplay_InsertDirtyNode
+//   (the dwRect_Overlaps/Clip/Union helpers live in dwRect.c)
 //
 // Buffer model (binary -> OpenJKDF2 mapping, see dwDisplay.cpp):
-//   back/working buffer (unnamed @0x6b5a40, the whole DW GUI draws here)
+//   back/working buffer (unnamed, the whole DW GUI draws here)
 //       -> dwDisplay_pBackVBuf  = &Video_otherBuf
-//   front/primary buffer (unnamed @0x6b17c0, what the player sees)
+//   front/primary buffer (unnamed, what the player sees)
 //       -> dwDisplay_pFrontVBuf = &Video_menuBuffer (pushed to the window via
 //          stdDisplay_DDrawGdiSurfaceFlip after each present)
 //
@@ -48,22 +48,22 @@ struct dwDirtyRect
 
 // Display environment/device selection (binary: stdBuildDisplayEnvironment
 // result + FindClosestDevice index + the hardware-3D caps scan results).
-extern void* dwDisplay_pEnv;          // binary: 0x541d24 (always NULL here — see dwDisplay_Open)
-extern int dwDisplay_deviceIdx;       // binary: 0x541c4c
-extern char dwDisplay_bHardware3D;    // binary: 0x541d28 (forced 0 — HW path stubbed)
-extern uint32_t dwDisplay_hw3DDevice; // binary: 0x541c58
-extern uint32_t dwDisplay_hw3DMode;   // binary: 0x541c5c
+extern void* dwDisplay_pEnv;          // binary (always NULL here — see dwDisplay_Open)
+extern int dwDisplay_deviceIdx;
+extern char dwDisplay_bHardware3D;    // binary (forced 0 — HW path stubbed)
+extern uint32_t dwDisplay_hw3DDevice;
+extern uint32_t dwDisplay_hw3DMode;
 
 // The screen wrapped as a dwImage (rebuilt by dwDisplay_SetMode; wraps the
 // BACK buffer — everything the DW GUI blits through it lands offscreen until
 // dwDisplay_Present).
-extern dwImageVBuf* dwDisplay_pScreenImage; // binary: 0x541c3c
+extern dwImageVBuf* dwDisplay_pScreenImage;
 
 // Screen-sized 16bpp system-memory scratch buffer created on the software
-// path (binary: 0x541c20; the mode format with bpp forced to 16).
+// path (binary: dwDisplay_pSwBuffer; the mode format with bpp forced to 16).
 extern tVBuffer* dwDisplay_pSwBuffer;
 
-// Sentinel of the circular dirty-rect list (binary: 0x541c54; consumed by
+// Sentinel of the circular dirty-rect list (binary: dwDisplay_pDirtyList; consumed by
 // dwGuiScreen_RenderActive/SegUpdate to decide what to repaint).
 extern dwDirtyRect* dwDisplay_pDirtyList;
 
@@ -74,7 +74,7 @@ extern tVBuffer* dwDisplay_pFrontVBuf;
 
 // Note: no binary counterpart — resets the module globals for OpenJKDF2's
 // soft-reset loop and (re)creates the dirty list, which the binary built in a
-// CRT static ctor (@0x443910) and freed atexit.
+// CRT static ctor (dwDisplay_StaticInit) and freed atexit.
 void dwDisplay_Startup();
 
 // Allocates the dirty list's sentinel node.

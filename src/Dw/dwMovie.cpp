@@ -3,13 +3,13 @@
 // dwSmushSeg (.san base, plays via libsmusher) and dwMovie (.san + widget
 // overlay), plus the SMUSH playback glue.
 //
-// Decompiled from DroidWorks.exe, unit range 0x401000-0x404010 (segment
-// half; the widget half is dwAnim.cpp). vtables: dwAnimSeg 0x51e108 ·
-// dwFlicSeg 0x51e050 · dwSmushSeg 0x51e070 · dwMovie 0x51e0a0 (7 slots —
+// Decompiled from DroidWorks.exe (segment
+// half; the widget half is dwAnim.cpp). vtables: dwAnimSeg dwAnimSeg_vtbl ·
+// dwFlicSeg dwFlicSeg_vtbl · dwSmushSeg dwSmushSeg_vtbl · dwMovie dwMovie_vtbl (7 slots —
 // dwMovie appends the +0x18 Draw virtual to the 6-slot dwSegment shape).
 //
 // SMUSH (P8, wired 2026-07-18): the binary's SmushPlay/LECSmush decode
-// cluster (0x43cf50-0x442390) stays bounds-only in Ghidra BY REQUEST — it is
+// cluster stays bounds-only in Ghidra BY REQUEST — it is
 // replaced wholesale by the repo's vendored libsmusher
 // (src/external/libsmusher), the same library jkCutscene.c drives for JK's
 // .san cutscenes; the glue below mirrors that usage. Role map for the
@@ -18,14 +18,14 @@
 //   smushPlay_sub_43D2E0 (volume)  -> dwMovie_SmushOpen's BufferSetVolume
 //   smushPlay_sub_43D1B0 (service) -> dwSmushSeg::Update's pacing loop
 //   smushPlay_sub_43D190 (close)   -> dwMovie_SmushClose
-//   dwSmushVid_Open @401b90        -> dwMovie_SmushBlitFrame (binary locked
-//      the back VBuffer @0x6b5a40 as the SMUSH decode target; libsmusher
+//   dwSmushVid_Open        -> dwMovie_SmushBlitFrame (binary locked
+//      the back VBuffer as the SMUSH decode target; libsmusher
 //      decodes into its own framebuffer, row-copied there per frame)
-//   dwSmushVid_Close @401bf0       -> dwMovie_VidPresent (the present slot;
+//   dwSmushVid_Close       -> dwMovie_VidPresent (the present slot;
 //      dwMovie swaps it for the overlay-drawing variant via dwMovie_pActive)
-//   dwSmushVid_Clear @401c10       -> unused (SmushPlay-era clear; no caller)
-//   dwSmushVid_SetPalette @401c60  -> dwMovie_SmushSetPalette
-//   dwSmushAud_* @401cd0-4021e0    -> the stdSound queue mirror below: the
+//   dwSmushVid_Clear       -> unused (SmushPlay-era clear; no caller)
+//   dwSmushVid_SetPalette  -> dwMovie_SmushSetPalette
+//   dwSmushAud_*    -> the stdSound queue mirror below: the
 //      binary's 5-second DirectSound streaming ring becomes 32 x 0x8000
 //      stdSound buffers chained with stdSound_BufferQueueAfterAnother
 //      (jkCutscene's exact pattern); the binary's audio-clock master pacing
@@ -33,9 +33,9 @@
 //
 // Adaptations (marked // Note: below):
 //  - DW-stdDisplay calls in dwMovie_VidPresent map per dwDisplay.cpp's
-//    table: GDI flip @0x4fdc60 -> dwDisplay_Present (the binary's flip showed
+//    table: GDI flip -> dwDisplay_Present (the binary's flip showed
 //    the DDraw back buffer directly; our two-buffer model needs the
-//    back->front copy — dwFlicSeg parity), back buffer @0x6b5a40 ->
+//    back->front copy — dwFlicSeg parity), back buffer ->
 //    dwDisplay_pBackVBuf.
 
 #include "Dw/dwMovie.h"
@@ -63,11 +63,11 @@ extern "C" {
 #include "smush.h"            // vendored libsmusher (src/external/libsmusher)
 }
 
-extern "C" HostServices* dwMain_pHS; // the DW host-services pointer (dwMain.c); binary global dwHS @0x6b6258
+extern "C" HostServices* dwMain_pHS; // the DW host-services pointer (dwMain.c); binary global dwHS
 
 // ---- module globals/statics ---------------------------------------------------
 
-dwMovie* dwMovie_pActive = NULL; // binary: 0x53d6b0
+dwMovie* dwMovie_pActive = NULL;
 int dwAnim_bSmushInitted = 0;    // binary: dwAnim_bSmushInitted
 
 // binary: DAT_00540620 — in the binary this was written by the lecSmush
@@ -75,7 +75,7 @@ int dwAnim_bSmushInitted = 0;    // binary: dwAnim_bSmushInitted
 // path). No libsmusher counterpart; kept 0.
 static int dwMovie_bPresentDisabled = 0;
 
-// @0x68b1c4 (lecSmush_frameNum; adopted from the dwEnding.cpp placeholder for
+// lecSmush_frameNum (adopted from the dwEnding.cpp placeholder for
 // P8) — index of the SMUSH frame currently on screen, written per presented
 // frame by dwSmushSeg::Update. Read by dwEnding + dwGuiOpening.
 extern "C" uint32_t lecSmush_frameNum = 0;
@@ -128,7 +128,7 @@ void dwMovie_Startup(void)
 
 // ---- dwAnimSeg -------------------------------------------------------------
 
-// @402c80 (dwAnimSeg_KeyMsgHandler) — ESC skips the movie.
+// dwAnimSeg_KeyMsgHandler — ESC skips the movie.
 extern "C" int dwAnimSeg_KeyMsgHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 {
     (void)hWnd;
@@ -139,7 +139,7 @@ extern "C" int dwAnimSeg_KeyMsgHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARA
     return 0;
 }
 
-// @402b50 (dwAnimSeg_Ctor)
+// dwAnimSeg_Ctor
 dwAnimSeg::dwAnimSeg(const char* pFilename, void* pCallbacks)
     : dwSegment()
     , pCallbacks(pCallbacks)
@@ -149,13 +149,13 @@ dwAnimSeg::dwAnimSeg(const char* pFilename, void* pCallbacks)
 {
 }
 
-// @402bd0 (dwAnimSeg_Dtor; scalar-deleting wrapper @402bb0) — filename free
+// dwAnimSeg_Dtor (scalar-deleting wrapper dwAnimSeg_DtorDelete) — filename free
 // + vptr walk-back, both implicit here.
 dwAnimSeg::~dwAnimSeg()
 {
 }
 
-// vtbl +0x00 @402c20 (dwAnimSeg_OnActivate)
+// vtbl +0x00 dwAnimSeg_OnActivate
 int dwAnimSeg::Activate()
 {
     Window_AddMsgHandler(dwAnimSeg_KeyMsgHandler);
@@ -166,14 +166,14 @@ int dwAnimSeg::Activate()
     return 1;
 }
 
-// vtbl +0x04 @402c50 (dwAnimSeg_OnDeactivate)
+// vtbl +0x04 dwAnimSeg_OnDeactivate
 void dwAnimSeg::Deactivate()
 {
     if (this->bKeyHandlerInstalled != 0)
         Window_RemoveMsgHandler(dwAnimSeg_KeyMsgHandler);
 }
 
-// vtbl +0x10 @402c70 (dwAnimSeg_Update)
+// vtbl +0x10 dwAnimSeg_Update
 void dwAnimSeg::Update()
 {
     if (this->bPlaying == 0)
@@ -184,7 +184,7 @@ void dwAnimSeg::Update()
 
 // Decode ONE FLC frame into the screen image, compositing over the overlay
 // image (pCallbacks) when present. Inlined four times in the binary
-// (@401470/@401640, overlay and non-overlay flavors); factored here,
+// (dwFlicSeg_OnActivate/dwFlicSeg_Update, overlay and non-overlay flavors); factored here,
 // behavior-identical: lock screen -> [lock overlay ->] decode -> [unlock
 // overlay ->] unlock screen. The dwFlicBits geometry comes from each image
 // object's desc, the pixels/stride from its Lock.
@@ -197,7 +197,7 @@ static void dwFlicSeg_DecodeFrameToScreen(dwFlicSeg* pThis)
     void* pPixels;
     int stride;
 
-    pScreen = (dwImage*)dwDisplay_pScreenImage; // binary global @0x541c3c
+    pScreen = (dwImage*)dwDisplay_pScreenImage;
     pPixels = NULL;
     stride = 0;
     pScreen->Lock(&pPixels, &stride); // vtbl +0x0c
@@ -226,7 +226,7 @@ static void dwFlicSeg_DecodeFrameToScreen(dwFlicSeg* pThis)
     pScreen->Unlock();
 }
 
-// @401410 (dwFlicSeg_Ctor)
+// dwFlicSeg_Ctor
 dwFlicSeg::dwFlicSeg(const char* pFilename, dwImage* pOverlayImage)
     : dwAnimSeg(pFilename, pOverlayImage)
     , curFrame(0)
@@ -235,12 +235,12 @@ dwFlicSeg::dwFlicSeg(const char* pFilename, dwImage* pOverlayImage)
     // binary (dwFlic_Open fills it in Activate).
 }
 
-// @401460 (dwFlicSeg_Dtor; scalar-deleting wrapper @401440) — base only.
+// dwFlicSeg_Dtor (scalar-deleting wrapper dwFlicSeg_DtorDelete) — base only.
 dwFlicSeg::~dwFlicSeg()
 {
 }
 
-// vtbl +0x00 @401470 (dwFlicSeg_OnActivate)
+// vtbl +0x00 dwFlicSeg_OnActivate
 int dwFlicSeg::Activate()
 {
     int result;
@@ -248,22 +248,22 @@ int dwFlicSeg::Activate()
     if (dwFlic_Open(&this->movie, this->filename.pBuffer) != 0)
         return 0; // Note: dwFlic_Open always returns 0 (see dwFlic.h) — the
                   // binary's failure return here is an uninitialized byte
-    result = dwAnimSeg::Activate(); // direct base call @402c20
+    result = dwAnimSeg::Activate(); // direct base call dwAnimSeg_OnActivate
     this->curFrame = 0;
     dwFlicSeg_DecodeFrameToScreen(this); // first frame up immediately
-    dwDisplay_Present();                 // @444050
+    dwDisplay_Present();
     return result;
 }
 
-// vtbl +0x04 @401620 (dwFlicSeg_OnDeactivate)
+// vtbl +0x04 dwFlicSeg_OnDeactivate
 void dwFlicSeg::Deactivate()
 {
     if (this->bPlaying != 0)
         dwFlic_Close(&this->movie);
-    dwAnimSeg::Deactivate(); // direct base call @402c50
+    dwAnimSeg::Deactivate(); // direct base call dwAnimSeg_OnDeactivate
 }
 
-// vtbl +0x10 @401640 (dwFlicSeg_Update) — 15 fps schedule off the segment
+// vtbl +0x10 dwFlicSeg_Update — 15 fps schedule off the segment
 // clock. Faithful quirks kept: the base Update runs both BEFORE and AFTER
 // the decode work, and the decode "loop" is a do/while whose condition
 // compares curFrame against the movie frame counter captured at the loop
@@ -280,7 +280,7 @@ void dwFlicSeg::Update()
 
     if (this->bPlaying != 0 && this->bPaused == 0)
     {
-        target = (uint32_t)(int32_t)(this->GetElapsed() * 15.0f); // binary: FMUL [0x51e068] + __ftol
+        target = (uint32_t)(int32_t)(this->GetElapsed() * 15.0f); // binary: FMUL  + __ftol
         numFrames = (int16_t)this->movie.numFrames;
         if (target >= (uint32_t)numFrames)
             target = (uint32_t)(numFrames - 1);
@@ -299,7 +299,7 @@ void dwFlicSeg::Update()
             } while (this->curFrame < frameBefore); // faithful: never repeats
         }
         if (bPresent != 0)
-            dwDisplay_Present(); // @444050
+            dwDisplay_Present();
     }
 
     dwAnimSeg::Update(); // faithful: base tick #2
@@ -307,7 +307,7 @@ void dwFlicSeg::Update()
 
 // ---- dwSmushSeg -------------------------------------------------------------
 
-// @401900 (dwSmushSeg_Ctor)
+// dwSmushSeg_Ctor
 dwSmushSeg::dwSmushSeg(const char* pFilename, void* pCallbacks)
     : dwAnimSeg(pFilename, pCallbacks)
 {
@@ -322,12 +322,12 @@ dwSmushSeg::dwSmushSeg(const char* pFilename, void* pCallbacks)
         dwMain_pHS->fileClose(fh);
 }
 
-// @4019a0 (dwSmushSeg_Dtor; scalar-deleting wrapper @401980) — base only.
+// dwSmushSeg_Dtor (scalar-deleting wrapper dwSmushSeg_DtorDelete) — base only.
 dwSmushSeg::~dwSmushSeg()
 {
 }
 
-// vtbl +0x00 @4019b0 (dwSmushSeg_OnActivate) — original sequence:
+// vtbl +0x00 dwSmushSeg_OnActivate — original sequence:
 //   1. video callback table { CRT stub x2, dwSmushVid_Open, dwSmushVid_Close,
 //      dwSmushVid_Clear, dwSmushVid_SetPalette } -> smushPlay_sub_43D080
 //   2. smushPlay_sub_43D2E0(dw_settingSoundVol * 127 / 100)   [volume]
@@ -349,7 +349,7 @@ int dwSmushSeg::Activate()
     return dwAnimSeg::Activate();
 }
 
-// vtbl +0x04 @401ad0 (dwSmushSeg_OnDeactivate) — original: if (bPlaying)
+// vtbl +0x04 dwSmushSeg_OnDeactivate — original: if (bPlaying)
 // smushPlay_sub_43D190() [close the SmushPlay session]; then base.
 void dwSmushSeg::Deactivate()
 {
@@ -358,7 +358,7 @@ void dwSmushSeg::Deactivate()
     dwAnimSeg::Deactivate();
 }
 
-// vtbl +0x08 @401af0 (Ghidra: dwSmushSeg_Pause — the Suspend slot) —
+// vtbl +0x08 (Ghidra: dwSmushSeg_Pause — the Suspend slot) —
 // original: if (bPlaying && !bPaused) { if (lecSmush_sub_43DC00() == 0)
 // dwSegment::Suspend(); }  (clock suspends only when the codec pause
 // succeeded). libsmusher has no codec pause (treated as success); the
@@ -369,7 +369,7 @@ void dwSmushSeg::Suspend()
         dwSegment::Suspend();
 }
 
-// vtbl +0x0c @401b20 (Ghidra: dwSmushSeg_Resume) — mirror of Suspend
+// vtbl +0x0c (Ghidra: dwSmushSeg_Resume) — mirror of Suspend
 // (original gated on lecSmush_sub_43DC30() == 0).
 void dwSmushSeg::Resume()
 {
@@ -377,7 +377,7 @@ void dwSmushSeg::Resume()
         dwSegment::Resume();
 }
 
-// vtbl +0x10 @401b50 (dwSmushSeg_Update) — original: base Update; then if
+// vtbl +0x10 dwSmushSeg_Update — original: base Update; then if
 // (bPlaying && !bPaused) { int bDone = 0; smushPlay_sub_43D1B0(&bDone)
 // [service the player]; if (bDone) { smushPlay_sub_43D190() [close];
 // bPlaying = 0; } }. The service call is the pacing loop below: frames are
@@ -445,7 +445,7 @@ void dwSmushSeg::Update()
 
 // ---- dwMovie -------------------------------------------------------------------
 
-// @4023c0 (dwMovie_Ctor)
+// dwMovie_Ctor
 dwMovie::dwMovie(const char* pFilename)
     : dwSmushSeg(pFilename, NULL)
     , lastOverlayTimeSec(0.0f) // Note: uninitialized in the binary until Activate
@@ -453,19 +453,19 @@ dwMovie::dwMovie(const char* pFilename)
 {
 }
 
-// @402440 (dwMovie_Dtor; scalar-deleting wrapper @402420) — the binary body
+// dwMovie_Dtor (scalar-deleting wrapper dwMovie_DtorDelete) — the binary body
 // is the inlined overlay-group teardown (FreeChildImages + delete children +
 // node/sentinel frees) followed by the base dtors; all implicit here.
 dwMovie::~dwMovie()
 {
 }
 
-// vtbl +0x00 @402580 (dwMovie_OnActivate)
+// vtbl +0x00 dwMovie_OnActivate
 int dwMovie::Activate()
 {
     int result;
 
-    result = dwSmushSeg::Activate(); // direct base call @4019b0
+    result = dwSmushSeg::Activate(); // direct base call dwSmushSeg_OnActivate
 
     // The original re-registered the video callback table with
     // dwMovie_VidPresent in the present slot (smushPlay_sub_43D080 with
@@ -475,19 +475,19 @@ int dwMovie::Activate()
     // overlay whenever it is set (see below).
 
     dwMovie_pActive = this;
-    this->lastOverlayTimeSec = this->GetElapsed(); // @434240
+    this->lastOverlayTimeSec = this->GetElapsed();
     return result;
 }
 
-// vtbl +0x04 @4025f0 (dwMovie_OnDeactivate)
+// vtbl +0x04 dwMovie_OnDeactivate
 void dwMovie::Deactivate()
 {
-    dwSmushSeg::Deactivate(); // direct base call @401ad0
+    dwSmushSeg::Deactivate(); // direct base call dwSmushSeg_OnDeactivate
     if (dwMovie_pActive == this)
         dwMovie_pActive = NULL;
 }
 
-// vtbl +0x10 @402610 (dwMovie_Update) — overlay tick throttled to ~45 Hz.
+// vtbl +0x10 dwMovie_Update — overlay tick throttled to ~45 Hz.
 void dwMovie::Update()
 {
     float elapsed;
@@ -505,7 +505,7 @@ void dwMovie::Update()
         snapped = 0.0f;
     if (snapped < 0.022f)
     {
-        dwSmushSeg::Update(); // direct base call @401b50
+        dwSmushSeg::Update(); // direct base call
         return;
     }
     this->lastOverlayTimeSec = elapsed;
@@ -514,14 +514,14 @@ void dwMovie::Update()
     dwSmushSeg::Update();
 }
 
-// vtbl +0x18 @402690 (dwMovie_Draw) — NEW virtual; draw the overlay group as
+// vtbl +0x18 dwMovie_Draw — NEW virtual; draw the overlay group as
 // a child (clip = dest bounds ∩ pClipRect ∩ overlay rect).
 void dwMovie::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
-    this->overlay.DrawChild(pDestBits, pClipRect); // @4424b0
+    this->overlay.DrawChild(pDestBits, pClipRect);
 }
 
-// @4026b0 (dwMovie_VidPresent) — SMUSH frame-present callback (the video
+// dwMovie_VidPresent — SMUSH frame-present callback (the video
 // table's present slot; dwSmushVid_Close's role with the dwMovie overlay on
 // top). Called from dwSmushSeg::Update once per due frame, after the frame
 // has been row-copied into the back buffer (dwMovie_SmushBlitFrame): draws
@@ -535,7 +535,7 @@ extern "C" int dwMovie_VidPresent(rdRect* pFrameRect)
     void* pPixels;
     int stride;
 
-    // Note: the binary unlocked the DW back VBuffer @0x6b5a40 here (locked at
+    // Note: the binary unlocked the DW back VBuffer here (locked at
     // dwSmushVid_Open as the SMUSH decode target). Our blit locks/unlocks per
     // frame, so there is nothing to unlock.
 
@@ -556,7 +556,7 @@ extern "C" int dwMovie_VidPresent(rdRect* pFrameRect)
         pScreen->Unlock();
     }
 
-    // Note: binary was the bare DW-stdDisplay GDI flip @0x4fdc60 (the DDraw
+    // Note: binary was the bare DW-stdDisplay GDI flip (the DDraw
     // back buffer became visible directly). Our two-buffer model needs
     // dwDisplay_Present's back->front copy — dwFlicSeg parity.
     dwDisplay_Present();
@@ -565,9 +565,9 @@ extern "C" int dwMovie_VidPresent(rdRect* pFrameRect)
 
 // ---- SMUSH glue (libsmusher — see the banner role map) ------------------------
 
-// @402af0 (dwAnim_SmushStartup) — original: LECSmush_Initialize(pHS, 0),
+// dwAnim_SmushStartup — original: LECSmush_Initialize(pHS, 0),
 // SmushPlay_Initialize(pHS, 0), LECSmush_SysStartup(), SmushPlay_SysStartup();
-// 1 only if all four returned 0. Caller: StartOpeningCutscenes @41b5de.
+// 1 only if all four returned 0. Caller: StartOpeningCutscenes.
 // libsmusher needs no global init, so only the binary's flag bookkeeping
 // remains.
 extern "C" int dwAnim_SmushStartup(void* pHS)
@@ -577,7 +577,7 @@ extern "C" int dwAnim_SmushStartup(void* pHS)
     return 1;
 }
 
-// @402b30 (dwAnim_SmushShutdown) — original: smushPlay_sub_43D010(),
+// dwAnim_SmushShutdown — original: smushPlay_sub_43D010(),
 // lecSmush_sub_43DBF0(), smushPlay_sub_43CFC0(), tail lecSmush_sub_43DBA0();
 // clears dwAnim_bSmushInitted.
 extern "C" void dwAnim_SmushShutdown(void)
@@ -686,11 +686,11 @@ static void dwMovie_SmushAudioPump(void)
     }
 }
 
-// @401c60 (dwSmushVid_SetPalette) role — original: repack the RGBX entries
+// dwSmushVid_SetPalette role — original: repack the RGBX entries
 // into the RGB dwSmushVid_palette[768], force entry 0 black, and when a
-// palettized mode is up push it to the display [SetMasterPalette-style
-// @0x4fe430] followed by a gamma re-apply of dwColormap_pDisplayPalette
-// [@0x4fe490]. libsmusher tracks delta-palette chunks internally, so the
+// palettized mode is up push it to the display [SetMasterPalette-style]
+// followed by a gamma re-apply of dwColormap_pDisplayPalette.
+// libsmusher tracks delta-palette chunks internally, so the
 // current RGB palette is pulled per presented frame (DW's SW display is
 // always the palettized mode).
 static void dwMovie_SmushSetPalette(void)
@@ -704,8 +704,8 @@ static void dwMovie_SmushSetPalette(void)
     stdDisplay_GammaCorrect3((int)(intptr_t)dwColormap_pDisplayPalette);
 }
 
-// @401b90 (dwSmushVid_Open) role, per frame — the binary locked the back
-// VBuffer @0x6b5a40 once and SMUSH decoded straight into it; libsmusher
+// dwSmushVid_Open role, per frame — the binary locked the back
+// VBuffer once and SMUSH decoded straight into it; libsmusher
 // decodes into its own 8bpp framebuffer, so row-copy it into the back buffer
 // (the dwDisplay_pScreenImage target) at (0,0).
 static void dwMovie_SmushBlitFrame(void)
@@ -778,7 +778,7 @@ static int dwMovie_SmushOpen(const char* pPath)
                        smush_num_frames(dwMovie_pSmush), dwMovie_smushFps);
 
     // Audio: 32 x 0x8000-byte stdSound buffers. Binary format (lecSmush_sub_43DD40
-    // @43dd33: audio setup called with (0x2b11, 2, 0x10)): **stereo 11025 Hz
+    // audio setup called with (0x2b11, 2, 0x10)): **stereo 11025 Hz
     // 16-bit, hardcoded** — every DroidWorks .san's SAHD declares 11025 and the
     // IACT stream is stereo-interleaved. (jkCutscene's stereo 22050 ran 2x
     // fast = BUG 16; mono 11025 misread the interleave and ran 2x slow.)

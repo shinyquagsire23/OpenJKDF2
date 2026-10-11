@@ -6,9 +6,9 @@
 // (name / mass / magnetic / durability / L+R arm strength / speed /
 // power-usage / power) plus a live POWER% gauge during missions.
 //
-// Decompiled from DroidWorks.exe @0x40fe00-0x410a2f (vtbl @0x51ea90; alloc
+// Decompiled from DroidWorks.exe (dwGuiStatsDroid_vtbl; alloc
 // 0xf8; derives dwWidget). It SHARES a compile unit with the dwDroidStats data
-// class (@0x40eb60-0x40fdff, translated in P5, dwDroidStats.cpp) — this file is
+// class (translated in P5, dwDroidStats.cpp) — this file is
 // only the GUI widget. The stats themselves are recomputed on demand from the
 // workspace (dwCore_pWorkspaceNodes) via an embedded dwDroidStatsTotals
 // accumulator; it does NOT read a persisted dwDroidStats record.
@@ -54,24 +54,24 @@ struct dwGuiStatsDroid : dwWidget
     int16_t powerStart;        // 0xf2: gauge start charge (for the tween)
     float animTimeAccum;       // 0xf4: seconds since the gauge tween started
 
-    // @40fe00 — dwWidget(pRect); loads the two fonts; localizes 9 labels;
+    // dwWidget(pRect); loads the two fonts; localizes 9 labels;
     // then Refresh() bakes the initial stat strings.
     dwGuiStatsDroid(dwRect* pRect, char* pFont1Name, uint8_t colorLabel,
                     char* pFont2Name, uint8_t colorValue);
-    // @40fff0 (DtorDelete @40ffd0) — frees the two fonts.
+    // (dwGuiStatsDroid_DtorDelete) — frees the two fonts.
     virtual ~dwGuiStatsDroid();
 
-    // @410070 — dispatch hover-help {0x7531, 0x791a}; return 1.
+    // dispatch hover-help {0x7531, 0x791a}; return 1.
     virtual int OnHover(int16_t x, int16_t y) override;
-    // @4100a0 — 0x7dc/0x7dd: Refresh + Invalidate; 0x7ec: Invalidate.
+    // 0x7dc/0x7dd: Refresh + Invalidate; 0x7ec: Invalidate.
     virtual int OnMessage(dwWidgetMsg* pMsg) override;
-    // @4103b0 — animate the power gauge toward its target (or, in a mission,
+    // animate the power gauge toward its target (or, in a mission,
     // snap it to the live player energy).
     virtual void Update(float dt) override;
-    // @410500 — draw the stat rows + the power gauge.
+    // draw the stat rows + the power gauge.
     virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect) override;
 
-    // @4100e0 (non-virtual) — recompute totals from the workspace and format
+    // (non-virtual) — recompute totals from the workspace and format
     // every value string.
     void Refresh();
 };

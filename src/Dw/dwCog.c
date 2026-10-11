@@ -1,5 +1,4 @@
-// dwCog part 2 — DroidWorks droid-tool "activate/use" interaction dispatch
-// (Ghidra 0x44c270-0x44cc4f).
+// dwCog part 2 — DroidWorks droid-tool "activate/use" interaction dispatch.
 //
 // Flow: player Activate (sithPlayerActions_Activate / sithControl tool keys)
 // -> dwCog_ActivateTool, or inventory click -> dwCog_UseItem
@@ -16,7 +15,7 @@
 //    DW_MESSAGE_CONVERSE is delivered immediately with no animation.
 //
 // Pure C unit (procedural, no vtables/EH). The COG verb wrappers
-// (dwCog_FreezePlayerVerb/UnfreezePlayerVerb @408fd0/408fe0) and
+// (dwCog_FreezePlayerVerb/UnfreezePlayerVerb/dwCog_UnfreezePlayerVerb) and
 // dwCog_RegisterVerbs are dwCog part 1 (P8), not here.
 
 #include "Dw/dwCog.h"
@@ -37,17 +36,17 @@
 // caption (pCammyText may be NULL; priority gates against the running line).
 extern void dwGuiInGame_PlayVoiceLine(const char* pCammyText, const char* pWavName, uint32_t priority);
 
-// ---- module globals (binary @0x541db8-0x541ddc) -------------------------
-static SithThing* dwCog_pHitThing = NULL;         // @0x541db8 (scan result)
-static SithSurface* dwCog_pHitSurface = NULL;     // @0x541dbc (scan result)
-static int dwCog_activateBin = 0;                 // @0x541dc0 (inventory bin used; read by the dwgetactivatebin verb)
-static SithThing* dwCog_pInteractSource = NULL;   // @0x541dc4 (activator)
-uint32_t dwCog_droidCaps = 0;                     // @0x541dc8 (set by dwGuiInGame_StartMission)
-uint32_t dwCog_toolCaps2 = 0;                     // @0x541dcc (set by dwGuiInGame_StartMission)
-uint32_t dwCog_toolCaps1 = 0;                     // @0x541dd0 (set by dwGuiInGame_StartMission)
-int dwCog_bInteractBusy = 0;                      // @0x541dd4 (reach anim in progress)
-int dwCog_pendingMessage = 0;                     // @0x541dd8 (queued DW_MESSAGE)
-static int dwCog_freezeCount = 0;                 // @0x541ddc (dwCog_FreezePlayer refcount)
+// ---- module globals (binary) -------------------------
+static SithThing* dwCog_pHitThing = NULL;         // scan result
+static SithSurface* dwCog_pHitSurface = NULL;     // scan result
+static int dwCog_activateBin = 0;                 // inventory bin used; read by the dwgetactivatebin verb
+static SithThing* dwCog_pInteractSource = NULL;   // activator
+uint32_t dwCog_droidCaps = 0;                     // set by dwGuiInGame_StartMission
+uint32_t dwCog_toolCaps2 = 0;                     // set by dwGuiInGame_StartMission
+uint32_t dwCog_toolCaps1 = 0;                     // set by dwGuiInGame_StartMission
+int dwCog_bInteractBusy = 0;                      // reach anim in progress
+int dwCog_pendingMessage = 0;                     // queued DW_MESSAGE
+static int dwCog_freezeCount = 0;                 // dwCog_FreezePlayer refcount
 
 // Added: reset module statics for the soft-reset loop (no binary equivalent;
 // the binary relies on process teardown).
@@ -65,7 +64,7 @@ void dwCog_Startup()
     dwCog_freezeCount = 0;
 }
 
-// @44c270 — refcounted player freeze: while frozen the player actor has
+// refcounted player freeze: while frozen the player actor has
 // SITH_AF_CONTROLSDISABLED set and all motion zeroed. Impl behind the
 // dwfreezeplayer verb wrapper (part 1).
 int dwCog_FreezePlayer()
@@ -83,7 +82,6 @@ int dwCog_FreezePlayer()
     return dwCog_freezeCount;
 }
 
-// @44c2e0
 int dwCog_UnfreezePlayer()
 {
     if ((unsigned int)dwCog_freezeCount > 1)
@@ -96,7 +94,7 @@ int dwCog_UnfreezePlayer()
     return dwCog_freezeCount;
 }
 
-// @44c320 — activate tool arm `toolSlot` (0 = body/converse, 1/2 = tool
+// activate tool arm `toolSlot` (0 = body/converse, 1/2 = tool
 // arms; auto-swaps 1<->2 when the requested arm is empty but the other
 // isn't). Body activation with no converse cap plays a random "huh?" grunt.
 void dwCog_ActivateTool(SithThing* pSource, int toolSlot)
@@ -144,7 +142,7 @@ void dwCog_ActivateTool(SithThing* pSource, int toolSlot)
     }
 }
 
-// @44c400 — fan-raycast in front of pSource, queue the selected message, and
+// fan-raycast in front of pSource, queue the selected message, and
 // play the reach anim (or deliver immediately for DW_MESSAGE_CONVERSE).
 // Ray lengths are 1/cos(net angle) corrected so every probe reaches the same
 // frontal plane; DWCOG_CAP_LONGREACH swaps the base length for the droid
@@ -251,7 +249,7 @@ void dwCog_ScanAndInteract(SithThing* pSource, uint32_t reqCaps, int toolSlot)
     }
 }
 
-// @44c820 — cast one ray along pOrient->lvec; classify hits until a message
+// cast one ray along pOrient->lvec; classify hits until a message
 // applies. Returns 1 when a message was queued (dwCog_pendingMessage +
 // dwCog_pHitThing/pHitSurface set), 0 otherwise. Note (faithful): every
 // popped hit overwrites pHit*/pendingMessage, including cap-less ones.
@@ -288,7 +286,7 @@ int dwCog_ScanRay(SithThing* pSource, const rdMatrix34* pOrient, const rdVector3
     return bFound;
 }
 
-// @44c8e0 — OR together the caps of every COG linked to pThing (class cog,
+// OR together the caps of every COG linked to pThing (class cog,
 // capture cog, and all signature-matching thing links).
 uint32_t dwCog_GetThingCaps(SithThing* pThing)
 {
@@ -310,7 +308,7 @@ uint32_t dwCog_GetThingCaps(SithThing* pThing)
     return caps;
 }
 
-// @44c960 — map a COG's declared message handlers to capability bits.
+// map a COG's declared message handlers to capability bits.
 uint32_t dwCog_GetCogCaps(sithCog* pCog)
 {
     uint32_t caps = 0;
@@ -352,7 +350,7 @@ uint32_t dwCog_GetCogCaps(sithCog* pCog)
     return caps;
 }
 
-// @44ca30 — OR together the caps of every COG linked to pSurface.
+// OR together the caps of every COG linked to pSurface.
 uint32_t dwCog_GetSurfaceCaps(SithSurface* pSurface)
 {
     uint32_t caps = 0;
@@ -369,7 +367,7 @@ uint32_t dwCog_GetSurfaceCaps(SithSurface* pSurface)
     return caps;
 }
 
-// @44ca80 — intersect object caps with the tool's requested caps and return
+// intersect object caps with the tool's requested caps and return
 // the highest-priority COG message (0 = none). DEBUGFLAG_IN_EDITOR ignores
 // the request mask entirely.
 int dwCog_SelectMessage(uint32_t objCaps, uint32_t reqCaps)
@@ -402,7 +400,7 @@ int dwCog_SelectMessage(uint32_t objCaps, uint32_t reqCaps)
     return 0;
 }
 
-// @44cb20 — inventory-item click: if a tool arm has the grab cap
+// inventory-item click: if a tool arm has the grab cap
 // (DWCOG_CAP_TAKEN) request DW_MESSAGE_USED through that arm; otherwise scan
 // with no request (body, no anim).
 void dwCog_UseItem(SithThing* pSource, int invBin)
@@ -431,14 +429,14 @@ void dwCog_UseItem(SithThing* pSource, int invBin)
     }
 }
 
-// @44cb90 — COG verb "dwgetactivatebin" (registered by dwCog_RegisterVerbs,
+// COG verb "dwgetactivatebin" (registered by dwCog_RegisterVerbs,
 // part 1/P8): pushes the inventory bin the running interaction came from.
 void dwCog_GetActivateBin(sithCog* pCtx)
 {
     sithCogExec_PushInt(pCtx, dwCog_activateBin);
 }
 
-// @44cbb0 — deliver the queued message to the scan hit.
+// deliver the queued message to the scan hit.
 void dwCog_SendPendingMessage()
 {
     if (dwCog_pHitThing)
@@ -451,7 +449,7 @@ void dwCog_SendPendingMessage()
     dwCog_pendingMessage = 0;
 }
 
-// @44cc10 — reach-anim track callback: marker 0x10 (the reach apex) delivers
+// reach-anim track callback: marker 0x10 (the reach apex) delivers
 // the queued message and unfreezes; track end (marker 0) clears the busy
 // flag. Always falls through to the engine default handler.
 void dwCog_ScanPuppetCallback(SithThing* pThing, int32_t track, uint32_t markerType)
@@ -470,7 +468,7 @@ void dwCog_ScanPuppetCallback(SithThing* pThing, int32_t track, uint32_t markerT
 
 
 // =========================================================================
-// dwCog verb layer (part 1, @409360 dwCog_RegisterVerbs). Each verb is
+// dwCog verb layer (part 1, dwCog_RegisterVerbs). Each verb is
 // `void dwCog_Verb(sithCog*)`. DW-data verbs that poke C++ structs go through
 // C-callable typed accessors (dw{Mission,Part}_*) because the binary's raw
 // field offsets are 32-bit-specific and wrong in this 64-bit port.
@@ -520,7 +518,7 @@ extern void sithCogFunctionPlayer_SetInvAvailable(sithCog* pCtx);
 // dwsetupcrystalinventory body (typed mission-list walk in dwMission.cpp).
 extern void dwMission_SetupCrystalInventory(void);
 
-// @408fc0 (dwCog_EnableJump) / @408fb0 (dwCog_DisableJump) — toggle the actor
+// dwCog_EnableJump / dwCog_DisableJump — toggle the actor
 // flag that gates jumping on the player thing. Verbs take no args (registered
 // as cog funcs, so the ignored ctx is present). Guarded vs a NULL world/player.
 void dwCog_EnableJump(sithCog* pCtx)
@@ -536,7 +534,7 @@ void dwCog_DisableJump(sithCog* pCtx)
         sithWorld_g_pCurrentWorld->pLocalPlayer->actorParams.flags |= SITH_AF_4000000;
 }
 
-// @408e90 (dwCog_GetCameraPosition) — push the current camera's world position
+// dwCog_GetCameraPosition — push the current camera's world position
 // (binary cam+100 = SithCamera.lookPos), or the zero vector when no camera.
 void dwCog_GetCameraPosition(sithCog* pCtx)
 {
@@ -549,7 +547,7 @@ void dwCog_GetCameraPosition(sithCog* pCtx)
     sithCogExec_PushVector(pCtx, &zero);
 }
 
-// @408ee0 (dwCog_GetCameraSector) — push the id of the camera's current sector
+// dwCog_GetCameraSector — push the id of the camera's current sector
 // (binary **(cam+0x18) = SithCamera.sector->id), or 0 when no camera/sector.
 void dwCog_GetCameraSector(sithCog* pCtx)
 {
@@ -561,7 +559,7 @@ void dwCog_GetCameraSector(sithCog* pCtx)
     sithCogExec_PushInt(pCtx, 0);
 }
 
-// @409010 (dwCog_EndMission, registered as BOTH dwendmission + dwendlevel) —
+// dwCog_EndMission (registered as BOTH dwendmission + dwendlevel) —
 // request mission end (SegUpdate acts on the flag next frame).
 void dwCog_EndMission(sithCog* pCtx)
 {
@@ -569,13 +567,13 @@ void dwCog_EndMission(sithCog* pCtx)
     dwGuiInGame_RequestEndMission();
 }
 
-// @408fa0 (dwCog_GetMissionText) — push the last Cammy-caption message code.
+// dwCog_GetMissionText — push the last Cammy-caption message code.
 void dwCog_GetMissionText(sithCog* pCtx)
 {
     sithCogExec_PushInt(pCtx, dwGuiInGame_GetCammyMsgCode());
 }
 
-// @409020 (dwCog_EnableMission) / @409060 — unlock/lock a mission by id name.
+// dwCog_EnableMission / dwCog_DisablePart — unlock/lock a mission by id name.
 void dwCog_EnableMission(sithCog* pCtx)
 {
     dwMission_SetUnlockedByName(sithCogExec_PopString(pCtx), 1);
@@ -585,7 +583,7 @@ void dwCog_DisableMission(sithCog* pCtx)
     dwMission_SetUnlockedByName(sithCogExec_PopString(pCtx), 0);
 }
 
-// @408f60 (dwCog_EnablePart) / @408f90 — set a blueprint's bAvailable flag.
+// dwCog_EnablePart / dwCog_GetArmStrength — set a blueprint's bAvailable flag.
 void dwCog_EnablePart(sithCog* pCtx)
 {
     dwPart_SetAvailableByName(sithCogExec_PopString(pCtx), 1);
@@ -595,13 +593,13 @@ void dwCog_DisablePart(sithCog* pCtx)
     dwPart_SetAvailableByName(sithCogExec_PopString(pCtx), 0);
 }
 
-// @408e50 (dwCog_CheckForPart) — 1 if the named part is in the workspace droid.
+// dwCog_CheckForPart — 1 if the named part is in the workspace droid.
 void dwCog_CheckForPart(sithCog* pCtx)
 {
     sithCogExec_PushInt(pCtx, dwCog_WorkspaceHasPart(sithCogExec_PopString(pCtx)));
 }
 
-// @408fd0 (dwCog_FreezePlayerVerb) / @408fe0 — thin verb wrappers over the
+// dwCog_FreezePlayerVerb / dwCog_UnfreezePlayerVerb — thin verb wrappers over the
 // part-2 freeze/unfreeze refcounted controls-disable helpers.
 void dwCog_FreezePlayerVerb(sithCog* pCtx)
 {
@@ -614,20 +612,20 @@ void dwCog_UnfreezePlayerVerb(sithCog* pCtx)
     dwCog_UnfreezePlayer();
 }
 
-// @408eb0 (dwCog_GetPlayerHeadType) — push the assembled droid's head/voice code.
+// dwCog_GetPlayerHeadType — push the assembled droid's head/voice code.
 void dwCog_GetPlayerHeadType(sithCog* pCtx)
 {
     sithCogExec_PushInt(pCtx, dwGuiInGame_GetDroidHeadType());
 }
 
-// @408f60 (dwCog_CheckDroidCaps) — push (droid capFlags & poppedMask).
+// dwCog_CheckDroidCaps — push (droid capFlags & poppedMask).
 void dwCog_CheckDroidCaps(sithCog* pCtx)
 {
     int mask = sithCogExec_PopInt(pCtx);
     sithCogExec_PushInt(pCtx, dwGuiInGame_GetDroidCaps(mask));
 }
 
-// @408f90 (dwCog_GetArmStrength) — push the droid's arm LOAD (max of the two arms).
+// dwCog_GetArmStrength — push the droid's arm LOAD (max of the two arms).
 void dwCog_GetArmStrength(sithCog* pCtx)
 {
     sithCogExec_PushInt(pCtx, dwGuiInGame_GetArmStrength());
@@ -636,7 +634,7 @@ void dwCog_GetArmStrength(sithCog* pCtx)
 // HUD notification dispatch (defined below with the inventory refresh helper).
 static void dwCog_HudDispatch(uint32_t code);
 
-// @408950 (dwCog_GetPlayerSpeechPath) — build the VO wav filename for a player
+// dwCog_GetPlayerSpeechPath — build the VO wav filename for a player
 // speech line. The base name is "GDxx%03lu.wav" (head-type 'B') or
 // "IDxx%03lu.wav"; the "xx" at chars [2],[3] is overwritten with the assembled
 // droid's two head-type code chars (dwDroidStats voiceChars[0..1]). When pSrc
@@ -732,7 +730,7 @@ static void dwCog_GetPlayerSpeechPath(char* pDest, const char* pSrc, uint32_t ms
     pDest[3] = h1;
 }
 
-// @408780 (dwCog_PlayCharacterSpeech) — play an NPC/character VO line + caption.
+// dwCog_PlayCharacterSpeech — play an NPC/character VO line + caption.
 // Pops (wav, textKey); the shim clears any response menu, plays the VO, shows
 // the localized caption, and returns its duration (VO length or reading-time
 // fallback). The cog then blocks for that duration (script_running=2).
@@ -748,7 +746,7 @@ void dwCog_PlayCharacterSpeech(sithCog* pCtx)
     }
 }
 
-// @408ca0 (dwCog_PlayPlayerSpeech) — play a player-droid speech line by index.
+// dwCog_PlayPlayerSpeech — play a player-droid speech line by index.
 // Pops (index, srcName); skips when a VO line is already playing. The wav name
 // is built by dwCog_GetPlayerSpeechPath (head-type remap).
 void dwCog_PlayPlayerSpeech(sithCog* pCtx)
@@ -773,7 +771,7 @@ void dwCog_PlayPlayerSpeech(sithCog* pCtx)
     }
 }
 
-// @408c60 (dwCog_PlayCammySpeech) — pop (priority, flex[discarded], wav, msgCode)
+// dwCog_PlayCammySpeech — pop (priority, flex[discarded], wav, msgCode)
 // and show a Cammy caption + play its VO via the priority-gated voice line.
 void dwCog_PlayCammySpeech(sithCog* pCtx)
 {
@@ -784,7 +782,7 @@ void dwCog_PlayCammySpeech(sithCog* pCtx)
     dwGuiInGame_PlayCammySpeech(msgCode, pWav, priority);
 }
 
-// @408880 (dwCog_AddResponse) — append a response to the in-mission conversation
+// dwCog_AddResponse — append a response to the in-mission conversation
 // RESPONSE MENU (dwGuiList). Pops (index, srcName, textKey, id): builds the VO
 // wav name (head-type remap), then adds {cog, id, localized text, wav} to the
 // menu and refreshes the HUD (msg 0x1f49).
@@ -803,14 +801,14 @@ void dwCog_AddResponse(sithCog* pCtx)
     dwCog_HudDispatch(0x1f49);
 }
 
-// @408d20 (dwCog_GetPlayerResponse) — push the id of the selected response (0 if
+// dwCog_GetPlayerResponse — push the id of the selected response (0 if
 // none picked yet).
 void dwCog_GetPlayerResponse(sithCog* pCtx)
 {
     sithCogExec_PushInt(pCtx, dwGuiInGame_GetSelectedResponseId());
 }
 
-// @408b60 (dwCog_PlayPlayerResponse) — play the selected response's VO wav and
+// dwCog_PlayPlayerResponse — play the selected response's VO wav and
 // block the cog for its duration (+0x2ee ms trailing pad).
 void dwCog_PlayPlayerResponse(sithCog* pCtx)
 {
@@ -822,35 +820,35 @@ void dwCog_PlayPlayerResponse(sithCog* pCtx)
     }
 }
 
-// @4089c0 (dwCog_EnableEscape) / @4089e0 (dwCog_DisableEscape) — toggle whether
+// dwCog_EnableEscape / dwCog_DisableEscape — toggle whether
 // the Esc key stops the current conversation (dwGuiInGame obj+0x110).
 void dwCog_EnableEscape(sithCog* pCtx)  { (void)pCtx; dwGuiInGame_SetEscapeEnabled(1); }
 void dwCog_DisableEscape(sithCog* pCtx) { (void)pCtx; dwGuiInGame_SetEscapeEnabled(0); }
 
-// @409300 (dwCog_FlashInventory) — start the HUD inventory button (obj+0x194)
+// dwCog_FlashInventory — start the HUD inventory button (obj+0x194)
 // blinking. The binary NULL-guards the button, the shim NULL-guards the screen.
 void dwCog_FlashInventory(sithCog* pCtx) { (void)pCtx; dwGuiInGame_FlashInventoryButton(); }
 
-// @408de0 (dwCog_SetMissionText) — show the Cammy caption for a message id.
+// dwCog_SetMissionText — show the Cammy caption for a message id.
 void dwCog_SetMissionText(sithCog* pCtx)
 {
     dwGuiInGame_ShowCammyTextVerb(sithCogExec_PopInt(pCtx));
 }
 
-// @409310 (dwCog_SetRefTopic) — set the in-mission reference topic file.
+// dwCog_SetRefTopic — set the in-mission reference topic file.
 void dwCog_SetRefTopic(sithCog* pCtx)
 {
     dwGuiInGame_SetRefTopicVerb(sithCogExec_PopString(pCtx));
 }
 
-// @408d60 (dwCog_ClearDialog) — clear the response menu + the NPC speech caption.
+// dwCog_ClearDialog — clear the response menu + the NPC speech caption.
 void dwCog_ClearDialog(sithCog* pCtx)
 {
     (void)pCtx;
     dwGuiInGame_ClearDialog();
 }
 
-// @409330 (dwCog_PlayMovie) — pop a filename, open it as a movie segment and
+// dwCog_PlayMovie — pop a filename, open it as a movie segment and
 // interrupt the active segment with it (returns to the active seg when done).
 void dwCog_PlayMovie(sithCog* pCtx)
 {
@@ -867,7 +865,7 @@ void dwCog_PlayMovie(sithCog* pCtx)
 // bin: OnMessage(0x1f4b) delivered to dwWidget_pDefault (the active screen/HUD,
 // pTarget/pOverride both NULL). No-op when no screen is active or the code is
 // unhandled. Binary: each verb builds this dwWidgetMsg on the stack and calls
-// the mislabeled dwWidget_DispatchMsg@0x444d00 — factored here.
+// the mislabeled dwWidget_DispatchMsg — factored here.
 static void dwCog_HudDispatch(uint32_t code)
 {
     dwWidgetMsg msg;
@@ -882,25 +880,25 @@ static void dwCog_HudRefreshInventory(void)
     dwCog_HudDispatch(0x1f4b);
 }
 
-// @409150 (dwCog_SetInv "setinv") — engine setinv + HUD refresh.
+// (dwCog_SetInv "setinv") — engine setinv + HUD refresh.
 void dwCog_SetInv(sithCog* pCtx)
 {
     sithCogFunctionThing_SetInventory(pCtx);
     dwCog_HudRefreshInventory();
 }
-// @409190 (dwCog_ChangeInv "changeinv") — engine changeinv + HUD refresh.
+// (dwCog_ChangeInv "changeinv") — engine changeinv + HUD refresh.
 void dwCog_ChangeInv(sithCog* pCtx)
 {
     sithCogFunctionThing_ChangeInventory(pCtx);
     dwCog_HudRefreshInventory();
 }
-// @4091d0 (dwCog_SetInvAvailable "setinvavailable") — engine setinvavailable + HUD refresh.
+// (dwCog_SetInvAvailable "setinvavailable") — engine setinvavailable + HUD refresh.
 void dwCog_SetInvAvailable(sithCog* pCtx)
 {
     sithCogFunctionPlayer_SetInvAvailable(pCtx);
     dwCog_HudRefreshInventory();
 }
-// @409210 (dwCog_SetupCrystalInventory "dwsetupcrystalinventory") — grant
+// (dwCog_SetupCrystalInventory "dwsetupcrystalinventory") — grant
 // crystal inventory bins for completed crystal missions, then HUD refresh.
 void dwCog_SetupCrystalInventory(sithCog* pCtx)
 {

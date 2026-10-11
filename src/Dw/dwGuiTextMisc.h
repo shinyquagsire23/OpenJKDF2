@@ -4,25 +4,25 @@
 // dwGuiTextMisc — six small DroidWorks text/decorator control classes from
 // three contiguous compile units:
 //
-//   dwGuiTextPopup  (0x78, vtbl 0x51fce8, 0x4399b0-0x439bxx) — TEXTPOPUP: a
+//   dwGuiTextPopup  (0x78, dwGuiTextPopup_vtbl) — TEXTPOPUP: a
 //                   dwGuiTextButton that also carries two toggle strings and
 //                   optionally an image, reusing the dwWorkshopCtrl
 //                   image-name dwStrings as its string storage.
-//   dwGuiTextSlider (0x34, vtbl 0x51fd38, 0x439c10-0x439f1x) — TEXTSLIDER:
+//   dwGuiTextSlider (0x34, dwGuiTextSlider_vtbl) — TEXTSLIDER:
 //                   horizontally scrolling-text marquee.
-//   dwGuiTextSpitter(0x70, vtbl 0x51fd88, 0x439f20-0x43a69x) — TEXTSPITTER:
+//   dwGuiTextSpitter(0x70, dwGuiTextSpitter_vtbl) — TEXTSPITTER:
 //                   per-character fly-in reveal (chars slide in from an edge
 //                   and "land" one by one, with a tick sound).
-//   dwGuiTextStrip  (0x30, vtbl 0x51fdd8, 0x43a6a0-0x43a8bx) — TEXTSTRIP:
+//   dwGuiTextStrip  (0x30, dwGuiTextStrip_vtbl) — TEXTSTRIP:
 //                   scrolling translucent colored strip (marquee decoration).
-//   dwGuiTimer      (0x20, vtbl 0x51fe28, 0x43a8c0-0x43aa2x) — TIMER/
+//   dwGuiTimer      (0x20, dwGuiTimer_vtbl) — TIMER/
 //                   SPITTIMER/STRIPTIMER: timed show/hide DECORATOR wrapping
 //                   another control (derives dwWcChildDecorator).
-//   dwGuiTypewriter (0x48, vtbl 0x51fe78, 0x43aa30-0x43ae3x) — TYPEWRITER:
+//   dwGuiTypewriter (0x48, dwGuiTypewriter_vtbl) — TYPEWRITER:
 //                   time-fraction-driven prefix reveal with a tick sound
 //                   (used by dwGuiStatus / dwGuiInGame / dwGuiReference).
 //
-// Decompiled from DroidWorks.exe 0x4399b0-0x43ae3f. Verifiably C++ (vtables,
+// Decompiled from DroidWorks.exe. Verifiably C++ (vtables,
 // ctor/dtor pairs, MSVC EH frames) -> C++ classes.
 //
 // No module statics — no dwGuiTextMisc_Startup needed (soft-reset rule).
@@ -69,10 +69,10 @@ dwWidget* dwGuiTimer_New(dwWidget* pTarget, float startTime, float duration);
 // ---- dwGuiTextPopup -----------------------------------------------------------
 //
 // Binary layout: dwGuiTextButton @0x00, NO new fields — sizeof 0x78. vtable
-// @0x51fce8 (dwGuiTextPopup_vtbl); overrides only +0x00 dtor and +0x44 Draw
+// dwGuiTextPopup_vtbl; overrides only +0x00 dtor and +0x44 Draw
 // (everything else — mouse handling, +0x18 OnHover hover-notify, +0x3c/+0x40
 // image loads, +0x48 HitTest — inherits the dwGuiTextButton/dwWorkshopCtrl
-// bases; the binary's +0x18 slot @439ad0 is the same shared COMDAT as
+// bases; the binary's +0x18 slot dwGuiTextPopup_OnHover is the same shared COMDAT as
 // dwWorkshopCtrl::OnHover).
 //
 // FIELD REUSE QUIRK (faithful): the dwWorkshopCtrl image-name dwStrings are
@@ -81,11 +81,11 @@ dwWidget* dwGuiTimer_New(dwWidget* pTarget, float startTime, float duration);
 // the display text is not "RmicroscopeGR.rle" (the reference-screen
 // microscope-zoom image), the ctor latches bHot = bChecked = 1 ("text mode");
 // otherwise the strings double as image filenames for the base's lazy loads.
-// TEXTPOPUP keyword (dwGuiScreen_CreateControl @430f6d, dwGuiReference).
+// TEXTPOPUP keyword (dwGuiScreen_CreateControl, dwGuiReference).
 
 struct dwGuiTextPopup : dwGuiTextButton
 {
-    // @4399b0 (dwGuiTextPopup_Ctor) — base(pRect, pLabel, pFontName,
+    // dwGuiTextPopup_Ctor — base(pRect, pLabel, pFontName,
     // colorNormal, pSndOff, colorHot, pSndClick, "CTextRollover.WAV" hover
     // snd, cmdId, bAltDraw); assigns the two toggle strings into the base
     // image-name slots, latches text mode (see above), re-assigns labelText
@@ -96,11 +96,11 @@ struct dwGuiTextPopup : dwGuiTextButton
                    char* pDisplayText, char* pSndOff, char* pAltText,
                    char* pSndClick, uint8_t bAltDraw);
 
-    // @439ac0 (dwGuiTextPopup_Dtor; scalar-deleting wrapper @439aa0) — vptr
+    // dwGuiTextPopup_Dtor (scalar-deleting wrapper dwGuiTextPopup_DtorDelete) — vptr
     // re-point + base dtor only (implicit here).
     virtual ~dwGuiTextPopup();
 
-    // vtbl +0x44 @439b00 — EnsureImages (virtual); blit pImagePressed when
+    // vtbl +0x44 dwGuiTextPopup_Draw — EnsureImages (virtual); blit pImagePressed when
     // bHot else pImageNormal (when loaded); then, while bChecked or bHot and
     // a font + label exist, draw labelText in a rect vertically centered on
     // the font line height, colorHot when bHot else colorNormal (NOTE: color
@@ -111,9 +111,9 @@ struct dwGuiTextPopup : dwGuiTextButton
 // ---- dwGuiTextSlider -----------------------------------------------------------
 //
 // Binary layout: dwWidget @0x00 + fields from 0x10 — sizeof 0x34. vtable
-// @0x51fd38 (dwGuiTextSlider_vtbl), 19 slots: overrides dtor/+0x14 Update/
+// dwGuiTextSlider_vtbl, 19 slots: overrides dtor/+0x14 Update/
 // +0x44 Draw and appends the NEW +0x48 SetText (this class's own slot; its
-// body @439d80 is COMDAT-shared with dwGuiTypewriter's +0x48).
+// body dwGuiTextSlider_SetText is COMDAT-shared with dwGuiTypewriter's +0x48).
 //
 // Marquee: scrollRect starts one rect-width left of the widget (right edge at
 // widget left, width = widget width - 50) and slides right; the advance per
@@ -136,20 +136,20 @@ struct dwGuiTextSlider : dwWidget
     float scrollSpeed;   // 0x28: seconds per full-width slide (0 = draw nothing)
     dwRect scrollRect;   // 0x2c (Ghidra: scrollL/T/R/B shorts): the marquee rect
 
-    // @439c10 (dwGuiTextSlider_Ctor)
+    // dwGuiTextSlider_Ctor
     dwGuiTextSlider(dwRect* pRect, char* pFontName, uint8_t textColor,
                     float scrollSpeed, uint8_t shadowColor, char* pText);
-    // @439d10 (dwGuiTextSlider_Dtor; scalar-deleting wrapper @439cf0) — the
-    // font handle "dtor" @504190 is a lone RET; only the handle is freed.
+    // dwGuiTextSlider_Dtor (scalar-deleting wrapper dwGuiTextSlider_DtorDelete) — the
+    // font handle "dtor" sithRender_Open is a lone RET; only the handle is freed.
     virtual ~dwGuiTextSlider();
 
-    // vtbl +0x14 @439db0
+    // vtbl +0x14 dwGuiTextSlider_Update
     virtual void Update(float dt);
-    // vtbl +0x44 @439e60
+    // vtbl +0x44 dwGuiTextSlider_Draw
     virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect);
 
     // NEW virtual — appended after dwWidget's +0x44 Draw.
-    // vtbl +0x48 @439d80 (dwGuiTextSlider_SetText, COMDAT shared with
+    // vtbl +0x48 dwGuiTextSlider_SetText (COMDAT shared with
     // dwGuiTypewriter) — scrollTimer = 0; label = pText; Invalidate.
     virtual void SetText(char* pText);
 };
@@ -157,8 +157,8 @@ struct dwGuiTextSlider : dwWidget
 // ---- dwGuiTextSpitter -----------------------------------------------------------
 //
 // Binary layout: dwWidget @0x00 + fields from 0x10 — sizeof 0x70. vtable
-// @0x51fd88 (dwGuiTextSpitter_vtbl), 19 slots: overrides dtor/+0x14 Update/
-// +0x44 Draw + NEW +0x48 SetText @43a1a0.
+// dwGuiTextSpitter_vtbl, 19 slots: overrides dtor/+0x14 Update/
+// +0x44 Draw + NEW +0x48 SetText dwGuiTextSpitter_SetText.
 //
 // Character fly-in reveal: the current char slides from the widget's right
 // edge toward the end of the revealed text (mode == 0; mode != 0 reveals
@@ -193,27 +193,27 @@ struct dwGuiTextSpitter : dwWidget
     dwPoint extentEnd;  // 0x60 (Ghidra: typed int): wrapped extent up to pEndChar
     dwString spitSound; // 0x64: per-landing tick sound name
 
-    // @439f20 (dwGuiTextSpitter_Ctor)
+    // dwGuiTextSpitter_Ctor
     dwGuiTextSpitter(dwRect* pRect, char* pFontName, uint8_t color1, int mode,
                      char* pSpitSound, uint8_t color2, char* pText);
-    // @43a0f0 (dwGuiTextSpitter_Dtor; scalar-deleting wrapper @43a0d0) —
+    // dwGuiTextSpitter_Dtor (scalar-deleting wrapper dwGuiTextSpitter_DtorDelete) —
     // free the font handle, stop the tick when still playing; strings free
     // via member dtors here.
     virtual ~dwGuiTextSpitter();
 
-    // vtbl +0x14 @43a230
+    // vtbl +0x14 dwGuiTextSpitter_Update
     virtual void Update(float dt);
-    // vtbl +0x44 @43a4e0
+    // vtbl +0x44 dwGuiTextSpitter_Draw
     virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect);
 
     // NEW virtual — appended after dwWidget's +0x44 Draw.
-    // vtbl +0x48 @43a1a0 (dwGuiTextSpitter_SetText) — text = pText;
+    // vtbl +0x48 dwGuiTextSpitter_SetText — text = pText;
     // Invalidate. QUIRK: does NOT reset the reveal state/cursors.
     virtual void SetText(char* pText);
 
     // -- non-virtual methods ---------------------------------------------------
 
-    // @43a1c0 (dwGuiTextSpitter_UpdateCharExtent) — charWidth = width of
+    // dwGuiTextSpitter_UpdateCharExtent — charWidth = width of
     // *pCh; reset charRect to the fly-in start: mode 0 just past the widget's
     // RIGHT edge, else charWidth left of the widget's LEFT edge.
     void UpdateCharExtent(char* pCh);
@@ -222,7 +222,7 @@ struct dwGuiTextSpitter : dwWidget
 // ---- dwGuiTextStrip -----------------------------------------------------------
 //
 // Binary layout: dwWidget @0x00 + fields from 0x10 — sizeof 0x30. vtable
-// @0x51fdd8 (dwGuiTextStrip_vtbl), 18 slots: overrides only dtor/+0x14
+// dwGuiTextStrip_vtbl, 18 slots: overrides only dtor/+0x14
 // Update/+0x44 Draw (NO SetText slot). Same marquee state machine as
 // dwGuiTextSlider, but Draw blend-fills the scroll rect with `color` instead
 // of drawing text; `label` is default-constructed and never used (binary
@@ -236,26 +236,26 @@ struct dwGuiTextStrip : dwWidget
     dwString label;    // 0x1c: dead field (never assigned/read after the ctor)
     dwRect scrollRect; // 0x28 (Ghidra: scrollL/T/R/B shorts)
 
-    // @43a6a0 (dwGuiTextStrip_Ctor)
+    // dwGuiTextStrip_Ctor
     dwGuiTextStrip(dwRect* pRect, uint8_t color, float scrollSpeed);
-    // @43a760 (dwGuiTextStrip_Dtor; scalar-deleting wrapper @43a740) — label
+    // dwGuiTextStrip_Dtor (scalar-deleting wrapper dwGuiTextStrip_DtorDelete) — label
     // free + base only (implicit here).
     virtual ~dwGuiTextStrip();
 
-    // vtbl +0x14 @43a7b0 — identical math to dwGuiTextSlider::Update.
+    // vtbl +0x14 dwGuiTextStrip_Update — identical math to dwGuiTextSlider::Update.
     virtual void Update(float dt);
-    // vtbl +0x44 @43a860
+    // vtbl +0x44 dwGuiTextStrip_Draw
     virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect);
 };
 
 // ---- dwGuiTimer -----------------------------------------------------------
 //
 // Binary layout: dwWcChildDecorator @0x00 (0x14; Ghidra's pTarget@0x10 IS the
-// decorator's pChild) + fields from 0x14 — sizeof 0x20. vtable @0x51fe28
+// decorator's pChild) + fields from 0x14 — sizeof 0x20. dwGuiTimer_vtbl
 // (dwGuiTimer_vtbl): every slot is the dwWcChildDecorator forwarder except
-// +0x00 dtor (the binary body @43a9d0 re-points the vptr and repeats the
+// +0x00 dtor (the binary body dwGuiTimer_Dtor re-points the vptr and repeats the
 // decorator dtor — FreeImages + delete child; implicit here) and +0x14
-// Update. TIMER keyword (dwGuiScreen_CreateControl2 @430fed parses
+// Update. TIMER keyword (dwGuiScreen_CreateControl2 parses
 // "TIMER <startTime> <duration> <child control...>"), also built directly by
 // dwWcEntryPanel::ShowEntry (through the dwGuiTimer_New shim above).
 //
@@ -271,20 +271,20 @@ struct dwGuiTimer : dwWcChildDecorator
     float duration;  // 0x18: seconds until the child is hidden again (0 = never)
     float elapsed;   // 0x1c
 
-    // @43a8c0 (dwGuiTimer_Ctor) — decorator base (widget rect copied from
+    // dwGuiTimer_Ctor — decorator base (widget rect copied from
     // the child); Disable()s the child when it starts enabled; elapsed = 0.
     dwGuiTimer(dwWidget* pTarget, float startTime, float duration);
-    // (no own dtor — @43a9d0/@43a9b0 are exactly ~dwWcChildDecorator)
+    // (no own dtor — dwGuiTimer_Dtor/dwGuiTimer_DtorDelete are exactly ~dwWcChildDecorator)
 
-    // vtbl +0x14 @43a940
+    // vtbl +0x14 dwGuiTimer_Update
     virtual void Update(float dt);
 };
 
 // ---- dwGuiTypewriter -----------------------------------------------------------
 //
 // Binary layout: dwWidget @0x00 + fields from 0x10 — sizeof 0x48. vtable
-// @0x51fe78 (dwGuiTypewriter_vtbl), 19 slots: overrides dtor/+0x14 Update/
-// +0x44 Draw + NEW +0x48 SetText (the SAME COMDAT body @439d80 as
+// dwGuiTypewriter_vtbl, 19 slots: overrides dtor/+0x14 Update/
+// +0x44 Draw + NEW +0x48 SetText (the SAME COMDAT body dwGuiTextSlider_SetText as
 // dwGuiTextSlider::SetText — both classes keep their timer at 0x24 and their
 // text dwString at 0x10, so the shared body works for both).
 //
@@ -309,21 +309,21 @@ struct dwGuiTypewriter : dwWidget
     dwString tickSound;   // 0x38: per-char tick sound name
     uint8_t bRightAlign;  // 0x44
 
-    // @43aa30 (dwGuiTypewriter_Ctor)
+    // dwGuiTypewriter_Ctor
     dwGuiTypewriter(dwRect* pRect, char* pFontName, uint8_t textColor,
                     float revealDuration, char* pTickSound, uint8_t color2,
                     uint8_t bRightAlign, char* pText);
-    // @43ab30 (dwGuiTypewriter_Dtor; scalar-deleting wrapper @43ab10) —
+    // dwGuiTypewriter_Dtor (scalar-deleting wrapper dwGuiTypewriter_DtorDelete) —
     // free the font handle, stop the tick when still playing.
     virtual ~dwGuiTypewriter();
 
-    // vtbl +0x14 @43abe0
+    // vtbl +0x14 dwGuiTypewriter_Update
     virtual void Update(float dt);
-    // vtbl +0x44 @43acd0
+    // vtbl +0x44 dwGuiTypewriter_Draw
     virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect);
 
     // NEW virtual — appended after dwWidget's +0x44 Draw.
-    // vtbl +0x48 @439d80 (COMDAT shared with dwGuiTextSlider::SetText) —
+    // vtbl +0x48 (COMDAT shared with dwGuiTextSlider::SetText) —
     // revealTimer = 0; text = pText; Invalidate.
     virtual void SetText(char* pText);
 };

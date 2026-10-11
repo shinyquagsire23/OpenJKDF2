@@ -3,11 +3,11 @@
 // widget player) and dwGuiAnimView (MI reference-room anim viewer), plus the
 // dwAnim_Open factory.
 //
-// Decompiled from DroidWorks.exe, unit range 0x401000-0x404010 (widget half;
+// Decompiled from DroidWorks.exe (widget half;
 // the segment half is dwMovie.cpp, the rdKeyframe helpers dwKeyframe.c).
-// vtables: dwAnimBase 0x51e1d0 · dwAnim 0x51e000 · dwGuiAnimView 0x51e180
-// (primary) + 0x51e138 (dwWidgetGroup secondary; the compiler regenerates
-// the binary's this-adjustor thunks @403780-4037e0).
+// vtables: dwAnimBase dwAnimBase_vtbl · dwAnim dwAnim_vtbl · dwGuiAnimView dwGuiAnimView_vtbl
+// (primary) + dwGuiAnimView_scn_vtbl (dwWidgetGroup secondary; the compiler regenerates
+// the binary's this-adjustor thunks).
 //
 // Adaptations (all marked // Note: below):
 //  - jk_logtofile -> stdPlatform_Printf (the binary's jk_logtofile is a
@@ -28,17 +28,17 @@
 #include "jk.h"
 #include "stdPlatform.h"
 
-extern "C" HostServices* dwMain_pHS; // the DW host-services pointer (dwMain.c); binary global dwHS @0x6b6258
+extern "C" HostServices* dwMain_pHS; // the DW host-services pointer (dwMain.c); binary global dwHS
 
 // Provided by the stdBitmapRle2 engine-side unit (P8, stdBitmapRle2.cpp). The
 // binary split each call into `operator new(0x18)` + a __thiscall ctor
-// (@442df0 / @442ec0); these 64-bit factories fold that pair.
-extern "C" dwImage* stdBitmapRle2_Instantiate(int16_t width, int16_t height, int bpp);         // @442df0
-extern "C" dwImage* stdBitmapRle2_InstantiateCopy(dwImage* pSrc, int16_t width, int16_t height); // @442ec0
+// (stdBitmapRle2_Ctor / stdBitmapRle2_ToVBuffer); these 64-bit factories fold that pair.
+extern "C" dwImage* stdBitmapRle2_Instantiate(int16_t width, int16_t height, int bpp);
+extern "C" dwImage* stdBitmapRle2_InstantiateCopy(dwImage* pSrc, int16_t width, int16_t height);
 
 // ---- dwAnimBase -------------------------------------------------------------
 
-// @4038f0 (dwAnimBase_Ctor)
+// dwAnimBase_Ctor
 dwAnimBase::dwAnimBase(dwRect* pRect, int msgCode, uint8_t bLoop)
     : dwWidget(pRect)
 {
@@ -47,13 +47,13 @@ dwAnimBase::dwAnimBase(dwRect* pRect, int msgCode, uint8_t bLoop)
     this->bLoop = bLoop;
 }
 
-// @403940 (dwAnimBase_Dtor; scalar-deleting wrapper @403920) — vptr re-point
+// dwAnimBase_Dtor (scalar-deleting wrapper dwAnimBase_DtorDelete) — vptr re-point
 // + dwWidget base dtor only, both implicit here.
 dwAnimBase::~dwAnimBase()
 {
 }
 
-// vtbl +0x1c @403950 (dwAnimBase_OnMessage) — toggle on our message code.
+// vtbl +0x1c dwAnimBase_OnMessage — toggle on our message code.
 // Always returns 0 (the binary returns with AL's surroundings masked off).
 int dwAnimBase::OnMessage(dwWidgetMsg* pMsg)
 {
@@ -67,14 +67,14 @@ int dwAnimBase::OnMessage(dwWidgetMsg* pMsg)
     return 0;
 }
 
-// vtbl +0x48 @403980 (dwAnimBase_Play)
+// vtbl +0x48 dwAnimBase_Play
 void dwAnimBase::Play()
 {
     this->bPlaying = 1;
     this->Invalidate(); // binary: tail-jump through vtbl +0x34
 }
 
-// vtbl +0x4c @403990 (dwAnimBase_Stop) — stop + broadcast "anim finished".
+// vtbl +0x4c dwAnimBase_Stop — stop + broadcast "anim finished".
 void dwAnimBase::Stop()
 {
     dwWidgetMsg msg;
@@ -93,7 +93,7 @@ void dwAnimBase::Stop()
 
 // ---- dwAnim -------------------------------------------------------------------
 
-// @401000 (dwAnim_Ctor)
+// dwAnim_Ctor
 dwAnim::dwAnim(dwRect* pRect, const char* pFilename, int msgCode, uint8_t bLoop, float fps)
     : dwAnimBase(pRect, msgCode, bLoop)
     , fps(fps)
@@ -107,18 +107,18 @@ dwAnim::dwAnim(dwRect* pRect, const char* pFilename, int msgCode, uint8_t bLoop,
     if (pFilename != NULL)
     {
         this->filename.AssignCStr(pFilename);
-        dwAnim::EnsureImages(); // binary: direct call @401200 (frames loaded in the ctor)
+        dwAnim::EnsureImages(); // binary: direct call dwAnim_EnsureLoaded (frames loaded in the ctor)
     }
 }
 
-// @4010c0 (dwAnim_Dtor; scalar-deleting wrapper @4010a0)
+// dwAnim_Dtor (scalar-deleting wrapper dwAnim_DtorDelete)
 dwAnim::~dwAnim()
 {
-    dwAnim::FreeImages(); // binary: direct call @4013c0
+    dwAnim::FreeImages(); // binary: direct call dwAnim_FreeFrames
     // filename ~dwString + base dtors run implicitly.
 }
 
-// vtbl +0x14 @401120 (dwAnim_Update)
+// vtbl +0x14 dwAnim_Update
 void dwAnim::Update(float dt)
 {
     uint32_t frame;
@@ -151,7 +151,7 @@ void dwAnim::Update(float dt)
     this->bUpdatedThisFrame = 0; // cleared unconditionally (faithful)
 }
 
-// vtbl +0x3c @401200 (Ghidra: dwAnim_EnsureLoaded — the EnsureImages slot).
+// vtbl +0x3c (Ghidra: dwAnim_EnsureLoaded — the EnsureImages slot).
 // Decodes the whole FLC up front. Frame 0 gets a fresh WxH 8bpp RLE image;
 // every later frame is constructed as a COPY of the previous frame's image
 // so the FLC delta chunks accumulate correctly.
@@ -209,7 +209,7 @@ void dwAnim::EnsureImages()
     dwFlic_Close(&flic);
 }
 
-// vtbl +0x40 @4013c0 (Ghidra: dwAnim_FreeFrames — the FreeImages slot)
+// vtbl +0x40 (Ghidra: dwAnim_FreeFrames — the FreeImages slot)
 void dwAnim::FreeImages()
 {
     uint32_t i;
@@ -227,7 +227,7 @@ void dwAnim::FreeImages()
     this->paFrames = NULL;
 }
 
-// vtbl +0x44 @4011c0 (dwAnim_Draw)
+// vtbl +0x44 dwAnim_Draw
 void dwAnim::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     dwImage* pImg;
@@ -242,7 +242,7 @@ void dwAnim::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
         pImg->Blit(pDestBits, this->left, this->top, pClipRect); // vtbl +0x04
 }
 
-// @401190 (dwAnim_Play — non-virtual overload; the +0x48 virtual slot keeps
+// (dwAnim_Play — non-virtual overload; the +0x48 virtual slot keeps
 // dwAnimBase_Play). bSkipUpdate lands in bUpdatedThisFrame, making the next
 // Update tick a no-op (callers pass 1 right after selecting a new anim).
 void dwAnim::Play(uint8_t bSkipUpdate)
@@ -253,11 +253,11 @@ void dwAnim::Play(uint8_t bSkipUpdate)
     {
         this->curFrame = 0;
         this->accumTimeSec = 0.0f;
-        this->dwAnimBase::Play(); // binary: direct (non-virtual) call @403980
+        this->dwAnimBase::Play(); // binary: direct (non-virtual) call
     }
 }
 
-// @4037f0 (dwAnim_Open) — extension-dispatch factory.
+// dwAnim_Open — extension-dispatch factory.
 dwAnim* dwAnim_Open(dwRect* pRect, char* pFilename, int msgCode, uint8_t bLoop)
 {
     dwAnim* pAnim;
@@ -290,8 +290,8 @@ dwAnim* dwAnim_Open(dwRect* pRect, char* pFilename, int msgCode, uint8_t bLoop)
 
 // ---- dwGuiAnimView ---------------------------------------------------------------
 
-// Item ctor (inlined in @4031f0 dwGuiAnimView_AddItem; freed by @4036b0
-// dwGuiAnimView_ItemDtor / @403690 dwGuiAnimView_ItemDtorDelete).
+// Item ctor (inlined dwGuiAnimView_AddItem; freed by dwGuiAnimView_ItemDtor
+// dwGuiAnimView_ItemDtor / dwGuiAnimView_ItemDtorDelete).
 dwGuiAnimViewItem::dwGuiAnimViewItem(const char* pAnimFile, int code, uint8_t flag,
                                      const char* pImageFile, const char* pExtraFile)
     : animFile(pAnimFile, 0)
@@ -302,7 +302,7 @@ dwGuiAnimViewItem::dwGuiAnimViewItem(const char* pAnimFile, int code, uint8_t fl
 {
 }
 
-// @402cf0 (dwGuiAnimView_Ctor)
+// dwGuiAnimView_Ctor
 dwGuiAnimView::dwGuiAnimView(dwRect* pRect, const char* pImageFilename, int itemCode)
     : dwAnimBase(pRect, 0, 1)
     , dwWidgetGroup(pRect)
@@ -315,11 +315,11 @@ dwGuiAnimView::dwGuiAnimView(dwRect* pRect, const char* pImageFilename, int item
     , pAnimPlayer(NULL)
 {
     this->filename.AssignCStr(pImageFilename);
-    dwGuiAnimView::EnsureImages(); // binary: direct call @403500
+    dwGuiAnimView::EnsureImages(); // binary: direct call
 }
 
-// @402dd0 (dwGuiAnimView_Dtor; primary DtorDelete @402db0, group-vtbl thunk
-// @403780)
+// dwGuiAnimView_Dtor (primary dwGuiAnimView_DtorDelete, group-vtbl thunk
+// dwGuiAnimView_DtorDelete_Thunk)
 dwGuiAnimView::~dwGuiAnimView()
 {
     dwListNode* pSent;
@@ -344,7 +344,7 @@ dwGuiAnimView::~dwGuiAnimView()
         pNext = pNode->pNext;
         this->items.UnlinkFreeNode(pNode);
         if (pItem != NULL)
-            delete pItem; // @403690 (dwGuiAnimView_ItemDtorDelete)
+            delete pItem; // dwGuiAnimView_ItemDtorDelete
         pNode = pNext;
     }
     this->items.Free();
@@ -354,15 +354,15 @@ dwGuiAnimView::~dwGuiAnimView()
     // implicitly, matching the binary's tail sequence.
 }
 
-// vtbl +0x14 @403450 (dwGuiAnimView_Update; group-vtbl thunk @403790)
+// vtbl +0x14 dwGuiAnimView_Update (group-vtbl thunk dwGuiAnimView_Update_Thunk)
 void dwGuiAnimView::Update(float dt)
 {
     if (this->dwAnimBase::bEnabled != 0 && this->pAnimPlayer != NULL)
         this->pAnimPlayer->Update(dt); // virtual +0x14
-    this->dwWidgetGroup::Update(dt);   // binary: direct (non-virtual) call @444620
+    this->dwWidgetGroup::Update(dt);   // binary: direct (non-virtual) call
 }
 
-// vtbl +0x18 @4032c0 (dwGuiAnimView_OnHover; group-vtbl thunk @4037a0) —
+// vtbl +0x18 dwGuiAnimView_OnHover (group-vtbl thunk dwGuiAnimView_OnHover_Thunk) —
 // same body shape as the shared dwWidget_OnHoverNotify COMDAT, with this
 // view's itemCode as the payload.
 int dwGuiAnimView::OnHover(int16_t x, int16_t y)
@@ -372,7 +372,7 @@ int dwGuiAnimView::OnHover(int16_t x, int16_t y)
     return this->dwAnimBase::OnHoverNotify((void*)(intptr_t)this->itemCode);
 }
 
-// vtbl +0x1c @403050 (dwGuiAnimView_OnMessage; group-vtbl thunk @4037b0)
+// vtbl +0x1c dwGuiAnimView_OnMessage (group-vtbl thunk dwGuiAnimView_OnMessage_Thunk)
 int dwGuiAnimView::OnMessage(dwWidgetMsg* pMsg)
 {
     dwListNode* pSent;
@@ -436,7 +436,7 @@ int dwGuiAnimView::OnMessage(dwWidgetMsg* pMsg)
         }
         if (this->pAnimPlayer != NULL)
         {
-            this->pAnimPlayer->Play((uint8_t)1); // the @401190 overload (skip next Update)
+            this->pAnimPlayer->Play((uint8_t)1); // the dwAnim_Play overload (skip next Update)
             this->bPlaying = 1;
             this->dwAnimBase::Invalidate();
             this->dwWidgetGroup::Invalidate();
@@ -450,20 +450,20 @@ int dwGuiAnimView::OnMessage(dwWidgetMsg* pMsg)
         this->dwWidgetGroup::Invalidate();
     }
 
-    return dwAnimBase::OnMessage(pMsg); // binary: direct call @403950
+    return dwAnimBase::OnMessage(pMsg); // binary: direct call
 }
 
-// vtbl +0x3c @403500 (dwGuiAnimView_EnsureImages; group-vtbl thunk @4037c0)
+// vtbl +0x3c dwGuiAnimView_EnsureImages (group-vtbl thunk dwGuiAnimView_EnsureImages_Thunk)
 void dwGuiAnimView::EnsureImages()
 {
     if (this->pImage == NULL && this->filename.length != 0)
         this->pImage = dwImage_LoadFile(this->filename.pBuffer);
     if (this->pAnimPlayer != NULL)
         this->pAnimPlayer->EnsureImages(); // virtual +0x3c
-    this->dwWidgetGroup::EnsureImages();   // binary: direct call @4447e0
+    this->dwWidgetGroup::EnsureImages();   // binary: direct call
 }
 
-// vtbl +0x40 @403540 (dwGuiAnimView_FreeImages; group-vtbl thunk @4037d0)
+// vtbl +0x40 dwGuiAnimView_FreeImages (group-vtbl thunk dwGuiAnimView_FreeImages_Thunk)
 void dwGuiAnimView::FreeImages()
 {
     if (this->pImage != NULL)
@@ -473,10 +473,10 @@ void dwGuiAnimView::FreeImages()
     }
     if (this->pAnimPlayer != NULL)
         this->pAnimPlayer->FreeImages(); // virtual +0x40
-    this->dwWidgetGroup::FreeImages();   // binary: direct call @43c040
+    this->dwWidgetGroup::FreeImages();   // binary: direct call dwWidgetGroup_FreeChildImages
 }
 
-// vtbl +0x44 @403480 (dwGuiAnimView_Draw; group-vtbl thunk @4037e0)
+// vtbl +0x44 dwGuiAnimView_Draw (group-vtbl thunk dwGuiAnimView_Draw_Thunk)
 void dwGuiAnimView::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     dwRect clip;
@@ -494,13 +494,13 @@ void dwGuiAnimView::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
         {
             clip = *pClipRect;
             dwRect_Clip(&clip, this->pAnimPlayer->GetRectPtr());
-            this->pAnimPlayer->DrawChild(pDestBits, &clip); // @4424b0
+            this->pAnimPlayer->DrawChild(pDestBits, &clip);
         }
     }
-    this->dwWidgetGroup::Draw(pDestBits, pClipRect); // binary: direct call @444730
+    this->dwWidgetGroup::Draw(pDestBits, pClipRect); // binary: direct call
 }
 
-// @4031f0 (dwGuiAnimView_AddItem) — push-back onto the item list.
+// dwGuiAnimView_AddItem — push-back onto the item list.
 void dwGuiAnimView::AddItem(const char* pAnimFile, int code, uint8_t flag,
                             const char* pImageFile, const char* pExtraFile)
 {
@@ -511,7 +511,7 @@ void dwGuiAnimView::AddItem(const char* pAnimFile, int code, uint8_t flag,
     this->itemCount = this->itemCount + 1;
 }
 
-// @4032f0 (dwGuiAnimView_AddHypTextChild) — build a "BLN"-format (word-wrap,
+// dwGuiAnimView_AddHypTextChild — build a "BLN"-format (word-wrap,
 // left, normal glyphs) dwGuiHypText caption child and push-FRONT it onto the
 // group. param_4 is the glyph color index and param_5 the font name — kept
 // as ints to match the original decompiled signature (TODO(dw-decomp):
@@ -530,13 +530,13 @@ void dwGuiAnimView::AddHypTextChild(char* pText, dwPoint pos, dwPoint size, int 
 
     // Note: the binary null-checked the 0x48 allocation and still inserted
     // the NULL payload on failure; unreachable with new.
-    pChild = new dwGuiHypText(&rect, NULL, (char*)(uintptr_t)param_5, (uint8_t)param_4, (char*)"BLN"); // @438690
+    pChild = new dwGuiHypText(&rect, NULL, (char*)(uintptr_t)param_5, (uint8_t)param_4, (char*)"BLN");
     pChild->text.Free();     // drop any current text so SetText replaces (it appends)
     pChild->SetText(pText);  // virtual +0x48
     this->children.InsertAfter(this->children.pSentinel, pChild); // push-FRONT
 }
 
-// @4033d0 (dwGuiAnimView_InitFirstFrame)
+// dwGuiAnimView_InitFirstFrame
 void dwGuiAnimView::InitFirstFrame()
 {
     dwListNode* pFirst;

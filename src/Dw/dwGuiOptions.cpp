@@ -1,5 +1,5 @@
-// dwGuiOptions — main-menu / sign-in / options flow (DroidWorks.exe
-// 0x423180-0x42607f): dwGuiRanking + dwGuiLongAgo + dwGuiOpening +
+// dwGuiOptions — main-menu / sign-in / options flow (DroidWorks.exe):
+// dwGuiRanking + dwGuiLongAgo + dwGuiOpening +
 // dwGuiOptions + the dwGuiIntroSeg / dwGuiOptionsEnterSeg sequencers.
 // See Dw/dwGuiOptions.h for the per-class notes.
 
@@ -40,10 +40,10 @@ extern "C" {
 
 // dw-core globals owned by the P7 boot flow (dwMain.c placeholders /
 // dwInits.cpp temporaries) — same per-file extern pattern as the other units.
-extern "C" dwStringTable* dwCore_pGlobalStrings; // @0x53d958
-extern "C" dwListNode* dwCore_pWorkspaceNodes;   // @0x53d984
-extern "C" dwListNode* dwCore_pBlueprintList;    // @0x53d964
-extern "C" dwString dwCore_workspaceName;        // @0x53d978
+extern "C" dwStringTable* dwCore_pGlobalStrings;
+extern "C" dwListNode* dwCore_pWorkspaceNodes;
+extern "C" dwListNode* dwCore_pBlueprintList;
+extern "C" dwString dwCore_workspaceName;
 
 #include <ctype.h> // isspace (binary CRT FUN_00507d80)
 
@@ -55,16 +55,16 @@ extern "C" dwString dwCore_workspaceName;        // @0x53d978
 // record (binary DAT_0053d954; written by dwGuiOptions_ResetGameState +
 // dwGuiMissionMap, read by dwGuiRanking/dwGuiStatus). Needs a dwMain.c
 // placeholder alongside dwCore_pMissionList.
-extern "C" dwMission* dwCore_pCurrentMission; // @0x53d954
+extern "C" dwMission* dwCore_pCurrentMission;
 
 // TODO(dw-decomp): provided by dwGuiInGame (P6 wave 2) — the running-mission
 // screen instance (NULL outside gameplay). dwGuiRanking's checkboxes go live
 // against the player inventory while it is set.
 typedef struct dwGuiInGame dwGuiInGame;
-extern "C" dwGuiInGame* dwGuiInGame_pActive; // @0x53e800
+extern "C" dwGuiInGame* dwGuiInGame_pActive;
 
 // TODO(dw-decomp): needs a one-line addition to dwSegment.cpp/.h — clear the
-// module-static quit flag dwSegment_bQuit (@0x53e8ac; set by
+// module-static quit flag dwSegment_bQuit (set by
 // dwSegment_SignalQuit). The binary's menu command 6000+0xa stores 0 to it
 // directly ("cancel quit" from the confirm-quit sub-screen).
 extern "C" void dwSegment_CancelQuit(void);
@@ -74,13 +74,13 @@ extern "C" int dwGuiDialog_RunModal(const char* pConfName, const char* pMsgKey);
 
 // stdBitmapRle2 image factory — P8 placeholder implemented in dwAnim.cpp
 // (returns NULL until the engine-side unit lands).
-extern "C" dwImage* stdBitmapRle2_Instantiate(int16_t width, int16_t height, int bpp); // @442df0
+extern "C" dwImage* stdBitmapRle2_Instantiate(int16_t width, int16_t height, int bpp);
 
 // ---------------------------------------------------------------------------
 // Module data
 // ---------------------------------------------------------------------------
 
-// @0x51f378 (referenced as dwGuiOpening_vtbl+0x20 by Ghidra): the six
+// (referenced as dwGuiOpening_vtbl+0x20 by Ghidra): the six
 // sub-screen script names, indexed by dwGuiOptions::screenIndex.
 static const char* dwGuiOptions_aSubScreenNames[6] = {
     "optMain",     // 0
@@ -144,7 +144,7 @@ static void dwGuiOptions_BlackoutScreen(void)
 // dwMovie_OpenSeg — the movie-SEGMENT factory
 // ---------------------------------------------------------------------------
 
-// @4029c0 (Ghidra: jkSmack_SmackPlay — VT-inherited misnomer). Physically part
+// (Ghidra: jkSmack_SmackPlay — VT-inherited misnomer). Physically part
 // of the dwAnim/dwMovie unit (P3, missed there); implemented here because
 // this unit and the boot flow are its callers. FLC/FLI -> dwFlicSeg,
 // SAN -> dwSmushSeg (libsmusher playback since P8).
@@ -178,7 +178,7 @@ extern "C" dwSegment* dwMovie_OpenSeg(const char* pFilename, dwImage* pOverlayIm
 // dwGuiRanking — the STATS_JOB mission rank/requirements card
 // ---------------------------------------------------------------------------
 
-// @423180 (dwGuiRanking_Ctor)
+// dwGuiRanking_Ctor
 dwGuiRanking::dwGuiRanking(dwRect* pRect, char* pFontLabelName, uint8_t labelColor_,
                            char* pFontValueName, uint8_t valueColor_)
     : dwWidget(pRect)
@@ -210,17 +210,17 @@ dwGuiRanking::dwGuiRanking(dwRect* pRect, char* pFontLabelName, uint8_t labelCol
     this->OnMessage(&msg);
 }
 
-// @4232f0 (dwGuiRanking_Dtor; scalar-deleting wrapper @4232d0)
+// dwGuiRanking_Dtor (scalar-deleting wrapper dwGuiRanking_DtorDelete)
 dwGuiRanking::~dwGuiRanking()
 {
-    // (binary: no-op font "dtor" @504190 + free — see dwFont.h conventions)
+    // (binary: no-op font "dtor" sithRender_Open + free — see dwFont.h conventions)
     if (this->pFontLabel != NULL)
         delete this->pFontLabel;
     if (this->pFontValue != NULL)
         delete this->pFontValue;
 }
 
-// vtbl +0x18 @4239d0 (dwGuiRanking_OnHover)
+// vtbl +0x18 dwGuiRanking_OnHover
 int dwGuiRanking::OnHover(int16_t x, int16_t y)
 {
     (void)x;
@@ -234,7 +234,7 @@ int dwGuiRanking::OnHover(int16_t x, int16_t y)
     return 1;
 }
 
-// vtbl +0x1c @423a00 (dwGuiRanking_OnMessage)
+// vtbl +0x1c dwGuiRanking_OnMessage
 int dwGuiRanking::OnMessage(dwWidgetMsg* pMsg)
 {
     if (pMsg->code == 0xbbc)
@@ -265,7 +265,7 @@ int dwGuiRanking::OnMessage(dwWidgetMsg* pMsg)
     return 0;
 }
 
-// vtbl +0x44 @423370 (dwGuiRanking_Draw)
+// vtbl +0x44 dwGuiRanking_Draw
 void dwGuiRanking::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     if (this->pMission == NULL || this->pFontLabel == NULL || this->pFontValue == NULL)
@@ -409,7 +409,7 @@ dwGuiIntroSeg::dwGuiIntroSeg()
     this->state = 0;
 }
 
-// vtbl +0x00 @423b10 (Ghidra: dwGuiIntroSeg_Update — the Activate slot; the
+// vtbl +0x00 (Ghidra: dwGuiIntroSeg_Update — the Activate slot; the
 // segment manager re-Activates this segment after every interruption, which
 // steps the state machine)
 int dwGuiIntroSeg::Activate()
@@ -495,7 +495,7 @@ dwGuiOptionsEnterSeg::dwGuiOptionsEnterSeg(int screenIndex_)
     this->bStarted = 0;
 }
 
-// vtbl +0x00 @425fa0 (Ghidra: dwGuiOptions_EnterSeg_Update — the Activate slot)
+// vtbl +0x00 (Ghidra: dwGuiOptions_EnterSeg_Update — the Activate slot)
 int dwGuiOptionsEnterSeg::Activate()
 {
     dwSegment* pSeg = NULL;
@@ -537,7 +537,7 @@ extern "C" dwSegment* dwGuiOptions_New(int index)
 // dwGuiLongAgo — the palette-fade intro card
 // ---------------------------------------------------------------------------
 
-// @423e80 (dwGuiLongAgo_Ctor)
+// dwGuiLongAgo_Ctor
 dwGuiLongAgo::dwGuiLongAgo()
     : dwGuiScreen("longago", NULL)
 {
@@ -546,13 +546,13 @@ dwGuiLongAgo::dwGuiLongAgo()
     this->fadeTimer = 0.0f;
 }
 
-// @423ee0 (dwGuiLongAgo_Dtor; scalar-deleting wrapper @423ec0; secondary
-// thunk @424ad0) — the binary body is just the inlined base teardown.
+// dwGuiLongAgo_Dtor (scalar-deleting wrapper dwGuiLongAgo_DtorDelete; secondary
+// thunk dwGuiLongAgo_ScnDtorThunk) — the binary body is just the inlined base teardown.
 dwGuiLongAgo::~dwGuiLongAgo()
 {
 }
 
-// scn vtbl +0x00 @423ef0 (dwGuiLongAgo_OnActivate)
+// scn vtbl +0x00 dwGuiLongAgo_OnActivate
 int dwGuiLongAgo::Activate()
 {
     int ret = dwGuiScreen::Activate();
@@ -564,7 +564,7 @@ int dwGuiLongAgo::Activate()
     return ret;
 }
 
-// scn vtbl +0x04 @423fd0 (dwGuiLongAgo_OnDeactivate)
+// scn vtbl +0x04 dwGuiLongAgo_OnDeactivate
 void dwGuiLongAgo::Deactivate()
 {
     dwGuiScreen::Deactivate();
@@ -577,7 +577,7 @@ void dwGuiLongAgo::Deactivate()
     stdPalEffects_FreeRequest((uint32_t)this->palFadeId);
 }
 
-// vtbl +0x14 @424110 (dwGuiLongAgo_Update)
+// vtbl +0x14 dwGuiLongAgo_Update
 void dwGuiLongAgo::Update(float dt)
 {
     float fade = 1.0f;
@@ -616,7 +616,7 @@ void dwGuiLongAgo::Update(float dt)
     this->controls.Update(dt);
 }
 
-// vtbl +0x10 @424220 (dwGuiLongAgo_OnKey)
+// vtbl +0x10 dwGuiLongAgo_OnKey
 int dwGuiLongAgo::OnKey(int key, int repeat)
 {
     if ((char)key == '\x1b')
@@ -628,21 +628,21 @@ int dwGuiLongAgo::OnKey(int key, int repeat)
 // dwGuiOpening — the 'Opening.san' text crawl
 // ---------------------------------------------------------------------------
 
-// @424250 (dwGuiOpening_Ctor)
+// dwGuiOpening_Ctor
 dwGuiOpening::dwGuiOpening()
     : dwMovie("Opening.san")
 {
     this->pCrawlImage = NULL;
 }
 
-// @424290 (dwGuiOpening_Dtor; scalar-deleting wrapper @424270)
+// dwGuiOpening_Dtor (scalar-deleting wrapper dwGuiOpening_DtorDelete)
 dwGuiOpening::~dwGuiOpening()
 {
     if (this->pCrawlImage != NULL)
         delete this->pCrawlImage; // binary: vtbl[0](1) virtual delete
 }
 
-// vtbl +0x00 @4242f0 (Ghidra: dwGuiOpening_BuildCrawl — the Activate slot).
+// vtbl +0x00 (Ghidra: dwGuiOpening_BuildCrawl — the Activate slot).
 // Pre-renders opening.txt into the tall crawl bitmap. Line format: byte0 =
 // '!' centered / '$' blank spacer / '*' justified (Bresenham-distributed gap
 // widening) / anything else left-aligned; the rest of the line is the text.
@@ -739,7 +739,7 @@ int dwGuiOpening::Activate()
             }
             pImg->Unlock();
         }
-        delete pFont; // binary: no-op font "dtor" @504190 + free
+        delete pFont; // binary: no-op font "dtor" + free
     }
 
     int ret = dwMovie::Activate();
@@ -760,7 +760,7 @@ int dwGuiOpening::Activate()
     return ret;
 }
 
-// @4249b0 (dwGuiOpening_ResampleSpan) — horizontal box-filter resample of one
+// dwGuiOpening_ResampleSpan — horizontal box-filter resample of one
 // crawl-bitmap row into one dest scanline: each output pixel averages the
 // source pixel and its one-step-right neighbor (the final pixel samples only
 // itself), scales by `color` (the crawl fade level 0..0x3f), and maps the
@@ -814,7 +814,7 @@ static void dwGuiOpening_ResampleSpan(uint8_t* pDst, int dstWidth, uint8_t* pSrc
     }
 }
 
-// vtbl +0x18 @424730 (Ghidra: dwGuiOpening_Update — really the Draw slot).
+// vtbl +0x18 (Ghidra: dwGuiOpening_Update — really the Draw slot).
 // Perspective crawl projection over the SMUSH frames: for each of the 430
 // dest scanlines (screen y 50..479) compute the crawl source row via the
 // rational scroll map N(u)/D(u), the narrowing x-inset (210 at the top row,
@@ -881,7 +881,7 @@ void dwGuiOpening::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 // dwGuiOptions_ResetGameState — fresh-profile game state
 // ---------------------------------------------------------------------------
 
-// @424ae0. Note: every dwCore_* global here is NULL-guarded — they are
+// Note: every dwCore_* global here is NULL-guarded — they are
 // dwMain.c placeholders (NULL) until the P7 boot flow lands; the binary's
 // lists always exist.
 extern "C" void dwGuiOptions_ResetGameState(void)
@@ -946,7 +946,7 @@ extern "C" void dwGuiOptions_ResetGameState(void)
 // dwGuiOptions — the screen class
 // ---------------------------------------------------------------------------
 
-// @424c30 (dwGuiOptions_Ctor)
+// dwGuiOptions_Ctor
 dwGuiOptions::dwGuiOptions(int screenIndex_)
     : dwGuiScreen(dwGuiOptions_aSubScreenNames[screenIndex_], NULL)
 {
@@ -967,13 +967,13 @@ dwGuiOptions::dwGuiOptions(int screenIndex_)
     dwGuiOptions_FreeProfileList(&profiles);
 }
 
-// @424e10 (dwGuiOptions_Dtor; scalar-deleting wrapper @424df0; secondary
-// thunk @426070) — frees selectedName + enteredName (implicit dwString dtors).
+// dwGuiOptions_Dtor (scalar-deleting wrapper dwGuiOptions_DtorDelete; secondary
+// thunk dwGuiOptions_ScnDtorThunk) — frees selectedName + enteredName (implicit dwString dtors).
 dwGuiOptions::~dwGuiOptions()
 {
 }
 
-// @4256c0 (dwGuiOptions_IsDuplicateName) — 1 when pName equals any existing
+// dwGuiOptions_IsDuplicateName — 1 when pName equals any existing
 // profile directory's basename (case-insensitive).
 static char dwGuiOptions_IsDuplicateName(dwString* pName)
 {
@@ -993,10 +993,10 @@ static char dwGuiOptions_IsDuplicateName(dwString* pName)
     return bDup;
 }
 
-// scn vtbl +0x00 @424e80 (dwGuiOptions_OnActivate)
+// scn vtbl +0x00 dwGuiOptions_OnActivate
 int dwGuiOptions::Activate()
 {
-    // (binary: AssignCStr from the shared empty-string BSS byte @0x53d6c4)
+    // (binary: AssignCStr from the shared empty-string BSS byte)
     this->selectedName.AssignCStr("");
     int ret = dwGuiScreen::Activate();
     if (this->pNameEntry != NULL)
@@ -1004,7 +1004,7 @@ int dwGuiOptions::Activate()
     return ret;
 }
 
-// scn vtbl +0x04 @424ec0 (dwGuiOptions_OnDeactivate)
+// scn vtbl +0x04 dwGuiOptions_OnDeactivate
 void dwGuiOptions::Deactivate()
 {
     if (dwPlayer_name.length == 0)
@@ -1025,13 +1025,13 @@ void dwGuiOptions::Deactivate()
     this->pScrollDownBtn = NULL;
 }
 
-// vtbl +0x14 @425830 (dwGuiOptions_Update)
+// vtbl +0x14 dwGuiOptions_Update
 void dwGuiOptions::Update(float dt)
 {
     this->controls.Update(dt);
 }
 
-// @425850 (dwGuiOptions_LoadSubScreen)
+// dwGuiOptions_LoadSubScreen
 void dwGuiOptions::LoadSubScreen(int index)
 {
     this->scriptName.AssignCStr(dwGuiOptions_aSubScreenNames[index]);
@@ -1054,7 +1054,7 @@ void dwGuiOptions::LoadSubScreen(int index)
     this->Activate();
 }
 
-// vtbl +0x1c @424f50 (dwGuiOptions_OnMessage) — the menu command switch on
+// vtbl +0x1c dwGuiOptions_OnMessage — the menu command switch on
 // (code - 6000). Commands (from the CreateControl-built widgets and the .ifc
 // BUTTON ids): 0 main / 1 game / 2 new-game / 3 load-game / 4 credits /
 // 5 help / 6 setup / 0xa cancel-quit / 0xb start-new-game / 0xc load
@@ -1100,7 +1100,7 @@ int dwGuiOptions::OnMessage(dwWidgetMsg* pMsg)
         this->LoadSubScreen(5);
         break;
     case 0xa:
-        // cancel a pending quit (binary: byte 0x53e8ac = 0)
+        // cancel a pending quit (binary: byte dwSegment_bQuit = 0)
         dwSegment_CancelQuit();
         break;
     case 0xb:
@@ -1292,7 +1292,7 @@ int dwGuiOptions::OnMessage(dwWidgetMsg* pMsg)
     return bHandled;
 }
 
-// vtbl +0x48 @425900 (dwGuiOptions_CreateControl)
+// vtbl +0x48 dwGuiOptions_CreateControl
 dwWidget* dwGuiOptions::CreateControl(char* pKeyword, dwConfFile* pConf)
 {
     dwRect rect = {0, 0, 0, 0};

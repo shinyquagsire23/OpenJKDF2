@@ -1,8 +1,8 @@
 // dwEnding — end-game graduation "certificate" sequence (dwMovie subclass).
-// DroidWorks.exe 0x410a30-0x410d5f, vtbl dwEnding_vtbl @0x51eaf8. See
+// DroidWorks.exe, dwEnding_vtbl. See
 // Dw/dwEnding.h for the class notes.
 //
-// Rank tables (.rdata @0x51ead8 / @0x51eae8, Ghidra binned them into the
+// Rank tables (.rdata, Ghidra binned them into the
 // neighboring dwGuiStatsDroid_vtbl label): the VO names ENJB018/019/010.wav
 // and the localizable rank keys APPRENTICE/DESIGNER/MASTER, both indexed by
 // the 0-based averaged rank.
@@ -23,7 +23,7 @@
 
 #include "stdPlatform.h"
 
-// @0x51ead8 (dwEnding_aVoiceNames): rank congratulation VO, indexed by the
+// dwEnding_aVoiceNames: rank congratulation VO, indexed by the
 // 0-based rank.
 static const char* dwEnding_aVoiceNames[3] = {
     "ENJB018.wav",
@@ -31,7 +31,7 @@ static const char* dwEnding_aVoiceNames[3] = {
     "ENJB010.wav",
 };
 
-// @0x51eae8 (dwEnding_aRankNames): localizable rank-name keys for the
+// dwEnding_aRankNames: localizable rank-name keys for the
 // certificate's RANK_NAME line.
 static const char* dwEnding_aRankNames[3] = {
     "APPRENTICE",
@@ -53,7 +53,7 @@ extern "C" dwSegment* dwEnding_New(void)
     return static_cast<dwSegment*>(new dwEnding());
 }
 
-// @410a30 (dwEnding_Ctor)
+// dwEnding_Ctor
 dwEnding::dwEnding()
     : dwMovie("ending.san")
 {
@@ -61,12 +61,12 @@ dwEnding::dwEnding()
     this->bVoicePlayed = 0;
 }
 
-// @410a70 (dwEnding_Dtor; scalar-deleting wrapper @410a50)
+// dwEnding_Dtor (scalar-deleting wrapper dwEnding_DtorDelete)
 dwEnding::~dwEnding()
 {
 }
 
-// vtbl +0x00 @410a80 (dwEnding_OnActivate)
+// vtbl +0x00 dwEnding_OnActivate
 int dwEnding::Activate()
 {
     dwColormap_Load((char*)"ending.cmp");
@@ -152,7 +152,7 @@ int dwEnding::Activate()
     return ret;
 }
 
-// vtbl +0x10 @410cb0 (dwEnding_Update)
+// vtbl +0x10 dwEnding_Update
 void dwEnding::Update()
 {
     if (lecSmush_frameNum > 0x168 && this->bVoicePlayed == 0)
@@ -163,7 +163,7 @@ void dwEnding::Update()
     dwMovie::Update();
 }
 
-// vtbl +0x18 @410cf0 (dwEnding_Draw)
+// vtbl +0x18 dwEnding_Draw
 void dwEnding::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     if (lecSmush_frameNum > 0x185 && lecSmush_frameNum < 0x1e9)

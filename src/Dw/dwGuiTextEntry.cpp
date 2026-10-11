@@ -1,8 +1,8 @@
 // dwGuiTextEntry — single-line editable name box (TEXTENTRY-family control)
 // + the dwGuiFindEntry (topic-search query box) subclass.
 //
-// Decompiled from DroidWorks.exe range 0x439160-0x4399ax (dwGuiTextEntry,
-// vtbl @0x51fca0) and 0x413c20-0x413ccx (dwGuiFindEntry, vtbl @0x51ec70 —
+// Decompiled from DroidWorks.exe (dwGuiTextEntry,
+// dwGuiTextEntry_vtbl) and (dwGuiFindEntry, dwGuiFindEntry_vtbl —
 // reclassified out of the dwFlic address span). See Dw/dwGuiTextEntry.h for
 // the field map and notification-code semantics.
 //
@@ -16,7 +16,7 @@
 //    the (unsigned char) cast per the dwGuiHypText.cpp precedent.
 //  - __ftol truncates toward zero -> plain C casts.
 //  - dwSound_PlayRestart is the repo dwSound C API (binary: thiscall on
-//    dwSound_pManager @0x53d960).
+//    dwSound_pManager).
 //
 // No module statics — no dwGuiTextEntry_Startup needed (soft-reset rule).
 
@@ -33,7 +33,7 @@
 
 // ---- dwGuiTextEntry ---------------------------------------------------------
 
-// @439160 (dwGuiTextEntry_Ctor)
+// dwGuiTextEntry_Ctor
 // Quirks preserved:
 //  - selEnd starts at pText->length + 1 (one past the length).
 //  - the dwFont handle is heap-owned; the binary stored NULL when the 0x10
@@ -66,12 +66,12 @@ dwGuiTextEntry::dwGuiTextEntry(dwRect* pRect, char* pFontName, uint8_t textColor
     this->selEnd = this->pText->length + 1; // quirk: one PAST the length
 }
 
-// @439250 (dwGuiTextEntry_Dtor; scalar-deleting wrapper @439230)
+// dwGuiTextEntry_Dtor (scalar-deleting wrapper dwGuiTextEntry_DtorDelete)
 dwGuiTextEntry::~dwGuiTextEntry()
 {
     if (this->pFont != NULL)
     {
-        // @504190: the binary's dwFont handle "dtor" is a lone RET (the
+        // the binary's dwFont handle "dtor" is a lone RET (the
         // glyph block is owned by the dwFont cache) — only the handle
         // allocation is released.
         delete this->pFont;
@@ -79,7 +79,7 @@ dwGuiTextEntry::~dwGuiTextEntry()
     // (pText is the caller's; dwWidget base dtor implicit)
 }
 
-// @439310 (dwGuiTextEntry_BeginEdit)
+// dwGuiTextEntry_BeginEdit
 void dwGuiTextEntry::BeginEdit()
 {
     dwWidgetMsg msg;
@@ -104,7 +104,7 @@ void dwGuiTextEntry::BeginEdit()
     }
 }
 
-// @439370 (dwGuiTextEntry_EndEdit)
+// dwGuiTextEntry_EndEdit
 void dwGuiTextEntry::EndEdit()
 {
     dwWidgetMsg msg;
@@ -126,7 +126,7 @@ void dwGuiTextEntry::EndEdit()
     }
 }
 
-// @4393d0 (dwGuiTextEntry_DeleteSelection)
+// dwGuiTextEntry_DeleteSelection
 void dwGuiTextEntry::DeleteSelection()
 {
     uint32_t tmp;
@@ -142,7 +142,7 @@ void dwGuiTextEntry::DeleteSelection()
     this->Invalidate();
 }
 
-// @439410 (dwGuiTextEntry_HitTestCaret) — x -> char index. Faithful shape:
+// dwGuiTextEntry_HitTestCaret — x -> char index. Faithful shape:
 // the first char's width is consumed before the loop; each further step
 // consumes the width of the char AFTER the new index (reads the NUL when the
 // caret passes the last char — dwFont_GetCharWidth handles it).
@@ -167,7 +167,7 @@ uint32_t dwGuiTextEntry::HitTestCaret(int16_t x)
     return idx;
 }
 
-// vtbl +0x08 @439470 (dwGuiTextEntry_OnMouseDown)
+// vtbl +0x08 dwGuiTextEntry_OnMouseDown
 int dwGuiTextEntry::OnMouseDown(int16_t x, int16_t y)
 {
     int result;
@@ -197,7 +197,7 @@ int dwGuiTextEntry::OnMouseDown(int16_t x, int16_t y)
     return result;
 }
 
-// vtbl +0x0c @4394f0 (dwGuiTextEntry_OnMouseUp)
+// vtbl +0x0c dwGuiTextEntry_OnMouseUp
 int dwGuiTextEntry::OnMouseUp(int16_t x, int16_t y)
 {
     (void)x;
@@ -207,7 +207,7 @@ int dwGuiTextEntry::OnMouseUp(int16_t x, int16_t y)
     return 0;
 }
 
-// vtbl +0x04 @439500 (dwGuiTextEntry_OnMouseMove)
+// vtbl +0x04 dwGuiTextEntry_OnMouseMove
 int dwGuiTextEntry::OnMouseMove(int16_t x, int16_t y)
 {
     (void)y;
@@ -219,7 +219,7 @@ int dwGuiTextEntry::OnMouseMove(int16_t x, int16_t y)
     return 0;
 }
 
-// vtbl +0x10 @439530 (dwGuiTextEntry_OnKey)
+// vtbl +0x10 dwGuiTextEntry_OnKey
 int dwGuiTextEntry::OnKey(int key, int repeat)
 {
     dwWidgetMsg msg;
@@ -318,7 +318,7 @@ int dwGuiTextEntry::OnKey(int key, int repeat)
     return this->bEditable;
 }
 
-// vtbl +0x14 @4397a0 (dwGuiTextEntry_Update) — 0.7s caret blink. The timer
+// vtbl +0x14 dwGuiTextEntry_Update — 0.7s caret blink. The timer
 // accumulates even while not editing (faithful).
 void dwGuiTextEntry::Update(float dt)
 {
@@ -336,7 +336,7 @@ void dwGuiTextEntry::Update(float dt)
     }
 }
 
-// vtbl +0x18 @4392c0 (dwGuiTextEntry_OnHover) — hover notify carrying the
+// vtbl +0x18 dwGuiTextEntry_OnHover — hover notify carrying the
 // msgEditNotify code as the payload (see the header note).
 int dwGuiTextEntry::OnHover(int16_t x, int16_t y)
 {
@@ -354,7 +354,7 @@ int dwGuiTextEntry::OnHover(int16_t x, int16_t y)
     return 1;
 }
 
-// vtbl +0x44 @439810 (dwGuiTextEntry_Draw)
+// vtbl +0x44 dwGuiTextEntry_Draw
 void dwGuiTextEntry::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     dwPoint pos;
@@ -425,7 +425,7 @@ void dwGuiTextEntry::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 
 // ---- dwGuiFindEntry ---------------------------------------------------------
 
-// @413c20 (dwGuiFindEntry_Ctor) — base ctor with msgCommit forced to 0x1b79;
+// dwGuiFindEntry_Ctor — base ctor with msgCommit forced to 0x1b79;
 // the caller's msgCommitIgnored is never read (faithful).
 dwGuiFindEntry::dwGuiFindEntry(dwRect* pRect, char* pFontName, uint8_t textColor,
                                uint8_t cursorColor, dwString* pText, int32_t msgEditNotify,
@@ -437,13 +437,13 @@ dwGuiFindEntry::dwGuiFindEntry(dwRect* pRect, char* pFontName, uint8_t textColor
     this->messageCode = messageCode;
 }
 
-// @413c90 (dwGuiFindEntry_Dtor; scalar-deleting wrapper @413c70)
+// dwGuiFindEntry_Dtor (scalar-deleting wrapper dwGuiFindEntry_DtorDelete)
 dwGuiFindEntry::~dwGuiFindEntry()
 {
     // vptr re-point + base dtor only (implicit).
 }
 
-// vtbl +0x1c @413ca0 (dwGuiFindEntry_OnMessage) — mirror the payload string
+// vtbl +0x1c dwGuiFindEntry_OnMessage — mirror the payload string
 // into the edited text.
 int dwGuiFindEntry::OnMessage(dwWidgetMsg* pMsg)
 {

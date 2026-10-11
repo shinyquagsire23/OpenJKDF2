@@ -1,6 +1,6 @@
 #include "Dw/dwInits.h"
 
-// DroidWorks "inits" unit (0x411560-0x41237f): VFS / file-resolution layer.
+// DroidWorks "inits" unit: VFS / file-resolution layer.
 //
 // Compiled as C++ (the binary unit carries MSVC EH unwind frames around its
 // dwString locals) in procedural style; the entire API keeps C linkage via
@@ -38,7 +38,7 @@
 // ------------------------------------------------------------------
 
 // C linkage (declared extern "C" in dwInits.h / used by future C units).
-dwString dwCore_workingDir;  // @0x53d8xx: cwd at startup, trailing '\'
+dwString dwCore_workingDir;  // cwd at startup, trailing '\'
 dwString dwCore_installPath; // registry InstallPath (empty if == workingDir)
 dwString dwCore_sourcePath;  // registry SourcePath (CD), read-only fallback
 
@@ -53,12 +53,12 @@ static int (*dwCore_pfnOrigFileClose)(stdFile_t);
 // dwMain.c's placeholder block. Owner: dw core P7 (binary static ctors
 // dwCore_RefFileInit etc.); move there when it lands.
 extern "C" {
-dwString dwCore_workspaceName;   // @0x53d978: workspace droid display name
-dwString dwCore_currentRefFile;  // @0x53d968: current reference-room topic file (.plr TOPIC)
+dwString dwCore_workspaceName;   // workspace droid display name
+dwString dwCore_currentRefFile;  // current reference-room topic file (.plr TOPIC)
 }
 
 // The 27-entry extension -> search-path-list table (binary: interleaved
-// dwCore_aFileExtNames/aFileExtPaths @0x527ad0/4). MUST stay sorted by
+// dwCore_aFileExtNames/aFileExtPaths/4). MUST stay sorted by
 // extension name (inits_LookupExtIndex binary-searches it, case-insensitive).
 // Path lists are whitespace-separated components appended to a base path;
 // components ending in .GOB resolve inside that archive via dwGob.

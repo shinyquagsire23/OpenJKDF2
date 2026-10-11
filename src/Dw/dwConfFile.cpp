@@ -1,8 +1,8 @@
 // dwConfFile — token/keyword config-file reader used by the DW GUI factories.
-// DroidWorks.exe unit range: 0x4477c0-0x447f1x (13 functions).
+// DroidWorks.exe unit range: (13 functions).
 //
 // Wraps a file handle obtained through the DW HostServices. In the original
-// binary this is dw_hostServices @0x53d988, whose file ops get hooked by the
+// binary this is dw_hostServices, whose file ops get hooked by the
 // dwGob/inits units so "files" can come from GOB archives; here that role is
 // filled by dwMain_pHS. Reads one logical line at a time into aLine, skips
 // blank/comment lines (leading ';' or '#'), then hands out whitespace- or
@@ -31,10 +31,9 @@
 #include "stdPlatform.h"
 
 // TODO(dw-decomp): defined by dwMain (original global: dwHS / dw_hostServices
-// @0x53d988). dwMain is (and stays) C — declare with C linkage.
+// dw_hostServices). dwMain is (and stays) C — declare with C linkage.
 extern "C" HostServices* dwMain_pHS;
 
-// @4477c0
 void dwConfFile_Open(dwConfFile* pThis, const char* pPath)
 {
     pThis->pFile = NULL;
@@ -55,7 +54,6 @@ void dwConfFile_Open(dwConfFile* pThis, const char* pPath)
     stdPlatform_Printf("WARNING: File %s not found!\n", pPath);
 }
 
-// @447830
 void dwConfFile_Close(dwConfFile* pThis)
 {
     if (pThis->pFile)
@@ -64,7 +62,6 @@ void dwConfFile_Close(dwConfFile* pThis)
     }
 }
 
-// @447850
 int dwConfFile_ReadLine(dwConfFile* pThis)
 {
     if (pThis->pFile)
@@ -105,7 +102,6 @@ int dwConfFile_ReadLine(dwConfFile* pThis)
     return pThis->bEof == 0;
 }
 
-// @447910
 char* dwConfFile_NextToken(dwConfFile* pThis)
 {
     char* pToken = pThis->pCursor;
@@ -127,14 +123,12 @@ char* dwConfFile_NextToken(dwConfFile* pThis)
     return pToken;
 }
 
-// @447990
 void dwConfFile_ParseString(dwConfFile* pThis, dwString* pOut)
 {
     char* pSrc = dwConfFile_NextToken(pThis);
     pOut->Assign(pSrc, 0);
 }
 
-// @4479b0
 // The delimiter is whatever character the cursor currently points at (the
 // callers guarantee it's a '"' via NextToken's check); the returned token
 // starts just past it.
@@ -158,14 +152,12 @@ char* dwConfFile_NextQuotedToken(dwConfFile* pThis)
     return pToken;
 }
 
-// @447a20
 void dwConfFile_ParseQuotedString(dwConfFile* pThis, dwString* pOut)
 {
     char* pSrc = dwConfFile_NextQuotedToken(pThis);
     pOut->Assign(pSrc, 0);
 }
 
-// @447a40
 void dwConfFile_ParseULong(dwConfFile* pThis, uint32_t* pOut)
 {
     // Note: original sscanf's "%lu" straight into the caller's 32-bit slot
@@ -193,7 +185,6 @@ void dwConfFile_ParseULong(dwConfFile* pThis, uint32_t* pOut)
     }
 }
 
-// @447ad0
 void dwConfFile_ParseLong(dwConfFile* pThis, int32_t* pOut)
 {
     // Note: 32-bit "%ld" in the original; temp + narrow (see ParseULong).
@@ -219,7 +210,6 @@ void dwConfFile_ParseLong(dwConfFile* pThis, int32_t* pOut)
     }
 }
 
-// @447b60
 void dwConfFile_ParseFloat(dwConfFile* pThis, float* pOut)
 {
     if (sscanf(pThis->pCursor, "%f", pOut) == 1)
@@ -242,7 +232,6 @@ void dwConfFile_ParseFloat(dwConfFile* pThis, float* pOut)
     }
 }
 
-// @447bf0
 // Quirk (original): unlike the scalar parsers, on scan failure the output
 // rect is left untouched and the cursor is not advanced.
 void dwConfFile_ParseRect(dwConfFile* pThis, dwRect* pOut)
@@ -265,7 +254,6 @@ void dwConfFile_ParseRect(dwConfFile* pThis, dwRect* pOut)
     }
 }
 
-// @447da0
 // Quirk (original): output untouched / cursor not advanced on scan failure
 // (same as ParseRect).
 void dwConfFile_ParsePoint(dwConfFile* pThis, dwPoint* pOut)
@@ -286,7 +274,6 @@ void dwConfFile_ParsePoint(dwConfFile* pThis, dwPoint* pOut)
     }
 }
 
-// @447e90
 void dwConfFile_ParseHex(dwConfFile* pThis, uint32_t* pOut)
 {
     // Note: 32-bit "%lx" in the original; temp + narrow (see ParseULong).

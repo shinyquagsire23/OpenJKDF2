@@ -2,11 +2,11 @@
 // <...> hyperlink markup that spawns clickable rollover children on top of a
 // timed text-reveal animation.
 //
-// Decompiled from DroidWorks.exe range 0x436d90-0x437d5x. MSVC MULTIPLE
+// Decompiled from DroidWorks.exe. MSVC MULTIPLE
 // INHERITANCE (dwWidgetGroup primary @0x00 + dwGuiHypText secondary @0x14):
-// binary vtables dwGuiTextBlock_vtbl @0x51fb68 (primary) and
-// dwGuiTextBlock_HypText_vtbl @0x51fb18 (secondary; this-adjustor thunks
-// @437d00-437d50 for dtor/OnMouseMove/OnMouseDown/Update/OnHover/Draw — the
+// binary vtables dwGuiTextBlock_vtbl primary and
+// dwGuiTextBlock_HypText_vtbl secondary (this-adjustor thunks
+// for dtor/OnMouseMove/OnMouseDown/Update/OnHover/Draw — the
 // exact override set below, so plain C++ MI regenerates them). See
 // Dw/dwGuiTextBlock.h for the field map.
 //
@@ -21,7 +21,7 @@
 //    base-qualified to match the exact subobject the binary touched
 //    (group rect for markup metrics, hyptext rect + bEnabled in Update).
 //  - dwSound_* is the repo's name-keyed C API (binary: thiscall on
-//    dwSound_pManager @0x53d960).
+//    dwSound_pManager).
 //  - dwGuiTextRollover children are constructed for real (Dw/dwGuiWidgets.h);
 //    the binary call sites push a dead 11th ctor arg the ctor never reads —
 //    see the notes in CreateLinkWidget.
@@ -37,7 +37,7 @@
 #include "jk.h"
 #include "stdPlatform.h"
 
-// @436d90 (dwGuiTextBlock_Ctor)
+// dwGuiTextBlock_Ctor
 // Base ctors exactly as the binary: dwWidgetGroup(pRect), then the hyptext
 // FORMAT ctor dwGuiHypText(pRect, NULL, pFontName, color, pFormat) — pFormat
 // may attach the visible wipe/typewriter elements to the base.
@@ -95,12 +95,12 @@ dwGuiTextBlock::dwGuiTextBlock(dwRect* pRect, char* pFontName, uint8_t color, ui
     }
 }
 
-// @436fa0 (dwGuiTextBlock_Dtor; scalar-deleting wrapper @436f80)
+// dwGuiTextBlock_Dtor (scalar-deleting wrapper dwGuiTextBlock_DtorDelete)
 dwGuiTextBlock::~dwGuiTextBlock()
 {
     if (this->pFont != NULL)
     {
-        // @504190: the binary's dwFont handle "dtor" is a lone RET (the
+        // the binary's dwFont handle "dtor" is a lone RET (the
         // glyph block is owned by the dwFont cache) — only the handle
         // allocation is released.
         delete this->pFont;
@@ -113,7 +113,7 @@ dwGuiTextBlock::~dwGuiTextBlock()
     // then ~dwWidget.
 }
 
-// @437190 (dwGuiTextBlock_ParseMarkup) — ctor-time markup strip. LITERAL
+// dwGuiTextBlock_ParseMarkup — ctor-time markup strip. LITERAL
 // translation of the binary's pointer walk (see the file-top note).
 //
 // Grammar handled per "<...>" tag (two forms, all cursors kept live across
@@ -271,7 +271,7 @@ void dwGuiTextBlock::ParseMarkup()
     }
 }
 
-// @4373f0 (dwGuiTextBlock_BuildLinkWidgets) — reveal-completion pass: reset
+// dwGuiTextBlock_BuildLinkWidgets — reveal-completion pass: reset
 // displayText from the pristine sourceMarkup, then re-walk the markup with
 // the SAME literal pointer walk as ParseMarkup, additionally measuring each
 // link's wrapped-text position and spawning its rollover child. Kept as a
@@ -422,20 +422,20 @@ void dwGuiTextBlock::BuildLinkWidgets()
     }
 }
 
-// vtbl +0x04 @437710 — unify both bases' vtables on the GROUP's handler
+// vtbl +0x04 dwGuiTextBlock_OnMouseMove — unify both bases' vtables on the GROUP's handler
 // (the compiler emits the secondary-vtable thunk).
 int dwGuiTextBlock::OnMouseMove(int16_t x, int16_t y)
 {
     return this->dwWidgetGroup::OnMouseMove(x, y);
 }
 
-// vtbl +0x08 @437730
+// vtbl +0x08 dwGuiTextBlock_OnMouseDown
 int dwGuiTextBlock::OnMouseDown(int16_t x, int16_t y)
 {
     return this->dwWidgetGroup::OnMouseDown(x, y);
 }
 
-// vtbl +0x18 @437750 (dwGuiTextBlock_OnHover) — route the cursor to the
+// vtbl +0x18 dwGuiTextBlock_OnHover — route the cursor to the
 // link child under (x,y) (containment only, NO enabled check); else the
 // stock hover notify. Returns 1 (or the child's result).
 int dwGuiTextBlock::OnHover(int16_t x, int16_t y)
@@ -462,7 +462,7 @@ int dwGuiTextBlock::OnHover(int16_t x, int16_t y)
     return 1;
 }
 
-// @437800 (dwGuiTextBlock_CreateLinkWidget) — build one rollover hotspot
+// dwGuiTextBlock_CreateLinkWidget — build one rollover hotspot
 // child for a link. The dwStrings arrive BY VALUE (the binary copy-
 // constructs stack temporaries and frees them in the callee; C++ value
 // parameters reproduce that).
@@ -482,7 +482,7 @@ void dwGuiTextBlock::CreateLinkWidget(dwString anchor, dwString target, dwPoint 
             + (int16_t)dwFont_MeasureString(this->pFont, anchor.pBuffer, (int)anchor.length);
         rect.bottom = rect.top + (int16_t)this->pFont->pHeader->lineHeight;
 
-        // Binary @437880-437914: new(0xcc) dwGuiTextRollover_Ctor(&rect,
+        // Binary: new(0xcc) dwGuiTextRollover_Ctor(&rect,
         // anchor, fontName, tagName, hAlign, 0, vAlign, 0,
         // "CTextRollover.WAV", 0x1b58, 1) — the trailing literal 1 is an 11th
         // arg the ctor never reads (RET 0x2c; dead param, dropped from the
@@ -506,7 +506,7 @@ void dwGuiTextBlock::CreateLinkWidget(dwString anchor, dwString target, dwPoint 
             + (int16_t)dwFont_MeasureString(this->pFont, anchor.pBuffer, (int)anchor.length);
         rect.bottom = rect.top + (int16_t)this->pFont->pHeader->lineHeight;
 
-        // Binary @437976-437a1e: identical to the HL branch except the
+        // Binary: identical to the HL branch except the
         // command id 0x1b61 (URL launch); same dead 11th arg, same push-front.
         pWidget = static_cast<dwGuiTextButton*>(
             new dwGuiTextRollover(&rect, anchor.pBuffer, this->fontName.pBuffer,
@@ -525,7 +525,7 @@ void dwGuiTextBlock::CreateLinkWidget(dwString anchor, dwString target, dwPoint 
     // (binary: explicit dwString_Free on both value params; the dtors do it)
 }
 
-// vtbl +0x14 @437a70 (dwGuiTextBlock_Update) — the reveal animation, gated
+// vtbl +0x14 dwGuiTextBlock_Update — the reveal animation, gated
 // on the HYPTEXT base's bEnabled (its own subobject flag; the group's copy
 // is what parents tick against).
 void dwGuiTextBlock::Update(float dt)
@@ -617,7 +617,7 @@ void dwGuiTextBlock::Update(float dt)
     this->dwWidgetGroup::Update(dt);  // child tick broadcast
 }
 
-// vtbl +0x44 @437cd0 (dwGuiTextBlock_Draw) — text first, children on top.
+// vtbl +0x44 dwGuiTextBlock_Draw — text first, children on top.
 // dwGuiHypText::Draw clips *pClipRect to its layout rect IN PLACE, so the
 // children inherit that clip (faithful — the binary passes the same pointer).
 void dwGuiTextBlock::Draw(dwImageBits* pDestBits, dwRect* pClipRect)

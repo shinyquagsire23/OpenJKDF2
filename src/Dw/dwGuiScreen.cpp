@@ -3,11 +3,11 @@
 // game-wide string-table lookup (dwGuiScreen_LocalizeString), the tooltip
 // machinery and the base cheat-code matcher.
 //
-// Decompiled from DroidWorks.exe, unit range 0x42f930-0x43214f, plus:
-//   - EnsureImages @0x432150 / FreeImages @0x432170 (base defaults physically
+// Decompiled from DroidWorks.exe, plus:
+//   - EnsureImages dwGuiScreen_EnsureImages / FreeImages dwGuiScreen_FreeImages (base defaults physically
 //     just past the unit end, mis-binned into the dwGuiWidgets range)
-//   - Update(dt) slot body @0x41c510 (shared COMDAT, Ghidra: mis-attributed
-//     dwGuiMission_ForwardUpdate) and OnHover slot body @0x40ba70 (undetected
+//   - Update(dt) slot body dwGuiMission_ForwardUpdate (shared COMDAT, Ghidra: mis-attributed
+//     dwGuiMission_ForwardUpdate) and OnHover slot body dwGuiScreen_OnHover (undetected
 //     fn in the dwGuiCredits range) — both trivial forwards into `controls`
 // See dwGuiScreen.h for the class/vtable/layout documentation.
 //
@@ -17,7 +17,7 @@
 //  - the 8bpp screen-sized background/snapshot copies go through
 //    stdBitmapRle2_InstantiateCopy (real since the stdBitmapRle2 unit landed, P8).
 //  - BACKGROUND image loads go through dwImage_LoadFile (the translated
-//    dispatcher; the binary's first-load path used its 0x444c50 sibling).
+//    dispatcher; the binary's first-load path used its sibling).
 //
 // Cross-unit symbols still owned elsewhere are declared extern below — see
 // the TODO(dw-decomp) block.
@@ -57,12 +57,12 @@
 #include "jk.h"
 #include "stdPlatform.h" // stdPlatform_Printf
 
-#include <ctype.h>  // isspace (binary: CRT isspace @0x507d80)
+#include <ctype.h>  // isspace (binary: CRT isspace)
 #include <stdlib.h> // malloc/free (binary: dwHS alloc/free) for the POD records
 
 // These engine headers have no extern "C" guards of their own — wrap at include site.
 extern "C" {
-#include "Win95/stdDisplay.h" // stdDisplay_pCurVideoMode (binary 0x6478f8; bpp = DAT_006b17e4)
+#include "Win95/stdDisplay.h" // stdDisplay_pCurVideoMode (binary; bpp = DAT_006b17e4)
 }
 
 // ---- cross-unit externs (TODO(dw-decomp): provided by other units) ----------
@@ -70,11 +70,11 @@ extern "C" {
 // The GLOBAL string table (Global.str) loaded by dw_Startup; the localization
 // fallback in dwGuiScreen_LocalizeString.
 // TODO(dw-decomp): provided by the dw core unit (dw part2, P7). Binary global
-// @0x53d958 (dwCore_pGlobalStrings).
+// dwCore_pGlobalStrings.
 extern "C" dwStringTable* dwCore_pGlobalStrings;
 
 // Nonzero when the recorded-input cue playlist is empty (binary: the direct
-// global read `dwSegment_pCueList == dwSegment_pCueList->pNext` @0x53e858 —
+// global read `dwSegment_pCueList == dwSegment_pCueList->pNext` —
 // the sentinel is a static inside dwSegment.cpp here, so an accessor is
 // needed). Used by the tutorial auto-exit in Update(void).
 // TODO(dw-decomp): provided by dwSegment (one-line accessor over its static
@@ -83,13 +83,13 @@ extern "C" int dwSegment_IsPlaylistEmpty(void);
 
 // Forces RenderActive to repaint the whole screen instead of walking the
 // dirty-rect list. TODO(dw-decomp): provided by the dwMain unit (P7). Binary
-// global @0x53e854 (dwMain_bFullRedraw).
+// global dwMain_bFullRedraw.
 extern "C" uint8_t dwMain_bFullRedraw;
 
 // 8bpp screen-sized image copy (background/snapshot). Real since the
 // stdBitmapRle2 unit landed (P8) — defined in stdBitmapRle2.cpp.
-extern "C" dwImage* stdBitmapRle2_InstantiateCopy(dwImage* pSrc, int16_t width, int16_t height); // @442ec0
-extern "C" dwImage* stdBitmapRle2_LoadFile16(char* pFilePath); // @444c50 (BACKGROUND: forces a lockable buffer)
+extern "C" dwImage* stdBitmapRle2_InstantiateCopy(dwImage* pSrc, int16_t width, int16_t height);
+extern "C" dwImage* stdBitmapRle2_LoadFile16(char* pFilePath); // BACKGROUND: forces a lockable buffer
 
 // ---- module init -------------------------------------------------------------
 
@@ -122,7 +122,7 @@ dwImage* dwGuiScreen_CaptureShadedScreen()
     rect.right = (int16_t)stdDisplay_pCurVideoMode->format.width;
     rect.bottom = (int16_t)stdDisplay_pCurVideoMode->format.height;
 
-    // Note: binary @0x442ec0 ctor takes (pSrcImage, pRect) with rect always
+    // Note: binary stdBitmapRle2_ToVBuffer ctor takes (pSrcImage, pRect) with rect always
     // {0,0,w,h}; the P8 placeholder signature takes width/height directly.
     pSnap = stdBitmapRle2_InstantiateCopy((dwImage*)dwDisplay_pScreenImage, rect.right, rect.bottom);
     if (pSnap)
@@ -157,7 +157,7 @@ static void dwGuiScreen_UnlinkWidgetNode(dwList* pList, dwWidget* pWidget)
 
 // ---- ctor / dtor ---------------------------------------------------------------
 
-// @42f930 (dwGuiScreen_Ctor)
+// dwGuiScreen_Ctor
 dwGuiScreen::dwGuiScreen(const char* pName, dwImage* pBgSrc)
     : dwWidget()  // full-screen widget rect
     , dwSegment() // pausable segment clock
@@ -215,7 +215,7 @@ dwGuiScreen::dwGuiScreen(const char* pName, dwImage* pBgSrc)
                                             // script; NOT ".cmp", which is a colormap file)
 }
 
-// @42fb30 (dwGuiScreen_Dtor; scalar-deleting wrapper @42fb10)
+// dwGuiScreen_Dtor (scalar-deleting wrapper dwGuiScreen_DtorDelete)
 dwGuiScreen::~dwGuiScreen()
 {
     dwListNode* pNode;
@@ -266,7 +266,7 @@ dwGuiScreen::~dwGuiScreen()
 
 // ---- controls script -----------------------------------------------------------
 
-// @42fdf0 (dwGuiScreen_LoadControls)
+// dwGuiScreen_LoadControls
 void dwGuiScreen::LoadControls(char* pScriptPath)
 {
     dwConfFile conf;
@@ -289,12 +289,12 @@ void dwGuiScreen::LoadControls(char* pScriptPath)
     dwConfFile_Close(&conf);
 }
 
-// @42fed0 (dwGuiScreen_LocalizeString) — THE game-wide string-table lookup.
+// dwGuiScreen_LocalizeString — THE game-wide string-table lookup.
 extern "C" char* dwGuiScreen_LocalizeString(char* pStr, dwStringTable* pTable)
 {
     dwString* pVal;
 
-    while (*pStr != '\0' && isspace((unsigned char)*pStr)) // binary: CRT isspace @0x507d80
+    while (*pStr != '\0' && isspace((unsigned char)*pStr)) // binary: CRT isspace
         pStr++;
 
     if (pStr != NULL && *pStr != '\0') // Note: vestigial NULL check preserved (already dereferenced above)
@@ -316,7 +316,7 @@ extern "C" char* dwGuiScreen_LocalizeString(char* pStr, dwStringTable* pTable)
 
 // ---- tooltip -------------------------------------------------------------------
 
-// @42ff30 (dwGuiScreen_FlushTooltipDirty)
+// dwGuiScreen_FlushTooltipDirty
 void dwGuiScreen::FlushTooltipDirty()
 {
     if (this->pTooltipTarget)
@@ -329,7 +329,7 @@ void dwGuiScreen::FlushTooltipDirty()
 
 // ---- factories -------------------------------------------------------------------
 
-// @42ff60 (Ghidra: dwGuiScreen_CreateControl) — the COMMON free-function
+// (Ghidra: dwGuiScreen_CreateControl) — the COMMON free-function
 // factory (screen-state-less keywords). Fallback of the virtual factory;
 // also called directly by dwEnding_OnActivate.
 extern "C" dwWidget* dwGuiScreen_CreateControl(char* pKeyword, dwConfFile* pConf, dwStringTable* pStringTable)
@@ -424,7 +424,7 @@ extern "C" dwWidget* dwGuiScreen_CreateControl(char* pKeyword, dwConfFile* pConf
         dwConfFile_ParseRect(pConf, &rect);
         dwConfFile_ParseULong(pConf, &param);
         // binary builds it INLINE: new(0x14) { dwWidget(&rect); helpCode@+0x10 =
-        // param; vptr = dwControlPanelHelpRect_vtbl@0x51e750 } (hover hotspot
+        // param; vptr = dwControlPanelHelpRect_vtbl } (hover hotspot
         // that notifies the help control).
         return new dwControlPanelHelpRect(&rect, (int32_t)param);
     }
@@ -572,7 +572,7 @@ extern "C" dwWidget* dwGuiScreen_CreateControl(char* pKeyword, dwConfFile* pConf
     return NULL;
 }
 
-// vtbl +0x48 @430a10 (Ghidra: dwGuiScreen_CreateControl2) — the VIRTUAL
+// vtbl +0x48 (Ghidra: dwGuiScreen_CreateControl2) — the VIRTUAL
 // factory: screen-level keywords, falling back to the common factory above.
 dwWidget* dwGuiScreen::CreateControl(char* pKeyword, dwConfFile* pConf)
 {
@@ -591,7 +591,7 @@ dwWidget* dwGuiScreen::CreateControl(char* pKeyword, dwConfFile* pConf)
             return NULL;
         if (!this->pBgImage)
         {
-            // binary: the display-format loader @0x444c50 (LoadFile16), NOT the
+            // binary: the display-format loader LoadFile16, NOT the
             // bpp dispatcher — LoadFile16 passes bIdk=1 to loads_bmp, forcing
             // the decode-into-buffer path (LoadFormat0/ToVBuffer) so a compressed
             // .rle background is a LOCKABLE stdBitmapRle2, not a lazy stdBitmapRle.
@@ -632,7 +632,7 @@ dwWidget* dwGuiScreen::CreateControl(char* pKeyword, dwConfFile* pConf)
         // binary: new(0x20) dwGuiClock_Ctor(rect, fontName, param,
         //   &this-dwSegment-subobject, 0). Note: the binary's 4th arg (the
         //   screen's segment subobject) is stored but only ever NULL-CHECKED
-        //   (dwGuiClock_Draw@4086c0 gates on it, then reads the global ms
+        //   (dwGuiClock_Draw gates on it, then reads the global ms
         //   counter directly) — here it is the plain bRunning flag, and the
         //   member-factory screen is never NULL, so pass 1.
         return new dwGuiClock(rect, pName, (uint8_t)param, 1, 0);
@@ -833,7 +833,7 @@ dwWidget* dwGuiScreen::CreateControl(char* pKeyword, dwConfFile* pConf)
 
 // ---- widget-side virtuals -------------------------------------------------------
 
-// vtbl +0x44 @431240 (dwGuiScreen_Draw)
+// vtbl +0x44 dwGuiScreen_Draw
 void dwGuiScreen::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     this->EnsureImages(); // virtual +0x3c
@@ -848,7 +848,7 @@ void dwGuiScreen::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
     }
 }
 
-// vtbl +0x04 @4318a0 (dwGuiScreen_OnMouseMove) — tooltip hover tracking.
+// vtbl +0x04 dwGuiScreen_OnMouseMove — tooltip hover tracking.
 int dwGuiScreen::OnMouseMove(int16_t x, int16_t y)
 {
     dwListNode* pNode;
@@ -881,7 +881,7 @@ int dwGuiScreen::OnMouseMove(int16_t x, int16_t y)
     return 1;
 }
 
-// vtbl +0x08 @431980 (dwGuiScreen_OnMouseDown)
+// vtbl +0x08 dwGuiScreen_OnMouseDown
 int dwGuiScreen::OnMouseDown(int16_t x, int16_t y)
 {
     dwPoint pt;
@@ -902,7 +902,7 @@ int dwGuiScreen::OnMouseDown(int16_t x, int16_t y)
     return 1;
 }
 
-// vtbl +0x0c @4319f0 (dwGuiScreen_OnMouseUp)
+// vtbl +0x0c dwGuiScreen_OnMouseUp
 int dwGuiScreen::OnMouseUp(int16_t x, int16_t y)
 {
     if (this->bActive)
@@ -921,7 +921,7 @@ int dwGuiScreen::OnMouseUp(int16_t x, int16_t y)
     return 1;
 }
 
-// vtbl +0x10 @431ad0 (dwGuiScreen_OnKey) — cheat-code entry.
+// vtbl +0x10 dwGuiScreen_OnKey — cheat-code entry.
 int dwGuiScreen::OnKey(int key, int repeat)
 {
     char c;
@@ -957,14 +957,14 @@ int dwGuiScreen::OnKey(int key, int repeat)
     return 0;
 }
 
-// vtbl +0x14 @41c510 (shared COMDAT; Ghidra: dwGuiMission_ForwardUpdate) —
+// vtbl +0x14 (shared COMDAT; Ghidra: dwGuiMission_ForwardUpdate) —
 // forward the per-frame widget tick into the controls group.
 void dwGuiScreen::Update(float dt)
 {
     this->controls.Update(dt);
 }
 
-// vtbl +0x18 @40ba70 (undetected COMDAT in the dwGuiCredits range) — forward
+// vtbl +0x18 dwGuiScreen_OnHover (undetected COMDAT in the dwGuiCredits range) — forward
 // hover into the controls group (no bEnabled gate; the group's own OnHover
 // does the containment checks).
 int dwGuiScreen::OnHover(int16_t x, int16_t y)
@@ -972,7 +972,7 @@ int dwGuiScreen::OnHover(int16_t x, int16_t y)
     return this->controls.OnHover(x, y);
 }
 
-// vtbl +0x3c @432150 (dwGuiScreen_EnsureImages — mis-binned past the unit end)
+// vtbl +0x3c (dwGuiScreen_EnsureImages — mis-binned past the unit end)
 void dwGuiScreen::EnsureImages()
 {
     if (this->pTutorialAnim)
@@ -980,7 +980,7 @@ void dwGuiScreen::EnsureImages()
     this->controls.EnsureImages();           // vtbl +0x3c
 }
 
-// vtbl +0x40 @432170 (dwGuiScreen_FreeImages — mis-binned past the unit end)
+// vtbl +0x40 (dwGuiScreen_FreeImages — mis-binned past the unit end)
 void dwGuiScreen::FreeImages()
 {
     if (this->pTutorialAnim)
@@ -988,7 +988,7 @@ void dwGuiScreen::FreeImages()
     this->controls.FreeImages();           // vtbl +0x40
 }
 
-// vtbl +0x1c @4312d0 (dwGuiScreen_OnMessage)
+// vtbl +0x1c dwGuiScreen_OnMessage
 int dwGuiScreen::OnMessage(dwWidgetMsg* pMsg)
 {
     uint32_t code;
@@ -1011,14 +1011,14 @@ int dwGuiScreen::OnMessage(dwWidgetMsg* pMsg)
         case 0x66:
             this->pSnapshotImage = dwGuiScreen_CaptureShadedScreen();
             // dwMissionSequence (unit dwGuiMission, landed): the
-            // workshop<->mission sequencer — binary new(0x1c) + vtbl 0x51f7d8.
+            // workshop<->mission sequencer — binary new(0x1c) + dwMissionSequence_vtbl.
             pSeg = static_cast<dwSegment*>(new dwMissionSequence(this->pSnapshotImage));
             break;
         case 0x67:
             // dwGuiInGame TRAINING deploy: if the assembled droid is valid,
             // find the TGROUND (missionType 4) mission in dwCore_pMissionList
             // and new(0x284) dwGuiInGame(pMissionInfo); pSeg = its dwSegment
-            // subobject. (Binary @431... iterates the list for the type-4
+            // subobject. (Binary iterates the list for the type-4
             // mission — NOT dwCore_pCurrentMission, which is the map default =
             // the first NORMAL mission. Using the current mission launched the
             // wrong level, e.g. Incline instead of the training ground.)
@@ -1044,7 +1044,7 @@ int dwGuiScreen::OnMessage(dwWidgetMsg* pMsg)
             break;
         case 0x6a:
             // reference-room intro-video segment (unit dwGuiReference): binary
-            // new(0x18){ dwSegment_Ctor; state@0x14 = 0; vptr = 0x51f238 } — a
+            // new(0x18){ dwSegment_Ctor; state@0x14 = 0; vptr = dwGuiRefIntroSeg_vtbl } — a
             // self-advancing dwGuiRefIntroSeg that chains RefIntro/RefRoom ->
             // RStart -> the reference screen. Same wiring as 0x65's EnterSeg.
             pSeg = dwGuiReference_NewIntroSeg();
@@ -1116,7 +1116,7 @@ int dwGuiScreen::OnMessage(dwWidgetMsg* pMsg)
 
 // ---- cheats ----------------------------------------------------------------------
 
-// vtbl +0x4c @431f50 (dwGuiScreen_CheckCheatCodes) — the base cheat table.
+// vtbl +0x4c dwGuiScreen_CheckCheatCodes — the base cheat table.
 // The game-data pokes need the P5 units' structs; each branch documents the
 // exact binary semantics and is stubbed until its owner lands.
 void dwGuiScreen::CheckCheatCodes(char* pCode)
@@ -1213,7 +1213,7 @@ extern "C" int dwGuiScreen_ExecCheatCode(const char* pCode)
 
 // ---- segment-side virtuals ---------------------------------------------------------
 
-// scn vtbl +0x00 @431b90 (Ghidra: dwGuiScreen_OnActivate)
+// scn vtbl +0x00 (Ghidra: dwGuiScreen_OnActivate)
 int dwGuiScreen::Activate()
 {
     // lazy-build the controls from "<name>.cmp" on first activation
@@ -1239,7 +1239,7 @@ int dwGuiScreen::Activate()
     return 1;
 }
 
-// scn vtbl +0x04 @431c30 (Ghidra: dwGuiScreen_OnHide)
+// scn vtbl +0x04 (Ghidra: dwGuiScreen_OnHide)
 void dwGuiScreen::Deactivate()
 {
     this->FlushTooltipDirty();
@@ -1252,7 +1252,7 @@ void dwGuiScreen::Deactivate()
         dwSound_pManager->FreeAllSamples();
 }
 
-// scn vtbl +0x08 @431a70 (Ghidra: dwGuiScreen_SegSuspend)
+// scn vtbl +0x08 (Ghidra: dwGuiScreen_SegSuspend)
 void dwGuiScreen::Suspend()
 {
     dwWidgetMsg msg;
@@ -1268,7 +1268,7 @@ void dwGuiScreen::Suspend()
     dwSegment::Suspend();
 }
 
-// scn vtbl +0x0c @431ab0 (Ghidra: dwGuiScreen_SegResume)
+// scn vtbl +0x0c (Ghidra: dwGuiScreen_SegResume)
 void dwGuiScreen::Resume()
 {
     this->Enable(); // virtual +0x20 (widget side)
@@ -1276,7 +1276,7 @@ void dwGuiScreen::Resume()
     dwWidget_pDefault = this;
 }
 
-// scn vtbl +0x10 @431c60 (Ghidra: dwGuiScreen_SegUpdate) — the per-frame tick.
+// scn vtbl +0x10 (Ghidra: dwGuiScreen_SegUpdate) — the per-frame tick.
 void dwGuiScreen::Update()
 {
     float elapsedSec;
@@ -1373,7 +1373,7 @@ void dwGuiScreen::Update()
     }
 }
 
-// @431e90 (dwGuiScreen_RenderActive) — repaint this screen into the locked
+// dwGuiScreen_RenderActive — repaint this screen into the locked
 // display surface, per dirty rect (or one full pass when dwMain_bFullRedraw).
 void dwGuiScreen::RenderActive()
 {

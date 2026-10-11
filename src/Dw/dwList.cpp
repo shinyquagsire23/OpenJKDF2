@@ -1,12 +1,12 @@
 // dwList — circular doubly-linked list (sentinel node), C++ template COMDATs
 // scattered through DroidWorks.exe:
-//   dwList::dwList        @0x40b940 (dwList_Ctor)
-//   dwList::Free          @0x436d20
-//   dwList::InsertAfter   @0x43c170
-//   dwList::FreeOwnedNodes@0x402780
-//   dwList::UnlinkFreeNode@0x403710
-//   dwList::UnlinkNode    @0x403750
-//   dwList::FreeNodeRange @0x40ab10
+//   dwList::dwList        dwList_Ctor
+//   dwList::Free
+//   dwList::InsertAfter
+//   dwList::FreeOwnedNodes
+//   dwList::UnlinkFreeNode
+//   dwList::UnlinkNode
+//   dwList::FreeNodeRange
 //
 // Allocation: original used operator new / HostServices FreeHandle; this
 // layer is desktop-only, so plain malloc/free are used (kept — the node
@@ -22,7 +22,6 @@
 // called as (this, bFreeMemory).
 typedef void (*dwList_DtorDeleteFn)(void* pThis, int bFreeMemory);
 
-// @40b940
 dwList::dwList()
 {
     dwListNode* pNewSentinel;
@@ -36,7 +35,6 @@ dwList::dwList()
     pNewSentinel->pPrev = pNewSentinel;
 }
 
-// @436d20
 void dwList::Free()
 {
     dwListNode* pSent;
@@ -60,7 +58,7 @@ void dwList::Free()
     // also why dwList has no implicit destructor (see dwList.h).
 }
 
-// @43c170 — pData is taken by value; the old C translation's void** was a
+// pData is taken by value; the old C translation's void** was a
 // const-ref artifact (see dwList.h).
 dwList* dwList::InsertAfter(dwListNode* pAfter, void* pData)
 {
@@ -78,7 +76,6 @@ dwList* dwList::InsertAfter(dwListNode* pAfter, void* pData)
     return this;
 }
 
-// @402780
 void dwList::FreeOwnedNodes()
 {
     dwListNode* pNode;
@@ -109,7 +106,6 @@ void dwList::FreeOwnedNodes()
     this->Free();
 }
 
-// @403710
 dwList* dwList::UnlinkFreeNode(dwListNode* pNode)
 {
     pNode->pPrev->pNext = pNode->pNext;
@@ -120,7 +116,6 @@ dwList* dwList::UnlinkFreeNode(dwListNode* pNode)
     return this;
 }
 
-// @403750
 void dwList::UnlinkNode(dwListNode** ppNode)
 {
     dwListNode* pNode;
@@ -132,7 +127,6 @@ void dwList::UnlinkNode(dwListNode** ppNode)
     pNode->pPrev = NULL;
 }
 
-// @40ab10
 dwList* dwList::FreeNodeRange(dwListNode* pNode, dwListNode* pEnd)
 {
     dwListNode* pNext;

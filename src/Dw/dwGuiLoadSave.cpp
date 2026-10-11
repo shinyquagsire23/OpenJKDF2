@@ -1,5 +1,5 @@
 // dwGuiLoadSave — 'lsdroid' droid save/load screen (dwGuiScreen subclass).
-// DroidWorks.exe 0x40ba90-0x40ce9f, vtbls @0x51e930 (primary) / 0x51e918
+// DroidWorks.exe, vtbls primary / dwGuiLoadSave_scn_vtbl
 // (segment). See Dw/dwGuiLoadSave.h for the class notes.
 
 #include "Dw/dwGuiLoadSave.h"
@@ -18,21 +18,21 @@
 
 #include <ctype.h>
 
-// The DW host-services pointer (dwMain.c; binary global dwHS @0x6b6258).
+// The DW host-services pointer (dwMain.c; binary global dwHS).
 extern "C" HostServices* dwMain_pHS;
 
 // ---- cross-unit symbols -----------------------------------------------------
 
 // The global assembled-droid workspace (owned by the dw core unit, P7).
-extern "C" dwListNode* dwCore_pWorkspaceNodes; // @0x53d984 (dwPartNode list sentinel)
-extern "C" dwString dwCore_workspaceName;      // @0x53d978 (edited droid name)
+extern "C" dwListNode* dwCore_pWorkspaceNodes; // dwPartNode list sentinel
+extern "C" dwString dwCore_workspaceName;      // edited droid name
 
 // The game-wide modal-dialog runner (dwGuiMission unit).
 extern "C" int dwGuiDialog_RunModal(const char* pConfName, const char* pMsgKey);
 
 // ---- dwGuiLoadSave ----------------------------------------------------------
 
-// @40ba90 (dwGuiLoadSave_Ctor)
+// dwGuiLoadSave_Ctor
 dwGuiLoadSave::dwGuiLoadSave(dwImage* pBgSnapshot)
     : dwGuiScreen("lsdroid", pBgSnapshot)
 {
@@ -51,7 +51,7 @@ dwGuiLoadSave::dwGuiLoadSave(dwImage* pBgSnapshot)
     this->slideDir = 0.0f;
 }
 
-// @40bb30 (dwGuiLoadSave_Dtor)
+// dwGuiLoadSave_Dtor
 dwGuiLoadSave::~dwGuiLoadSave()
 {
     this->FreeImages();
@@ -77,7 +77,7 @@ dwGuiLoadSave::~dwGuiLoadSave()
     //  deletes the remaining child controls)
 }
 
-// vtbl(scn) +0x00 @40beb0 (dwGuiLoadSave_OnActivate)
+// vtbl(scn) +0x00 dwGuiLoadSave_OnActivate
 int dwGuiLoadSave::Activate()
 {
     // Empty the controls group so the base Activate rebuilds it (re-listing
@@ -126,14 +126,14 @@ int dwGuiLoadSave::Activate()
     return ret;
 }
 
-// vtbl(scn) +0x04 @40bea0 (dwGuiLoadSave_OnDeactivate)
+// vtbl(scn) +0x04 dwGuiLoadSave_OnDeactivate
 void dwGuiLoadSave::Deactivate()
 {
     if (dwSound_pManager)
         dwSound_pManager->FreeAllSamples();
 }
 
-// vtbl +0x10 @40c110 (dwGuiLoadSave_OnKey)
+// vtbl +0x10 dwGuiLoadSave_OnKey
 int dwGuiLoadSave::OnKey(int code, int repeat)
 {
     if ((char)code == '\x1b' && repeat != 0
@@ -146,7 +146,7 @@ int dwGuiLoadSave::OnKey(int code, int repeat)
     return 0;
 }
 
-// vtbl +0x08 @40c160 (dwGuiLoadSave_OnMouseDown)
+// vtbl +0x08 dwGuiLoadSave_OnMouseDown
 int dwGuiLoadSave::OnMouseDown(int16_t x, int16_t y)
 {
     // Swallow clicks while the panel is sliding.
@@ -155,7 +155,7 @@ int dwGuiLoadSave::OnMouseDown(int16_t x, int16_t y)
     return 0;
 }
 
-// vtbl +0x14 @40bc10 (dwGuiLoadSave_Update)
+// vtbl +0x14 dwGuiLoadSave_Update
 void dwGuiLoadSave::Update(float dt)
 {
     if (this->slideDir != 0.0f)
@@ -184,7 +184,7 @@ void dwGuiLoadSave::Update(float dt)
                 if (this->bEditNameMode != 0)
                     this->pNameEntry->BeginEdit();
 
-                // Settle the controls group to (0,0) FIRST (binary @40bcb1:
+                // Settle the controls group to (0,0) FIRST (binary:
                 // Move(-left,-top) inside the completion block). Without this
                 // the DROIDBOX bake below lands one slide-step (~20px at low
                 // fps) too low — the controls then rest above the baked chrome
@@ -192,7 +192,7 @@ void dwGuiLoadSave::Update(float dt)
                 this->controls.Move((int16_t)(-this->controls.left), (int16_t)(-this->controls.top));
 
                 // Bake the DROIDBOX chrome into the screen background BEFORE
-                // detaching it (binary @40bcc9-40bd60: pBgImage->Lock, then
+                // detaching it (binary: pBgImage->Lock, then
                 // pDroidBoxImage->DrawChild into the locked bg bits, Unlock).
                 // Without the bake the whole window frame/list/buttons vanish
                 // when the post-slide repaint draws the bare snapshot bg
@@ -235,7 +235,7 @@ void dwGuiLoadSave::Update(float dt)
     this->controls.Update(dt);
 }
 
-// vtbl +0x1c @40c190 (dwGuiLoadSave_OnMessage)
+// vtbl +0x1c dwGuiLoadSave_OnMessage
 int dwGuiLoadSave::OnMessage(dwWidgetMsg* pMsg)
 {
     switch (pMsg->code)
@@ -360,7 +360,7 @@ int dwGuiLoadSave::OnMessage(dwWidgetMsg* pMsg)
     return ret;
 }
 
-// vtbl +0x48 @40c5a0 (dwGuiLoadSave_CreateControl)
+// vtbl +0x48 dwGuiLoadSave_CreateControl
 dwWidget* dwGuiLoadSave::CreateControl(char* pKeyword, dwConfFile* pConf)
 {
     dwRect rect = { 0, 0, 0, 0 };
@@ -414,7 +414,7 @@ dwWidget* dwGuiLoadSave::CreateControl(char* pKeyword, dwConfFile* pConf)
                 delete pStr;
             pNode = pNext;
         }
-        // @40ce30 dwGuiLoadSave_ClearList + free-sentinel == dwList::Free
+        // dwGuiLoadSave_ClearList + free-sentinel == dwList::Free
         files.Free();
         return this->pFileScrollBox;
     }
@@ -502,7 +502,7 @@ dwWidget* dwGuiLoadSave::CreateControl(char* pKeyword, dwConfFile* pConf)
     return dwGuiScreen::CreateControl(pKeyword, pConf);
 }
 
-// vtbl +0x3c @40ccd0 (dwGuiLoadSave_EnsureImages)
+// vtbl +0x3c dwGuiLoadSave_EnsureImages
 void dwGuiLoadSave::EnsureImages()
 {
     dwGuiScreen::EnsureImages();
@@ -517,7 +517,7 @@ void dwGuiLoadSave::EnsureImages()
     if (this->pButtonRecycle != NULL)   this->pButtonRecycle->EnsureImages();
 }
 
-// vtbl +0x40 @40cd70 (dwGuiLoadSave_FreeImages)
+// vtbl +0x40 dwGuiLoadSave_FreeImages
 void dwGuiLoadSave::FreeImages()
 {
     dwGuiScreen::FreeImages();
@@ -532,7 +532,7 @@ void dwGuiLoadSave::FreeImages()
     if (this->pButtonRecycle != NULL)   this->pButtonRecycle->FreeImages();
 }
 
-// @40bff0 (dwGuiLoadSave_RefreshWidgets)
+// dwGuiLoadSave_RefreshWidgets
 void dwGuiLoadSave::RefreshWidgets()
 {
     if (dwCore_pWorkspaceNodes == dwCore_pWorkspaceNodes->pNext)
@@ -588,11 +588,11 @@ void dwGuiLoadSave::RefreshWidgets()
     this->Invalidate();
 }
 
-// @40bdc0 (dwGuiLoadSave_StartSlideOut)
+// dwGuiLoadSave_StartSlideOut
 void dwGuiLoadSave::StartSlideOut()
 {
-    // Un-bake the DROIDBOX chrome from the background FIRST (binary
-    // @40bdc0-40bdf5: pBgImage->Lock [vtbl+0x0c], pSnapshot->Blit into the
+    // Un-bake the DROIDBOX chrome from the background FIRST (binary:
+    // pBgImage->Lock [vtbl+0x0c], pSnapshot->Blit into the
     // locked bg bits [vtbl+0x04], Unlock [vtbl+0x10]) — restores the pristine
     // dimmed snapshot so no ghost of the window sticks around as the panel
     // slides away (BUG 20).

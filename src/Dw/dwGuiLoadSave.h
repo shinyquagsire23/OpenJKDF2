@@ -3,14 +3,14 @@
 
 // dwGuiLoadSave — the 'lsdroid' droid SAVE/LOAD SCREEN (dwGuiScreen subclass).
 //
-// Decompiled from DroidWorks.exe, unit range 0x40ba90-0x40ce9f (the map row
-// lists 0x40b940-0x40d17f, but 0x40b940 is the shared dwList_Ctor COMDAT,
-// 0x40ba60 is dwGuiCredits' segment dtor thunk, and 0x40cea0+ is
+// Decompiled from DroidWorks.exe (the map row
+// lists, but is the shared dwList_Ctor COMDAT,
+// dwGuiCredits_ScnDtorThunk is dwGuiCredits' segment dtor thunk, and dwWorkshopDroidEditor_Ctor+ is
 // dwWorkshopDroidEditor — all translated elsewhere).
 //
 // MSVC multiple inheritance (binary): PRIMARY vtable dwGuiLoadSave_vtbl
-// @0x51e930 (dwWidget shape + screen extras), SECONDARY/segment vtable
-// dwGuiLoadSave_scn_vtbl @0x51e918 (dwSegment lifecycle @obj+0x10; the tail
+// (dwWidget shape + screen extras), SECONDARY/segment vtable
+// dwGuiLoadSave_scn_vtbl (dwSegment lifecycle @obj+0x10; the tail
 // re-shares the primary). In this translation simply
 // `struct dwGuiLoadSave : dwGuiScreen`.
 //
@@ -68,7 +68,7 @@ struct dwSegment* dwGuiLoadSave_New(struct dwImage* pBgSnapshot);
 struct dwImage; // Dw/dwImage.h (the slide-out snapshot)
 
 // Binary layout: dwGuiScreen base @0x00 (0xc8) + own fields below — sizeof
-// 0xfc. Primary vtbl @0x51e930, segment vtbl @0x51e918.
+// 0xfc. Primary dwGuiLoadSave_vtbl, segment dwGuiLoadSave_scn_vtbl.
 struct dwGuiLoadSave : dwGuiScreen
 {
     dwImage* pSnapshot;                // 0xc8: dimmed screen snapshot (== the
@@ -93,36 +93,36 @@ struct dwGuiLoadSave : dwGuiScreen
                                        //       slide-in, 0 idle
     // (binary sizeof 0xfc)
 
-    // @40ba90 (dwGuiLoadSave_Ctor) — dwGuiScreen("lsdroid", pBgSnapshot) +
+    // dwGuiLoadSave_Ctor — dwGuiScreen("lsdroid", pBgSnapshot) +
     // zeroed fields; pBgSnapshot stored at 0xc8 too.
     dwGuiLoadSave(dwImage* pBgSnapshot);
 
-    // @40bb30 (dwGuiLoadSave_Dtor; scalar-deleting wrapper @40bb10; segment
-    // dtor thunk @40ce90) — FreeImages, detach + delete the droidbox image
+    // dwGuiLoadSave_Dtor (scalar-deleting wrapper dwGuiLoadSave_DtorDelete; segment
+    // dtor thunk dwGuiLoadSave_ScnDtorThunk) — FreeImages, detach + delete the droidbox image
     // (it may or may not still be attached to `controls`), then the base
     // dtor tears down the rest.
     virtual ~dwGuiLoadSave();
 
-    // ---- dwWidget/dwGuiScreen overrides (primary vtbl @0x51e930) -----------
-    virtual int OnMouseDown(int16_t x, int16_t y); // +0x08 @40c160 — consume clicks while sliding
-    virtual int OnKey(int key, int repeat);        // +0x10 @40c110 — Esc during slide fast-forwards it
-    virtual void Update(float dt);                 // +0x14 @40bc10 — panel slide anim
-    virtual int OnMessage(dwWidgetMsg* pMsg);      // +0x1c @40c190 — command codes 0xfa3-0xfa8
-    virtual void EnsureImages();                   // +0x3c @40ccd0 — base + every control
-    virtual void FreeImages();                     // +0x40 @40cd70 — base + every control
-    virtual dwWidget* CreateControl(char* pKeyword, dwConfFile* pConf); // +0x48 @40c5a0
+    // ---- dwWidget/dwGuiScreen overrides (primary dwGuiLoadSave_vtbl) -----------
+    virtual int OnMouseDown(int16_t x, int16_t y); // +0x08 dwGuiLoadSave_OnMouseDown — consume clicks while sliding
+    virtual int OnKey(int key, int repeat);        // +0x10 dwGuiLoadSave_OnKey — Esc during slide fast-forwards it
+    virtual void Update(float dt);                 // +0x14 dwGuiLoadSave_Update — panel slide anim
+    virtual int OnMessage(dwWidgetMsg* pMsg);      // +0x1c dwGuiLoadSave_OnMessage — command codes 0xfa3-0xfa8
+    virtual void EnsureImages();                   // +0x3c dwGuiLoadSave_EnsureImages — base + every control
+    virtual void FreeImages();                     // +0x40 dwGuiLoadSave_FreeImages — base + every control
+    virtual dwWidget* CreateControl(char* pKeyword, dwConfFile* pConf); // +0x48 dwGuiLoadSave_CreateControl
 
-    // ---- dwSegment overrides (segment vtbl @0x51e918) ----------------------
-    virtual int Activate();     // +0x00 @40beb0 — free stale scrollbox items, base activate, start slide-in + WLSPanelAmb loop
-    virtual void Deactivate();  // +0x04 @40bea0 — free cached sound samples
+    // ---- dwSegment overrides (segment dwGuiLoadSave_scn_vtbl) ----------------------
+    virtual int Activate();     // +0x00 dwGuiLoadSave_OnActivate — free stale scrollbox items, base activate, start slide-in + WLSPanelAmb loop
+    virtual void Deactivate();  // +0x04 dwGuiLoadSave_OnDeactivate — free cached sound samples
 
     // ---- non-virtual --------------------------------------------------------
-    // @40bff0 — enable/disable the buttons + scroll controls from
+    // enable/disable the buttons + scroll controls from
     // workspace-empty state, the scrollbox selection and its scroll flag.
     void RefreshWidgets();
-    // @40bdc0 — re-attach the droidbox image to `controls`, arm the slide-out.
+    // re-attach the droidbox image to `controls`, arm the slide-out.
     void StartSlideOut();
-    // (@40ce30 dwGuiLoadSave_ClearList: the scrollbox-population temp list is
+    // (dwGuiLoadSave_ClearList: the scrollbox-population temp list is
     //  freed inline via dwList::Free — the binary's node-free + free-sentinel
     //  pair is exactly dwList::Free.)
 };

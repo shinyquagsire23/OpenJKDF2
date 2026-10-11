@@ -1,4 +1,4 @@
-// dwFont — DroidWorks bitmap-font module (Ghidra 0x447f20-0x448d5x).
+// dwFont — DroidWorks bitmap-font module.
 //
 // Loads/caches `<name>.laf` bitmap fonts through dwMain_pHS file ops; draws
 // into 8bpp locked surfaces (16bpp = no-op stubs, exactly like the binary).
@@ -21,20 +21,19 @@
 #include <ctype.h>
 #include <string.h>
 
-// The DW host-services pointer (dwMain.c; binary dwHS @0x6b6258).
+// The DW host-services pointer (dwMain.c; binary dwHS).
 extern HostServices* dwMain_pHS;
 
-// name -> cached font block (binary: 0x541d38).
+// name -> cached font block (binary: dwFont_pCache).
 tHashTable* dwFont_pCache = NULL;
 
-// @447f20
 int dwFont_Startup()
 {
     dwFont_pCache = stdHashtbl_New(10);
     return dwFont_pCache != NULL;
 }
 
-// @447f40 — frees every cached font block (node values), then the table.
+// frees every cached font block (node values), then the table.
 void dwFont_Shutdown()
 {
     if (!dwFont_pCache)
@@ -51,7 +50,7 @@ void dwFont_Shutdown()
     dwFont_pCache = NULL; // Note: the binary leaves the stale pointer; nulled for the soft-reset loop.
 }
 
-// @447fa0 — fill the handle for pName, loading "<pName>.laf" on a cache miss.
+// fill the handle for pName, loading "<pName>.laf" on a cache miss.
 // Cached block layout:
 //   [name\0][u32 numGlyphs][dwFontHeader][u16 charMap[n]][dwFontGlyph[n]][pixels]
 // NOTE (faithful): the header/glyph arrays inside the block are only byte-
@@ -80,7 +79,7 @@ dwFont* dwFont_Load(dwFont* pFont, const char* pName)
 
     char aPath[32];
     strncpy(aPath, pName, 0x1e);
-    strcpy(aPath + nameLen, ".laf"); // binary: strcpy of the @0x52a288 suffix at name end
+    strcpy(aPath + nameLen, ".laf"); // binary: strcpy of the suffix at name end
 
     stdFile_t hFile = dwMain_pHS->fileOpen(aPath, "rb");
     if (!hFile)
@@ -176,7 +175,6 @@ dwFont* dwFont_Load(dwFont* pFont, const char* pName)
     return pFont;
 }
 
-// @448390
 int dwFont_GetCharWidth(dwFont* pFont, char ch)
 {
     int c = ch; // sign-extends; chars >= 0x80 fall outside the range
@@ -188,7 +186,7 @@ int dwFont_GetCharWidth(dwFont* pFont, char ch)
     return 0;
 }
 
-// @4483c0 — len 0 measures the whole string; stops early at NUL.
+// len 0 measures the whole string; stops early at NUL.
 int dwFont_MeasureString(dwFont* pFont, const char* pStr, int len)
 {
     if (len == 0)
@@ -209,7 +207,7 @@ int dwFont_MeasureString(dwFont* pFont, const char* pStr, int len)
 // ------------------------------------------------------------------
 // Glyph blits
 
-// @448410 — unclipped 8bpp glyph blit; advances pPos->x by the advance width.
+// unclipped 8bpp glyph blit; advances pPos->x by the advance width.
 void dwFont_DrawGlyph8(dwFont* pFont, dwImageBits* pBits, dwPoint* pPos, char ch, uint8_t color)
 {
     int c = ch;
@@ -259,13 +257,13 @@ void dwFont_DrawGlyph8(dwFont* pFont, dwImageBits* pBits, dwPoint* pPos, char ch
     pPos->x += pGlyph->advanceWidth;
 }
 
-// @448520 — 16bpp stub (empty in the binary).
+// 16bpp stub (empty in the binary).
 void dwFont_DrawGlyph16(dwFont* pFont, dwImageBits* pBits, dwPoint* pPos, char ch, uint8_t color)
 {
     (void)pFont; (void)pBits; (void)pPos; (void)ch; (void)color;
 }
 
-// @448530 — bpp dispatch.
+// bpp dispatch.
 void dwFont_DrawGlyph(dwFont* pFont, dwImageBits* pBits, dwPoint* pPos, char ch, uint8_t color)
 {
     uint8_t v = (uint8_t)(pBits->pDesc->bpp << 3); // low 5 bits of bpp
@@ -275,7 +273,7 @@ void dwFont_DrawGlyph(dwFont* pFont, dwImageBits* pBits, dwPoint* pPos, char ch,
         dwFont_DrawGlyph16(pFont, pBits, pPos, ch, color);
 }
 
-// @448580 — clipped 8bpp glyph blit; advances pPos->x, then clamps it to
+// clipped 8bpp glyph blit; advances pPos->x, then clamps it to
 // pClip->right.
 void dwFont_DrawGlyphClipped8(dwFont* pFont, dwImageBits* pBits, dwPoint* pPos, char ch, uint8_t color, dwRect* pClip)
 {
@@ -357,13 +355,13 @@ void dwFont_DrawGlyphClipped8(dwFont* pFont, dwImageBits* pBits, dwPoint* pPos, 
         pPos->x = pClip->right;
 }
 
-// @448730 — 16bpp stub (empty in the binary).
+// 16bpp stub (empty in the binary).
 void dwFont_DrawGlyphClipped16(dwFont* pFont, dwImageBits* pBits, dwPoint* pPos, char ch, uint8_t color, dwRect* pClip)
 {
     (void)pFont; (void)pBits; (void)pPos; (void)ch; (void)color; (void)pClip;
 }
 
-// @448740 — bpp dispatch.
+// bpp dispatch.
 void dwFont_DrawGlyphClipped(dwFont* pFont, dwImageBits* pBits, dwPoint* pPos, char ch, uint8_t color, dwRect* pClip)
 {
     uint8_t v = (uint8_t)(pBits->pDesc->bpp << 3);
@@ -376,7 +374,7 @@ void dwFont_DrawGlyphClipped(dwFont* pFont, dwImageBits* pBits, dwPoint* pPos, c
 // ------------------------------------------------------------------
 // Layout
 
-// @448850 — number of chars of pStr (up to '\n'/NUL) that fit in maxWidth px;
+// number of chars of pStr (up to '\n'/NUL) that fit in maxWidth px;
 // backs up to the previous whitespace while the line overflows. Note: the
 // binary uses the CRT ctype isspace here.
 int dwFont_FindLineBreak(dwFont* pFont, const char* pStr, unsigned int maxWidth)
@@ -400,7 +398,7 @@ int dwFont_FindLineBreak(dwFont* pFont, const char* pStr, unsigned int maxWidth)
     return len;
 }
 
-// @448790 — word-wrap up to maxChars into pRect's width. *pOut ends at
+// word-wrap up to maxChars into pRect's width. *pOut ends at
 // (left + width of the final partial line, top + summed line heights); the
 // bpp inset added up front is subtracted again at the end (faithful).
 void dwFont_MeasureWrappedExtent(dwPoint* pOut, dwFont* pFont, dwRect* pRect, const char* pStr, unsigned int maxChars)
@@ -438,7 +436,7 @@ void dwFont_MeasureWrappedExtent(dwPoint* pOut, dwFont* pFont, dwRect* pRect, co
 // ------------------------------------------------------------------
 // String draws
 
-// @4488c0 — single-line draw at *pPos (not advanced), truncated at both ends
+// single-line draw at *pPos (not advanced), truncated at both ends
 // against the clipped bounds with a 2x'W'-width soft margin. When the line is
 // vertically clipped it falls back to a plain clipped glyph walk.
 void dwFont_DrawStringClipped(dwImageBits* pBits, dwFont* pFont, dwPoint* pPos, const char* pStr, uint8_t color, dwRect* pClip)
@@ -499,7 +497,7 @@ void dwFont_DrawStringClipped(dwImageBits* pBits, dwFont* pFont, dwPoint* pPos, 
     }
 }
 
-// @448a60 — word-wrapped multiline draw into pRect (clipped additionally by
+// word-wrapped multiline draw into pRect (clipped additionally by
 // pClip); bCentered centers each line horizontally.
 void dwFont_DrawTextWrapped(dwImageBits* pBits, dwFont* pFont, dwRect* pRect, const char* pStr, uint8_t color, dwRect* pClip, int bCentered)
 {
@@ -539,7 +537,7 @@ void dwFont_DrawTextWrapped(dwImageBits* pBits, dwFont* pFont, dwRect* pRect, co
     }
 }
 
-// @448b90 — word-wrapped multiline draw with per-line x alignment:
+// word-wrapped multiline draw with per-line x alignment:
 // 1 = shift left by the free width, 2 = right-align, 3 = center.
 void dwFont_DrawTextAligned(dwImageBits* pBits, dwFont* pFont, dwRect* pRect, const char* pStr, uint8_t color, dwRect* pClip, int align)
 {
@@ -589,13 +587,11 @@ void dwFont_DrawTextAligned(dwImageBits* pBits, dwFont* pFont, dwRect* pRect, co
     }
 }
 
-// @448d00
 void dwFont_DrawText(dwImageBits* pBits, dwFont* pFont, dwRect* pRect, const char* pStr, uint8_t color, dwRect* pClip)
 {
     dwFont_DrawTextWrapped(pBits, pFont, pRect, pStr, color, pClip, 0);
 }
 
-// @448d30
 void dwFont_DrawTextCentered(dwImageBits* pBits, dwFont* pFont, dwRect* pRect, const char* pStr, uint8_t color, dwRect* pClip)
 {
     dwFont_DrawTextWrapped(pBits, pFont, pRect, pStr, color, pClip, 1);

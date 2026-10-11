@@ -5,13 +5,13 @@
 // double-buffering (draws a 32x32 sprite into the dwDisplay back buffer,
 // remembering the pixels underneath so the working buffer stays clean).
 //
-// Ghidra (DroidWorks.exe) 0x443340-0x44391x:
-//   dwCursor_TableInit@0x443350 (CRT static-ctor body; thunk @0x443340)
-//   dwCursor_Redraw@0x443500
-//   dwCursor_Draw@0x4435f0
-//   dwCursor_RestoreUnder@0x443720
-//   dwCursor_SetCursor@0x443780
-//   dwCursor_Precache@0x4438d0
+// Ghidra (DroidWorks.exe):
+//   dwCursor_TableInit (CRT static-ctor body; thunk)
+//   dwCursor_Redraw
+//   dwCursor_Draw
+//   dwCursor_RestoreUnder
+//   dwCursor_SetCursor
+//   dwCursor_Precache
 //
 // The cursor sprite/save-under tVBuffers are ALLOCATED AND FREED BY dwDisplay
 // (dwDisplay_CreateCursorSprites / dwDisplay_FreeCursors); this module only
@@ -45,7 +45,7 @@ typedef struct dwCursorEntry
 
 extern dwCursorEntry dwCursor_aCursors[DWCURSOR_NUM_CURSORS];
 extern int dwCursor_curIdx;        // current table index (0 = no cursor)
-extern dwPoint dwCursor_pos;       // binary: 0x541bf8 — shared cursor position
+extern dwPoint dwCursor_pos;       // binary — shared cursor position
                                    // (dwWidget/dwSegment write it directly)
 extern int16_t dwCursor_drawX;     // last draw position (pos - hotspot), pre-clip
 extern int16_t dwCursor_drawY;

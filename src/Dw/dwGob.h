@@ -1,7 +1,7 @@
 #ifndef _DWGOB_H
 #define _DWGOB_H
 
-// dwGob (DroidWorks.exe 0x414e70-0x4155a0): transparent GOB-archive vs OS-file
+// dwGob: transparent GOB-archive vs OS-file
 // I/O shim. dwGob_Startup saves the HostServices OS file ops and installs the
 // dwGob_* wrappers in their place, so ALL HostServices file I/O transparently
 // resolves into mounted GOB archives ("...\foo.GOB\member" paths) or plain OS

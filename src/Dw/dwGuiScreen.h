@@ -6,17 +6,17 @@
 // dwGuiInGame, dwGuiOptions, dwGuiCredits, dwGuiLoadSave, dwGuiFind, ...)
 // derives from it.
 //
-// Decompiled from DroidWorks.exe, unit range 0x42f930-0x43214f, plus the base
-// EnsureImages/FreeImages defaults @0x432150/0x432170 (physically just past
+// Decompiled from DroidWorks.exe, plus the base
+// EnsureImages/FreeImages defaults dwGuiScreen_EnsureImages/dwGuiScreen_FreeImages (physically just past
 // the unit end, mis-binned into the dwGuiWidgets range) and two shared-COMDAT
-// forwarder slot bodies: Update(dt) @0x41c510 (Ghidra: mis-attributed
-// dwGuiMission_ForwardUpdate) and OnHover @0x40ba70 (undetected fn in the
+// forwarder slot bodies: Update(dt) dwGuiMission_ForwardUpdate (Ghidra: mis-attributed
+// dwGuiMission_ForwardUpdate) and OnHover dwGuiScreen_OnHover (undetected fn in the
 // dwGuiCredits range).
 //
 // MSVC multiple inheritance (binary): PRIMARY vtable dwGuiScreen_vtbl
-// @0x51f770 (dwWidget shape + 2 NEW slots: +0x48 CreateControl factory,
+// (dwWidget shape + 2 NEW slots: +0x48 CreateControl factory,
 // +0x4c CheckCheatCodes) with this = obj+0; SECONDARY "scn" vtable
-// dwGuiScreen_scn_vtbl @0x51f7c0 (the 6-slot dwSegment lifecycle iface) for
+// dwGuiScreen_scn_vtbl (the 6-slot dwSegment lifecycle iface) for
 // the dwSegment subobject embedded at binary obj+0x10. In this translation
 // that is simply `struct dwGuiScreen : dwWidget, dwSegment` — the compiler
 // generates the this-adjustor thunks the binary carried by hand.
@@ -85,7 +85,7 @@ typedef struct dwGuiScreenLabel
 // dwCore_pGlobalStrings; returns the localized string's buffer, or the
 // trimmed key itself when no table has it (callers use `result == input` as
 // the "not found" test). ⚠ pStr must be non-NULL (the binary dereferences it
-// unconditionally). @42fed0
+// unconditionally).
 char* dwGuiScreen_LocalizeString(char* pStr, dwStringTable* pTable);
 
 // The COMMON control factory shared by every screen: builds the keyword ->
@@ -96,8 +96,8 @@ char* dwGuiScreen_LocalizeString(char* pStr, dwStringTable* pTable);
 // Returns the new control or NULL (unknown keywords log "Unrecognized UI
 // control"). The virtual dwGuiScreen::CreateControl falls back here; the only
 // other binary caller is dwEnding_OnActivate. Returns dwWidget* (opaque in
-// the C view). @42ff60 (Ghidra: dwGuiScreen_CreateControl — the free
-// function, distinct from the virtual factory slot @430a10)
+// the C view). (Ghidra: dwGuiScreen_CreateControl — the free
+// function, distinct from the virtual factory slot dwGuiScreen_CreateControl2)
 #ifdef __cplusplus
 dwWidget* dwGuiScreen_CreateControl(char* pKeyword, dwConfFile* pConf, dwStringTable* pStringTable);
 
@@ -194,26 +194,26 @@ struct dwGuiScreen : dwWidget, dwSegment
     // pName = screen name (scriptName becomes "<pName>.cmp" when non-empty);
     // pBgSrc = optional source image copied into pBgImage (8bpp display: a
     // screen-sized stdBitmapRle2 copy; 16bpp: an owned dwImageVBuf copy).
-    // @42f930 (dwGuiScreen_Ctor)
+    // dwGuiScreen_Ctor
     dwGuiScreen(const char* pName, dwImage* pBgSrc);
 
     // Frees images/tutorial anim/string table/tooltip font/labels; the
     // embedded `controls` group dtor then deletes the child controls.
-    // @42fb30 (dwGuiScreen_Dtor; scalar-deleting wrapper @42fb10 = primary
-    // vtbl +0x00, shared by the secondary vtbl's +0x14 thunk @432290)
+    // dwGuiScreen_Dtor (scalar-deleting wrapper dwGuiScreen_DtorDelete = primary
+    // vtbl +0x00, shared by the secondary vtbl's +0x14 thunk dwGuiScreen_ScnDtorThunk)
     virtual ~dwGuiScreen();
 
-    // ---- dwWidget overrides (primary vtbl @0x51f770, slot order) -----------
-    virtual int OnMouseMove(int16_t x, int16_t y);  // +0x04 @4318a0 — tooltip hover tracking, then forward to `controls`
-    virtual int OnMouseDown(int16_t x, int16_t y);  // +0x08 @431980 — pick mode capture, else forward
-    virtual int OnMouseUp(int16_t x, int16_t y);    // +0x0c @4319f0 — pick mode resolve (OnHover the picked widget), else forward
-    virtual int OnKey(int key, int repeat);         // +0x10 @431ad0 — Esc exits a tutorial; cheat-code ring; forward
-    virtual void Update(float dt);                  // +0x14 @41c510 (shared COMDAT; Ghidra: dwGuiMission_ForwardUpdate) — forward to `controls`
-    virtual int OnHover(int16_t x, int16_t y);      // +0x18 @40ba70 (undetected COMDAT) — forward to `controls`
-    virtual int OnMessage(dwWidgetMsg* pMsg);       // +0x1c @4312d0 — screen-switch commands 0x65-0x6c, 0x96 advance, 0x7530 pick mode, 0x792a/0x7932 tutorial; forward
-    virtual void EnsureImages();                    // +0x3c @432150 — tutorial anim + `controls`
-    virtual void FreeImages();                      // +0x40 @432170 — tutorial anim + `controls`
-    virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect); // +0x44 @431240 — background + controls + tooltip
+    // ---- dwWidget overrides (primary dwGuiScreen_vtbl, slot order) -----------
+    virtual int OnMouseMove(int16_t x, int16_t y);  // +0x04 dwGuiScreen_OnMouseMove — tooltip hover tracking, then forward to `controls`
+    virtual int OnMouseDown(int16_t x, int16_t y);  // +0x08 dwGuiScreen_OnMouseDown — pick mode capture, else forward
+    virtual int OnMouseUp(int16_t x, int16_t y);    // +0x0c dwGuiScreen_OnMouseUp — pick mode resolve (OnHover the picked widget), else forward
+    virtual int OnKey(int key, int repeat);         // +0x10 dwGuiScreen_OnKey — Esc exits a tutorial; cheat-code ring; forward
+    virtual void Update(float dt);                  // +0x14 (shared COMDAT; Ghidra: dwGuiMission_ForwardUpdate) — forward to `controls`
+    virtual int OnHover(int16_t x, int16_t y);      // +0x18 dwGuiScreen_OnHover (undetected COMDAT) — forward to `controls`
+    virtual int OnMessage(dwWidgetMsg* pMsg);       // +0x1c dwGuiScreen_OnMessage — screen-switch commands 0x65-0x6c, 0x96 advance, 0x7530 pick mode, 0x792a/0x7932 tutorial; forward
+    virtual void EnsureImages();                    // +0x3c dwGuiScreen_EnsureImages — tutorial anim + `controls`
+    virtual void FreeImages();                      // +0x40 dwGuiScreen_FreeImages — tutorial anim + `controls`
+    virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect); // +0x44 dwGuiScreen_Draw — background + controls + tooltip
 
     // ---- NEW virtual slots (appended after dwWidget's +0x44) ---------------
     // The keyword -> control factory called per script line by LoadControls.
@@ -221,35 +221,35 @@ struct dwGuiScreen : dwWidget, dwSegment
     // LABEL_INFO/LABEL/LABEL_RECT/STRINGTABLE/TEXTPOPUP/TIMER/TUTORIAL/
     // WIDGETBAR) and falls back to the common dwGuiScreen_CreateControl.
     // Subclass screens override this slot (their Ghidra *_CreateControl).
-    // +0x48 @430a10 (Ghidra: dwGuiScreen_CreateControl2)
+    // +0x48 (Ghidra: dwGuiScreen_CreateControl2)
     virtual dwWidget* CreateControl(char* pKeyword, dwConfFile* pConf);
     // Cheat-code matcher fed by OnKey on Enter/Ctrl-C. Base cheats:
     // SOMONEY/FITTO/BEEFCAKE/DEFCON0-3/MST3K (subclasses override and chain).
-    // +0x4c @431f50 (dwGuiScreen_CheckCheatCodes)
+    // +0x4c dwGuiScreen_CheckCheatCodes
     virtual void CheckCheatCodes(char* pCode);
 
-    // ---- dwSegment overrides (secondary "scn" vtbl @0x51f7c0, slot order) --
-    virtual int Activate();    // +0x00 @431b90 (Ghidra: dwGuiScreen_OnActivate) — lazy LoadControls, free snapshot, colormap, pDefault=this, cursor, music, Invalidate
-    virtual void Deactivate(); // +0x04 @431c30 (Ghidra: dwGuiScreen_OnHide) — flush tooltip, clear pDefault, free cached sound samples
-    virtual void Suspend();    // +0x08 @431a70 (Ghidra: dwGuiScreen_SegSuspend) — dispatch {0x7932} (exit tutorial), Disable(), base Suspend
-    virtual void Resume();     // +0x0c @431ab0 (Ghidra: dwGuiScreen_SegResume) — Enable(), base Resume, pDefault=this
-    virtual void Update();     // +0x10 @431c60 (Ghidra: dwGuiScreen_SegUpdate) — tutorial auto-exit, ~45Hz widget tick, tooltip idle, repaint+present
-    // (+0x14 = the compiler's dtor thunk @432290 — implicit here)
+    // ---- dwSegment overrides (secondary "scn" dwGuiScreen_scn_vtbl, slot order) --
+    virtual int Activate();    // +0x00 (Ghidra: dwGuiScreen_OnActivate) — lazy LoadControls, free snapshot, colormap, pDefault=this, cursor, music, Invalidate
+    virtual void Deactivate(); // +0x04 (Ghidra: dwGuiScreen_OnHide) — flush tooltip, clear pDefault, free cached sound samples
+    virtual void Suspend();    // +0x08 (Ghidra: dwGuiScreen_SegSuspend) — dispatch {0x7932} (exit tutorial), Disable(), base Suspend
+    virtual void Resume();     // +0x0c (Ghidra: dwGuiScreen_SegResume) — Enable(), base Resume, pDefault=this
+    virtual void Update();     // +0x10 (Ghidra: dwGuiScreen_SegUpdate) — tutorial auto-exit, ~45Hz widget tick, tooltip idle, repaint+present
+    // (+0x14 = the compiler's dtor thunk dwGuiScreen_ScnDtorThunk — implicit here)
 
     // ---- non-virtual methods ------------------------------------------------
 
     // Parse the controls script: per line, keyword -> virtual CreateControl;
     // non-NULL results are appended to `controls`' child list. Ends with a
-    // (virtual) Invalidate. @42fdf0 (dwGuiScreen_LoadControls)
+    // (virtual) Invalidate. dwGuiScreen_LoadControls
     void LoadControls(char* pScriptPath);
 
     // If a tooltip target is latched: dirty its rect and clear target +
-    // visibility. @42ff30 (dwGuiScreen_FlushTooltipDirty)
+    // visibility. dwGuiScreen_FlushTooltipDirty
     void FlushTooltipDirty();
 
     // Repaint this screen into the locked display surface — every dirty rect
     // (or one full-screen pass when dwMain_bFullRedraw). Does NOT present.
-    // @431e90 (dwGuiScreen_RenderActive)
+    // dwGuiScreen_RenderActive
     void RenderActive();
 };
 

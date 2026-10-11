@@ -1,5 +1,5 @@
 // dwGuiCredits — 'credits' end-credits scroll screen (dwGuiScreen subclass).
-// DroidWorks.exe 0x40af10-0x40b93f, vtbls @0x51e8c0 (primary) / 0x51e8a8
+// DroidWorks.exe, vtbls primary / dwGuiCredits_scn_vtbl
 // (segment). See Dw/dwGuiCredits.h for the class notes.
 
 #include "Dw/dwGuiCredits.h"
@@ -15,7 +15,7 @@
 
 #include "stdPlatform.h"
 
-// @40af10 (dwGuiCredits_Ctor)
+// dwGuiCredits_Ctor
 dwGuiCredits::dwGuiCredits()
     : dwGuiScreen("credits", NULL)
 {
@@ -37,11 +37,11 @@ dwGuiCredits::dwGuiCredits()
     this->scrollBaseline = 0;
 }
 
-// @40b000 (dwGuiCredits_Dtor; scalar-deleting wrapper @40afe0; secondary
-// dtor thunk @40ba60)
+// dwGuiCredits_Dtor (scalar-deleting wrapper dwGuiCredits_DtorDelete; secondary
+// dtor thunk dwGuiCredits_ScnDtorThunk)
 dwGuiCredits::~dwGuiCredits()
 {
-    // The dwFont handle "dtor" in the binary (@504190) is a no-op; freeing
+    // The dwFont handle "dtor" in the binary (sithRender_Open) is a no-op; freeing
     // the handle allocation is all that happens.
     if (this->pSectionFont != NULL)
         delete this->pSectionFont;
@@ -64,7 +64,7 @@ dwGuiCredits::~dwGuiCredits()
     // (base dwGuiScreen dtor tears the rest down)
 }
 
-// vtbl(scn) +0x00 @40b170 (dwGuiCredits_OnActivate)
+// vtbl(scn) +0x00 dwGuiCredits_OnActivate
 int dwGuiCredits::Activate()
 {
     int ret = dwGuiScreen::Activate();
@@ -75,7 +75,7 @@ int dwGuiCredits::Activate()
     return ret;
 }
 
-// vtbl +0x10 @40b1b0 (dwGuiCredits_OnKey)
+// vtbl +0x10 dwGuiCredits_OnKey
 int dwGuiCredits::OnKey(int key, int repeat)
 {
     (void)repeat;
@@ -84,7 +84,7 @@ int dwGuiCredits::OnKey(int key, int repeat)
     return 0;
 }
 
-// @40b300 (dwGuiCredits_GetLineFont)
+// dwGuiCredits_GetLineFont
 dwFont* dwGuiCredits::GetLineFont(char* pLineText)
 {
     dwFont* pFont = this->pTitleFont;
@@ -101,7 +101,7 @@ dwFont* dwGuiCredits::GetLineFont(char* pLineText)
     return pFont;
 }
 
-// vtbl +0x14 @40b1d0 (dwGuiCredits_Update)
+// vtbl +0x14 dwGuiCredits_Update
 void dwGuiCredits::Update(float dt)
 {
     this->scrollAccum += dt;
@@ -137,7 +137,7 @@ void dwGuiCredits::Update(float dt)
     this->controls.Update(dt); // tick the droid-dance child
 }
 
-// vtbl +0x44 @40b340 (dwGuiCredits_Draw)
+// vtbl +0x44 dwGuiCredits_Draw
 void dwGuiCredits::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     dwGuiScreen::Draw(pDestBits, pClipRect);
@@ -207,7 +207,7 @@ void dwGuiCredits::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
     }
 }
 
-// vtbl +0x48 @40b580 (dwGuiCredits_CreateControl)
+// vtbl +0x48 dwGuiCredits_CreateControl
 dwWidget* dwGuiCredits::CreateControl(char* pKeyword, dwConfFile* pConf)
 {
     dwRect rect = {0, 0, 0, 0};
@@ -215,7 +215,7 @@ dwWidget* dwGuiCredits::CreateControl(char* pKeyword, dwConfFile* pConf)
     if (dwString_Equals(pKeyword, "DROID_DANCE"))
     {
         dwConfFile_ParseRect(pConf, &rect);
-        // dwGuiDroidDance (disco droid viewer, unit dwGuiList @40ab70, landed
+        // dwGuiDroidDance (disco droid viewer, unit dwGuiList dwGuiDroidDance_Ctor, landed
         // P6w2b). Binary: new(0x598) dwGuiDroidDance_Ctor(&rect).
         return (dwWidget*)new dwGuiDroidDance(&rect);
     }

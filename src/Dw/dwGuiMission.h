@@ -3,51 +3,51 @@
 
 // dwGuiMission — the mission-select MAP / briefing screen cluster:
 //
-//   dwGuiDialog       (0xd8, vtbl 0x51eec8 / scn 0x51eeb0) — modal message-box
+//   dwGuiDialog       (0xd8, dwGuiDialog_vtbl / scn dwGuiDialog_scn_vtbl) — modal message-box
 //                     SCREEN (dwGuiScreen subclass over a 60%-shaded screen
 //                     snapshot; DLG_TEXT control shows the localized message
-//                     key) + the game-wide runner dwGuiDialog_RunModal@41c0f0
+//                     key) + the game-wide runner dwGuiDialog_RunModal
 //                     ("gyesno"/"gmessage" confs; returns 5000 YES / 5001 NO).
-//   dwGuiBriefText    (0x4c, vtbl 0x51ef38) — the mission-briefing caption
+//   dwGuiBriefText    (0x4c, dwGuiBriefText_vtbl) — the mission-briefing caption
 //                     widget (dwAnimBase subclass): plays a VO wav and shows a
 //                     timed sequence of caption IMAGES from a .brf conf,
 //                     revealed through a growing ragged-edged circle around
 //                     the mission's map anchor point.
-//   dwGuiObjectiveBtn (0x5c, vtbl 0x51ef98) — one mission marker on the galaxy
+//   dwGuiObjectiveBtn (0x5c, dwGuiObjectiveBtn_vtbl) — one mission marker on the galaxy
 //                     map: a dwGuiRefRadioButton whose icon reflects the
 //                     mission type + earned rank; hover broadcasts
 //                     { 0xBBB, dwMission* }, select { 0xBBC, dwMission* }.
-//   dwGuiBriefLine    (0x54, vtbl 0x51f008) — JOB_NAME / JOB_DESCRIPTION
+//   dwGuiBriefLine    (0x54, dwGuiBriefLine_vtbl) — JOB_NAME / JOB_DESCRIPTION
 //                     dwGuiHypText line showing the selected mission's
 //                     displayName ('N' mode) or briefing text ('B' mode, with
 //                     a 5s typewriter reveal element).
-//   dwGuiBriefTextElem(0x14, vtbl 0x51efe8) — dwGuiHypText_ElemT subclass that
+//   dwGuiBriefTextElem(0x14, dwGuiBriefTextElem_vtbl) — dwGuiHypText_ElemT subclass that
 //                     loops "WTextAppear.wav" while the reveal runs.
-//   dwGuiMissionMap   (0xf4, vtbl 0x51f070 / scn 0x51f058) — the 'map'
+//   dwGuiMissionMap   (0xf4, dwGuiMissionMap_vtbl / scn dwGuiMissionMap_scn_vtbl) — the 'map'
 //                     mission-select/briefing SCREEN itself (the middle phase
 //                     of dwMissionSequence): objective radio buttons per
 //                     unlocked mission, zoom-box fly-to, briefing playback,
 //                     deploy flow into dwGuiInGame.
-//   dwMissionTransIn/Out (0x3d0, vtbls 0x51f0c0/0x51f0d8) — the workshop<->map
+//   dwMissionTransIn/Out (0x3d0, dwMissionTransIn_vtbl/dwMissionTransOut_vtbl) — the workshop<->map
 //                     panel-slide dwFlicSeg movies (TransToM/FromM.flc) with
 //                     frame-cued MPanel*.wav sounds.
 //
 // Plus (landed here EARLY, owner dwGuiReference P6 — see the note below):
-//   dwGuiRefRadioGroup  (0x18, vtbl 0x51f618) — radio-button container.
-//   dwGuiRefRadioButton (0x54, vtbl 0x51f660) — toggling dwWorkshopCtrl that
+//   dwGuiRefRadioGroup  (0x18, dwGuiRefRadioGroup_vtbl) — radio-button container.
+//   dwGuiRefRadioButton (0x54, dwGuiRefRadioButton_vtbl) — toggling dwWorkshopCtrl that
 //                     deselects its group sibling.
 //
-// Ghidra (DroidWorks.exe) unit range 0x41c0f0-0x41f16f (the unit's
+// Ghidra (DroidWorks.exe) (the unit's
 // dwMission_ParseInfo/ParseObjective/ClearObjectives and dwMissionSequence
-// members are in Dw/dwMission.h; dwSith_Startup@41f170 is dwSith.c). The
-// dwGuiRefRadio* pair is 0x42a540-0x42a87f in the dwGuiReference range.
+// members are in Dw/dwMission.h; dwSith_Startup is dwSith.c). The
+// dwGuiRefRadio* pair is in the dwGuiReference range.
 // Everything verifiably C++ (vtables, ctor/dtor pairs, MSVC EH frames).
 //
 // ⚠ OWNERSHIP NOTE (for the dwGuiReference P6 translator): dwGuiRefRadioGroup
 // and dwGuiRefRadioButton are defined HERE because dwGuiObjectiveBtn derives
 // the button and dwGuiMissionMap constructs the group. When dwGuiReference
 // lands, REUSE these classes (do not redefine); the group's AddCategory
-// @42a6f0 (RADIOGROUP/CP_RADIOGROUP conf-line helper) is intentionally NOT
+// (RADIOGROUP/CP_RADIOGROUP conf-line helper) is intentionally NOT
 // implemented here — it belongs to that unit's factory work.
 
 #include "Dw/dwTypes.h"
@@ -91,17 +91,16 @@ typedef struct dwImage dwImage;
 // CError.wav and runs it as the dwSegment overlay until its OnMessage stores
 // a result. Returns 5000 (YES/OK) or 5001 (NO/CANCEL); 0 when the app-running
 // flag is down (pre-P7 boot flow — see the loop note in dwGuiMission.cpp).
-// @41c0f0
 int dwGuiDialog_RunModal(const char* pConfName, const char* pMsgKey);
 
 // dwMissionSequence phase factories (Dw/dwMission.h externs these; no single
 // binary counterpart — they bundle the sequencer's `new(size) + Ctor` pairs
-// inside dwMissionSequence_Advance @41ea60 so dwMission.cpp needs no class
+// inside dwMissionSequence_Advance so dwMission.cpp needs no class
 // definitions). Each returns the new segment (for the screen: its dwSegment
 // subobject).
-dwSegment* dwMissionTransIn_New(dwImage* pBgImage);  // new dwMissionTransIn @41eb90
-dwSegment* dwGuiMissionMap_New(dwImage* pBgImage);   // new dwGuiMissionMap @41db20
-dwSegment* dwMissionTransOut_New(dwImage* pBgImage); // new dwMissionTransOut @41ee60
+dwSegment* dwMissionTransIn_New(dwImage* pBgImage);  // new dwMissionTransIn dwMissionTransIn_Ctor
+dwSegment* dwGuiMissionMap_New(dwImage* pBgImage);   // new dwGuiMissionMap dwGuiMissionMap_Ctor
+dwSegment* dwMissionTransOut_New(dwImage* pBgImage); // new dwMissionTransOut dwMissionTransOut_Ctor
 
 // Note: no binary counterpart — the unit owns no module statics (the shared
 // current-mission global dwCore_pCurrentMission is dw-core P7 state); kept
@@ -132,57 +131,57 @@ struct dwGuiZoomBox; // Dw/dwGuiButton.h
 // The group is a dwWidgetGroup whose children are dwGuiRefRadioButtons; it
 // tracks the selected one and deselects the previous on a switch. Binary
 // layout: dwWidgetGroup @0x00 (0x14) + pSelected@0x14 — sizeof 0x18. vtable
-// @0x51f618 overrides only the dtor.
+// dwGuiRefRadioGroup_vtbl overrides only the dtor.
 
 struct dwGuiRefRadioGroup : dwWidgetGroup
 {
     dwGuiRefRadioButton* pSelected; // 0x14: current selection (not owned)
 
-    // @42a540 (dwGuiRefRadioGroup_Ctor)
+    // dwGuiRefRadioGroup_Ctor
     dwGuiRefRadioGroup(dwRect* pRect);
 
-    // @42a580 (dwGuiRefRadioGroup_Dtor; scalar-deleting wrapper @42a560) —
+    // dwGuiRefRadioGroup_Dtor (scalar-deleting wrapper dwGuiRefRadioGroup_DtorDelete) —
     // body is the inlined base group dtor (children deleted there).
     virtual ~dwGuiRefRadioGroup();
 
     // Append pBtn to the children; the FIRST button added is auto-Select()ed
     // (quirk: the select fires BEFORE the insert, exactly as in the binary).
-    // @42a6a0 (dwGuiRefRadioGroup_AddButton)
+    // dwGuiRefRadioGroup_AddButton
     void AddButton(dwGuiRefRadioButton* pBtn);
 
     // Deselect the previous selection (when different) and latch pBtn.
-    // @42a770 (dwGuiRefRadioGroup_SetSelected)
+    // dwGuiRefRadioGroup_SetSelected
     void SetSelected(dwGuiRefRadioButton* pBtn);
 
-    // (@42a6f0 dwGuiRefRadioGroup_AddCategory intentionally not here — owner
+    // (dwGuiRefRadioGroup_AddCategory intentionally not here — owner
     // dwGuiReference; it news a 0x54 dwGuiRefRadioButton from one conf line.)
 };
 
 // Toggling image button bound to a group. Binary layout: dwWorkshopCtrl
 // @0x00 (0x50) + pGroup@0x50 (Ghidra: pPayload) — sizeof 0x54. vtable
-// @0x51f660 overrides only the dtor and OnMouseDown.
+// dwGuiRefRadioButton_vtbl overrides only the dtor and OnMouseDown.
 
 struct dwGuiRefRadioButton : dwWorkshopCtrl
 {
     dwGuiRefRadioGroup* pGroup; // 0x50 (Ghidra: pPayload): owning group
 
-    // @42a7a0 (dwGuiRefRadioButton_Ctor) — dwWorkshopCtrl(pRect, ..., cmdId,
+    // dwGuiRefRadioButton_Ctor — dwWorkshopCtrl(pRect, ..., cmdId,
     // /*bToggle*/1).
     dwGuiRefRadioButton(dwGuiRefRadioGroup* pGroup, dwRect* pRect,
                         char* pImgNormal, char* pSndOff, char* pImgPressed,
                         char* pSndClick, int cmdId);
 
-    // @42a800 (dwGuiRefRadioButton_Dtor; scalar-deleting wrapper @42a7e0)
+    // dwGuiRefRadioButton_Dtor (scalar-deleting wrapper dwGuiRefRadioButton_DtorDelete)
     virtual ~dwGuiRefRadioButton();
 
-    // vtbl +0x08 @42a810 — only when not already selected (bHot): base
+    // vtbl +0x08 dwGuiRefRadioButton_OnMouseDown — only when not already selected (bHot): base
     // toggle, then on a hit latch this as the group selection.
     virtual int OnMouseDown(int16_t x, int16_t y);
 
-    // @42a860 (dwGuiRefRadioButton_Select) — when not selected: bPressed = 0,
+    // dwGuiRefRadioButton_Select — when not selected: bPressed = 0,
     // bHot = 1, group->SetSelected(this), Invalidate.
     void Select();
-    // @42a850 (dwGuiRefRadioButton_Deselect) — bPressed = 0, bHot = 0,
+    // dwGuiRefRadioButton_Deselect — bPressed = 0, bHot = 0,
     // Invalidate.
     void Deselect();
 };
@@ -190,7 +189,7 @@ struct dwGuiRefRadioButton : dwWorkshopCtrl
 // ---- dwGuiDialog ----------------------------------------------------------------
 //
 // Binary layout: dwGuiScreen @0x00 (0xc8) + msgKey dwString@0xc8 +
-// pResult@0xd4 — sizeof 0xd8. vtable @0x51eec8 (scn @0x51eeb0) overrides only
+// pResult@0xd4 — sizeof 0xd8. dwGuiDialog_vtbl (scn dwGuiDialog_scn_vtbl) overrides only
 // the dtor, OnMessage and CreateControl.
 
 struct dwGuiDialog : dwGuiScreen
@@ -198,19 +197,19 @@ struct dwGuiDialog : dwGuiScreen
     dwString msgKey; // 0xc8: string-table key of the message text
     int* pResult;    // 0xd4: RunModal's result slot (5000/5001)
 
-    // @41c200 (dwGuiDialog_Ctor) — dwGuiScreen(pConfName, NULL), then
+    // dwGuiDialog_Ctor — dwGuiScreen(pConfName, NULL), then
     // captures the current screen (60%-shaded copy) as pBgImage.
     dwGuiDialog(const char* pConfName, const char* pMsgKey, int* pResult);
 
-    // @41c350 (dwGuiDialog_Dtor; scalar-deleting wrapper @41c330) — frees
+    // dwGuiDialog_Dtor (scalar-deleting wrapper dwGuiDialog_DtorDelete) — frees
     // msgKey (member dtor here) + base.
     virtual ~dwGuiDialog();
 
-    // vtbl +0x1c @41c4d0 — codes 5000/0x1389: *pResult = code, return 1
+    // vtbl +0x1c dwGuiDialog_OnMessage — codes 5000/0x1389: *pResult = code, return 1
     // (RunModal's loop ends); everything else -> base.
     virtual int OnMessage(dwWidgetMsg* pMsg);
 
-    // vtbl +0x48 @41c3a0 — "DLG_TEXT <rect> <font> <color>": a dwGuiHypText
+    // vtbl +0x48 dwGuiDialog_CreateControl — "DLG_TEXT <rect> <font> <color>": a dwGuiHypText
     // (left/top-aligned, word-wrapped) showing the LOCALIZED msgKey;
     // fall back to the base factory.
     virtual dwWidget* CreateControl(char* pKeyword, dwConfFile* pConf);
@@ -230,7 +229,7 @@ struct dwGuiBriefTextLine
 };
 
 // Binary layout: dwAnimBase @0x00 (0x1c) + fields below — sizeof 0x4c.
-// vtable @0x51ef38 overrides dtor/OnKey/Update/OnMessage/Draw/Play/Stop.
+// dwGuiBriefText_vtbl overrides dtor/OnKey/Update/OnMessage/Draw/Play/Stop.
 //
 // .brf conf format: line 1 = the VO wav name; every further line =
 // "<float time> <image.rle>". state: 0 idle, 1 = circle reveal growing,
@@ -254,28 +253,28 @@ struct dwGuiBriefText : dwAnimBase
     dwListNode* pCurLineNode;// 0x44 (Ghidra: pCurLineNode): next caption line
     dwImage* pCurImage;      // 0x48 (Ghidra: pCurGlyph): current caption image
 
-    // @41c9e0 (dwGuiBriefText_Ctor) — dwAnimBase(pRect, msgCode, 0); parses
+    // dwGuiBriefText_Ctor — dwAnimBase(pRect, msgCode, 0); parses
     // pConfName; precaches the VO sample; revealMax = round(distance from
     // *pAnchor to the farthest widget corner).
     dwGuiBriefText(dwRect* pRect, dwPoint* pAnchor, const char* pConfName, int msgCode);
 
-    // @41cc20 (dwGuiBriefText_Dtor; scalar-deleting wrapper @41cc00)
+    // dwGuiBriefText_Dtor (scalar-deleting wrapper dwGuiBriefText_DtorDelete)
     virtual ~dwGuiBriefText();
 
-    // vtbl +0x10 @41d050 — ESC -> virtual Stop. Returns 0.
+    // vtbl +0x10 dwGuiBriefText_OnKey — ESC -> virtual Stop. Returns 0.
     virtual int OnKey(int key, int repeat);
-    // vtbl +0x14 @41cd80 — VO start (finish msg 0xC1D), circle grow/collapse
+    // vtbl +0x14 dwGuiBriefText_Update — VO start (finish msg 0xC1D), circle grow/collapse
     // + dirty rects, timed caption-line image switching.
     virtual void Update(float dt);
-    // vtbl +0x1c @41d070 — 0xC1D (VO finished) -> virtual Stop; then base.
+    // vtbl +0x1c dwGuiBriefText_OnMessage — 0xC1D (VO finished) -> virtual Stop; then base.
     virtual int OnMessage(dwWidgetMsg* pMsg);
-    // vtbl +0x44 @41d0a0 — state 2: plain blit; states 1/3: the wobbled
+    // vtbl +0x44 dwGuiBriefText_Draw — state 2: plain blit; states 1/3: the wobbled
     // circular-reveal row copy out of the locked caption image.
     virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect);
-    // vtbl +0x48 @41cf80 — reset clocks, state = 1, load the first caption
+    // vtbl +0x48 dwGuiBriefText_Play — reset clocks, state = 1, load the first caption
     // image, re-precache the VO, base Play.
     virtual void Play();
-    // vtbl +0x4c @41d000 — state = 3 (collapse), mirror the elapsed clock,
+    // vtbl +0x4c dwGuiBriefText_Stop — state = 3 (collapse), mirror the elapsed clock,
     // fade the VO out. Idempotent while already collapsing.
     virtual void Stop();
 };
@@ -284,7 +283,7 @@ struct dwGuiBriefText : dwAnimBase
 //
 // Binary layout: dwGuiRefRadioButton @0x00 (0x54) + pMission@0x54 (Ghidra:
 // objectiveIndex — misnamed, it is the dwMission record) + pFont@0x58 —
-// sizeof 0x5c. vtable @0x51ef98 overrides dtor/OnMouseMove/OnMouseDown/
+// sizeof 0x5c. dwGuiObjectiveBtn_vtbl overrides dtor/OnMouseMove/OnMouseDown/
 // EnsureImages/FreeImages/Draw.
 
 struct dwGuiObjectiveBtn : dwGuiRefRadioButton
@@ -292,28 +291,28 @@ struct dwGuiObjectiveBtn : dwGuiRefRadioButton
     dwMission* pMission; // 0x54: the mission this marker represents (not owned)
     dwFont* pFont;       // 0x58: "Arial14BA" label font (owned heap handle)
 
-    // @41d390 (dwGuiObjectiveBtn_Ctor) — dwGuiRefRadioButton(pGroup, pRect,
+    // dwGuiObjectiveBtn_Ctor — dwGuiRefRadioButton(pGroup, pRect,
     // NULLs, cmdId 0x791f); loads the icon; sndClick = "WMissionLocate.wav".
     dwGuiObjectiveBtn(dwGuiRefRadioGroup* pGroup, dwRect* pRect, dwMission* pMission);
 
-    // @41d460 (dwGuiObjectiveBtn_Dtor; scalar-deleting wrapper @41d440)
+    // dwGuiObjectiveBtn_Dtor (scalar-deleting wrapper dwGuiObjectiveBtn_DtorDelete)
     virtual ~dwGuiObjectiveBtn();
 
-    // vtbl +0x04 @41d650 (undetected fn, recovered from the vtable) — on a
+    // vtbl +0x04 dwGuiObjectiveBtn_OnMouseMove (undetected fn, recovered from the vtable) — on a
     // HitTest hit broadcast { 0xBBB, pMission } and return 1.
     virtual int OnMouseMove(int16_t x, int16_t y);
-    // vtbl +0x08 @41d6a0 (undetected fn) — base radio select; on a hit
+    // vtbl +0x08 dwGuiObjectiveBtn_OnMouseDown (undetected fn) — base radio select; on a hit
     // broadcast { 0xBBC, pMission } (the mission-selected message).
     virtual int OnMouseDown(int16_t x, int16_t y);
-    // vtbl +0x3c @41d6f0 (Ghidra: dwGuiObjectiveBtn_LoadImage) — pick the
+    // vtbl +0x3c (Ghidra: dwGuiObjectiveBtn_LoadImage) — pick the
     // marker icon from missionType + rank (NORMAL: the 4-entry rank table;
     // SECRET/CRYSTAL: earned vs MSecretIcon; FINAL: MScroll_Icon); the ONE
     // image is aliased into both pImageNormal and pImagePressed.
     virtual void EnsureImages();
-    // vtbl +0x40 @41d7c0 (Ghidra: dwGuiObjectiveBtn_FreeImage) — single
+    // vtbl +0x40 (Ghidra: dwGuiObjectiveBtn_FreeImage) — single
     // delete of the aliased image.
     virtual void FreeImages();
-    // vtbl +0x44 @41d4d0 — base image draw, then the mission displayName:
+    // vtbl +0x44 dwGuiObjectiveBtn_Draw — base image draw, then the mission displayName:
     // "#X" names draw only glyph X centered (and only while rank == 0);
     // otherwise the name is drawn shadowed under the marker.
     virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect);
@@ -321,25 +320,25 @@ struct dwGuiObjectiveBtn : dwGuiRefRadioButton
 
 // ---- dwGuiBriefTextElem ---------------------------------------------------------
 //
-// dwGuiHypText_ElemT alias (no own fields, sizeof 0x14, vtable @0x51efe8
+// dwGuiHypText_ElemT alias (no own fields, sizeof 0x14, dwGuiBriefTextElem_vtbl
 // overriding Update + dtor): loops "WTextAppear.wav" while the typewriter
 // reveal runs, stops it when done (dtor silences it instantly).
 
 struct dwGuiBriefTextElem : dwGuiHypText_ElemT
 {
-    // @41d7e0 (dwGuiBriefTextElem_Ctor)
+    // dwGuiBriefTextElem_Ctor
     dwGuiBriefTextElem(float revealDuration);
-    // @41d820 (dwGuiBriefTextElem_Dtor; scalar-deleting wrapper @41d800;
-    // the base-dtor COMDATs @41d880/@41db00 are implicit here)
+    // dwGuiBriefTextElem_Dtor (scalar-deleting wrapper dwGuiBriefTextElem_DtorDelete;
+    // the base-dtor COMDATs dwGuiBriefTextElem_BaseDtor/dwGuiBriefTextElem_BaseDtorDelete are implicit here)
     virtual ~dwGuiBriefTextElem();
-    // vtbl +0x04 @41d890 (undetected fn, recovered from the vtable)
+    // vtbl +0x04 dwGuiBriefTextElem_Update (undetected fn, recovered from the vtable)
     virtual void Update(dwGuiHypText* pOwner, float dt, dwGuiHypTextRun** ppRuns);
 };
 
 // ---- dwGuiBriefLine -------------------------------------------------------------
 //
 // Binary layout: dwGuiHypText @0x00 (0x48) + modeText dwString@0x48 (Ghidra:
-// text) — sizeof 0x54. vtable @0x51f008 overrides only dtor + OnMessage.
+// text) — sizeof 0x54. dwGuiBriefLine_vtbl overrides only dtor + OnMessage.
 // modeText comes from the conf line's tail; its FIRST char selects what to
 // show: 'N' = mission displayName, 'B' = mission briefing text (with a 5s
 // dwGuiBriefTextElem typewriter reveal added at construction).
@@ -348,15 +347,15 @@ struct dwGuiBriefLine : dwGuiHypText
 {
     dwString modeText; // 0x48: mode selector ('N'/'B' first char)
 
-    // @41d910 (dwGuiBriefLine_Ctor) — dwGuiHypText format ctor + modeText;
+    // dwGuiBriefLine_Ctor — dwGuiHypText format ctor + modeText;
     // when pMission is set, shows its field per the mode immediately.
     dwGuiBriefLine(dwRect* pRect, void* pNotify, char* pFontName, uint8_t color,
                    char* pFormat, char* pModeText, dwMission* pMission);
 
-    // @41da40 (dwGuiBriefLine_Dtor; scalar-deleting wrapper @41da20)
+    // dwGuiBriefLine_Dtor (scalar-deleting wrapper dwGuiBriefLine_DtorDelete)
     virtual ~dwGuiBriefLine();
 
-    // vtbl +0x1c @41da90 (undetected fn, recovered from the vtable) — msg
+    // vtbl +0x1c dwGuiBriefLine_OnMessage (undetected fn, recovered from the vtable) — msg
     // 0xBBC (mission selected): re-show the sender mission's field per the
     // mode. Always returns 0 (the broadcast keeps going).
     virtual int OnMessage(dwWidgetMsg* pMsg);
@@ -365,8 +364,8 @@ struct dwGuiBriefLine : dwGuiHypText
 // ---- dwGuiMissionMap ------------------------------------------------------------
 //
 // Binary layout: dwGuiScreen @0x00 (0xc8) + fields below — sizeof 0xf4.
-// Primary vtable @0x51f070 overrides dtor/OnMessage/EnsureImages/FreeImages/
-// CreateControl; scn vtable @0x51f058 overrides Activate/Deactivate.
+// Primary dwGuiMissionMap_vtbl overrides dtor/OnMessage/EnsureImages/FreeImages/
+// CreateControl; scn dwGuiMissionMap_scn_vtbl overrides Activate/Deactivate.
 //
 // Screen name "map" (map.cmp); mission data comes from dwCore_pMissionList /
 // dwCore_pCurrentMission. Message map (OnMessage):
@@ -390,36 +389,36 @@ struct dwGuiMissionMap : dwGuiScreen
     dwAnim* pJawaAnim;               // 0xec: JAWA_ANIM decoration (owned via children)
     dwWcButtonBlink* pBriefingBlink; // 0xf0: BRIEFING_BUTTON (owned via children)
 
-    // @41db20 (dwGuiMissionMap_Ctor) — dwGuiScreen("map", pBgImage).
+    // dwGuiMissionMap_Ctor — dwGuiScreen("map", pBgImage).
     dwGuiMissionMap(dwImage* pBgImage);
 
-    // @41dbd0 (dwGuiMissionMap_Dtor; scalar-deleting wrapper @41dbb0; the
-    // scn dtor thunk @41f160 is compiler-made) — FreeImages + base.
+    // dwGuiMissionMap_Dtor (scalar-deleting wrapper dwGuiMissionMap_DtorDelete; the
+    // scn dtor thunk dwGuiMissionMap_ScnDtorThunk is compiler-made) — FreeImages + base.
     virtual ~dwGuiMissionMap();
 
-    // ---- dwWidget-side overrides (primary vtbl @0x51f070) ----
-    virtual int OnMessage(dwWidgetMsg* pMsg);                     // +0x1c @41e320
-    virtual void EnsureImages();                                  // +0x3c @41e9f0
-    virtual void FreeImages();                                    // +0x40 @41ea20
-    // +0x48 @41e630 — keywords HELP / JOB_DESCRIPTION / JOB_NAME / JAWA_ANIM /
+    // ---- dwWidget-side overrides (primary dwGuiMissionMap_vtbl) ----
+    virtual int OnMessage(dwWidgetMsg* pMsg);                     // +0x1c dwGuiMissionMap_OnMessage
+    virtual void EnsureImages();                                  // +0x3c dwGuiMissionMap_EnsureImages
+    virtual void FreeImages();                                    // +0x40 dwGuiMissionMap_FreeImages
+    // +0x48 dwGuiMissionMap_CreateControl — keywords HELP / JOB_DESCRIPTION / JOB_NAME / JAWA_ANIM /
     // MAP / PART_BOUNDS / PARTTEXT / BRIEFING_BUTTON; fall back to the base.
     virtual dwWidget* CreateControl(char* pKeyword, dwConfFile* pConf);
 
-    // ---- dwSegment-side overrides (scn vtbl @0x51f058) ----
-    // @41ddb0 (dwGuiMissionMap_OnActivate) — base Activate, rebuild the
+    // ---- dwSegment-side overrides (scn dwGuiMissionMap_scn_vtbl) ----
+    // dwGuiMissionMap_OnActivate — base Activate, rebuild the
     // objective radio group from every unlocked mission, broadcast
     // { 0xBBC, dwCore_pCurrentMission }.
     virtual int Activate();
-    // @41dfd0 (dwGuiMissionMap_OnDeactivate) — broadcast { 0x7532 }, destroy
+    // dwGuiMissionMap_OnDeactivate — broadcast { 0x7532 }, destroy
     // the briefing caption, stop the jawa anim + WTextAppear.wav, base.
     virtual void Deactivate();
 
     // ---- non-virtual methods ----
-    // @41dc30 (dwGuiMissionMap_SelectObjective) — latch dwCore_pCurrentMission,
+    // dwGuiMissionMap_SelectObjective — latch dwCore_pCurrentMission,
     // blink the BRIEFING button while un-briefed, (re)create the zoom box on
     // mapRect and fly it to the mission's map position.
     void SelectObjective(dwMission* pMission);
-    // @41e0b0 (dwGuiMissionMap_BeginDeploy) — tear down the briefing caption;
+    // dwGuiMissionMap_BeginDeploy — tear down the briefing caption;
     // refuse (hover-notify 0x7921) until the briefing was viewed; validate
     // the droid; then push this screen + the mission dwGuiInGame (preceded by
     // the DEPLOYMENT-type training mission when one exists) onto the segment
@@ -430,8 +429,8 @@ struct dwGuiMissionMap : dwGuiScreen
 // ---- dwMissionTransIn / dwMissionTransOut -----------------------------------------
 //
 // Binary layout: dwFlicSeg @0x00 (0x3cc) + cueState@0x3cc — sizeof 0x3d0.
-// vtables @0x51f0c0 / @0x51f0d8 override Activate/Deactivate/Update (+ the
-// shared dtor @41ee90, Ghidra: dwMissionTrans_Dtor). Full-screen FLC panel
+// vtables dwMissionTransIn_vtbl / dwMissionTransOut_vtbl override Activate/Deactivate/Update (+ the
+// shared dtor, Ghidra: dwMissionTrans_Dtor). Full-screen FLC panel
 // slides between the workshop and the mission map, with per-frame sound cues
 // (MPanel*.wav; the Move loops fade in over 0.1s and out at the next cue).
 
@@ -439,17 +438,17 @@ struct dwMissionTransIn : dwFlicSeg
 {
     int32_t cueState; // 0x3cc: sound-cue state machine position
 
-    // @41eb90 (dwMissionTransIn_Ctor) — dwFlicSeg("TransToM.flc", pBgImage).
+    // dwMissionTransIn_Ctor — dwFlicSeg("TransToM.flc", pBgImage).
     dwMissionTransIn(dwImage* pBgImage);
-    virtual ~dwMissionTransIn(); // shared @41ee90 (dwMissionTrans_Dtor)
+    virtual ~dwMissionTransIn(); // shared dwMissionTrans_Dtor
 
-    // vtbl +0x00 @41ebc0 (Ghidra: dwMissionTransIn_PreloadSounds) — precache
+    // vtbl +0x00 (Ghidra: dwMissionTransIn_PreloadSounds) — precache
     // the 6 cue wavs, then base Activate.
     virtual int Activate();
-    // vtbl +0x04 @41ec30 (Ghidra: dwMissionTransIn_StopSounds) — fade the
+    // vtbl +0x04 (Ghidra: dwMissionTransIn_StopSounds) — fade the
     // cue sounds out (0.1s), free cached samples, base Deactivate.
     virtual void Deactivate();
-    // vtbl +0x10 @41ecc0 — base Update, then the frame-cued sound machine
+    // vtbl +0x10 dwMissionTransIn_Update — base Update, then the frame-cued sound machine
     // (Begin @0 / Move1 loop @1 / Middle @9 / Move2 loop @10 / End @18 /
     // ScreenAppear @22).
     virtual void Update();
@@ -459,13 +458,13 @@ struct dwMissionTransOut : dwFlicSeg
 {
     int32_t cueState; // 0x3cc
 
-    // @41ee60 (dwMissionTransOut_Ctor) — dwFlicSeg("TransFromM.flc", pBgImage).
+    // dwMissionTransOut_Ctor — dwFlicSeg("TransFromM.flc", pBgImage).
     dwMissionTransOut(dwImage* pBgImage);
-    virtual ~dwMissionTransOut(); // shared @41ee90 (dwMissionTrans_Dtor)
+    virtual ~dwMissionTransOut(); // shared dwMissionTrans_Dtor
 
-    virtual int Activate();    // vtbl +0x00 @41eec0 (PreloadSounds)
-    virtual void Deactivate(); // vtbl +0x04 @41ef30 (StopSounds)
-    // vtbl +0x10 @41efc0 — mirrored cue order (ScreenVanish @0 / End @9 /
+    virtual int Activate();    // vtbl +0x00 PreloadSounds
+    virtual void Deactivate(); // vtbl +0x04 StopSounds
+    // vtbl +0x10 dwMissionTransOut_Update — mirrored cue order (ScreenVanish @0 / End @9 /
     // Move2 loop @12 / Middle @21 / Move1 loop @22 / Begin @29).
     virtual void Update();
 };

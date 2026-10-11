@@ -4,9 +4,9 @@
 // palette + gamma, or a rebuilt 8->16bpp lookup table when the display runs
 // 16bpp).
 //
-// Ghidra (DroidWorks.exe) 0x4430c0-0x4434fx:
-//   dwColormap_SetDisplayPalette@0x4430c0, dwColormap_Load@0x4430e0,
-//   dwColormap_Apply@0x4432d0.
+// Ghidra (DroidWorks.exe):
+//   dwColormap_SetDisplayPalette, dwColormap_Load,
+//   dwColormap_Apply.
 
 #include "Dw/dwColormap.h"
 
@@ -19,18 +19,18 @@
 
 // TODO(dw-decomp): provided by dwDisplay (P2). AddDirtyRect/Present are real
 // dwDisplay unit functions; dwDisplay_pBackVBuf is our handle for the
-// DW-stdDisplay-internal back-buffer tVBuffer (binary: unnamed @0x6b5a40)
+// DW-stdDisplay-internal back-buffer tVBuffer (binary: unnamed)
 // that the dwDisplay translation will own.
 void dwDisplay_AddDirtyRect(dwRect* pRect);
 void dwDisplay_Present();
 extern tVBuffer* dwDisplay_pBackVBuf;
 
-rdColormap* dwColormap_pCurrent = NULL;     // binary: 0x541c60
-void* dwColormap_pDisplayPalette = NULL;    // binary: 0x541d1c
-int dwColormap_transparentIdx = 0;          // binary: 0x541c48
-int dwColormap_whiteIdx = 0;                // binary: 0x541d14
-int dwColormap_greenIdx = 0;                // binary: 0x541d10
-uint16_t dwColormap_aPalette16[256];        // binary: stdDisplay .bss 0x6afde0 (see dwColormap.h)
+rdColormap* dwColormap_pCurrent = NULL;
+void* dwColormap_pDisplayPalette = NULL;
+int dwColormap_transparentIdx = 0;
+int dwColormap_whiteIdx = 0;
+int dwColormap_greenIdx = 0;
+uint16_t dwColormap_aPalette16[256];        // binary: stdDisplay .bss (see dwColormap.h)
 
 // Note: no binary counterpart — statics reset for the soft-reset loop only.
 // Deliberately does not free dwColormap_pCurrent: shutdown-order vs. the
@@ -45,7 +45,7 @@ void dwColormap_Startup()
     _memset(dwColormap_aPalette16, 0, sizeof(dwColormap_aPalette16));
 }
 
-// Note: replicates the DW-era stdColor helper @0x5021c0 (no OpenJKDF2 twin:
+// Note: replicates the DW-era stdColor helper (no OpenJKDF2 twin:
 // stdColor_ColorConvertOneRow converts pixel rows, not 24-bit palette
 // entries). Builds the 256-entry 16bpp palette lookup table.
 static void dwColormap_BuildPalette16(rdColor24* paColors, uint16_t* paOut, rdTexFormat* pFmt)
@@ -60,7 +60,7 @@ static void dwColormap_BuildPalette16(rdColor24* paColors, uint16_t* paOut, rdTe
 
 // Pushes the master palette to the hardware with the given gamma parameter
 // and remembers it for dedup.
-// Note: the binary calls a DW-stdDisplay routine (@0x4fe490) that
+// Note: the binary calls a DW-stdDisplay routine that
 // gamma-corrects the master palette by pPalette and sets the hardware
 // palette — the exact role of JK.EXE/OpenJKDF2 stdDisplay_GammaCorrect3, so
 // the opaque parameter is forwarded as its gamma index.

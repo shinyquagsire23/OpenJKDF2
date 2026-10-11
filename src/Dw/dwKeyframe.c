@@ -1,10 +1,10 @@
 // dwKeyframe — DroidWorks rdKeyframe helpers (resample/clone/markers).
 //
-// Decompiled from DroidWorks.exe @0x4039e0-0x403ffx (mis-binned tail of the
+// Decompiled from DroidWorks.exe (mis-binned tail of the
 // dwAnim compile unit; used only by dwDroidStats to bake the assembled
 // droid's merged animation, plus the marker helpers reused by dwCog).
 //
-// All allocation goes through the DW HostServices (binary: dwHS @0x6b6258 =
+// All allocation goes through the DW HostServices (binary: dwHS =
 // dwMain_pHS here), matching the original. The structs are the engine's
 // rdKeyframe/rdJoint/rdAnimEntry from src/types.h — every 32-bit binary
 // offset maps onto a named field (joint stride 0x2c, entry stride 0x38);
@@ -18,9 +18,8 @@
 
 #include <math.h>
 
-extern HostServices* dwMain_pHS; // the DW host-services pointer (dwMain.c); binary global dwHS @0x6b6258
+extern HostServices* dwMain_pHS; // the DW host-services pointer (dwMain.c); binary global dwHS
 
-// @4039e0
 void dwKeyframe_BuildJointDeltas(rdJoint* pJoint, uint32_t numFrames)
 {
     uint32_t i;
@@ -71,7 +70,6 @@ void dwKeyframe_BuildJointDeltas(rdJoint* pJoint, uint32_t numFrames)
     } while (i < numEntries);
 }
 
-// @403bc0
 void dwKeyframe_Resample(rdKeyframe* pKeyframe)
 {
     uint32_t i;
@@ -90,7 +88,6 @@ void dwKeyframe_Resample(rdKeyframe* pKeyframe)
     }
 }
 
-// @403c30
 void dwKeyframe_ResampleJoint(rdJoint* pJoint, uint32_t numFrames)
 {
     rdAnimEntry* paEntries;
@@ -120,7 +117,6 @@ void dwKeyframe_ResampleJoint(rdJoint* pJoint, uint32_t numFrames)
     dwKeyframe_BuildJointDeltas(pJoint, numFrames);
 }
 
-// @403d00
 void dwKeyframe_SampleJointAt(rdJoint* pJoint, uint32_t numFrames, float time,
                               rdVector3* pPos, rdVector3* pOrient)
 {
@@ -200,7 +196,6 @@ void dwKeyframe_SampleJointAt(rdJoint* pJoint, uint32_t numFrames, float time,
     *pOrient = pEntry->orientation;
 }
 
-// @403e80
 rdKeyframe* dwKeyframe_Clone(rdKeyframe* pKeyframe)
 {
     rdKeyframe* pClone;
@@ -248,7 +243,6 @@ rdKeyframe* dwKeyframe_Clone(rdKeyframe* pKeyframe)
     return pClone;
 }
 
-// @403fb0
 void dwKeyframe_AddMarker(rdKeyframe* pKeyframe, float frameNum, int type)
 {
     if (pKeyframe == NULL)
@@ -258,7 +252,6 @@ void dwKeyframe_AddMarker(rdKeyframe* pKeyframe, float frameNum, int type)
     pKeyframe->numMarkers = pKeyframe->numMarkers + 1;
 }
 
-// @403fe0
 void dwKeyframe_AddMidMarker(rdKeyframe* pKeyframe, int type)
 {
     if (pKeyframe == NULL)

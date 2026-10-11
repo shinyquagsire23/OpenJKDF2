@@ -1,8 +1,8 @@
 // dwGuiWidgetBar — the WIDGETBAR sliding icon+label toolbar (dwGuiWidgetBar
 // + dwGuiBarItem). See Dw/dwGuiWidgetBar.h for the class/selection notes.
 //
-// Decompiled from DroidWorks.exe, unit range 0x43b4c0-0x43bfff (the
-// 0x43c040/0x43c170 COMDATs past the end belong to dwWidgetGroup/dwList).
+// Decompiled from DroidWorks.exe (the
+// dwWidgetGroup_FreeChildImages/dwList_InsertAfter COMDATs past the end belong to dwWidgetGroup/dwList).
 //
 // No module statics — no dwGuiWidgetBar_Startup needed (soft-reset rule).
 
@@ -12,10 +12,10 @@
 #include <stdlib.h>
 
 // ---------------------------------------------------------------------------
-// dwGuiBarItem (vtbl 0x51ff48)
+// dwGuiBarItem (dwGuiBarItem_vtbl)
 // ---------------------------------------------------------------------------
 
-// @43b4c0 (dwGuiWidgetBar_ItemCtor)
+// dwGuiWidgetBar_ItemCtor
 dwGuiBarItem::dwGuiBarItem(dwWidget* pChildWidget, dwImage* pImage, char* pText,
                            char* pFontName, uint8_t color, int padTop, int padSide)
     : dwWcChildDecorator(pChildWidget) // dwWidget(child's rect) + pChild
@@ -53,12 +53,12 @@ dwGuiBarItem::dwGuiBarItem(dwWidget* pChildWidget, dwImage* pImage, char* pText,
     pChildWidget->bottom = (int16_t)(this->bottom - (int16_t)this->padSide);
 }
 
-// @43b620 (dwGuiWidgetBar_ItemDtor; scalar-deleting wrapper @43b600)
+// dwGuiWidgetBar_ItemDtor (scalar-deleting wrapper dwGuiWidgetBar_ItemDtorDelete)
 dwGuiBarItem::~dwGuiBarItem()
 {
     if (this->pFont != NULL)
     {
-        delete this->pFont; // binary: no-op font "dtor" @504190 + free
+        delete this->pFont; // binary: no-op font "dtor" + free
         this->pFont = NULL;
     }
     if (this->pImage != NULL)
@@ -70,7 +70,7 @@ dwGuiBarItem::~dwGuiBarItem()
     // FreeImages()es and deletes pChild (binary order preserved).
 }
 
-// vtbl +0x14 @43b6e0 (dwGuiWidgetBar_ItemUpdate) — 1000.0f px/s @0x51ff40
+// vtbl +0x14 dwGuiWidgetBar_ItemUpdate — 1000.0f px/s
 void dwGuiBarItem::Update(float dt)
 {
     int16_t step;
@@ -100,7 +100,7 @@ void dwGuiBarItem::Update(float dt)
     this->pChild->Update(dt);
 }
 
-// vtbl +0x44 @43b7a0 (dwGuiWidgetBar_ItemDraw)
+// vtbl +0x44 dwGuiWidgetBar_ItemDraw
 void dwGuiBarItem::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     dwPoint pos;
@@ -120,7 +120,7 @@ void dwGuiBarItem::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
     this->pChild->DrawChild(pDestBits, pClipRect);
 }
 
-// @43b6c0 (dwGuiWidgetBar_ItemSetScrollTarget)
+// dwGuiWidgetBar_ItemSetScrollTarget
 void dwGuiBarItem::SetScrollTarget(dwPoint* pPos)
 {
     this->scrollPos = 0.0f;
@@ -131,10 +131,10 @@ void dwGuiBarItem::SetScrollTarget(dwPoint* pPos)
 }
 
 // ---------------------------------------------------------------------------
-// dwGuiWidgetBar (vtbl 0x51ff90)
+// dwGuiWidgetBar (dwGuiWidgetBar_vtbl)
 // ---------------------------------------------------------------------------
 
-// @43b840 (dwGuiWidgetBar_Ctor)
+// dwGuiWidgetBar_Ctor
 dwGuiWidgetBar::dwGuiWidgetBar(dwRect* pRect)
     : dwWidget(pRect)
     , items()
@@ -142,14 +142,14 @@ dwGuiWidgetBar::dwGuiWidgetBar(dwRect* pRect)
 {
 }
 
-// @43b8d0 (dwGuiWidgetBar_Dtor; scalar-deleting wrapper @43b8b0)
+// dwGuiWidgetBar_Dtor (scalar-deleting wrapper dwGuiWidgetBar_DtorDelete)
 dwGuiWidgetBar::~dwGuiWidgetBar()
 {
     dwListNode* pNode;
     dwListNode* pNext;
     dwGuiBarItem* pItem;
 
-    dwGuiWidgetBar::FreeImages(); // binary: direct call to the @43c040 broadcast
+    dwGuiWidgetBar::FreeImages(); // binary: direct call to the dwWidgetGroup_FreeChildImages broadcast
 
     pNode = this->items.pSentinel->pNext;
     while (pNode != this->items.pSentinel)
@@ -166,7 +166,7 @@ dwGuiWidgetBar::~dwGuiWidgetBar()
     this->items.Free();
 }
 
-// vtbl +0x04 @43be80
+// vtbl +0x04 dwGuiWidgetBar_OnMouseMove
 int dwGuiWidgetBar::OnMouseMove(int16_t x, int16_t y)
 {
     dwPoint pt;
@@ -181,7 +181,7 @@ int dwGuiWidgetBar::OnMouseMove(int16_t x, int16_t y)
     return 0;
 }
 
-// vtbl +0x08 @43bd70
+// vtbl +0x08 dwGuiWidgetBar_OnMouseDown
 int dwGuiWidgetBar::OnMouseDown(int16_t x, int16_t y)
 {
     dwPoint pt;
@@ -222,7 +222,7 @@ int dwGuiWidgetBar::OnMouseDown(int16_t x, int16_t y)
     return 0;
 }
 
-// vtbl +0x0c @43bed0
+// vtbl +0x0c dwGuiWidgetBar_OnMouseUp
 int dwGuiWidgetBar::OnMouseUp(int16_t x, int16_t y)
 {
     dwPoint pt;
@@ -237,7 +237,7 @@ int dwGuiWidgetBar::OnMouseUp(int16_t x, int16_t y)
     return 0;
 }
 
-// vtbl +0x10 @43bf20
+// vtbl +0x10 dwGuiWidgetBar_OnKey
 int dwGuiWidgetBar::OnKey(int key, int repeat)
 {
     if (this->pSelectedItem->bEnabled != 0) // unguarded deref — binary behavior
@@ -245,7 +245,7 @@ int dwGuiWidgetBar::OnKey(int key, int repeat)
     return 0;
 }
 
-// vtbl +0x14 @43bd20
+// vtbl +0x14 dwGuiWidgetBar_Update
 void dwGuiWidgetBar::Update(float dt)
 {
     dwListNode* pNode;
@@ -257,7 +257,7 @@ void dwGuiWidgetBar::Update(float dt)
     }
 }
 
-// vtbl +0x18 @43bf80
+// vtbl +0x18 dwGuiWidgetBar_OnHover
 int dwGuiWidgetBar::OnHover(int16_t x, int16_t y)
 {
     dwPoint pt;
@@ -282,7 +282,7 @@ int dwGuiWidgetBar::OnHover(int16_t x, int16_t y)
     return this->pSelectedItem->OnHover(x, y); // unguarded deref — binary behavior
 }
 
-// vtbl +0x1c @43bf40
+// vtbl +0x1c dwGuiWidgetBar_OnMessage
 int dwGuiWidgetBar::OnMessage(dwWidgetMsg* pMsg)
 {
     dwListNode* pNode;
@@ -299,7 +299,7 @@ int dwGuiWidgetBar::OnMessage(dwWidgetMsg* pMsg)
     return result;
 }
 
-// vtbl +0x3c @4447e0 (the shared dwWidgetGroup_EnsureImages broadcast body,
+// vtbl +0x3c (the shared dwWidgetGroup_EnsureImages broadcast body,
 // reused by this vtable over the +0x10 list)
 void dwGuiWidgetBar::EnsureImages()
 {
@@ -309,7 +309,7 @@ void dwGuiWidgetBar::EnsureImages()
         ((dwGuiBarItem*)pNode->pData)->EnsureImages();
 }
 
-// vtbl +0x40 @43c040 (the shared dwWidgetGroup_FreeChildImages broadcast body)
+// vtbl +0x40 (the shared dwWidgetGroup_FreeChildImages broadcast body)
 void dwGuiWidgetBar::FreeImages()
 {
     dwListNode* pNode;
@@ -318,7 +318,7 @@ void dwGuiWidgetBar::FreeImages()
         ((dwGuiBarItem*)pNode->pData)->FreeImages();
 }
 
-// vtbl +0x44 @43bc70
+// vtbl +0x44 dwGuiWidgetBar_Draw
 void dwGuiWidgetBar::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     dwRect band;
@@ -346,7 +346,7 @@ void dwGuiWidgetBar::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
     }
 }
 
-// @43b9f0 (dwGuiWidgetBar_AddItem)
+// dwGuiWidgetBar_AddItem
 dwGuiBarItem* dwGuiWidgetBar::AddItem(dwWidget* pInner, char* pImageFile, char* pText,
                                       char* pFontName, uint8_t color, int padTop, int padSide)
 {
@@ -377,7 +377,7 @@ dwGuiBarItem* dwGuiWidgetBar::AddItem(dwWidget* pInner, char* pImageFile, char* 
     return pItem;
 }
 
-// @43bb40 (dwGuiWidgetBar_SelectIndex)
+// dwGuiWidgetBar_SelectIndex
 void dwGuiWidgetBar::SelectIndex(int index)
 {
     dwListNode* pNode;
@@ -392,7 +392,7 @@ void dwGuiWidgetBar::SelectIndex(int index)
         this->ScrollToItem((dwGuiBarItem*)pNode->pData);
 }
 
-// @43bba0 (dwGuiWidgetBar_ScrollToItem)
+// dwGuiWidgetBar_ScrollToItem
 void dwGuiWidgetBar::ScrollToItem(dwGuiBarItem* pItem)
 {
     dwPoint pos;

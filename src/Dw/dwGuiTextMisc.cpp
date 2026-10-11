@@ -1,23 +1,23 @@
 // dwGuiTextMisc — six small DroidWorks text/decorator controls:
-// dwGuiTextPopup + dwGuiTextSlider (unit 0x4399b0-0x439f1x), dwGuiTextSpitter
-// + dwGuiTextStrip + dwGuiTimer (unit 0x439f20-0x43aa2x), dwGuiTypewriter
-// (unit 0x43aa30-0x43ae3x). See Dw/dwGuiTextMisc.h for the class map and the
+// dwGuiTextPopup + dwGuiTextSlider, dwGuiTextSpitter
+// + dwGuiTextStrip + dwGuiTimer, dwGuiTypewriter.
+// See Dw/dwGuiTextMisc.h for the class map and the
 // per-class quirk notes.
 //
-// Decompiled from DroidWorks.exe 0x4399b0-0x43ae3f. vtables:
-// dwGuiTextPopup_vtbl @0x51fce8, dwGuiTextSlider_vtbl @0x51fd38,
-// dwGuiTextSpitter_vtbl @0x51fd88, dwGuiTextStrip_vtbl @0x51fdd8,
-// dwGuiTimer_vtbl @0x51fe28, dwGuiTypewriter_vtbl @0x51fe78.
+// Decompiled from DroidWorks.exe. vtables:
+// dwGuiTextPopup_vtbl, dwGuiTextSlider_vtbl,
+// dwGuiTextSpitter_vtbl, dwGuiTextStrip_vtbl,
+// dwGuiTimer_vtbl, dwGuiTypewriter_vtbl.
 //
 // Translation notes:
 //  - The binary's __ftol truncates toward zero; where the binary biases by
-//    +0.5 first (FSUB of the -0.5 double @0x51fed0, dwGuiTypewriter::Update)
+//    +0.5 first (FSUB of the -0.5 double, dwGuiTypewriter::Update)
 //    that is round-half-up. Mirrored with double math + C casts (same
 //    approach as dwGuiHypText.cpp).
 //  - The slider/strip/spitter fly math accumulates its timer WITHOUT reset,
 //    so the motion accelerates over time — faithful to the binary.
 //  - Font handles follow the dwGuiTextButton precedent: `new dwFont` +
-//    dwFont_Load; the binary's handle "dtor" @504190 is a lone RET (the
+//    dwFont_Load; the binary's handle "dtor" sithRender_Open is a lone RET (the
 //    glyph block belongs to the dwFont cache), so the dtors just delete the
 //    handle.
 //
@@ -30,10 +30,10 @@
 #include "Dw/dwSound.h"
 
 // ---------------------------------------------------------------------------
-// dwGuiTextPopup (vtbl 0x51fce8)
+// dwGuiTextPopup (dwGuiTextPopup_vtbl)
 // ---------------------------------------------------------------------------
 
-// @4399b0 (dwGuiTextPopup_Ctor)
+// dwGuiTextPopup_Ctor
 dwGuiTextPopup::dwGuiTextPopup(dwRect* pRect, char* pLabel, char* pFontName,
                                uint8_t colorNormal, uint8_t colorHot, int cmdId,
                                char* pDisplayText, char* pSndOff, char* pAltText,
@@ -59,16 +59,16 @@ dwGuiTextPopup::dwGuiTextPopup(dwRect* pRect, char* pLabel, char* pFontName,
     // Redundant re-assign (the base ctor already set labelText = pLabel) —
     // binary quirk, preserved.
     this->labelText.Assign(pLabel, 0);
-    this->dwWorkshopCtrl::EnsureImages(); // direct @4075c0 call in the binary
+    this->dwWorkshopCtrl::EnsureImages(); // direct dwWorkshopCtrl_EnsureImagesLoaded call in the binary
 }
 
-// @439ac0 (dwGuiTextPopup_Dtor; scalar-deleting wrapper @439aa0) — vptr
+// dwGuiTextPopup_Dtor (scalar-deleting wrapper dwGuiTextPopup_DtorDelete) — vptr
 // re-point + base dtor only.
 dwGuiTextPopup::~dwGuiTextPopup()
 {
 }
 
-// vtbl +0x44 @439b00 (dwGuiTextPopup_Draw)
+// vtbl +0x44 dwGuiTextPopup_Draw
 void dwGuiTextPopup::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     dwImage* pImg;
@@ -109,17 +109,17 @@ void dwGuiTextPopup::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 
     if (this->bAltDraw != 0)
         dwFont_DrawTextCentered(pDestBits, this->hFont, &textRect,
-                                this->labelText.pBuffer, color, pClipRect); // @448d30
+                                this->labelText.pBuffer, color, pClipRect);
     else
         dwFont_DrawText(pDestBits, this->hFont, &textRect,
-                        this->labelText.pBuffer, color, pClipRect);         // @448d00
+                        this->labelText.pBuffer, color, pClipRect);
 }
 
 // ---------------------------------------------------------------------------
-// dwGuiTextSlider (vtbl 0x51fd38)
+// dwGuiTextSlider (dwGuiTextSlider_vtbl)
 // ---------------------------------------------------------------------------
 
-// @439c10 (dwGuiTextSlider_Ctor)
+// dwGuiTextSlider_Ctor
 dwGuiTextSlider::dwGuiTextSlider(dwRect* pRect, char* pFontName, uint8_t textColor,
                                  float scrollSpeed, uint8_t shadowColor, char* pText)
     : dwWidget(pRect)
@@ -149,14 +149,14 @@ dwGuiTextSlider::dwGuiTextSlider(dwRect* pRect, char* pFontName, uint8_t textCol
     this->scrollRect.right = (int16_t)(this->scrollRect.right + d);
 }
 
-// @439d10 (dwGuiTextSlider_Dtor; scalar-deleting wrapper @439cf0)
+// dwGuiTextSlider_Dtor (scalar-deleting wrapper dwGuiTextSlider_DtorDelete)
 dwGuiTextSlider::~dwGuiTextSlider()
 {
     if (this->pFont != NULL)
         delete this->pFont;
 }
 
-// vtbl +0x48 @439d80 (dwGuiTextSlider_SetText; COMDAT shared with
+// vtbl +0x48 dwGuiTextSlider_SetText (COMDAT shared with
 // dwGuiTypewriter's +0x48 — both keep the timer at binary 0x24 and the text
 // at 0x10)
 void dwGuiTextSlider::SetText(char* pText)
@@ -166,7 +166,7 @@ void dwGuiTextSlider::SetText(char* pText)
     this->Invalidate(); // vtbl +0x34
 }
 
-// vtbl +0x14 @439db0 (dwGuiTextSlider_Update) — advance = widget width *
+// vtbl +0x14 dwGuiTextSlider_Update — advance = widget width *
 // (total elapsed / scrollSpeed) px, added CUMULATIVELY each tick (the timer
 // never resets -> the slide accelerates; binary quirk). Once the rect's
 // right edge reaches the widget's right edge the `>=` gate stops all
@@ -200,7 +200,7 @@ void dwGuiTextSlider::Update(float dt)
     this->Invalidate(); // vtbl +0x34
 }
 
-// vtbl +0x44 @439e60 (dwGuiTextSlider_Draw) — label at scrollRect with a
+// vtbl +0x44 dwGuiTextSlider_Draw — label at scrollRect with a
 // (+1,+1) shadow pass in dwColormap_transparentIdx first (the stored
 // shadowColor is NOT used — binary quirk), both clipped to
 // pClipRect ∩ scrollRect. Nothing draws while scrollSpeed == 0.
@@ -227,14 +227,14 @@ void dwGuiTextSlider::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 }
 
 // ---------------------------------------------------------------------------
-// dwGuiTextSpitter (vtbl 0x51fd88)
+// dwGuiTextSpitter (dwGuiTextSpitter_vtbl)
 // ---------------------------------------------------------------------------
 
-// Fly-in speed factor (binary float @0x51fdd4 = 0x3f7d7721 ≈ 1/1.01, applied
+// Fly-in speed factor (binary float = 0x3f7d7721 ≈ 1/1.01, applied
 // TWICE: once to the timer, once to the fly range).
 #define DWGUITEXTMISC_SPIT_FLY_K 0.99009901
 
-// @439f20 (dwGuiTextSpitter_Ctor)
+// dwGuiTextSpitter_Ctor
 dwGuiTextSpitter::dwGuiTextSpitter(dwRect* pRect, char* pFontName, uint8_t color1,
                                    int mode, char* pSpitSound, uint8_t color2,
                                    char* pText)
@@ -305,7 +305,7 @@ dwGuiTextSpitter::dwGuiTextSpitter(dwRect* pRect, char* pFontName, uint8_t color
     this->UpdateCharExtent(pCh);
 }
 
-// @43a0f0 (dwGuiTextSpitter_Dtor; scalar-deleting wrapper @43a0d0)
+// dwGuiTextSpitter_Dtor (scalar-deleting wrapper dwGuiTextSpitter_DtorDelete)
 dwGuiTextSpitter::~dwGuiTextSpitter()
 {
     if (this->pFont != NULL)
@@ -314,7 +314,7 @@ dwGuiTextSpitter::~dwGuiTextSpitter()
         dwSound_Stop(this->spitSound.pBuffer);
 }
 
-// vtbl +0x48 @43a1a0 (dwGuiTextSpitter_SetText) — QUIRK: no reveal-state
+// vtbl +0x48 dwGuiTextSpitter_SetText — QUIRK: no reveal-state
 // reset (cursors/rects/bDone keep their values).
 void dwGuiTextSpitter::SetText(char* pText)
 {
@@ -322,7 +322,7 @@ void dwGuiTextSpitter::SetText(char* pText)
     this->Invalidate(); // vtbl +0x34
 }
 
-// @43a1c0 (dwGuiTextSpitter_UpdateCharExtent)
+// dwGuiTextSpitter_UpdateCharExtent
 void dwGuiTextSpitter::UpdateCharExtent(char* pCh)
 {
     int16_t x;
@@ -347,7 +347,7 @@ void dwGuiTextSpitter::UpdateCharExtent(char* pCh)
     }
 }
 
-// vtbl +0x14 @43a230 (dwGuiTextSpitter_Update)
+// vtbl +0x14 dwGuiTextSpitter_Update
 void dwGuiTextSpitter::Update(float dt)
 {
     int width;
@@ -455,7 +455,7 @@ void dwGuiTextSpitter::Update(float dt)
     this->Invalidate(); // vtbl +0x34 (every non-early-return path)
 }
 
-// vtbl +0x44 @43a4e0 (dwGuiTextSpitter_Draw)
+// vtbl +0x44 dwGuiTextSpitter_Draw
 void dwGuiTextSpitter::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     dwRect clipChar;
@@ -515,10 +515,10 @@ void dwGuiTextSpitter::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 }
 
 // ---------------------------------------------------------------------------
-// dwGuiTextStrip (vtbl 0x51fdd8)
+// dwGuiTextStrip (dwGuiTextStrip_vtbl)
 // ---------------------------------------------------------------------------
 
-// @43a6a0 (dwGuiTextStrip_Ctor)
+// dwGuiTextStrip_Ctor
 dwGuiTextStrip::dwGuiTextStrip(dwRect* pRect, uint8_t color, float scrollSpeed)
     : dwWidget(pRect)
     , color(color)
@@ -539,13 +539,13 @@ dwGuiTextStrip::dwGuiTextStrip(dwRect* pRect, uint8_t color, float scrollSpeed)
     this->scrollRect.right = (int16_t)(this->scrollRect.right + d);
 }
 
-// @43a760 (dwGuiTextStrip_Dtor; scalar-deleting wrapper @43a740) — label
+// dwGuiTextStrip_Dtor (scalar-deleting wrapper dwGuiTextStrip_DtorDelete) — label
 // free + base only (member dtors here).
 dwGuiTextStrip::~dwGuiTextStrip()
 {
 }
 
-// vtbl +0x14 @43a7b0 (dwGuiTextStrip_Update) — identical math to
+// vtbl +0x14 dwGuiTextStrip_Update — identical math to
 // dwGuiTextSlider::Update (see its notes; single accelerating slide).
 void dwGuiTextStrip::Update(float dt)
 {
@@ -574,7 +574,7 @@ void dwGuiTextStrip::Update(float dt)
     this->Invalidate(); // vtbl +0x34
 }
 
-// vtbl +0x44 @43a860 (dwGuiTextStrip_Draw) — blend-fill the scroll rect.
+// vtbl +0x44 dwGuiTextStrip_Draw — blend-fill the scroll rect.
 void dwGuiTextStrip::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     dwRect clip;
@@ -589,14 +589,14 @@ void dwGuiTextStrip::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
     (void)clip;
     if (this->scrollSpeed == 0.0f)
         return;
-    dwImageDraw_BlendRect(pDestBits, &this->scrollRect, this->color, pClipRect); // @446970
+    dwImageDraw_BlendRect(pDestBits, &this->scrollRect, this->color, pClipRect);
 }
 
 // ---------------------------------------------------------------------------
-// dwGuiTimer (vtbl 0x51fe28)
+// dwGuiTimer (dwGuiTimer_vtbl)
 // ---------------------------------------------------------------------------
 
-// @43a8c0 (dwGuiTimer_Ctor) — the binary inlines the decorator ctor (widget
+// dwGuiTimer_Ctor — the binary inlines the decorator ctor (widget
 // rect copied from the child via &child->left); the base ctor here is that
 // exact sequence. The child starts hidden.
 dwGuiTimer::dwGuiTimer(dwWidget* pTarget, float startTime, float duration)
@@ -609,11 +609,11 @@ dwGuiTimer::dwGuiTimer(dwWidget* pTarget, float startTime, float duration)
     this->elapsed = 0.0f;
 }
 
-// (dwGuiTimer dtor @43a9d0 / DtorDelete @43a9b0: re-points the vptr to
+// (dwGuiTimer dtor dwGuiTimer_Dtor / dwGuiTimer_DtorDelete: re-points the vptr to
 // dwWcChildDecorator_vtbl and repeats the decorator dtor body — FreeImages +
 // delete child. That IS ~dwWcChildDecorator; no override needed here.)
 
-// vtbl +0x14 @43a940 (dwGuiTimer_Update) — NOTE: does not gate on
+// vtbl +0x14 dwGuiTimer_Update — NOTE: does not gate on
 // this->bEnabled (containers gate it); the child's Update is forwarded
 // every tick, shown or not.
 void dwGuiTimer::Update(float dt)
@@ -640,10 +640,10 @@ extern "C" dwWidget* dwGuiTimer_New(dwWidget* pTarget, float startTime, float du
 }
 
 // ---------------------------------------------------------------------------
-// dwGuiTypewriter (vtbl 0x51fe78)
+// dwGuiTypewriter (dwGuiTypewriter_vtbl)
 // ---------------------------------------------------------------------------
 
-// @43aa30 (dwGuiTypewriter_Ctor)
+// dwGuiTypewriter_Ctor
 dwGuiTypewriter::dwGuiTypewriter(dwRect* pRect, char* pFontName, uint8_t textColor,
                                  float revealDuration, char* pTickSound,
                                  uint8_t color2, uint8_t bRightAlign, char* pText)
@@ -665,7 +665,7 @@ dwGuiTypewriter::dwGuiTypewriter(dwRect* pRect, char* pFontName, uint8_t textCol
     this->revealTimer = 0.0f;
 }
 
-// @43ab30 (dwGuiTypewriter_Dtor; scalar-deleting wrapper @43ab10)
+// dwGuiTypewriter_Dtor (scalar-deleting wrapper dwGuiTypewriter_DtorDelete)
 dwGuiTypewriter::~dwGuiTypewriter()
 {
     if (this->pFont != NULL)
@@ -674,7 +674,7 @@ dwGuiTypewriter::~dwGuiTypewriter()
         dwSound_Stop(this->tickSound.pBuffer);
 }
 
-// vtbl +0x48 @439d80 — the binary reuses dwGuiTextSlider_SetText as a COMDAT
+// vtbl +0x48 — the binary reuses dwGuiTextSlider_SetText as a COMDAT
 // (identical layout: timer @0x24, text dwString @0x10); same body here.
 void dwGuiTypewriter::SetText(char* pText)
 {
@@ -683,7 +683,7 @@ void dwGuiTypewriter::SetText(char* pText)
     this->Invalidate(); // vtbl +0x34
 }
 
-// vtbl +0x14 @43abe0 (dwGuiTypewriter_Update)
+// vtbl +0x14 dwGuiTypewriter_Update
 void dwGuiTypewriter::Update(float dt)
 {
     float frac;
@@ -695,7 +695,7 @@ void dwGuiTypewriter::Update(float dt)
     frac = this->revealTimer / this->revealDuration;
     if (frac > 1.0f)
         frac = 1.0f;
-    // round-half-up: the binary FSUBs the -0.5 double @0x51fed0 before the
+    // round-half-up: the binary FSUBs the -0.5 double before the
     // truncating __ftol.
     len = (uint32_t)((double)this->text.length * (double)frac + 0.5);
     if (this->revealed.length != len)
@@ -713,7 +713,7 @@ void dwGuiTypewriter::Update(float dt)
     }
 }
 
-// vtbl +0x44 @43acd0 (dwGuiTypewriter_Draw) — revealed prefix with a (+1,+1)
+// vtbl +0x44 dwGuiTypewriter_Draw — revealed prefix with a (+1,+1)
 // shadow pass in dwColormap_transparentIdx; bRightAlign shifts the draw rect
 // so the FULL text would end at the widget's right edge.
 void dwGuiTypewriter::Draw(dwImageBits* pDestBits, dwRect* pClipRect)

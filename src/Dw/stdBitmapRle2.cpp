@@ -4,11 +4,11 @@
 // the exported C loader API. This unit provides the two concrete dwImage
 // subclasses the loaders return:
 //
-//   stdBitmapRle2 (vtbl 0x520140, struct 0x18) — an UNCOMPRESSED image: a flat
+//   stdBitmapRle2 (stdBitmapRle2_vtbl, struct 0x18) — an UNCOMPRESSED image: a flat
 //     4-byte-aligned pixel buffer. Overrides Lock/Unlock (+ dtor); inherits the
-//     shared dwImage base Blit/BlitColorMap (@0x448d60/@0x448e40).
+//     shared dwImage base Blit/BlitColorMap (dwImage_Blit/dwImage_BlitColorMap).
 //
-//   stdBitmapRle (vtbl 0x5201b8, struct 0x10) — a LAZY-DECODE RLE8 image: it
+//   stdBitmapRle (stdBitmapRle_vtbl, struct 0x10) — a LAZY-DECODE RLE8 image: it
 //     keeps the raw BI_RLE8 byte stream and decodes it straight into the
 //     destination on every Blit/BlitColorMap. Its binary vtable has only THREE
 //     slots (dtor/Blit/BlitColorMap) — it is never Lock'd, so Lock/Unlock are
@@ -37,7 +37,7 @@ extern "C" {
 extern "C" HostServices* dwMain_pHS;
 
 // ===========================================================================
-// stdBitmapRle2 — uncompressed image (vtbl 0x520140, struct 0x18)
+// stdBitmapRle2 — uncompressed image (stdBitmapRle2_vtbl, struct 0x18)
 // ===========================================================================
 
 // binary /DW struct stdBitmapRle2, size 0x18:
@@ -52,14 +52,14 @@ struct stdBitmapRle2 : dwImage
     void* pPixels;     // 0x10: owned pixel buffer
     int32_t stride;    // 0x14: bytes per row (4-byte aligned)
 
-    stdBitmapRle2(uint16_t width, uint16_t height, uint8_t bppBits); // @442df0 (Ctor)
-    stdBitmapRle2(dwImage* pSrc, dwRect* pRect);                     // @442ec0 (ToVBuffer)
-    virtual ~stdBitmapRle2();                                        // @442ea0/@442fd0
-    virtual int Lock(void** ppPixels, int* pStride);                 // vtbl +0x0c @443030
-    virtual int Unlock();                                            // vtbl +0x10 @443070
+    stdBitmapRle2(uint16_t width, uint16_t height, uint8_t bppBits); // Ctor
+    stdBitmapRle2(dwImage* pSrc, dwRect* pRect);                     // ToVBuffer
+    virtual ~stdBitmapRle2();
+    virtual int Lock(void** ppPixels, int* pStride);                 // vtbl +0x0c stdBitmapRle2_Lock
+    virtual int Unlock();                                            // vtbl +0x10 stdBitmapRle2_Unlock
 };
 
-// Construct an empty width x height image at bppBits (8 or 16). @442df0
+// Construct an empty width x height image at bppBits (8 or 16).
 stdBitmapRle2::stdBitmapRle2(uint16_t width, uint16_t height, uint8_t bppBits)
 {
     uint8_t bppBytes = (uint8_t)(bppBits >> 3);
@@ -83,7 +83,7 @@ stdBitmapRle2::stdBitmapRle2(uint16_t width, uint16_t height, uint8_t bppBits)
 }
 
 // Construct a width x height copy of pRect's region of pSrc (a flat blit of the
-// source image at the source's bpp). pRect = {left,top,right,bottom}. @442ec0
+// source image at the source's bpp). pRect = {left,top,right,bottom}.
 stdBitmapRle2::stdBitmapRle2(dwImage* pSrc, dwRect* pRect)
 {
     uint8_t bppBytes = (uint8_t)(pSrc->desc.bpp & 0x1f);
@@ -115,8 +115,8 @@ stdBitmapRle2::stdBitmapRle2(dwImage* pSrc, dwRect* pRect)
     }
 }
 
-// Free the pixel buffer (binary: stdBitmapRle2_Dtor2 @442fd0; the base dtor
-// then re-points the vptr — the compiler does that here). @442ea0
+// Free the pixel buffer (binary: stdBitmapRle2_Dtor2; the base dtor
+// then re-points the vptr — the compiler does that here).
 stdBitmapRle2::~stdBitmapRle2()
 {
     if (this->pPixels)
@@ -126,7 +126,6 @@ stdBitmapRle2::~stdBitmapRle2()
 // Hand out the pixel pointer + stride and bump the lock count. If the stride is
 // negative (bottom-up storage) the pixel pointer is repositioned to the last
 // row — never happens here (stride is always positive), preserved for fidelity.
-// @443030
 int stdBitmapRle2::Lock(void** ppPixels, int* pStride)
 {
     this->lockCount++;
@@ -137,7 +136,7 @@ int stdBitmapRle2::Lock(void** ppPixels, int* pStride)
     return 1;
 }
 
-// Release a lock (decrement the count). @443070
+// Release a lock (decrement the count).
 int stdBitmapRle2::Unlock()
 {
     this->lockCount--;
@@ -145,7 +144,7 @@ int stdBitmapRle2::Unlock()
 }
 
 // ===========================================================================
-// stdBitmapRle — lazy-decode RLE8 image (vtbl 0x5201b8, struct 0x10)
+// stdBitmapRle — lazy-decode RLE8 image (stdBitmapRle_vtbl, struct 0x10)
 // ===========================================================================
 
 // The RLE8 decoders write straight into the destination's locked pixel buffer.
@@ -159,7 +158,7 @@ int stdBitmapRle2::Unlock()
 // transparent.
 
 // Real 8bpp decode WITHOUT colormap blend (plain copy; 0 = transparent).
-// @4498f0 (Ghidra: RLE_decompress_type1)
+// (Ghidra: RLE_decompress_type1)
 static void RLE_decompress_type1(dwImageBits* pDest, uint8_t* pData,
                                  dwRect* pDstExtent, dwRect* pSrcExtent)
 {
@@ -319,7 +318,7 @@ static void RLE_decompress_type1(dwImageBits* pDest, uint8_t* pData,
 // 8bpp decode WITH colormap blend: dest = transparencyTable[dest*256 + src]
 // for src != 0. The table is the current engine colormap's 256x256 transparency
 // table (binary: *(DAT_005542b8 + 0x338) = rdColormap_pCurMap->transparency).
-// @449bf0 (Ghidra: stdBitmapRle_sub_449BF0)
+// (Ghidra: stdBitmapRle_sub_449BF0)
 static void RLE_decompress_type1_colormap(dwImageBits* pDest, uint8_t* pData,
                                           dwRect* pDstExtent, dwRect* pSrcExtent)
 {
@@ -475,7 +474,7 @@ static void RLE_decompress_type1_colormap(dwImageBits* pDest, uint8_t* pData,
 }
 
 // The src-16bpp RLE decode path — an EMPTY stub in the binary (a lone RET; the
-// 16bpp RLE decode was never implemented). @449180 (Ghidra: RLE_decompress_type2)
+// 16bpp RLE decode was never implemented). (Ghidra: RLE_decompress_type2)
 static void RLE_decompress_type2(dwImageBits* pDest, uint8_t* pData,
                                  dwRect* pDstExtent, dwRect* pSrcExtent)
 {
@@ -488,10 +487,10 @@ struct stdBitmapRle : dwImage
 {
     void* pRleData; // 0x0c: owned raw BI_RLE8 byte stream
 
-    stdBitmapRle(int16_t width, int16_t height, void* pRleData);       // @449750 (InstFormat1)
-    virtual ~stdBitmapRle();                                           // @449780/@4497a0
-    virtual void Blit(dwImageBits* pDestBits, int x, int y, dwRect* pClipRect);         // vtbl +0x04 @449800
-    virtual void BlitColorMap(dwImageBits* pDestBits, int x, int y, dwRect* pClipRect); // vtbl +0x08 @449b00
+    stdBitmapRle(int16_t width, int16_t height, void* pRleData);       // InstFormat1
+    virtual ~stdBitmapRle();
+    virtual void Blit(dwImageBits* pDestBits, int x, int y, dwRect* pClipRect);         // vtbl +0x04
+    virtual void BlitColorMap(dwImageBits* pDestBits, int x, int y, dwRect* pClipRect); // vtbl +0x08
     // Note: the binary's stdBitmapRle vtable has ONLY 3 slots (dtor/Blit/
     // BlitColorMap) — this class is never Lock'd (it decodes on Blit). These
     // inert overrides exist only to make the class concrete against the
@@ -500,7 +499,7 @@ struct stdBitmapRle : dwImage
     virtual int Unlock();                                              // (not in binary vtable)
 };
 
-// Construct from a raw RLE stream (bpp fixed at 1 = 8bpp). @449750
+// Construct from a raw RLE stream (bpp fixed at 1 = 8bpp).
 stdBitmapRle::stdBitmapRle(int16_t width, int16_t height, void* pRleData)
 {
     this->desc.width = (uint16_t)width;
@@ -510,7 +509,7 @@ stdBitmapRle::stdBitmapRle(int16_t width, int16_t height, void* pRleData)
 }
 
 // Free the RLE stream (binary frees via rdroid_pHS->free — the same underlying
-// HostServices as dwMain_pHS in DW). @4497a0
+// HostServices as dwMain_pHS in DW).
 stdBitmapRle::~stdBitmapRle()
 {
     if (this->pRleData)
@@ -518,7 +517,7 @@ stdBitmapRle::~stdBitmapRle()
 }
 
 // Decode the RLE stream into pDestBits at (x, y), clipped to the destination
-// bounds intersected with pClipRect. @449800
+// bounds intersected with pClipRect.
 void stdBitmapRle::Blit(dwImageBits* pDestBits, int x, int y, dwRect* pClipRect)
 {
     dwRect dstExtent;
@@ -547,7 +546,7 @@ void stdBitmapRle::Blit(dwImageBits* pDestBits, int x, int y, dwRect* pClipRect)
 }
 
 // Same as Blit but blends through the current colormap's transparency table
-// (8bpp path). @449b00
+// (8bpp path).
 void stdBitmapRle::BlitColorMap(dwImageBits* pDestBits, int x, int y, dwRect* pClipRect)
 {
     dwRect dstExtent;
@@ -616,7 +615,7 @@ typedef struct BmpInfoHeader
 #pragma pack(pop)
 
 // Read `sizeImage` raw RLE bytes and wrap them in a lazy-decode stdBitmapRle.
-// @444ba0 (Ghidra: stdBitmapRle_LoadFormat1)
+// (Ghidra: stdBitmapRle_LoadFormat1)
 static dwImage* stdBitmapRle_LoadFormat1(stdFile_t fp, BmpInfoHeader* pInfo)
 {
     dwImage* pResult = NULL;
@@ -636,7 +635,7 @@ static dwImage* stdBitmapRle_LoadFormat1(stdFile_t fp, BmpInfoHeader* pInfo)
 
 // Load an uncompressed (BI_RGB) BMP body into a flat stdBitmapRle2. When the
 // file is really BI_RLE8 but the caller forced decompression, it loads the RLE
-// image then flattens it via stdBitmapRle2(pSrc, {0,0,w,h}). @444a30
+// image then flattens it via stdBitmapRle2(pSrc, {0,0,w,h}).
 static dwImage* stdBitmapRle_LoadFormat0(stdFile_t fp, BmpInfoHeader* pInfo)
 {
     dwImage* pResult = NULL;
@@ -683,7 +682,7 @@ static dwImage* stdBitmapRle_LoadFormat0(stdFile_t fp, BmpInfoHeader* pInfo)
 
 // Open pFilePath, validate the BITMAPFILEHEADER + BITMAPINFOHEADER (8bpp only),
 // seek to the pixel data and dispatch by compression. bForceDecompress forces a
-// BI_RLE8 file down the flat LoadFormat0 path. @4448f0 (stdBitmapRle_LoadEntry)
+// BI_RLE8 file down the flat LoadFormat0 path. stdBitmapRle_LoadEntry
 static dwImage* stdBitmapRle_LoadEntry(char* pFilePath, int bForceDecompress)
 {
     dwImage* pResult = NULL;
@@ -745,7 +744,7 @@ static dwImage* stdBitmapRle_LoadEntry(char* pFilePath, int bForceDecompress)
     return pResult;
 }
 
-// 8bpp image file loader. @444850
+// 8bpp image file loader.
 extern "C" dwImage* stdBitmapRle2_LoadFile8(char* pFilePath, int bForceDecompress)
 {
     if (pFilePath == NULL)
@@ -774,10 +773,10 @@ extern "C" dwImage* stdBitmapRle2_LoadFile8(char* pFilePath, int bForceDecompres
     return pResult;
 }
 
-// >8bpp-display image loader. @444c50 (Ghidra: stdBitmapRle_FUN_00444c50)
+// >8bpp-display image loader. (Ghidra: stdBitmapRle_FUN_00444c50)
 extern "C" dwImage* stdBitmapRle2_LoadFile16(char* pFilePath)
 {
-    // Binary reads the display depth from DAT_006b17e4 (tRasterInfo @0x6b17cc);
+    // Binary reads the display depth from DAT_006b17e4 (tRasterInfo);
     // in the repo that is stdDisplay_pCurVideoMode->format.format.bpp. A NULL
     // video mode is treated as the 8bpp path (DW's default software display).
     int displayBpp = stdDisplay_pCurVideoMode ? (int)stdDisplay_pCurVideoMode->format.format.bpp : 8;

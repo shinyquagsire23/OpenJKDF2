@@ -2,17 +2,17 @@
 #define _DWSOUND_H
 
 // dwSound — DroidWorks sound manager + three sample classes.
-// DroidWorks.exe unit range: 0x444d40-0x44612x.
+// DroidWorks.exe unit range:.
 //
 // MANAGER (struct dwSound 0x24, global dwSound_pManager = dwSound_pManagerCached
-// @0x541d2c / @0x53d960): owns a name->sample stdHashtbl cache, a circular
+// dwSound_pManagerCached / dwSound_pManager): owns a name->sample stdHashtbl cache, a circular
 // active-voice list, a crossfading music slot and a clockSec driven by a worker
 // thread (dwSound_ThreadProc: 25ms tick -> dwSound::Update = advance clock,
 // lazy-start pending music, service voices via the sample Update virtual, reap
 // finished voices).
 //
-// SAMPLE CLASSES (verifiably C++ in the binary: vtables @0x520168/0x520188/
-// 0x520190, ctor/dtor pairs, MSVC EH frames — hence a .cpp translation):
+// SAMPLE CLASSES (verifiably C++ in the binary: vtables dwSoundSample_vtbl/dwSoundSampleStatic_vtbl/
+// dwSoundSampleStream_vtbl, ctor/dtor pairs, MSVC EH frames — hence a .cpp translation):
 //   dwSoundSample       base (0x30): stdSound buffer + volume-envelope lerp.
 //   dwSoundSampleStatic (0x30): fully-loaded WAV SFX (the GetOrLoadSample kind).
 //   dwSoundSampleStream (0x44): streamed/looped from an open file (music).
@@ -45,7 +45,7 @@ extern "C" {
 
 // Base sample: a named stdSound buffer with a volume envelope
 // (curVolume lerps startVolume -> targetVolume over fadeStartSec..fadeEndSec).
-// vtbl @0x520168 {+0 scalar-deleting dtor, +4 Update}.
+// dwSoundSample_vtbl {+0 scalar-deleting dtor, +4 Update}.
 struct dwSoundSample
 {
     // (vtable @0x00)
@@ -64,26 +64,26 @@ struct dwSoundSample
 
     // Opens pName via dwMain_pHS, parses the WAV header and creates the
     // stdSound buffer (len = data length, or bufferLen when nonzero).
-    // flags was the DSBCAPS static/streaming split; unused here. @444d40
+    // flags was the DSBCAPS static/streaming split; unused here.
     dwSoundSample(const char* pName, int flags, uint32_t bufferLen);
-    virtual ~dwSoundSample();  // @444e50 (dwSoundSample_Dtor; scalar-deleting
-                               //  thunk @444e30 = the compiler's delete path)
-    virtual void Update();     // @444f60: clear bPlaying when the buffer went
+    virtual ~dwSoundSample();  // dwSoundSample_Dtor (scalar-deleting
+                               //  thunk dwSoundSample_DtorDelete = the compiler's delete path)
+    virtual void Update();     // clear bPlaying when the buffer went
                                //  silent, then ProcessFade
-    void ProcessFade();        // @444e80: envelope lerp; 0-crossing ends voice
-    void ApplyVolume(float volume);              // @444fa0
-    void SetVolume(float volume, float fadeSec); // @444fe0: fadeSec<=0 -> immediate
-    uint32_t GetLengthMs();    // @445040: bufferBytes*1000/nAvgBytesPerSec
+    void ProcessFade();        // envelope lerp; 0-crossing ends voice
+    void ApplyVolume(float volume);
+    void SetVolume(float volume, float fadeSec); // fadeSec<=0 -> immediate
+    uint32_t GetLengthMs();    // bufferBytes*1000/nAvgBytesPerSec
 };
 
-// Fully-loaded SFX sample (the common cache entry). vtbl @0x520188.
+// Fully-loaded SFX sample (the common cache entry). dwSoundSampleStatic_vtbl.
 struct dwSoundSampleStatic : dwSoundSample
 {
-    dwSoundSampleStatic(const char* pName); // @4450d0: load whole data chunk
-    virtual ~dwSoundSampleStatic();         // @445230 (DtorDelete @445210)
+    dwSoundSampleStatic(const char* pName); // load whole data chunk
+    virtual ~dwSoundSampleStatic();         // dwSoundSampleStatic_DtorDelete
 };
 
-// Streamed/looped sample (music/long speech). vtbl @0x520190.
+// Streamed/looped sample (music/long speech). dwSoundSampleStream_vtbl.
 struct dwSoundSampleStream : dwSoundSample
 {
     stdFile_t hFile;           // 0x30: file kept open for streaming (dwMain_pHS)
@@ -98,10 +98,10 @@ struct dwSoundSampleStream : dwSoundSample
     float fChunkSec;                // seconds of audio per chunk
     float fQueueEndSec;             // manager clockSec when queued audio runs out
 
-    dwSoundSampleStream(const char* pName); // @445240
-    virtual ~dwSoundSampleStream();         // @445320 (DtorDelete @445300)
-    virtual void Update();                  // @4454c0: refill to stay >= two chunks ahead
-    void FillRing();                        // @445380: stage+queue the next 0x2000
+    dwSoundSampleStream(const char* pName);
+    virtual ~dwSoundSampleStream();         // dwSoundSampleStream_DtorDelete
+    virtual void Update();                  // refill to stay >= two chunks ahead
+    void FillRing();                        // stage+queue the next 0x2000
 };
 
 // The manager (0x24). One instance, created by dwSound_Startup().
@@ -115,30 +115,30 @@ struct dwSound
     float masterVolume;               // 0x1c: mirror of stdSound menu volume
     float clockSec;                   // 0x20: worker-thread clock (absolute sec)
 
-    dwSound();                        // @4455c0 (dwSound_Startup: the manager
+    dwSound();                        // (dwSound_Startup: the manager
                                       //  ctor; also spawns the worker thread)
-    void Shutdown();                  // @445670: stop+free all, join thread
-    void SetMenuVolume(float volume); // @445760
-    dwSoundSample* FindSample(const char* pName);      // @445780
-    dwSoundSample* GetOrLoadSample(const char* pName); // @4457c0
-    void FreeSample(dwSoundSample* pSample);           // @445860
-    void FreeAllSamples();                             // @445910 (skips playing)
-    void SetMusic(const char* pName, uint8_t bLoop);   // @445990 (crossfade)
-    void FadeMusic(float volume, float fadeSec);       // @445a30
-    dwSoundSampleStream* StartMusicStream(const char* pName, float volume); // @445a70
-    int IsPlaying(const char* pName);                  // @445b50
-    dwSoundSample* Play(const char* pName);            // @445bb0
-    dwSoundSample* PlayLooping(const char* pName);     // @445bf0
-    dwSoundSample* StartSample(dwSoundSample* pSample);// @445c50
-    void Stop(const char* pName);                      // @445ce0
-    static void StopSample(dwSoundSample* pSample);    // @445d20 (no this in binary)
-    void RestartSample(dwSoundSample* pSample);        // @445d60
-    dwSoundSample* PlayRestart(const char* pName);     // @445de0
-    void StopAll();                                    // @445e20 (music too)
-    void PauseAll();                                   // @445ed0 (voices only)
-    void ResumeAll();                                  // @445f30 (voices only)
-    void SetSampleVolume(const char* pName, float volume, float fadeSec); // @445fa0
-    void Update(float clockSec);                       // @445fe0 (worker only)
+    void Shutdown();                  // stop+free all, join thread
+    void SetMenuVolume(float volume);
+    dwSoundSample* FindSample(const char* pName);
+    dwSoundSample* GetOrLoadSample(const char* pName);
+    void FreeSample(dwSoundSample* pSample);
+    void FreeAllSamples();                             // skips playing
+    void SetMusic(const char* pName, uint8_t bLoop);   // crossfade
+    void FadeMusic(float volume, float fadeSec);
+    dwSoundSampleStream* StartMusicStream(const char* pName, float volume);
+    int IsPlaying(const char* pName);
+    dwSoundSample* Play(const char* pName);
+    dwSoundSample* PlayLooping(const char* pName);
+    dwSoundSample* StartSample(dwSoundSample* pSample);
+    void Stop(const char* pName);
+    static void StopSample(dwSoundSample* pSample);    // no this in binary
+    void RestartSample(dwSoundSample* pSample);
+    dwSoundSample* PlayRestart(const char* pName);
+    void StopAll();                                    // music too
+    void PauseAll();                                   // voices only
+    void ResumeAll();                                  // voices only
+    void SetSampleVolume(const char* pName, float volume, float fadeSec);
+    void Update(float clockSec);                       // worker only
 };
 
 #else // !__cplusplus
@@ -158,8 +158,8 @@ typedef struct dwSoundSampleStream dwSoundSampleStream;
 extern "C" {
 #endif
 
-// The manager singleton. dwSound_pManager is the dw-core slot (@0x53d960),
-// dwSound_pManagerCached the module's own mirror (@0x541d2c, set by the ctor
+// The manager singleton. dwSound_pManager is the dw-core slot,
+// dwSound_pManagerCached the module's own mirror (set by the ctor
 // and read by the sample envelope code).
 extern dwSound* dwSound_pManager;
 extern dwSound* dwSound_pManagerCached;

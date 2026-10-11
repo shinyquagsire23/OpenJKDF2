@@ -4,7 +4,7 @@
 // DroidWorks app-layer entry points (OpenJKDF2-side wrappers).
 //
 // These are the seams the rest of OpenJKDF2 calls when Main_bDroidWorks is
-// set. The decompiled originals (dw_Startup @419bd0, dwMain_MainLoopTick,
+// set. The decompiled originals (dw_Startup, dwMain_MainLoopTick,
 // the boot dwSegment) land here in P7 (see DW/DECOMP_PROGRESS.md); until
 // then these are stubs so the -droidworks path links and runs.
 

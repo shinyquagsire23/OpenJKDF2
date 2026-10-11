@@ -16,9 +16,9 @@
 // (JAWA_ANIM) and dwGuiStatus; on message 0xbbc it rebuilds its list to show
 // one blueprint variant of the selected part.
 //
-// Decompiled from DroidWorks.exe, unit range 0x429a80-0x42a5xx.
-//   dwGuiQuickView   ctor@429c90  vtable @0x51f5c0  struct sizeof 0x574
-//   dwGuiDroidPreview ctor@429a80 vtable @0x51f548  struct sizeof 0x574 (0 new fields)
+// Decompiled from DroidWorks.exe.
+//   dwGuiQuickView   ctor  dwGuiQuickView_vtbl  struct sizeof 0x574
+//   dwGuiDroidPreview ctor dwGuiDroidPreview_vtbl  struct sizeof 0x574 (0 new fields)
 //
 // dwGuiQuickView binary layout (sizeof 0x574):
 //   +0x000 dwGuiViewBox base (0x560; ctor forces bLightsFollowView = 1)
@@ -56,47 +56,47 @@ struct dwGuiQuickView : dwGuiViewBox
     float rotTimer;      // 0x56c
     dwListNode* pNodes;  // 0x570: own droid's part-node list (heap sentinel)
 
-    // Orbit preview covering *pRect (lights follow the view). @429c90
+    // Orbit preview covering *pRect (lights follow the view).
     dwGuiQuickView(dwRect* pRect);
 
     // Free every node + delete its dwPartNode payload, free the sentinel,
-    // release the name, then the base dtor. @429d50 (DtorDelete @429d30)
+    // release the name, then the base dtor. dwGuiQuickView_Dtor (dwGuiQuickView_DtorDelete)
     virtual ~dwGuiQuickView();
 
-    // @429e80 — vtbl +0x14: rotTimer += dt, then broadcast a set-pitch message
+    // vtbl +0x14: rotTimer += dt, then broadcast a set-pitch message
     // (angle = round(rotTimer*45) + 180, mod 360) to pDefault.
     virtual void Update(float dt);
 
-    // @42a510 — vtbl +0x18: dispatch a { 0x7531, 0x7922 } hover notification.
+    // vtbl +0x18: dispatch a { 0x7531, 0x7922 } hover notification.
     virtual int OnHover(int16_t x, int16_t y);
 
-    // @429ee0 — vtbl +0x1c (see the code map above).
+    // vtbl +0x1c (see the code map above).
     virtual int OnMessage(dwWidgetMsg* pMsg);
 
-    // @42a260 — vtbl +0x44: camera bring-up, then draw every root/detached
+    // vtbl +0x44: camera bring-up, then draw every root/detached
     // node of the active droid list (own list, or the workspace when empty).
     virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect);
 
-    // @42a320 — fit the orbit camera to the bounding box of the active droid
+    // fit the orbit camera to the bounding box of the active droid
     // list (own list, or the workspace when empty): sets orbitDistance + pivot
     // then Refresh. Non-virtual helper.
     void LayoutNodes();
 };
 
-// dwGuiDroidPreview — dwGuiQuickView subclass (adds NO fields). @429a80
+// dwGuiDroidPreview — dwGuiQuickView subclass (adds NO fields).
 struct dwGuiDroidPreview : dwGuiQuickView
 {
     // Preview covering *pRect. When pBlueprint != NULL, seeds the list with
-    // one node of that blueprint. @429a80
+    // one node of that blueprint.
     dwGuiDroidPreview(dwRect* pRect, dwPart* pBlueprint);
 
-    // Base dtor only. @429b30 (DtorDelete @429b10)
+    // Base dtor only. dwGuiDroidPreview_Dtor (dwGuiDroidPreview_DtorDelete)
     virtual ~dwGuiDroidPreview();
 
-    // @429c60 — vtbl +0x18: dispatch a { 0x7531, 0x7920 } hover notification.
+    // vtbl +0x18: dispatch a { 0x7531, 0x7920 } hover notification.
     virtual int OnHover(int16_t x, int16_t y);
 
-    // @429b40 — vtbl +0x1c: on { 0xbbc, pPart } rebuild the list to show one
+    // vtbl +0x1c: on { 0xbbc, pPart } rebuild the list to show one
     // blueprint variant of the selected part, then chain the base OnMessage.
     virtual int OnMessage(dwWidgetMsg* pMsg);
 };

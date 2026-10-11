@@ -1,11 +1,11 @@
 // dwImage — the shared DroidWorks image/blit BASE class implementation.
 //
-// Decompiled from DroidWorks.exe, unit range 0x448d60-0x449530 (+ the
-// dwImage_LoadFile dispatcher @0x444820). See dwImage.h for the vtable
+// Decompiled from DroidWorks.exe (+ the
+// dwImage_LoadFile dispatcher). See dwImage.h for the vtable
 // contract, the Blit semantics (this = SOURCE image) and the object-as-desc
 // layout quirk.
 //
-// Row-copy dispatch (from the 0x448f20/0x4491c0/0x449370 disassembly), keyed
+// Row-copy dispatch (from the dwImage_BlitRows/dwImage_BlitRowsColorMap/dwImage_BlitRowsTransparent disassembly), keyed
 // on BYTES-per-pixel of source (outer) then destination (inner):
 //   src 1 -> dest 1 : CopyRow8 / CopyRow8ColorMap / CopyRow8Transparent
 //   src 1 -> dest 2 : RLE_decompress_type2 (an EMPTY stub in the binary —
@@ -35,18 +35,18 @@ extern "C" {
 typedef void (*dwImageCopyRowFn)(uint8_t* pDestRow, uint8_t* pSrcRow, unsigned int count);
 
 // ---------------------------------------------------------------------------
-// Row copiers (file-local in the binary; addresses within 0x449160-0x44950x)
+// Row copiers (file-local in the binary; addresses within)
 // ---------------------------------------------------------------------------
 
 // Empty stub in the binary (a lone RET) — the src-8bpp -> dest-16bpp row path
-// is unimplemented. Kept so the dispatch tables stay faithful. @449180
+// is unimplemented. Kept so the dispatch tables stay faithful.
 static void RLE_decompress_type2(uint8_t* pDestRow, uint8_t* pSrcRow, unsigned int count)
 {
     (void)pDestRow; (void)pSrcRow; (void)count;
 }
 
 // Opaque 8bpp row copy: dword-at-a-time then the 0-3 byte tail. count is in
-// pixels (== bytes at 8bpp). @449160
+// pixels (== bytes at 8bpp).
 static void dwImage_CopyRow8(uint8_t* pDestRow, uint8_t* pSrcRow, unsigned int count)
 {
     uint32_t* pDest32 = (uint32_t*)pDestRow;
@@ -64,7 +64,7 @@ static void dwImage_CopyRow8(uint8_t* pDestRow, uint8_t* pSrcRow, unsigned int c
 }
 
 // Opaque 16bpp row copy: count is in PIXELS (2 bytes each) — dwords then the
-// odd-pixel tail. @449190
+// odd-pixel tail.
 static void dwImage_CopyRow16(uint8_t* pDestRow, uint8_t* pSrcRow, unsigned int count)
 {
     uint32_t* pDest32 = (uint32_t*)pDestRow;
@@ -84,7 +84,7 @@ static void dwImage_CopyRow16(uint8_t* pDestRow, uint8_t* pSrcRow, unsigned int 
 // 8bpp blend copy: dest = transparencyTable[dest * 256 + src], where the
 // table is the current engine colormap's 256x256 transparency/mix table
 // (binary: *(DAT_005542b8 + 0x338); DAT_005542b8 = rdColormap_pCurMap, set by
-// rdColormap_SetCurrent via dwColormap_Apply). @4492e0
+// rdColormap_SetCurrent via dwColormap_Apply).
 static void dwImage_CopyRow8ColorMap(uint8_t* pDestRow, uint8_t* pSrcRow, unsigned int count)
 {
     uint8_t* pTable = (uint8_t*)rdColormap_pCurMap->transparency;
@@ -96,20 +96,20 @@ static void dwImage_CopyRow8ColorMap(uint8_t* pDestRow, uint8_t* pSrcRow, unsign
     }
 }
 
-// Forwards to the empty RLE stub (binary quirk preserved). @449330
+// Forwards to the empty RLE stub (binary quirk preserved).
 static void dwImage_CopyRow8ColorMapRle(uint8_t* pDestRow, uint8_t* pSrcRow, unsigned int count)
 {
     RLE_decompress_type2(pDestRow, pSrcRow, count);
 }
 
 // 16bpp "colormap" copy is a plain copy — no palette translate (binary
-// quirk). @449350
+// quirk).
 static void dwImage_CopyRow16ColorMap(uint8_t* pDestRow, uint8_t* pSrcRow, unsigned int count)
 {
     dwImage_CopyRow16(pDestRow, pSrcRow, count);
 }
 
-// 8bpp color-key copy: source bytes of 0 are transparent. @449490
+// 8bpp color-key copy: source bytes of 0 are transparent.
 static void dwImage_CopyRow8Transparent(uint8_t* pDestRow, uint8_t* pSrcRow, unsigned int count)
 {
     for (unsigned int n = count; n != 0; n--)
@@ -121,14 +121,13 @@ static void dwImage_CopyRow8Transparent(uint8_t* pDestRow, uint8_t* pSrcRow, uns
     }
 }
 
-// Forwards to the empty RLE stub (binary quirk preserved). @4494c0
+// Forwards to the empty RLE stub (binary quirk preserved).
 static void dwImage_CopyRow8TransparentRle(uint8_t* pDestRow, uint8_t* pSrcRow, unsigned int count)
 {
     RLE_decompress_type2(pDestRow, pSrcRow, count);
 }
 
 // 16bpp "transparent" copy is a plain copy — no color key (binary quirk).
-// @4494e0
 static void dwImage_CopyRow16Transparent(uint8_t* pDestRow, uint8_t* pSrcRow, unsigned int count)
 {
     dwImage_CopyRow16(pDestRow, pSrcRow, count);
@@ -146,7 +145,7 @@ static void dwImage_CopyRow16Transparent(uint8_t* pDestRow, uint8_t* pSrcRow, un
 // draw. pDestBits is unused (kept for fidelity — the binary passes it too).
 // Quirk preserved: the pre-test uses <=, so a footprint that merely touches
 // pRect's left/top edge from outside still takes the clip path (the final
-// x0 < x1 && y0 < y1 test rejects it anyway). @449040
+// x0 < x1 && y0 < y1 test rejects it anyway).
 static int dwImage_ClipBlitRect(dwImageBits* pSrcBits, dwImageBits* pDestBits, int x, int y, dwRect* pRect,
                                 int* pDestX0, int* pDestY0, int* pDestX1, int* pDestY1,
                                 int* pSrcXofs, int* pSrcYofs)
@@ -184,7 +183,7 @@ static int dwImage_ClipBlitRect(dwImageBits* pSrcBits, dwImageBits* pDestBits, i
 }
 
 // Shared row-loop skeleton for the three blit modes. The binary emits three
-// near-identical functions (@448f20/@4491c0/@449370) differing only in the
+// near-identical functions (dwImage_BlitRows/dwImage_BlitRowsColorMap/dwImage_BlitRowsTransparent) differing only in the
 // dispatch table; the skeleton is factored here and each named function keeps
 // its own faithful dispatch.
 static void dwImage_BlitRowsCommon(dwImageBits* pSrcBits, dwImageBits* pDestBits, int x, int y,
@@ -225,14 +224,14 @@ static void dwImage_BlitRowsCommon(dwImageBits* pSrcBits, dwImageBits* pDestBits
     }
 }
 
-// Opaque row blit. @448f20
+// Opaque row blit.
 static void dwImage_BlitRows(dwImageBits* pSrcBits, dwImageBits* pDestBits, int x, int y, dwRect* pClipRect)
 {
     dwImage_BlitRowsCommon(pSrcBits, pDestBits, x, y, pClipRect,
                            dwImage_CopyRow8, RLE_decompress_type2, dwImage_CopyRow16);
 }
 
-// Colormap-blend row blit. @4491c0
+// Colormap-blend row blit.
 static void dwImage_BlitRowsColorMap(dwImageBits* pSrcBits, dwImageBits* pDestBits, int x, int y, dwRect* pClipRect)
 {
     dwImage_BlitRowsCommon(pSrcBits, pDestBits, x, y, pClipRect,
@@ -240,7 +239,7 @@ static void dwImage_BlitRowsColorMap(dwImageBits* pSrcBits, dwImageBits* pDestBi
 }
 
 // Color-key-0 row blit; extern — called directly by the dwCompleteMovie frame
-// draw (binary @0x41112a). @449370
+// draw.
 extern "C" void dwImage_BlitRowsTransparent(dwImageBits* pSrcBits, dwImageBits* pDestBits, int x, int y, dwRect* pClipRect)
 {
     dwImage_BlitRowsCommon(pSrcBits, pDestBits, x, y, pClipRect,
@@ -262,8 +261,8 @@ dwImage::dwImage()
     this->desc.bpp = 0;
 }
 
-// Base dtor (binary: @0x4430a0, emitted in the stdBitmapRle2 unit; base vtbl
-// @0x520158). Trivial.
+// Base dtor (binary: dwImage_Dtor, emitted in the stdBitmapRle2 unit; base vtbl
+// dwImage_vtbl). Trivial.
 dwImage::~dwImage()
 {
 }
@@ -271,8 +270,7 @@ dwImage::~dwImage()
 // Draw this image into the locked destination bits at (x, y), clipped to the
 // destination bounds intersected with pClipRect. Locks `this` (vtbl +0x0c)
 // around the row loop; the Lock return value is ignored (binary behavior).
-// vtbl +0x04, shared by stdBitmapRle2 @0x520144 and dwImageVBuf @0x5201a4.
-// @448d60
+// vtbl +0x04, shared by stdBitmapRle2 and dwImageVBuf.
 void dwImage::Blit(dwImageBits* pDestBits, int x, int y, dwRect* pClipRect)
 {
     dwRect clipRect;
@@ -296,7 +294,7 @@ void dwImage::Blit(dwImageBits* pDestBits, int x, int y, dwRect* pClipRect)
 }
 
 // Same as Blit but blends through the current colormap's transparency table
-// (8bpp path). vtbl +0x08, shared by both concrete vtables. @448e40
+// (8bpp path). vtbl +0x08, shared by both concrete vtables.
 void dwImage::BlitColorMap(dwImageBits* pDestBits, int x, int y, dwRect* pClipRect)
 {
     dwRect clipRect;
@@ -325,13 +323,13 @@ void dwImage::BlitColorMap(dwImageBits* pDestBits, int x, int y, dwRect* pClipRe
 
 // Loads an image file, picking the loader by the current display depth.
 // Binary:
-//   if (<display tRasterInfo @0x6b17cc>.format.bpp > 8)   // = DAT_006b17e4
+//   if (<display tRasterInfo>.format.bpp > 8)   // = DAT_006b17e4
 //       return stdBitmapRle_FUN_00444c50(pFilePath);       // 16bpp RLE loader
 //   return stdBitmapRle2_LoadFile8(pFilePath, 0);                        // 8bpp BMP/RLE loader
-// Both loaders (@0x444850/@0x444c50) live in the stdBitmapRle2 unit
+// Both loaders (loads_bmp and the 16bpp RLE loader) live in the stdBitmapRle2 unit
 // (stdBitmapRle2.cpp, P8). The display-depth global DAT_006b17e4 maps to
 // stdDisplay_pCurVideoMode->format.format.bpp; a NULL video mode is treated as
-// the 8bpp software display DW runs. @444820
+// the 8bpp software display DW runs.
 extern "C" dwImage* dwImage_LoadFile(char* pFilePath)
 {
     // Added: real dispatch (P8 — stdBitmapRle2 unit landed).
@@ -346,10 +344,10 @@ extern "C" dwImage* dwImage_LoadFile(char* pFilePath)
 // ---------------------------------------------------------------------------
 
 // Logs the raw format string and returns 0. The binary forwards ONLY pFmt to
-// jk_logtofile@0x402cc0 and drops the varargs (quirk preserved — arguments
+// jk_logtofile and drops the varargs (quirk preserved — arguments
 // are never expanded). Note: mapped to stdPlatform_Printf; printing via
 // "%s" rather than vfprintf-with-missing-args keeps the dropped-varargs
-// behavior without the UB. @449530
+// behavior without the UB.
 extern "C" int dwImage_NullMethodLog(const char* pFmt, ...)
 {
     stdPlatform_Printf("%s", pFmt);
@@ -360,7 +358,6 @@ extern "C" int dwImage_NullMethodLog(const char* pFmt, ...)
 // the five HostServices print handlers (offsets +0x04..+0x14 = messagePrint,
 // statusPrint, warningPrint, errorPrint, debugPrint). Called once by the DW
 // boot (StartOpeningCutscenes) right after std_Startup(&dw_hostServices).
-// @449500
 extern "C" void dwImage_InitNullVtable(HostServices* pHS)
 {
     pHS->messagePrint = dwImage_NullMethodLog;

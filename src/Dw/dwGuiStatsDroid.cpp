@@ -1,6 +1,6 @@
 // dwGuiStatsDroid — the STATS_DROID assembled-droid stat-sheet widget.
 //
-// Decompiled from DroidWorks.exe @0x40fe00-0x410a2f (vtbl @0x51ea90).
+// Decompiled from DroidWorks.exe (dwGuiStatsDroid_vtbl).
 // See dwGuiStatsDroid.h for the layout / slot map.
 //
 // No module statics — no dwGuiStatsDroid_Startup needed (soft-reset rule).
@@ -24,12 +24,12 @@ flex_t sithInventory_GetInventory(SithThing* pThing, int typeId);
 // ---- cross-unit symbols -----------------------------------------------------
 
 // Workspace droid part list + display name (owned by dwPart/dwInits/dwPlayer).
-extern "C" dwListNode* dwCore_pWorkspaceNodes; // @0x53d984
-extern "C" dwString dwCore_workspaceName;      // @0x53d978
+extern "C" dwListNode* dwCore_pWorkspaceNodes;
+extern "C" dwString dwCore_workspaceName;
 
 // The running-mission HUD (NULL outside a mission). Owned by dwGuiInGame (P6w2).
 struct dwGuiInGame;
-extern "C" dwGuiInGame* dwGuiInGame_pActive; // @0x53e800
+extern "C" dwGuiInGame* dwGuiInGame_pActive;
 
 // ---- localized-string-key tables (binary: the PTR_s_NONE tables inside
 // dwWorkshopDroidEditor_vtbl at +0x18 / +0x1c / +0x22) -----------------------
@@ -42,7 +42,6 @@ static const char* const dwGuiStatsDroid_aDurability[6] =
 
 // ===============================================================================
 
-// @40fe00
 dwGuiStatsDroid::dwGuiStatsDroid(dwRect* pRect, char* pFont1Name, uint8_t colorLabel,
                                  char* pFont2Name, uint8_t colorValue)
     : dwWidget(pRect)
@@ -78,7 +77,7 @@ dwGuiStatsDroid::dwGuiStatsDroid(dwRect* pRect, char* pFont1Name, uint8_t colorL
     this->Refresh();
 }
 
-// @40fff0 (DtorDelete @40ffd0)
+// (dwGuiStatsDroid_DtorDelete)
 dwGuiStatsDroid::~dwGuiStatsDroid()
 {
     if (this->pFont1 != NULL)
@@ -87,7 +86,7 @@ dwGuiStatsDroid::~dwGuiStatsDroid()
         delete this->pFont2;
 }
 
-// @410070 — hover-help notification.
+// hover-help notification.
 int dwGuiStatsDroid::OnHover(int16_t x, int16_t y)
 {
     (void)x; (void)y;
@@ -96,7 +95,6 @@ int dwGuiStatsDroid::OnHover(int16_t x, int16_t y)
     return 1;
 }
 
-// @4100a0
 int dwGuiStatsDroid::OnMessage(dwWidgetMsg* pMsg)
 {
     uint32_t code = (uint32_t)pMsg->code;
@@ -115,7 +113,7 @@ int dwGuiStatsDroid::OnMessage(dwWidgetMsg* pMsg)
     return 0;
 }
 
-// @4100e0 — recompute the stat totals from the workspace and format the value
+// recompute the stat totals from the workspace and format the value
 // strings.
 void dwGuiStatsDroid::Refresh()
 {
@@ -202,7 +200,6 @@ void dwGuiStatsDroid::Refresh()
     this->animTimeAccum = 0.0f;
 }
 
-// @4103b0
 void dwGuiStatsDroid::Update(float dt)
 {
     if (dwGuiInGame_pActive == NULL)
@@ -253,7 +250,7 @@ void dwGuiStatsDroid::Update(float dt)
     }
 }
 
-// @410500 — draw the power gauge + the stat rows.
+// draw the power gauge + the stat rows.
 void dwGuiStatsDroid::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     if (this->pFont1 == NULL || this->pFont2 == NULL)

@@ -3,8 +3,8 @@
 
 // dwImageVBuf — dwImage subclass backed by a stdDisplay tVBuffer.
 //
-// Decompiled from DroidWorks.exe, unit range 0x449540-0x449740 (6 functions,
-// vtbl dwImageVBuf_vtbl @0x5201a0). Binary /DW struct dwImageVBuf, size 0x18:
+// Decompiled from DroidWorks.exe (6 functions,
+// dwImageVBuf_vtbl). Binary /DW struct dwImageVBuf, size 0x18:
 //   0x00 vptr (aliases dwImageDesc.format — see dwImage.h layout quirk)
 //   0x04 width / 0x06 height / 0x08 bpp (bytes)   [= the dwImage base fields]
 //   0x0c lockState
@@ -22,7 +22,7 @@
 //    stdBitmapRle2 loader and dwGuiScreen_Ctor.
 //
 // Only Lock/Unlock/dtor are overridden — Blit/BlitColorMap are the shared
-// dwImage base implementations (vtbl slots +0x04/+0x08 @0x448d60/@0x448e40).
+// dwImage base implementations (vtbl slots +0x04/+0x08 dwImage_Blit/dwImage_BlitColorMap).
 
 #include "Dw/dwImage.h"
 
@@ -34,12 +34,12 @@ struct dwImageVBuf : dwImage
     uint8_t bOwnsVBuffer; // 0x10: nonzero -> dtor frees pVBuffer
     tVBuffer* pVBuffer;   // 0x14
 
-    dwImageVBuf(tVBuffer* pVBuffer);                  // @449540 (dwImageVBuf_Ctor) — wraps, non-owning
-    dwImageVBuf(dwImage* pSrcImage, uint8_t bppBits); // @4495a0 (dwImageVBuf_CtorFromImage) — owned copy
-    virtual ~dwImageVBuf();                           // @4496a0 (dwImageVBuf_Dtor; the scalar-deleting
-                                                      //  dwImageVBuf_DtorDelete @449580 is the compiler's)
-    virtual int Lock(void** ppPixels, int* pStride);  // vtbl +0x0c @4496d0
-    virtual int Unlock();                             // vtbl +0x10 @449730
+    dwImageVBuf(tVBuffer* pVBuffer);                  // dwImageVBuf_Ctor — wraps, non-owning
+    dwImageVBuf(dwImage* pSrcImage, uint8_t bppBits); // dwImageVBuf_CtorFromImage — owned copy
+    virtual ~dwImageVBuf();                           // dwImageVBuf_Dtor (the scalar-deleting
+                                                      //  dwImageVBuf_DtorDelete is the compiler's)
+    virtual int Lock(void** ppPixels, int* pStride);  // vtbl +0x0c dwImageVBuf_Lock
+    virtual int Unlock();                             // vtbl +0x10 dwImageVBuf_Unlock
 }; // binary sizeof 0x18
 
 #else // !__cplusplus
@@ -55,8 +55,8 @@ extern "C" {
 // Added: C FFI factories (not in the binary — its callers inlined
 // `operator new(0x18)` + the ctor). Return the object as the dwImage base so
 // C callers can hand it straight to the dwImage_Call* shims / dwImage_Delete.
-dwImage* dwImageVBuf_New(tVBuffer* pVBuffer);                     // new + @449540
-dwImage* dwImageVBuf_NewFromImage(dwImage* pSrcImage, uint8_t bppBits); // new + @4495a0
+dwImage* dwImageVBuf_New(tVBuffer* pVBuffer);                     // new +
+dwImage* dwImageVBuf_NewFromImage(dwImage* pSrcImage, uint8_t bppBits); // new +
 
 #ifdef __cplusplus
 }

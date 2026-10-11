@@ -1,5 +1,5 @@
 // dwSound — DroidWorks sound manager + three sample classes.
-// DroidWorks.exe unit range: 0x444d40-0x44612x (see dwSound.h for the class map).
+// DroidWorks.exe unit range: (see dwSound.h for the class map).
 //
 // DirectSound / Win32 -> OpenJKDF2 mapping used throughout this file:
 //   DW stdSound_BufferCreate/ParseWav/BufferSetData/
@@ -45,16 +45,16 @@ extern "C" {
 extern "C" HostServices* dwMain_pHS; // the DW host-services pointer (dwMain.c)
 extern "C" int dwGuiInGame_VoiceDebug(void); // dwGuiInGame.cpp (DW_VOICE_DEBUG gate)
 
-// dwWidget (P3, landed): dwWidgetMsg + the shared OnMessage dispatcher
-// (binary @0x444d00). dwSound::Update builds a { code, pSample, 0, NULL }
+// dwWidget (P3, landed): dwWidgetMsg + the shared OnMessage dispatcher.
+// dwSound::Update builds a { code, pSample, 0, NULL }
 // stack msg when a voice with a finish message CODE is reaped.
 #include "Dw/dwWidget.h"
 
 // ---------------------------------------------------------------------------
 // Module state
 // ---------------------------------------------------------------------------
-dwSound* dwSound_pManager = NULL;       // @0x53d960 (the dw-core slot)
-dwSound* dwSound_pManagerCached = NULL; // @0x541d2c (set by the manager ctor)
+dwSound* dwSound_pManager = NULL;       // the dw-core slot
+dwSound* dwSound_pManagerCached = NULL; // set by the manager ctor
 
 static uint8_t dwSound_bShutdownReq = 0; // worker-thread stop request (Ghidra: dwSound_bShutdownReq)
 static uint8_t dwSound_bThreadDone = 0;  // worker acknowledges exit (Ghidra: dwSound_bThreadDone)
@@ -80,7 +80,6 @@ static void dwSound_Unlock(void)
 // dwSoundSample (base)
 // ---------------------------------------------------------------------------
 
-// @444d40
 dwSoundSample::dwSoundSample(const char* pName, int flags, uint32_t bufferLen)
     : name(pName, 0)
 {
@@ -123,7 +122,7 @@ dwSoundSample::dwSoundSample(const char* pName, int flags, uint32_t bufferLen)
     dwSound_Unlock();
 }
 
-// @444e50 (dwSoundSample_Dtor; the scalar-deleting thunk @444e30 is the
+// dwSoundSample_Dtor (the scalar-deleting thunk dwSoundSample_DtorDelete is the
 // compiler-generated delete path)
 dwSoundSample::~dwSoundSample()
 {
@@ -133,7 +132,6 @@ dwSoundSample::~dwSoundSample()
     // dwString_Free here explicitly).
 }
 
-// @444e80
 void dwSoundSample::ProcessFade()
 {
     float fVol;
@@ -175,7 +173,7 @@ void dwSoundSample::ProcessFade()
     this->ApplyVolume(fVol);
 }
 
-// @444f60 (vtbl +4)
+// (vtbl +4)
 void dwSoundSample::Update()
 {
     if (this->bPlaying != 0 && this->pBuffer != NULL)
@@ -189,7 +187,6 @@ void dwSoundSample::Update()
     this->ProcessFade();
 }
 
-// @444fa0
 void dwSoundSample::ApplyVolume(float volume)
 {
     dwSound_Lock();
@@ -210,7 +207,6 @@ void dwSoundSample::ApplyVolume(float volume)
     dwSound_Unlock();
 }
 
-// @444fe0
 void dwSoundSample::SetVolume(float volume, float fadeSec)
 {
     float fNow;
@@ -226,7 +222,6 @@ void dwSoundSample::SetVolume(float volume, float fadeSec)
     dwSound_Unlock();
 }
 
-// @445040
 uint32_t dwSoundSample::GetLengthMs()
 {
     uint32_t result = 0;
@@ -251,7 +246,6 @@ uint32_t dwSoundSample::GetLengthMs()
 // dwSoundSampleStatic — fully-loaded SFX
 // ---------------------------------------------------------------------------
 
-// @4450d0
 dwSoundSampleStatic::dwSoundSampleStatic(const char* pName)
     : dwSoundSample(pName, 1, 0)
 {
@@ -297,7 +291,7 @@ dwSoundSampleStatic::dwSoundSampleStatic(const char* pName)
     dwSound_Unlock();
 }
 
-// @445230 (DtorDelete @445210)
+// (dwSoundSampleStatic_DtorDelete)
 dwSoundSampleStatic::~dwSoundSampleStatic()
 {
     // Nothing beyond the base dtor (the binary only reset the vtable).
@@ -307,7 +301,6 @@ dwSoundSampleStatic::~dwSoundSampleStatic()
 // dwSoundSampleStream — streamed/looped from an open file (music)
 // ---------------------------------------------------------------------------
 
-// @445240
 dwSoundSampleStream::dwSoundSampleStream(const char* pName)
     : dwSoundSample(pName, 0, DWSOUND_STREAM_RING_LEN)
 {
@@ -360,7 +353,7 @@ dwSoundSampleStream::dwSoundSampleStream(const char* pName)
     dwSound_Unlock();
 }
 
-// @445320 (DtorDelete @445300)
+// (dwSoundSampleStream_DtorDelete)
 dwSoundSampleStream::~dwSoundSampleStream()
 {
     if (this->hFile != 0)
@@ -374,7 +367,7 @@ dwSoundSampleStream::~dwSoundSampleStream()
     }
 }
 
-// @445380 — stage the next 0x2000 bytes from the file (wrapping to
+// stage the next 0x2000 bytes from the file (wrapping to
 // dataStartOffset at the end of the data chunk, endlessly) and queue them.
 // The binary locked the DSound ring at ringWritePos (twice on ring wrap,
 // stdSound_FUN_00500d50) and wrote in place; here the bytes go into the next
@@ -447,7 +440,7 @@ void dwSoundSampleStream::FillRing()
     dwSound_Unlock();
 }
 
-// @4454c0 (vtbl +4)
+// (vtbl +4)
 void dwSoundSampleStream::Update()
 {
     // The binary read the play cursor out of stdSound_IsPlaying and refilled
@@ -475,7 +468,7 @@ void dwSoundSampleStream::Update()
 // Worker thread
 // ---------------------------------------------------------------------------
 
-// @445520 — every 25ms, under the lock, advance the manager clock and service
+// every 25ms, under the lock, advance the manager clock and service
 // everything. Note: SDL_ThreadFunction shape (returns instead of ExitThread).
 extern "C" int dwSound_ThreadProc(void* pParam)
 {
@@ -502,7 +495,7 @@ extern "C" int dwSound_ThreadProc(void* pParam)
 // dwSound manager
 // ---------------------------------------------------------------------------
 
-// @4455c0 (dwSound_Startup — the manager ctor; the binary's dw_Startup news
+// (dwSound_Startup — the manager ctor; the binary's dw_Startup news
 // the object and calls this). activeVoices/pendingMusicName are constructed
 // by their member ctors, exactly as the binary's inline ctors did.
 dwSound::dwSound()
@@ -522,7 +515,6 @@ dwSound::dwSound()
     dwSound_pThread = SDL_CreateThread(dwSound_ThreadProc, "dwSound", this);
 }
 
-// @445670
 void dwSound::Shutdown()
 {
     this->StopAll();
@@ -543,14 +535,12 @@ void dwSound::Shutdown()
     this->activeVoices.Free();
 }
 
-// @445760
 void dwSound::SetMenuVolume(float volume)
 {
     this->masterVolume = volume;
     stdSound_SetMenuVolume(volume);
 }
 
-// @445780
 dwSoundSample* dwSound::FindSample(const char* pName)
 {
     dwSoundSample* pSample;
@@ -561,7 +551,7 @@ dwSoundSample* dwSound::FindSample(const char* pName)
     return pSample;
 }
 
-// @4457c0 — no top-level lock in the binary (FindSample/the ctor lock
+// no top-level lock in the binary (FindSample/the ctor lock
 // internally; callers that need atomicity hold the lock already).
 dwSoundSample* dwSound::GetOrLoadSample(const char* pName)
 {
@@ -587,7 +577,6 @@ dwSoundSample* dwSound::GetOrLoadSample(const char* pName)
     return pSample;
 }
 
-// @445860
 void dwSound::FreeSample(dwSoundSample* pSample)
 {
     dwListNode* pSent;
@@ -607,7 +596,7 @@ void dwSound::FreeSample(dwSoundSample* pSample)
     dwSound_Unlock();
 }
 
-// @445910 — free every cached sample that is not currently playing.
+// free every cached sample that is not currently playing.
 void dwSound::FreeAllSamples()
 {
     tHashTable* pTable;
@@ -647,7 +636,7 @@ void dwSound::FreeAllSamples()
     dwSound_Unlock();
 }
 
-// @445990 — queue new music; the worker crossfades: the old stream fades to 0
+// queue new music; the worker crossfades: the old stream fades to 0
 // (0.25s loop music / 0.01s one-shot / 0.75s when stopping), gets reaped, and
 // Update lazy-starts pendingMusicName.
 void dwSound::SetMusic(const char* pName, uint8_t bLoop)
@@ -677,7 +666,6 @@ void dwSound::SetMusic(const char* pName, uint8_t bLoop)
     dwSound_Unlock();
 }
 
-// @445a30
 void dwSound::FadeMusic(float volume, float fadeSec)
 {
     dwSound_Lock();
@@ -686,7 +674,7 @@ void dwSound::FadeMusic(float volume, float fadeSec)
     dwSound_Unlock();
 }
 
-// @445a70 — open + prime + start the music stream. Quirk kept: if a CACHED
+// open + prime + start the music stream. Quirk kept: if a CACHED
 // sample already owns the name, nothing starts and the current pMusicVoice
 // (usually NULL) is returned.
 dwSoundSampleStream* dwSound::StartMusicStream(const char* pName, float volume)
@@ -723,7 +711,6 @@ dwSoundSampleStream* dwSound::StartMusicStream(const char* pName, float volume)
     return this->pMusicVoice;
 }
 
-// @445b50
 int dwSound::IsPlaying(const char* pName)
 {
     dwSoundSample* pSample;
@@ -739,7 +726,6 @@ int dwSound::IsPlaying(const char* pName)
     return 0;
 }
 
-// @445bb0
 dwSoundSample* dwSound::Play(const char* pName)
 {
     dwSoundSample* pSample;
@@ -751,7 +737,7 @@ dwSoundSample* dwSound::Play(const char* pName)
     return pSample;
 }
 
-// @445bf0 — quirk kept: an already-cached one-shot sample is stopped, flagged
+// quirk kept: an already-cached one-shot sample is stopped, flagged
 // looping, and re-fetched (the second GetOrLoadSample returns the same object).
 dwSoundSample* dwSound::PlayLooping(const char* pName)
 {
@@ -770,7 +756,7 @@ dwSoundSample* dwSound::PlayLooping(const char* pName)
     return pSample;
 }
 
-// @445c50 — start (if stopped) + snap volume to 1, adding a voice-list node.
+// start (if stopped) + snap volume to 1, adding a voice-list node.
 dwSoundSample* dwSound::StartSample(dwSoundSample* pSample)
 {
     dwSound_Lock();
@@ -791,7 +777,6 @@ dwSoundSample* dwSound::StartSample(dwSoundSample* pSample)
     return pSample;
 }
 
-// @445ce0
 void dwSound::Stop(const char* pName)
 {
     dwSoundSample* pSample;
@@ -803,7 +788,7 @@ void dwSound::Stop(const char* pName)
     dwSound_Unlock();
 }
 
-// @445d20 — static in effect (no this in the binary): flag the sample stopped
+// static in effect (no this in the binary): flag the sample stopped
 // and give the worker a tick to reap it. (When the caller holds the lock the
 // delay just waits; the reap then happens on the next worker tick — same as
 // the original recursive critsec.)
@@ -816,7 +801,7 @@ void dwSound::StopSample(dwSoundSample* pSample)
     SDL_Delay(25); // Sleep(0x19)
 }
 
-// @445d60 — rewind + replay a playing sample (or just start it).
+// rewind + replay a playing sample (or just start it).
 void dwSound::RestartSample(dwSoundSample* pSample)
 {
     if (pSample == NULL)
@@ -838,7 +823,6 @@ void dwSound::RestartSample(dwSoundSample* pSample)
     dwSound_Unlock();
 }
 
-// @445de0
 dwSoundSample* dwSound::PlayRestart(const char* pName)
 {
     dwSoundSample* pSample;
@@ -850,7 +834,7 @@ dwSoundSample* dwSound::PlayRestart(const char* pName)
     return pSample;
 }
 
-// @445e20 — stop + drop every voice node, and kill the music stream.
+// stop + drop every voice node, and kill the music stream.
 void dwSound::StopAll()
 {
     dwListNode* pSent;
@@ -877,7 +861,7 @@ void dwSound::StopAll()
     dwSound_Unlock();
 }
 
-// @445ed0 — pause the active voices (NOT the music stream, as in the binary).
+// pause the active voices (NOT the music stream, as in the binary).
 // Quirk kept: the worker's next Update sees the paused buffers as not playing
 // and reaps them, so this is effectively a stop for anything not re-Played.
 void dwSound::PauseAll()
@@ -897,7 +881,6 @@ void dwSound::PauseAll()
     dwSound_Unlock();
 }
 
-// @445f30
 void dwSound::ResumeAll()
 {
     dwListNode* pSent;
@@ -915,7 +898,6 @@ void dwSound::ResumeAll()
     dwSound_Unlock();
 }
 
-// @445fa0
 void dwSound::SetSampleVolume(const char* pName, float volume, float fadeSec)
 {
     dwSoundSample* pSample;
@@ -927,7 +909,7 @@ void dwSound::SetSampleVolume(const char* pName, float volume, float fadeSec)
     dwSound_Unlock();
 }
 
-// @445fe0 — the worker tick (runs under the lock, from dwSound_ThreadProc):
+// the worker tick (runs under the lock, from dwSound_ThreadProc):
 // advance the clock, lazy-start pending music, service each voice via the
 // Update virtual, reap finished voices (dispatching their finish message).
 void dwSound::Update(float clockSec_)
@@ -966,7 +948,7 @@ void dwSound::Update(float clockSec_)
             stdSound_BufferReset(pSample->pBuffer);
             if (pSample->pFinishMsg != NULL)
             {
-                // binary @446093: the field is the finish message CODE (int in
+                // binary: the field is the finish message CODE (int in
                 // the pointer slot); the reap builds a stack msg with the
                 // sample as sender and dispatches THAT (not the field itself).
                 dwWidgetMsg finishMsg;
@@ -974,7 +956,7 @@ void dwSound::Update(float clockSec_)
                 finishMsg.pSender = pSample;
                 finishMsg.param = 0;
                 finishMsg.pTarget = NULL;
-                dwWidget_DispatchMsg(&finishMsg, NULL); // binary @444d00
+                dwWidget_DispatchMsg(&finishMsg, NULL);
             }
             this->activeVoices.UnlinkFreeNode(pNode);
         }

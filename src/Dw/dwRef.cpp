@@ -1,7 +1,7 @@
 // dwRef — reference-room content controls (dwRefGraph / dwRefPulldown /
 // dwRefMenuItem). See Dw/dwRef.h for the class roster and design notes.
 //
-// Decompiled from DroidWorks.exe, unit range 0x4155e0-0x418980. Built by
+// Decompiled from DroidWorks.exe. Built by
 // dwGuiReference_CreateControl (keywords GRAPH / PULLDOWN_MENU). Everything
 // verifiably C++ (vtables, ctor/dtor pairs, MSVC EH frames).
 
@@ -23,7 +23,7 @@
 #include "jk.h"
 
 extern "C" {
-#include "Win95/stdDisplay.h" // stdDisplay_pCurVideoMode (binary 0x6478f8): mode dims
+#include "Win95/stdDisplay.h" // stdDisplay_pCurVideoMode: mode dims
 }
 
 #include <stdlib.h> // free
@@ -46,7 +46,7 @@ extern "C" void dwRef_Startup(void)
 
 // ---- shared list helpers -------------------------------------------------------
 
-// Append pData at the tail of pList (mirrors dwRefGraph_ListAppend @416bb0 and
+// Append pData at the tail of pList (mirrors dwRefGraph_ListAppend and
 // the many inlined tail-inserts across the unit).
 static void dwRef_Append(dwList* pList, void* pData)
 {
@@ -55,7 +55,7 @@ static void dwRef_Append(dwList* pList, void* pData)
 
 // Free a list of dwString* payloads (topic-file records from
 // inits_EnumFilesByExt): unlink each node, delete its dwString, then free the
-// sentinel. Mirrors dwRefGraph_FreeTopicList @416a90 (payload = the filename
+// sentinel. Mirrors dwRefGraph_FreeTopicList (payload = the filename
 // dwString the enumerator allocated).
 static void dwRef_FreeStringList(dwList* pList)
 {
@@ -77,7 +77,7 @@ static void dwRef_FreeStringList(dwList* pList)
 //  dwRefGraph
 // =================================================================================
 
-// @4155e0 (dwRefGraph_Ctor) — the three data lists are constructed by their
+// dwRefGraph_Ctor — the three data lists are constructed by their
 // member initializers (each allocs its sentinel, matching the binary's manual
 // sentinel allocs). LoadTopics/LayoutLabels/LayoutMarkers run at construction.
 dwRefGraph::dwRefGraph(dwRect* pRect, void* pScreen, float config1, float config2,
@@ -93,7 +93,7 @@ dwRefGraph::dwRefGraph(dwRect* pRect, void* pScreen, float config1, float config
     , bDirtyX(0)
     , bDirtyY(0)
 {
-    // Initial eased-rect state seeded from the widget rect (binary @415694).
+    // Initial eased-rect state seeded from the widget rect.
     this->animOriginX = this->left;
     this->curY = this->top;
     this->curX = this->left;
@@ -104,13 +104,13 @@ dwRefGraph::dwRefGraph(dwRect* pRect, void* pScreen, float config1, float config
     this->LayoutMarkers();
 }
 
-// @415710 (dwRefGraph_Dtor) — free the data + topic lists (the base
+// dwRefGraph_Dtor — free the data + topic lists (the base
 // dwWidgetGroup dtor deletes the label/marker children and frees the child
 // list). soundName is freed by its member dtor.
 dwRefGraph::~dwRefGraph()
 {
     // pDataPoints payloads are dwRefGraphPoint* (delete = dwString name dtor +
-    // free), matching dwRefGraph_FreeStringNode @416b90.
+    // free), matching dwRefGraph_FreeStringNode.
     dwListNode* pSent = this->pDataPoints.pSentinel;
     dwListNode* pNode = pSent->pNext;
     while (pNode != pSent)
@@ -128,7 +128,7 @@ dwRefGraph::~dwRefGraph()
     dwRef_FreeStringList(&this->pTopicsTPC);
 }
 
-// @4159a0 (dwRefGraph_AddDataPoint) — append a { name, density, strength }
+// dwRefGraph_AddDataPoint — append a { name, density, strength }
 // record at the tail of pDataPoints.
 void dwRefGraph::AddDataPoint(char* pName, float density, float strength)
 {
@@ -137,9 +137,9 @@ void dwRefGraph::AddDataPoint(char* pName, float density, float strength)
     this->dataPointCount++;
 }
 
-// @416970 / @416980 handled inline in the header (SetMode0/SetMode1).
+// handled inline in the header (SetMode0/SetMode1).
 
-// @4161a0 (dwRefGraph_Update) — while enabled, ease the current rect toward the
+// dwRefGraph_Update — while enabled, ease the current rect toward the
 // target and loop a tick sound; then forward to the base group tick.
 // Note: the binary computed the per-frame eased delta with an x87 __ftol whose
 // float source the decompiler dropped; it is reconstructed here as a config1/
@@ -179,7 +179,7 @@ void dwRefGraph::Update(float dt)
     dwWidgetGroup::Update(dt);
 }
 
-// @416130 (dwRefGraph_OnMessage) — 0x1b62 SetMode0 / 0x1b63 SetMode1: re-seed
+// dwRefGraph_OnMessage — 0x1b62 SetMode0 / 0x1b63 SetMode1: re-seed
 // the eased rect from the widget rect, re-tick and invalidate.
 int dwRefGraph::OnMessage(dwWidgetMsg* pMsg)
 {
@@ -197,7 +197,7 @@ int dwRefGraph::OnMessage(dwWidgetMsg* pMsg)
     return 1;
 }
 
-// @416650 (dwRefGraph_LoadTopics) — enumerate TPC + SUB topic files and parse
+// dwRefGraph_LoadTopics — enumerate TPC + SUB topic files and parse
 // each whose FREQUENCY line is non-zero.
 void dwRefGraph::LoadTopics()
 {
@@ -242,7 +242,7 @@ void dwRefGraph::LoadTopics()
     }
 }
 
-// @416830 (dwRefGraph_ParseTopicFile) — read TOPIC_NAME/DENSITY/STRENGTH from an
+// dwRefGraph_ParseTopicFile — read TOPIC_NAME/DENSITY/STRENGTH from an
 // OPEN conf, then AddDataPoint and close. (See LoadTopics for the open flow.)
 void dwRefGraph::ParseTopicFile(dwConfFile* pConf)
 {
@@ -268,7 +268,7 @@ void dwRefGraph::ParseTopicFile(dwConfFile* pConf)
     dwConfFile_Close(pConf);
 }
 
-// @415a50 (dwRefGraph_LayoutLabels) — build the 3-column comparison chart's
+// dwRefGraph_LayoutLabels — build the 3-column comparison chart's
 // topic-name labels (Arial10 dwGuiHypText children). The magic pixel constants
 // are the hard-coded column X positions (0x154 track, 0xf3/0x132/0x171 column
 // centers) preserved verbatim from the binary.
@@ -336,7 +336,7 @@ void dwRefGraph::LayoutLabels()
     }
 }
 
-// @415ee0 (dwRefGraph_LayoutMarkers) — the colored arrow markers
+// dwRefGraph_LayoutMarkers — the colored arrow markers
 // (ROrange/RGreen/RBlue) at the three column positions.
 void dwRefGraph::LayoutMarkers()
 {
@@ -384,7 +384,7 @@ dwRefMenuItem::dwRefMenuItem(const char* pLabel, const char* pSortKey, const cha
 {
 }
 
-// @418910 (dwRefMenuItem_Dtor) — delete any submenu, then the strings (member
+// dwRefMenuItem_Dtor — delete any submenu, then the strings (member
 // dtors here).
 dwRefMenuItem::~dwRefMenuItem()
 {
@@ -396,7 +396,7 @@ dwRefMenuItem::~dwRefMenuItem()
 //  dwRefPulldown
 // =================================================================================
 
-// @416bf0 (dwRefPulldown_Ctor) — the three lists are member-constructed (each
+// dwRefPulldown_Ctor — the three lists are member-constructed (each
 // with its sentinel). A root menu precaches its images + snapshots its
 // collapsed rect; a submenu starts already expanded/open.
 dwRefPulldown::dwRefPulldown(dwRect* pRect, char* pFontName, uint8_t colorParam,
@@ -470,7 +470,7 @@ dwRefPulldown::dwRefPulldown(dwRect* pRect, char* pFontName, uint8_t colorParam,
     }
 }
 
-// @416f30 (dwRefPulldown_Dtor) — free images, fonts, the three lists (item list
+// dwRefPulldown_Dtor — free images, fonts, the three lists (item list
 // deletes dwRefMenuItem payloads; the TPC/SUB lists delete their dwString
 // filename payloads), then the strings (member dtors).
 dwRefPulldown::~dwRefPulldown()
@@ -501,7 +501,7 @@ dwRefPulldown::~dwRefPulldown()
     dwRef_FreeStringList(&this->pListC);
 }
 
-// @4188c0 (dwRefPulldown_EnsureImages)
+// dwRefPulldown_EnsureImages
 void dwRefPulldown::EnsureImages()
 {
     if (this->pImageNormal == NULL && this->imageNameNormal.length != 0)
@@ -510,7 +510,7 @@ void dwRefPulldown::EnsureImages()
         this->pImagePressed = dwImage_LoadFile(this->imageNameHot.pBuffer);
 }
 
-// @418980 (dwRefPulldown_FreeImages) — delete via each image's vtbl slot 0.
+// dwRefPulldown_FreeImages — delete via each image's vtbl slot 0.
 void dwRefPulldown::FreeImages()
 {
     // Binary calls vtbl slot 0 with the scalar-deleting flag (1) and `this` in
@@ -527,14 +527,14 @@ void dwRefPulldown::FreeImages()
     }
 }
 
-// @417d00 (dwRefPulldown_OnMessage) — no-op.
+// dwRefPulldown_OnMessage — no-op.
 int dwRefPulldown::OnMessage(dwWidgetMsg* pMsg)
 {
     (void)pMsg;
     return 0;
 }
 
-// @418880 (dwRefPulldown_ApplyBounds) — restore the collapsed rect from the
+// dwRefPulldown_ApplyBounds — restore the collapsed rect from the
 // saved snapshot unless it was never captured (degenerate).
 void dwRefPulldown::ApplyBounds()
 {
@@ -547,7 +547,7 @@ void dwRefPulldown::ApplyBounds()
     }
 }
 
-// @4185a0 (dwRefPulldown_MeasureWidth) — widest visible item label (+4) or the
+// dwRefPulldown_MeasureWidth — widest visible item label (+4) or the
 // collapsed rect width; caches into `width`.
 int16_t dwRefPulldown::MeasureWidth()
 {
@@ -571,7 +571,7 @@ int16_t dwRefPulldown::MeasureWidth()
     return this->width;
 }
 
-// @4184f0 (dwRefPulldown_ComputeRect) — lay out the expanded rectangle.
+// dwRefPulldown_ComputeRect — lay out the expanded rectangle.
 void dwRefPulldown::ComputeRect()
 {
     if (this->bIsSubmenu == 0)
@@ -603,7 +603,7 @@ void dwRefPulldown::ComputeRect()
     }
 }
 
-// @418740 (dwRefPulldown_LayoutExpanded) — position the expanded list / a
+// dwRefPulldown_LayoutExpanded — position the expanded list / a
 // hovered submenu, flipping the anchor when it would run off-screen.
 void dwRefPulldown::LayoutExpanded(int16_t left, int16_t top, int hoverRow)
 {
@@ -647,12 +647,12 @@ void dwRefPulldown::LayoutExpanded(int16_t left, int16_t top, int hoverRow)
     }
 }
 
-// @418670 (dwRefPulldown_BuildSubmenu) — spawn a nested submenu inheriting the
+// dwRefPulldown_BuildSubmenu — spawn a nested submenu inheriting the
 // parent's fonts/colors/wavs; returns it (owned by the item that requested it).
 dwRefPulldown* dwRefPulldown::BuildSubmenu(char* pTopicFile)
 {
     dwRect zero; zero.left = 0; zero.top = 0; zero.right = 0; zero.bottom = 0;
-    // Args mirror the binary @418670: fonts/colors/image names/wavs inherited
+    // Args mirror the binary dwRefPulldown_BuildSubmenu: fonts/colors/image names/wavs inherited
     // from the parent (image names = field_0xb0/0xbc.pBuffer; wav slots below),
     // pLabel = the topic file, textColor 0, no hot font, bIsSubmenu = 1.
     return new dwRefPulldown(&zero, this->field_0xa4.pBuffer, this->field_0x1c, this->field_0x1e,
@@ -662,7 +662,7 @@ dwRefPulldown* dwRefPulldown::BuildSubmenu(char* pTopicFile)
                              pTopicFile, 0, NULL, 1);
 }
 
-// @417b90 (dwRefPulldown_AddItem) — insert a new item sorted by its category
+// dwRefPulldown_AddItem — insert a new item sorted by its category
 // (sortKey, case-insensitive), then reset the visible window to the top.
 void dwRefPulldown::AddItem(char* pTopicFile, char* pLabel, char* pSortKey, uint32_t labelColor,
                             uint8_t flag, dwRefPulldown* pSubmenu)
@@ -692,7 +692,7 @@ void dwRefPulldown::AddItem(char* pTopicFile, char* pLabel, char* pSortKey, uint
     this->Invalidate();
 }
 
-// @418210 (dwRefPulldown_BuildItems) — read the TPC (root) or SUB (submenu)
+// dwRefPulldown_BuildItems — read the TPC (root) or SUB (submenu)
 // topic files, add every entry matching this menu's category, growing the
 // expand height by one line each.
 void dwRefPulldown::BuildItems()
@@ -747,7 +747,7 @@ void dwRefPulldown::BuildItems()
     }
 }
 
-// @417530 (dwRefPulldown_OnMouseMove) — the collapsed/expanded hover state
+// dwRefPulldown_OnMouseMove — the collapsed/expanded hover state
 // machine (open on hover, track the highlighted row, hand off to a submenu).
 // Faithful translation over the named struct fields.
 int dwRefPulldown::OnMouseMove(int16_t x, int16_t y)
@@ -913,7 +913,7 @@ int dwRefPulldown::OnMouseMove(int16_t x, int16_t y)
     return 1;
 }
 
-// @4171f0 (dwRefPulldown_OnMouseDown) — open on the header, select the hovered
+// dwRefPulldown_OnMouseDown — open on the header, select the hovered
 // item (dropping into a submenu or closing), or dismiss on an outside click.
 int dwRefPulldown::OnMouseDown(int16_t x, int16_t y)
 {
@@ -995,7 +995,7 @@ int dwRefPulldown::OnMouseDown(int16_t x, int16_t y)
     return 0;
 }
 
-// @417d10 (dwRefPulldown_Draw) — paint the collapsed image/label, and when
+// dwRefPulldown_Draw — paint the collapsed image/label, and when
 // open the scrollable expanded item list (highlight + shadowed text). Faithful
 // over the named fields; the two open-state branches (submenu vs root) are
 // merged since they paint identically.

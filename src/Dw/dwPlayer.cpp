@@ -1,8 +1,8 @@
 // dwPlayer — player PROFILE persistence (.plr files).
 //
-// DroidWorks.exe 0x429180-0x4299ff: dwPlayer_CreateProfile@429180 /
-// DeleteProfile@4291e0 / LoadPlr@429200 / SavePlr@4296d0 /
-// EnumProfiles@429950. (The dwGuiQuickView/dwGuiDroidPreview widgets that
+// DroidWorks.exe: dwPlayer_CreateProfile /
+// DeleteProfile / LoadPlr / SavePlr /
+// EnumProfiles. (The dwGuiQuickView/dwGuiDroidPreview widgets that
 // share the unit range are P6 — dwGuiQuickView.c.)
 //
 // Compiled as C++ (the binary functions carry MSVC EH frames around their
@@ -30,7 +30,7 @@ extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 
-extern "C" HostServices* dwMain_pHS; // the DW host-services pointer (dwMain.c); binary global dwHS @0x6b6258
+extern "C" HostServices* dwMain_pHS; // the DW host-services pointer (dwMain.c); binary global dwHS
 
 // ------------------------------------------------------------------
 // Cross-unit externs
@@ -38,11 +38,11 @@ extern "C" HostServices* dwMain_pHS; // the DW host-services pointer (dwMain.c);
 
 // Owner: dw core P7 (dwMain.c placeholder) — global blueprint list sentinel
 // (dwList of dwPart*) and workspace droid node list sentinel.
-extern "C" dwListNode* dwCore_pBlueprintList;  // @0x53d964
-extern "C" dwListNode* dwCore_pWorkspaceNodes; // @0x53d984
+extern "C" dwListNode* dwCore_pBlueprintList;
+extern "C" dwListNode* dwCore_pWorkspaceNodes;
 
 // TODO(dw-decomp): provided by dw core (P7) — the workspace droid's display
-// name (@0x53d978) and the current reference-room topic file (@0x53d968,
+// name (dwCore_workspaceName) and the current reference-room topic file (dwCore_currentRefFile,
 // binary static ctor dwCore_RefFileInit; the .plr TOPIC key).
 extern "C" dwString dwCore_workspaceName;
 extern "C" dwString dwCore_currentRefFile;
@@ -56,11 +56,11 @@ extern "C" dwString dwCore_currentRefFile;
 // ------------------------------------------------------------------
 
 extern "C" {
-dwString dwPlayer_name;       // @0x53d900 (CRT static ctor dwCore_PlayerNameInit@4113b0)
-dwString dwPlayer_basePath;   // @0x53d8f0 (dwCore_PlayerBasePathInit@411430; dw_Startup fills it)
-dwString dwPlayer_profileDir; // @0x53d930 (dwCore_PlayerProfileDirInit@411470)
+dwString dwPlayer_name;       // CRT static ctor dwCore_PlayerNameInit
+dwString dwPlayer_basePath;   // dwCore_PlayerBasePathInit (dw_Startup fills it)
+dwString dwPlayer_profileDir; // dwCore_PlayerProfileDirInit
 
-// Added (P7 boot): construct dwPlayer_basePath the way dw_Startup @419bd0 does —
+// Added (P7 boot): construct dwPlayer_basePath the way dw_Startup does —
 // (installPath || workingDir) + the player-dir name + '\'. The binary sources
 // the dir name from global.txt's PLAYER_DIR; until the boot flow loads global.txt
 // callers pass the DW default "Player".
@@ -76,14 +76,14 @@ extern "C" void dwPlayer_SetupBasePath(const char* pPlayerDirName)
     dwPlayer_basePath.Append("\\", 1);
 }
 
-// Shared settings — defaults from the binary's .data initializers @0x527d50.
-uint8_t dw_settingShowText = 1;      // @0x527d50
-uint32_t dw_settingBrightness = 4;   // @0x527d54
-uint32_t dw_viewSizePct = 100;       // @0x527d58
-uint32_t dw_settingMusicVol = 50;    // @0x527d5c
-uint32_t dw_settingSoundVol = 60;    // @0x527d60
+// Shared settings — defaults from the binary's .data initializers dw_settingShowText.
+uint8_t dw_settingShowText = 1;
+uint32_t dw_settingBrightness = 4;
+uint32_t dw_viewSizePct = 100;
+uint32_t dw_settingMusicVol = 50;
+uint32_t dw_settingSoundVol = 60;
 
-uint32_t dwPlayer_statsFlags = 0;    // @0x53d9f8 (BSS)
+uint32_t dwPlayer_statsFlags = 0;    // BSS
 }
 
 // Module statics reset (no binary counterpart; soft-reset loop rule — the
@@ -105,7 +105,7 @@ extern "C" void dwPlayer_Startup(void)
 // API
 // ------------------------------------------------------------------
 
-// @429180 (dwPlayer_CreateProfile)
+// dwPlayer_CreateProfile
 extern "C" void dwPlayer_CreateProfile(const char* pName)
 {
     if (inits_MakeDir("PLR", pName))
@@ -118,13 +118,13 @@ extern "C" void dwPlayer_CreateProfile(const char* pName)
     }
 }
 
-// @4291e0 (dwPlayer_DeleteProfile) — recursive rmdir of the profile dir.
+// dwPlayer_DeleteProfile — recursive rmdir of the profile dir.
 extern "C" void dwPlayer_DeleteProfile(const char* pName)
 {
     inits_RemoveDirTree("PLR", pName);
 }
 
-// @429200 (dwPlayer_LoadPlr)
+// dwPlayer_LoadPlr
 extern "C" void dwPlayer_LoadPlr(const char* pName)
 {
     dwConfFile conf;
@@ -165,7 +165,7 @@ extern "C" void dwPlayer_LoadPlr(const char* pName)
         else if (dwString_Equals(pToken, "MUSIC_VOLUME"))
         {
             dwConfFile_ParseULong(&conf, &dw_settingMusicVol);
-            // binary: sithSoundMixer music-volume setter @45ea00
+            // binary: sithSoundMixer music-volume setter
             sithSoundMixer_UpdateMusicVolume((flex_t)dw_settingMusicVol * 0.01);
         }
         else if (dwString_Equals(pToken, "SOUND_VOLUME"))
@@ -259,7 +259,7 @@ extern "C" void dwPlayer_LoadPlr(const char* pName)
     // fname freed by the dwString dtor (binary: explicit dwString_Free)
 }
 
-// @4296d0 (dwPlayer_SavePlr)
+// dwPlayer_SavePlr
 extern "C" void dwPlayer_SavePlr(void)
 {
     char aFname[128];
@@ -318,7 +318,7 @@ extern "C" void dwPlayer_SavePlr(void)
     dwMain_pHS->fileClose(file);
 }
 
-// @429950 (dwPlayer_EnumProfiles) — list profile subdirs, then drop entries
+// dwPlayer_EnumProfiles — list profile subdirs, then drop entries
 // lacking <name>\<name>.plr.
 extern "C" void dwPlayer_EnumProfiles(dwList* pOutList)
 {

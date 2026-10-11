@@ -1,0 +1,41 @@
+dwWcArrows_aCmdIds 0x0051E22C const int[6]
+dwWorkshopDroidEditor_aPaintColors 0x0051E987 const uint8_t[10]
+dwEnding_aVoiceNames 0x0051EAD8 const char*[3]
+dwEnding_aRankNames 0x0051EAE8 const char*[3]
+dwGuiBriefText_aWobble 0x0051EF20 const int16_t[4]
+dwGuiObjectiveBtn_aRankIcons 0x0051EF88 const char*[4]
+dwGuiOptions_aSubScreenNames 0x0051F378 const char*[6]
+dwGuiStatsPart_aDurability 0x0051F478 const char*const[6]
+dwGuiStatus_rankImages 0x0051FA28 const char*const[6]
+dwGuiStatus_rankNames 0x0051FA40 const char*const[4]
+dwImageDraw_aFillRunH 0x0052A210 const dwImageDraw_fillRunHFunc_t[3]
+dwImageDraw_aFillRunV 0x0052A218 const dwImageDraw_fillRunVFunc_t[3]
+dwDroidStats_aAnimNames 0x0052BC78 const char*[24]
+dwPart_aAnimKeywords 0x0052BC7C const char*[24]
+dwPart_aSoundKeywords 0x0052C4AC const char*[94]
+dwLaser_aQuadVertIdx 0x0052D978 const int[4]
+dwMain_pMaterialCache 0x0053D950 dwMaterialCache*
+dwGob_pBaseServices 0x0053DA00 HostServices*
+dwGob_baseServices 0x0053DA70 HostServices
+dwGob_aHandles 0x0053DB10 dwGobFile[DWGOB_MAX_HANDLES]
+dwGob_apLoadedGobs 0x0053E710 Gob*[DWGOB_MAX_GOBS]
+dwSegment_pCueList 0x0053E858 dwSegmentCue*
+dwSegment_cursorPos 0x0053E85C dwPoint
+dwSegment_aStack 0x0053E860 dwSegment*[DWSEGMENT_STACK_SLOTS]
+dwSegment_stackDepth 0x0053E88C int
+dwSegment_lastMoveCueTime 0x0053E890 float
+dwSegment_nextMoveCueTime 0x0053E898 float
+dwSegment_bPlaylistFreed 0x0053E89C uint8_t
+dwSegment_playbackStartTime 0x0053E8A0 float
+dwSegment_nextCursorX 0x0053E8A4 int16_t
+dwSegment_nextCursorY 0x0053E8A6 int16_t
+dwSegment_bAdvancePending 0x0053E8A8 uint8_t
+dwSegment_bQuit 0x0053E8AC uint8_t
+dwWidget_recordFile 0x00541C0C stdFile_t
+dwWidget_recordStartTick 0x00541C10 uint32_t
+dwWidget_bRecordPending 0x00541C14 int
+dwCog_pHitThing 0x00541DB8 SithThing*
+dwCog_pHitSurface 0x00541DBC SithSurface*
+dwCog_activateBin 0x00541DC0 int
+dwCog_pInteractSource 0x00541DC4 SithThing*
+dwCog_freezeCount 0x00541DDC int

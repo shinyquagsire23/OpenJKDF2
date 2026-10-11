@@ -3,7 +3,7 @@
 // Dw/dwGuiReference.h for the class roster, design notes and the translation
 // status caveat.
 //
-// Decompiled from DroidWorks.exe, unit range 0x42a240-0x42f92f.
+// Decompiled from DroidWorks.exe.
 
 #include "Dw/dwGuiReference.h"
 
@@ -39,8 +39,8 @@ extern "C" void dwGuiReference_Startup(void)
     // No module statics.
 }
 
-// @0x53d968 — the reference-room "current topic" .plr TOPIC file (a dwString).
-// In the Ghidra decompile its pBuffer@0x53d970 appears as DAT_0053d970.
+// the reference-room "current topic" .plr TOPIC file (a dwString).
+// In the Ghidra decompile its pBuffer appears as DAT_0053d970.
 extern "C" dwString dwCore_currentRefFile;
 
 // --- content-group list helpers ---------------------------------------------
@@ -95,7 +95,7 @@ static void dwGuiReference_PostMsg(uint32_t code, void* pSender)
 //  dwGuiRefTile
 // =================================================================================
 
-// @42a890 (dwGuiRefTile_Ctor)
+// dwGuiRefTile_Ctor
 dwGuiRefTile::dwGuiRefTile(dwRect* pRect, uint8_t color, uint8_t count)
     : dwWidget(pRect)
     , color(color)
@@ -103,13 +103,13 @@ dwGuiRefTile::dwGuiRefTile(dwRect* pRect, uint8_t color, uint8_t count)
 {
 }
 
-// @42a8e0 (dwGuiRefTile_Dtor; scalar-deleting wrapper @42a8c0) — plain dwWidget
+// dwGuiRefTile_Dtor (scalar-deleting wrapper dwGuiRefTile_DtorDelete) — plain dwWidget
 // dtor (no owned members).
 dwGuiRefTile::~dwGuiRefTile()
 {
 }
 
-// @42a8f0 (dwGuiRefTile_Draw) — one frame when count == 1; otherwise `count`
+// dwGuiRefTile_Draw — one frame when count == 1; otherwise `count`
 // nested frames, each shrunk 1px on every side.
 void dwGuiRefTile::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
@@ -136,7 +136,7 @@ void dwGuiRefTile::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 //  dwGuiRefRadioGroup_AddCategory (owner of this unit; see the header note)
 // =================================================================================
 
-// @42a6f0 — new(0x54) dwGuiRefRadioButton(pGroup, pRect, imgNormal, sndOff,
+// new(0x54) dwGuiRefRadioButton(pGroup, pRect, imgNormal, sndOff,
 // imgPressed, sndClick, cmdId), then pGroup->AddButton(it).
 void dwGuiRefRadioGroup_AddCategory(dwGuiRefRadioGroup* pGroup, dwRect* pRect, char* pImgNormal,
                                     char* pSndOff, char* pImgPressed, char* pSndClick, int cmdId)
@@ -150,7 +150,7 @@ void dwGuiRefRadioGroup_AddCategory(dwGuiRefRadioGroup* pGroup, dwRect* pRect, c
 //  dwGuiReference
 // =================================================================================
 
-// @42a990 (dwGuiReference_Ctor) — dwGuiScreen("reference", NULL); pSubPath seeds
+// dwGuiReference_Ctor — dwGuiScreen("reference", NULL); pSubPath seeds
 // `path`. (pTopicList + the dwString members are constructed by their member
 // initializers, matching the binary's per-field ctors.)
 dwGuiReference::dwGuiReference(char* pSubPath)
@@ -196,7 +196,7 @@ static void dwGuiReference_RemoveGroup(dwGuiScreen* pScreen, dwWidgetGroup* pGro
     delete pGroup;
 }
 
-// @42aac0 (dwGuiReference_Dtor) — FreeImages, detach + delete the 5 content
+// dwGuiReference_Dtor — FreeImages, detach + delete the 5 content
 // sub-groups, free the topic list, then the strings (member dtors) + base.
 dwGuiReference::~dwGuiReference()
 {
@@ -216,7 +216,7 @@ dwGuiReference::~dwGuiReference()
     this->pTopicList.Free();
 }
 
-// @42f740 (dwGuiReference_EnsureLoaded, vtbl +0x3c) — base EnsureImages, then
+// dwGuiReference_EnsureLoaded (vtbl +0x3c) — base EnsureImages, then
 // each present content sub-group.
 void dwGuiReference::EnsureImages()
 {
@@ -228,7 +228,7 @@ void dwGuiReference::EnsureImages()
     if (this->pChildF8)      this->pChildF8->EnsureImages();
 }
 
-// @42f7a0 (dwGuiReference_FreeImages, vtbl +0x40)
+// dwGuiReference_FreeImages (vtbl +0x40)
 void dwGuiReference::FreeImages()
 {
     dwGuiScreen::FreeImages();
@@ -239,14 +239,14 @@ void dwGuiReference::FreeImages()
     if (this->pChildF8)      this->pChildF8->FreeImages();
 }
 
-// @42d740 (dwGuiReference_CreateControl, vtbl +0x48) — the reference keyword
+// dwGuiReference_CreateControl (vtbl +0x48) — the reference keyword
 // factory. The GRAPH/PULLDOWN_MENU/CONTROLPANEL/CAT_RADIOGROUP/BUTTONHELPRECT/
 // ICON_ANIM_PLAY/DENSITY_LABEL/TENSILE_LABEL branches are wired; the anim-viewer
 // (ANIM_VIEWER/BACKDROP/BILEVEL/STILL_FRAME) and remaining text-control branches
 // (SEEALSO/TEXTBLOCK/TEXTPOPUP/TEXTSLIDER/TEXTSPITTER/TEXTSTRIP/TYPEWRITER/
 // SPITTIMER/STRIPTIMER) + HELP fall through to the base factory pending their
 // dependencies (dwGuiPicture/dwWcMaterials/dwGuiAnimView/dwHelp + arg-verified
-// ctors). See the binary @42d740 for those branches' exact recipes.
+// ctors). See the binary dwGuiReference_CreateControl for those branches' exact recipes.
 dwWidget* dwGuiReference::CreateControl(char* pKeyword, dwConfFile* pConf)
 {
     dwStringTable* pTable = this->pStringTable;
@@ -367,7 +367,7 @@ dwWidget* dwGuiReference::CreateControl(char* pKeyword, dwConfFile* pConf)
     // ANIM_VIEWER / BACKDROP / BILEVEL / STILL_FRAME / SEEALSO / TEXTBLOCK /
     // TEXTPOPUP / TEXTSLIDER / TEXTSPITTER / TEXTSTRIP / TYPEWRITER / SPITTIMER /
     // STRIPTIMER / HELP / HYP_TEXT / unknown -> base factory. TODO(dw-decomp):
-    // wire the anim-viewer + text-control branches (recipes at binary @42d740).
+    // wire the anim-viewer + text-control branches (recipes at binary dwGuiReference_CreateControl).
     return dwGuiScreen::CreateControl(pKeyword, pConf);
 }
 
@@ -382,7 +382,7 @@ static void dwGuiReference_ClearGroups(dwWidgetGroup* a, dwWidgetGroup* b, dwWid
     dwGuiReference_ClearGroup(e);
 }
 
-// @42ba30 (dwGuiReference_OnMessage, vtbl +0x1c). Topic navigation + the
+// dwGuiReference_OnMessage (vtbl +0x1c). Topic navigation + the
 // reference-room command handlers. Field mapping was pinned from the
 // disassembly (direct this-relative offsets): the 5 content groups
 // (pContentGroup/pChildEc/pChildF0/pChildF4/pChildF8), menuMode (@0x10c),
@@ -617,7 +617,7 @@ int dwGuiReference::OnMessage(dwWidgetMsg* pMsg)
     return dwGuiScreen::OnMessage(pMsg);
 }
 
-// @42ed50 (dwGuiReference_Update, vtbl +0x14) — rebuilds the current page's
+// dwGuiReference_Update (vtbl +0x14) — rebuilds the current page's
 // dynamic controls when bReloadPending/bReloadMaterials is set (opens the topic
 // .ifc, clears the 5 content groups, re-runs BuildDynamicControls), then forwards
 // the tick to the base controls group.
@@ -712,7 +712,7 @@ void dwGuiReference::Update(float dt)
     dwGuiScreen::Update(dt);
 }
 
-// @42b300 (dwGuiReference_OnActivate, scn Activate) — base Activate, then (first
+// dwGuiReference_OnActivate (scn Activate) — base Activate, then (first
 // time) allocates the 5 content widget-groups + prepends them into the embedded
 // controls list, loads the initial topic page (TPC enumeration + string table +
 // BuildDynamicControls).
@@ -799,7 +799,7 @@ int dwGuiReference::Activate()
     return r;
 }
 
-// @42ae40 (dwGuiReference_BuildDynamicControls) — parses a topic sub-section
+// dwGuiReference_BuildDynamicControls — parses a topic sub-section
 // (DYNAMIC_CONTROL/NUMERATED_CONTROLS/NUMERATED_HEADER_CONTROLS/STRIPTIMER/
 // ICON_ANIM_PLAY/BUTTONHELPRECT/TEXTPOPUP), building each control via the virtual
 // CreateControl and prepending it into the target group. Returns 1 (the binary's
@@ -907,7 +907,7 @@ dwGuiRefIntroSeg::dwGuiRefIntroSeg()
     this->state = 0;
 }
 
-// vtbl +0x00 @42f800 (Ghidra: dwGuiReference_PlayIntroVideo) — the intro-video
+// vtbl +0x00 (Ghidra: dwGuiReference_PlayIntroVideo) — the intro-video
 // state machine. The segment manager re-Activates this after each movie
 // interruption, stepping the state machine. .san movies play via libsmusher
 // (P8), so the movie segments run for real and the flow/state chain is
@@ -961,7 +961,7 @@ int dwGuiRefIntroSeg::Activate()
 }
 
 // Added: C factory (the binary constructed the segment inline at the msg-0x6a
-// site: new(0x18) + dwSegment_Ctor + state=0 + vtbl 0x51f238).
+// site: new(0x18) + dwSegment_Ctor + state=0 + dwGuiRefIntroSeg_vtbl).
 extern "C" dwSegment* dwGuiReference_NewIntroSeg(void)
 {
     return static_cast<dwSegment*>(new dwGuiRefIntroSeg());
@@ -969,7 +969,7 @@ extern "C" dwSegment* dwGuiReference_NewIntroSeg(void)
 
 // ---- internet-launch gates (Win32 in the binary; portable here) -----------------
 
-// @42b7e0 (dwGuiReference_HasBrowser) — the binary probes the registry for the
+// dwGuiReference_HasBrowser — the binary probes the registry for the
 // configured BROWSER_PATH key (RegOpenKeyExA under HKEY_CLASSES_ROOT).
 // Note: no portable registry; report "browser available" so the LAUNCH_URL flow
 // is not falsely blocked. TODO(dw-decomp): route through a portable URL opener.
@@ -978,7 +978,7 @@ int dwGuiReference::HasBrowser()
     return 1;
 }
 
-// @42b830 (dwGuiReference_CheckInternet) — the binary opens a Winsock socket to
+// dwGuiReference_CheckInternet — the binary opens a Winsock socket to
 // probe connectivity (Ordinal_* = WS2_32 by-ordinal imports).
 // Note: no portable connectivity probe; report "connected".
 int dwGuiReference::CheckInternet()
@@ -987,7 +987,7 @@ int dwGuiReference::CheckInternet()
     return 1;
 }
 
-// @42b920 (dwGuiReference_ReadBrowserRegistry) — the binary reads the parental
+// dwGuiReference_ReadBrowserRegistry — the binary reads the parental
 // "INTERNET=ENABLED" lockout value from the registry (RegQueryValueExA under
 // HKEY_LOCAL_MACHINE\<REG_PATH>).
 // Note: no portable registry; report "not locked out".

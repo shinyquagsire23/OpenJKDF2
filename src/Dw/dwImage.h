@@ -3,25 +3,25 @@
 
 // dwImage — the shared DroidWorks image/blit BASE class.
 //
-// Decompiled from DroidWorks.exe, unit range 0x448d60-0x449530 (the blit
+// Decompiled from DroidWorks.exe (the blit
 // cluster, mis-binned into the dwFont row in the original compile-unit map)
-// plus the dwImage_LoadFile dispatcher @0x444820.
+// plus the dwImage_LoadFile dispatcher.
 //
 // The binary's image hierarchy is a 6-slot vtable contract shared by TWO
-// concrete classes: stdBitmapRle2 (engine-side RLE bitmap, vtbl 0x520140 —
-// NOT translated here) and dwImageVBuf (tVBuffer-backed, vtbl 0x5201a0, see
+// concrete classes: stdBitmapRle2 (engine-side RLE bitmap, stdBitmapRle2_vtbl —
+// NOT translated here) and dwImageVBuf (tVBuffer-backed, dwImageVBuf_vtbl, see
 // dwImageVBuf.h). Both vtables point at the SAME code for the two blit slots:
 //   +0x00 scalar-deleting dtor    (per-class)
-//   +0x04 Blit         @0x448d60  (SHARED base implementation)
-//   +0x08 BlitColorMap @0x448e40  (SHARED base implementation)
+//   +0x04 Blit         dwImage_Blit  (SHARED base implementation)
+//   +0x08 BlitColorMap dwImage_BlitColorMap  (SHARED base implementation)
 //   +0x0c Lock                    (per-class)
 //   +0x10 Unlock                  (per-class)
 //   +0x14 NULL in both vtables    (never called; no method translated)
-// The naked base-class vtable also exists in the binary @0x520158 (its dtor
-// @0x4430a0 was emitted in the stdBitmapRle2 unit; the dwImageVBuf dtor
+// The naked base-class vtable also exists in the binary dwImage_vtbl (its dtor
+// dwImage_Dtor was emitted in the stdBitmapRle2 unit; the dwImageVBuf dtor
 // re-points the vptr at it while unwinding).
 //
-// Blit semantics (proven from the 0x448d60 disassembly + the
+// Blit semantics (proven from the dwImage_Blit disassembly + the
 // dwImageVBuf_CtorFromImage caller): `this` is the SOURCE image;
 // pImage->Blit(pDestBits, x, y, pClipRect) draws the whole image into the
 // already-locked destination bits at (x, y), clipped to the destination
@@ -68,9 +68,9 @@ struct dwImage
     dwImageDesc desc; // width/height/bpp of this image (see layout quirk above)
 
     dwImage();
-    virtual ~dwImage();                                                          // vtbl +0x00 (base vtbl @0x520158, base dtor @0x4430a0)
-    virtual void Blit(dwImageBits* pDestBits, int x, int y, dwRect* pClipRect);         // vtbl +0x04 @448d60 (shared impl)
-    virtual void BlitColorMap(dwImageBits* pDestBits, int x, int y, dwRect* pClipRect); // vtbl +0x08 @448e40 (shared impl)
+    virtual ~dwImage();                                                          // vtbl +0x00 (base dwImage_vtbl, base dtor dwImage_Dtor)
+    virtual void Blit(dwImageBits* pDestBits, int x, int y, dwRect* pClipRect);         // vtbl +0x04 dwImage_Blit (shared impl)
+    virtual void BlitColorMap(dwImageBits* pDestBits, int x, int y, dwRect* pClipRect); // vtbl +0x08 dwImage_BlitColorMap (shared impl)
     // Lock fills *ppPixels/*pStride for this image's surface (NULL/0 on
     // failure) and returns nonzero on success. Unlock releases it.
     virtual int Lock(void** ppPixels, int* pStride) = 0;                         // vtbl +0x0c
@@ -91,23 +91,23 @@ extern "C" {
 // Loads an image file (.BMP/.RLE) and returns a heap image object, or NULL.
 // Binary dispatch: display bpp > 8 -> stdBitmapRle2_LoadFile16 (16bpp loader),
 // else loads_bmp(pFilePath, 0). Both loaders live in the stdBitmapRle2 unit
-// (stdBitmapRle2.cpp, P8). @444820
-dwImage* dwImage_LoadFile(char* pFilePath); // @444820
+// (stdBitmapRle2.cpp, P8).
+dwImage* dwImage_LoadFile(char* pFilePath);
 
 // Color-key-0 row blit between two locked pixel views (skips source bytes of
 // 0 in the 8bpp path; the 16bpp path is a plain copy — binary quirk). The
-// only in-binary external caller is the dwCompleteMovie frame draw @0x41112a.
-void dwImage_BlitRowsTransparent(dwImageBits* pSrcBits, dwImageBits* pDestBits, int x, int y, dwRect* pClipRect); // @449370
+// only in-binary external caller is the dwCompleteMovie frame draw.
+void dwImage_BlitRowsTransparent(dwImageBits* pSrcBits, dwImageBits* pDestBits, int x, int y, dwRect* pClipRect);
 
 // Despite the (inherited Ghidra) name, this installs dwImage_NullMethodLog as
 // the five HostServices print handlers (+0x04..+0x14: messagePrint,
 // statusPrint, warningPrint, errorPrint, debugPrint). Called once by the DW
 // WinMain boot (StartOpeningCutscenes) right after std_Startup.
-void dwImage_InitNullVtable(HostServices* pHS); // @449500
+void dwImage_InitNullVtable(HostServices* pHS);
 
 // The installed print handler: logs the raw format string (the binary
 // forwards only pFmt to jk_logtofile and DROPS the varargs) and returns 0.
-int dwImage_NullMethodLog(const char* pFmt, ...); // @449530
+int dwImage_NullMethodLog(const char* pFmt, ...);
 
 // Added: C FFI shims for the virtual methods — the C units (dwCursor/
 // dwDisplay/dwMain) called these through the vtable in the binary. Each shim

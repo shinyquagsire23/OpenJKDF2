@@ -4,12 +4,12 @@
 // dwDroidStats — the assembled-droid STATS + BAKED MODEL record (data class,
 // NOT a widget) + the random-droid generator.
 //
-// Decompiled from DroidWorks.exe @0x40eb60-0x40fdff. The dwGuiStatsDroid
-// display widget sharing the compile unit (@0x40fe00-0x410a2f) is NOT here —
+// Decompiled from DroidWorks.exe. The dwGuiStatsDroid
+// display widget sharing the compile unit is NOT here —
 // it is a P6 GUI class.
 //
 // The record (binary sizeof 0x4ac, allocated with operator new by
-// dwGuiInGame_BuildDroidStats @4220d8, freed with Free() + delete in
+// dwGuiInGame_BuildDroidStats, freed with Free() + delete in
 // dwGuiInGame_Dtor) bakes the workshop droid (the dwPartNode tree on
 // dwCore_pWorkspaceNodes) into:
 //  (1) aggregate game stats (dwDroidStatsTotals — also used STANDALONE on the
@@ -48,13 +48,13 @@ typedef struct dwListNode dwListNode; // C++-side list node (Dw/dwList.h); opaqu
 // the unit owns no module-level state — see the note in dwDroidStats.cpp.
 void dwDroidStats_Startup(void);
 
-// @40fae0 — clear the workspace list (deleting every dwPartNode) and build a
+// clear the workspace list (deleting every dwPartNode) and build a
 // random droid into it. bodyType = the body-slot mask the picked blueprints'
 // MODE must contain (1 NORMAL / 2 CARGO); ppWorkspaceList = &dwCore_pWorkspaceNodes.
 // Broadcasts workshop refresh messages 0x7d6/0x7dc/0x7db when done.
 void dwDroidStats_AutoBuildRandom(int bodyType, dwListNode** ppWorkspaceList);
 
-// @40edd0 — append every workspace part's SOUNDS entries to pSoundClass (the
+// append every workspace part's SOUNDS entries to pSoundClass (the
 // player droid's sithSoundClass): sithSound_Load + a 0x1c sithSoundClassEntry
 // per sound, chained per soundclass id. droidCapFlags is passed by the binary
 // caller (record capFlags) but never read (dead parameter, kept for ABI).
@@ -101,10 +101,10 @@ struct dwDroidStatsTotals
     char voiceChars[2];       // 0x64: last part VOICE pair seen (⚠ NOT cleared by
                               //       ClearTotals — faithful; starts as heap/stack garbage)
 
-    // @40eb60 — zero every field EXCEPT voiceChars (faithful quirk).
+    // zero every field EXCEPT voiceChars (faithful quirk).
     void ClearTotals();
 
-    // @40ebb0 — accumulate one part node (blueprint stats + model counts);
+    // accumulate one part node (blueprint stats + model counts);
     // recurses into attached children when bRecurse is set.
     void AccumulatePart(dwPartNode* pNode, int bRecurse);
 };
@@ -148,15 +148,15 @@ struct dwDroidStats
     // `new dwDroidStats` + Build(), later Free() + delete (nothing here owns
     // heap state before Build runs).
 
-    // @40ef00 — bake the workspace droid rooted at pRoot (the node whose
+    // bake the workspace droid rooted at pRoot (the node whose
     // partType == DW_PARTTYPE_NONE). Returns this.
     dwDroidStats* Build(dwPartNode* pRoot);
 
-    // @40f420 — release the merged mesh/node/material arrays + the 24 merged
+    // release the merged mesh/node/material arrays + the 24 merged
     // keyframes (the ONLY teardown; see the aliasing warning at file top).
     void Free();
 
-    // @40f4c0 — recursively concatenate pNode's model into the merged model
+    // recursively concatenate pNode's model into the merged model
     // (meshes/nodes/materials + hierarchy re-wiring) and merge its per-slot
     // keyframes onto the merged skeleton. *ppTorsoNode receives the TORSO
     // part's node. parentNodeIdx = merged-node index the part mounts on

@@ -1,6 +1,6 @@
 // dwFlic — DroidWorks Autodesk FLC/FLI animation decoder (see dwFlic.h).
 //
-// Ghidra (DroidWorks.exe) 0x413cd0-0x414c1x. Faithful translation of the
+// Ghidra (DroidWorks.exe). Faithful translation of the
 // binary's decoder, including its quirks:
 //  - dwFlic_Open always returns 0 (open failures are undetectable) and
 //    leaves pFile dangling after closing an unknown-type file.
@@ -23,7 +23,7 @@
 
 #include <stddef.h>
 
-extern HostServices* dwMain_pHS; // the DW host-services pointer (binary: dwHS @0x6b6258)
+extern HostServices* dwMain_pHS; // the DW host-services pointer (binary: dwHS)
 
 // The on-disk header/frame/chunk regions are read straight into the struct;
 // pin the load-bearing offsets (all naturally aligned, no packing needed).
@@ -32,7 +32,7 @@ _Static_assert(offsetof(dwFlic, frameSize) == 0x80, "dwFlic frame header layout"
 _Static_assert(offsetof(dwFlic, numSubChunks) == 0x86, "dwFlic frame header layout");
 _Static_assert(offsetof(dwFlic, chunkType) == 0x94, "dwFlic chunk header layout");
 
-// @0x413f80 — COLOR_256 chunk (type 4): FLC 8-bit palette packets, written
+// COLOR_256 chunk (type 4): FLC 8-bit palette packets, written
 // straight into paPalette (= pThis->palette; the caller pushes the result to
 // the display palette itself).
 static void dwFlic_ChunkColor256(dwFlic* pThis, uint8_t* paPalette)
@@ -59,7 +59,7 @@ static void dwFlic_ChunkColor256(dwFlic* pThis, uint8_t* paPalette)
     }
 }
 
-// @0x414060 — COLOR_64 chunk (type 11): FLI 6-bit VGA palette packets,
+// COLOR_64 chunk (type 11): FLI 6-bit VGA palette packets,
 // scaled <<2 to 8-bit in place after each run is read.
 static void dwFlic_ChunkColor64(dwFlic* pThis, uint8_t* paPalette)
 {
@@ -105,7 +105,7 @@ static void dwFlic_ChunkColor64(dwFlic* pThis, uint8_t* paPalette)
     }
 }
 
-// @0x414160 — DELTA_FLC chunk (type 7, "SS2"): word-oriented row deltas.
+// DELTA_FLC chunk (type 7, "SS2"): word-oriented row deltas.
 // pOverlay != NULL enables transparent compositing (0 bytes take the overlay
 // pixel at the same position).
 static void dwFlic_ChunkDeltaSS2(dwFlic* pThis, dwFlicBits* pTarget, dwFlicBits* pOverlay)
@@ -353,7 +353,7 @@ static void dwFlic_ChunkDeltaSS2(dwFlic* pThis, dwFlicBits* pTarget, dwFlicBits*
     }
 }
 
-// @0x414640 — DELTA_FLI chunk (type 12, "LC"): byte-oriented row deltas.
+// DELTA_FLI chunk (type 12, "LC"): byte-oriented row deltas.
 // Clips against the TARGET dimensions only (unlike SS2/BRUN, which clip
 // against min(flic, target)); no overlay compositing in the binary (the
 // dispatcher pushes pOverlay but this handler never reads it).
@@ -455,7 +455,7 @@ static void dwFlic_ChunkDeltaLC(dwFlic* pThis, dwFlicBits* pTarget)
     }
 }
 
-// @0x414900 — BLACK chunk (type 13). Note: DW does NOT clear the target
+// BLACK chunk (type 13). Note: DW does NOT clear the target
 // here; it just skips the chunk payload (a real BLACK chunk has none, so
 // this seeks 0 bytes — the frame is left unchanged).
 static void dwFlic_ChunkBlack(dwFlic* pThis)
@@ -463,7 +463,7 @@ static void dwFlic_ChunkBlack(dwFlic* pThis)
     dwMain_pHS->fseek((stdFile_t)pThis->pFile, pThis->chunkSize - 6, 1);
 }
 
-// @0x414930 — BYTE_RUN chunk (type 15): per-row RLE full frame.
+// BYTE_RUN chunk (type 15): per-row RLE full frame.
 // pOverlay != NULL enables transparent compositing (0-valued pixels take the
 // overlay pixel at the same position).
 static void dwFlic_ChunkBrun(dwFlic* pThis, dwFlicBits* pTarget, dwFlicBits* pOverlay)
@@ -585,7 +585,7 @@ static void dwFlic_ChunkBrun(dwFlic* pThis, dwFlicBits* pTarget, dwFlicBits* pOv
     } while (--nRows != 0);
 }
 
-// @0x414b80 — LITERAL chunk (type 16): raw uncompressed frame, one
+// LITERAL chunk (type 16): raw uncompressed frame, one
 // flic-width row of bytes per line, clipped/skipped against the target.
 static void dwFlic_ChunkCopy(dwFlic* pThis, dwFlicBits* pTarget)
 {
@@ -618,7 +618,6 @@ static void dwFlic_ChunkCopy(dwFlic* pThis, dwFlicBits* pTarget)
     } while (y < (int16_t)pThis->height);
 }
 
-// @0x413cd0
 int dwFlic_Open(dwFlic* pThis, const char* pFilename)
 {
     pThis->pFile = (void*)dwMain_pHS->fileOpen(pFilename, "rb");
@@ -644,7 +643,6 @@ int dwFlic_Open(dwFlic* pThis, const char* pFilename)
     return 0;
 }
 
-// @0x413d70
 void dwFlic_Close(dwFlic* pThis)
 {
     if (pThis->pFile != NULL)
@@ -653,7 +651,6 @@ void dwFlic_Close(dwFlic* pThis)
     }
 }
 
-// @0x413d90
 int dwFlic_DecodeFrame(dwFlic* pThis, dwFlicBits* pTarget, dwFlicBits* pOverlay)
 {
     uint32_t frameRemain;

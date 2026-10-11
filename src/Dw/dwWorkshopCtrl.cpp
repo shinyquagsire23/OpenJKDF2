@@ -5,11 +5,11 @@
 // dwWcBuildPaintButton/dwWcCargoNormalButton — declared in Dw/dwGuiButton.h,
 // implemented here because their code lives in this compile unit).
 //
-// Decompiled from DroidWorks.exe, unit range 0x404020-0x40763x (see the
+// Decompiled from DroidWorks.exe (see the
 // per-function `// @address` tags; several vtable-slot bodies were
 // undetected functions recovered from the vtables — tagged "recovered fn").
 // The dwWcBuildPaintButton/dwWcCargoNormalButton ctors were INLINED into
-// dwWorkshop_CreateControl (@43cbb1/@43cc17) in the binary; they are real
+// dwWorkshop_CreateControl  in the binary; they are real
 // ctors here so the P6 workshop screen can `new` them.
 //
 // GUI message codes used by this unit (dispatched to dwWidget_pDefault):
@@ -39,24 +39,24 @@
 // Cross-unit externs (not yet translated — declare + report, do not implement)
 // ---------------------------------------------------------------------------
 
-// dw-core global string table @0x53d958 (owner: dwMain, P7; also declared by
+// dw-core global string table dwCore_pGlobalStrings (owner: dwMain, P7; also declared by
 // dwGuiScreen.cpp). TODO(dw-decomp): provided by dwMain.
 extern "C" dwStringTable* dwCore_pGlobalStrings;
 
-// dw-core blueprint list sentinel @0x53d964 (owner: dwMain, P7; payloads are
+// dw-core blueprint list sentinel dwCore_pBlueprintList (owner: dwMain, P7; payloads are
 // dwPart blueprint records, P5). TODO(dw-decomp): provided by dwMain.
 extern "C" dwListNode* dwCore_pBlueprintList;
 
-// dw-core workspace part-node list sentinel @0x53d984 (owner: dwMain, P7).
+// dw-core workspace part-node list sentinel dwCore_pWorkspaceNodes (owner: dwMain, P7).
 // TODO(dw-decomp): provided by dwMain.
 extern "C" dwListNode* dwCore_pWorkspaceNodes;
 
-// Modal yes/no dialog runner @41c0f0 (owner: dwGuiMission, P6). Returns
+// Modal yes/no dialog runner dwGuiDialog_RunModal (owner: dwGuiMission, P6). Returns
 // 0x1388 (5000) for YES, 0x1389 (5001) for NO.
 // TODO(dw-decomp): provided by dwGuiMission.
 extern "C" int dwGuiDialog_RunModal(const char* pConfName, const char* pMsgKey);
 
-// Random-droid generator @40fae0 (owner: dwDroidStats, P5).
+// Random-droid generator dwDroidStats_AutoBuildRandom (owner: dwDroidStats, P5).
 // TODO(dw-decomp): provided by dwDroidStats.
 extern "C" void dwDroidStats_AutoBuildRandom(int bodyType, dwListNode** ppWorkspaceList);
 
@@ -74,10 +74,10 @@ extern "C" dwWidget* dwGuiTimer_New(dwWidget* pTarget, float startTime, float du
 #include "Dw/dwPart.h"
 
 // ---------------------------------------------------------------------------
-// dwWorkshopCtrl (vtbl 0x51e548)
+// dwWorkshopCtrl (dwWorkshopCtrl_vtbl)
 // ---------------------------------------------------------------------------
 
-// @4071a0 (dwWorkshopCtrl_Ctor)
+// dwWorkshopCtrl_Ctor
 dwWorkshopCtrl::dwWorkshopCtrl(dwRect* pRect, char* pImgNormal, char* pSndOff,
                                char* pImgPressed, char* pSndClick, int cmdId, uint8_t bToggle)
     : dwWidget(pRect)
@@ -94,20 +94,20 @@ dwWorkshopCtrl::dwWorkshopCtrl(dwRect* pRect, char* pImgNormal, char* pSndOff,
 {
     this->imageNameNormal.AssignCStr(pImgNormal);
     this->imageNamePressed.AssignCStr(pImgPressed);
-    dwWorkshopCtrl::EnsureImages(); // binary: direct call @4075c0
+    dwWorkshopCtrl::EnsureImages(); // binary: direct call dwWorkshopCtrl_EnsureImagesLoaded
     if (this->sndClick.length == 0)
         this->sndClick.AssignCStr("CGenButton.wav");
 }
 
-// @4072b0 (dwWorkshopCtrl_Dtor; scalar-deleting wrapper @407290) — the four
+// dwWorkshopCtrl_Dtor (scalar-deleting wrapper dwWorkshopCtrl_DtorDelete) — the four
 // string frees are the member dtors (binary order matches reverse
 // declaration order).
 dwWorkshopCtrl::~dwWorkshopCtrl()
 {
-    dwWorkshopCtrl::FreeImages(); // binary: direct call @407610
+    dwWorkshopCtrl::FreeImages(); // binary: direct call
 }
 
-// vtbl +0x48 @407340 (Ghidra: dwWorkshopCtrl_HitTest) — the NEW overridable
+// vtbl +0x48 (Ghidra: dwWorkshopCtrl_HitTest) — the NEW overridable
 // point-on-control test (left/top inclusive, right/bottom exclusive).
 int dwWorkshopCtrl::HitTest(int16_t x, int16_t y)
 {
@@ -116,7 +116,7 @@ int dwWorkshopCtrl::HitTest(int16_t x, int16_t y)
     return 0;
 }
 
-// vtbl +0x04 @407370
+// vtbl +0x04 dwWorkshopCtrl_OnMouseMove
 int dwWorkshopCtrl::OnMouseMove(int16_t x, int16_t y)
 {
     if (this->bPressed == 0)
@@ -140,7 +140,7 @@ int dwWorkshopCtrl::OnMouseMove(int16_t x, int16_t y)
     return 1;
 }
 
-// vtbl +0x08 @4073d0
+// vtbl +0x08 dwWorkshopCtrl_OnMouseDown
 int dwWorkshopCtrl::OnMouseDown(int16_t x, int16_t y)
 {
     dwWidgetMsg msg;
@@ -184,7 +184,7 @@ int dwWorkshopCtrl::OnMouseDown(int16_t x, int16_t y)
     return 1;
 }
 
-// vtbl +0x0c @4074f0
+// vtbl +0x0c dwWorkshopCtrl_OnMouseUp
 int dwWorkshopCtrl::OnMouseUp(int16_t x, int16_t y)
 {
     dwWidgetMsg msg;
@@ -211,7 +211,7 @@ int dwWorkshopCtrl::OnMouseUp(int16_t x, int16_t y)
     return 1;
 }
 
-// vtbl +0x18 @439ad0 (shared COMDAT; Ghidra: dwGuiTextPopup_OnHover — the
+// vtbl +0x18 (shared COMDAT; Ghidra: dwGuiTextPopup_OnHover — the
 // linker kept the dwGuiTextPopup unit's copy)
 int dwWorkshopCtrl::OnHover(int16_t x, int16_t y)
 {
@@ -226,7 +226,7 @@ int dwWorkshopCtrl::OnHover(int16_t x, int16_t y)
     return 1;
 }
 
-// vtbl +0x3c @4075c0 (Ghidra: dwWorkshopCtrl_EnsureImagesLoaded)
+// vtbl +0x3c (Ghidra: dwWorkshopCtrl_EnsureImagesLoaded)
 void dwWorkshopCtrl::EnsureImages()
 {
     if (this->pImageNormal == NULL && this->imageNameNormal.length != 0)
@@ -235,7 +235,7 @@ void dwWorkshopCtrl::EnsureImages()
         this->pImagePressed = dwImage_LoadFile(this->imageNamePressed.pBuffer);
 }
 
-// vtbl +0x40 @407610
+// vtbl +0x40 dwWorkshopCtrl_FreeImages
 void dwWorkshopCtrl::FreeImages()
 {
     if (this->pImageNormal != NULL)
@@ -250,7 +250,7 @@ void dwWorkshopCtrl::FreeImages()
     }
 }
 
-// vtbl +0x44 @407580
+// vtbl +0x44 dwWorkshopCtrl_Draw
 void dwWorkshopCtrl::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     dwImage* pImg;
@@ -266,14 +266,14 @@ void dwWorkshopCtrl::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 }
 
 // ---------------------------------------------------------------------------
-// dwWcButtonBlink (vtbl 0x51e380)
+// dwWcButtonBlink (dwWcButtonBlink_vtbl)
 // ---------------------------------------------------------------------------
 
-// Blink timing constants (binary rdata @0x51e378 / @0x51e37c).
+// Blink timing constants (binary rdata).
 #define DWWCBUTTONBLINK_PERIOD    0.5f
 #define DWWCBUTTONBLINK_THRESHOLD 0.0f
 
-// @405bd0 (dwWcButtonBlink_Ctor)
+// dwWcButtonBlink_Ctor
 dwWcButtonBlink::dwWcButtonBlink(dwRect* pRect, char* pImgNormal, char* pSndOff,
                                  char* pImgPressed, char* pSndClick, char* pBlinkImg,
                                  char* pBlinkSnd, int cmdId)
@@ -286,18 +286,18 @@ dwWcButtonBlink::dwWcButtonBlink(dwRect* pRect, char* pImgNormal, char* pSndOff,
     , blinkTimer(0.0f)
 {
     this->blinkImageName.AssignCStr(pBlinkImg);
-    dwWcButtonBlink::EnsureImages(); // binary: direct call @405e90
+    dwWcButtonBlink::EnsureImages(); // binary: direct call dwWcButtonBlink_EnsureImagesLoaded
     if (pBlinkSnd != NULL)
         this->blinkSound.AssignCStr(pBlinkSnd);
 }
 
-// @405cb0 (dwWcButtonBlink_Dtor; scalar-deleting wrapper @405c90)
+// dwWcButtonBlink_Dtor (scalar-deleting wrapper dwWcButtonBlink_DtorDelete)
 dwWcButtonBlink::~dwWcButtonBlink()
 {
-    dwWcButtonBlink::FreeImages(); // binary: direct call @405ec0
+    dwWcButtonBlink::FreeImages(); // binary: direct call
 }
 
-// @405d90 (dwWcButtonBlink_StartBlink)
+// dwWcButtonBlink_StartBlink
 void dwWcButtonBlink::StartBlink()
 {
     this->bBlinking = 1;
@@ -306,7 +306,7 @@ void dwWcButtonBlink::StartBlink()
     this->Invalidate(); // binary: tail-jump vtbl +0x34
 }
 
-// @405db0 (dwWcButtonBlink_StopBlink)
+// dwWcButtonBlink_StopBlink
 void dwWcButtonBlink::StopBlink()
 {
     this->bBlinking = 0;
@@ -314,7 +314,7 @@ void dwWcButtonBlink::StopBlink()
     this->Invalidate();
 }
 
-// vtbl +0x0c @405d20 (recovered fn — vtable-only body, no Ghidra name)
+// vtbl +0x0c dwWcButtonBlink_OnMouseUp (recovered fn — vtable-only body, no Ghidra name)
 int dwWcButtonBlink::OnMouseUp(int16_t x, int16_t y)
 {
     uint8_t bWasHot;
@@ -331,7 +331,7 @@ int dwWcButtonBlink::OnMouseUp(int16_t x, int16_t y)
     return result;
 }
 
-// vtbl +0x18 @405d50 (recovered fn)
+// vtbl +0x18 dwWcButtonBlink_OnHover (recovered fn)
 int dwWcButtonBlink::OnHover(int16_t x, int16_t y)
 {
     dwWidgetMsg msg;
@@ -345,7 +345,7 @@ int dwWcButtonBlink::OnHover(int16_t x, int16_t y)
     return 1;
 }
 
-// vtbl +0x14 @405dc0 (dwWcButtonBlink_Update)
+// vtbl +0x14 dwWcButtonBlink_Update
 void dwWcButtonBlink::Update(float dt)
 {
     uint8_t bOldState;
@@ -370,7 +370,7 @@ void dwWcButtonBlink::Update(float dt)
     }
 }
 
-// vtbl +0x44 @405e40 (dwWcButtonBlink_Draw)
+// vtbl +0x44 dwWcButtonBlink_Draw
 void dwWcButtonBlink::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     dwImage* pImg;
@@ -387,15 +387,15 @@ void dwWcButtonBlink::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
         pImg->Blit(pDestBits, this->left, this->top, pClipRect);
 }
 
-// vtbl +0x3c @405e90 (Ghidra: dwWcButtonBlink_EnsureImagesLoaded)
+// vtbl +0x3c (Ghidra: dwWcButtonBlink_EnsureImagesLoaded)
 void dwWcButtonBlink::EnsureImages()
 {
-    dwWorkshopCtrl::EnsureImages(); // binary: direct call @4075c0
+    dwWorkshopCtrl::EnsureImages(); // binary: direct call dwWorkshopCtrl_EnsureImagesLoaded
     if (this->pBlinkImage == NULL && this->blinkImageName.length != 0)
         this->pBlinkImage = dwImage_LoadFile(this->blinkImageName.pBuffer);
 }
 
-// vtbl +0x40 @405ec0 (dwWcButtonBlink_FreeImages)
+// vtbl +0x40 dwWcButtonBlink_FreeImages
 void dwWcButtonBlink::FreeImages()
 {
     if (this->pBlinkImage != NULL)
@@ -403,14 +403,14 @@ void dwWcButtonBlink::FreeImages()
         delete this->pBlinkImage;
         this->pBlinkImage = NULL;
     }
-    dwWorkshopCtrl::FreeImages(); // binary: direct call @407610
+    dwWorkshopCtrl::FreeImages(); // binary: direct call
 }
 
 // ---------------------------------------------------------------------------
-// dwWcEntry / dwWcEntryPanel (vtbl 0x51e298)
+// dwWcEntry / dwWcEntryPanel (dwWcEntryPanel_vtbl)
 // ---------------------------------------------------------------------------
 
-// Entry ctor (binary: inlined into dwWcEntryPanel_AddEntry @4047d0).
+// Entry ctor (binary: inlined into dwWcEntryPanel_AddEntry).
 dwWcEntry::dwWcEntry(dwRect rect, char* pText, char* pFontName, uint8_t color,
                      int id, int16_t kind, char* pMarkup, float showTime, float hideTime)
     : rect(rect)
@@ -425,13 +425,13 @@ dwWcEntry::dwWcEntry(dwRect rect, char* pText, char* pFontName, uint8_t color,
 {
 }
 
-// @404e80 (dwWcEntry_Dtor; scalar-deleting wrapper @404e60) — frees fontName
+// dwWcEntry_Dtor (scalar-deleting wrapper dwWcEntry_DtorDelete) — frees fontName
 // then text (member dtors; pMarkup is borrowed, not freed).
 dwWcEntry::~dwWcEntry()
 {
 }
 
-// @404230 (dwWcEntryPanel_Ctor)
+// dwWcEntryPanel_Ctor
 dwWcEntryPanel::dwWcEntryPanel(dwRect* pRect, char* pName, void* pContext)
     : dwWidget(pRect)
     , pTimer0(NULL)
@@ -446,10 +446,10 @@ dwWcEntryPanel::dwWcEntryPanel(dwRect* pRect, char* pName, void* pContext)
     , pContext(pContext)
 {
     this->name.AssignCStr(pName);
-    dwWcEntryPanel::EnsureImages(); // binary: direct call @404d00
+    dwWcEntryPanel::EnsureImages(); // binary: direct call dwWcEntryPanel_EnsureImagesLoaded
 }
 
-// @404300 (dwWcEntryPanel_Dtor; scalar-deleting wrapper @4042e0)
+// dwWcEntryPanel_Dtor (scalar-deleting wrapper dwWcEntryPanel_DtorDelete)
 dwWcEntryPanel::~dwWcEntryPanel()
 {
     dwListNode* pSent;
@@ -457,7 +457,7 @@ dwWcEntryPanel::~dwWcEntryPanel()
     dwListNode* pNext;
     dwWcEntry* pEntry;
 
-    dwWcEntryPanel::FreeImages(); // binary: direct call @404d30
+    dwWcEntryPanel::FreeImages(); // binary: direct call
 
     // Delete the timers — each dwGuiTimer deletes its wrapped caption.
     if (this->pTimer0 != NULL)
@@ -487,7 +487,7 @@ dwWcEntryPanel::~dwWcEntryPanel()
 }
 
 // Added: shared show body (the binary duplicates this inline in OnMessage
-// @4044a0 and ShowById @4048b0 — one helper here, same behavior/order).
+// dwWcEntryPanel_OnMessage and ShowById dwWcEntryPanel_ShowById — one helper here, same behavior/order).
 void dwWcEntryPanel::ShowEntry(dwWcEntry* pEntry)
 {
     dwWidget** ppTimerSlot;
@@ -535,7 +535,7 @@ void dwWcEntryPanel::ShowEntry(dwWcEntry* pEntry)
     *ppTimerSlot = dwGuiTimer_New(pHyp, pEntry->showTime, pEntry->hideTime);
 }
 
-// vtbl +0x1c @4044a0 (dwWcEntryPanel_OnMessage) — shows EVERY entry whose id
+// vtbl +0x1c dwWcEntryPanel_OnMessage — shows EVERY entry whose id
 // matches (no early exit). Returns 0.
 int dwWcEntryPanel::OnMessage(dwWidgetMsg* pMsg)
 {
@@ -553,7 +553,7 @@ int dwWcEntryPanel::OnMessage(dwWidgetMsg* pMsg)
     return 0;
 }
 
-// @4048b0 (dwWcEntryPanel_ShowById)
+// dwWcEntryPanel_ShowById
 void dwWcEntryPanel::ShowById(int id)
 {
     dwListNode* pSent;
@@ -569,7 +569,7 @@ void dwWcEntryPanel::ShowById(int id)
     }
 }
 
-// @4047d0 (dwWcEntryPanel_AddEntry) — rect BY VALUE, push-back.
+// dwWcEntryPanel_AddEntry — rect BY VALUE, push-back.
 void dwWcEntryPanel::AddEntry(dwRect rect, char* pText, char* pFontName, uint8_t color,
                               int id, int16_t kind, char* pMarkup, float showTime, float hideTime)
 {
@@ -579,7 +579,7 @@ void dwWcEntryPanel::AddEntry(dwRect rect, char* pText, char* pFontName, uint8_t
     this->entries.InsertAfter(this->entries.pSentinel->pPrev, pEntry);
 }
 
-// vtbl +0x14 @404be0 (dwWcEntryPanel_Update)
+// vtbl +0x14 dwWcEntryPanel_Update
 void dwWcEntryPanel::Update(float dt)
 {
     if (this->bEnabled == 0)
@@ -592,7 +592,7 @@ void dwWcEntryPanel::Update(float dt)
         this->pTimer2->Update(dt);
 }
 
-// vtbl +0x18 @419a00 (shared COMDAT; Ghidra: dwGuiIndicator_OnHover — the
+// vtbl +0x18 (shared COMDAT; Ghidra: dwGuiIndicator_OnHover — the
 // linker kept the dwHelp unit's copy; here the +0x3c field is pContext)
 int dwWcEntryPanel::OnHover(int16_t x, int16_t y)
 {
@@ -607,7 +607,7 @@ int dwWcEntryPanel::OnHover(int16_t x, int16_t y)
     return 1;
 }
 
-// vtbl +0x44 @404c20 (dwWcEntryPanel_Draw)
+// vtbl +0x44 dwWcEntryPanel_Draw
 void dwWcEntryPanel::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     dwRect clip0, clip2, clip1;
@@ -634,14 +634,14 @@ void dwWcEntryPanel::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
     }
 }
 
-// vtbl +0x3c @404d00 (Ghidra: dwWcEntryPanel_EnsureImagesLoaded)
+// vtbl +0x3c (Ghidra: dwWcEntryPanel_EnsureImagesLoaded)
 void dwWcEntryPanel::EnsureImages()
 {
     if (this->pImage == NULL && this->name.length != 0)
         this->pImage = dwImage_LoadFile(this->name.pBuffer);
 }
 
-// vtbl +0x40 @404d30 (dwWcEntryPanel_FreeImages)
+// vtbl +0x40 dwWcEntryPanel_FreeImages
 void dwWcEntryPanel::FreeImages()
 {
     if (this->pImage != NULL)
@@ -652,10 +652,10 @@ void dwWcEntryPanel::FreeImages()
 }
 
 // ---------------------------------------------------------------------------
-// dwWcMaterialsEntry / dwWcMaterials (MI vtbls 0x51e328 / 0x51e2e0)
+// dwWcMaterialsEntry / dwWcMaterials (MI dwWcMaterials_vtbl / dwWcMaterials_group_vtbl)
 // ---------------------------------------------------------------------------
 
-// Entry ctor (binary: inlined into dwWcMaterials_AddEntry @4055a0).
+// Entry ctor (binary: inlined into dwWcMaterials_AddEntry).
 dwWcMaterialsEntry::dwWcMaterialsEntry(char* pAnimFile, int code, uint8_t flag,
                                        char* pImageFile, char* pExtraFile)
     : animFile(pAnimFile, 0)
@@ -666,12 +666,12 @@ dwWcMaterialsEntry::dwWcMaterialsEntry(char* pAnimFile, int code, uint8_t flag,
 {
 }
 
-// @405b00 (dwWcMaterialsEntry_Dtor; scalar-deleting wrapper @405ae0)
+// dwWcMaterialsEntry_Dtor (scalar-deleting wrapper dwWcMaterialsEntry_DtorDelete)
 dwWcMaterialsEntry::~dwWcMaterialsEntry()
 {
 }
 
-// @404ed0 (dwWcMaterials_Ctor)
+// dwWcMaterials_Ctor
 dwWcMaterials::dwWcMaterials(dwRect* pRect, char* pImageName, void* pContext)
     : dwAnimBase(pRect, 0, 1)
     , dwWidgetGroup(pRect)
@@ -689,13 +689,13 @@ dwWcMaterials::dwWcMaterials(dwRect* pRect, char* pImageName, void* pContext)
     , imageName()
 {
     this->imageName.AssignCStr(pImageName);
-    dwWcMaterials::EnsureImages(); // binary: direct call @4058d0
+    dwWcMaterials::EnsureImages(); // binary: direct call dwWcMaterials_EnsureImagesLoaded
     this->matIdxA = 7;
     this->matIdxB = 7;
 }
 
-// @404fd0 (dwWcMaterials_Dtor; scalar-deleting wrapper @404fb0, group thunk
-// @405b60). Binary order: FreeImages, delete pAnim, free items, delete the
+// dwWcMaterials_Dtor (scalar-deleting wrapper dwWcMaterials_DtorDelete, group thunk
+// dwWcMaterials_DtorDelete_Thunk). Binary order: FreeImages, delete pAnim, free items, delete the
 // group children, free imageName, base dtors — the child deletion is left
 // to ~dwWidgetGroup here (single delete either way).
 dwWcMaterials::~dwWcMaterials()
@@ -705,7 +705,7 @@ dwWcMaterials::~dwWcMaterials()
     dwListNode* pNext;
     dwWcMaterialsEntry* pEntry;
 
-    dwWcMaterials::FreeImages(); // binary: direct call @405910
+    dwWcMaterials::FreeImages(); // binary: direct call
 
     if (this->pAnim != NULL)
     {
@@ -729,7 +729,7 @@ dwWcMaterials::~dwWcMaterials()
     this->items.Free();
 }
 
-// vtbl +0x1c @405220 (group thunk @405b90) — the material panel logic.
+// vtbl +0x1c dwWcMaterials_OnMessage (group thunk dwWcMaterials_OnMessage_Thunk) — the material panel logic.
 int dwWcMaterials::OnMessage(dwWidgetMsg* pMsg)
 {
     dwListNode* pSent;
@@ -806,7 +806,7 @@ int dwWcMaterials::OnMessage(dwWidgetMsg* pMsg)
                 delete this->pImage;
             this->imageName.AssignString(&pEntry->imageFile);
             this->pImage = dwImage_LoadFile(this->imageName.pBuffer);
-            static_cast<dwAnimBase*>(this)->Invalidate(); // binary: primary-subobject Invalidate @4424a0
+            static_cast<dwAnimBase*>(this)->Invalidate(); // binary: primary-subobject Invalidate dwWidget_Invalidate
             break;
         }
     }
@@ -831,7 +831,7 @@ int dwWcMaterials::OnMessage(dwWidgetMsg* pMsg)
         }
         if (this->pAnim != NULL)
         {
-            this->pAnim->Play((uint8_t)1); // @401190 (non-virtual dwAnim::Play)
+            this->pAnim->Play((uint8_t)1); // non-virtual dwAnim::Play
             this->bPlaying = 1;
             static_cast<dwAnimBase*>(this)->Invalidate();
         }
@@ -848,10 +848,10 @@ int dwWcMaterials::OnMessage(dwWidgetMsg* pMsg)
     }
 
     this->curCode = 0x1bbc;
-    return this->dwAnimBase::OnMessage(pMsg); // @403950
+    return this->dwAnimBase::OnMessage(pMsg);
 }
 
-// @405440 (dwWcMaterials_HighlightSwatchA) — row A sits at group-top + 5.
+// dwWcMaterials_HighlightSwatchA — row A sits at group-top + 5.
 void dwWcMaterials::HighlightSwatchA(char* pMatName)
 {
     dwString* pLocalized;
@@ -880,7 +880,7 @@ void dwWcMaterials::HighlightSwatchA(char* pMatName)
     }
 }
 
-// @4054f0 (dwWcMaterials_HighlightSwatchB) — row B sits at group-top + 0xa0.
+// dwWcMaterials_HighlightSwatchB — row B sits at group-top + 0xa0.
 void dwWcMaterials::HighlightSwatchB(char* pMatName)
 {
     dwString* pLocalized;
@@ -909,7 +909,7 @@ void dwWcMaterials::HighlightSwatchB(char* pMatName)
     }
 }
 
-// @4055a0 (dwWcMaterials_AddEntry) — push-back onto items.
+// dwWcMaterials_AddEntry — push-back onto items.
 void dwWcMaterials::AddEntry(char* pAnimFile, int code, uint8_t flag,
                              char* pImageFile, char* pExtraFile)
 {
@@ -919,7 +919,7 @@ void dwWcMaterials::AddEntry(char* pAnimFile, int code, uint8_t flag,
     this->items.InsertAfter(this->items.pSentinel->pPrev, pEntry);
 }
 
-// @405670 (dwWcMaterials_AddLabel) — push-FRONT a disabled label child.
+// dwWcMaterials_AddLabel — push-FRONT a disabled label child.
 void dwWcMaterials::AddLabel(char* pText, dwPoint pos, dwPoint size, uint8_t color, char* pFontName)
 {
     dwRect rect;
@@ -940,7 +940,7 @@ void dwWcMaterials::AddLabel(char* pText, dwPoint pos, dwPoint size, uint8_t col
     this->children.InsertAfter(this->children.pSentinel, pLabel); // push-front
 }
 
-// @405760 (dwWcMaterials_RefreshSelection)
+// dwWcMaterials_RefreshSelection
 void dwWcMaterials::RefreshSelection()
 {
     dwListNode* pFirst;
@@ -965,15 +965,15 @@ void dwWcMaterials::RefreshSelection()
     this->HighlightSwatchB((char*)"WOOD");
 }
 
-// vtbl +0x14 @4057d0 (group thunk @405b70)
+// vtbl +0x14 dwWcMaterials_Update (group thunk dwWcMaterials_Update_Thunk)
 void dwWcMaterials::Update(float dt)
 {
     if (this->dwAnimBase::bEnabled != 0 && this->pAnim != NULL)
         this->pAnim->Update(dt); // vtbl +0x14
-    this->dwWidgetGroup::Update(dt); // binary: direct call @444620
+    this->dwWidgetGroup::Update(dt); // binary: direct call
 }
 
-// vtbl +0x18 @405800 (group thunk @405b80)
+// vtbl +0x18 dwWcMaterials_OnHover (group thunk dwWcMaterials_OnHover_Thunk)
 int dwWcMaterials::OnHover(int16_t x, int16_t y)
 {
     dwWidgetMsg msg;
@@ -987,7 +987,7 @@ int dwWcMaterials::OnHover(int16_t x, int16_t y)
     return 1;
 }
 
-// vtbl +0x44 @405830 (group thunk @405bc0 — the binary re-emitted the whole
+// vtbl +0x44 dwWcMaterials_Draw (group thunk dwWcMaterials_Draw_Thunk — the binary re-emitted the whole
 // body for the group vtable; the compiler generates the thunk here)
 void dwWcMaterials::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
@@ -1006,7 +1006,7 @@ void dwWcMaterials::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
         {
             clip = *pClipRect;
             dwRect_Clip(&clip, this->pAnim->GetRectPtr());
-            this->pAnim->DrawChild(pDestBits, &clip); // @4424b0
+            this->pAnim->DrawChild(pDestBits, &clip);
         }
     }
     // The two enabled swatch labels draw even when the panel is disabled
@@ -1017,15 +1017,15 @@ void dwWcMaterials::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
         ((dwWidget*)this->pSwatchB)->DrawChild(pDestBits, pClipRect);
 }
 
-// vtbl +0x3c @4058d0 (group thunk @405ba0; Ghidra: dwWcMaterials_EnsureImagesLoaded)
+// vtbl +0x3c (group thunk dwWcMaterials_EnsureLoaded_Thunk; Ghidra: dwWcMaterials_EnsureImagesLoaded)
 void dwWcMaterials::EnsureImages()
 {
     if (this->pImage == NULL && this->imageName.length != 0)
         this->pImage = dwImage_LoadFile(this->imageName.pBuffer);
-    this->dwWidgetGroup::EnsureImages(); // binary: direct call @4447e0
+    this->dwWidgetGroup::EnsureImages(); // binary: direct call
 }
 
-// vtbl +0x40 @405910 (group thunk @405bb0)
+// vtbl +0x40 dwWcMaterials_FreeImages (group thunk dwWcMaterials_FreeImages_Thunk)
 void dwWcMaterials::FreeImages()
 {
     if (this->pImage != NULL)
@@ -1033,14 +1033,14 @@ void dwWcMaterials::FreeImages()
         delete this->pImage;
         this->pImage = NULL;
     }
-    this->dwWidgetGroup::FreeImages(); // binary: direct call @43c040 (dwWidgetGroup_FreeChildImages)
+    this->dwWidgetGroup::FreeImages(); // binary: direct call dwWidgetGroup_FreeChildImages
 }
 
 // ---------------------------------------------------------------------------
-// dwWcBlueprints (vtbl 0x51e3d0)
+// dwWcBlueprints (dwWcBlueprints_vtbl)
 // ---------------------------------------------------------------------------
 
-// @405ee0 (dwWcBlueprints_Ctor)
+// dwWcBlueprints_Ctor
 dwWcBlueprints::dwWcBlueprints(dwRect* pRect, int16_t xIndent)
     : dwWidget(pRect)
     , xIndent(xIndent)
@@ -1063,7 +1063,7 @@ dwWcBlueprints::dwWcBlueprints(dwRect* pRect, int16_t xIndent)
     this->hoverRect.bottom = 0;
 }
 
-// @405f60 (dwWcBlueprints_Dtor; scalar-deleting wrapper @405f40)
+// dwWcBlueprints_Dtor (scalar-deleting wrapper dwWcBlueprints_DtorDelete)
 dwWcBlueprints::~dwWcBlueprints()
 {
     if (this->bShown != 0)
@@ -1087,7 +1087,7 @@ static int dwWcBlueprints_IsEligible(dwWcBlueprints* pThis, dwPart* pBp)
     return 1;
 }
 
-// @405fc0 (dwWcBlueprints_BuildGrid)
+// dwWcBlueprints_BuildGrid
 void dwWcBlueprints::BuildGrid()
 {
     dwListNode* pNode;
@@ -1133,7 +1133,7 @@ void dwWcBlueprints::BuildGrid()
     dwWidget_pMouseTarget = this;
 }
 
-// @406120 (dwWcBlueprints_Hide)
+// dwWcBlueprints_Hide
 void dwWcBlueprints::Hide()
 {
     if (dwWidget_pMouseTarget == this)
@@ -1142,7 +1142,7 @@ void dwWcBlueprints::Hide()
     this->Invalidate(); // binary: tail-jump vtbl +0x34
 }
 
-// vtbl +0x44 @406140 (dwWcBlueprints_Draw)
+// vtbl +0x44 dwWcBlueprints_Draw
 void dwWcBlueprints::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     dwPoint apex;
@@ -1195,7 +1195,7 @@ void dwWcBlueprints::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
     }
 }
 
-// vtbl +0x04 @406290 (dwWcBlueprints_OnMouseMove) — hover tracking. Always
+// vtbl +0x04 dwWcBlueprints_OnMouseMove — hover tracking. Always
 // returns 0.
 int dwWcBlueprints::OnMouseMove(int16_t x, int16_t y)
 {
@@ -1256,7 +1256,7 @@ int dwWcBlueprints::OnMouseMove(int16_t x, int16_t y)
     return 0;
 }
 
-// vtbl +0x08 @406430 (dwWcBlueprints_OnMouseDown)
+// vtbl +0x08 dwWcBlueprints_OnMouseDown
 int dwWcBlueprints::OnMouseDown(int16_t x, int16_t y)
 {
     dwWidgetMsg msg;
@@ -1306,7 +1306,7 @@ int dwWcBlueprints::OnMouseDown(int16_t x, int16_t y)
     return 0;
 }
 
-// vtbl +0x1c @406520 (dwWcBlueprints_OnMessage)
+// vtbl +0x1c dwWcBlueprints_OnMessage
 int dwWcBlueprints::OnMessage(dwWidgetMsg* pMsg)
 {
     if (pMsg->code == 0x7e4)
@@ -1332,18 +1332,18 @@ int dwWcBlueprints::OnMessage(dwWidgetMsg* pMsg)
 }
 
 // ---------------------------------------------------------------------------
-// dwWcChildDecorator (vtbl 0x51e500)
+// dwWcChildDecorator (dwWcChildDecorator_vtbl)
 // ---------------------------------------------------------------------------
 
 // No standalone binary ctor — subclasses inline this sequence (the widget
-// rect is COPIED FROM the child; see dwWcPalette_Ctor @406950).
+// rect is COPIED FROM the child; see dwWcPalette_Ctor).
 dwWcChildDecorator::dwWcChildDecorator(dwWidget* pChildWidget)
     : dwWidget(pChildWidget->GetRectPtr())
     , pChild(pChildWidget)
 {
 }
 
-// @407140 (dwWcChildDecorator_Dtor; scalar-deleting wrapper @407120)
+// dwWcChildDecorator_Dtor (scalar-deleting wrapper dwWcChildDecorator_DtorDelete)
 dwWcChildDecorator::~dwWcChildDecorator()
 {
     this->pChild->FreeImages(); // vtbl +0x40
@@ -1351,63 +1351,53 @@ dwWcChildDecorator::~dwWcChildDecorator()
         delete this->pChild;
 }
 
-// @406fd0
 int dwWcChildDecorator::OnMouseMove(int16_t x, int16_t y)
 {
     return this->pChild->OnMouseMove(x, y);
 }
 
-// @406ff0
 int dwWcChildDecorator::OnMouseDown(int16_t x, int16_t y)
 {
     return this->pChild->OnMouseDown(x, y);
 }
 
-// @407010
 int dwWcChildDecorator::OnMouseUp(int16_t x, int16_t y)
 {
     return this->pChild->OnMouseUp(x, y);
 }
 
-// @407030
 int dwWcChildDecorator::OnKey(int key, int repeat)
 {
     return this->pChild->OnKey(key, repeat);
 }
 
-// @407050
 void dwWcChildDecorator::Update(float dt)
 {
     this->pChild->Update(dt);
 }
 
-// @407060
 int dwWcChildDecorator::OnHover(int16_t x, int16_t y)
 {
     return this->pChild->OnHover(x, y);
 }
 
-// @407080
 int dwWcChildDecorator::OnMessage(dwWidgetMsg* pMsg)
 {
     return this->pChild->OnMessage(pMsg);
 }
 
-// @407090
 void dwWcChildDecorator::Enable()
 {
     this->bEnabled = 1;
     this->pChild->Enable();
 }
 
-// @4070a0
 void dwWcChildDecorator::Disable()
 {
     this->bEnabled = 0;
     this->pChild->Disable();
 }
 
-// @4070b0
 void dwWcChildDecorator::Move(int16_t dx, int16_t dy)
 {
     this->left = (int16_t)(this->left + dx);
@@ -1417,29 +1407,27 @@ void dwWcChildDecorator::Move(int16_t dx, int16_t dy)
     this->pChild->Move(dx, dy);
 }
 
-// @4070e0 (Ghidra: dwWcChildDecorator_EnsureLoaded)
+// (Ghidra: dwWcChildDecorator_EnsureLoaded)
 void dwWcChildDecorator::EnsureImages()
 {
     this->pChild->EnsureImages();
 }
 
-// @4070f0
 void dwWcChildDecorator::FreeImages()
 {
     this->pChild->FreeImages();
 }
 
-// @407100
 void dwWcChildDecorator::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
-    this->pChild->DrawChild(pDestBits, pClipRect); // @4424b0
+    this->pChild->DrawChild(pDestBits, pClipRect);
 }
 
 // ---------------------------------------------------------------------------
-// dwWcPalette (vtbl 0x51e4b8)
+// dwWcPalette (dwWcPalette_vtbl)
 // ---------------------------------------------------------------------------
 
-// @406950 (dwWcPalette_Ctor)
+// dwWcPalette_Ctor
 dwWcPalette::dwWcPalette(dwRect* pRect)
     : dwWcChildDecorator(new dwWcBuildButton((char*)"wcbuildn", pRect))
     , mode(0)
@@ -1448,13 +1436,13 @@ dwWcPalette::dwWcPalette(dwRect* pRect)
 {
 }
 
-// @406a00 (dwWcPalette_Dtor; scalar-deleting wrapper @4069e0) — the binary
+// dwWcPalette_Dtor (scalar-deleting wrapper dwWcPalette_DtorDelete) — the binary
 // body is byte-identical to the decorator dtor (no own resources).
 dwWcPalette::~dwWcPalette()
 {
 }
 
-// @406a60 (dwWcPalette_SetMode)
+// dwWcPalette_SetMode
 void dwWcPalette::SetMode(int newMode)
 {
     dwAnim* pAnim;
@@ -1480,7 +1468,7 @@ void dwWcPalette::SetMode(int newMode)
             pAnim = dwAnim_Open(this->GetRectPtr(), (char*)"WPaintBuild.flc", 0x7ea, 0);
         if (pAnim != NULL)
         {
-            pAnim->Play((uint8_t)1); // @401190 (non-virtual dwAnim::Play)
+            pAnim->Play((uint8_t)1); // non-virtual dwAnim::Play
             dwSound_PlayRestart("WModeSwitch.wav");
         }
         this->pChild = pAnim;
@@ -1495,7 +1483,7 @@ void dwWcPalette::SetMode(int newMode)
     this->Invalidate(); // vtbl +0x34
 }
 
-// vtbl +0x1c @406bf0 (dwWcPalette_OnMessage) — every path forwards the
+// vtbl +0x1c dwWcPalette_OnMessage — every path forwards the
 // message to the child afterwards.
 int dwWcPalette::OnMessage(dwWidgetMsg* pMsg)
 {
@@ -1578,25 +1566,25 @@ int dwWcPalette::OnMessage(dwWidgetMsg* pMsg)
 }
 
 // ---------------------------------------------------------------------------
-// dwWcArrows (vtbl 0x51e248) — dwGuiButton subclass, declared in dwGuiButton.h
+// dwWcArrows (dwWcArrows_vtbl) — dwGuiButton subclass, declared in dwGuiButton.h
 // ---------------------------------------------------------------------------
 
-// Rotate command table (binary rdata @0x51e22c, indexed by button id 1..5).
+// Rotate command table (binary rdata dwWcArrows_aCmdIds, indexed by button id 1..5).
 static const int dwWcArrows_aCmdIds[6] = { 0, 0x7de, 0x7df, 0x7e0, 0x7e1, 0x7db };
 
-// @404020 (dwWcArrows_Ctor)
+// dwWcArrows_Ctor
 dwWcArrows::dwWcArrows(dwRect* pRect)
     : dwGuiButton((char*)"wcarrows", pRect)
 {
 }
 
-// @404060 (dwWcArrows_Dtor; scalar-deleting wrapper @404040) — vptr re-point
+// dwWcArrows_Dtor (scalar-deleting wrapper dwWcArrows_DtorDelete) — vptr re-point
 // + base dtor only.
 dwWcArrows::~dwWcArrows()
 {
 }
 
-// vtbl +0x04 @404070 (recovered fn) — after the base tracking, press/release
+// vtbl +0x04 dwWcArrows_OnMouseMove (recovered fn) — after the base tracking, press/release
 // the arrow the cursor moved onto/off of (hold-to-rotate repeat).
 int dwWcArrows::OnMouseMove(int16_t x, int16_t y)
 {
@@ -1617,7 +1605,7 @@ int dwWcArrows::OnMouseMove(int16_t x, int16_t y)
     return result;
 }
 
-// vtbl +0x08 @4040c0 (recovered fn) — arrows fire on PRESS (ids 1-4), not
+// vtbl +0x08 dwWcArrows_OnMouseDown (recovered fn) — arrows fire on PRESS (ids 1-4), not
 // just on the completed click.
 int dwWcArrows::OnMouseDown(int16_t x, int16_t y)
 {
@@ -1631,7 +1619,7 @@ int dwWcArrows::OnMouseDown(int16_t x, int16_t y)
     return result;
 }
 
-// vtbl +0x48 @404100 (Ghidra: dwWcArrows_HitTest — misnamed; this is the
+// vtbl +0x48 (Ghidra: dwWcArrows_HitTest — misnamed; this is the
 // press-action hook)
 void dwWcArrows::OnButtonPressed(int buttonId)
 {
@@ -1661,7 +1649,7 @@ void dwWcArrows::OnButtonPressed(int buttonId)
     this->Invalidate(); // vtbl +0x34
 }
 
-// vtbl +0x4c @404180 (Ghidra: dwWcArrows_OnAction)
+// vtbl +0x4c (Ghidra: dwWcArrows_OnAction)
 void dwWcArrows::OnButtonReleased(int buttonId)
 {
     dwWidgetMsg msg;
@@ -1681,7 +1669,7 @@ void dwWcArrows::OnButtonReleased(int buttonId)
     }
 }
 
-// vtbl +0x18 @4041f0 (recovered fn)
+// vtbl +0x18 dwWcArrows_OnHover (recovered fn)
 int dwWcArrows::OnHover(int16_t x, int16_t y)
 {
     dwWidgetMsg msg;
@@ -1696,24 +1684,24 @@ int dwWcArrows::OnHover(int16_t x, int16_t y)
 }
 
 // ---------------------------------------------------------------------------
-// dwWcBuildButton (vtbl 0x51e418)
+// dwWcBuildButton (dwWcBuildButton_vtbl)
 // ---------------------------------------------------------------------------
 
-// Part-type bit sets by button id 1..6 (binary switch @406781).
+// Part-type bit sets by button id 1..6 (binary switch switchD).
 static const int dwWcBuildButton_aTypeBits[7] = { 0, 0x18a, 0x20, 0x14, 0x200, 0x1, 0x40 };
 
-// @406730 (dwWcBuildButton_Ctor)
+// dwWcBuildButton_Ctor
 dwWcBuildButton::dwWcBuildButton(char* pName, dwRect* pRect)
     : dwGuiButton(pName, pRect)
 {
 }
 
-// (scalar-deleting dtor = shared COMDAT dwWcButton_DtorDelete @406870)
+// (scalar-deleting dtor = shared COMDAT dwWcButton_DtorDelete)
 dwWcBuildButton::~dwWcBuildButton()
 {
 }
 
-// vtbl +0x48 @406770 (recovered fn)
+// vtbl +0x48 dwWcBuildButton_OnButtonPressed (recovered fn)
 void dwWcBuildButton::OnButtonPressed(int buttonId)
 {
     dwWidgetMsg msg;
@@ -1732,7 +1720,7 @@ void dwWcBuildButton::OnButtonPressed(int buttonId)
     this->Invalidate();
 }
 
-// vtbl +0x4c @406810 (recovered fn)
+// vtbl +0x4c dwWcBuildButton_OnButtonReleased (recovered fn)
 void dwWcBuildButton::OnButtonReleased(int buttonId)
 {
     dwWidgetMsg msg;
@@ -1746,7 +1734,7 @@ void dwWcBuildButton::OnButtonReleased(int buttonId)
     this->Invalidate();
 }
 
-// vtbl +0x1c @406750 (recovered fn) — the fly-out closed: unlatch.
+// vtbl +0x1c dwWcBuildButton_OnMessage (recovered fn) — the fly-out closed: unlatch.
 int dwWcBuildButton::OnMessage(dwWidgetMsg* pMsg)
 {
     if (pMsg->code == 0x7e6)
@@ -1754,7 +1742,7 @@ int dwWcBuildButton::OnMessage(dwWidgetMsg* pMsg)
     return 0;
 }
 
-// vtbl +0x18 @406f10 (recovered fn)
+// vtbl +0x18 dwWcBuildButton_OnHover (recovered fn)
 int dwWcBuildButton::OnHover(int16_t x, int16_t y)
 {
     dwWidgetMsg msg;
@@ -1773,21 +1761,21 @@ int dwWcBuildButton::OnHover(int16_t x, int16_t y)
 }
 
 // ---------------------------------------------------------------------------
-// dwWcPaintButton (vtbl 0x51e468)
+// dwWcPaintButton (dwWcPaintButton_vtbl)
 // ---------------------------------------------------------------------------
 
-// @406850 (dwWcPaintButton_Ctor)
+// dwWcPaintButton_Ctor
 dwWcPaintButton::dwWcPaintButton(dwRect* pRect)
     : dwGuiButton((char*)"wcpaint", pRect)
 {
 }
 
-// (scalar-deleting dtor = shared COMDAT dwWcButton_DtorDelete @406870)
+// (scalar-deleting dtor = shared COMDAT dwWcButton_DtorDelete)
 dwWcPaintButton::~dwWcPaintButton()
 {
 }
 
-// vtbl +0x48 @4068c0 (recovered fn)
+// vtbl +0x48 dwWcPaintButton_OnButtonPressed (recovered fn)
 void dwWcPaintButton::OnButtonPressed(int buttonId)
 {
     dwWidgetMsg msg;
@@ -1801,7 +1789,7 @@ void dwWcPaintButton::OnButtonPressed(int buttonId)
     this->Invalidate();
 }
 
-// vtbl +0x4c @406910 (recovered fn)
+// vtbl +0x4c dwWcPaintButton_OnButtonReleased (recovered fn)
 void dwWcPaintButton::OnButtonReleased(int buttonId)
 {
     dwWidgetMsg msg;
@@ -1815,7 +1803,7 @@ void dwWcPaintButton::OnButtonReleased(int buttonId)
     this->Invalidate();
 }
 
-// vtbl +0x1c @406890 (recovered fn) — a { 0x7d3, 0 } deselect while a color
+// vtbl +0x1c dwWcPaintButton_OnMessage (recovered fn) — a { 0x7d3, 0 } deselect while a color
 // is latched unlatches it.
 int dwWcPaintButton::OnMessage(dwWidgetMsg* pMsg)
 {
@@ -1824,7 +1812,7 @@ int dwWcPaintButton::OnMessage(dwWidgetMsg* pMsg)
     return 0;
 }
 
-// vtbl +0x18 @406f70 (recovered fn)
+// vtbl +0x18 dwWcPaintButton_OnHover (recovered fn)
 int dwWcPaintButton::OnHover(int16_t x, int16_t y)
 {
     dwWidgetMsg msg;
@@ -1843,7 +1831,7 @@ int dwWcPaintButton::OnHover(int16_t x, int16_t y)
 }
 
 // ---------------------------------------------------------------------------
-// dwWcBuildPaintButton (vtbl 0x5200a0; ctor inlined @43cbb1)
+// dwWcBuildPaintButton (dwWcBuildPaintButton_vtbl; ctor inlined)
 // ---------------------------------------------------------------------------
 
 // Binary: inline ctor in dwWorkshop_CreateControl (keyword "BUILD/PAINT",
@@ -1858,7 +1846,7 @@ dwWcBuildPaintButton::~dwWcBuildPaintButton()
 {
 }
 
-// vtbl +0x48 @4065a0 (recovered fn) — button 1 = build (0x7e7), 2 = paint (0x7e8).
+// vtbl +0x48 dwWcBuildPaintButton_OnButtonPressed (recovered fn) — button 1 = build (0x7e7), 2 = paint (0x7e8).
 void dwWcBuildPaintButton::OnButtonPressed(int buttonId)
 {
     dwWidgetMsg msg;
@@ -1871,14 +1859,14 @@ void dwWcBuildPaintButton::OnButtonPressed(int buttonId)
     this->Invalidate();
 }
 
-// vtbl +0x4c @43cf30 (shared tiny body emitted in the dwWorkshop unit)
+// vtbl +0x4c dwWcCargoNormalButton_OnButtonReleased (shared tiny body emitted in the dwWorkshop unit)
 void dwWcBuildPaintButton::OnButtonReleased(int buttonId)
 {
     (void)buttonId;
     this->Invalidate();
 }
 
-// vtbl +0x18 @406e50 (recovered fn)
+// vtbl +0x18 dwWcBuildPaintButton_OnHover (recovered fn)
 int dwWcBuildPaintButton::OnHover(int16_t x, int16_t y)
 {
     dwWidgetMsg msg;
@@ -1896,7 +1884,7 @@ int dwWcBuildPaintButton::OnHover(int16_t x, int16_t y)
 }
 
 // ---------------------------------------------------------------------------
-// dwWcCargoNormalButton (vtbl 0x520050; ctor inlined @43cc17)
+// dwWcCargoNormalButton (dwWcCargoNormalButton_vtbl; ctor inlined)
 // ---------------------------------------------------------------------------
 
 // Binary: inline ctor in dwWorkshop_CreateControl (keyword "CARGO/NORMAL",
@@ -1915,7 +1903,7 @@ dwWcCargoNormalButton::~dwWcCargoNormalButton()
 {
 }
 
-// vtbl +0x48 @406630 (recovered fn) — the body-type switch, with a yes/no
+// vtbl +0x48 dwWcCargoNormalButton_OnButtonPressed (recovered fn) — the body-type switch, with a yes/no
 // confirmation when the workspace still has parts.
 void dwWcCargoNormalButton::OnButtonPressed(int buttonId)
 {
@@ -1941,7 +1929,7 @@ void dwWcCargoNormalButton::OnButtonPressed(int buttonId)
     if (confirmed)
     {
         msg.code = 0x7e4;
-        // Binary @4066b2: the button requests the OTHER body type (button 1
+        // Binary: the button requests the OTHER body type (button 1
         // asks for 2=cargo, matching its DLG_BUILDBIPED "switch to treads"
         // text) — the inverted 1:1 mapping here made the toggle ask for the
         // type already active, so the switch never happened (BUG 22).
@@ -1959,14 +1947,14 @@ void dwWcCargoNormalButton::OnButtonPressed(int buttonId)
     }
 }
 
-// vtbl +0x4c @43cf30 (shared tiny body)
+// vtbl +0x4c dwWcCargoNormalButton_OnButtonReleased (shared tiny body)
 void dwWcCargoNormalButton::OnButtonReleased(int buttonId)
 {
     (void)buttonId;
     this->Invalidate();
 }
 
-// vtbl +0x1c @4065f0 (recovered fn) — mirror an external body-type change
+// vtbl +0x1c dwWcCargoNormalButton_OnMessage (recovered fn) — mirror an external body-type change
 // into the shown frame (mode 2 shows frame 1 and vice versa — the frames
 // display the button that SWITCHES AWAY from the current type).
 int dwWcCargoNormalButton::OnMessage(dwWidgetMsg* pMsg)
@@ -1982,7 +1970,7 @@ int dwWcCargoNormalButton::OnMessage(dwWidgetMsg* pMsg)
     return 0;
 }
 
-// vtbl +0x18 @406eb0 (recovered fn)
+// vtbl +0x18 dwWcCargoNormalButton_OnHover (recovered fn)
 int dwWcCargoNormalButton::OnHover(int16_t x, int16_t y)
 {
     dwWidgetMsg msg;

@@ -5,9 +5,9 @@
 // DW GUI (widget rects, font glyph clipping, image blits, dwDisplay dirty
 // rects).
 //
-// Ghidra (DroidWorks.exe): dwRect_ContainsPoint@0x406570 (COMDAT),
-// dwRect_Set@0x418850 (COMDAT), dwRect_Overlaps@0x444180,
-// dwRect_Clip@0x4441f0, dwRect_Union@0x444270 (the latter three live in the
+// Ghidra (DroidWorks.exe): dwRect_ContainsPoint (COMDAT),
+// dwRect_Set (COMDAT), dwRect_Overlaps,
+// dwRect_Clip, dwRect_Union (the latter three live in the
 // dwDisplay unit's range and feed its dirty-rect list).
 
 #include "Dw/dwTypes.h"

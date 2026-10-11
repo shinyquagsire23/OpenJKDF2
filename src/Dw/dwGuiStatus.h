@@ -4,9 +4,9 @@
 // dwGuiStatus — the mission STATUS / debriefing SCREEN ("Status"), plus the
 // shared dwGuiPicture control that COMDAT-tails this unit.
 //
-// Decompiled from DroidWorks.exe, unit range 0x434d50-0x436d7f. dwGuiStatus
-// @0x434d50 (primary vtbl 0x51fa80 / segment vtbl 0x51fa68); dwGuiPicture
-// @0x4365d0 (vtbl 0x51fad0) lives at the tail and is reused by dwRef /
+// Decompiled from DroidWorks.exe. dwGuiStatus
+// (primary dwGuiStatus_vtbl / segment dwGuiStatus_scn_vtbl); dwGuiPicture
+// (dwGuiPicture_vtbl) lives at the tail and is reused by dwRef /
 // dwGuiStatus / dwGuiReference.
 //
 // dwGuiStatus shows the player's mission result: rank progression icons, the
@@ -71,7 +71,7 @@ struct dwImage; // Dw/dwImage.h
 // ---- dwGuiPicture ----------------------------------------------------------
 //
 // Binary: dwWidgetGroup base @0x00 (0x14) + fields below — sizeof 0x2c.
-// vtable @0x51fad0.
+// dwGuiPicture_vtbl.
 
 // One id->image entry (binary 0x10, no vptr).
 struct dwGuiPictureItem
@@ -92,33 +92,33 @@ struct dwGuiPicture : dwWidgetGroup
     int16_t posY;        // 0x1e (Ghidra: field1e): ctor posPair.y
     dwString imageName;  // 0x20: current image's name
 
-    // @4365d0 (dwGuiPicture_Ctor) — dwWidgetGroup(pRect); imageName =
+    // dwGuiPicture_Ctor — dwWidgetGroup(pRect); imageName =
     // pImageName; EnsureLoaded. posPair packs an (x,y) short pair. (Ghidra
     // mislabeled the rect arg "pParent"; every caller passes a rect.)
     dwGuiPicture(dwRect* pRect, const char* pImageName, int32_t posPair);
 
-    // @436690 (dwGuiPicture_Dtor; scalar-deleting wrapper @436670) — FreeImage
+    // dwGuiPicture_Dtor (scalar-deleting wrapper dwGuiPicture_DtorDelete) — FreeImage
     // + delete every item; the base group dtor deletes the caption children.
     virtual ~dwGuiPicture();
 
-    // vtbl +0x18 @436b60 — hover consume (returns 1).
+    // vtbl +0x18 dwGuiPicture_OnHover — hover consume (returns 1).
     virtual int OnHover(int16_t x, int16_t y);
-    // vtbl +0x1c @4368c0 — match pMsg->code to an item id -> swap the image;
+    // vtbl +0x1c dwGuiPicture_OnMessage — match pMsg->code to an item id -> swap the image;
     // then forward to the caption children (dwWidgetGroup::OnMessage).
     virtual int OnMessage(dwWidgetMsg* pMsg);
-    // vtbl +0x3c @436bd0 (EnsureLoaded) — lazily load pImage, then broadcast.
+    // vtbl +0x3c EnsureLoaded — lazily load pImage, then broadcast.
     virtual void EnsureImages();
-    // vtbl +0x40 @436c00 (FreeImage) — delete pImage, then broadcast.
+    // vtbl +0x40 FreeImage — delete pImage, then broadcast.
     virtual void FreeImages();
-    // vtbl +0x44 @436b90 — EnsureImages, blit pImage at (left,top), draw captions.
+    // vtbl +0x44 dwGuiPicture_Draw — EnsureImages, blit pImage at (left,top), draw captions.
     virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect);
 
     // -- non-virtual methods --------------------------------------------------
-    // @436960 — append a {pImageName, id} entry to the set.
+    // append a {pImageName, id} entry to the set.
     void AddImage(char* pImageName, uint32_t id);
-    // @436a00 — spawn a dwGuiHypText caption child at (left+x, top+y).
+    // spawn a dwGuiHypText caption child at (left+x, top+y).
     void AddText(char* pText, int x, int y, int color, char* pFont);
-    // @436ae0 — swap the shown image to the entry whose id == id.
+    // swap the shown image to the entry whose id == id.
     void SelectById(int id);
 };
 
@@ -131,7 +131,7 @@ dwWidget* dwGuiPicture_New(dwRect* pRect, const char* pImgName, int posPair);
 // ---- dwGuiStatus ------------------------------------------------------------
 //
 // Binary: dwGuiScreen base @0x00 (0xc8) + own fields below — sizeof ~0x138.
-// Field offsets reconciled to obj+0. Primary vtbl 0x51fa80, segment 0x51fa68.
+// Field offsets reconciled to obj+0. Primary dwGuiStatus_vtbl, segment dwGuiStatus_scn_vtbl.
 
 struct dwGuiStatus : dwGuiScreen
 {
@@ -157,29 +157,29 @@ struct dwGuiStatus : dwGuiScreen
     float healthPct;          // 0x130: DAMAGE gauge fill (ctor arg 3)
     int32_t chargeMax;        // 0x134: CLOCK elapsed-seconds seed (ctor arg 4)
 
-    // @434d50 (dwGuiStatus_Ctor) — dwGuiScreen("Status", NULL); savedRank/
+    // dwGuiStatus_Ctor — dwGuiScreen("Status", NULL); savedRank/
     // altRank seeded from pContext->rank; stat pointers zeroed.
     dwGuiStatus(dwMission* pContext, float itemPct, float healthPct, int chargeMax);
 
-    // @434ee0 (dwGuiStatus_Dtor; scalar-deleting wrapper @434ec0; segment
-    // thunk @4365c0) — FreeImages, delete pGroup + its children, free the two
+    // dwGuiStatus_Dtor (scalar-deleting wrapper dwGuiStatus_DtorDelete; segment
+    // thunk dwGuiStatus_ScnDtorThunk) — FreeImages, delete pGroup + its children, free the two
     // strings; the base dtor tears down the rest.
     virtual ~dwGuiStatus();
 
-    // ---- primary vtbl (0x51fa80) overrides ---------------------------------
-    virtual void Update(float dt);                 // +0x14 @436400 — text blink timer
-    virtual int OnMessage(dwWidgetMsg* pMsg);      // +0x1c @435180 — 30000 stop speech / 0x96 dismiss
-    virtual void EnsureImages();                   // +0x3c @436520 (EnsureLoaded)
-    virtual void FreeImages();                     // +0x40 @436570
-    virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect); // +0x44 @436480 — rank icon centered
-    virtual dwWidget* CreateControl(char* pKeyword, dwConfFile* pConf); // +0x48 @4352e0
+    // ---- primary vtbl (dwGuiStatus_vtbl) overrides ---------------------------------
+    virtual void Update(float dt);                 // +0x14 dwGuiStatus_Update — text blink timer
+    virtual int OnMessage(dwWidgetMsg* pMsg);      // +0x1c dwGuiStatus_OnMessage — 30000 stop speech / 0x96 dismiss
+    virtual void EnsureImages();                   // +0x3c EnsureLoaded
+    virtual void FreeImages();                     // +0x40 dwGuiStatus_FreeImages
+    virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect); // +0x44 dwGuiStatus_Draw — rank icon centered
+    virtual dwWidget* CreateControl(char* pKeyword, dwConfFile* pConf); // +0x48 dwGuiStatus_CreateControl
 
-    // ---- segment vtbl (0x51fa68) overrides ---------------------------------
-    virtual int Activate();    // +0x00 @434ff0 — layout rank rects + BuildControls once
-    virtual void Deactivate(); // +0x04 @435120 — stop speech + SavePlr
+    // ---- segment vtbl (dwGuiStatus_scn_vtbl) overrides ---------------------------------
+    virtual int Activate();    // +0x00 dwGuiStatus_OnActivate — layout rank rects + BuildControls once
+    virtual void Deactivate(); // +0x04 dwGuiStatus_OnDeactivate — stop speech + SavePlr
 
     // ---- non-virtual --------------------------------------------------------
-    // @4356f0 — build the per-goal typewriter lines + rank name/icon + reward
+    // build the per-goal typewriter lines + rank name/icon + reward
     // preview + the mission-progression achievement state machine.
     void BuildControls();
 };

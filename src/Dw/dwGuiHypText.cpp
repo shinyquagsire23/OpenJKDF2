@@ -2,12 +2,12 @@
 // dwGuiHypText (+ its inline animation elements T/S/W and the ten stock
 // format callbacks) and the dwGuiPartText (PARTTEXT) subclass.
 //
-// Decompiled from DroidWorks.exe range 0x437d60-0x439150 (callbacks
-// 0x437d60-0x438140, elements 0x438150-0x43853x, dwGuiHypText
-// 0x438540-0x43904x, dwGuiPartText 0x439050-0x439150). vtables:
-// dwGuiHypText_vtbl @0x51fc00 (19 slots: dwWidget's 18 + the new +0x48
-// SetText), dwGuiPartText_vtbl @0x51fc50, elements @0x51fbb0/0x51fbe0/
-// 0x51fbf0 (3 slots each). See Dw/dwGuiHypText.h for the class map.
+// Decompiled from DroidWorks.exe (callbacks,
+// elements, dwGuiHypText,
+// dwGuiPartText). vtables:
+// dwGuiHypText_vtbl (19 slots: dwWidget's 18 + the new +0x48
+// SetText), dwGuiPartText_vtbl, elements dwGuiHypText_ElemT_vtbl/dwGuiHypText_ElemS_vtbl/
+// (3 slots each). See Dw/dwGuiHypText.h for the class map.
 //
 // Translation notes:
 //  - The line-run ring is hand-rolled (dwGuiHypTextRun) because the binary's
@@ -87,7 +87,7 @@ static void dwGuiHypText_FreeRunNodes(dwGuiHypTextRun* pSentinel)
 
 // ---- stock format callbacks -------------------------------------------------
 
-// @437d60 (dwGuiHypText_WrapNone) — the whole string (embedded '\n' and all)
+// dwGuiHypText_WrapNone — the whole string (embedded '\n' and all)
 // as ONE run; the width parameter is ignored.
 void dwGuiHypText_WrapNone(dwString* pText, dwFont* pFont, int width, dwGuiHypTextRun** ppRuns)
 {
@@ -95,7 +95,7 @@ void dwGuiHypText_WrapNone(dwString* pText, dwFont* pFont, int width, dwGuiHypTe
     dwGuiHypText_AppendRun(ppRuns, pText->pBuffer, (int)pText->length, pFont);
 }
 
-// @437de0 (dwGuiHypText_WrapWords) — greedy word wrap: accumulate glyph
+// dwGuiHypText_WrapWords — greedy word wrap: accumulate glyph
 // widths until the line overflows (or '\n'/NUL), back up to the previous
 // whitespace (a single over-long word at line start is instead extended to
 // the next whitespace), emit the run, skip the inter-word whitespace.
@@ -169,26 +169,23 @@ emit_run:
     }
 }
 
-// @437f10
 void dwGuiHypText_HAlignLeft(dwGuiHypTextRun* pRun, int width)
 {
     (void)width;
     pRun->xOffset = 0;
 }
 
-// @437f20
 void dwGuiHypText_HAlignRight(dwGuiHypTextRun* pRun, int width)
 {
     pRun->xOffset = (int16_t)((int16_t)width - (int16_t)pRun->width);
 }
 
-// @437f40 — 16-bit difference, then a signed integer halving.
+// 16-bit difference, then a signed integer halving.
 void dwGuiHypText_HAlignCenter(dwGuiHypTextRun* pRun, int width)
 {
     pRun->xOffset = (int16_t)((int16_t)((int16_t)width - (int16_t)pRun->width) / 2);
 }
 
-// @437f60
 int dwGuiHypText_VAlignTop(dwGuiHypTextRun** ppRuns, dwFont* pFont, dwRect* pRect)
 {
     (void)ppRuns;
@@ -197,7 +194,7 @@ int dwGuiHypText_VAlignTop(dwGuiHypTextRun** ppRuns, dwFont* pFont, dwRect* pRec
     return 0;
 }
 
-// @437f90 — rect height minus (line height x run count). Note: only the low
+// rect height minus (line height x run count). Note: only the low
 // 16 bits of the return are meaningful (the binary leaves garbage above
 // them; both consumers truncate to short).
 int dwGuiHypText_VAlignBottom(dwGuiHypTextRun** ppRuns, dwFont* pFont, dwRect* pRect)
@@ -215,13 +212,12 @@ int dwGuiHypText_VAlignBottom(dwGuiHypTextRun** ppRuns, dwFont* pFont, dwRect* p
     return (int16_t)(pRect->bottom - pRect->top) - totalHeight;
 }
 
-// @437f70
 int dwGuiHypText_VAlignCenter(dwGuiHypTextRun** ppRuns, dwFont* pFont, dwRect* pRect)
 {
     return (int16_t)dwGuiHypText_VAlignBottom(ppRuns, pFont, pRect) / 2;
 }
 
-// @437fe0 (dwGuiHypText_DrawGlyphsNormal) — draw drawLen glyphs starting at
+// dwGuiHypText_DrawGlyphsNormal — draw drawLen glyphs starting at
 // pStr + startChar; *pPos is advanced per glyph by dwFont.
 void dwGuiHypText_DrawGlyphsNormal(dwImageBits* pBits, dwPoint* pPos, dwFont* pFont, uint8_t color, dwGuiHypTextRun* pRun, dwRect* pClip)
 {
@@ -239,7 +235,7 @@ void dwGuiHypText_DrawGlyphsNormal(dwImageBits* pBits, dwPoint* pPos, dwFont* pF
     }
 }
 
-// @438070 (dwGuiHypText_DrawGlyphsShadow) — per glyph, first a shadow copy
+// dwGuiHypText_DrawGlyphsShadow — per glyph, first a shadow copy
 // offset (+1,+1) in the colormap's transparent/black index, then the normal
 // glyph on top (both positions advance in step).
 void dwGuiHypText_DrawGlyphsShadow(dwImageBits* pBits, dwPoint* pPos, dwFont* pFont, uint8_t color, dwGuiHypTextRun* pRun, dwRect* pClip)
@@ -270,13 +266,13 @@ void dwGuiHypText_DrawGlyphsShadow(dwImageBits* pBits, dwPoint* pPos, dwFont* pF
 
 // ---- inline elements ---------------------------------------------------------
 
-// @438170 (dwGuiHypText_Elem_DtorDelete — the scalar-deleting dtor shared by
+// (dwGuiHypText_Elem_DtorDelete — the scalar-deleting dtor shared by
 // all three element vtables; the base dtor body is empty).
 dwGuiHypTextElem::~dwGuiHypTextElem()
 {
 }
 
-// @438150 (dwGuiHypText_ElemT_Ctor)
+// dwGuiHypText_ElemT_Ctor
 dwGuiHypText_ElemT::dwGuiHypText_ElemT(float revealDuration)
 {
     this->revealDuration = revealDuration;
@@ -285,7 +281,7 @@ dwGuiHypText_ElemT::dwGuiHypText_ElemT(float revealDuration)
     this->curReveal = 0;
 }
 
-// vtbl +0x04 @438190 (dwGuiHypText_ElemT_Update) — reveal
+// vtbl +0x04 dwGuiHypText_ElemT_Update — reveal
 // round(totalLen * min(accumTime / revealDuration, 1)) chars, distributed
 // front-to-back across the runs; repaint only when the count changes.
 void dwGuiHypText_ElemT::Update(dwGuiHypText* pOwner, float dt, dwGuiHypTextRun** ppRuns)
@@ -324,7 +320,7 @@ void dwGuiHypText_ElemT::Update(dwGuiHypText* pOwner, float dt, dwGuiHypTextRun*
     }
 }
 
-// vtbl +0x08 @438250 (dwGuiHypText_ElemT_Layout) — restart the reveal:
+// vtbl +0x08 dwGuiHypText_ElemT_Layout — restart the reveal:
 // nothing drawn, totalLen re-summed from the fresh runs.
 void dwGuiHypText_ElemT::Layout(dwGuiHypText* pOwner, dwGuiHypTextRun** ppRuns, dwFont* pFont)
 {
@@ -344,7 +340,7 @@ void dwGuiHypText_ElemT::Layout(dwGuiHypText* pOwner, dwGuiHypTextRun** ppRuns, 
     }
 }
 
-// @4382b0 (dwGuiHypText_ElemS_Ctor)
+// dwGuiHypText_ElemS_Ctor
 dwGuiHypText_ElemS::dwGuiHypText_ElemS(float speed)
 {
     this->accumTime = 0.0f;
@@ -352,7 +348,7 @@ dwGuiHypText_ElemS::dwGuiHypText_ElemS(float speed)
     this->totalWidth = 0;
 }
 
-// vtbl +0x04 @4382d0 (dwGuiHypText_ElemS_Update) — marquee: shift every
+// vtbl +0x04 dwGuiHypText_ElemS_Update — marquee: shift every
 // run's drawX by round(speed * accumTime) px from the off-screen start edge
 // (right edge when scrolling left, -totalWidth when scrolling right); once
 // fully off the far side, Clear() the owner's text.
@@ -390,7 +386,7 @@ void dwGuiHypText_ElemS::Update(dwGuiHypText* pOwner, float dt, dwGuiHypTextRun*
     pOwner->Invalidate();
 }
 
-// vtbl +0x08 @4383b0 (dwGuiHypText_ElemS_Layout) — restart the scroll;
+// vtbl +0x08 dwGuiHypText_ElemS_Layout — restart the scroll;
 // totalWidth = the widest run's pixel width.
 void dwGuiHypText_ElemS::Layout(dwGuiHypText* pOwner, dwGuiHypTextRun** ppRuns, dwFont* pFont)
 {
@@ -409,14 +405,14 @@ void dwGuiHypText_ElemS::Layout(dwGuiHypText* pOwner, dwGuiHypTextRun** ppRuns, 
     }
 }
 
-// @438400 (dwGuiHypText_ElemW_Ctor)
+// dwGuiHypText_ElemW_Ctor
 dwGuiHypText_ElemW::dwGuiHypText_ElemW(float wipeDuration)
 {
     this->accumTime = 0.0f;
     this->wipeDuration = wipeDuration;
 }
 
-// vtbl +0x04 @438420 (dwGuiHypText_ElemW_Update) — reveal wipe: while the
+// vtbl +0x04 dwGuiHypText_ElemW_Update — reveal wipe: while the
 // owner's layoutRect has not reached the widget rect, grow it from the
 // widget's top-left by accumTime/wipeDuration of the full size (truncating
 // __ftol, no rounding bias here), clamped to the widget extent.
@@ -445,7 +441,7 @@ void dwGuiHypText_ElemW::Update(dwGuiHypText* pOwner, float dt, dwGuiHypTextRun*
     }
 }
 
-// vtbl +0x08 @438500 (dwGuiHypText_ElemW_Layout) — restart the wipe: zero
+// vtbl +0x08 dwGuiHypText_ElemW_Layout — restart the wipe: zero
 // the owner's layout/clip rect entirely (the first Update tick snaps
 // left/top back onto the widget rect).
 void dwGuiHypText_ElemW::Layout(dwGuiHypText* pOwner, dwGuiHypTextRun** ppRuns, dwFont* pFont)
@@ -468,8 +464,8 @@ void dwGuiHypText_ElemW::Layout(dwGuiHypText* pOwner, dwGuiHypTextRun** ppRuns, 
 //   allocation failed — unreachable with new (noted, same as other units).
 // - yOffset is left uninitialized by the binary until Layout(); zeroed here.
 
-// @438690 (dwGuiHypText_Ctor) — defaults + "<format>" code-string parse.
-// Grammar (verified against the disassembly, constants @0x51fbc0-0x51fbdc):
+// dwGuiHypText_Ctor — defaults + "<format>" code-string parse.
+// Grammar (verified against the disassembly, constants):
 // a decimal literal accumulates into a float (integer digits via
 // acc = digit - acc * -10.0; fractional digits via acc += digit * scale,
 // scale *= 0.1 after a '.'; '-' TOGGLES the pending sign, which is re-applied
@@ -598,7 +594,7 @@ dwGuiHypText::dwGuiHypText(dwRect* pRect, void* pNotify, char* pFontName, uint8_
     }
 }
 
-// @438540 (dwGuiHypText_CtorEx) — callback-injection ctor for the CtorEx
+// dwGuiHypText_CtorEx — callback-injection ctor for the CtorEx
 // family subclasses (dwGuiTextBlock/dwGuiSpeech/dwGuiBriefLine, later
 // units); no format parse, one optional pre-built element appended.
 dwGuiHypText::dwGuiHypText(dwRect* pRect, void* pNotify, char* pFontName, uint8_t color,
@@ -626,7 +622,7 @@ dwGuiHypText::dwGuiHypText(dwRect* pRect, void* pNotify, char* pFontName, uint8_
         this->elements.InsertAfter(this->elements.pSentinel->pPrev, pElem);
 }
 
-// @438ac0 (dwGuiHypText_Dtor; scalar-deleting wrapper @438670)
+// dwGuiHypText_Dtor (scalar-deleting wrapper dwGuiHypText_DtorDelete)
 dwGuiHypText::~dwGuiHypText()
 {
     dwListNode* pNode;
@@ -635,7 +631,7 @@ dwGuiHypText::~dwGuiHypText()
 
     if (this->pFont != NULL)
     {
-        // @504190: the binary's dwFont handle "dtor" is a lone RET (the
+        // the binary's dwFont handle "dtor" is a lone RET (the
         // glyph block is owned by the dwFont cache) — only the handle
         // allocation is released.
         delete this->pFont;
@@ -663,7 +659,7 @@ dwGuiHypText::~dwGuiHypText()
     // (dwWidget base dtor implicit)
 }
 
-// vtbl +0x14 @438c20 (dwGuiHypText_Update) — tick every element (they
+// vtbl +0x14 dwGuiHypText_Update — tick every element (they
 // Invalidate the owner themselves when something moved).
 void dwGuiHypText::Update(float dt)
 {
@@ -679,7 +675,7 @@ void dwGuiHypText::Update(float dt)
     }
 }
 
-// vtbl +0x18 @438f10 (recovered fn; Ghidra: dwGuiHypText_sub_438F10) —
+// vtbl +0x18 (recovered fn; Ghidra: dwGuiHypText_sub_438F10) —
 // guarded hover notify: only when a pNotify payload was given, dispatch
 // { 0x7531, pNotify, 0, NULL } to dwWidget_pDefault and report handled.
 int dwGuiHypText::OnHover(int16_t x, int16_t y)
@@ -691,7 +687,7 @@ int dwGuiHypText::OnHover(int16_t x, int16_t y)
     return this->OnHoverNotify(this->pNotify); // dispatches + returns 1
 }
 
-// vtbl +0x44 @438e20 (dwGuiHypText_Draw)
+// vtbl +0x44 dwGuiHypText_Draw
 void dwGuiHypText::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     dwGuiHypTextRun* pRun;
@@ -716,7 +712,7 @@ void dwGuiHypText::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
     }
 }
 
-// vtbl +0x48 @438cf0 (dwGuiHypText_SetText) — NEW virtual. Quirk preserved:
+// vtbl +0x48 dwGuiHypText_SetText — NEW virtual. Quirk preserved:
 // the new text is APPENDED to the current buffer when it differs (callers
 // that want a replace Free() the string first — dwGuiPartText, the
 // dwGuiAnimView caption builder).
@@ -729,7 +725,7 @@ void dwGuiHypText::SetText(char* pText)
     }
 }
 
-// @438c80 (dwGuiHypText_Clear) — drop the text and the line runs (element
+// dwGuiHypText_Clear — drop the text and the line runs (element
 // state untouched — a following Layout() resets it), repaint.
 void dwGuiHypText::Clear()
 {
@@ -738,7 +734,7 @@ void dwGuiHypText::Clear()
     this->Invalidate(); // vtbl +0x34
 }
 
-// @438d20 (dwGuiHypText_Layout) — full reflow.
+// dwGuiHypText_Layout — full reflow.
 void dwGuiHypText::Layout()
 {
     dwGuiHypTextRun* pRun;
@@ -772,7 +768,7 @@ void dwGuiHypText::Layout()
 
 // ---- dwGuiPartText --------------------------------------------------------------
 
-// @439050 (dwGuiPartText_Ctor)
+// dwGuiPartText_Ctor
 dwGuiPartText::dwGuiPartText(dwRect* pRect, void* pNotify, char* pFontName, uint8_t color,
                              char* pFormat, void* pSourcePart)
     : dwGuiHypText(pRect, pNotify, pFontName, color, pFormat)
@@ -787,13 +783,13 @@ dwGuiPartText::dwGuiPartText(dwRect* pRect, void* pNotify, char* pFontName, uint
     }
 }
 
-// @4390f0 (dwGuiPartText_Dtor; scalar-deleting wrapper @4390d0) — vptr
+// dwGuiPartText_Dtor (scalar-deleting wrapper dwGuiPartText_DtorDelete) — vptr
 // re-point + base dtor only, both implicit here.
 dwGuiPartText::~dwGuiPartText()
 {
 }
 
-// vtbl +0x1c @439100 (dwGuiPartText_OnMessage) — part-selection broadcast.
+// vtbl +0x1c dwGuiPartText_OnMessage — part-selection broadcast.
 // Always returns 0 (the binary returns with the low byte cleared, so the
 // message keeps broadcasting).
 int dwGuiPartText::OnMessage(dwWidgetMsg* pMsg)

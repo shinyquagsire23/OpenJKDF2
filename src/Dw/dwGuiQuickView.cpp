@@ -1,13 +1,13 @@
 // dwGuiQuickView — the DroidWorks 3D droid-model preview widget, plus its
 // dwGuiDroidPreview subclass. See dwGuiQuickView.h for the layout / slot map.
 //
-// Decompiled from DroidWorks.exe, unit range 0x429a80-0x42a5xx.
+// Decompiled from DroidWorks.exe.
 //
 // Engine-call mapping (DW-binary label -> repo):
 //   stdBitmapRle_FUN_00444d00 -> dwWidget_DispatchMsg
 //   DAT_005542cc              -> rdCamera_g_pCurCamera
 //   stdDisplay_FUN_004fe010   -> stdDisplay_VBufferFill (canvas->d3d_vbuf)
-//   rd_FUN_0047ebd0/0047ebf0  -> rdAdvanceFrame / rdFinishFrame
+//   rd_FUN_0047ebd0/rd_FUN_0047ebf0  -> rdAdvanceFrame / rdFinishFrame
 //   idk_alloc(0xc)            -> malloc(sizeof(dwListNode))  (list sentinel/node)
 //   stdPlatform_FreeHandle    -> free / delete (per the freed object)
 //
@@ -38,7 +38,7 @@ extern "C" {
 
 #include <stdlib.h> // malloc/free
 
-// dw-core workspace part-node list sentinel @0x53d984 (owner: dwMain, P7).
+// dw-core workspace part-node list sentinel dwCore_pWorkspaceNodes (owner: dwMain, P7).
 // TODO(dw-decomp): provided by dwMain.
 extern "C" dwListNode* dwCore_pWorkspaceNodes;
 
@@ -59,7 +59,7 @@ static void dwGuiQuickView_ClearNodes(dwListNode* pSentinel)
 
 // ================================ dwGuiQuickView ================================
 
-// @429c90 (Ghidra: dwGuiQuickView_Ctor). Lights follow the view.
+// (Ghidra: dwGuiQuickView_Ctor). Lights follow the view.
 dwGuiQuickView::dwGuiQuickView(dwRect* pRect)
     : dwGuiViewBox(pRect, 1), name(), rotTimer(0.0f), pNodes(NULL)
 {
@@ -70,7 +70,7 @@ dwGuiQuickView::dwGuiQuickView(dwRect* pRect)
     this->LayoutNodes();
 }
 
-// @429d50 (Ghidra: dwGuiQuickView_Dtor; DtorDelete @429d30).
+// (Ghidra: dwGuiQuickView_Dtor; dwGuiQuickView_DtorDelete).
 dwGuiQuickView::~dwGuiQuickView()
 {
     dwGuiQuickView_ClearNodes(this->pNodes);
@@ -79,7 +79,7 @@ dwGuiQuickView::~dwGuiQuickView()
     // (base dtor runs automatically)
 }
 
-// @429e80 (Ghidra: dwGuiQuickView_Update) — vtbl +0x14. Auto-rotate: broadcast
+// (Ghidra: dwGuiQuickView_Update) — vtbl +0x14. Auto-rotate: broadcast
 // a set-pitch message with the accumulated angle to the active screen.
 void dwGuiQuickView::Update(float dt)
 {
@@ -94,13 +94,13 @@ void dwGuiQuickView::Update(float dt)
     dwWidget_DispatchMsg(&msg, NULL);
 }
 
-// @42a510 (Ghidra: dwGuiQuickView_OnHover) — vtbl +0x18.
+// (Ghidra: dwGuiQuickView_OnHover) — vtbl +0x18.
 int dwGuiQuickView::OnHover(int16_t /*x*/, int16_t /*y*/)
 {
     return this->OnHoverNotify((void*)0x7922);
 }
 
-// @429ee0 (Ghidra: dwGuiQuickView_OnMessage) — vtbl +0x1c.
+// (Ghidra: dwGuiQuickView_OnMessage) — vtbl +0x1c.
 int dwGuiQuickView::OnMessage(dwWidgetMsg* pMsg)
 {
     uint32_t code = (uint32_t)pMsg->code;
@@ -188,10 +188,10 @@ int dwGuiQuickView::OnMessage(dwWidgetMsg* pMsg)
     return this->dwGuiViewBox::OnMessage(pMsg);
 }
 
-// @42a260 (Ghidra: dwGuiQuickView_Draw) — vtbl +0x44.
+// (Ghidra: dwGuiQuickView_Draw) — vtbl +0x44.
 void dwGuiQuickView::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
-    this->dwGui3DView::Draw(pDestBits, pClipRect); // camera bring-up (binary CALL 0x43b2b0)
+    this->dwGui3DView::Draw(pDestBits, pClipRect); // camera bring-up (binary CALL)
 
     // Added: software-renderer bracket (shared — without it the geometry takes
     // the GL path and the preview renders nothing).
@@ -212,7 +212,7 @@ void dwGuiQuickView::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
     dwGui3DView_EndSwRender(pSwCanvas, swSavedAccel);
 }
 
-// @42a320 (Ghidra: dwGuiQuickView_LayoutNodes).
+// (Ghidra: dwGuiQuickView_LayoutNodes).
 void dwGuiQuickView::LayoutNodes()
 {
     dwListNode* pSentinel = this->pNodes;
@@ -248,7 +248,7 @@ void dwGuiQuickView::LayoutNodes()
 
 // =============================== dwGuiDroidPreview ==============================
 
-// @429a80 (Ghidra: dwGuiDroidPreview_Ctor).
+// (Ghidra: dwGuiDroidPreview_Ctor).
 dwGuiDroidPreview::dwGuiDroidPreview(dwRect* pRect, dwPart* pBlueprint)
     : dwGuiQuickView(pRect)
 {
@@ -261,18 +261,18 @@ dwGuiDroidPreview::dwGuiDroidPreview(dwRect* pRect, dwPart* pBlueprint)
     }
 }
 
-// @429b30 (Ghidra: dwGuiDroidPreview_Dtor; DtorDelete @429b10) — base dtor only.
+// (Ghidra: dwGuiDroidPreview_Dtor; dwGuiDroidPreview_DtorDelete) — base dtor only.
 dwGuiDroidPreview::~dwGuiDroidPreview()
 {
 }
 
-// @429c60 (Ghidra: dwGuiDroidPreview_OnHover) — vtbl +0x18.
+// (Ghidra: dwGuiDroidPreview_OnHover) — vtbl +0x18.
 int dwGuiDroidPreview::OnHover(int16_t /*x*/, int16_t /*y*/)
 {
     return this->OnHoverNotify((void*)0x7920);
 }
 
-// @429b40 (Ghidra: dwGuiDroidPreview_OnMessage) — vtbl +0x1c.
+// (Ghidra: dwGuiDroidPreview_OnMessage) — vtbl +0x1c.
 int dwGuiDroidPreview::OnMessage(dwWidgetMsg* pMsg)
 {
     if (pMsg->code == 0xbbc && pMsg->pSender != NULL)

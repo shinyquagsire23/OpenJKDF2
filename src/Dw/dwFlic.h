@@ -4,16 +4,16 @@
 // dwFlic — DroidWorks Autodesk FLC/FLI animation decoder (used by the dwAnim
 // widget player and the dwFlicSeg full-screen segments).
 //
-// Ghidra (DroidWorks.exe) unit 0x413c20-0x414e5f; the flic code proper is:
-//   dwFlic_Open@0x413cd0          dwFlic_Close@0x413d70
-//   dwFlic_DecodeFrame@0x413d90
+// Ghidra (DroidWorks.exe) unit; the flic code proper is:
+//   dwFlic_Open          dwFlic_Close
+//   dwFlic_DecodeFrame
 // plus the file-local chunk handlers (static in dwFlic.c):
-//   dwFlic_ChunkColor256@0x413f80  dwFlic_ChunkColor64@0x414060
-//   dwFlic_ChunkDeltaSS2@0x414160  dwFlic_ChunkDeltaLC@0x414640
-//   dwFlic_ChunkBlack@0x414900     dwFlic_ChunkBrun@0x414930
-//   dwFlic_ChunkCopy@0x414b80
-// (0x413c20-0x413c9x is dwGuiFindEntry — re-attributed to dwGuiFind — and
-// 0x414c20-0x414e50 is dw-core static ctor/dtor glue; neither lives here.)
+//   dwFlic_ChunkColor256  dwFlic_ChunkColor64
+//   dwFlic_ChunkDeltaSS2  dwFlic_ChunkDeltaLC
+//   dwFlic_ChunkBlack     dwFlic_ChunkBrun
+//   dwFlic_ChunkCopy
+// (is dwGuiFindEntry — re-attributed to dwGuiFind — and
+// is dw-core static ctor/dtor glue; neither lives here.)
 //
 // The decoder is standalone: all state lives in a caller-owned dwFlic
 // context (embedded in dwFlicSeg / stack-local in dwAnim_EnsureLoaded), so
@@ -76,17 +76,17 @@ typedef struct dwFlic
     uint8_t palette[768];      // 0x9e RGB888, updated in place by COLOR chunks
 } dwFlic;
 
-// @0x413cd0 — open pFilename ("rb" via dwMain_pHS, so the DW VFS/GOB shim
+// open pFilename ("rb" via dwMain_pHS, so the DW VFS/GOB shim
 // applies), read the 0x80-byte main header, seek to the first frame (FLC) or
 // force 320x200 (FLI). Quirks kept from the binary: ALWAYS returns 0, even
 // on open failure or unknown type (callers cannot detect failure); on an
 // unknown type the file is closed but pFile is left dangling (non-NULL).
 int dwFlic_Open(dwFlic* pThis, const char* pFilename);
 
-// @0x413d70 — close the file if open. pFile is not cleared (as original).
+// close the file if open. pFile is not cleared (as original).
 void dwFlic_Close(dwFlic* pThis);
 
-// @0x413d90 — decode the next frame into pTarget (8bpp). Returns 0xFFFF when
+// decode the next frame into pTarget (8bpp). Returns 0xFFFF when
 // all frames have been decoded, 1 on a non-0xF1FA frame header (file position
 // is NOT restored in that case — original behavior), 0 on success. Palette
 // chunks update pThis->palette even when pTarget is NULL (the caller pushes

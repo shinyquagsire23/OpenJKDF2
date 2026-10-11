@@ -4,7 +4,7 @@
 // dwGuiHypText — the DroidWorks base rich/hyperlinked-text control, plus its
 // PARTTEXT subclass:
 //
-//   dwGuiHypText   (0x48, vtbl 0x51fc00, ctors @438690/@438540) — dwWidget
+//   dwGuiHypText   (0x48, dwGuiHypText_vtbl, ctors dwGuiHypText_Ctor/dwGuiHypText_CtorEx) — dwWidget
 //                  subclass that word-wraps a dwString into a ring of "line
 //                  runs", aligns them through four pluggable format
 //                  callbacks (wrap / h-align / v-align / draw-glyphs) and
@@ -13,23 +13,23 @@
 //                    S = horizontal marquee scroll at px/sec,
 //                    W = rectangular reveal wipe over a duration.
 //                  The plain ctor parses a "<format>" code string (see the
-//                  grammar note on the ctor); the extended ctor (@438540,
+//                  grammar note on the ctor); the extended ctor (dwGuiHypText_CtorEx,
 //                  dwGuiHypText_CtorEx) takes the four callbacks + one
 //                  pre-built element directly (used by the dwGuiTextBlock /
 //                  dwGuiSpeech / dwGuiBriefLine family, later units).
-//   dwGuiPartText  (0x48, vtbl 0x51fc50, ctor @439050) — PARTTEXT control:
+//   dwGuiPartText  (0x48, dwGuiPartText_vtbl, ctor dwGuiPartText_Ctor) — PARTTEXT control:
 //                  direct subclass adding NO fields; overrides only the dtor
 //                  and OnMessage (msg 0xBBC -> shows the selected droid
 //                  part's display name).
 //
 // Element classes (3-slot vtables {DtorDelete, Update, Layout}):
-//   dwGuiHypText_ElemT (0x14, vtbl 0x51fbb0) / _ElemS (0x10, vtbl 0x51fbe0) /
-//   _ElemW (0x0c, vtbl 0x51fbf0); shared scalar-deleting dtor @438170.
+//   dwGuiHypText_ElemT (0x14, dwGuiHypText_ElemT_vtbl) / _ElemS (0x10, dwGuiHypText_ElemS_vtbl) /
+//   _ElemW (0x0c, dwGuiHypText_ElemW_vtbl); shared scalar-deleting dtor dwGuiHypText_Elem_DtorDelete.
 //   (dwGuiBriefTextElem, a later unit, is an ElemT alias.)
 //
-// Ghidra (DroidWorks.exe) range 0x437d60-0x439150: the ten stock format
-// callbacks (0x437d60-0x438140) + elements (0x438150-0x43853x) + dwGuiHypText
-// (0x438540-0x43904x) + dwGuiPartText (0x439050-0x439150). Verifiably C++
+// Ghidra (DroidWorks.exe): the ten stock format
+// callbacks + elements + dwGuiHypText
+// + dwGuiPartText. Verifiably C++
 // (vtables, ctor/dtor pairs, MSVC EH frames) -> C++ classes.
 //
 // No module statics — no dwGuiHypText_Startup needed (soft-reset rule).
@@ -101,21 +101,20 @@ typedef int (*dwGuiHypTextVAlignFn)(dwGuiHypTextRun** ppRuns, dwFont* pFont, dwR
 typedef void (*dwGuiHypTextDrawGlyphsFn)(dwImageBits* pBits, dwPoint* pPos, dwFont* pFont, uint8_t color, dwGuiHypTextRun* pRun, dwRect* pClip);
 
 // Stock callback implementations (also the ctor's format-code targets).
-// Whole string (incl. '\n') as ONE run; width ignored. @437d60
+// Whole string (incl. '\n') as ONE run; width ignored.
 void dwGuiHypText_WrapNone(dwString* pText, dwFont* pFont, int width, dwGuiHypTextRun** ppRuns);
 // Greedy word wrap on whitespace; '\n' forces a break; a single word wider
-// than the line is emitted whole. @437de0
+// than the line is emitted whole.
 void dwGuiHypText_WrapWords(dwString* pText, dwFont* pFont, int width, dwGuiHypTextRun** ppRuns);
-// @437f10 / @437f20 / @437f40
 void dwGuiHypText_HAlignLeft(dwGuiHypTextRun* pRun, int width);
 void dwGuiHypText_HAlignRight(dwGuiHypTextRun* pRun, int width);
 void dwGuiHypText_HAlignCenter(dwGuiHypTextRun* pRun, int width);
-// @437f60 / @437f70 / @437f90 (Top returns 0; Bottom returns rect height -
+// (Top returns 0; Bottom returns rect height -
 // summed line heights; Center halves Bottom's result)
 int dwGuiHypText_VAlignTop(dwGuiHypTextRun** ppRuns, dwFont* pFont, dwRect* pRect);
 int dwGuiHypText_VAlignCenter(dwGuiHypTextRun** ppRuns, dwFont* pFont, dwRect* pRect);
 int dwGuiHypText_VAlignBottom(dwGuiHypTextRun** ppRuns, dwFont* pFont, dwRect* pRect);
-// @437fe0 / @438070 (Shadow first draws every glyph offset (+1,+1) in
+// (Shadow first draws every glyph offset (+1,+1) in
 // dwColormap_transparentIdx, then the normal pass on top)
 void dwGuiHypText_DrawGlyphsNormal(dwImageBits* pBits, dwPoint* pPos, dwFont* pFont, uint8_t color, dwGuiHypTextRun* pRun, dwRect* pClip);
 void dwGuiHypText_DrawGlyphsShadow(dwImageBits* pBits, dwPoint* pPos, dwFont* pFont, uint8_t color, dwGuiHypTextRun* pRun, dwRect* pClip);
@@ -124,12 +123,12 @@ void dwGuiHypText_DrawGlyphsShadow(dwImageBits* pBits, dwPoint* pPos, dwFont* pF
 //
 // Polymorphic animation attachments ticked by dwGuiHypText::Update and reset
 // by Layout. Binary vtables are 3 slots: +0x00 scalar-deleting dtor (shared
-// COMDAT @438170), +0x04 Update, +0x08 Layout. The base class below has no
+// COMDAT dwGuiHypText_Elem_DtorDelete), +0x04 Update, +0x08 Layout. The base class below has no
 // binary struct of its own (each element embeds only the vptr + own fields).
 
 struct dwGuiHypTextElem
 {
-    // @438170 (dwGuiHypText_Elem_DtorDelete, shared by all three vtables;
+    // dwGuiHypText_Elem_DtorDelete (shared by all three vtables;
     // the base dtor body is trivial)
     virtual ~dwGuiHypTextElem();
     // vtbl +0x04 — advance the animation; ppRuns = &owner->pRuns.
@@ -139,7 +138,7 @@ struct dwGuiHypTextElem
 };
 
 // 'T' — typewriter: reveals round(totalLen * min(accumTime/revealDuration, 1))
-// chars across the runs, front to back. Binary struct 0x14, vtbl 0x51fbb0.
+// chars across the runs, front to back. Binary struct 0x14, dwGuiHypText_ElemT_vtbl.
 struct dwGuiHypText_ElemT : dwGuiHypTextElem
 {
     float revealDuration; // 0x04 (Ghidra: field_0x4): seconds for the full reveal
@@ -147,37 +146,37 @@ struct dwGuiHypText_ElemT : dwGuiHypTextElem
     int32_t totalLen;     // 0x0c (Ghidra: totalWidth): total chars across all runs
     uint32_t curReveal;   // 0x10: chars currently revealed
 
-    dwGuiHypText_ElemT(float revealDuration);                                    // @438150
-    virtual void Update(dwGuiHypText* pOwner, float dt, dwGuiHypTextRun** ppRuns); // @438190
-    virtual void Layout(dwGuiHypText* pOwner, dwGuiHypTextRun** ppRuns, dwFont* pFont); // @438250
+    dwGuiHypText_ElemT(float revealDuration);
+    virtual void Update(dwGuiHypText* pOwner, float dt, dwGuiHypTextRun** ppRuns);
+    virtual void Layout(dwGuiHypText* pOwner, dwGuiHypTextRun** ppRuns, dwFont* pFont);
 };
 
 // 'S' — marquee scroll: shifts every run's drawX by round(speed * accumTime)
 // px, starting off-screen (right edge when speed < 0, -totalWidth when
 // speed >= 0); Clear()s the owner once fully scrolled off. Binary struct
-// 0x10, vtbl 0x51fbe0.
+// 0x10, dwGuiHypText_ElemS_vtbl.
 struct dwGuiHypText_ElemS : dwGuiHypTextElem
 {
     float accumTime;    // 0x04
     float speed;        // 0x08: px/sec (sign = direction)
     int32_t totalWidth; // 0x0c: widest run's pixel width
 
-    dwGuiHypText_ElemS(float speed);                                             // @4382b0
-    virtual void Update(dwGuiHypText* pOwner, float dt, dwGuiHypTextRun** ppRuns); // @4382d0
-    virtual void Layout(dwGuiHypText* pOwner, dwGuiHypTextRun** ppRuns, dwFont* pFont); // @4383b0
+    dwGuiHypText_ElemS(float speed);
+    virtual void Update(dwGuiHypText* pOwner, float dt, dwGuiHypTextRun** ppRuns);
+    virtual void Layout(dwGuiHypText* pOwner, dwGuiHypTextRun** ppRuns, dwFont* pFont);
 };
 
 // 'W' — reveal wipe: grows the owner's layoutRect (which Draw clips to) from
 // the widget's top-left toward its full rect over wipeDuration seconds.
-// Binary struct 0x0c, vtbl 0x51fbf0.
+// Binary struct 0x0c, dwGuiHypText_ElemW_vtbl.
 struct dwGuiHypText_ElemW : dwGuiHypTextElem
 {
     float accumTime;    // 0x04
     float wipeDuration; // 0x08 (Ghidra: pWord — misnamed): seconds for the full wipe
 
-    dwGuiHypText_ElemW(float wipeDuration);                                      // @438400
-    virtual void Update(dwGuiHypText* pOwner, float dt, dwGuiHypTextRun** ppRuns); // @438420
-    virtual void Layout(dwGuiHypText* pOwner, dwGuiHypTextRun** ppRuns, dwFont* pFont); // @438500
+    dwGuiHypText_ElemW(float wipeDuration);
+    virtual void Update(dwGuiHypText* pOwner, float dt, dwGuiHypTextRun** ppRuns);
+    virtual void Layout(dwGuiHypText* pOwner, dwGuiHypTextRun** ppRuns, dwFont* pFont);
 };
 
 // ---- dwGuiHypText ---------------------------------------------------------------
@@ -185,7 +184,7 @@ struct dwGuiHypText_ElemW : dwGuiHypTextElem
 // Binary layout: dwWidget base @0x00 (0xe) + pNotify@0x10 + text@0x14 +
 // layoutRect@0x20 + pFont@0x28 + color@0x2c + yOffset@0x2e + pRuns@0x30 +
 // pfnHAlign@0x34 + pfnVAlign@0x38 + pfnWrap@0x3c + pfnDrawGlyphs@0x40 +
-// elements@0x44 — sizeof 0x48. vtable @0x51fc00 (dwGuiHypText_vtbl):
+// elements@0x44 — sizeof 0x48. dwGuiHypText_vtbl:
 // overrides dtor/Update/OnHover/Draw and appends ONE new slot, +0x48 SetText.
 
 struct dwGuiHypText : dwWidget
@@ -206,7 +205,7 @@ struct dwGuiHypText : dwWidget
     dwGuiHypTextDrawGlyphsFn pfnDrawGlyphs; // 0x40
     dwList elements;                        // 0x44 (Ghidra: pElements): dwGuiHypTextElem* payloads
 
-    // @438690 (dwGuiHypText_Ctor) — dwWidget(pRect) base + defaults
+    // dwGuiHypText_Ctor — dwWidget(pRect) base + defaults
     // (HAlignLeft/VAlignTop/WrapWords/DrawGlyphsNormal), then parses pFormat:
     // a decimal value (digits/'-'/'.') accumulates and the NEXT letter
     // consumes it —
@@ -217,7 +216,7 @@ struct dwGuiHypText : dwWidget
     // e.g. "BLN" (dwGuiAnimView captions), "0.05T..." typewriter reveals.
     dwGuiHypText(dwRect* pRect, void* pNotify, char* pFontName, uint8_t color, char* pFormat);
 
-    // @438540 (dwGuiHypText_CtorEx) — same base setup, but the four format
+    // dwGuiHypText_CtorEx — same base setup, but the four format
     // callbacks are passed directly and pElem (may be NULL) is appended to
     // the element list. No format-string parse.
     dwGuiHypText(dwRect* pRect, void* pNotify, char* pFontName, uint8_t color,
@@ -225,38 +224,38 @@ struct dwGuiHypText : dwWidget
                  dwGuiHypTextWrapFn pfnWrap, dwGuiHypTextDrawGlyphsFn pfnDrawGlyphs,
                  dwGuiHypTextElem* pElem);
 
-    // @438ac0 (dwGuiHypText_Dtor; scalar-deleting wrapper @438670) — frees
+    // dwGuiHypText_Dtor (scalar-deleting wrapper dwGuiHypText_DtorDelete) — frees
     // the font handle, deletes every element (virtual dtor) + both rings.
     virtual ~dwGuiHypText();
 
-    // vtbl +0x14 @438c20 (dwGuiHypText_Update) — when enabled, ticks every
+    // vtbl +0x14 dwGuiHypText_Update — when enabled, ticks every
     // element (elements repaint via the owner's Invalidate themselves).
     virtual void Update(float dt);
 
-    // vtbl +0x18 @438f10 (recovered fn; Ghidra: dwGuiHypText_sub_438F10) —
+    // vtbl +0x18 (recovered fn; Ghidra: dwGuiHypText_sub_438F10) —
     // guarded hover notify: when pNotify is set, dispatches { 0x7531,
     // pNotify, 0, NULL } to dwWidget_pDefault and returns 1; else 0.
     virtual int OnHover(int16_t x, int16_t y);
 
-    // vtbl +0x44 @438e20 (dwGuiHypText_Draw) — clips *pClipRect to
+    // vtbl +0x44 dwGuiHypText_Draw — clips *pClipRect to
     // layoutRect (empty -> skip), then draws each run through pfnDrawGlyphs;
     // baseline = layoutRect.top + font header y-inset + yOffset, advancing
     // by the font line height per run.
     virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect);
 
     // NEW virtual — appended after dwWidget's +0x44 Draw.
-    // vtbl +0x48 @438cf0 (dwGuiHypText_SetText) — if pText differs from the
+    // vtbl +0x48 dwGuiHypText_SetText — if pText differs from the
     // current buffer (dwString_Equals), APPENDS it (quirk: callers Free()
     // the string first for a replace) and re-Layout()s.
     virtual void SetText(char* pText);
 
     // -- non-virtual methods ---------------------------------------------------
 
-    // @438c80 (dwGuiHypText_Clear) — frees the text and every line run
+    // dwGuiHypText_Clear — frees the text and every line run
     // (elements/layout state untouched), then Invalidate()s.
     void Clear();
 
-    // @438d20 (dwGuiHypText_Layout) — full reflow: free runs; when text is
+    // dwGuiHypText_Layout — full reflow: free runs; when text is
     // non-empty: pfnWrap -> per-run pfnHAlign + draw-field reset ->
     // pfnVAlign (yOffset) -> per-element Layout -> Invalidate.
     void Layout();
@@ -265,22 +264,22 @@ struct dwGuiHypText : dwWidget
 // ---- dwGuiPartText ---------------------------------------------------------------
 //
 // PARTTEXT keyword control. Binary layout identical to dwGuiHypText (0x48,
-// no new fields). vtable @0x51fc50 (dwGuiPartText_vtbl): overrides only
+// no new fields). dwGuiPartText_vtbl: overrides only
 // +0x00 dtor and +0x1c OnMessage.
 
 struct dwGuiPartText : dwGuiHypText
 {
-    // @439050 (dwGuiPartText_Ctor) — forwards to the dwGuiHypText format
+    // dwGuiPartText_Ctor — forwards to the dwGuiHypText format
     // ctor; when pSourcePart (a dwPart blueprint) is given, immediately
     // shows its display name (text.Free() + virtual SetText).
     dwGuiPartText(dwRect* pRect, void* pNotify, char* pFontName, uint8_t color,
                   char* pFormat, void* pSourcePart);
 
-    // @4390f0 (dwGuiPartText_Dtor; scalar-deleting wrapper @4390d0) — vptr
+    // dwGuiPartText_Dtor (scalar-deleting wrapper dwGuiPartText_DtorDelete) — vptr
     // re-point + base dtor only (implicit here).
     virtual ~dwGuiPartText();
 
-    // vtbl +0x1c @439100 (dwGuiPartText_OnMessage) — msg 0xBBC (part
+    // vtbl +0x1c dwGuiPartText_OnMessage — msg 0xBBC (part
     // selected): resolve the sender's selected slot part name via
     // dwPart_FindBlueprint and show the blueprint's display name.
     // Always returns 0 (the broadcast keeps going).

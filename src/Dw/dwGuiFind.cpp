@@ -1,6 +1,6 @@
 // dwGuiFind — reference-room TOPIC SEARCH screen ("Find") + its two nested
-// scroll subclasses. DroidWorks.exe 0x412380-0x413c1f, primary vtbl 0x51eb90 /
-// segment vtbl 0x51eb78 (dwGuiFind), 0x51ebe0 (dwGuiFindScrollBar), 0x51ec28
+// scroll subclasses. DroidWorks.exe, primary dwGuiFind_vtbl /
+// segment vtbl dwGuiFind, dwGuiFindScrollBar, dwGuiFindScrollBox_vtbl
 // (dwGuiFindScrollBox). See Dw/dwGuiFind.h.
 
 #include "Dw/dwGuiFind.h"
@@ -21,7 +21,7 @@
 
 // ---- cross-unit externs ------------------------------------------------------
 
-// The current reference-room topic file (dwString @0x53d968) — owned by
+// The current reference-room topic file (dwString dwCore_currentRefFile) — owned by
 // dwInits.cpp (parked there until dwGuiReference/dw core claims it). The
 // QUERY factory seeds the box with this file's TOPIC_NAME; the confirm-selection
 // messages write the picked result here.
@@ -34,7 +34,7 @@ static const char dwGuiFind_emptyQueryMark[] = " ";
 // dwGuiFindScrollBar
 // =====================================================================
 
-// @4136b0 (dwGuiFindScrollBar_Ctor)
+// dwGuiFindScrollBar_Ctor
 dwGuiFindScrollBar::dwGuiFindScrollBar(dwRect* pRect, int msgSetValue, int msgLineUp,
                                        int msgLineDown, int minValue, int maxValue,
                                        char* pTrackImgName, char* pThumbImgName, int msgCode)
@@ -44,12 +44,12 @@ dwGuiFindScrollBar::dwGuiFindScrollBar(dwRect* pRect, int msgSetValue, int msgLi
     this->msgCode = msgCode;
 }
 
-// @413720 (dwGuiFindScrollBar_Dtor; scalar-deleting wrapper @413700)
+// dwGuiFindScrollBar_Dtor (scalar-deleting wrapper dwGuiFindScrollBar_DtorDelete)
 dwGuiFindScrollBar::~dwGuiFindScrollBar()
 {
 }
 
-// vtbl +0x1c @413730 (dwGuiFindScrollBar_OnMessage)
+// vtbl +0x1c dwGuiFindScrollBar_OnMessage
 int dwGuiFindScrollBar::OnMessage(dwWidgetMsg* pMsg)
 {
     if (pMsg->code == this->msgCode)
@@ -74,7 +74,7 @@ int dwGuiFindScrollBar::OnMessage(dwWidgetMsg* pMsg)
     return this->dwGuiScrollBar::OnMessage(pMsg);
 }
 
-// @4137a0 (dwGuiFindScrollBar_SetValue) — clamp-no-notify.
+// dwGuiFindScrollBar_SetValue — clamp-no-notify.
 void dwGuiFindScrollBar::SetValueClamp(int newValue)
 {
     int mn = this->minValue;
@@ -100,7 +100,7 @@ void dwGuiFindScrollBar::SetValueClamp(int newValue)
 // dwGuiFindScrollBox
 // =====================================================================
 
-// @4137e0 (dwGuiFindScrollBox_Ctor)
+// dwGuiFindScrollBox_Ctor
 dwGuiFindScrollBox::dwGuiFindScrollBox(dwRect* pRect, int scrollMsgCode, char* pFontName,
                                        uint8_t textColorIdx, uint8_t highlightColorIdx,
                                        int msgSelChanged, int msgNotify)
@@ -111,12 +111,12 @@ dwGuiFindScrollBox::dwGuiFindScrollBox(dwRect* pRect, int scrollMsgCode, char* p
     this->reserved = 0;
 }
 
-// @413850 (dwGuiFindScrollBox_Dtor; scalar-deleting wrapper @413830)
+// dwGuiFindScrollBox_Dtor (scalar-deleting wrapper dwGuiFindScrollBox_DtorDelete)
 dwGuiFindScrollBox::~dwGuiFindScrollBox()
 {
 }
 
-// vtbl +0x08 @413860 (dwGuiFindScrollBox_OnMouseDown)
+// vtbl +0x08 dwGuiFindScrollBox_OnMouseDown
 int dwGuiFindScrollBox::OnMouseDown(int16_t x, int16_t y)
 {
     (void)x;
@@ -147,14 +147,14 @@ int dwGuiFindScrollBox::OnMouseDown(int16_t x, int16_t y)
     return 0;
 }
 
-// vtbl +0x10 @413910 (dwGuiFindScrollBox_OnKey)
+// vtbl +0x10 dwGuiFindScrollBox_OnKey
 int dwGuiFindScrollBox::OnKey(int key, int repeat)
 {
     (void)key; (void)repeat;
     return 0;
 }
 
-// vtbl +0x1c @413920 (dwGuiFindScrollBox_OnMessage) — the type-ahead matcher.
+// vtbl +0x1c dwGuiFindScrollBox_OnMessage — the type-ahead matcher.
 int dwGuiFindScrollBox::OnMessage(dwWidgetMsg* pMsg)
 {
     uint8_t ret = 0;
@@ -255,7 +255,7 @@ int dwGuiFindScrollBox::OnMessage(dwWidgetMsg* pMsg)
 // =====================================================================
 
 // Scan every *.<ext> topic file and add the searchable ones (TOPIC_CATEGORY 0)
-// to the result box. Binary: the two SCROLLBOX-population loops @412e40/412f90
+// to the result box. Binary: the two SCROLLBOX-population loops
 // (one for "TPC", one for "SUB"). Cleanup here inlines what the binary did via
 // dwGuiLoadSave_StringItemDtorDelete/_ClearList (avoids a cross-unit dependency).
 static void dwGuiFind_ScanTopics(dwGuiFindScrollBox* pBox, const char* pExt)
@@ -306,7 +306,7 @@ static void dwGuiFind_ScanTopics(dwGuiFindScrollBox* pBox, const char* pExt)
 
 // The dwGuiFind_OnActivate reopen body (composite the parent snapshot into the
 // background, seed the slide-in, set the ambient volume). Called by Activate()
-// and by the OnMessage reopen commands. Binary @4128e0 (does NOT re-run base
+// and by the OnMessage reopen commands. Binary dwGuiFind_OnActivate (does NOT re-run base
 // Activate; base is chained from Activate() to lazy-load the controls).
 static void dwGuiFind_DoReopen(dwGuiFind* pThis)
 {
@@ -327,7 +327,7 @@ static void dwGuiFind_DoReopen(dwGuiFind* pThis)
     dwSound_SetSampleVolume("WLSPanelAmb.WAV", 0.0f, (float)pThis->bottom / 320.0f);
 }
 
-// @412380 (dwGuiFind_Ctor)
+// dwGuiFind_Ctor
 dwGuiFind::dwGuiFind(dwImage* pBgSnapshot)
     : dwGuiScreen("Find", pBgSnapshot)
 {
@@ -343,7 +343,7 @@ dwGuiFind::dwGuiFind(dwImage* pBgSnapshot)
     this->slideDir = 0.0f;
 }
 
-// @412410 (dwGuiFind_Dtor)
+// dwGuiFind_Dtor
 dwGuiFind::~dwGuiFind()
 {
     // The tracked controls (FINDBOX/QUERY/SCROLLBOX/FILESCROLLBAR/scroll
@@ -353,7 +353,7 @@ dwGuiFind::~dwGuiFind()
     // dwGuiMissionMap — and avoids the binary's duplicate-node hazard.)
 }
 
-// vtbl(scn) +0x00 @4128e0 (dwGuiFind_OnActivate)
+// vtbl(scn) +0x00 dwGuiFind_OnActivate
 int dwGuiFind::Activate()
 {
     // Note: the binary's OnActivate does NOT chain the base; base Activate is
@@ -364,7 +364,7 @@ int dwGuiFind::Activate()
     return ret;
 }
 
-// vtbl(scn) +0x04 @40bea0 (shared body; Ghidra: dwGuiLoadSave_OnDeactivate) —
+// vtbl(scn) +0x04 (shared body; Ghidra: dwGuiLoadSave_OnDeactivate) —
 // reproduced here so dwGuiFind stays independent of the dwGuiLoadSave unit.
 void dwGuiFind::Deactivate()
 {
@@ -372,7 +372,7 @@ void dwGuiFind::Deactivate()
         dwSound_pManager->FreeAllSamples();
 }
 
-// vtbl +0x10 @412be0 (dwGuiFind_OnKey)
+// vtbl +0x10 dwGuiFind_OnKey
 int dwGuiFind::OnKey(int key, int repeat)
 {
     if ((char)key == '\x1b' && repeat != 0 && this->slideDir != 0.0f)
@@ -381,7 +381,7 @@ int dwGuiFind::OnKey(int key, int repeat)
     return 0;
 }
 
-// vtbl +0x14 @412730 (dwGuiFind_Update) — drive the slide.
+// vtbl +0x14 dwGuiFind_Update — drive the slide.
 // Note: the binary's per-frame block is heavily EH-mangled in the decompile;
 // the recoverable behavior (slide accumulation, completion -> RequestAdvance /
 // BeginEdit, group Move + Invalidate, then the group tick) is reproduced here.
@@ -421,7 +421,7 @@ void dwGuiFind::Update(float dt)
     this->controls.Update(dt);
 }
 
-// vtbl +0x1c @412c30 (dwGuiFind_OnMessage)
+// vtbl +0x1c dwGuiFind_OnMessage
 int dwGuiFind::OnMessage(dwWidgetMsg* pMsg)
 {
     switch (pMsg->code)
@@ -456,7 +456,7 @@ int dwGuiFind::OnMessage(dwWidgetMsg* pMsg)
     return 0;
 }
 
-// @412b00 (dwGuiFind_RefreshScrollWidgets)
+// dwGuiFind_RefreshScrollWidgets
 void dwGuiFind::RefreshScrollWidgets()
 {
     this->pQueryEntry->Enable();
@@ -490,7 +490,7 @@ void dwGuiFind::RefreshScrollWidgets()
     }
 }
 
-// vtbl +0x48 @412d10 (dwGuiFind_CreateControl)
+// vtbl +0x48 dwGuiFind_CreateControl
 dwWidget* dwGuiFind::CreateControl(char* pKeyword, dwConfFile* pConf)
 {
     dwRect rect = {0, 0, 0, 0};

@@ -1,5 +1,5 @@
 // dwStringTable — STRINGTABLE name->string map loaded from a conf file.
-// DroidWorks.exe unit range: 0x446130-0x4464dx (3 functions).
+// DroidWorks.exe unit range: (3 functions).
 //
 // The ctor reads the file line-by-line via dwConfFile: the first token on a
 // line is the key, the remainder of the line is the value. Each pair is
@@ -23,8 +23,7 @@
 
 #include "Dw/dwConfFile.h"
 
-// @446130
-// The `pairs` member ctor (dwList @40b940) allocates + self-links the
+// The `pairs` member ctor (dwList dwList_Ctor) allocates + self-links the
 // sentinel before the body runs, exactly like the original's inlined
 // list-ctor prologue.
 dwStringTable::dwStringTable(const char* pFilename)
@@ -76,7 +75,6 @@ dwStringTable::dwStringTable(const char* pFilename)
     dwConfFile_Close(&confFile);
 }
 
-// @446340
 dwStringTable::~dwStringTable()
 {
     dwListNode* pNode;
@@ -110,7 +108,6 @@ dwStringTable::~dwStringTable()
     pairs.Free();
 }
 
-// @446450
 dwString* dwStringTable::Find(const char* pName)
 {
     dwString* pResult = NULL;

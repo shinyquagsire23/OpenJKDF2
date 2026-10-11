@@ -2,7 +2,7 @@
 #define _DWSTRINGTABLE_H
 
 // dwStringTable — STRINGTABLE name->string map loaded from a conf file.
-// DroidWorks.exe unit range: 0x446130-0x4464dx (3 functions).
+// DroidWorks.exe unit range: (3 functions).
 //
 // C++-ONLY header: dwStringTable is a real class (verifiably C++ in the
 // binary — MSVC SEH/EH frames around the dwConfFile/dwString work in
@@ -31,9 +31,9 @@ struct dwStringTable
     tHashTable* pHash;
     // sizeof 0x8
 
-    dwStringTable(const char* pFilename); // @446130 (dwStringTable_Ctor)
-    ~dwStringTable();                     // @446340 (dwStringTable_Dtor)
-    dwString* Find(const char* pName);    // @446450: NULL if absent
+    dwStringTable(const char* pFilename); // dwStringTable_Ctor
+    ~dwStringTable();                     // dwStringTable_Dtor
+    dwString* Find(const char* pName);    // NULL if absent
 };
 
 #endif // _DWSTRINGTABLE_H

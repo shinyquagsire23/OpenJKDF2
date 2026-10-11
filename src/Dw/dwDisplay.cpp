@@ -1,11 +1,11 @@
 // dwDisplay — DroidWorks display/backbuffer manager: display bring-up, the
 // dirty-rect repaint list, the wrapped screen image, and frame present.
 //
-// Decompiled from DroidWorks.exe, unit range 0x443920-0x4442ff (the
-// dwRect_Overlaps/Clip/Union tail @0x444180-0x4442ff already lives in
+// Decompiled from DroidWorks.exe (the
+// dwRect_Overlaps/Clip/Union tail already lives in
 // dwRect.c).
 //
-// ORIGINAL BRING-UP (0x4439c0): build a display environment
+// ORIGINAL BRING-UP (dwDisplay_Open): build a display environment
 // (stdBuildDisplayEnvironment), pick a device (stdDisplay_FindClosestDevice),
 // scan every device/mode for hardware-3D capability, start stdDisplay, hook
 // the gamma table + palette-effects palette pusher, open the device, load the
@@ -21,18 +21,18 @@
 // routed through the repo stdDisplay:
 //   - no display-environment enumeration (dwDisplay_pEnv stays NULL) and no
 //     DirectDraw caps scan (dwDisplay_bHardware3D forced 0);
-//   - TODO(dw-decomp): LOUD — the HARDWARE-3D path (std3D_* init @0x443bd0,
+//   - TODO(dw-decomp): LOUD — the HARDWARE-3D path (std3D_* init,
 //     render option |0x100, 640x480x16) is STUBBED; only the software 8bpp
 //     path is brought up (P2 decision: SW path first).
-//   - buffer mapping: DW back/working buffer @0x6b5a40 -> &Video_otherBuf;
-//     DW front/primary buffer @0x6b17c0 -> &Video_menuBuffer, pushed to the
+//   - buffer mapping: DW back/working buffer -> &Video_otherBuf;
+//     DW front/primary buffer -> &Video_menuBuffer, pushed to the
 //     window with stdDisplay_DDrawGdiSurfaceFlip() after each present (the
 //     binary's fullscreen present WAS the copy to the visible primary).
 //     Under -droidworks the jk GUI never runs, so both engine buffers are
 //     free for DW's use.
 //
 // Dirty-rect list: circular list of dwDirtyRect with a rect-less sentinel.
-// The binary allocated the sentinel in a CRT static ctor (@0x443910, with an
+// The binary allocated the sentinel in a CRT static ctor (dwDisplay_StaticInit, with an
 // atexit'd FreeDirtyList); here dwDisplay_Startup() does it. Nodes use
 // malloc/free like dwList (binary: operator new / HostServices FreeHandle).
 //
@@ -60,16 +60,16 @@ extern "C" {
 }
 
 // Module globals (all reset in dwDisplay_Startup; soft-reset rule).
-void* dwDisplay_pEnv = NULL;               // binary: 0x541d24
-int dwDisplay_deviceIdx = 0;               // binary: 0x541c4c
-char dwDisplay_bHardware3D = 0;            // binary: 0x541d28
-uint32_t dwDisplay_hw3DDevice = 0;         // binary: 0x541c58
-uint32_t dwDisplay_hw3DMode = 0;           // binary: 0x541c5c
-dwImageVBuf* dwDisplay_pScreenImage = NULL;// binary: 0x541c3c
-tVBuffer* dwDisplay_pSwBuffer = NULL;      // binary: 0x541c20
-dwDirtyRect* dwDisplay_pDirtyList = NULL;  // binary: 0x541c54
-tVBuffer* dwDisplay_pBackVBuf = NULL;      // binary: the unnamed tVBuffer @0x6b5a40
-tVBuffer* dwDisplay_pFrontVBuf = NULL;     // binary: the unnamed tVBuffer @0x6b17c0
+void* dwDisplay_pEnv = NULL;
+int dwDisplay_deviceIdx = 0;
+char dwDisplay_bHardware3D = 0;
+uint32_t dwDisplay_hw3DDevice = 0;
+uint32_t dwDisplay_hw3DMode = 0;
+dwImageVBuf* dwDisplay_pScreenImage = NULL;
+tVBuffer* dwDisplay_pSwBuffer = NULL;
+dwDirtyRect* dwDisplay_pDirtyList = NULL;
+tVBuffer* dwDisplay_pBackVBuf = NULL;      // binary: the unnamed tVBuffer
+tVBuffer* dwDisplay_pFrontVBuf = NULL;     // binary: the unnamed tVBuffer
 
 // DW's 10-entry display gamma table (binary: DAT_00529fb8; verified
 // byte-identical to the engine's own table in src/Win95/Video.c).
@@ -87,7 +87,7 @@ static flex_d_t dwDisplay_aGammaTable[10] = {
 };
 
 // Note: no binary counterpart — the binary built the dirty list in a CRT
-// static ctor (@0x443910: call InitDirtyList, atexit FreeDirtyList). Resets
+// static ctor (dwDisplay_StaticInit: call InitDirtyList, atexit FreeDirtyList). Resets
 // every module global for the soft-reset loop, freeing a previous run's list.
 void dwDisplay_Startup()
 {
@@ -108,7 +108,6 @@ void dwDisplay_Startup()
     dwDisplay_InitDirtyList();
 }
 
-// @443920
 void dwDisplay_InitDirtyList()
 {
     dwDisplay_pDirtyList = NULL;
@@ -119,7 +118,6 @@ void dwDisplay_InitDirtyList()
     dwDisplay_pDirtyList->pPrev = dwDisplay_pDirtyList;
 }
 
-// @443960
 void dwDisplay_FreeDirtyList()
 {
     dwDirtyRect* pSent = dwDisplay_pDirtyList;
@@ -139,7 +137,6 @@ void dwDisplay_FreeDirtyList()
     // (dwDisplay_Startup) re-run InitDirtyList before any further use.
 }
 
-// @4439c0
 int dwDisplay_Open(char* pColormapName)
 {
     stdDeviceParams params;
@@ -168,7 +165,7 @@ int dwDisplay_Open(char* pColormapName)
     if (stdDisplay_Startup())
     {
         // Binary: DW-stdDisplay SetGammaTable(10, DAT_00529fb8) + registers
-        // its gamma-corrected master-palette pusher (@0x4fe3b0) with
+        // its gamma-corrected master-palette pusher with
         // stdPalEffects. Note: repo twin per Video_Startup — the palette
         // pusher maps to stdDisplay_SetMasterPalette.
         stdDisplay_SetGammaTable(10, dwDisplay_aGammaTable);
@@ -229,7 +226,6 @@ int dwDisplay_Open(char* pColormapName)
     return 0;
 }
 
-// @443cb0
 void dwDisplay_CreateCursorSprites()
 {
     // Running 16bpp: reload the workshop colormap so dwColormap rebuilds its
@@ -267,7 +263,6 @@ void dwDisplay_CreateCursorSprites()
     dwCursor_SetCursor(1);
 }
 
-// @443d80
 void dwDisplay_Shutdown()
 {
     // Binary: stdFreeDisplayEnvironment(dwDisplay_pEnv).
@@ -302,7 +297,6 @@ void dwDisplay_Shutdown()
     stdDisplay_RestoreDisplayMode();
 }
 
-// @443e00
 void dwDisplay_FreeCursors()
 {
     if (dwCursor_pSprite)
@@ -323,7 +317,6 @@ void dwDisplay_FreeCursors()
     }
 }
 
-// @443e60
 int dwDisplay_SetMode(int width, int height, int bpp)
 {
     render_pair mode;
@@ -350,8 +343,8 @@ int dwDisplay_SetMode(int width, int height, int bpp)
         dwDisplay_pBackVBuf = &Video_otherBuf;
         dwDisplay_pFrontVBuf = &Video_menuBuffer;
 
-        stdDisplay_VBufferFill(dwDisplay_pBackVBuf, 0, NULL); // binary: DW-stdDisplay fill @0x4fe010
-        stdDisplay_DDrawGdiSurfaceFlip();                     // binary: DW-stdDisplay flip @0x4fdc60
+        stdDisplay_VBufferFill(dwDisplay_pBackVBuf, 0, NULL); // binary: DW-stdDisplay fill
+        stdDisplay_DDrawGdiSurfaceFlip();                     // binary: DW-stdDisplay flip
 
         if (dwDisplay_pScreenImage)
             delete dwDisplay_pScreenImage; // binary: vtbl +0x00 scalar-deleting dtor(1)
@@ -363,7 +356,7 @@ int dwDisplay_SetMode(int width, int height, int bpp)
     return bOk != 0;
 }
 
-// @444140 — links a fresh node carrying *pRect after pAfter.
+// links a fresh node carrying *pRect after pAfter.
 // (File-local in effect: the binary's only caller is dwDisplay_AddDirtyRect.)
 static dwDirtyRect* dwDisplay_InsertDirtyNode(dwDirtyRect* pAfter, dwRect* pRect)
 {
@@ -382,7 +375,6 @@ static dwDirtyRect* dwDisplay_InsertDirtyNode(dwDirtyRect* pAfter, dwRect* pRect
     return pNew;
 }
 
-// @443fa0
 void dwDisplay_AddDirtyRect(dwRect* pRect)
 {
     // Note: guard added — the binary's list exists from CRT static-init;
@@ -427,7 +419,6 @@ void dwDisplay_AddDirtyRect(dwRect* pRect)
     }
 }
 
-// @444050
 void dwDisplay_Present(void)
 {
     rdRect rect;
@@ -441,7 +432,7 @@ void dwDisplay_Present(void)
         return;
 
     // Binary: in windowed GDI mode (device video_device[0] flag == 0) this
-    // was just the whole-surface BitBlt (DW-stdDisplay flip @0x4fdc60) with
+    // was just the whole-surface BitBlt (DW-stdDisplay flip) with
     // the OS cursor on top; the fullscreen path below drew the software
     // cursor and copied back -> front/primary. Note: the SDL3 adaptation
     // always takes the DW fullscreen-style software-cursor path, then flips

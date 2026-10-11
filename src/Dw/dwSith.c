@@ -1,6 +1,6 @@
 // dwSith — DroidWorks sith-engine bring-up/teardown glue
-// (Ghidra dwSith_Startup @41f170 / dwSith_Shutdown @41f270 + the two
-// callbacks they register @423070/@4230a0).
+// (Ghidra dwSith_Startup / dwSith_Shutdown + the two
+// callbacks they register dwGuiInGame_SithPrintHook).
 //
 // Pure C unit. See dwSith.h for the role summary. The saved engine loader
 // hooks are re-installed by dwGuiInGame_StartMission (P6) when a mission
@@ -33,19 +33,19 @@ extern void dwGuiInGame_ConsolePrint(const char* pText);
 // TODO(dw-decomp): provided by dwGuiInGame (P6) — per-frame control callback
 // applying the SCREEN_SIZE setting to the 3D viewport.
 extern int dwGuiInGame_UpdateViewSize(SithThing* pPlayer, flex_t deltaSecs);
-// The binary's rdModel3 hook setters @0x47fe40/50 are DW's build of the
+// The binary's rdModel3 hook setters rdModel3_SetLoadEntryHook/50 are DW's build of the
 // repo's existing rdModel3_RegisterLoader/RegisterUnloader (see dwSith.h).
 #include "Primitives/rdModel3.h"
 
-// ---- module globals (binary @0x53e804-0x53e824, dwSith-owned) ------------
-rdMaterialLoader_t dwSith_pfnPrevMaterialLoader = NULL;       // @0x53e818
-rdMaterialUnloader_t dwSith_pfnPrevMaterialUnloader = NULL;   // @0x53e80c
-dwModel3LoadEntryHook_t dwSith_pfnPrevModel3LoadHook = NULL;  // @0x53e81c
-dwModel3FreeEntryHook_t dwSith_pfnPrevModel3FreeHook = NULL;  // @0x53e804
-keyframeLoader_t dwSith_pfnPrevKeyframeLoader = NULL;         // @0x53e824
-keyframeUnloader_t dwSith_pfnPrevKeyframeUnloader = NULL;     // @0x53e820
+// ---- module globals (binary, dwSith-owned) ------------
+rdMaterialLoader_t dwSith_pfnPrevMaterialLoader = NULL;
+rdMaterialUnloader_t dwSith_pfnPrevMaterialUnloader = NULL;
+dwModel3LoadEntryHook_t dwSith_pfnPrevModel3LoadHook = NULL;
+dwModel3FreeEntryHook_t dwSith_pfnPrevModel3FreeHook = NULL;
+keyframeLoader_t dwSith_pfnPrevKeyframeLoader = NULL;
+keyframeUnloader_t dwSith_pfnPrevKeyframeUnloader = NULL;
 
-// @423070 — sithConsole print hook installed by dwSith_Startup: mirrors every
+// sithConsole print hook installed by dwSith_Startup: mirrors every
 // engine console print to the log and the in-game HUD console.
 // Note: the binary appends to its debug log via jk_logtofile("SITH: %s\n");
 // stdPlatform_Printf is the repo-side analog. Returns 1 (the binary's hook
@@ -57,7 +57,7 @@ int dwGuiInGame_SithPrintHook(const char* pText)
     return 1;
 }
 
-// @4230a0 (Ghidra: FUN_004230a0_Instinct_TouchOfDeath) — "touchofdeath"
+// (Ghidra: FUN_004230a0_Instinct_TouchOfDeath) — "touchofdeath"
 // instinct (registered with updateModes=6, blockModes=0, triggerEvents=4):
 // while armed (pState->param0 != 0), a periodic update (event 0) disarms it
 // and sends USER7 to the owning thing; a touch (SITHAI_EVENTTOUCHED) by the
@@ -90,7 +90,7 @@ int dwSith_Instinct_TouchOfDeath(SithAIControlBlock* pLocal, SithAIInstinct* pIn
     return 0;
 }
 
-// @41f170 — DW's sith bring-up (the dwApp boot segment calls this from
+// DW's sith bring-up (the dwApp boot segment calls this from
 // dw_Startup, P7). Returns 1 only when the core engine started; the DW-side
 // registrations below run regardless (faithful).
 int dwSith_Startup(HostServices* pHS)
@@ -116,8 +116,8 @@ int dwSith_Startup(HostServices* pHS)
     sithOpenStatic("static.jkl");
     dw_ParseInventoryTypes();
     sithConsole_RegisterPrintFunctions(dwGuiInGame_SithPrintHook, NULL);
-    // Note: the binary registers its sithControl_HandlePlayer twin (@457430,
-    // which also dispatches the DW tool keys -> dwCog_ActivateTool; the
+    // Note: the binary registers its sithControl_HandlePlayer twin
+    // (which also dispatches the DW tool keys -> dwCog_ActivateTool; the
     // repo-side tool-key dispatch is an engine edit, see the P5 report).
     sithControl_RegisterControlCallback(sithControl_HandlePlayer);
     sithControl_RegisterControlCallback(dwGuiInGame_UpdateViewSize);
@@ -133,7 +133,7 @@ int dwSith_Startup(HostServices* pHS)
     return bResult;
 }
 
-// @41f270 — teardown mirror (binary sithMain_FUN_00458550 = sithCloseStatic).
+// teardown mirror (binary sithMain_FUN_00458550 = sithCloseStatic).
 void dwSith_Shutdown()
 {
     sithCloseStatic();

@@ -1,4 +1,4 @@
-// dwImageDraw — DroidWorks 2D drawing primitives (Ghidra 0x446480-0x4477bx).
+// dwImageDraw — DroidWorks 2D drawing primitives.
 //
 // Draws into a locked surface described by dwImageBits {pDesc, pPixels,
 // stride} / dwImageDesc {format, width, height, bpp}. All primitives are
@@ -23,7 +23,7 @@
 // ------------------------------------------------------------------
 // Per-bpp solid-fill run helpers + function tables
 
-// @446480 — fill `count` bytes at pDest with color (dword-at-a-time).
+// fill `count` bytes at pDest with color (dword-at-a-time).
 static void dwImageDraw_FillRunH8(void* pDest, int color, unsigned int count)
 {
     uint8_t c = (uint8_t)color;
@@ -40,7 +40,7 @@ static void dwImageDraw_FillRunH8(void* pDest, int color, unsigned int count)
     }
 }
 
-// @4464b0 — fill `count` bytes spaced `stride` apart with color.
+// fill `count` bytes spaced `stride` apart with color.
 static void dwImageDraw_FillRunV8(void* pDest, int stride, int color, int count)
 {
     uint8_t* p = (uint8_t*)pDest;
@@ -52,7 +52,7 @@ static void dwImageDraw_FillRunV8(void* pDest, int stride, int color, int count)
 }
 
 // 16bpp entries: the binary points both tables' [2] slots at a shared CRT
-// no-op (RLE_decompress_type2@0x449180) — 16bpp fills draw nothing.
+// no-op (RLE_decompress_type2) — 16bpp fills draw nothing.
 static void dwImageDraw_FillRunH16(void* pDest, int color, unsigned int count)
 {
     (void)pDest; (void)color; (void)count;
@@ -66,7 +66,7 @@ static void dwImageDraw_FillRunV16(void* pDest, int stride, int color, int count
 typedef void (*dwImageDraw_fillRunHFunc_t)(void* pDest, int color, unsigned int count);
 typedef void (*dwImageDraw_fillRunVFunc_t)(void* pDest, int stride, int color, int count);
 
-// @52a210 / @52a218 — indexed by pDesc->bpp (1 = 8bpp, 2 = 16bpp stub).
+// indexed by pDesc->bpp (1 = 8bpp, 2 = 16bpp stub).
 // [0] is never referenced (the binary's tables start at index 1).
 static const dwImageDraw_fillRunHFunc_t dwImageDraw_aFillRunH[3] = { NULL, dwImageDraw_FillRunH8, dwImageDraw_FillRunH16 };
 static const dwImageDraw_fillRunVFunc_t dwImageDraw_aFillRunV[3] = { NULL, dwImageDraw_FillRunV8, dwImageDraw_FillRunV16 };
@@ -94,7 +94,7 @@ static void dwImageDraw_CirclePlot4(uint8_t* pPixels, int stride, dwRect* pBound
     dwImageDraw_CirclePlot(pPixels, stride, pBounds, cx - x, cy - r, color);
 }
 
-// @4464e0 — Bresenham (second-order midpoint) circle outline, 8bpp only.
+// Bresenham (second-order midpoint) circle outline, 8bpp only.
 void dwImageDraw_Circle(dwImageBits* pBits, dwPoint* pCenter, int16_t radius, int color, dwRect* pClip)
 {
     dwImageDesc* pDesc = pBits->pDesc;
@@ -173,7 +173,6 @@ void dwImageDraw_Circle(dwImageBits* pBits, dwPoint* pCenter, int16_t radius, in
 // ------------------------------------------------------------------
 // Rect fills
 
-// @4468c0
 void dwImageDraw_FillRect(dwImageBits* pBits, dwRect* pRect, int color, dwRect* pClip)
 {
     dwRect rect = *pRect; // stack copy; the clip modifies it
@@ -194,7 +193,7 @@ void dwImageDraw_FillRect(dwImageBits* pBits, dwRect* pRect, int color, dwRect* 
     }
 }
 
-// @446970 — translucent overlay, 8bpp only.
+// translucent overlay, 8bpp only.
 void dwImageDraw_BlendRect(dwImageBits* pBits, dwRect* pRect, int color, dwRect* pClip)
 {
     if ((uint8_t)(pBits->pDesc->bpp << 3) != 8)
@@ -222,7 +221,7 @@ void dwImageDraw_BlendRect(dwImageBits* pBits, dwRect* pRect, int color, dwRect*
     }
 }
 
-// @446a40 — rect outline with per-edge clip visibility.
+// rect outline with per-edge clip visibility.
 void dwImageDraw_FrameRect(dwImageBits* pBits, dwRect* pRect, int color, dwRect* pClip)
 {
     dwImageDesc* pDesc = pBits->pDesc;
@@ -276,7 +275,7 @@ void dwImageDraw_FrameRect(dwImageBits* pBits, dwRect* pRect, int color, dwRect*
     }
 }
 
-// @446c80 — darken by pct (0..100 -> ramp level 0..63), 8bpp only. The caller
+// darken by pct (0..100 -> ramp level 0..63), 8bpp only. The caller
 // pre-clips (no clip parameter in the binary either).
 void dwImageDraw_ShadeRect(dwImageBits* pBits, dwRect* pRect, int pct)
 {
@@ -309,7 +308,7 @@ void dwImageDraw_ShadeRect(dwImageBits* pBits, dwRect* pRect, int pct)
 // ------------------------------------------------------------------
 // Lines
 
-// @447080 — vertical run for the y-major octants: `count` pixels stepping by
+// vertical run for the y-major octants: `count` pixels stepping by
 // the surface stride, then advance the cursor by xStep (the cross step).
 static void dwImageDraw_LineRunVert(dwImageBits* pBits, uint8_t** ppCursor, int16_t xStep, int16_t count, int color)
 {
@@ -324,7 +323,7 @@ static void dwImageDraw_LineRunVert(dwImageBits* pBits, uint8_t** ppCursor, int1
     *ppCursor += xStep;
 }
 
-// @4470c0 — horizontal run for the x-major octants: `count` pixels stepping
+// horizontal run for the x-major octants: `count` pixels stepping
 // by xStep, then advance the cursor by the stride.
 static void dwImageDraw_LineRunHoriz(dwImageBits* pBits, uint8_t** ppCursor, int16_t xStep, int16_t count, int color)
 {
@@ -347,7 +346,7 @@ static void dwImageDraw_LineRun16(dwImageBits* pBits, uint8_t** ppCursor, int16_
     (void)pBits; (void)ppCursor; (void)xStep; (void)count; (void)color;
 }
 
-// @447100 — Cohen-Sutherland clip; clamps *pP0/*pP1 into pBounds in place.
+// Cohen-Sutherland clip; clamps *pP0/*pP1 into pBounds in place.
 // Outcodes: 8 = y >= bottom, 4 = y < top, 2 = x >= right, 1 = x < left.
 int dwImageDraw_ClipLine(dwRect* pBounds, dwPoint* pP0, dwPoint* pP1)
 {
@@ -475,7 +474,7 @@ int dwImageDraw_ClipLine(dwRect* pBounds, dwPoint* pP0, dwPoint* pP1)
     return 0;
 }
 
-// @446d50 — run-length-slice Bresenham line (Abrash-style: whole runs of the
+// run-length-slice Bresenham line (Abrash-style: whole runs of the
 // minor axis per step), clipped to {0,0,w,h} ∩ pClip.
 void dwImageDraw_Line(dwImageBits* pBits, dwPoint* pP0, dwPoint* pP1, int color, dwRect* pClip)
 {
@@ -598,7 +597,7 @@ void dwImageDraw_Line(dwImageBits* pBits, dwPoint* pP0, dwPoint* pP1, int color,
 // ------------------------------------------------------------------
 // Triangle blend
 
-// @447710 — vertical blend span at column x, [yTop, yBottom) ∩ pClip.
+// vertical blend span at column x, [yTop, yBottom) ∩ pClip.
 void dwImageDraw_BlendColumn(dwImageBits* pBits, int16_t x, int16_t yTop, int16_t yBottom, int color, dwRect* pClip)
 {
     if ((uint8_t)(pBits->pDesc->bpp << 3) != 8)
@@ -628,7 +627,7 @@ void dwImageDraw_BlendColumn(dwImageBits* pBits, int16_t x, int16_t yTop, int16_
     }
 }
 
-// @447520 — translucent filled triangle: apex *pApex, vertical opposite edge
+// translucent filled triangle: apex *pApex, vertical opposite edge
 // at paEnds[0].x spanning paEnds[0].y..paEnds[1].y. Interpolates both edges
 // with a truncated-division DDA and blends one column at a time.
 // NOTE (faithful): x coordinates are zero-extended from their int16 storage,

@@ -5,16 +5,16 @@
 // hosting the droid-assembly workspace (dwWorkshopDroidEditor), the blueprint
 // fly-out, the tool palette and the droid viewer. dwGuiScreen subclass.
 //
-// Decompiled from DroidWorks.exe, unit range 0x43c1b0-0x43cf4f.
-// MSVC MI (binary): primary vtable dwWorkshop_vtbl @0x51fff0 (this = obj+0),
-// secondary dwWorkshop_scn_vtbl @0x51ffd8 (the dwSegment lifecycle iface for
-// the subobject @obj+0x10; its +0x14 dtor thunk @43cf20). In this translation
+// Decompiled from DroidWorks.exe.
+// MSVC MI (binary): primary dwWorkshop_vtbl (this = obj+0),
+// secondary dwWorkshop_scn_vtbl (the dwSegment lifecycle iface for
+// the subobject @obj+0x10; its +0x14 dtor thunk dwWorkshop_ScnDtorThunk). In this translation
 // that is simply `struct dwWorkshop : dwGuiScreen` — the compiler generates
 // the this-adjustor thunks.
 //
-// Singleton: dwWorkshop_pSingleton @0x53e8c0, built once by
-// dwWorkshop_CreateSingleton (binary callers: dw_Startup @41a034 [P7] and
-// dwGuiIntroSeg_Update @423cac [dwGuiOptions unit]) and pushed onto the
+// Singleton: dwWorkshop_pSingleton, built once by
+// dwWorkshop_CreateSingleton (binary callers: dw_Startup [P7] and
+// dwGuiIntroSeg_Update [dwGuiOptions unit]) and pushed onto the
 // dwSegment stack by the app flow; the dtor clears the global.
 //
 // CreateControl keywords (over the dwGuiScreen base factory): ARROWBALL /
@@ -41,13 +41,13 @@ extern "C" {
 typedef struct dwWorkshop dwWorkshop; // C++ class; opaque in the C view
 #endif
 
-// The workshop screen singleton @0x53e8c0 (NULL until CreateSingleton;
+// The workshop screen singleton dwWorkshop_pSingleton (NULL until CreateSingleton;
 // cleared by the dtor and by dwWorkshop_Startup).
 extern dwWorkshop* dwWorkshop_pSingleton;
 
 // Build the singleton when it does not exist yet (new dwWorkshop; a failed
 // allocation leaves the global NULL). Binary callers: dw_Startup (P7),
-// dwGuiIntroSeg_Update (dwGuiOptions). @43c1b0
+// dwGuiIntroSeg_Update (dwGuiOptions).
 void dwWorkshop_CreateSingleton(void);
 
 // Note: no binary counterpart — resets the module global for OpenJKDF2's
@@ -81,42 +81,42 @@ struct dwWorkshop : dwGuiScreen
     float nextDanceTime;     // 0xec: GetElapsed() deadline of the next idle
                              //       dance poke (now + rand*120/32768 + 180)
 
-    // @43c220 (dwWorkshop_Ctor) — dwGuiScreen("workshop", NULL) + zeroed state
+    // dwWorkshop_Ctor — dwGuiScreen("workshop", NULL) + zeroed state
     // + danceSound "dance.wav".
     dwWorkshop();
 
-    // @43c300 (dwWorkshop_Dtor; scalar-deleting wrapper @43c2e0, secondary
-    // thunk dwWorkshop_ScnDtorThunk @43cf20) — clears dwWorkshop_pSingleton;
+    // dwWorkshop_Dtor (scalar-deleting wrapper dwWorkshop_DtorDelete, secondary
+    // thunk dwWorkshop_ScnDtorThunk) — clears dwWorkshop_pSingleton;
     // danceSound freed by its member dtor.
     virtual ~dwWorkshop();
 
-    // ---- dwWidget/dwGuiScreen overrides (primary vtbl @0x51fff0) -----------
-    // vtbl +0x04 @43c5b0 — cursor shaping, then the base tooltip/forwarding:
+    // ---- dwWidget/dwGuiScreen overrides (primary dwWorkshop_vtbl) -----------
+    // vtbl +0x04 dwWorkshop_OnMouseMove — cursor shaping, then the base tooltip/forwarding:
     // pick mode (base bActive) -> cursor 3; inside viewRect -> grab cursor 2;
     // paint armed + inside paintRect -> paint cursor (4 + paintColorIdx);
     // else arrow (1).
     virtual int OnMouseMove(int16_t x, int16_t y);
-    // vtbl +0x14 @43c990 — statsFlags-0x4000000 tutorial-advance latch (fires
+    // vtbl +0x14 dwWorkshop_Update — statsFlags-0x4000000 tutorial-advance latch (fires
     // dwSegment_RequestAdvance once the cue playlist drains), the idle dance
     // poke ({ 0x7531, 0x7929 } + reseed), then ticks the embedded `controls`.
     // NOTE: does NOT chain the base Update (replaces the controls forward).
     virtual void Update(float dt);
-    // vtbl +0x1c @43c670 — workshop commands (codes in dwWorkshop.cpp);
+    // vtbl +0x1c dwWorkshop_OnMessage — workshop commands (codes in dwWorkshop.cpp);
     // everything else chains to dwGuiScreen::OnMessage.
     virtual int OnMessage(dwWidgetMsg* pMsg);
-    // vtbl +0x48 @43ca70 — the workshop control factory (keywords above);
+    // vtbl +0x48 dwWorkshop_CreateControl — the workshop control factory (keywords above);
     // unknown keywords fall back to dwGuiScreen::CreateControl.
     virtual dwWidget* CreateControl(char* pKeyword, dwConfFile* pConf);
 
-    // ---- dwSegment overrides (secondary "scn" vtbl @0x51ffd8) --------------
-    // +0x00 @43c3e0 (dwWorkshop_OnActivate) — base Activate; on success (and
+    // ---- dwSegment overrides (secondary "scn" dwWorkshop_scn_vtbl) --------------
+    // +0x00 dwWorkshop_OnActivate — base Activate; on success (and
     // when idle anims are on) restart every part anim and the dance music,
     // then broadcast the current-mission reward ({ 0xbbc, pCurrentMission }),
     // the workspace body type ({ 0x7e4, 1|2 }, first torso/loco slotMask hit)
     // and { 0x7dc }; a pending statsFlags-0x10000000 tutorial request becomes
     // { 0x792a } (flag swapped for 0x80000000). Always reseeds nextDanceTime.
     virtual int Activate();
-    // +0x04 @43c360 (dwWorkshop_OnDeactivate) — while idle anims run: restore
+    // +0x04 dwWorkshop_OnDeactivate — while idle anims run: restore
     // the screen music when dancing (and not in a tutorial), stop every part
     // anim; then base Deactivate.
     virtual void Deactivate();

@@ -7,11 +7,11 @@
 // the part under the cursor (recentering the orbit pivot on the picked point).
 // Built by the dwWorkshop screen for the PANCONTROL control keyword.
 //
-// Decompiled from DroidWorks.exe, unit range 0x426080-0x426d6f.
-// vtable @0x51f418 (dwDroidView_vtbl). struct dwDroidView sizeof 0x57c.
+// Decompiled from DroidWorks.exe.
+// dwDroidView_vtbl. struct dwDroidView sizeof 0x57c.
 //
 // NOTE: the dwDroidView compile unit ALSO physically contains dwPartNode
-// (@0x4267a0+), but that class landed in dwPart.cpp/.h (P5) — it is NOT
+// (dwPartNode_Ctor+), but that class landed in dwPart.cpp/.h (P5) — it is NOT
 // re-translated here; this file is only the dwDroidView class.
 //
 // Binary layout (sizeof 0x57c):
@@ -57,49 +57,49 @@ struct dwDroidView : dwGuiViewBox
 
     // Orbit droid viewer covering *pRect. The binary ctor has a dead middle
     // argument (kept so the PANCONTROL factory call stays literal); fovPct is
-    // the FOV percent (also seeds tanFovX/tanFovY and the camera FOV). @426080
+    // the FOV percent (also seeds tanFovX/tanFovY and the camera FOV).
     dwDroidView(dwRect* pRect, int dwUnused, int fovPct);
 
-    // Base dtor only (vtable reset handled by the compiler). @426190
-    // (DtorDelete @426170)
+    // Base dtor only (vtable reset handled by the compiler).
+    // (dwDroidView_DtorDelete)
     virtual ~dwDroidView();
 
     // While mouse-captured, ray-pick the part under (x, y) (forced). Returns
-    // bMouseCaptured (the "handled" flag). @4261d0 — vtbl +0x04
+    // bMouseCaptured (the "handled" flag). dwDroidView_OnMouseMove — vtbl +0x04
     virtual int OnMouseMove(int16_t x, int16_t y);
 
     // Start capture when free: set bMouseCaptured + dwWidget_pMouseTarget, then
-    // OnMouseMove(x, y). Returns 1 iff it just captured. @426210 — vtbl +0x08
+    // OnMouseMove(x, y). Returns 1 iff it just captured. dwDroidView_OnMouseDown — vtbl +0x08
     virtual int OnMouseDown(int16_t x, int16_t y);
 
     // Release capture (clears bMouseCaptured; clears pMouseTarget when it is
-    // us). @426240 — vtbl +0x0c
+    // us). dwDroidView_OnMouseUp — vtbl +0x0c
     virtual int OnMouseUp(int16_t x, int16_t y);
 
     // Dispatch a { 0x7531, 0x3eb } hover notification to pDefault, return 1.
-    // @4261a0 — vtbl +0x18
+    // vtbl +0x18
     virtual int OnHover(int16_t x, int16_t y);
 
-    // @426270 — vtbl +0x1c (see the code map above).
+    // vtbl +0x1c (see the code map above).
     virtual int OnMessage(dwWidgetMsg* pMsg);
 
-    // @426690 — vtbl +0x44: camera bring-up, draw every root/detached
+    // vtbl +0x44: camera bring-up, draw every root/detached
     // workspace node highlighted, then the green pick-selection FrameRect.
     virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect);
 
     // -- non-virtual helpers -------------------------------------------------
 
-    // @426370 — slide *pRect so it stays inside the widget rect (keeping its
+    // slide *pRect so it stays inside the widget rect (keeping its
     // size); returns nonzero when it had to be moved (i.e. was out of bounds).
     bool ClampRectToView(dwRect* pRect);
 
-    // @4263f0 — build a pick rect around *pPoint, clamp it to the view, and if
+    // build a pick rect around *pPoint, clamp it to the view, and if
     // its center moved (or bForce) cast a ray through that center against the
     // camera-facing plane, store the world hit as pickResult, broadcast a
     // 0x3eb pivot-recenter, and Invalidate.
     void PickPart(dwPoint* pPoint, uint8_t bForce);
 
-    // @426590 — compute a screen-space rect centered on *pPoint whose size is
+    // compute a screen-space rect centered on *pPoint whose size is
     // the widget rect scaled by tan(tanFovY*0.5)/tan(tanFovX*0.5).
     void ComputeViewExtents(dwPoint* pPoint, dwRect* pOut);
 };

@@ -1,7 +1,7 @@
 // dwGob — DroidWorks' transparent GOB-vs-OS-file stdio shim.
 //
-// Decompiled from DroidWorks.exe, unit range 0x414e70-0x4155a0 (the
-// 0x414e70-0x414e9x dwCore_RefFile* static ctors and the 0x4155e0+ dwRef
+// Decompiled from DroidWorks.exe (the
+// dwCore_RefFile* static ctors and the dwRefGraph_Ctor+ dwRef
 // control are mis-binned neighbors and are NOT part of this unit).
 //
 // dwGob_Startup(pHS) first hands the *original* pHS to stdGob_Startup (so the
@@ -16,7 +16,7 @@
 // base services, 2 = GOB member via stdGob_File*).
 //
 // All open/close/list operations were serialized by a Win32 CRITICAL_SECTION
-// (dwGob_critSec@0x6b6240); translated here as an SDL mutex (see dwGob_Lock).
+// (dwGob_critSec); translated here as an SDL mutex (see dwGob_Lock).
 //
 // Compiled as C++ (the binary unit carries MSVC EH frames around dwString
 // locals) in procedural style; the entire API keeps C linkage via dwGob.h's
@@ -46,21 +46,21 @@ extern "C" {
 #error "dwGob requires resident GOB entry names (STDGOB_COMPACT_ENTRIES unsupported)"
 #endif
 
-#define DWGOB_MAX_HANDLES     (256)  // dwGob_aHandles@0x53db10: 0x300 dwords = 256 * sizeof(dwGobFile)
-#define DWGOB_MAX_GOBS        (12)   // dwGob_apLoadedGobs@0x53e710
+#define DWGOB_MAX_HANDLES     (256)  // dwGob_aHandles: 0x300 dwords = 256 * sizeof(dwGobFile)
+#define DWGOB_MAX_GOBS        (12)   // dwGob_apLoadedGobs
 #define DWGOB_GOB_NUM_HANDLES (0x40) // per-archive stdGob handle count passed to stdGob_Load
 #define DWGOB_SCRATCH_LEN     (0x104)
 
 // Module statics (all reset in dwGob_Startup; soft-reset rule).
-static HostServices dwGob_baseServices;              // @0x53da70: copy of the pre-patch HostServices
-static HostServices* dwGob_pBaseServices = NULL;     // @0x53da00
-static dwGobFile dwGob_aHandles[DWGOB_MAX_HANDLES];  // @0x53db10
-static Gob* dwGob_apLoadedGobs[DWGOB_MAX_GOBS];      // @0x53e710
+static HostServices dwGob_baseServices;              // copy of the pre-patch HostServices
+static HostServices* dwGob_pBaseServices = NULL;
+static dwGobFile dwGob_aHandles[DWGOB_MAX_HANDLES];
+static Gob* dwGob_apLoadedGobs[DWGOB_MAX_GOBS];
 static tHashTable* dwGob_apBasenameHash[DWGOB_MAX_GOBS]; // Note: added — see dwGob_BuildBasenameIndex
 static char dwGob_scratchBuf[DWGOB_SCRATCH_LEN];     // shared path/printf staging buffer
 static HostServices* dwGob_pInstalledHS = NULL;      // Note: added — which HostServices we patched (for Shutdown restore)
 static int dwGob_bInstalled = 0;                     // Note: added — guards double-install on soft reset
-static SDL_Mutex* dwGob_mtx = NULL;                  // Note: replaces dwGob_critSec@0x6b6240; lazily created, kept across soft resets
+static SDL_Mutex* dwGob_mtx = NULL;                  // Note: replaces dwGob_critSec; lazily created, kept across soft resets
 
 static tHashTable* dwGob_BuildBasenameIndex(Gob* pGob);
 static const char* dwGob_FindMemberPath(Gob* pGob, const char* pMember);
@@ -86,14 +86,13 @@ static const char16_t* dwGob_GetwsStub(stdFile_t fhand, char16_t *pStr, size_t s
     return NULL;
 }
 
-// @0x414ea0. Note: case-sensitive ".GOB" substring test, as in the binary
-// (string @0x527ecc); lowercase ".gob" paths fall through to the OS branch.
+// Note: case-sensitive ".GOB" substring test, as in the binary;
+// lowercase ".gob" paths fall through to the OS branch.
 int dwGob_IsGobPath(const char *pPath)
 {
     return _strstr(pPath, ".GOB") != NULL;
 }
 
-// @0x414ec0
 int dwGob_Startup(HostServices *pHS)
 {
     // Note: added — a re-Startup without Shutdown (soft-reset loop) would
@@ -152,7 +151,6 @@ int dwGob_Startup(HostServices *pHS)
     return 1;
 }
 
-// @0x414f50
 void dwGob_Shutdown(void)
 {
     if (!dwGob_bInstalled)
@@ -195,7 +193,7 @@ void dwGob_Shutdown(void)
     dwGob_Unlock();
 }
 
-// @0x414f90 — append a dwString for every member of archive pGobPath whose
+// append a dwString for every member of archive pGobPath whose
 // extension case-insensitively equals pExt (no dot), skipping names already
 // in the list (inits_EnumFilesByPattern calls this once per search path, all
 // appending into one list). Takes the dwList handle directly now — the old
@@ -251,7 +249,7 @@ void dwGob_ListFilesByExt(char *pGobPath, char *pExt, dwList *pList)
     dwGob_Unlock();
 }
 
-// @0x415130 — the installed HostServices.fileOpen
+// the installed HostServices.fileOpen
 stdFile_t dwGob_Open(const char *pPath, const char *pMode)
 {
     dwGobFile* pFile;
@@ -266,7 +264,7 @@ stdFile_t dwGob_Open(const char *pPath, const char *pMode)
     return (stdFile_t)pFile;
 }
 
-// @0x415190 — split "<...>\foo.GOB\member" at the LAST separator, mount the
+// split "<...>\foo.GOB\member" at the LAST separator, mount the
 // archive, open the member through stdGob. Caller holds the lock.
 dwGobFile* dwGob_OpenFromGob(const char *pPath, const char *pMode)
 {
@@ -303,7 +301,7 @@ dwGobFile* dwGob_OpenFromGob(const char *pPath, const char *pMode)
     return pFile;
 }
 
-// @0x415240 — plain OS file through the saved base services. Caller holds the lock.
+// plain OS file through the saved base services. Caller holds the lock.
 dwGobFile* dwGob_OpenOsFile(const char *pPath, const char *pMode)
 {
     stdFile_t fhand = dwGob_pBaseServices->fileOpen(pPath, pMode);
@@ -323,11 +321,11 @@ dwGobFile* dwGob_OpenOsFile(const char *pPath, const char *pMode)
     return pFile;
 }
 
-// @0x415290 — find-or-load an archive in the 12-slot cache. Case-SENSITIVE
+// find-or-load an archive in the 12-slot cache. Case-SENSITIVE
 // strcmp against the loaded gob's fpath, as in the binary. Caller holds the lock.
 // DW's stdGob fork keys each archive's directory hashtable by entry BASENAME
-// (stdGob_LoadEntry@502740: name after the last '\', first entry wins) and
-// lowercases lookups (stdGob_FileOpen@502af0 via the tolower helper @506770).
+// (stdGob_LoadEntry: name after the last '\', first entry wins) and
+// lowercases lookups (stdGob_FileOpen via the tolower helper).
 // That's how bare filenames like "items.inv" resolve to "misc\items.inv"
 // inside a GOB. The repo's stdGob hashes FULL paths instead, so dwGob layers
 // the basename index here rather than touching shared engine code:
@@ -394,7 +392,7 @@ Gob* dwGob_LoadArchive(char *pPath)
     return NULL; // cache full
 }
 
-// @0x415320 — first free slot (type == 0); the caller stamps type/pBacking.
+// first free slot (type == 0); the caller stamps type/pBacking.
 // Only called with the lock held (dwGob_Open paths), as in the binary.
 dwGobFile* dwGob_AllocHandle(void)
 {
@@ -406,7 +404,7 @@ dwGobFile* dwGob_AllocHandle(void)
     return NULL;
 }
 
-// @0x415350 — the installed HostServices.fileClose
+// the installed HostServices.fileClose
 int dwGob_Close(stdFile_t fhand)
 {
     dwGobFile* pFile = (dwGobFile*)fhand;
@@ -428,7 +426,7 @@ int dwGob_Close(stdFile_t fhand)
     return result;
 }
 
-// @0x4153c0 — the installed HostServices.fileEof
+// the installed HostServices.fileEof
 int dwGob_Eof(stdFile_t fhand)
 {
     dwGobFile* pFile = (dwGobFile*)fhand;
@@ -440,7 +438,7 @@ int dwGob_Eof(stdFile_t fhand)
     return 0; // Note: return value is undefined in the binary for a stale handle
 }
 
-// @0x415400 — the installed HostServices.ftell
+// the installed HostServices.ftell
 int dwGob_Tell(stdFile_t fhand)
 {
     dwGobFile* pFile = (dwGobFile*)fhand;
@@ -452,7 +450,7 @@ int dwGob_Tell(stdFile_t fhand)
     return 0;
 }
 
-// @0x415430 — the installed HostServices.fseek. stdio convention: 0 on
+// the installed HostServices.fseek. stdio convention: 0 on
 // success, -1 on failure (stdGob_FileSeek returns nonzero on success).
 int dwGob_Seek(stdFile_t fhand, int offset, int origin)
 {
@@ -468,7 +466,7 @@ int dwGob_Seek(stdFile_t fhand, int offset, int origin)
     return -1;
 }
 
-// @0x415490 — the installed HostServices.fileRead
+// the installed HostServices.fileRead
 size_t dwGob_Read(stdFile_t fhand, void *pDst, size_t size)
 {
     dwGobFile* pFile = (dwGobFile*)fhand;
@@ -480,7 +478,7 @@ size_t dwGob_Read(stdFile_t fhand, void *pDst, size_t size)
     return 0;
 }
 
-// @0x4154e0 — the installed HostServices.fileGets. For text-mode GOB opens,
+// the installed HostServices.fileGets. For text-mode GOB opens,
 // a trailing "\r\n" is rewritten to "\n" (CRT text-translation emulation;
 // stdGob reads raw bytes).
 const char* dwGob_Gets(stdFile_t fhand, char *pStr, size_t size)
@@ -506,7 +504,7 @@ const char* dwGob_Gets(stdFile_t fhand, char *pStr, size_t size)
     return pRet;
 }
 
-// @0x415570 — the installed HostServices.fileWrite. GOB members are
+// the installed HostServices.fileWrite. GOB members are
 // read-only: writes only go through for OS-file handles, else 0.
 size_t dwGob_Write(stdFile_t fhand, void *pSrc, size_t size)
 {
@@ -517,7 +515,7 @@ size_t dwGob_Write(stdFile_t fhand, void *pSrc, size_t size)
     return 0;
 }
 
-// @0x4155a0 — the installed HostServices.filePrintf: format into the shared
+// the installed HostServices.filePrintf: format into the shared
 // scratch buffer, then dwGob_Write. Always returns 0, as in the binary.
 int dwGob_Printf(stdFile_t fhand, const char *pFmt, ...)
 {

@@ -3,12 +3,12 @@
 // dwGuiZoomBox (animated targeting reticle) and dwGuiClock (HH:MM:SS
 // display).
 //
-// Decompiled from DroidWorks.exe, unit range 0x407640-0x40877x. The unit's
+// Decompiled from DroidWorks.exe. The unit's
 // dwGuiButton SUBCLASSES owned by the dwWorkshopCtrl compile unit
 // (dwWcArrows/dwWcBuildButton/dwWcPaintButton/dwWcBuildPaintButton/
 // dwWcCargoNormalButton) are implemented in dwWorkshopCtrl.cpp.
 //
-// dwGui_NullVirtual @407ee0 (the shared no-op vtable default) is part of this
+// dwGui_NullVirtual (the shared no-op vtable default) is part of this
 // unit's range in the binary but was already translated with dwWidget — not
 // re-implemented here.
 //
@@ -22,11 +22,11 @@
 #include "jk.h" // _sscanf/_sprintf
 #include "stdPlatform.h"
 
-extern "C" HostServices* dwMain_pHS; // the DW host-services pointer (dwMain.c); binary global dwHS @0x6b6258
+extern "C" HostServices* dwMain_pHS; // the DW host-services pointer (dwMain.c); binary global dwHS
 
 // Engine headers/globals without extern "C" guards of their own — wrap at
 // include site. globals.h provides rdColormap_pCurMap (the palette-cycle
-// ramp) and sithTime_g_msecGameTime (the binary's sithTime_curMs @0x541d48).
+// ramp) and sithTime_g_msecGameTime (the binary's sithTime_curMs).
 extern "C" {
 #include "globals.h"
 }
@@ -39,17 +39,17 @@ extern "C" {
 // Cross-unit externs (not yet translated — declare + report, do not implement)
 // ---------------------------------------------------------------------------
 
-// The 16bpp RLE image loader @444c50 (Ghidra: stdBitmapRle_FUN_00444c50) —
+// The 16bpp RLE image loader (Ghidra: stdBitmapRle_FUN_00444c50) —
 // dwGuiButton loads its hit-test MASK image through it unconditionally
 // (unlike dwImage_LoadFile's bpp dispatch). Provided by the stdBitmapRle2
 // engine-side unit (P8, stdBitmapRle2.cpp).
-extern "C" dwImage* stdBitmapRle2_LoadFile16(char* pFilePath); // @444c50
+extern "C" dwImage* stdBitmapRle2_LoadFile16(char* pFilePath);
 
 // ---------------------------------------------------------------------------
-// dwGuiButton (vtbl 0x51e598)
+// dwGuiButton (dwGuiButton_vtbl)
 // ---------------------------------------------------------------------------
 
-// @407640 (dwGuiButton_Ctor)
+// dwGuiButton_Ctor
 dwGuiButton::dwGuiButton(char* pName, dwRect* pRect)
     : dwWidget(pRect)
     , bSticky(0)
@@ -66,19 +66,19 @@ dwGuiButton::dwGuiButton(char* pName, dwRect* pRect)
 {
     dwString filename(pName, 0);
     filename.Append(".bbl", 4);
-    dwGuiButton::ParseBlob(filename.pBuffer); // binary: direct call @407810
-    dwGuiButton::EnsureImages();              // binary: direct call @407da0
+    dwGuiButton::ParseBlob(filename.pBuffer); // binary: direct call
+    dwGuiButton::EnsureImages();              // binary: direct call dwGuiButton_EnsureImagesLoaded
 }
 
-// @407710 (dwGuiButton_Dtor; scalar-deleting wrapper @4076f0; COMDAT copy
-// dwWcButton_DtorDelete @406870 shared by the wc-button vtables)
+// dwGuiButton_Dtor (scalar-deleting wrapper dwGuiButton_DtorDelete; COMDAT copy
+// dwWcButton_DtorDelete shared by the wc-button vtables)
 dwGuiButton::~dwGuiButton()
 {
-    dwGuiButton::FreeImages();     // binary: direct call @407e70
-    dwGuiButton::FreeResources();  // binary: direct call @407770
+    dwGuiButton::FreeImages();     // binary: direct call
+    dwGuiButton::FreeResources();  // binary: direct call
 }
 
-// @407770 (dwGuiButton_FreeResources)
+// dwGuiButton_FreeResources
 void dwGuiButton::FreeResources()
 {
     uint32_t i;
@@ -110,8 +110,8 @@ void dwGuiButton::FreeResources()
     }
 }
 
-// @407810 (dwGuiButton_ParseBlob) — (re)parse the .bbl conf file.
-// Note: the binary's syntax-error log fn (Ghidra: jk_logtofile @402cc0) is a
+// dwGuiButton_ParseBlob — (re)parse the .bbl conf file.
+// Note: the binary's syntax-error log fn (Ghidra: jk_logtofile) is a
 // retail NO-OP; printing here is a diagnostic adaptation.
 void dwGuiButton::ParseBlob(char* pFilePath)
 {
@@ -198,12 +198,12 @@ void dwGuiButton::ParseBlob(char* pFilePath)
             continue;
         pErrFmt = "Button Blob %s: syntax error -- %s\n";
 logError:
-        stdPlatform_Printf(pErrFmt, pFilePath, pTok); // binary: @402cc0 (retail no-op)
+        stdPlatform_Printf(pErrFmt, pFilePath, pTok); // binary (retail no-op)
     }
     dwConfFile_Close(&conf);
 }
 
-// @407b20 (dwGuiButton_SetPressed)
+// dwGuiButton_SetPressed
 void dwGuiButton::SetPressed(int buttonId)
 {
     int oldShown;
@@ -230,7 +230,7 @@ void dwGuiButton::SetPressed(int buttonId)
     }
 }
 
-// @407b80 (dwGuiButton_ClearPressed)
+// dwGuiButton_ClearPressed
 void dwGuiButton::ClearPressed()
 {
     int oldShown;
@@ -242,7 +242,7 @@ void dwGuiButton::ClearPressed()
         this->OnButtonReleased(oldShown); // vtbl +0x4c
 }
 
-// @407ba0 (dwGuiButton_HitTest) — button id under (x, y) from the mask
+// dwGuiButton_HitTest — button id under (x, y) from the mask
 // image's pixel value. QUIRK preserved: both bounds pre-checks compare
 // against the mask WIDTH (the y check should use the height).
 int dwGuiButton::HitTest(int16_t x, int16_t y)
@@ -268,7 +268,7 @@ int dwGuiButton::HitTest(int16_t x, int16_t y)
     return id;
 }
 
-// vtbl +0x04 @407c50 (dwGuiButton_OnMouseMove) — while a non-sticky press is
+// vtbl +0x04 dwGuiButton_OnMouseMove — while a non-sticky press is
 // active, track whether the cursor is still over the pressed button.
 // Returns 0.
 int dwGuiButton::OnMouseMove(int16_t x, int16_t y)
@@ -295,7 +295,7 @@ int dwGuiButton::OnMouseMove(int16_t x, int16_t y)
     return 0;
 }
 
-// vtbl +0x08 @407cb0 (dwGuiButton_OnMouseDown)
+// vtbl +0x08 dwGuiButton_OnMouseDown
 int dwGuiButton::OnMouseDown(int16_t x, int16_t y)
 {
     int hitId;
@@ -312,7 +312,7 @@ int dwGuiButton::OnMouseDown(int16_t x, int16_t y)
     return 1;
 }
 
-// vtbl +0x0c @407cf0 (dwGuiButton_OnMouseUp)
+// vtbl +0x0c dwGuiButton_OnMouseUp
 int dwGuiButton::OnMouseUp(int16_t x, int16_t y)
 {
     int hitId;
@@ -329,19 +329,19 @@ int dwGuiButton::OnMouseUp(int16_t x, int16_t y)
     return 1;
 }
 
-// vtbl +0x48 default @407ee0 (dwGui_NullVirtual)
+// vtbl +0x48 default dwGui_NullVirtual
 void dwGuiButton::OnButtonPressed(int buttonId)
 {
     (void)buttonId;
 }
 
-// vtbl +0x4c default @407ee0 (dwGui_NullVirtual)
+// vtbl +0x4c default dwGui_NullVirtual
 void dwGuiButton::OnButtonReleased(int buttonId)
 {
     (void)buttonId;
 }
 
-// vtbl +0x44 @407d50 (dwGuiButton_Draw)
+// vtbl +0x44 dwGuiButton_Draw
 void dwGuiButton::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     dwImage* pImg;
@@ -356,7 +356,7 @@ void dwGuiButton::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
         pImg->Blit(pDestBits, this->left, this->top, pClipRect); // vtbl +0x04
 }
 
-// vtbl +0x3c @407da0 (Ghidra: dwGuiButton_EnsureImagesLoaded)
+// vtbl +0x3c (Ghidra: dwGuiButton_EnsureImagesLoaded)
 void dwGuiButton::EnsureImages()
 {
     uint32_t i;
@@ -377,10 +377,10 @@ void dwGuiButton::EnsureImages()
     }
 
     if (this->pMaskName != NULL && this->pMaskName->length != 0 && this->hMaskImage == NULL)
-        this->hMaskImage = stdBitmapRle2_LoadFile16(this->pMaskName->pBuffer); // @444c50
+        this->hMaskImage = stdBitmapRle2_LoadFile16(this->pMaskName->pBuffer);
 }
 
-// vtbl +0x40 @407e70 (dwGuiButton_FreeImages)
+// vtbl +0x40 dwGuiButton_FreeImages
 void dwGuiButton::FreeImages()
 {
     uint32_t i;
@@ -406,10 +406,10 @@ void dwGuiButton::FreeImages()
 }
 
 // ---------------------------------------------------------------------------
-// dwGuiTextButton (vtbl 0x51e5e8)
+// dwGuiTextButton (dwGuiTextButton_vtbl)
 // ---------------------------------------------------------------------------
 
-// @407ef0 (dwGuiTextButton_Ctor)
+// dwGuiTextButton_Ctor
 dwGuiTextButton::dwGuiTextButton(dwRect* pRect, char* pLabel, char* pFontName,
                                  uint8_t colorNormal, char* pSndOff, uint8_t colorHot,
                                  char* pSndClick, char* pHoverSnd, int cmdId, uint8_t bAltDraw)
@@ -429,8 +429,8 @@ dwGuiTextButton::dwGuiTextButton(dwRect* pRect, char* pLabel, char* pFontName,
     }
 }
 
-// @407ff0 (dwGuiTextButton_Dtor; scalar-deleting wrapper @407fd0) — the font
-// handle "dtor" @504190 is a lone RET in the binary (the glyph block belongs
+// dwGuiTextButton_Dtor (scalar-deleting wrapper dwGuiTextButton_DtorDelete) — the font
+// handle "dtor" sithRender_Open is a lone RET in the binary (the glyph block belongs
 // to the dwFont cache); only the handle allocation is released.
 dwGuiTextButton::~dwGuiTextButton()
 {
@@ -438,7 +438,7 @@ dwGuiTextButton::~dwGuiTextButton()
         delete this->hFont;
 }
 
-// vtbl +0x04 @408070 (dwGuiTextButton_OnMouseMove) — hover tracking through
+// vtbl +0x04 dwGuiTextButton_OnMouseMove — hover tracking through
 // bChecked (with mouse capture), plus the optional hover sound.
 int dwGuiTextButton::OnMouseMove(int16_t x, int16_t y)
 {
@@ -474,14 +474,14 @@ int dwGuiTextButton::OnMouseMove(int16_t x, int16_t y)
     return dwWorkshopCtrl::OnMouseMove(x, y);
 }
 
-// vtbl +0x0c @408130 (dwGuiTextButton_OnMouseUp)
+// vtbl +0x0c dwGuiTextButton_OnMouseUp
 int dwGuiTextButton::OnMouseUp(int16_t x, int16_t y)
 {
     this->bChecked = 0;
     return dwWorkshopCtrl::OnMouseUp(x, y);
 }
 
-// vtbl +0x44 @408150 (dwGuiTextButton_Draw)
+// vtbl +0x44 dwGuiTextButton_Draw
 void dwGuiTextButton::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     uint8_t color;
@@ -493,17 +493,17 @@ void dwGuiTextButton::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
         color = this->colorHot;
     if (this->bAltDraw != 0)
         dwFont_DrawTextCentered(pDestBits, this->hFont, this->GetRectPtr(),
-                                this->labelText.pBuffer, color, pClipRect); // @448d30
+                                this->labelText.pBuffer, color, pClipRect);
     else
         dwFont_DrawText(pDestBits, this->hFont, this->GetRectPtr(),
-                        this->labelText.pBuffer, color, pClipRect);         // @448d00
+                        this->labelText.pBuffer, color, pClipRect);
 }
 
 // ---------------------------------------------------------------------------
-// dwGuiZoomBox (vtbl 0x51e638)
+// dwGuiZoomBox (dwGuiZoomBox_vtbl)
 // ---------------------------------------------------------------------------
 
-// @4081d0 (dwGuiZoomBox_Ctor)
+// dwGuiZoomBox_Ctor
 dwGuiZoomBox::dwGuiZoomBox(dwRect* pRect, float speed, uint8_t color)
     : dwWidget(pRect)
     , accumTime(0.0f) // Note: left uninitialized by the binary ctor (first
@@ -520,13 +520,13 @@ dwGuiZoomBox::dwGuiZoomBox(dwRect* pRect, float speed, uint8_t color)
     this->pt.y = 0;
 }
 
-// @408230 (dwGuiZoomBox_Dtor; scalar-deleting wrapper @408210) — vptr
+// dwGuiZoomBox_Dtor (scalar-deleting wrapper dwGuiZoomBox_DtorDelete) — vptr
 // re-point + base dtor only.
 dwGuiZoomBox::~dwGuiZoomBox()
 {
 }
 
-// @408240 (dwGuiZoomBox_SetTarget)
+// dwGuiZoomBox_SetTarget
 void dwGuiZoomBox::SetTarget(dwPoint* pPt)
 {
     int dx, dy;
@@ -552,7 +552,7 @@ void dwGuiZoomBox::SetTarget(dwPoint* pPt)
     this->curSpeed = this->speed;
 }
 
-// vtbl +0x14 @4082d0 (dwGuiZoomBox_Update) — ease curRadius toward
+// vtbl +0x14 dwGuiZoomBox_Update — ease curRadius toward
 // targetRadius; on arrival advance the state and RECURSE with the overshoot
 // time (keeps the animation continuous across state changes).
 void dwGuiZoomBox::Update(float dt)
@@ -623,7 +623,7 @@ void dwGuiZoomBox::Update(float dt)
     this->Invalidate();
 }
 
-// vtbl +0x44 @408420 (dwGuiZoomBox_Draw)
+// vtbl +0x44 dwGuiZoomBox_Draw
 void dwGuiZoomBox::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     dwRect rect;
@@ -679,10 +679,10 @@ void dwGuiZoomBox::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 }
 
 // ---------------------------------------------------------------------------
-// dwGuiClock (vtbl 0x51e698)
+// dwGuiClock (dwGuiClock_vtbl)
 // ---------------------------------------------------------------------------
 
-// @4085a0 (dwGuiClock_Ctor) — NOTE: rect passed BY VALUE in the binary.
+// dwGuiClock_Ctor — NOTE: rect passed BY VALUE in the binary.
 dwGuiClock::dwGuiClock(dwRect rect, char* pFontName, uint8_t color, int bRunning, int elapsedSec)
     : dwWidget(&rect)
     , pFont(NULL)
@@ -695,17 +695,17 @@ dwGuiClock::dwGuiClock(dwRect rect, char* pFontName, uint8_t color, int bRunning
         dwFont_Load(this->pFont, pFontName);
 }
 
-// @408650 (dwGuiClock_Dtor; scalar-deleting wrapper @408630) — see the
-// dwGuiTextButton dtor note on the @504190 font-handle "dtor".
+// dwGuiClock_Dtor (scalar-deleting wrapper dwGuiClock_DtorDelete) — see the
+// dwGuiTextButton dtor note on the sithRender_Open font-handle "dtor".
 dwGuiClock::~dwGuiClock()
 {
     if (this->pFont != NULL)
         delete this->pFont;
 }
 
-// vtbl +0x44 @4086c0 (dwGuiClock_Draw) — the clock advances HERE (there is
+// vtbl +0x44 dwGuiClock_Draw — the clock advances HERE (there is
 // no Update override — binary quirk). Binary time source: sithTime_curMs
-// @0x541d48 (= sithTime_g_msecGameTime in OpenJKDF2 naming), scaled by
+// (= sithTime_g_msecGameTime in OpenJKDF2 naming), scaled by
 // 0.001f and rounded.
 void dwGuiClock::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {

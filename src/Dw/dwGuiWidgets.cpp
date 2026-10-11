@@ -2,12 +2,12 @@
 // / dwGuiScrollButton / dwGuiTextRollover) + the .drd droid-file
 // serialization free functions. See Dw/dwGuiWidgets.h for the class notes.
 //
-// Decompiled from DroidWorks.exe, unit range 0x432150-0x433d8f.
-// NOT re-implemented here (already owned elsewhere): 0x432150/0x432170 =
-// dwGuiScreen_EnsureImages/FreeImages (dwGuiScreen.cpp); 0x432280 =
+// Decompiled from DroidWorks.exe.
+// NOT re-implemented here (already owned elsewhere): dwGuiScreen_EnsureImages/dwGuiScreen_FreeImages =
+// dwGuiScreen_EnsureImages/FreeImages (dwGuiScreen.cpp); dw_CoreStubCtor =
 // dw_CoreStubCtor (a dwSegment-vptr-reset COMDAT used only by the dw core
 // unit's EH cleanup — C++ base-dtor semantics cover it); the four MI
-// this-adjustor thunks @0x433db0-0x433de0 (compiler-generated now).
+// this-adjustor thunks (compiler-generated now).
 //
 // No module statics — no dwGuiWidgets_Startup needed (soft-reset rule).
 
@@ -19,15 +19,15 @@
 
 #include "stdPlatform.h"
 
-extern "C" HostServices* dwMain_pHS; // the DW host-services pointer (dwMain.c); binary global dwHS @0x6b6258
+extern "C" HostServices* dwMain_pHS; // the DW host-services pointer (dwMain.c); binary global dwHS
 
 #include <stdlib.h>
 
 // ---------------------------------------------------------------------------
-// dwGuiScrollBar (vtbl 0x51f7f0)
+// dwGuiScrollBar (dwGuiScrollBar_vtbl)
 // ---------------------------------------------------------------------------
 
-// @432980 (dwGuiScrollBar_Ctor)
+// dwGuiScrollBar_Ctor
 dwGuiScrollBar::dwGuiScrollBar(dwRect* pRect, int msgSetValue, int msgLineUp, int msgLineDown,
                                int minValue, int maxValue, char* pTrackImgName, char* pThumbImgName)
     : dwWidget(pRect)
@@ -48,17 +48,17 @@ dwGuiScrollBar::dwGuiScrollBar(dwRect* pRect, int msgSetValue, int msgLineUp, in
 {
     this->thumbImageName.AssignCStr(pThumbImgName);
     this->trackImageName.AssignCStr(pTrackImgName);
-    dwGuiScrollBar::EnsureImages(); // binary: direct call @433000
+    dwGuiScrollBar::EnsureImages(); // binary: direct call
 }
 
-// @432a80 (dwGuiScrollBar_Dtor; scalar-deleting wrapper @432a60)
+// dwGuiScrollBar_Dtor (scalar-deleting wrapper dwGuiScrollBar_DtorDelete)
 dwGuiScrollBar::~dwGuiScrollBar()
 {
-    dwGuiScrollBar::FreeImages(); // binary: direct call @433050
+    dwGuiScrollBar::FreeImages(); // binary: direct call
     // thumbImageName/trackImageName freed by the member dtors (that order).
 }
 
-// vtbl +0x04 @432b20
+// vtbl +0x04 dwGuiScrollBar_OnMouseMove
 int dwGuiScrollBar::OnMouseMove(int16_t x, int16_t y)
 {
     if (this->bDragging != 0)
@@ -66,7 +66,7 @@ int dwGuiScrollBar::OnMouseMove(int16_t x, int16_t y)
     return this->bDragging;
 }
 
-// vtbl +0x08 @432b50
+// vtbl +0x08 dwGuiScrollBar_OnMouseDown
 int dwGuiScrollBar::OnMouseDown(int16_t x, int16_t y)
 {
     this->bDragging = 1;
@@ -74,7 +74,7 @@ int dwGuiScrollBar::OnMouseDown(int16_t x, int16_t y)
     return this->OnMouseMove(x, y); // binary: virtual tail call (vtbl +0x04)
 }
 
-// vtbl +0x0c @432b70
+// vtbl +0x0c dwGuiScrollBar_OnMouseUp
 int dwGuiScrollBar::OnMouseUp(int16_t x, int16_t y)
 {
     (void)x; (void)y;
@@ -84,8 +84,8 @@ int dwGuiScrollBar::OnMouseUp(int16_t x, int16_t y)
     return 1;
 }
 
-// vtbl +0x14 @432c00 — auto-repeat tick (constants 0.1f @0x51f838 / 10.0f
-// @0x51f83c in the binary).
+// vtbl +0x14 dwGuiScrollBar_Update — auto-repeat tick (constants 0.1f / 10.0f
+// in the binary).
 void dwGuiScrollBar::Update(float dt)
 {
     int steps;
@@ -117,7 +117,7 @@ void dwGuiScrollBar::Update(float dt)
     }
 }
 
-// vtbl +0x18 @419780 (the shared dwWidget_OnHoverNotify COMDAT reading the
+// vtbl +0x18 (the shared dwWidget_OnHoverNotify COMDAT reading the
 // derived +0x10 field — see the dwWidget.h note on the 64-bit adaptation)
 int dwGuiScrollBar::OnHover(int16_t x, int16_t y)
 {
@@ -125,7 +125,7 @@ int dwGuiScrollBar::OnHover(int16_t x, int16_t y)
     return this->OnHoverNotify((void*)(intptr_t)this->msgSetValue);
 }
 
-// vtbl +0x1c @432b90
+// vtbl +0x1c dwGuiScrollBar_OnMessage
 int dwGuiScrollBar::OnMessage(dwWidgetMsg* pMsg)
 {
     if (pMsg->code == this->msgSetValue)
@@ -158,7 +158,7 @@ int dwGuiScrollBar::OnMessage(dwWidgetMsg* pMsg)
     return 0;
 }
 
-// vtbl +0x20 @432af0 (Ghidra: dwGuiScrollBar_EnableInput) — Enable override
+// vtbl +0x20 (Ghidra: dwGuiScrollBar_EnableInput) — Enable override
 void dwGuiScrollBar::Enable()
 {
     dwWidgetMsg msg;
@@ -171,7 +171,7 @@ void dwGuiScrollBar::Enable()
     dwWidget_DispatchMsg(&msg, NULL);
 }
 
-// vtbl +0x3c @433000 (thumb first, then track — binary order)
+// vtbl +0x3c dwGuiScrollBar_EnsureImages (thumb first, then track — binary order)
 void dwGuiScrollBar::EnsureImages()
 {
     if (this->pThumbImage == NULL && this->thumbImageName.length != 0)
@@ -180,7 +180,7 @@ void dwGuiScrollBar::EnsureImages()
         this->pTrackImage = dwImage_LoadFile(this->trackImageName.pBuffer);
 }
 
-// vtbl +0x40 @433050
+// vtbl +0x40 dwGuiScrollBar_FreeImages
 void dwGuiScrollBar::FreeImages()
 {
     if (this->pThumbImage != NULL)
@@ -195,7 +195,7 @@ void dwGuiScrollBar::FreeImages()
     }
 }
 
-// vtbl +0x44 @432f60
+// vtbl +0x44 dwGuiScrollBar_Draw
 void dwGuiScrollBar::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     dwRect thumbRect;
@@ -216,7 +216,7 @@ void dwGuiScrollBar::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
         dwImageDraw_FillRect(pDestBits, &thumbRect, dwColormap_transparentIdx, NULL);
 }
 
-// @432cc0 (dwGuiScrollBar_SetValue)
+// dwGuiScrollBar_SetValue
 void dwGuiScrollBar::SetValue(int newValue)
 {
     dwWidgetMsg msg;
@@ -247,7 +247,7 @@ void dwGuiScrollBar::SetValue(int newValue)
     }
 }
 
-// @432d30 (dwGuiScrollBar_PointToValue)
+// dwGuiScrollBar_PointToValue
 int dwGuiScrollBar::PointToValue(int16_t x, int16_t y)
 {
     int16_t thumbLen;
@@ -280,7 +280,7 @@ int dwGuiScrollBar::PointToValue(int16_t x, int16_t y)
     return this->maxValue;
 }
 
-// @432e20 (dwGuiScrollBar_GetThumbRect)
+// dwGuiScrollBar_GetThumbRect
 void dwGuiScrollBar::GetThumbRect(dwRect* pRectOut)
 {
     int16_t thumbLen;
@@ -336,10 +336,10 @@ void dwGuiScrollBar::GetThumbRect(dwRect* pRectOut)
 }
 
 // ---------------------------------------------------------------------------
-// dwGuiScrollBox (vtbl 0x51f840)
+// dwGuiScrollBox (dwGuiScrollBox_vtbl)
 // ---------------------------------------------------------------------------
 
-// @433080 (dwGuiScrollBox_Ctor)
+// dwGuiScrollBox_Ctor
 dwGuiScrollBox::dwGuiScrollBox(dwRect* pRect, int scrollMsgCode, char* pFontName,
                                uint8_t textColorIdx, uint8_t highlightColorIdx, int msgSelChanged)
     : dwWidget(pRect)
@@ -366,7 +366,7 @@ dwGuiScrollBox::dwGuiScrollBox(dwRect* pRect, int scrollMsgCode, char* pFontName
     this->pFirstVisible = this->items.pSentinel->pNext; // == sentinel (empty)
 }
 
-// @433180 (dwGuiScrollBox_Dtor; scalar-deleting wrapper @433160)
+// dwGuiScrollBox_Dtor (scalar-deleting wrapper dwGuiScrollBox_DtorDelete)
 dwGuiScrollBox::~dwGuiScrollBox()
 {
     dwListNode* pNode;
@@ -374,7 +374,7 @@ dwGuiScrollBox::~dwGuiScrollBox()
     dwGuiScrollBoxItem* pItem;
 
     if (this->pFont != NULL)
-        delete this->pFont; // binary: no-op font "dtor" @504190 + free
+        delete this->pFont; // binary: no-op font "dtor" + free
 
     // unlink + free every node, deleting its item (strings then the block)
     pNode = this->items.pSentinel->pNext;
@@ -392,7 +392,7 @@ dwGuiScrollBox::~dwGuiScrollBox()
     this->items.Free();
 }
 
-// vtbl +0x08 @433310
+// vtbl +0x08 dwGuiScrollBox_OnMouseDown
 int dwGuiScrollBox::OnMouseDown(int16_t x, int16_t y)
 {
     dwPoint pt;
@@ -434,14 +434,14 @@ int dwGuiScrollBox::OnMouseDown(int16_t x, int16_t y)
     return 0;
 }
 
-// vtbl +0x18 @4337f0
+// vtbl +0x18 dwGuiScrollBox_OnHover
 int dwGuiScrollBox::OnHover(int16_t x, int16_t y)
 {
     (void)x; (void)y;
     return this->OnHoverNotify((void*)(intptr_t)this->msgSelChanged);
 }
 
-// vtbl +0x1c @433750
+// vtbl +0x1c dwGuiScrollBox_OnMessage
 int dwGuiScrollBox::OnMessage(dwWidgetMsg* pMsg)
 {
     int newPos;
@@ -483,7 +483,7 @@ int dwGuiScrollBox::OnMessage(dwWidgetMsg* pMsg)
     return 0;
 }
 
-// vtbl +0x44 @433820
+// vtbl +0x44 dwGuiScrollBox_Draw
 void dwGuiScrollBox::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     dwListNode* pNode;
@@ -528,7 +528,7 @@ void dwGuiScrollBox::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
         dwImageDraw_FrameRect(pDestBits, this->GetRectPtr(), 7, pClipRect);
 }
 
-// @433410 (dwGuiScrollBox_ContainsFile)
+// dwGuiScrollBox_ContainsFile
 int dwGuiScrollBox::ContainsFile(dwString* pFilename)
 {
     dwListNode* pNode;
@@ -548,7 +548,7 @@ int dwGuiScrollBox::ContainsFile(dwString* pFilename)
     return 0;
 }
 
-// @433490 (dwGuiScrollBox_AddItem) — sorted insert by display name
+// dwGuiScrollBox_AddItem — sorted insert by display name
 void dwGuiScrollBox::AddItem(char* pFilename, char* pDisplayName)
 {
     dwGuiScrollBoxItem* pItem;
@@ -576,7 +576,7 @@ void dwGuiScrollBox::AddItem(char* pFilename, char* pDisplayName)
     this->Invalidate();
 }
 
-// @4335c0 (dwGuiScrollBox_RemoveSelected)
+// dwGuiScrollBox_RemoveSelected
 void dwGuiScrollBox::RemoveSelected()
 {
     dwListNode* pNode;
@@ -601,7 +601,7 @@ void dwGuiScrollBox::RemoveSelected()
     this->items.UnlinkFreeNode(pNode);
     this->itemCount = this->itemCount - 1;
     if (this->pSelectedItem != NULL)
-        delete this->pSelectedItem; // dwGuiScrollBox_ItemFree @433700 + free
+        delete this->pSelectedItem; // dwGuiScrollBox_ItemFree + free
     if (pNext != this->items.pSentinel)
     {
         this->pSelectedItem = (dwGuiScrollBoxItem*)pNext->pData;
@@ -623,7 +623,7 @@ void dwGuiScrollBox::RemoveSelected()
     this->Invalidate();
 }
 
-// @433960 (dwGuiScrollBox_UpdateScrollFlag)
+// dwGuiScrollBox_UpdateScrollFlag
 void dwGuiScrollBox::UpdateScrollFlag()
 {
     if ((uint32_t)((int)(int16_t)(this->bottom - this->top) / (int)this->pFont->pHeader->lineHeight)
@@ -637,27 +637,27 @@ void dwGuiScrollBox::UpdateScrollFlag()
 }
 
 // ---------------------------------------------------------------------------
-// dwGuiScrollButton (vtbl 0x51f888)
+// dwGuiScrollButton (dwGuiScrollButton_vtbl)
 // ---------------------------------------------------------------------------
 
-// @433aa0 (dwGuiScrollButton_Ctor)
+// dwGuiScrollButton_Ctor
 dwGuiScrollButton::dwGuiScrollButton(dwRect* pRect, char* pImgUpName, char* pImgDownName, int cmdId)
     : dwWorkshopCtrl(pRect, pImgUpName, NULL, pImgDownName, NULL, cmdId, 0)
 {
 }
 
-// @433af0 (dwGuiScrollButton_Dtor; scalar-deleting wrapper @433ad0)
+// dwGuiScrollButton_Dtor (scalar-deleting wrapper dwGuiScrollButton_DtorDelete)
 dwGuiScrollButton::~dwGuiScrollButton()
 {
 }
 
-// vtbl +0x08 @433b00
+// vtbl +0x08 dwGuiScrollButton_OnMouseDown
 int dwGuiScrollButton::OnMouseDown(int16_t x, int16_t y)
 {
     int result;
     dwWidgetMsg msg;
 
-    result = dwWorkshopCtrl::OnMouseDown(x, y); // binary: direct call @4073d0
+    result = dwWorkshopCtrl::OnMouseDown(x, y); // binary: direct call
     if (this->bHot != 0)
     {
         msg.code = this->cmdId;
@@ -669,7 +669,7 @@ int dwGuiScrollButton::OnMouseDown(int16_t x, int16_t y)
     return result;
 }
 
-// vtbl +0x0c @433b50
+// vtbl +0x0c dwGuiScrollButton_OnMouseUp
 int dwGuiScrollButton::OnMouseUp(int16_t x, int16_t y)
 {
     dwWidgetMsg msg;
@@ -692,16 +692,16 @@ int dwGuiScrollButton::OnMouseUp(int16_t x, int16_t y)
 }
 
 // ---------------------------------------------------------------------------
-// dwGuiTextRollover (vtbls 0x51f928 primary / 0x51f8d8 hyptext subobject)
+// dwGuiTextRollover (dwGuiTextRollover_vtbl primary / dwGuiTextRollover_HypText_vtbl hyptext subobject)
 // ---------------------------------------------------------------------------
 
-// @433bb0 (dwGuiTextRollover_Ctor)
+// dwGuiTextRollover_Ctor
 dwGuiTextRollover::dwGuiTextRollover(dwRect* pRect, char* pText, char* pFontName, char* pLinkTarget,
                                      uint8_t color, char* pSndOff, uint8_t colorHot,
                                      char* pSndClick, char* pHoverSnd, int cmdId)
     : dwGuiTextButton(pRect, pText, pFontName, color, pSndOff, colorHot,
                       pSndClick, pHoverSnd, cmdId, /*bAltDraw*/ 0)
-    , dwGuiHypText(pRect, NULL, pFontName, color, (char*)"BCO") // binary format string @5294a4
+    , dwGuiHypText(pRect, NULL, pFontName, color, (char*)"BCO")
     , linkTarget(pLinkTarget, 0)
 {
     this->text.Free();      // dwGuiHypText::text — SetText APPENDS, so Free first
@@ -709,13 +709,13 @@ dwGuiTextRollover::dwGuiTextRollover(dwRect* pRect, char* pText, char* pFontName
     this->labelText.Assign(this->text.pBuffer, 0); // button label = the hyptext text
 }
 
-// @433cb0 (dwGuiTextRollover_Dtor; scalar-deleting wrapper @433c90;
-// hyptext-subobject thunk @433db0) — linkTarget + base dtors, all implicit.
+// dwGuiTextRollover_Dtor (scalar-deleting wrapper dwGuiTextRollover_DtorDelete;
+// hyptext-subobject thunk dwGuiTextRollover_DtorDelete_Thunk) — linkTarget + base dtors, all implicit.
 dwGuiTextRollover::~dwGuiTextRollover()
 {
 }
 
-// vtbl +0x0c @433d50 (hyptext-subobject thunk @433dc0 — Ghidra named it
+// vtbl +0x0c dwGuiTextRollover_OnMouseUp (hyptext-subobject thunk dwGuiTextRollover_OnHover2_Thunk — Ghidra named it
 // dwGuiTextRollover_OnHover2_Thunk, but the slot is OnMouseUp)
 int dwGuiTextRollover::OnMouseUp(int16_t x, int16_t y)
 {
@@ -730,21 +730,21 @@ int dwGuiTextRollover::OnMouseUp(int16_t x, int16_t y)
     return 1;
 }
 
-// vtbl +0x18 @433d30 (hyptext-subobject thunk @433dd0) — forwards to the
-// shared { 0x7531, (void*)cmdId } body @439ad0 (= dwWorkshopCtrl::OnHover).
+// vtbl +0x18 dwGuiTextRollover_OnHover (hyptext-subobject thunk dwGuiTextRollover_OnHover_Thunk) — forwards to the
+// shared { 0x7531, (void*)cmdId } body dwGuiTextPopup_OnHover (= dwWorkshopCtrl::OnHover).
 int dwGuiTextRollover::OnHover(int16_t x, int16_t y)
 {
     return dwWorkshopCtrl::OnHover(x, y);
 }
 
-// vtbl +0x44 @433d80 (hyptext-subobject thunk @433de0)
+// vtbl +0x44 dwGuiTextRollover_Draw (hyptext-subobject thunk dwGuiTextRollover_Draw_Thunk)
 void dwGuiTextRollover::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     // binary reads the PRIMARY (dwGuiTextButton) subobject's bEnabled
     if (this->dwGuiTextButton::bEnabled != 0)
     {
-        dwGuiHypText::Draw(pDestBits, pClipRect);    // binary: direct call @438e20
-        dwGuiTextButton::Draw(pDestBits, pClipRect); // binary: direct call @408150
+        dwGuiHypText::Draw(pDestBits, pClipRect);    // binary: direct call
+        dwGuiTextButton::Draw(pDestBits, pClipRect); // binary: direct call
     }
 }
 
@@ -752,7 +752,7 @@ void dwGuiTextRollover::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 // .drd droid-file serialization (free functions)
 // ---------------------------------------------------------------------------
 
-// @432540 (dwGuiWidgets_NodeIndexOf)
+// dwGuiWidgets_NodeIndexOf
 extern "C" int dwGuiWidgets_NodeIndexOf(dwList* pList, void* pPayload)
 {
     dwListNode* pNode;
@@ -768,7 +768,7 @@ extern "C" int dwGuiWidgets_NodeIndexOf(dwList* pList, void* pPayload)
     return index; // quirk: == list size when not found
 }
 
-// @4328a0 (dwGuiWidgets_NodeAtIndex)
+// dwGuiWidgets_NodeAtIndex
 extern "C" void* dwGuiWidgets_NodeAtIndex(dwList* pList, int index)
 {
     dwListNode* pNode;
@@ -785,8 +785,8 @@ extern "C" void* dwGuiWidgets_NodeAtIndex(dwList* pList, int index)
     return NULL;
 }
 
-// @4322a0 (dwGuiWidgets_WriteDroidFile) — all prints via dwHS->filePrintf
-// (dwHS @0x6b6258 = dwMain_pHS). Sections: VERSION / NAME / PARTS (blueprint
+// dwGuiWidgets_WriteDroidFile — all prints via dwHS->filePrintf
+// (dwHS = dwMain_pHS). Sections: VERSION / NAME / PARTS (blueprint
 // name + slotIdx16 + position per node) / COLORS (the 9 recorded paint pairs
 // per node) / PARENTS (1-based parent node index + attach-slot ordinal).
 extern "C" int dwGuiWidgets_WriteDroidFile(stdFile_t file, dwString* pName, dwList* pNodeList)
@@ -867,7 +867,7 @@ extern "C" int dwGuiWidgets_WriteDroidFile(stdFile_t file, dwString* pName, dwLi
     return 1;
 }
 
-// @4325d0 (dwGuiWidgets_ReadDroidFile) — rebuild the part tree from an open
+// dwGuiWidgets_ReadDroidFile — rebuild the part tree from an open
 // .drd dwConfFile. Returns 0 when any referenced blueprint is missing or
 // locked (the parse still consumes the remaining PARTS lines, as in the
 // binary, and the outer keyword loop then stops).
@@ -893,7 +893,7 @@ extern "C" int dwGuiWidgets_ReadDroidFile(dwConfFile* pConf, dwString* pNameOut,
     {
         dwConfFile_ReadLine(pConf);
         pTok = dwConfFile_NextToken(pConf);
-        if (dwString_Equals(pTok, "END")) // @528470
+        if (dwString_Equals(pTok, "END"))
             break;
         if (dwString_Equals(pTok, "VERSION"))
         {
@@ -978,7 +978,7 @@ extern "C" int dwGuiWidgets_ReadDroidFile(dwConfFile* pConf, dwString* pNameOut,
     return bOk;
 }
 
-// @432580 (dwGuiWidgets_SaveDroidToFile)
+// dwGuiWidgets_SaveDroidToFile
 extern "C" int dwGuiWidgets_SaveDroidToFile(const char* pPath, dwString* pName, dwList* pNodeList)
 {
     int result;
@@ -994,7 +994,7 @@ extern "C" int dwGuiWidgets_SaveDroidToFile(const char* pPath, dwString* pName, 
     return result;
 }
 
-// @4328f0 (dwGuiWidgets_LoadDroidFromFile) — note: no open-failure check in
+// dwGuiWidgets_LoadDroidFromFile — note: no open-failure check in
 // the binary; a missing file simply parses as immediate EOF.
 extern "C" int dwGuiWidgets_LoadDroidFromFile(const char* pPath, dwString* pNameOut, dwList* pNodeList)
 {

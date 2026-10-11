@@ -1,9 +1,9 @@
 // dwCursor — DroidWorks software mouse cursor with save-under
 // double-buffering.
 //
-// Decompiled from DroidWorks.exe, unit range 0x443340-0x44391x. The cursor
-// table is filled by a C++ static ctor (dwCursor_TableInit @0x443350, CRT
-// thunk @0x443340); here dwCursor_Startup() runs it instead. The sprite and
+// Decompiled from DroidWorks.exe. The cursor
+// table is filled by a C++ static ctor (dwCursor_TableInit, CRT
+// thunk dwCursor_TableInit); here dwCursor_Startup() runs it instead. The sprite and
 // save-under tVBuffers are allocated/freed by dwDisplay
 // (dwDisplay_CreateCursorSprites / dwDisplay_FreeCursors).
 //
@@ -44,7 +44,7 @@ extern "C" {
 // Module globals (all reset in dwCursor_Startup; soft-reset rule).
 dwCursorEntry dwCursor_aCursors[DWCURSOR_NUM_CURSORS]; // binary: filled by the static ctor
 int dwCursor_curIdx = 0;
-dwPoint dwCursor_pos = { 0, 0 };   // binary: 0x541bf8 (dwWidget/dwSegment write it directly)
+dwPoint dwCursor_pos = { 0, 0 };   // binary (dwWidget/dwSegment write it directly)
 int16_t dwCursor_drawX = 0;        // Note: int32 globals in the binary, but only the low
 int16_t dwCursor_drawY = 0;        //       16 bits are ever written/read
 rdRect dwCursor_prevRect = { 0, 0, 0, 0 };
@@ -74,7 +74,7 @@ void dwCursor_Startup()
     dwCursor_TableInit();
 }
 
-// @443350 (CRT static-ctor body; thunk @443340)
+// (CRT static-ctor body; thunk dwCursor_TableInit)
 void dwCursor_TableInit()
 {
     dwCursor_aCursors[0].pFilename = NULL;
@@ -135,12 +135,11 @@ void dwCursor_TableInit()
     dwCursor_aCursors[13].hotY = 26;
 }
 
-// @443500
 void dwCursor_Redraw()
 {
     rdRect rect;
 
-    if (dwCursor_curIdx != 0 && dwDisplay_pFrontVBuf) // binary: front tVBuffer's DDraw flag @0x6b17c0
+    if (dwCursor_curIdx != 0 && dwDisplay_pFrontVBuf) // binary: front tVBuffer's DDraw flag
     {
         // binary: DAT_0065be00, the Window WM_ACTIVATE flag
         if (g_window_active)
@@ -172,7 +171,6 @@ void dwCursor_Redraw()
     }
 }
 
-// @4435f0
 int dwCursor_Draw(rdRect* pOutRect)
 {
     int bDrawn = 0;
@@ -226,7 +224,6 @@ int dwCursor_Draw(rdRect* pOutRect)
     return bDrawn;
 }
 
-// @443720
 void dwCursor_RestoreUnder(rdRect* pRect)
 {
     rdRect rect;
@@ -242,7 +239,6 @@ void dwCursor_RestoreUnder(rdRect* pRect)
     }
 }
 
-// @443780
 void dwCursor_SetCursor(int idx)
 {
     if (dwCursor_curIdx == idx)
@@ -297,7 +293,6 @@ show_hide:
     }
 }
 
-// @4438d0
 void dwCursor_Precache(int idx)
 {
     dwCursorEntry* pEntry = &dwCursor_aCursors[idx];

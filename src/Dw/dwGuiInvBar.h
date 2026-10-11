@@ -9,11 +9,11 @@
 // hover-highlights the cell under the cursor, and on click uses that item via
 // dwCog_UseItem, then hides.
 //
-// Decompiled from DroidWorks.exe unit range 0x41a9f0-0x41b240 (this class was
+// Decompiled from DroidWorks.exe (this class was
 // originally mis-binned into the dw-core unit; it is its own dwGui compile-unit
 // contribution — the four undetected vtbl fns OnMouseMove/OnMessage/
 // ContainsPoint/Draw were recovered in Ghidra). vtable dwGuiInvBar_vtbl
-// @0x51ee58 (18 slots): +00 DtorDelete / +04 OnMouseMove / +08 OnMouseDown /
+// (18 slots): +00 DtorDelete / +04 OnMouseMove / +08 OnMouseDown /
 // +1c OnMessage / +2c ContainsPoint (returns 1: modal, grabs every click) /
 // +44 Draw; the rest are dwWidget defaults.
 //
@@ -62,33 +62,33 @@ struct dwGuiInvBar : dwWidget
     int16_t cellHeight;    // 0x30: max icon height
     int16_t columns;       // 0x32: computed grid column count
 
-    // @41a9f0 (dwGuiInvBar_Ctor) — dwWidget(pRect); cellSpacing/textColorIdx
+    // dwGuiInvBar_Ctor — dwWidget(pRect); cellSpacing/textColorIdx
     // from the args; bgColorIdx = 0x46; loads pFontName when non-empty.
     dwGuiInvBar(dwRect* pRect, int16_t cellSpacing, const char* pFontName, uint8_t textColorIdx);
 
-    // @41aad0 (dwGuiInvBar_Dtor; scalar-deleting wrapper @41aab0) — Hide if
+    // dwGuiInvBar_Dtor (scalar-deleting wrapper dwGuiInvBar_DtorDelete) — Hide if
     // shown, free the font, base dtor.
     virtual ~dwGuiInvBar();
 
-    // vtbl +0x04 @41ace0 — hover: find the cell under (x,y), update selectedBin
+    // vtbl +0x04 dwGuiInvBar_OnMouseMove — hover: find the cell under (x,y), update selectedBin
     // and dirty the old/new highlight rects.
     virtual int OnMouseMove(int16_t x, int16_t y);
-    // vtbl +0x08 @41aeb0 — click: Hide, then if a cell was under the cursor
+    // vtbl +0x08 dwGuiInvBar_OnMouseDown — click: Hide, then if a cell was under the cursor
     // select it (sithInventory) and dwCog_UseItem it.
     virtual int OnMouseDown(int16_t x, int16_t y);
-    // vtbl +0x1c @41af40 — 0x1f41 toggle / 0x1f49 hide-if-shown /
+    // vtbl +0x1c dwGuiInvBar_OnMessage — 0x1f41 toggle / 0x1f49 hide-if-shown /
     // 0x1f4a show-if-hidden / 0x1f4b relayout-if-shown.
     virtual int OnMessage(dwWidgetMsg* pMsg);
-    // vtbl +0x2c @41b240 — always returns 1 (modal: grabs every click).
+    // vtbl +0x2c dwGuiInvBar_ContainsPoint — always returns 1 (modal: grabs every click).
     virtual int ContainsPoint(dwPoint* pPt);
-    // vtbl +0x44 @41afd0 — FillTriBlend background, then each usable item's
+    // vtbl +0x44 dwGuiInvBar_Draw — FillTriBlend background, then each usable item's
     // icon + owned-count digits + item name.
     virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect);
 
-    // @41ab40 — measure the usable inventory items, compute the centered grid,
+    // measure the usable inventory items, compute the centered grid,
     // and show the bar (or, if nothing is usable, play GHCA037.wav + Hide).
     void Layout();
-    // @41acd0 — bShown = 0, Invalidate.
+    // bShown = 0, Invalidate.
     void Hide();
 };
 

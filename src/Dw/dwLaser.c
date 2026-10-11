@@ -1,6 +1,6 @@
 // dwLaser — DroidWorks per-world laser/beam pool (see dwLaser.h).
 //
-// Ghidra (DroidWorks.exe) 0x46aa90-0x46b5cx. Pool entries are tDwLaser
+// Ghidra (DroidWorks.exe). Pool entries are tDwLaser
 // (types.h): each carries an INLINE solid-color rdMaterial whose texinfos[0]
 // points at the entry's own INLINE rdTexinfo (header.solidColor = beam
 // color); rdCache proc entries reference that material directly, which is
@@ -23,9 +23,9 @@
 
 #include <ctype.h>
 
-uint32_t dwLaser_nextId = 1; // binary: 0x52d988, initial 1
+uint32_t dwLaser_nextId = 1; // binary, initial 1
 
-// Quad vertex index list handed to rdPrimit3_ClipFace (binary: 0x52d978).
+// Quad vertex index list handed to rdPrimit3_ClipFace (binary: dwLaser_aQuadVertIdx).
 static const int dwLaser_aQuadVertIdx[4] = { 0, 1, 2, 3 };
 
 // Note: no binary counterpart — statics reset for the soft-reset loop only.
@@ -34,7 +34,6 @@ void dwLaser_Startup()
     dwLaser_nextId = 1;
 }
 
-// @0x46aa90
 void dwLaser_Draw(tDwLaser* pLaser)
 {
     if (pLaser->pTargetThing)
@@ -45,7 +44,6 @@ void dwLaser_Draw(tDwLaser* pLaser)
     dwLaser_TraceBeam(pLaser);
 }
 
-// @0x46aad0
 void dwLaser_DrawBeamSegment(const rdVector3* pFrom, const rdVector3* pTo, rdMaterial* pMaterial, flex_t width)
 {
     rdVector3 dir;
@@ -107,7 +105,6 @@ void dwLaser_DrawBeamSegment(const rdVector3* pFrom, const rdVector3* pTo, rdMat
     dwLaser_DrawQuad(aQuad, pMaterial);
 }
 
-// @0x46adb0
 void dwLaser_DrawQuad(rdVector3* aQuad, rdMaterial* pMaterial)
 {
     rdProcEntry* pProc;
@@ -172,7 +169,6 @@ void dwLaser_DrawQuad(rdVector3* aQuad, rdMaterial* pMaterial)
     rdCache_AddProcFace(0, dstInfo.numVertices, 1);
 }
 
-// @0x46b010
 void dwLaser_TraceBeam(tDwLaser* pLaser)
 {
     SithThing* pOwner;
@@ -280,7 +276,6 @@ void dwLaser_TraceBeam(tDwLaser* pLaser)
     }
 }
 
-// @0x46b3f0
 tDwLaser* dwLaser_Add(SithWorld* pWorld, SithThing* pOwnerThing, SithThing* pTargetThing, int color, flex_t width)
 {
     tDwLaser* pEntry;
@@ -337,7 +332,6 @@ tDwLaser* dwLaser_Add(SithWorld* pWorld, SithThing* pOwnerThing, SithThing* pTar
     return pEntry;
 }
 
-// @0x46b530
 tDwLaser* dwLaser_FindByThing(SithWorld* pWorld, SithThing* pThing)
 {
     int32_t i;
@@ -349,7 +343,6 @@ tDwLaser* dwLaser_FindByThing(SithWorld* pWorld, SithThing* pThing)
     return NULL;
 }
 
-// @0x46b570
 tDwLaser* dwLaser_FindById(SithWorld* pWorld, uint32_t id)
 {
     int32_t i;
@@ -361,13 +354,11 @@ tDwLaser* dwLaser_FindById(SithWorld* pWorld, uint32_t id)
     return NULL;
 }
 
-// @0x46b5b0
 void dwLaser_Remove(SithWorld* pWorld, tDwLaser* pLaser)
 {
     pLaser->pOwnerThing = NULL;
 }
 
-// @0x46b5c0
 void dwLaser_Free(SithWorld* pWorld)
 {
     pWorld->numDwLasers = 0;
@@ -378,7 +369,7 @@ void dwLaser_Free(SithWorld* pWorld)
     }
 }
 
-// The binary's sithRender_DrawLasers@0x45e780 (sithRender unit there; lives
+// The binary's sithRender_DrawLasers (sithRender unit there; lives
 // here because src/Dw is retro-excluded while sithRender.c is shared). Called
 // from sithRender_Draw each frame under Main_bDwCompat.
 void dwLaser_DrawAll()

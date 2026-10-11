@@ -4,18 +4,18 @@
 // dwGuiList / dwGuiSpeech / dwGuiDroidDance — three DroidWorks in-game GUI
 // controls that share one compile unit.
 //
-//   dwGuiList       (0x5c, vtbl 0x51e798, ctor @409fc0) — dwGuiHypText
+//   dwGuiList       (0x5c, dwGuiList_vtbl, ctor dwGuiList_Ctor) — dwGuiHypText
 //                   subclass: an interactive, vertically-stacked list of
 //                   text items. Concrete use is the IN-GAME CONVERSATION
 //                   RESPONSE MENU (the player's clickable dialog choices,
 //                   appended by dwCog_AddResponse). Clicking an item
 //                   dispatches command 0x1f40 (8000) with the item as sender.
-//   dwGuiSpeech     (0x5c, vtbl 0x51e7e8, ctor @40a8a0) — dwGuiHypText
+//   dwGuiSpeech     (0x5c, dwGuiSpeech_vtbl, ctor dwGuiSpeech_Ctor) — dwGuiHypText
 //                   subclass: a single CHARACTER SPEECH caption line (the NPC
 //                   currently-spoken line + the sound it plays). SetText binds
 //                   a caption + a "timed item" + a sound; Clear stops the sound
 //                   and expires the timed item.
-//   dwGuiDroidDance (0x598, vtbl 0x51e850, ctor @40ab70) — dwGuiQuickView
+//   dwGuiDroidDance (0x598, dwGuiDroidDance_vtbl, ctor dwGuiDroidDance_Ctor) — dwGuiQuickView
 //                   subclass: the DROID_DANCE 3D "disco" viewer. Builds 7
 //                   groups of randomly-generated droids and cycles through them
 //                   on a 12-second timer, playing each group's active/dance
@@ -23,9 +23,9 @@
 //                   also used by the reference room. It overrides ONLY the
 //                   scalar-deleting dtor and Update; Draw / OnHover / OnMessage
 //                   / LayoutNodes are all INHERITED unchanged from
-//                   dwGuiQuickView (confirmed against vtbl 0x51e850).
+//                   dwGuiQuickView (confirmed against dwGuiDroidDance_vtbl).
 //
-// Decompiled from DroidWorks.exe, unit range 0x409fc0-0x40adbf. Verifiably C++
+// Decompiled from DroidWorks.exe. Verifiably C++
 // (vtables, ctor/dtor pairs, MSVC EH frames) -> C++ classes.
 //
 // No module statics -> no dwGuiList_Startup needed (soft-reset rule).
@@ -71,7 +71,7 @@ struct dwGuiListItem
 //
 // Binary layout: dwGuiHypText base @0x00 (0x48) + pItems@0x48 +
 // colorHighlight@0x4c + colorFlag2@0x4d + drawStyle@0x4e + bLayoutInvalid@0x52
-// + pHoverItem@0x54 + pPressedItem@0x58 — sizeof 0x5c. vtable @0x51e798:
+// + pHoverItem@0x54 + pPressedItem@0x58 — sizeof 0x5c. dwGuiList_vtbl:
 // overrides DtorDelete / OnMouseMove / OnMouseDown / OnMouseUp / Draw; inherits
 // Update / OnHover / SetText from dwGuiHypText.
 
@@ -85,47 +85,47 @@ struct dwGuiList : dwGuiHypText
     dwGuiListItem* pHoverItem;   // 0x54: item under the cursor (NULL = none)
     dwGuiListItem* pPressedItem; // 0x58: item captured on mouse-down
 
-    // @409fc0 (dwGuiList_Ctor). NOTE: the a / pFontName parameters are ordered
+    // dwGuiList_Ctor. NOTE: the a / pFontName parameters are ordered
     // to match the (Ghidra-derived) dwMain.c placeholder + its dwGuiInGame
     // caller: `a` (float) carries the base text color, `pFontName` the font
     // name (the binary's own arg order is the reverse — see the .cpp note).
     dwGuiList(dwRect* pRect, float a, char* pFontName, uint8_t colorHi,
               uint8_t colorFlag2, void* pStyle);
 
-    // @40a0c0 (dwGuiList_Dtor; DtorDelete @40a0a0) — free every item (both
+    // dwGuiList_Dtor (dwGuiList_DtorDelete) — free every item (both
     // dwStrings) + the list, then the base dtor.
     virtual ~dwGuiList();
 
-    // vtbl +0x04 @40a5e0 — refresh the hover item unless the point is still
+    // vtbl +0x04 dwGuiList_OnMouseMove — refresh the hover item unless the point is still
     // over the current one; never consumes the event.
     virtual int OnMouseMove(int16_t x, int16_t y);
-    // vtbl +0x08 @40a630 — capture the pressed item + become the mouse target.
+    // vtbl +0x08 dwGuiList_OnMouseDown — capture the pressed item + become the mouse target.
     virtual int OnMouseDown(int16_t x, int16_t y);
-    // vtbl +0x0c @40a690 — on release over the pressed item, dispatch command
+    // vtbl +0x0c dwGuiList_OnMouseUp — on release over the pressed item, dispatch command
     // 0x1f40 (item = sender) and latch bLayoutInvalid.
     virtual int OnMouseUp(int16_t x, int16_t y);
-    // vtbl +0x44 @40a710 — shaded/framed/tri-blended panel + each run's glyphs
+    // vtbl +0x44 dwGuiList_Draw — shaded/framed/tri-blended panel + each run's glyphs
     // (hovered item drawn in colorHighlight).
     virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect);
 
     // -- non-virtual methods ---------------------------------------------------
 
-    // @40a200 — recompute every item's rect (wrapping textA into the shared run
+    // recompute every item's rect (wrapping textA into the shared run
     // ring), re-align + reset the runs, re-layout the elements, then refresh
     // the hover item.
     void Relayout();
-    // @40a3b0 — free every item, Relayout, clear bLayoutInvalid.
+    // free every item, Relayout, clear bLayoutInvalid.
     void Clear();
-    // @40a430 — append an item {data, val, textA, textB} and Relayout.
+    // append an item {data, val, textA, textB} and Relayout.
     void AddItem(void* pData, int val, char* pTextA, char* pTextB);
-    // @40a550 — set pHoverItem to the item containing (x, y) (or NULL).
+    // set pHoverItem to the item containing (x, y) (or NULL).
     void UpdateHoverItem(int16_t x, int16_t y);
 };
 
 // ---- dwGuiSpeech -------------------------------------------------------------
 //
 // Binary layout: dwGuiHypText base @0x00 (0x48) + drawStyle@0x48 +
-// pTimedItem@0x4c + soundName@0x50 — sizeof 0x5c. vtable @0x51e7e8: overrides
+// pTimedItem@0x4c + soundName@0x50 — sizeof 0x5c. dwGuiSpeech_vtbl: overrides
 // only DtorDelete + Draw; inherits everything else from dwGuiHypText.
 
 struct dwGuiSpeech : dwGuiHypText
@@ -134,26 +134,26 @@ struct dwGuiSpeech : dwGuiHypText
     void* pTimedItem;     // 0x4c: response item expired (its +0x14 = curMs) on Clear
     dwString soundName;   // 0x50: name of the speech sound currently playing
 
-    // @40a8a0 (dwGuiSpeech_Ctor). notify -> the base OnHover payload;
+    // dwGuiSpeech_Ctor. notify -> the base OnHover payload;
     // color (low byte) -> base glyph color; pStyle's first dword -> drawStyle.
     dwGuiSpeech(dwRect* pRect, int notify, char* pFontName, uint32_t color, void* pStyle);
 
-    // @40a990 (dwGuiSpeech_Dtor; DtorDelete @40a970) — free soundName + base.
+    // dwGuiSpeech_Dtor (dwGuiSpeech_DtorDelete) — free soundName + base.
     virtual ~dwGuiSpeech();
 
-    // vtbl +0x44 @40aa90 — panel (only when there is caption text) + the base
+    // vtbl +0x44 dwGuiSpeech_Draw — panel (only when there is caption text) + the base
     // dwGuiHypText::Draw.
     virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect);
 
     // -- non-virtual methods ---------------------------------------------------
 
-    // @40a9e0 (dwGuiSpeech_SetText) — replace the caption (virtual SetText),
+    // dwGuiSpeech_SetText — replace the caption (virtual SetText),
     // bind the timed item, and remember the sound name. Called by
     // dwCog_PlayCharacterSpeech. Distinct from the inherited 1-arg SetText.
     using dwGuiHypText::SetText;
     void SetText(char* pText, void* pTimedItem, char* pSoundName);
 
-    // @40aa30 (dwGuiSpeech_Clear) — stop the speech sound + free all samples,
+    // dwGuiSpeech_Clear — stop the speech sound + free all samples,
     // and expire the timed item (stamps its +0x14 with the current game time).
     void Clear();
 };
@@ -163,7 +163,7 @@ struct dwGuiSpeech : dwGuiHypText
 // Binary layout: dwGuiQuickView base @0x00 (0x574) + danceTimer@0x574 +
 // groupIdx@0x578 + aGroups[7]@0x57c — sizeof 0x598. The inherited
 // dwGuiQuickView::pNodes holds the CURRENTLY-ANIMATING (shared) part nodes;
-// aGroups OWNS the 7 randomly-generated droids. vtable @0x51e850: overrides
+// aGroups OWNS the 7 randomly-generated droids. dwGuiDroidDance_vtbl: overrides
 // only DtorDelete + Update.
 
 struct dwGuiDroidDance : dwGuiQuickView
@@ -172,16 +172,16 @@ struct dwGuiDroidDance : dwGuiQuickView
     int32_t groupIdx;    // 0x578: index of the group currently dancing
     dwList aGroups[7];   // 0x57c: 7 owned droids (each a dwPartNode* list)
 
-    // @40ab70 (dwGuiDroidDance_Ctor) — build 7 random droids, pick one, play
+    // dwGuiDroidDance_Ctor — build 7 random droids, pick one, play
     // its active anims, danceTimer = 12s, LayoutNodes.
     dwGuiDroidDance(dwRect* pRect);
 
-    // @40acf0 (dwGuiDroidDance_Dtor; DtorDelete @40acd0) — empty the shared
+    // dwGuiDroidDance_Dtor (dwGuiDroidDance_DtorDelete) — empty the shared
     // active list (payloads owned by aGroups), destruct the 7 owned groups,
     // then the base dtor.
     virtual ~dwGuiDroidDance();
 
-    // vtbl +0x14 @40adb0 — fade the active anims; when danceTimer expires pick
+    // vtbl +0x14 dwGuiDroidDance_Update — fade the active anims; when danceTimer expires pick
     // a new random group, stop the old anims, play the new group's, reset the
     // timer, LayoutNodes.
     virtual void Update(float dt);

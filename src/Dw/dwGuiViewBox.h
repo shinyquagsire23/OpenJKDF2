@@ -7,8 +7,8 @@
 // This binary compile unit ALSO contains dwGuiImage, a separate small
 // static-image widget (adjacent vtable) — declared below.
 //
-// Decompiled from DroidWorks.exe, unit range 0x434840-0x434cff.
-// vtables: dwGuiViewBox_vtbl @0x51f988, dwGuiImage_vtbl @0x51f9e0.
+// Decompiled from DroidWorks.exe.
+// vtables: dwGuiViewBox_vtbl, dwGuiImage_vtbl.
 //
 // dwGuiViewBox binary layout (sizeof 0x560):
 //   +0x000 dwGui3DView base (0x544)
@@ -52,21 +52,20 @@ struct dwGuiViewBox : dwGui3DView
 
     // Orbit view covering *pRect: pivot origin, yaw 0 / pitch 180,
     // orbitDistance = 0.08 / tan(fov * 0.5), then RebuildLights +
-    // the view-matrix rebuild. @434840
+    // the view-matrix rebuild.
     dwGuiViewBox(dwRect* pRect, uint8_t bLightsFollowView);
 
-    // @434910 (DtorDelete @4348f0)
+    // (dwGuiViewBox_DtorDelete)
     virtual ~dwGuiViewBox();
 
     // 0x3e8 = set pitch, 0x3e9 = set yaw (integer degrees in the pSender
     // slot, via virtual SetAngles), 0x3eb = set pivot from a float[3]
     // payload (then virtual Refresh); everything else -> dwGui3DView.
-    // Handled codes return 0. @434920
+    // Handled codes return 0.
     virtual int OnMessage(dwWidgetMsg* pMsg); // vtbl +0x1c
 
     // When bLightsFollowView: re-drive SetAngles(yaw, pitch) (which rebuilds
     // the view AND the following lights); else the static base rebuild.
-    // @434b20
     virtual void RebuildLights(); // vtbl +0x48
 
     // THE ORBIT REBUILD (Ghidra: dwGuiViewBox_RebuildView — this class's
@@ -74,11 +73,11 @@ struct dwGuiViewBox : dwGui3DView
     // pivot + rot * (0, -orbitDistance, 0)); when bLightsFollowView, re-adds
     // the two base lights with their positions rotated by the new view
     // matrix (plain != 0 intensity test here, unlike the base's epsilon);
-    // ends with virtual Invalidate. @4349c0
+    // ends with virtual Invalidate.
     virtual void Refresh(); // vtbl +0x4c
 
     // NEW virtual — appended after dwGui3DView's +0x4c Refresh.
-    // Stores the angles (pitch first) and virtual-Refreshes. @4349a0
+    // Stores the angles (pitch first) and virtual-Refreshes.
     // (recovered fn)
     virtual void SetAngles(float yaw, float pitch); // vtbl +0x50
 };
@@ -88,7 +87,7 @@ struct dwGuiViewBox : dwGui3DView
 // the IMAGE control keyword.
 //
 // Binary layout (sizeof 0x20): dwWidget base @0x00 + dwString filename@0x10
-// + dwImage* pImage@0x1c. vtable @0x51f9e0.
+// + dwImage* pImage@0x1c. dwGuiImage_vtbl.
 struct dwGuiImage : dwWidget
 {
     dwString filename; // 0x10: image file name (.BMP/.RLE)
@@ -97,22 +96,21 @@ struct dwGuiImage : dwWidget
                        //       for now, so this stays NULL — all uses guard)
 
     // Image widget covering *pRect showing pFilename (loaded immediately).
-    // @434b50
     dwGuiImage(dwRect* pRect, char* pFilename);
 
-    // FreeImages + filename release + base dtor. @434bf0 (DtorDelete @434bd0)
+    // FreeImages + filename release + base dtor. dwGuiImage_Dtor (dwGuiImage_DtorDelete)
     virtual ~dwGuiImage();
 
     // Lazy-load the image when missing and the filename is non-empty.
-    // @434c80 (Ghidra: dwGuiImage_EnsureLoaded)
+    // (Ghidra: dwGuiImage_EnsureLoaded)
     virtual void EnsureImages(); // vtbl +0x3c
 
-    // Delete the image object (virtual dtor) and NULL it. @434cb0
+    // Delete the image object (virtual dtor) and NULL it.
     // (Ghidra: dwGuiImage_FreeImage)
     virtual void FreeImages(); // vtbl +0x40
 
     // Virtual EnsureImages, then blit the image at (left, top) clipped to
-    // pClipRect. @434c50
+    // pClipRect.
     virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect); // vtbl +0x44
 };
 

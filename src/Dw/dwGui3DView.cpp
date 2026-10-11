@@ -1,8 +1,8 @@
 // dwGui3DView — the DroidWorks base 3D-view widget (embedded rdCanvas +
 // rdCamera + two rdLights rendering into the DW back buffer).
 //
-// Decompiled from DroidWorks.exe, unit range 0x43ae40-0x43b4bf.
-// vtable @0x51fef0. See dwGui3DView.h for the field/slot map.
+// Decompiled from DroidWorks.exe.
+// dwGui3DView_vtbl. See dwGui3DView.h for the field/slot map.
 //
 // Engine mapping notes:
 //  - The binary's `rdCanvas_New` label at the ctor call site is the engine's
@@ -10,8 +10,8 @@
 //    9th parameter (a9 -> field_14) is not visible in the 8-arg binary call,
 //    so 0 is passed.
 //  - rd_FUN_0047eb60(2) resolves to rdSetZBufferMethod (the DW rdroid setter
-//    cluster @0x47eb00 mirrors src/Engine/rdroid.c's function order).
-//  - The dtor's `sithRender_Open()` call is a mislabel: 0x504190 is an empty
+//    cluster mirrors src/Engine/rdroid.c's function order).
+//  - The dtor's `sithRender_Open()` call is a mislabel: the target is an empty
 //    ICF-folded COMDAT == rdCanvas_FreeEntry (a no-op in the engine too).
 //  - rdMatrix_FUN_00486af0 == rdMatrix_TransformPoint34Acc (verified from its
 //    body: in-place point transform incl. translation).
@@ -40,7 +40,7 @@ extern "C" {
 
 // ---- ctor/dtor -----------------------------------------------------------------
 
-// @43ae40 (Ghidra: dwGui3DView_Ctor)
+// (Ghidra: dwGui3DView_Ctor)
 dwGui3DView::dwGui3DView(dwRect* pRect)
     : dwWidget(pRect)
 {
@@ -81,17 +81,17 @@ dwGui3DView::dwGui3DView(dwRect* pRect)
     dwGui3DView::Refresh();       // binary: direct call
 }
 
-// @43afd0 (Ghidra: dwGui3DView_Dtor; DtorDelete @43afb0)
+// (Ghidra: dwGui3DView_Dtor; dwGui3DView_DtorDelete)
 dwGui3DView::~dwGui3DView()
 {
-    rdCanvas_FreeEntry(&this->canvas); // binary: ICF-folded empty fn @0x504190 (mislabeled sithRender_Open)
+    rdCanvas_FreeEntry(&this->canvas); // binary: ICF-folded empty fn (mislabeled sithRender_Open)
     rdCamera_FreeEntry(&this->camera);
     // dwWidget base dtor runs automatically.
 }
 
 // ---- virtuals ------------------------------------------------------------------
 
-// @43b000 (Ghidra: dwGui3DView_OnMessage) — vtbl +0x1c.
+// (Ghidra: dwGui3DView_OnMessage) — vtbl +0x1c.
 // Msg 0x3ea = set FOV/zoom; the numeric payload rides in the pSender slot
 // (percent: fov = payload * 0.01).
 int dwGui3DView::OnMessage(dwWidgetMsg* pMsg)
@@ -123,7 +123,7 @@ int dwGui3DView::OnMessage(dwWidgetMsg* pMsg)
     return 0;
 }
 
-// @43b0f0 (Ghidra: dwGui3DView_Move; recovered fn) — vtbl +0x28
+// (Ghidra: dwGui3DView_Move; recovered fn) — vtbl +0x28
 void dwGui3DView::Move(int16_t dx, int16_t dy)
 {
     this->left = this->left + dx;
@@ -134,7 +134,7 @@ void dwGui3DView::Move(int16_t dx, int16_t dy)
     this->camera.pCanvas->half_screen_height = (flex_t)(this->top + this->bottom) * 0.5;
 }
 
-// @43b2b0 (Ghidra: dwGui3DView_Draw) — vtbl +0x44. Camera bring-up only;
+// (Ghidra: dwGui3DView_Draw) — vtbl +0x44. Camera bring-up only;
 // draws no pixels (derived classes render content after calling this).
 // pDestBits is unused (faithful).
 void dwGui3DView::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
@@ -188,7 +188,7 @@ void dwGui3DView_EndSwRender(rdCanvas* pSwCanvas, int savedAccel)
     rdroid_curAcceleration = savedAccel;
 }
 
-// @43b370 (Ghidra: dwGui3DView_RebuildLights) — vtbl +0x48 (NEW virtual).
+// (Ghidra: dwGui3DView_RebuildLights) — vtbl +0x48 (NEW virtual).
 // Re-adds each light whose |intensity| > 1e-5 (quirk preserved: a NEGATIVE
 // intensity beyond the epsilon is added too).
 void dwGui3DView::RebuildLights()
@@ -216,7 +216,7 @@ void dwGui3DView::RebuildLights()
         rdCamera_AddLight(&this->camera, &this->light1, &this->light1Pos);
 }
 
-// @43b150 (Ghidra: dwGui3DView_Refresh) — vtbl +0x4c (NEW virtual):
+// (Ghidra: dwGui3DView_Refresh) — vtbl +0x4c (NEW virtual):
 // forwards to virtual Invalidate (+0x34).
 void dwGui3DView::Refresh()
 {
@@ -225,7 +225,7 @@ void dwGui3DView::Refresh()
 
 // ---- non-virtual helpers -------------------------------------------------------
 
-// @43b160 (Ghidra: dwGui3DView_ScreenToWorld)
+// (Ghidra: dwGui3DView_ScreenToWorld)
 void dwGui3DView::ScreenToWorld(dwPoint* pPt, rdVector3* pOut)
 {
     pOut->x = (flex_t)pPt->x;
@@ -236,7 +236,7 @@ void dwGui3DView::ScreenToWorld(dwPoint* pPt, rdVector3* pOut)
     rdMatrix_TransformPoint34Acc(pOut, &this->viewMat); // binary: rdMatrix_FUN_00486af0
 }
 
-// @43b1b0 (Ghidra: dwGui3DView_ProjectPoint)
+// (Ghidra: dwGui3DView_ProjectPoint)
 void dwGui3DView::ProjectPoint(rdVector3* pOut, rdVector3* pWorldPos)
 {
     if (rdCamera_g_pCurCamera != &this->camera) // binary: DAT_005542cc
@@ -253,7 +253,7 @@ void dwGui3DView::ProjectPoint(rdVector3* pOut, rdVector3* pWorldPos)
     this->camera.pfProject(pOut, &camSpace); // Ghidra: "pProjCallback"@0xb4
 }
 
-// @43b220 (Ghidra: dwGui3DView_DrawMarker)
+// (Ghidra: dwGui3DView_DrawMarker)
 void dwGui3DView::DrawMarker(dwImageBits* pDestBits, rdVector3* pWorldPos, int16_t halfSize, int color, dwRect* pClipRect)
 {
     rdVector3 screen;
@@ -271,7 +271,7 @@ void dwGui3DView::DrawMarker(dwImageBits* pDestBits, rdVector3* pWorldPos, int16
     dwImageDraw_FillRect(pDestBits, &rect, color, NULL);
 }
 
-// @43b440 (Ghidra: dwGui3DView_SetLight0)
+// (Ghidra: dwGui3DView_SetLight0)
 void dwGui3DView::SetLight0(float x, float y, float z, float intensity, int type)
 {
     this->light0Pos.x = x;
@@ -282,7 +282,7 @@ void dwGui3DView::SetLight0(float x, float y, float z, float intensity, int type
     this->RebuildLights(); // vtbl +0x48 (virtual)
 }
 
-// @43b480 (Ghidra: dwGui3DView_SetLight1)
+// (Ghidra: dwGui3DView_SetLight1)
 void dwGui3DView::SetLight1(float x, float y, float z, float intensity, int type)
 {
     this->light1Pos.x = x;

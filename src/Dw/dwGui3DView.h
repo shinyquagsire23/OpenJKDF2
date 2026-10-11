@@ -6,8 +6,8 @@
 // viewport inside a GUI rect. dwGuiViewBox (orbit/turntable view, see
 // dwGuiViewBox.h) and the P5 droid viewers derive from it.
 //
-// Decompiled from DroidWorks.exe, unit range 0x43ae40-0x43b4bf.
-// vtable @0x51fef0 (dwGui3DView_vtbl).
+// Decompiled from DroidWorks.exe.
+// dwGui3DView_vtbl.
 //
 // Binary layout (sizeof 0x544; pinned by the dwGuiViewBox ctor):
 //   +0x00  dwWidget base (0xe)
@@ -59,56 +59,55 @@ struct dwGui3DView : dwWidget
     // View covering *pRect: canvas over the DW back buffer, camera
     // fov=20 near=0.008 far=50 aspect=1 ambient=0.3 attenuation=1e-5,
     // light0=(0,-1,-0.4) i=1.0, light1=(0,-0.2,1) i=0.75 (both type 2).
-    // @43ae40
     dwGui3DView(dwRect* pRect);
 
     // rdCanvas_FreeEntry + rdCamera_FreeEntry, then the dwWidget base dtor.
-    // @43afd0 (DtorDelete @43afb0)
+    // (dwGui3DView_DtorDelete)
     virtual ~dwGui3DView();
 
     // Msg 0x3ea = set FOV/zoom: fov = (uint)payload * 0.01; re-syncs the
     // frustum to the WIDGET rect when the canvas cache is stale, then
-    // BuildFOV + virtual Refresh. Always returns 0. @43b000
+    // BuildFOV + virtual Refresh. Always returns 0.
     virtual int OnMessage(dwWidgetMsg* pMsg); // vtbl +0x1c
 
     // Translate the widget rect and recenter the canvas
-    // half_screen_width/height on it. @43b0f0 (recovered fn)
+    // half_screen_width/height on it. dwGui3DView_Move (recovered fn)
     virtual void Move(int16_t dx, int16_t dy); // vtbl +0x28
 
     // Camera bring-up for a repaint: SetCurrent + Update(viewMat), re-syncs
     // the frustum to (clip.left+1, clip.top+1, clip.right, clip.bottom) when
     // the canvas cache is stale, then rdSetLightingMode(3). Draws NO pixels —
-    // derived classes call this first, then render their content. @43b2b0
+    // derived classes call this first, then render their content.
     virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect); // vtbl +0x44
 
     // NEW virtuals — appended after dwWidget's +0x44 Draw.
 
     // ClearLights, then re-add each light whose |intensity| > 1e-5 at its
-    // static lightNPos. @43b370
+    // static lightNPos.
     virtual void RebuildLights(); // vtbl +0x48
 
     // Forwards to virtual Invalidate (+0x34); called after camera changes.
     // dwGuiViewBox overrides this slot with its view-matrix rebuild
-    // (Ghidra: dwGuiViewBox_RebuildView). @43b150
+    // (Ghidra: dwGuiViewBox_RebuildView).
     virtual void Refresh(); // vtbl +0x4c
 
     // -- non-virtual methods --------------------------------------------------
 
     // 2D canvas point -> 3D world point at depth camera.focalLength (the
     // distance where 1 world unit == 1 pixel, i.e. the inverse projection),
-    // transformed by viewMat. @43b160
+    // transformed by viewMat.
     void ScreenToWorld(dwPoint* pPt, rdVector3* pOut);
 
     // World point -> screen via camera.orient + camera.pfProject (makes this
-    // camera current first when it is not). @43b1b0
+    // camera current first when it is not).
     void ProjectPoint(rdVector3* pOut, rdVector3* pWorldPos);
 
     // Project pWorldPos and fill a (2*halfSize)^2 square marker centered on
-    // it (clipped to pClipRect when non-NULL). @43b220
+    // it (clipped to pClipRect when non-NULL).
     void DrawMarker(dwImageBits* pDestBits, rdVector3* pWorldPos, int16_t halfSize, int color, dwRect* pClipRect);
 
     // Set light 0/1 position + intensity + rdLight type, then virtual
-    // RebuildLights (+0x48). @43b440 / @43b480
+    // RebuildLights (+0x48). dwGui3DView_SetLight0 / dwGui3DView_SetLight1
     void SetLight0(float x, float y, float z, float intensity, int type);
     void SetLight1(float x, float y, float z, float intensity, int type);
 };

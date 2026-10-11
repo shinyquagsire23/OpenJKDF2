@@ -1,25 +1,25 @@
 // dwSegment — app-flow "segment" base class + global segment-stack manager +
 // recorded-input cue playback. See dwSegment.h for the design overview.
 //
-// DroidWorks.exe unit range: 0x433e40-0x43483f (+ base default virtual bodies
-// @0x402cb0/0x402cc0/0x402cd0, physically in the dwAnim range).
+// DroidWorks.exe unit range: (+ base default virtual bodies
+// dwSegment_DefaultReturnTrue/jk_logtofile/dwSegment_DtorDelete, physically in the dwAnim range).
 //
 // Win32/engine -> OpenJKDF2 mappings used in this file:
-//   dwHS->getTimerTick() / dwHS->some_float (binary global @0x6b6258)
+//   dwHS->getTimerTick() / dwHS->some_float (binary global)
 //       -> dwMain_pHS->getTimerTick() / ->some_float (ms tick -> seconds;
 //          same HostServices fields the binary read)
 //   stdControl_FUN_00503e00 (drain buffered DirectInput device data)
-//       -> stdControl_Flush() (JK.EXE twin @0x42e320)
+//       -> stdControl_Flush() (JK.EXE twin)
 //   DAT_0065be0c (DW Window unit's message-loop quit flag, set on WM_QUIT)
 //       -> g_should_exit (generated globals.h)
-//   video-mode global @0x6478f8 (+0x08 width / +0x0c height)
+//   video-mode global (+0x08 width / +0x0c height)
 //       -> stdDisplay_pCurVideoMode->format.width/.height (same mapping as
 //          dwColormap.c / dwDisplay.cpp)
-//   jk_logtofile -> stdPlatform_Printf (the binary's jk_logtofile @0x402cc0 is
+//   jk_logtofile -> stdPlatform_Printf (the binary's jk_logtofile is
 //       an empty stub — the prints were compiled out; kept visible here)
 //   operator new/delete (idk_alloc/stdPlatform_FreeHandle) -> new/delete
 //
-// Compiled as C++ (vtable @0x51e120, ctor + scalar-deleting dtor pair, MSVC
+// Compiled as C++ (dwSegment_vtbl, ctor + scalar-deleting dtor pair, MSVC
 // EH frame around the dwConfFile local in dwSegment_Play).
 
 #include "Dw/dwSegment.h"
@@ -62,25 +62,25 @@ struct dwSegmentCue
 };
 
 // ---------------------------------------------------------------------------
-// Manager globals (binary @0x53e858-0x53e8ac; all reset in dwSegment_Startup)
+// Manager globals (binary; all reset in dwSegment_Startup)
 // ---------------------------------------------------------------------------
 
-#define DWSEGMENT_STACK_SLOTS 10 // binary: 10 pointers @0x53e860..0x53e884
+#define DWSEGMENT_STACK_SLOTS 10 // binary: 10 pointers
 
-static dwSegmentCue* dwSegment_pCueList = NULL; // @0x53e858: playlist sentinel (circular)
-static dwPoint dwSegment_cursorPos = {0, 0};    // @0x53e85c: synthesized cursor pos at the last fired move cue
-static dwSegment* dwSegment_aStack[DWSEGMENT_STACK_SLOTS] = {NULL}; // @0x53e860: pending-segment stack
-dwSegment* dwSegment_pActive = NULL;            // @0x53e888: current segment
-static int dwSegment_stackDepth = 0;            // @0x53e88c
-static float dwSegment_lastMoveCueTime = 0.0f;  // @0x53e890: time of the last fired 'D'/'U' cue
-dwSegment* dwSegment_pOverlay = NULL;           // @0x53e894: modal overlay segment
-static float dwSegment_nextMoveCueTime = 0.0f;  // @0x53e898: time of the next pending 'D'/'U' cue
-static uint8_t dwSegment_bPlaylistFreed = 0;    // @0x53e89c: FreePlaylist once-guard
-static float dwSegment_playbackStartTime = 0.0f;// @0x53e8a0: absolute time (sec) when Play latched
-static int16_t dwSegment_nextCursorX = 0;       // @0x53e8a4: cursor target of the next move cue
-static int16_t dwSegment_nextCursorY = 0;       // @0x53e8a6
-static uint8_t dwSegment_bAdvancePending = 0;   // @0x53e8a8: RequestAdvance flag
-static uint8_t dwSegment_bQuit = 0;             // @0x53e8ac: Tick return value (SignalQuit)
+static dwSegmentCue* dwSegment_pCueList = NULL; // playlist sentinel (circular)
+static dwPoint dwSegment_cursorPos = {0, 0};    // synthesized cursor pos at the last fired move cue
+static dwSegment* dwSegment_aStack[DWSEGMENT_STACK_SLOTS] = {NULL}; // pending-segment stack
+dwSegment* dwSegment_pActive = NULL;            // current segment
+static int dwSegment_stackDepth = 0;
+static float dwSegment_lastMoveCueTime = 0.0f;  // time of the last fired 'D'/'U' cue
+dwSegment* dwSegment_pOverlay = NULL;           // modal overlay segment
+static float dwSegment_nextMoveCueTime = 0.0f;  // time of the next pending 'D'/'U' cue
+static uint8_t dwSegment_bPlaylistFreed = 0;    // FreePlaylist once-guard
+static float dwSegment_playbackStartTime = 0.0f;// absolute time (sec) when Play latched
+static int16_t dwSegment_nextCursorX = 0;       // cursor target of the next move cue
+static int16_t dwSegment_nextCursorY = 0;
+static uint8_t dwSegment_bAdvancePending = 0;   // RequestAdvance flag
+static uint8_t dwSegment_bQuit = 0;             // Tick return value (SignalQuit)
 
 // Current absolute time in seconds (the binary inlines this expression at
 // every site: dwHS->getTimerTick() / dwHS->some_float; ms -> sec).
@@ -111,7 +111,7 @@ static void dwSegment_ClearCues()
 // dwSegment class (base slots + clock)
 // ---------------------------------------------------------------------------
 
-// @4341e0 (dwSegment_Ctor)
+// dwSegment_Ctor
 dwSegment::dwSegment()
 {
     this->bPaused = 0;
@@ -120,18 +120,18 @@ dwSegment::dwSegment()
     ResetClock();
 }
 
-// vtbl +0x00 @402cb0 (dwSegment_DefaultReturnTrue)
+// vtbl +0x00 dwSegment_DefaultReturnTrue
 int dwSegment::Activate()
 {
     return 1;
 }
 
-// vtbl +0x04 @402cc0 (no-op default; ICF-folded with the empty jk_logtofile stub)
+// vtbl +0x04 (no-op default; ICF-folded with the empty jk_logtofile stub)
 void dwSegment::Deactivate()
 {
 }
 
-// vtbl +0x08 @434280 (dwSegment_Suspend)
+// vtbl +0x08 dwSegment_Suspend
 void dwSegment::Suspend()
 {
     float nowSec = dwSegment_GetNowSec();
@@ -139,7 +139,7 @@ void dwSegment::Suspend()
     this->pausedAtSec = nowSec;
 }
 
-// vtbl +0x0c @4342c0 (dwSegment_Resume)
+// vtbl +0x0c dwSegment_Resume
 void dwSegment::Resume()
 {
     float pausedSpan = dwSegment_GetNowSec() - this->pausedAtSec;
@@ -151,18 +151,18 @@ void dwSegment::Resume()
         this->pauseAccumSec += pausedSpan;
 }
 
-// vtbl +0x10 @402cc0 (no-op default)
+// vtbl +0x10 jk_logtofile (no-op default)
 void dwSegment::Update()
 {
 }
 
-// vtbl +0x14 @402cd0 (dwSegment_DtorDelete: reset vtbl + conditional free —
+// vtbl +0x14 (dwSegment_DtorDelete: reset vtbl + conditional free —
 // the compiler emits the equivalent for `delete`)
 dwSegment::~dwSegment()
 {
 }
 
-// @434200 (dwSegment_ResetClock)
+// dwSegment_ResetClock
 void dwSegment::ResetClock()
 {
     float nowSec = dwSegment_GetNowSec();
@@ -171,7 +171,7 @@ void dwSegment::ResetClock()
     this->pausedAtSec = nowSec;
 }
 
-// @434240 (dwSegment_GetElapsed)
+// dwSegment_GetElapsed
 float dwSegment::GetElapsed()
 {
     float elapsedSec = dwSegment_GetNowSec() - this->startTimeSec - this->pauseAccumSec;
@@ -184,7 +184,7 @@ float dwSegment::GetElapsed()
 // Manager: lifecycle
 // ---------------------------------------------------------------------------
 
-// @433e40 — binary: CRT static ctor body (thunk @433e30 also atexit-registers
+// binary: CRT static ctor body (thunk dwSegment_StaticInit also atexit-registers
 // dwSegment_FreePlaylist).
 void dwSegment_Startup(void)
 {
@@ -217,7 +217,7 @@ void dwSegment_Startup(void)
     dwSegment_pCueList->arg1 = 0;
 }
 
-// @433e80 — atexit-registered in the binary.
+// atexit-registered in the binary.
 void dwSegment_FreePlaylist(void)
 {
     if ((dwSegment_bPlaylistFreed & 1) == 0)
@@ -230,26 +230,24 @@ void dwSegment_FreePlaylist(void)
 
 // Note: no binary counterpart — accessor over the static cue sentinel for
 // dwGuiScreen's tutorial auto-exit check (the binary read the playlist global
-// @0x53e858 directly; the sentinel is module-static here).
+// dwSegment_pCueList directly; the sentinel is module-static here).
 int dwSegment_IsPlaylistEmpty(void)
 {
     return dwSegment_pCueList == NULL || dwSegment_pCueList->pNext == dwSegment_pCueList;
 }
 
-// @433f00
 void dwSegment_SignalQuit(void)
 {
     dwSegment_bQuit = 1;
 }
 
 // Added: clear the quit flag (no binary function — dwGuiOptions_OnMessage
-// cmd 6000+0xa stores 0 straight to 0x53e8ac; the flag is static here).
+// cmd 6000+0xa stores 0 straight to dwSegment_bQuit; the flag is static here).
 void dwSegment_CancelQuit(void)
 {
     dwSegment_bQuit = 0;
 }
 
-// @433f10
 void dwSegment_Shutdown(void)
 {
     dwSegment_bQuit = 0;
@@ -273,7 +271,6 @@ void dwSegment_Shutdown(void)
 // Manager: suspend/resume + overlay
 // ---------------------------------------------------------------------------
 
-// @433f80
 void dwSegment_SuspendActive(void)
 {
     if (dwSegment_pOverlay != NULL)
@@ -285,7 +282,6 @@ void dwSegment_SuspendActive(void)
         dwSegment_pActive->Suspend();
 }
 
-// @433fa0
 void dwSegment_ResumeActive(void)
 {
     stdControl_Flush(); // binary: stdControl_FUN_00503e00 (drain buffered device input)
@@ -299,7 +295,7 @@ void dwSegment_ResumeActive(void)
 }
 
 // Full-screen dirty rect from the current video mode (binary: the video-mode
-// global @0x6478f8, +0x08 width / +0x0c height — same mapping as dwColormap.c).
+// global, +0x08 width / +0x0c height — same mapping as dwColormap.c).
 static void dwSegment_AddFullScreenDirtyRect()
 {
     if (stdDisplay_pCurVideoMode) // Note: guard added; always non-NULL here in the binary
@@ -313,7 +309,7 @@ static void dwSegment_AddFullScreenDirtyRect()
     }
 }
 
-// @434340 — binary caller: dwGuiDialog_RunModal.
+// binary caller: dwGuiDialog_RunModal.
 void dwSegment_BeginOverlay(dwSegment* pSeg)
 {
     dwSegment_pActive->Suspend(); // binary: unguarded — an overlay requires an active segment
@@ -322,7 +318,6 @@ void dwSegment_BeginOverlay(dwSegment* pSeg)
     dwSegment_AddFullScreenDirtyRect();
 }
 
-// @434390
 void dwSegment_EndOverlay(void)
 {
     dwSegment_pOverlay->Deactivate();
@@ -335,7 +330,6 @@ void dwSegment_EndOverlay(void)
 // Manager: recorded-input playback
 // ---------------------------------------------------------------------------
 
-// @433fd0
 void dwSegment_Play(const char* pFilename)
 {
     stdPlatform_Printf("Attempting playback of %s\n", pFilename); // binary: jk_logtofile (compiled-out stub)
@@ -378,7 +372,6 @@ void dwSegment_Play(const char* pFilename)
     dwConfFile_Close(&conf);
 }
 
-// @434180
 void dwSegment_EndPlayback(void)
 {
     dwSegment_ClearCues();
@@ -389,7 +382,7 @@ void dwSegment_EndPlayback(void)
 // Manager: the per-frame tick
 // ---------------------------------------------------------------------------
 
-// @4343f0 — called once per frame by the main loop (dwMain_MainLoopTick @41b6d0).
+// called once per frame by the main loop (dwMain_MainLoopTick).
 int dwSegment_Tick(void)
 {
     if (g_should_exit) // binary: the DW Window unit's msg-loop quit flag DAT_0065be0c
@@ -514,7 +507,6 @@ int dwSegment_Tick(void)
 // Manager: pending-segment stack
 // ---------------------------------------------------------------------------
 
-// @434740
 void dwSegment_Push(dwSegment* pSeg)
 {
     dwSegment_aStack[dwSegment_stackDepth] = pSeg; // binary: unguarded (10 slots)
@@ -522,7 +514,6 @@ void dwSegment_Push(dwSegment* pSeg)
     pSeg->Suspend();
 }
 
-// @434760
 dwSegment* dwSegment_Pop(void)
 {
     if (dwSegment_stackDepth != 0)
@@ -539,20 +530,17 @@ dwSegment* dwSegment_Pop(void)
     return NULL;
 }
 
-// @4347b0
 void dwSegment_RequestAdvance(void)
 {
     dwSegment_bAdvancePending = 1;
 }
 
-// @4347c0
 void dwSegment_PushAndAdvance(dwSegment* pSeg)
 {
     dwSegment_Push(pSeg);
     dwSegment_RequestAdvance();
 }
 
-// @4347e0
 void dwSegment_InterruptWith(dwSegment* pReturnTo, dwSegment* pInterrupt)
 {
     dwSegment_Push(pReturnTo);
@@ -560,7 +548,6 @@ void dwSegment_InterruptWith(dwSegment* pReturnTo, dwSegment* pInterrupt)
     dwSegment_RequestAdvance();
 }
 
-// @434800
 void dwSegment_Release(dwSegment* pSeg)
 {
     int i = 0;

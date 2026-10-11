@@ -1,6 +1,6 @@
 // dwHelp — animated HELP-droid speech control (keyword "HELP") + dwGuiIndicator
-// blinking status widget (keyword "INDICATOR"). DroidWorks.exe 0x418af0-0x419ba0,
-// vtbls @0x51ed50 (dwHelp) / @0x51edc8 (dwGuiIndicator). See Dw/dwHelp.h.
+// blinking status widget (keyword "INDICATOR"). DroidWorks.exe,
+// vtbls dwHelp / dwGuiIndicator. See Dw/dwHelp.h.
 //
 // This unit owns the dwGuiIndicator_*/dwHelp_Ctor shims (ex-dwMain.c
 // placeholders — the orchestrator deletes those copies now that these are real).
@@ -25,7 +25,7 @@
 // dwHelp
 // =====================================================================
 
-// @418af0 (dwHelp_Ctor)
+// dwHelp_Ctor
 dwHelp::dwHelp(dwRect* pRect, char* pAnimName, int speakerCode)
     : dwAnim(pRect, pAnimName, /*msgCode*/0, /*bLoop*/1, /*fps*/15.0f)
 {
@@ -36,14 +36,14 @@ dwHelp::dwHelp(dwRect* pRect, char* pAnimName, int speakerCode)
     this->savedAnimFrame = 0;
 }
 
-// @418b90 (dwHelp_Dtor; scalar-deleting wrapper @418b70)
+// dwHelp_Dtor (scalar-deleting wrapper dwHelp_DtorDelete)
 dwHelp::~dwHelp()
 {
     this->StopSpeech();
     // currentWav dtor frees its buffer; dwAnim base dtor tears the rest down.
 }
 
-// vtbl +0x10 @418bf0 (dwHelp_OnKey)
+// vtbl +0x10 dwHelp_OnKey
 int dwHelp::OnKey(int key, int repeat)
 {
     (void)repeat;
@@ -52,7 +52,7 @@ int dwHelp::OnKey(int key, int repeat)
     return 0;
 }
 
-// vtbl +0x14 @418c10 (dwHelp_Update)
+// vtbl +0x14 dwHelp_Update
 void dwHelp::Update(float dt)
 {
     if (this->currentWav.length == 0 && this->speechDelay > 0.0f)
@@ -64,7 +64,7 @@ void dwHelp::Update(float dt)
     this->dwAnim::Update(dt); // tick the mouth-flap frames
 }
 
-// vtbl +0x18 @4196d0 (dwHelp_OnHover)
+// vtbl +0x18 dwHelp_OnHover
 int dwHelp::OnHover(int16_t x, int16_t y)
 {
     (void)x; (void)y;
@@ -74,7 +74,7 @@ int dwHelp::OnHover(int16_t x, int16_t y)
     return this->OnHoverNotify((void*)(intptr_t)this->msgCode);
 }
 
-// vtbl +0x1c @419700 (dwHelp_OnMessage)
+// vtbl +0x1c dwHelp_OnMessage
 int dwHelp::OnMessage(dwWidgetMsg* pMsg)
 {
     char handled = 0;
@@ -109,7 +109,7 @@ int dwHelp::OnMessage(dwWidgetMsg* pMsg)
     return handled;
 }
 
-// @419610 (dwHelp_StopSpeech)
+// dwHelp_StopSpeech
 void dwHelp::StopSpeech()
 {
     if (this->currentWav.length != 0)
@@ -134,7 +134,7 @@ void dwHelp::StopSpeech()
     }
 }
 
-// @418c70 (dwHelp_PlaySpeech) — the giant (speakerCode, msgCode) -> wav table.
+// dwHelp_PlaySpeech — the giant (speakerCode, msgCode) -> wav table.
 char dwHelp::PlaySpeech(unsigned int msgCode, int var)
 {
     const char* pWav = NULL;
@@ -461,7 +461,7 @@ char dwHelp::PlaySpeech(unsigned int msgCode, int var)
 // dwGuiIndicator
 // =====================================================================
 
-// @4197b0 (dwGuiIndicator_Ctor)
+// dwGuiIndicator_Ctor
 dwGuiIndicator::dwGuiIndicator(dwRect* pRect, char* pImage1Name, char* pImage2Name,
                                int code, float progress0)
     : dwWidget(pRect)
@@ -487,14 +487,14 @@ dwGuiIndicator::dwGuiIndicator(dwRect* pRect, char* pImage1Name, char* pImage2Na
     this->EnsureImages();
 }
 
-// @4198a0 (dwGuiIndicator_Dtor; scalar-deleting wrapper @419880)
+// dwGuiIndicator_Dtor (scalar-deleting wrapper dwGuiIndicator_DtorDelete)
 dwGuiIndicator::~dwGuiIndicator()
 {
     this->FreeImages();
     // imageName1/imageName2 dtors free their buffers; dwWidget base dtor last.
 }
 
-// @419910 (dwGuiIndicator_SetProgress)
+// dwGuiIndicator_SetProgress
 void dwGuiIndicator::SetProgress(float progress)
 {
     if (progress < 0.0f)
@@ -525,7 +525,7 @@ void dwGuiIndicator::SetProgress(float progress)
     }
 }
 
-// vtbl +0x18 @419a00 (dwGuiIndicator_OnHover — shared COMDAT; the twin body
+// vtbl +0x18 (dwGuiIndicator_OnHover — shared COMDAT; the twin body
 // in dwWorkshopCtrl.cpp confirms it reads the +0x3c field as the pSender).
 int dwGuiIndicator::OnHover(int16_t x, int16_t y)
 {
@@ -534,7 +534,7 @@ int dwGuiIndicator::OnHover(int16_t x, int16_t y)
     return this->OnHoverNotify((void*)(intptr_t)this->code);
 }
 
-// @419a30 (dwGuiIndicator_Show)
+// dwGuiIndicator_Show
 void dwGuiIndicator::Show()
 {
     if (this->bActive == 0)
@@ -546,7 +546,7 @@ void dwGuiIndicator::Show()
     }
 }
 
-// @419a50 (dwGuiIndicator_Hide)
+// dwGuiIndicator_Hide
 void dwGuiIndicator::Hide()
 {
     if (this->bActive != 0)
@@ -557,7 +557,7 @@ void dwGuiIndicator::Hide()
     }
 }
 
-// vtbl +0x14 @419a70 (dwGuiIndicator_Update)
+// vtbl +0x14 dwGuiIndicator_Update
 void dwGuiIndicator::Update(float dt)
 {
     if (this->bActive != 0)
@@ -574,7 +574,7 @@ void dwGuiIndicator::Update(float dt)
     }
 }
 
-// vtbl +0x44 @419ad0 (dwGuiIndicator_Draw)
+// vtbl +0x44 dwGuiIndicator_Draw
 void dwGuiIndicator::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     this->EnsureImages();
@@ -592,7 +592,7 @@ void dwGuiIndicator::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
     }
 }
 
-// vtbl +0x3c @419b50 (dwGuiIndicator_EnsureImages)
+// vtbl +0x3c dwGuiIndicator_EnsureImages
 void dwGuiIndicator::EnsureImages()
 {
     if (this->pImage1 == NULL && this->imageName1.length != 0)
@@ -601,7 +601,7 @@ void dwGuiIndicator::EnsureImages()
         this->pImage2 = dwImage_LoadFile(this->imageName2.pBuffer);
 }
 
-// vtbl +0x40 @419ba0 (dwGuiIndicator_FreeImages)
+// vtbl +0x40 dwGuiIndicator_FreeImages
 void dwGuiIndicator::FreeImages()
 {
     if (this->pImage1 != NULL)
@@ -620,13 +620,13 @@ void dwGuiIndicator::FreeImages()
 // C-linkage shims (own the ex-dwMain.c placeholders)
 // =====================================================================
 
-// @418af0 — placement-ctor over a caller-allocated 0x5c block.
+// placement-ctor over a caller-allocated 0x5c block.
 extern "C" dwHelp* dwHelp_Ctor(dwHelp* pThis, dwRect* pRect, char* pAnimName, int speakerCode)
 {
     return new (pThis) dwHelp(pRect, pAnimName, speakerCode);
 }
 
-// @4197b0 — placement-ctor over a caller-allocated 0x48 block.
+// placement-ctor over a caller-allocated 0x48 block.
 extern "C" dwGuiIndicator* dwGuiIndicator_Ctor(dwGuiIndicator* pThis, dwRect* pRect,
                                                char* pImage1Name, char* pImage2Name,
                                                int code, float progress0)

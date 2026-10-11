@@ -1,7 +1,7 @@
 // dwGuiInvBar — the in-game INVENTORY item-bar popup (dwWidget subclass). See
 // Dw/dwGuiInvBar.h for the role summary and the vtable/struct maps.
 //
-// Decompiled from DroidWorks.exe unit range 0x41a9f0-0x41b240. Per-function
+// Decompiled from DroidWorks.exe. Per-function
 // @addresses below. Compiled as C++ (vtable + ctor/dtor + MSVC EH frames).
 //
 // Engine-name mapping (Ghidra DW name -> OpenJKDF2 repo name):
@@ -53,7 +53,6 @@ extern "C" void dwGuiInvBar_Startup(void)
 
 // ---- ctor / dtor ------------------------------------------------------------
 
-// @41a9f0
 dwGuiInvBar::dwGuiInvBar(dwRect* pRect, int16_t cellSpacing, const char* pFontName, uint8_t textColorIdx)
     : dwWidget(pRect)
 {
@@ -77,7 +76,7 @@ dwGuiInvBar::dwGuiInvBar(dwRect* pRect, int16_t cellSpacing, const char* pFontNa
     }
 }
 
-// @41aad0 (scalar-deleting wrapper @41aab0)
+// (scalar-deleting wrapper dwGuiInvBar_DtorDelete)
 dwGuiInvBar::~dwGuiInvBar()
 {
     if (this->bShown != 0)
@@ -92,7 +91,6 @@ dwGuiInvBar::~dwGuiInvBar()
 
 // ---- layout / visibility ----------------------------------------------------
 
-// @41ab40
 void dwGuiInvBar::Layout()
 {
     this->cellWidth = 0;
@@ -155,7 +153,6 @@ void dwGuiInvBar::Layout()
     Invalidate();
 }
 
-// @41acd0
 void dwGuiInvBar::Hide()
 {
     this->bShown = 0;
@@ -164,7 +161,6 @@ void dwGuiInvBar::Hide()
 
 // ---- input ------------------------------------------------------------------
 
-// @41ace0
 int dwGuiInvBar::OnMouseMove(int16_t x, int16_t y)
 {
     int newSel = 0;
@@ -219,7 +215,6 @@ int dwGuiInvBar::OnMouseMove(int16_t x, int16_t y)
     return 0;
 }
 
-// @41aeb0
 int dwGuiInvBar::OnMouseDown(int16_t x, int16_t y)
 {
     if (this->bShown != 0)
@@ -241,7 +236,6 @@ int dwGuiInvBar::OnMouseDown(int16_t x, int16_t y)
     return 0;
 }
 
-// @41af40
 int dwGuiInvBar::OnMessage(dwWidgetMsg* pMsg)
 {
     switch (pMsg->code)
@@ -268,7 +262,6 @@ int dwGuiInvBar::OnMessage(dwWidgetMsg* pMsg)
     return 0;
 }
 
-// @41b240
 int dwGuiInvBar::ContainsPoint(dwPoint* pPt)
 {
     return 1; // modal: grabs every click
@@ -276,7 +269,6 @@ int dwGuiInvBar::ContainsPoint(dwPoint* pPt)
 
 // ---- draw -------------------------------------------------------------------
 
-// @41afd0
 void dwGuiInvBar::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     if (this->bShown == 0)

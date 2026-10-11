@@ -1,7 +1,7 @@
 // dwImageVBuf — dwImage subclass backed by a stdDisplay tVBuffer.
 //
-// Decompiled from DroidWorks.exe, unit range 0x449540-0x449740 (vtbl
-// @0x5201a0). See dwImageVBuf.h for the class layout and construction modes.
+// Decompiled from DroidWorks.exe (vtbl
+// dwImageVBuf_vtbl). See dwImageVBuf.h for the class layout and construction modes.
 //
 // Engine-API mapping (binary -> repo):
 //   stdDisplay_FUN_004fdcc0 -> stdDisplay_VBufferNew(fmt, 1, 1, NULL)
@@ -29,7 +29,7 @@ extern "C" {
 #include "globals.h"
 }
 
-// Wrap an existing tVBuffer (non-owning). @449540
+// Wrap an existing tVBuffer (non-owning).
 dwImageVBuf::dwImageVBuf(tVBuffer* pVBuffer)
 {
     this->desc.width = (uint16_t)pVBuffer->format.width;
@@ -41,7 +41,7 @@ dwImageVBuf::dwImageVBuf(tVBuffer* pVBuffer)
 }
 
 // Allocate an owned tVBuffer sized to pSrcImage (bppBits BITS per pixel) and
-// copy the source in through its virtual Blit. @4495a0
+// copy the source in through its virtual Blit.
 dwImageVBuf::dwImageVBuf(dwImage* pSrcImage, uint8_t bppBits)
 {
     this->desc.width = pSrcImage->desc.width;
@@ -51,8 +51,8 @@ dwImageVBuf::dwImageVBuf(dwImage* pSrcImage, uint8_t bppBits)
     this->bOwnsVBuffer = 1;
     this->pVBuffer = NULL;
 
-    // Binary: copies the 0x4c-byte display-format global (tRasterInfo
-    // @0x6b17cc, kept current by the engine's stdDisplay SetMode) as the
+    // Binary: copies the 0x4c-byte display-format global (tRasterInfo,
+    // kept current by the engine's stdDisplay SetMode) as the
     // template, then overrides width/height/bpp.
     // Note: mapped to stdDisplay_pCurVideoMode->format; NULL-guarded with a
     // zeroed template (the binary trusted the global unconditionally —
@@ -83,9 +83,9 @@ dwImageVBuf::dwImageVBuf(dwImage* pSrcImage, uint8_t bppBits)
 }
 
 // Frees the buffer only when owned. (The binary body also re-points the vptr
-// at the dwImage base vtbl @0x520158 while unwinding — the compiler does
-// that here; the scalar-deleting dwImageVBuf_DtorDelete @449580 is likewise
-// compiler-generated via `delete`.) @4496a0
+// at the dwImage base dwImage_vtbl while unwinding — the compiler does
+// that here; the scalar-deleting dwImageVBuf_DtorDelete is likewise
+// compiler-generated via `delete`.)
 dwImageVBuf::~dwImageVBuf()
 {
     if (this->bOwnsVBuffer)
@@ -93,7 +93,7 @@ dwImageVBuf::~dwImageVBuf()
 }
 
 // Lock the underlying buffer and expose its pixels/stride. Returns nonzero
-// when stdDisplay_VBufferLock succeeded. @4496d0
+// when stdDisplay_VBufferLock succeeded.
 int dwImageVBuf::Lock(void** ppPixels, int* pStride)
 {
     int bRes = stdDisplay_VBufferLock(this->pVBuffer);
@@ -116,7 +116,7 @@ int dwImageVBuf::Lock(void** ppPixels, int* pStride)
     return bRes != 0;
 }
 
-// Unlock the underlying buffer and re-snapshot the lock state. @449730
+// Unlock the underlying buffer and re-snapshot the lock state.
 int dwImageVBuf::Unlock()
 {
     stdDisplay_VBufferUnlock(this->pVBuffer);

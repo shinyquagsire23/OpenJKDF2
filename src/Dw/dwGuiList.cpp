@@ -1,5 +1,5 @@
 // dwGuiList / dwGuiSpeech / dwGuiDroidDance — DroidWorks in-game GUI controls.
-// Decompiled from DroidWorks.exe, unit range 0x409fc0-0x40adbf. See dwGuiList.h
+// Decompiled from DroidWorks.exe. See dwGuiList.h
 // for the class map. Verifiably C++ (vtables, ctor/dtor pairs, MSVC EH frames).
 
 #include "Dw/dwGuiList.h"
@@ -13,7 +13,7 @@
 
 #include "jk.h"
 #include "stdPlatform.h"
-#include "globals.h"          // sithTime_g_msecGameTime (binary sithTime_curMs @0x541d48)
+#include "globals.h"          // sithTime_g_msecGameTime (binary sithTime_curMs)
 
 #include <new>       // placement new (raw-allocated list items / factory objects)
 #include <stdlib.h>  // malloc / free / rand
@@ -28,7 +28,6 @@
 // fontName, colorHi, colorFlag2, pStyle) — we keep that signature so the caller
 // links unchanged, mapping `a` -> base color and `pFontName` -> font name. The
 // runtime effect is identical to the binary.
-// @409fc0
 dwGuiList::dwGuiList(dwRect* pRect, float a, char* pFontName, uint8_t colorHi,
                      uint8_t colorFlagParam, void* pStyle)
     : dwGuiHypText(pRect, /*pNotify*/NULL, pFontName, (uint8_t)a,
@@ -54,7 +53,7 @@ dwGuiList::dwGuiList(dwRect* pRect, float a, char* pFontName, uint8_t colorHi,
     this->layoutRect.bottom = (int16_t)(pRect->bottom - 2);
 }
 
-// @40a500 (dwGuiList_ItemFree) — free an item's two dwStrings (textB then
+// dwGuiList_ItemFree — free an item's two dwStrings (textB then
 // textA, matching the binary order).
 static void dwGuiList_ItemFree(dwGuiListItem* pItem)
 {
@@ -62,7 +61,7 @@ static void dwGuiList_ItemFree(dwGuiListItem* pItem)
     pItem->textA.Free();
 }
 
-// @40a0c0 (scalar-deleting wrapper @40a0a0)
+// (scalar-deleting wrapper dwGuiList_DtorDelete)
 dwGuiList::~dwGuiList()
 {
     dwListNode* pSentinel = this->pItems;
@@ -87,7 +86,6 @@ dwGuiList::~dwGuiList()
     // base ~dwGuiHypText runs automatically.
 }
 
-// @40a200
 void dwGuiList::Relayout()
 {
     const int16_t x0 = this->layoutRect.left;
@@ -139,7 +137,6 @@ void dwGuiList::Relayout()
     this->UpdateHoverItem(dwCursor_pos.x, dwCursor_pos.y);
 }
 
-// @40a3b0
 void dwGuiList::Clear()
 {
     dwListNode* pSentinel = this->pItems;
@@ -164,7 +161,6 @@ void dwGuiList::Clear()
     this->bLayoutInvalid = 0;
 }
 
-// @40a430
 void dwGuiList::AddItem(void* pData, int val, char* pTextA, char* pTextB)
 {
     dwGuiListItem* pItem = (dwGuiListItem*)malloc(sizeof(dwGuiListItem));
@@ -184,7 +180,6 @@ void dwGuiList::AddItem(void* pData, int val, char* pTextA, char* pTextB)
     }
 }
 
-// @40a550
 void dwGuiList::UpdateHoverItem(int16_t x, int16_t y)
 {
     dwListNode* pSentinel = this->pItems;
@@ -201,7 +196,6 @@ void dwGuiList::UpdateHoverItem(int16_t x, int16_t y)
     }
 }
 
-// @40a5e0
 int dwGuiList::OnMouseMove(int16_t x, int16_t y)
 {
     if (!this->bLayoutInvalid)
@@ -215,7 +209,6 @@ int dwGuiList::OnMouseMove(int16_t x, int16_t y)
     return 0;
 }
 
-// @40a630
 int dwGuiList::OnMouseDown(int16_t x, int16_t y)
 {
     if (this->bLayoutInvalid)
@@ -229,7 +222,6 @@ int dwGuiList::OnMouseDown(int16_t x, int16_t y)
     return 1;
 }
 
-// @40a690
 int dwGuiList::OnMouseUp(int16_t x, int16_t y)
 {
     if (dwWidget_pMouseTarget == this)
@@ -252,7 +244,6 @@ int dwGuiList::OnMouseUp(int16_t x, int16_t y)
     return 0;
 }
 
-// @40a710
 void dwGuiList::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     if (this->pItems == this->pItems->pNext) // empty list
@@ -294,7 +285,6 @@ void dwGuiList::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 // dwGuiSpeech
 // =============================================================================
 
-// @40a8a0
 dwGuiSpeech::dwGuiSpeech(dwRect* pRect, int notify, char* pFontName, uint32_t color, void* pStyle)
     : dwGuiHypText(pRect, (void*)(intptr_t)notify, pFontName, (uint8_t)color,
                    dwGuiHypText_HAlignLeft, dwGuiHypText_VAlignTop,
@@ -309,13 +299,13 @@ dwGuiSpeech::dwGuiSpeech(dwRect* pRect, int notify, char* pFontName, uint32_t co
     this->layoutRect.bottom = (int16_t)(pRect->bottom - 2);
 }
 
-// @40a990 (scalar-deleting wrapper @40a970) — soundName freed by its member
+// (scalar-deleting wrapper dwGuiSpeech_DtorDelete) — soundName freed by its member
 // dtor; base ~dwGuiHypText runs after.
 dwGuiSpeech::~dwGuiSpeech()
 {
 }
 
-// @40a9e0 (dwGuiSpeech_SetText)
+// dwGuiSpeech_SetText
 void dwGuiSpeech::SetText(char* pText, void* pTimedItemArg, char* pSoundName)
 {
     this->text.Free();
@@ -328,7 +318,6 @@ void dwGuiSpeech::SetText(char* pText, void* pTimedItemArg, char* pSoundName)
         this->soundName.AssignCStr("");
 }
 
-// @40aa30
 void dwGuiSpeech::Clear()
 {
     if (this->soundName.length != 0)
@@ -346,7 +335,6 @@ void dwGuiSpeech::Clear()
     }
 }
 
-// @40aa90
 void dwGuiSpeech::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     char* pBuf = this->text.pBuffer;
@@ -367,7 +355,6 @@ void dwGuiSpeech::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 // dwGuiDroidDance
 // =============================================================================
 
-// @40ab70
 dwGuiDroidDance::dwGuiDroidDance(dwRect* pRect)
     : dwGuiQuickView(pRect) // base ctor: allocs pNodes, LayoutNodes, sets QuickView vtbl
 {
@@ -397,7 +384,7 @@ dwGuiDroidDance::dwGuiDroidDance(dwRect* pRect)
     this->LayoutNodes();
 }
 
-// @40acf0 (scalar-deleting wrapper @40acd0)
+// (scalar-deleting wrapper dwGuiDroidDance_DtorDelete)
 dwGuiDroidDance::~dwGuiDroidDance()
 {
     // Empty the active list WITHOUT deleting its payloads (they belong to
@@ -428,7 +415,7 @@ dwGuiDroidDance::~dwGuiDroidDance()
     // base ~dwGuiQuickView runs automatically (pNodes now empty).
 }
 
-// @40adb0 — vtbl +0x14
+// vtbl +0x14
 void dwGuiDroidDance::Update(float dt)
 {
     dwGuiQuickView::Update(dt);

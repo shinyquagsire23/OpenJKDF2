@@ -2,7 +2,7 @@
 #define _DWCOG_H
 
 // dwCog part 2 — DroidWorks droid-tool "activate/use" interaction dispatch
-// (Ghidra 0x44c270-0x44cc4f, program=DroidWorks.exe).
+// (Ghidra, program=DroidWorks.exe).
 //
 // When the player acts (Activate key -> sithPlayerActions_Activate /
 // sithControl tool keys -> dwCog_ActivateTool; or clicks an inventory item ->
@@ -14,7 +14,7 @@
 // message on the animation's trigger marker (dwCog_ScanPuppetCallback ->
 // dwCog_SendPendingMessage).
 //
-// The COG verb layer (dwCog part 1, 0x408780-0x4093xx incl. the
+// The COG verb layer (dwCog part 1, incl. the
 // dwfreezeplayer/dwunfreezeplayer verb wrappers and dwCog_RegisterVerbs) is
 // P8 — NOT here.
 
@@ -71,29 +71,29 @@ enum DW_CAP
 // Written by dwGuiInGame_StartMission (P6) from the assembled droid's stats
 // record (+0x30/+0x34/+0x3c); dwCog_droidCaps is also read by the DW physics
 // twin (sithPhysics_FUN_0045b070) and dwGuiInGame_SegUpdate.
-extern uint32_t dwCog_droidCaps; // @0x541dc8
-extern uint32_t dwCog_toolCaps2; // @0x541dcc
-extern uint32_t dwCog_toolCaps1; // @0x541dd0
-extern int dwCog_bInteractBusy;  // @0x541dd4 (reach anim in progress)
-extern int dwCog_pendingMessage; // @0x541dd8 (queued DW_MESSAGE, 0 = none)
+extern uint32_t dwCog_droidCaps;
+extern uint32_t dwCog_toolCaps2;
+extern uint32_t dwCog_toolCaps1;
+extern int dwCog_bInteractBusy;  // reach anim in progress
+extern int dwCog_pendingMessage; // queued DW_MESSAGE, 0 = none
 
 // Added: module reset for the soft-reset loop (the binary has no dwCog
 // startup; part 1's dwCog_RegisterVerbs is the only registration entry).
 void dwCog_Startup();
 
-int dwCog_FreezePlayer();   // @44c270 (refcounted; zeroes motion + sets SITH_AF_CONTROLSDISABLED)
-int dwCog_UnfreezePlayer(); // @44c2e0
-void dwCog_ActivateTool(SithThing* pSource, int toolSlot); // @44c320 (0=body, 1/2=tool arms)
-void dwCog_ScanAndInteract(SithThing* pSource, uint32_t reqCaps, int toolSlot); // @44c400
-int dwCog_ScanRay(SithThing* pSource, const rdMatrix34* pOrient, const rdVector3* pStartPos, SithSector* pSector, flex_t rayDist, uint32_t reqCaps); // @44c820
-uint32_t dwCog_GetThingCaps(SithThing* pThing);       // @44c8e0
-uint32_t dwCog_GetCogCaps(sithCog* pCog);             // @44c960
-uint32_t dwCog_GetSurfaceCaps(SithSurface* pSurface); // @44ca30
-int dwCog_SelectMessage(uint32_t objCaps, uint32_t reqCaps); // @44ca80
-void dwCog_UseItem(SithThing* pSource, int invBin);   // @44cb20 (inventory click)
-void dwCog_GetActivateBin(sithCog* pCtx);             // @44cb90 (verb "dwgetactivatebin", registered by part 1/P8)
-void dwCog_SendPendingMessage();                      // @44cbb0
-void dwCog_ScanPuppetCallback(SithThing* pThing, int32_t track, uint32_t markerType); // @44cc10
+int dwCog_FreezePlayer();   // refcounted (zeroes motion + sets SITH_AF_CONTROLSDISABLED)
+int dwCog_UnfreezePlayer();
+void dwCog_ActivateTool(SithThing* pSource, int toolSlot); // 0=body, 1/2=tool arms
+void dwCog_ScanAndInteract(SithThing* pSource, uint32_t reqCaps, int toolSlot);
+int dwCog_ScanRay(SithThing* pSource, const rdMatrix34* pOrient, const rdVector3* pStartPos, SithSector* pSector, flex_t rayDist, uint32_t reqCaps);
+uint32_t dwCog_GetThingCaps(SithThing* pThing);
+uint32_t dwCog_GetCogCaps(sithCog* pCog);
+uint32_t dwCog_GetSurfaceCaps(SithSurface* pSurface);
+int dwCog_SelectMessage(uint32_t objCaps, uint32_t reqCaps);
+void dwCog_UseItem(SithThing* pSource, int invBin);   // inventory click
+void dwCog_GetActivateBin(sithCog* pCtx);             // verb "dwgetactivatebin", registered by part 1/P8
+void dwCog_SendPendingMessage();
+void dwCog_ScanPuppetCallback(SithThing* pThing, int32_t track, uint32_t markerType);
 
 void dwCog_RegisterVerbs(void);
 

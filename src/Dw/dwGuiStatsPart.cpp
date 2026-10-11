@@ -1,8 +1,8 @@
 // dwGuiStatsPart / dwGuiPartImage — droid-part display widgets.
 //
 // Decompiled from DroidWorks.exe:
-//   dwGuiStatsPart 0x428740-0x428a0f (STATS_PART; vtbl @0x51f498)
-//   dwGuiPartImage 0x428d10-0x4291ff (PART_IMAGE; vtbl @0x51f4e0)
+//   dwGuiStatsPart (STATS_PART; dwGuiStatsPart_vtbl)
+//   dwGuiPartImage (PART_IMAGE; dwGuiPartImage_vtbl)
 // See dwGuiStatsPart.h for the layout / slot maps.
 //
 // No module statics — no dwGuiStatsPart_Startup needed (soft-reset rule).
@@ -19,14 +19,13 @@
 #include "jk.h" // _sprintf
 
 // Durability index (dwPart::durability, 0..5) -> localized-string key.
-// Binary: the PTR_s_NONE table at dwDroidView_vtbl+0x18 (0x51f478).
+// Binary: the PTR_s_NONE table at dwDroidView_vtbl+0x18 (dwGuiStatsPart_aDurability).
 static const char* const dwGuiStatsPart_aDurability[6] = {
     "NONE", "LOW", "MEDIUM_LOW", "MEDIUM", "MEDIUM_HIGH", "HIGH"
 };
 
 // =============================== dwGuiStatsPart ================================
 
-// @428740
 dwGuiStatsPart::dwGuiStatsPart(dwRect* pRect, char* pLabelFontName, uint8_t colorLabel,
                                char* pValueFontName, uint8_t colorValue)
     : dwWidget(pRect)
@@ -49,7 +48,7 @@ dwGuiStatsPart::dwGuiStatsPart(dwRect* pRect, char* pLabelFontName, uint8_t colo
     this->pValueDurability = NULL;
 }
 
-// @428880 (DtorDelete @428860) — free the two font handles (binary:
+// (dwGuiStatsPart_DtorDelete) — free the two font handles (binary:
 // sithRender_Open() is a mislabeled empty COMDAT; the handle "dtor" is a lone
 // RET, so a plain delete of the handle allocation is faithful).
 dwGuiStatsPart::~dwGuiStatsPart()
@@ -60,7 +59,7 @@ dwGuiStatsPart::~dwGuiStatsPart()
         delete this->pValueFont;
 }
 
-// @428900 — hover-help notification.
+// hover-help notification.
 int dwGuiStatsPart::OnHover(int16_t x, int16_t y)
 {
     (void)x; (void)y;
@@ -69,7 +68,6 @@ int dwGuiStatsPart::OnHover(int16_t x, int16_t y)
     return 1;
 }
 
-// @428930
 int dwGuiStatsPart::OnMessage(dwWidgetMsg* pMsg)
 {
     if (pMsg->code == 2000)
@@ -102,7 +100,7 @@ int dwGuiStatsPart::OnMessage(dwWidgetMsg* pMsg)
     return 0;
 }
 
-// @428a10 — draw the info-card: display name (2 label-lines), a separator,
+// draw the info-card: display name (2 label-lines), a separator,
 // the description (4 value-lines), DURABILITY label+value, a separator, the
 // materials list, then the MASS / MAGNETIC bottom row (left / right half).
 void dwGuiStatsPart::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
@@ -187,7 +185,6 @@ void dwGuiStatsPart::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 
 // =============================== dwGuiPartImage ================================
 
-// @428d10
 dwGuiPartImage::dwGuiPartImage(dwRect* pRect, char* pFontName, uint8_t color)
     : dwWidget(pRect)
 {
@@ -201,7 +198,7 @@ dwGuiPartImage::dwGuiPartImage(dwRect* pRect, char* pFontName, uint8_t color)
         this->pFont = dwFont_Load(new dwFont, pFontName);
 }
 
-// @428dd0 (DtorDelete @428db0)
+// (dwGuiPartImage_DtorDelete)
 dwGuiPartImage::~dwGuiPartImage()
 {
     this->FreeImages();          // release the child anim's images (Ghidra: FreeAnim)
@@ -212,7 +209,7 @@ dwGuiPartImage::~dwGuiPartImage()
     this->partName.Free();
 }
 
-// @428e90 — advance the reveal / spawn the preview anim.
+// advance the reveal / spawn the preview anim.
 void dwGuiPartImage::Update(float dt)
 {
     dwPart* pPart = this->pPart;
@@ -253,7 +250,7 @@ void dwGuiPartImage::Update(float dt)
         this->pAnim->Update(dt);
 }
 
-// @428e60 — hover-help notification.
+// hover-help notification.
 int dwGuiPartImage::OnHover(int16_t x, int16_t y)
 {
     (void)x; (void)y;
@@ -262,7 +259,6 @@ int dwGuiPartImage::OnHover(int16_t x, int16_t y)
     return 1;
 }
 
-// @428fe0
 int dwGuiPartImage::OnMessage(dwWidgetMsg* pMsg)
 {
     if (pMsg->code == 0x7e6)
@@ -293,7 +289,7 @@ int dwGuiPartImage::OnMessage(dwWidgetMsg* pMsg)
     return 0;
 }
 
-// @429060 — translate the rect and forward to the child anim.
+// translate the rect and forward to the child anim.
 void dwGuiPartImage::Move(int16_t dx, int16_t dy)
 {
     this->left = (int16_t)(this->left + dx);
@@ -304,21 +300,21 @@ void dwGuiPartImage::Move(int16_t dx, int16_t dy)
         this->pAnim->Move(dx, dy);
 }
 
-// @429160 (Ghidra: dwGuiPartImage_Precache) — vtbl +0x3c EnsureImages override.
+// (Ghidra: dwGuiPartImage_Precache) — vtbl +0x3c EnsureImages override.
 void dwGuiPartImage::EnsureImages()
 {
     if (this->pAnim != NULL)
         this->pAnim->EnsureImages();
 }
 
-// @429170 (Ghidra: dwGuiPartImage_FreeAnim) — vtbl +0x40 FreeImages override.
+// (Ghidra: dwGuiPartImage_FreeAnim) — vtbl +0x40 FreeImages override.
 void dwGuiPartImage::FreeImages()
 {
     if (this->pAnim != NULL)
         this->pAnim->FreeImages();
 }
 
-// @429090 — draw the part image (or the child anim), then the name text.
+// draw the part image (or the child anim), then the name text.
 void dwGuiPartImage::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     this->EnsureImages(); // vtbl +0x3c (Precache)

@@ -4,7 +4,7 @@
 // dwRef — the DroidWorks reference-room CONTENT controls (built by
 // dwGuiReference_CreateControl's GRAPH / PULLDOWN_MENU keywords):
 //
-//   dwRefGraph    (dwWidgetGroup subclass, vtbl 0x51ecb8, struct 0x50) —
+//   dwRefGraph    (dwWidgetGroup subclass, dwRefGraph_vtbl, struct 0x50) —
 //                 the material-properties comparison CHART control (keyword
 //                 "GRAPH"). Plots droid-part topics in a 3-column chart:
 //                 dwGuiHypText topic-name labels (LayoutLabels, Arial10) +
@@ -16,7 +16,7 @@
 //                 dwSound tick while animating; OnMessage codes 0x1b62/0x1b63
 //                 flip the view mode.
 //
-//   dwRefPulldown (dwWidget subclass, vtbl 0x51ed08, struct 0x104) — the
+//   dwRefPulldown (dwWidget subclass, dwRefPulldown_vtbl, struct 0x104) — the
 //                 scrollable pull-down MENU control (keyword "PULLDOWN_MENU").
 //                 Collapsed it shows one selected label; a click expands a
 //                 scrollable list of dwRefMenuItem entries; an item that owns
@@ -28,10 +28,10 @@
 //                 { dwString label; dwString sortKey; dwString topic;
 //                   int value; u8 flag; dwRefPulldown* pSubmenu }.
 //
-// Decompiled from DroidWorks.exe, unit range 0x4155e0-0x418980 (the shared
-// dwRect_Set COMDAT @0x418850 lives here but is declared in Dw/dwRect.h). The
-// genuine dwHelp unit starts ~0x418af0 (a different agent owns it) — this file
-// does NOT translate past 0x418980.
+// Decompiled from DroidWorks.exe (the shared
+// dwRect_Set COMDAT lives here but is declared in Dw/dwRect.h). The
+// genuine dwHelp unit starts at dwHelp_Ctor (a different agent owns it) — this file
+// does NOT translate past dwRefPulldown_FreeImages.
 //
 // Everything is verifiably C++ (vtables, ctor/dtor pairs, MSVC EH frames).
 
@@ -81,7 +81,7 @@ struct dwRefGraphPoint
 };
 
 // dwWidgetGroup base @0x00 (0x14) + fields below — sizeof 0x50. vtable
-// @0x51ecb8 overrides only DtorDelete(+0x00), Update(+0x14), OnMessage(+0x1c).
+// dwRefGraph_vtbl overrides only DtorDelete(+0x00), Update(+0x14), OnMessage(+0x1c).
 struct dwRefGraph : dwWidgetGroup
 {
     dwList pDataPoints;   // 0x14: dwRefGraphPoint* payloads
@@ -101,33 +101,33 @@ struct dwRefGraph : dwWidgetGroup
     uint8_t bDirtyX;      // 0x4c
     uint8_t bDirtyY;      // 0x4d
 
-    // @4155e0 (dwRefGraph_Ctor) — dwWidgetGroup(pRect); LoadTopics ->
+    // dwRefGraph_Ctor — dwWidgetGroup(pRect); LoadTopics ->
     // LayoutLabels -> LayoutMarkers at construction.
     dwRefGraph(dwRect* pRect, void* pScreen, float config1, float config2, char* pSoundName);
 
-    // @415710 (dwRefGraph_Dtor; scalar-deleting wrapper @4156f0 = vtbl +0x00) —
+    // dwRefGraph_Dtor (scalar-deleting wrapper dwRefGraph_DtorDelete = vtbl +0x00) —
     // free the 3 data lists + soundName; the base group dtor deletes children.
     virtual ~dwRefGraph();
 
-    // vtbl +0x14 @4161a0 — ease cur->target rect, play the tick loop, forward.
+    // vtbl +0x14 dwRefGraph_Update — ease cur->target rect, play the tick loop, forward.
     virtual void Update(float dt);
-    // vtbl +0x1c @416130 — 0x1b62 SetMode0 / 0x1b63 SetMode1 (re-tick + redraw).
+    // vtbl +0x1c dwRefGraph_OnMessage — 0x1b62 SetMode0 / 0x1b63 SetMode1 (re-tick + redraw).
     virtual int OnMessage(dwWidgetMsg* pMsg);
 
     // ---- non-virtual helpers ----
-    void AddDataPoint(char* pName, float density, float strength); // @4159a0
-    void LayoutLabels();   // @415a50 — the 3-column hyptext name labels
-    void LayoutMarkers();  // @415ee0 — the colored arrow-marker pictures
-    void LoadTopics();     // @416650 — enumerate + parse TPC/SUB topic files
-    void ParseTopicFile(dwConfFile* pConf); // @416830
-    void SetMode0() { this->viewMode = 0; } // @416970
-    void SetMode1() { this->viewMode = 1; } // @416980
+    void AddDataPoint(char* pName, float density, float strength);
+    void LayoutLabels();   // the 3-column hyptext name labels
+    void LayoutMarkers();  // the colored arrow-marker pictures
+    void LoadTopics();     // enumerate + parse TPC/SUB topic files
+    void ParseTopicFile(dwConfFile* pConf);
+    void SetMode0() { this->viewMode = 0; }
+    void SetMode1() { this->viewMode = 1; }
 };
 
 // ---- dwRefMenuItem --------------------------------------------------------------
 
-// One pull-down entry (0x30). AddItem builds these; the item dtor @418910
-// (scalar-deleting wrapper @417ce0) deletes any submenu then frees the strings.
+// One pull-down entry (0x30). AddItem builds these; the item dtor dwRefMenuItem_Dtor
+// (scalar-deleting wrapper dwRefMenuItem_DtorDelete) deletes any submenu then frees the strings.
 struct dwRefMenuItem
 {
     dwString label;         // 0x00
@@ -144,7 +144,7 @@ struct dwRefMenuItem
 
 // ---- dwRefPulldown --------------------------------------------------------------
 
-// dwWidget base @0x00 (0xe) + fields below — sizeof 0x104. vtable @0x51ed08
+// dwWidget base @0x00 (0xe) + fields below — sizeof 0x104. dwRefPulldown_vtbl
 // overrides DtorDelete/OnMouseMove/OnMouseDown/Update(no-op)/OnMessage(ret 0)/
 // Invalidate/EnsureImages/FreeImages/Draw. Field names follow the Ghidra
 // struct dump; several remain field_0xNN where the role is only structural.
@@ -204,32 +204,32 @@ struct dwRefPulldown : dwWidget
     dwString field_0xec;      // 0xec: select wav
     dwString field_0xf8;      // 0xf8: close wav
 
-    // @416bf0 (dwRefPulldown_Ctor) — dwWidget(pRect); builds the item list and
+    // dwRefPulldown_Ctor — dwWidget(pRect); builds the item list and
     // (for a root menu) precaches images + snapshots its collapsed rect.
     dwRefPulldown(dwRect* pRect, char* pFontName, uint8_t colorParam, uint8_t hotColorParam,
                   uint32_t labelColor, char* pImgNormal, char* pImgHot, char* pOpenWav,
                   char* pSelectWav, char* pCloseWav, char* pHoverWav, char* pLabel,
                   uint8_t textColor, char* pFontHot, uint8_t bIsSubmenu);
 
-    // @416f30 (dwRefPulldown_Dtor; scalar-deleting wrapper @416f10 = vtbl +0x00)
+    // dwRefPulldown_Dtor (scalar-deleting wrapper dwRefPulldown_DtorDelete = vtbl +0x00)
     virtual ~dwRefPulldown();
 
-    virtual int OnMouseMove(int16_t x, int16_t y); // vtbl +0x04 @417530
-    virtual int OnMouseDown(int16_t x, int16_t y); // vtbl +0x08 @4171f0
-    virtual int OnMessage(dwWidgetMsg* pMsg);      // vtbl +0x1c @417d00 (ret 0)
-    virtual void EnsureImages();                   // vtbl +0x3c @4188c0
-    virtual void FreeImages();                     // vtbl +0x40 @418980
-    virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect); // vtbl +0x44 @417d10
+    virtual int OnMouseMove(int16_t x, int16_t y); // vtbl +0x04 dwRefPulldown_OnMouseMove
+    virtual int OnMouseDown(int16_t x, int16_t y); // vtbl +0x08 dwRefPulldown_OnMouseDown
+    virtual int OnMessage(dwWidgetMsg* pMsg);      // vtbl +0x1c dwRefPulldown_OnMessage (ret 0)
+    virtual void EnsureImages();                   // vtbl +0x3c dwRefPulldown_EnsureImages
+    virtual void FreeImages();                     // vtbl +0x40 dwRefPulldown_FreeImages
+    virtual void Draw(dwImageBits* pDestBits, dwRect* pClipRect); // vtbl +0x44 dwRefPulldown_Draw
 
     // ---- non-virtual helpers ----
     void AddItem(char* pTopicFile, char* pLabel, char* pSortKey, uint32_t labelColor,
-                 uint8_t flag, dwRefPulldown* pSubmenu);       // @417b90
-    void ApplyBounds();                                        // @418880
-    void BuildItems();                                         // @418210
-    dwRefPulldown* BuildSubmenu(char* pTopicFile);             // @418670
-    void ComputeRect();                                        // @4184f0
-    int16_t MeasureWidth();                                    // @4185a0
-    void LayoutExpanded(int16_t left, int16_t top, int hoverRow); // @418740
+                 uint8_t flag, dwRefPulldown* pSubmenu);
+    void ApplyBounds();
+    void BuildItems();
+    dwRefPulldown* BuildSubmenu(char* pTopicFile);
+    void ComputeRect();
+    int16_t MeasureWidth();
+    void LayoutExpanded(int16_t left, int16_t top, int hoverRow);
 };
 
 #endif // __cplusplus

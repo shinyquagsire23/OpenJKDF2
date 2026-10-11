@@ -1,7 +1,7 @@
 // dwString — CString-like heap string + path helpers.
-// Decompiled from DroidWorks.exe, unit range 0x4429e0-0x442d9x.
+// Decompiled from DroidWorks.exe.
 // dwString::Free exists as three byte-identical COMDATs in the binary
-// (0x436d80, 0x442b70, 0x442cd0) — implemented once here.
+// (dwString_Free, dwString_Free, dwString_Free) — implemented once here.
 //
 // Allocation: the original went through the HostServices hooks
 // (dwHS->alloc/realloc/free); this layer is desktop-only, so plain
@@ -95,7 +95,7 @@ extern "C" void dwString_FindFilename(char** ppStr)
 // dwString class methods
 // ------------------------------------------------------------------
 
-// @442ac0 (dwString_CtorDefault)
+// dwString_CtorDefault
 dwString::dwString()
 {
     this->length = 0;
@@ -103,7 +103,7 @@ dwString::dwString()
     this->pBuffer = NULL;
 }
 
-// @442ad0 (dwString_Ctor): len==0 -> strlen
+// dwString_Ctor: len==0 -> strlen
 dwString::dwString(const char* pSrc, uint32_t len)
 {
     this->length = 0;
@@ -112,7 +112,7 @@ dwString::dwString(const char* pSrc, uint32_t len)
     this->Assign(pSrc, len);
 }
 
-// @442b00 (dwString_CtorCopy)
+// dwString_CtorCopy
 dwString::dwString(const dwString& src)
 {
     this->length = 0;
@@ -128,13 +128,13 @@ dwString::~dwString()
     this->Free();
 }
 
-// @442b30 (dwString_AssignString)
+// dwString_AssignString
 dwString* dwString::AssignString(const dwString* pSrc)
 {
     return this->Assign(pSrc->pBuffer, pSrc->length);
 }
 
-// @442b50 (dwString_AssignCStr)
+// dwString_AssignCStr
 dwString* dwString::AssignCStr(const char* pSrc)
 {
     return this->Assign(pSrc, 0);
@@ -148,7 +148,7 @@ dwString& dwString::operator=(const dwString& src)
     return *this;
 }
 
-// @442b70 (=0x436d80/0x442cd0)
+// (=dwString_Free/dwString_Free)
 // Note: made idempotent (free + zero ALL THREE members unconditionally) —
 // required because the dtor now also runs after explicit Free() calls in
 // translated code. The original only zeroed under the pBuffer!=NULL check;
@@ -163,7 +163,7 @@ dwString* dwString::Free()
     return this;
 }
 
-// @442b80 (dwString_Append)
+// dwString_Append
 dwString* dwString::Append(const char* pSrc, uint32_t len)
 {
     uint32_t oldLen;
@@ -189,7 +189,7 @@ dwString* dwString::Append(const char* pSrc, uint32_t len)
     return this;
 }
 
-// @442c00 (dwString_Insert)
+// dwString_Insert
 dwString* dwString::Insert(uint32_t pos, const char* pSrc, uint32_t len)
 {
     if (pSrc != NULL) {
@@ -210,7 +210,7 @@ dwString* dwString::Insert(uint32_t pos, const char* pSrc, uint32_t len)
     return this;
 }
 
-// @442c80 (dwString_Erase) — remove chars [start, end); end clamped to length.
+// dwString_Erase — remove chars [start, end); end clamped to length.
 dwString* dwString::Erase(uint32_t start, uint32_t end)
 {
     if (end > this->length)
@@ -224,7 +224,7 @@ dwString* dwString::Erase(uint32_t start, uint32_t end)
     return this;
 }
 
-// @442d00 (dwString_Assign)
+// dwString_Assign
 dwString* dwString::Assign(const char* pSrc, uint32_t len)
 {
     char* pBuf;
@@ -258,7 +258,7 @@ dwString* dwString::Assign(const char* pSrc, uint32_t len)
     return this;
 }
 
-// @442d90 (dwString_Reserve)
+// dwString_Reserve
 int dwString::Reserve(uint32_t needed)
 {
     uint32_t newCap;

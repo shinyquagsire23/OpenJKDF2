@@ -1,8 +1,8 @@
 // dwWorkshop — the 'workshop' droid-editor SCREEN singleton. See dwWorkshop.h.
 //
-// Decompiled from DroidWorks.exe, unit range 0x43c1b0-0x43cf4f (primary
-// vtable @0x51fff0, secondary scn vtable @0x51ffd8; the compiler regenerates
-// the MI thunks, incl. dwWorkshop_ScnDtorThunk @43cf20).
+// Decompiled from DroidWorks.exe (primary
+// dwWorkshop_vtbl, secondary scn dwWorkshop_scn_vtbl; the compiler regenerates
+// the MI thunks, incl. dwWorkshop_ScnDtorThunk).
 //
 // Engine/API mapping (DW-binary label -> repo):
 //   stdBitmapRle_FUN_00444d00 -> dwWidget_DispatchMsg (known mislabel; the
@@ -10,10 +10,10 @@
 //     the Ghidra decompile hides the thiscall msg pointer)
 //   DAT_0053d9f8 -> dwPlayer_statsFlags · DAT_0053d984 -> dwCore_pWorkspaceNodes
 //   DAT_0053d954 -> dwCore_pCurrentMission (dw-core global, P7)
-//   dwSegment_pCueList emptiness (@0x53e858) -> dwSegment_IsPlaylistEmpty()
-//   rand() @507f30 -> _rand() (jk.h; dwDroidStats precedent)
+//   dwSegment_pCueList emptiness -> dwSegment_IsPlaylistEmpty()
+//   rand() -> _rand() (jk.h; dwDroidStats precedent)
 //   constants: 3.051851e-05f (~1/32768) * 120.0f + 180.0f dance reseed;
-//   float -180.0 @0x51e998 / double -0.5 @0x51e9a0 (editor unit; not used here)
+//   float -180.0 / double -0.5 (editor unit; not used here)
 //
 // Module statics: dwWorkshop_pSingleton (reset in dwWorkshop_Startup).
 
@@ -37,24 +37,24 @@
 #include "jk.h" // _rand
 #include "stdPlatform.h"
 
-// dw-core workspace part-node list sentinel @0x53d984 (owner: dwMain, P7).
+// dw-core workspace part-node list sentinel dwCore_pWorkspaceNodes (owner: dwMain, P7).
 // TODO(dw-decomp): provided by dwMain.
 extern "C" dwListNode* dwCore_pWorkspaceNodes;
-// Modal yes/no dialog runner @41c0f0 (owner: dwGuiMission, P6). Returns
+// Modal yes/no dialog runner dwGuiDialog_RunModal (owner: dwGuiMission, P6). Returns
 // 0x1388 (5000) for YES, 0x1389 (5001) for NO.
 // TODO(dw-decomp): provided by dwGuiMission.
 extern "C" int dwGuiDialog_RunModal(const char* pConfName, const char* pMsgKey);
-// The workspace droid's display name @0x53d978 (currently dwInits.cpp,
+// The workspace droid's display name dwCore_workspaceName (currently dwInits.cpp,
 // P7-owned) — the DROID_NAME entry edits it in place.
 extern "C" dwString dwCore_workspaceName;
-// The currently-selected mission record @0x53d954 (dwMissionInfo*; owner:
+// The currently-selected mission record dwCore_pCurrentMission (dwMissionInfo*; owner:
 // dw core, P7) — broadcast as the 0xbbc "show reward part" sender.
 // TODO(dw-decomp): provided by dwMain/dwGuiMission (dwMain.c placeholder).
 extern "C" void* dwCore_pCurrentMission;
 
 // ---- module statics -----------------------------------------------------------
 
-extern "C" dwWorkshop* dwWorkshop_pSingleton = NULL; // @0x53e8c0
+extern "C" dwWorkshop* dwWorkshop_pSingleton = NULL;
 
 // Reseed the idle dance poke: now + rand()*120/32768 + 180 seconds (the
 // exact binary constants; shared by Activate/Update/msg 0x7932).
@@ -66,7 +66,7 @@ static void dwWorkshop_ReseedDanceTime(dwWorkshop* pThis)
 
 // ---- singleton -----------------------------------------------------------------
 
-// @43c1b0 (dwWorkshop_CreateSingleton)
+// dwWorkshop_CreateSingleton
 extern "C" void dwWorkshop_CreateSingleton(void)
 {
     if (dwWorkshop_pSingleton == NULL)
@@ -82,7 +82,7 @@ extern "C" void dwWorkshop_Startup(void)
 
 // ---- ctor/dtor -----------------------------------------------------------------
 
-// @43c220 (dwWorkshop_Ctor)
+// dwWorkshop_Ctor
 dwWorkshop::dwWorkshop()
     : dwGuiScreen("workshop", NULL)
     , danceSound("dance.wav", 0)
@@ -97,8 +97,8 @@ dwWorkshop::dwWorkshop()
     this->nextDanceTime = 0.0f;
 }
 
-// @43c300 (dwWorkshop_Dtor; scalar-deleting wrapper @43c2e0; secondary-vtbl
-// dtor thunk dwWorkshop_ScnDtorThunk @43cf20 = compiler-generated here)
+// dwWorkshop_Dtor (scalar-deleting wrapper dwWorkshop_DtorDelete; secondary-vtbl
+// dtor thunk dwWorkshop_ScnDtorThunk = compiler-generated here)
 dwWorkshop::~dwWorkshop()
 {
     dwWorkshop_pSingleton = NULL;
@@ -107,7 +107,7 @@ dwWorkshop::~dwWorkshop()
 
 // ---- segment lifecycle -----------------------------------------------------------
 
-// @43c3e0 (dwWorkshop_OnActivate — secondary vtbl +0x00)
+// (dwWorkshop_OnActivate — secondary vtbl +0x00)
 int dwWorkshop::Activate()
 {
     dwListNode* pIter;
@@ -179,7 +179,7 @@ int dwWorkshop::Activate()
     return ok;
 }
 
-// @43c360 (dwWorkshop_OnDeactivate — secondary vtbl +0x04)
+// (dwWorkshop_OnDeactivate — secondary vtbl +0x04)
 void dwWorkshop::Deactivate()
 {
     dwListNode* pIter;
@@ -196,7 +196,7 @@ void dwWorkshop::Deactivate()
 
 // ---- widget overrides -----------------------------------------------------------
 
-// @43c5b0 (dwWorkshop_OnMouseMove — primary vtbl +0x04)
+// (dwWorkshop_OnMouseMove — primary vtbl +0x04)
 int dwWorkshop::OnMouseMove(int16_t x, int16_t y)
 {
     int cursorIdx;
@@ -222,7 +222,7 @@ int dwWorkshop::OnMouseMove(int16_t x, int16_t y)
     return this->dwGuiScreen::OnMouseMove(x, y);
 }
 
-// @43c990 (dwWorkshop_Update — primary vtbl +0x14).
+// (dwWorkshop_Update — primary vtbl +0x14).
 // NOTE: replaces (does not chain) the base Update — it forwards to the
 // embedded `controls` group itself, exactly like the base body.
 void dwWorkshop::Update(float dt)
@@ -254,7 +254,7 @@ void dwWorkshop::Update(float dt)
     this->controls.Update(dt); // binary: controls vtbl +0x14
 }
 
-// @43c670 (dwWorkshop_OnMessage — primary vtbl +0x1c)
+// (dwWorkshop_OnMessage — primary vtbl +0x1c)
 int dwWorkshop::OnMessage(dwWidgetMsg* pMsg)
 {
     dwListNode* pIter;
@@ -379,7 +379,7 @@ int dwWorkshop::OnMessage(dwWidgetMsg* pMsg)
 
 // ---- control factory -----------------------------------------------------------
 
-// @43ca70 (dwWorkshop_CreateControl — primary vtbl +0x48)
+// (dwWorkshop_CreateControl — primary vtbl +0x48)
 dwWidget* dwWorkshop::CreateControl(char* pKeyword, dwConfFile* pConf)
 {
     dwRect rect;
@@ -408,7 +408,7 @@ dwWidget* dwWorkshop::CreateControl(char* pKeyword, dwConfFile* pConf)
     {
         dwConfFile_ParseRect(pConf, &rect);
         // binary: new(0x38) dwGuiButton_Ctor("wcbuildpaint", &rect) + vtbl
-        // 0x5200a0 + SetPressed(2) — the dwWcBuildPaintButton ctor is that
+        // dwWcBuildPaintButton_vtbl + SetPressed(2) — the dwWcBuildPaintButton ctor is that
         // exact inlined sequence (Dw/dwGuiButton.h).
         return new dwWcBuildPaintButton(&rect);
     }
@@ -416,7 +416,7 @@ dwWidget* dwWorkshop::CreateControl(char* pKeyword, dwConfFile* pConf)
     {
         dwConfFile_ParseRect(pConf, &rect);
         // binary: new(0x3c) dwGuiButton_Ctor("wccargonorm", &rect) + vtbl
-        // 0x520050 + bSuppressConfirm-wrapped SetPressed(2) — inlined
+        // dwWcCargoNormalButton_vtbl + bSuppressConfirm-wrapped SetPressed(2) — inlined
         // dwWcCargoNormalButton ctor (Dw/dwGuiButton.h).
         return new dwWcCargoNormalButton(&rect);
     }
@@ -455,7 +455,7 @@ dwWidget* dwWorkshop::CreateControl(char* pKeyword, dwConfFile* pConf)
         dwConfFile_ParseRect(pConf, &rect);
         pTok = dwConfFile_NextToken(pConf);
         // dwHelp (unit dwHelp, landed P6w2b): binary new(0x5c)
-        // dwHelp_Ctor(&rect, tok, /*speakerCode*/100) @418af0
+        // dwHelp_Ctor(&rect, tok, /*speakerCode*/100)
         return new dwHelp(&rect, pTok, 100);
     }
     if (dwString_Equals(pKeyword, "PALETTE"))
@@ -472,7 +472,7 @@ dwWidget* dwWorkshop::CreateControl(char* pKeyword, dwConfFile* pConf)
         dwConfFile_ParseRect(pConf, &this->viewRect);
         dwConfFile_ParseULong(pConf, &param);
         dwConfFile_ParseULong(pConf, &param2);
-        // binary: new(0x57c) dwDroidView_Ctor(&this->viewRect, param, param2) @426080
+        // binary: new(0x57c) dwDroidView_Ctor(&this->viewRect, param, param2)
         // param = dead middle arg, param2 = FOV%.
         return new dwDroidView(&this->viewRect, (int)param, (int)param2);
     }
@@ -482,9 +482,9 @@ dwWidget* dwWorkshop::CreateControl(char* pKeyword, dwConfFile* pConf)
         dwConfFile_ParseRect(pConf, &rect);
         pTok = dwConfFile_NextToken(pConf); // font
         dwConfFile_ParseULong(pConf, &param); // color
-        // binary: new(0x34) dwGuiPartImage_Ctor(&rect, font, (u8)color) @428d10
+        // binary: new(0x34) dwGuiPartImage_Ctor(&rect, font, (u8)color)
         return new dwGuiPartImage(&rect, pTok, (uint8_t)param);
     }
 
-    return this->dwGuiScreen::CreateControl(pKeyword, pConf); // @430a10 base factory
+    return this->dwGuiScreen::CreateControl(pKeyword, pConf); // base factory
 }

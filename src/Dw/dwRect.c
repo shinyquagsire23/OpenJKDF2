@@ -1,8 +1,8 @@
 // dwRect — DroidWorks short-LTRB rectangle helpers (see dwRect.h).
 //
-// Ghidra (DroidWorks.exe): dwRect_ContainsPoint@0x406570 (COMDAT),
-// dwRect_Set@0x418850 (COMDAT), dwRect_Overlaps@0x444180,
-// dwRect_Clip@0x4441f0, dwRect_Union@0x444270.
+// Ghidra (DroidWorks.exe): dwRect_ContainsPoint (COMDAT),
+// dwRect_Set (COMDAT), dwRect_Overlaps,
+// dwRect_Clip, dwRect_Union.
 //
 // All five were __thiscall in the binary (`this` = the first rect); the C
 // translation passes it as the first parameter per DW/DECOMP_PROGRESS.md.

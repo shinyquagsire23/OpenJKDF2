@@ -1,8 +1,8 @@
 // dwGuiViewBox — the DroidWorks orbit/turntable 3D-view widget, plus the
 // dwGuiImage static-image widget that shares its compile unit.
 //
-// Decompiled from DroidWorks.exe, unit range 0x434840-0x434cff.
-// vtables: dwGuiViewBox_vtbl @0x51f988, dwGuiImage_vtbl @0x51f9e0.
+// Decompiled from DroidWorks.exe.
+// vtables: dwGuiViewBox_vtbl, dwGuiImage_vtbl.
 // See dwGuiViewBox.h for the layout/slot maps.
 //
 // No module statics — no dwGuiViewBox_Startup needed (soft-reset rule).
@@ -18,7 +18,7 @@ extern "C" {
 
 // =============================== dwGuiViewBox ===================================
 
-// @434840 (Ghidra: dwGuiViewBox_Ctor)
+// (Ghidra: dwGuiViewBox_Ctor)
 dwGuiViewBox::dwGuiViewBox(dwRect* pRect, uint8_t bLightsFollowView)
     : dwGui3DView(pRect)
 {
@@ -34,12 +34,12 @@ dwGuiViewBox::dwGuiViewBox(dwRect* pRect, uint8_t bLightsFollowView)
     dwGuiViewBox::Refresh();       // (Ghidra: dwGuiViewBox_RebuildView)
 }
 
-// @434910 (Ghidra: dwGuiViewBox_Dtor; DtorDelete @4348f0) — base dtor only.
+// (Ghidra: dwGuiViewBox_Dtor; dwGuiViewBox_DtorDelete) — base dtor only.
 dwGuiViewBox::~dwGuiViewBox()
 {
 }
 
-// @434920 (Ghidra: dwGuiViewBox_OnMessage) — vtbl +0x1c. The numeric/pointer
+// (Ghidra: dwGuiViewBox_OnMessage) — vtbl +0x1c. The numeric/pointer
 // payload rides in the message's pSender slot (see dwWidgetMsg).
 int dwGuiViewBox::OnMessage(dwWidgetMsg* pMsg)
 {
@@ -65,7 +65,7 @@ int dwGuiViewBox::OnMessage(dwWidgetMsg* pMsg)
     return dwGui3DView::OnMessage(pMsg); // 0x3ea set-FOV lives in the base
 }
 
-// @434b20 (Ghidra: dwGuiViewBox_RebuildLights) — vtbl +0x48
+// (Ghidra: dwGuiViewBox_RebuildLights) — vtbl +0x48
 void dwGuiViewBox::RebuildLights()
 {
     if (this->bLightsFollowView != 0)
@@ -76,7 +76,7 @@ void dwGuiViewBox::RebuildLights()
     dwGui3DView::RebuildLights(); // static base lights
 }
 
-// @4349c0 (Ghidra: dwGuiViewBox_RebuildView — this class's override of the
+// (Ghidra: dwGuiViewBox_RebuildView — this class's override of the
 // +0x4c Refresh slot). Rebuilds viewMat from yaw/pitch orbiting the pivot at
 // orbitDistance; when bLightsFollowView, re-adds the two base lights with
 // positions rotated by the new view matrix (so they rotate WITH the camera).
@@ -118,7 +118,7 @@ void dwGuiViewBox::Refresh()
     this->Invalidate(); // vtbl +0x34
 }
 
-// @4349a0 (Ghidra: dwGuiViewBox_SetAngles; recovered fn) — NEW vtbl +0x50.
+// (Ghidra: dwGuiViewBox_SetAngles; recovered fn) — NEW vtbl +0x50.
 // Binary stores pitch first, then yaw, then virtual-Refreshes.
 void dwGuiViewBox::SetAngles(float yaw, float pitch)
 {
@@ -129,7 +129,7 @@ void dwGuiViewBox::SetAngles(float yaw, float pitch)
 
 // ================================ dwGuiImage ====================================
 
-// @434b50 (Ghidra: dwGuiImage_Ctor)
+// (Ghidra: dwGuiImage_Ctor)
 dwGuiImage::dwGuiImage(dwRect* pRect, char* pFilename)
     : dwWidget(pRect), filename(), pImage(NULL)
 {
@@ -137,14 +137,14 @@ dwGuiImage::dwGuiImage(dwRect* pRect, char* pFilename)
     dwGuiImage::EnsureImages(); // binary: direct call (Ghidra: dwGuiImage_EnsureLoaded)
 }
 
-// @434bf0 (Ghidra: dwGuiImage_Dtor; DtorDelete @434bd0) — FreeImage, then the
+// (Ghidra: dwGuiImage_Dtor; dwGuiImage_DtorDelete) — FreeImage, then the
 // filename release (the dwString member dtor here) and the base dtor.
 dwGuiImage::~dwGuiImage()
 {
     dwGuiImage::FreeImages(); // binary: direct call (Ghidra: dwGuiImage_FreeImage)
 }
 
-// @434c80 (Ghidra: dwGuiImage_EnsureLoaded) — vtbl +0x3c.
+// (Ghidra: dwGuiImage_EnsureLoaded) — vtbl +0x3c.
 // dwImage_LoadFile is the P8 stdBitmapRle2 stub (returns NULL) for now —
 // pImage simply stays NULL and Draw's guard skips (dwCursor precedent).
 void dwGuiImage::EnsureImages()
@@ -155,7 +155,7 @@ void dwGuiImage::EnsureImages()
     }
 }
 
-// @434cb0 (Ghidra: dwGuiImage_FreeImage) — vtbl +0x40. Binary: scalar-deleting
+// (Ghidra: dwGuiImage_FreeImage) — vtbl +0x40. Binary: scalar-deleting
 // dtor via the image's vtbl slot 0 == C++ delete.
 void dwGuiImage::FreeImages()
 {
@@ -166,7 +166,7 @@ void dwGuiImage::FreeImages()
     }
 }
 
-// @434c50 (Ghidra: dwGuiImage_Draw) — vtbl +0x44. Blit `this` is the SOURCE
+// (Ghidra: dwGuiImage_Draw) — vtbl +0x44. Blit `this` is the SOURCE
 // image (see dwImage.h).
 void dwGuiImage::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {

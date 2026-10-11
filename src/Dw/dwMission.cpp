@@ -1,18 +1,18 @@
 // dwMission — mission-record parsing + the workshop<->mission sequencer.
 //
-// DroidWorks.exe: dwMission_ParseInfo@41c530 / ParseObjective@41c960 /
-// ClearObjectives@41c920 (0x41c0f0 dwGuiMission unit) + dwMission_FreeInfo
-// @41a530 (dw part2) + dwMissionSequence Reset@41ea50 / Advance@41ea60
-// (vtbl 0x51f7d8: dwSegment subclass overriding Activate; dtor slot = the
-// shared trivial stub @41a7b0).
+// DroidWorks.exe: dwMission_ParseInfo / ParseObjective /
+// ClearObjectives (dwGuiMission unit) + dwMission_FreeInfo
+// (dw part2) + dwMissionSequence Reset / Advance
+// (dwMissionSequence_vtbl: dwSegment subclass overriding Activate; dtor slot = the
+// shared trivial stub dw_CoreStubDtorDelete).
 //
 // Compiled as C++ (the binary functions carry MSVC EH frames around their
 // dwString/objective locals; dwMissionSequence is a real class). The record
 // API keeps C linkage via dwMission.h.
 //
 // SKIPPED here (P6, dwGuiMission screens): dwGuiDialog/dwGuiMissionMap/
-// dwGuiBrief* classes of the 0x41c0f0 unit, and the dwMissionTransIn/Out
-// slide anims @41eb90/41ee60 — dwMissionSequence::Activate reaches them
+// dwGuiBrief* classes of the dwGuiDialog_RunModal unit, and the dwMissionTransIn/Out
+// slide anims dwMissionTransIn_Ctor/dwMissionTransOut_Ctor — dwMissionSequence::Activate reaches them
 // through the TODO factory externs below.
 
 #include "Dw/dwMission.h"
@@ -36,12 +36,12 @@ extern "C" {
 
 // TODO(dw-decomp): provided by dwGuiMission (P6). Creation shims for the
 // three segments the sequencer spawns:
-//  - dwMissionTransIn_New:  binary `new(0x3d0)` + dwMissionTransIn_Ctor@41eb90
-//    (dwAnim subclass, vtbl 0x51f0c0 — TransToM.flc slide-in + MPanel*.wav cues)
-//  - dwGuiMissionMap_New:   binary `new(0xf4)` + dwGuiMissionMap_Ctor@41db20;
+//  - dwMissionTransIn_New:  binary `new(0x3d0)` + dwMissionTransIn_Ctor
+//    (dwAnim subclass, dwMissionTransIn_vtbl — TransToM.flc slide-in + MPanel*.wav cues)
+//  - dwGuiMissionMap_New:   binary `new(0xf4)` + dwGuiMissionMap_Ctor;
 //    the binary then used object+0x10 (the MI dwSegment base) — in C++ the
 //    shim just upcasts the screen to dwSegment*.
-//  - dwMissionTransOut_New: binary `new(0x3d0)` + dwMissionTransOut_Ctor@41ee60
+//  - dwMissionTransOut_New: binary `new(0x3d0)` + dwMissionTransOut_Ctor
 //    (TransFromM.flc slide-out).
 extern "C" dwSegment* dwMissionTransIn_New(dwImage* pBgImage);
 extern "C" dwSegment* dwGuiMissionMap_New(dwImage* pBgImage);
@@ -72,7 +72,7 @@ extern "C" void dwMission_SetUnlockedByName(const char* pName, int bUnlocked)
 }
 
 // C-callable helper for the dwCog dwsetupcrystalinventory verb
-// (@dwCog_SetupCrystalInventory@409210): walk dwCore_pMissionList and, for each
+// (dwCog_SetupCrystalInventory): walk dwCore_pMissionList and, for each
 // "crystal" mission (missionType == 1), grant the local player an inventory bin
 // starting at 0x22 — amount 1.0 + mark-available for a COMPLETED mission
 // (rank != 0, advancing the bin), or amount 0 + not-available otherwise (bin
@@ -125,7 +125,7 @@ extern "C" void dwMission_UnlockAll(void)
     }
 }
 
-// @41c960 (dwMission_ParseObjective) — parse "<code> <param> <label...>"
+// dwMission_ParseObjective — parse "<code> <param> <label...>"
 // from the current line into pObj.
 // Note: the binary default-ctor'd pObj->label here (it received raw memory);
 // the translation receives a `new`-constructed record, so label is already
@@ -145,7 +145,7 @@ extern "C" dwMissionObjective* dwMission_ParseObjective(dwMissionObjective* pObj
     return pObj;
 }
 
-// @41c530 (dwMission_ParseInfo) — parse one mission record (positioned on
+// dwMission_ParseInfo — parse one mission record (positioned on
 // the "BEGIN <name>" line) until END/EOF.
 extern "C" dwMission* dwMission_ParseInfo(dwMission* pMission, dwConfFile* pConf)
 {
@@ -263,7 +263,7 @@ extern "C" dwMission* dwMission_ParseInfo(dwMission* pMission, dwConfFile* pConf
     return pMission;
 }
 
-// @41c920 (dwMission_ClearObjectives)
+// dwMission_ClearObjectives
 extern "C" void dwMission_ClearObjectives(dwMission* pMission)
 {
     dwListNode* pNode;
@@ -274,7 +274,7 @@ extern "C" void dwMission_ClearObjectives(dwMission* pMission)
     }
 }
 
-// @41a530 (dwMission_FreeInfo) — free every owned string + the objective
+// dwMission_FreeInfo — free every owned string + the objective
 // list. The record itself is NOT freed (dw_Shutdown does that after).
 // Note: the binary freed rewards/videos via the MSVC vector-dtor helper and
 // swept the objective ring twice (payload pass, then a leftover-node pass
@@ -324,11 +324,11 @@ extern "C" void dwMission_Delete(dwMission* pMission)
 }
 
 // ------------------------------------------------------------------
-// dwMissionSequence (vtbl 0x51f7d8)
+// dwMissionSequence (dwMissionSequence_vtbl)
 // ------------------------------------------------------------------
 
-// Ctor (inlined in dwGuiScreen_OnMessage @43146x: alloc 0x1c + dwSegment_Ctor
-// + pBgImage/phase stores + vtbl 0x51f7d8).
+// Ctor (inlined in dwGuiScreen_OnMessage: alloc 0x1c + dwSegment_Ctor
+// + pBgImage/phase stores + dwMissionSequence_vtbl).
 dwMissionSequence::dwMissionSequence(dwImage* pBgImage_)
     : dwSegment()
     , pBgImage(pBgImage_)
@@ -336,14 +336,14 @@ dwMissionSequence::dwMissionSequence(dwImage* pBgImage_)
 {
 }
 
-// @41ea50 (dwMissionSequence_Reset) — called by dwGuiStatus_OnMessage to
+// dwMissionSequence_Reset — called by dwGuiStatus_OnMessage to
 // replay the sequence from the workshop.
 void dwMissionSequence::Reset()
 {
     this->phase = 0;
 }
 
-// vtbl +0x00 @41ea60 (dwMissionSequence_Advance) — the 3-phase state
+// vtbl +0x00 dwMissionSequence_Advance — the 3-phase state
 // machine. Always returns 1.
 int dwMissionSequence::Activate()
 {

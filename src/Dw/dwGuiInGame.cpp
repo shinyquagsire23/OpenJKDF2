@@ -2,7 +2,7 @@
 // dwGuiInGamePause dialog. See Dw/dwGuiInGame.h for the role summary, the
 // segment lifecycle and the (un-rigid) struct/vtable maps.
 //
-// Decompiled from DroidWorks.exe unit range 0x41f2a0-0x42317f (excluding the
+// Decompiled from DroidWorks.exe (excluding the
 // dwSith.c / dwMain.c functions that share the window — see the header note).
 // Per-function @addresses below. Compiled as C++ (two vtables, ctor/dtor pair,
 // MSVC EH frames).
@@ -108,7 +108,7 @@ extern HostServices* dwMain_pHS; // the DW host-services pointer (dwMain.c)
 extern rdMaterialLoader_t dwMain_MaterialLoaderCb;
 extern rdMaterialUnloader_t dwMain_MaterialUnloaderCb;
 
-extern dwListNode* dwCore_pWorkspaceNodes; // @0x53d984 (workspace dwPartNode list sentinel)
+extern dwListNode* dwCore_pWorkspaceNodes; // workspace dwPartNode list sentinel
 extern dwString dwCore_currentRefFile;     // reference-room current topic file
 
 // ---- Genuinely DW-forked / DW-internal engine globals with no repo twin ----
@@ -180,15 +180,15 @@ static int dwGuiInGamePause_result = 0;
 // module state + init
 // ----------------------------------------------------------------------------
 
-dwGuiInGame* dwGuiInGame_pActive = NULL; // @0x53e800 (real def; ex-dwMain.c placeholder)
+dwGuiInGame* dwGuiInGame_pActive = NULL; // real def; ex-dwMain.c placeholder
 
 extern "C" void dwGuiInGame_Startup(void)
 {
     dwGuiInGame_pActive = NULL;
 }
 
-// DW COG verb accessors (dwCog.c is C, this struct is C++). @409010 dwCog_EndMission
-// sets field_0x124 (bEndRequested); @408fa0 dwCog_GetMissionText reads field_0x174
+// DW COG verb accessors (dwCog.c is C, this struct is C++). dwCog_EndMission
+// sets field_0x124 (bEndRequested); dwCog_GetMissionText reads field_0x174
 // (cammyMsgCode). Both no-op / return 0 when no mission is live.
 extern "C" void dwGuiInGame_RequestEndMission(void)
 {
@@ -205,7 +205,7 @@ extern "C" int dwGuiInGame_GetCammyMsgCode(void)
 //     byte-identical 32/64-bit — all scalar fields). All read binary offsets
 //     into field_0x10c (== pDroidStats): capFlags@0x30, maxLoadLeft@0x38,
 //     maxLoadRight@0x40, voiceChars@0x64. Return 0 when no droid is baked.
-// @408eb0 dwCog_GetPlayerHeadType — the last part VOICE pair; when the first
+// dwCog_GetPlayerHeadType — the last part VOICE pair; when the first
 // char is 'B' the second char is the answer (faithful branch).
 extern "C" int dwGuiInGame_GetDroidHeadType(void)
 {
@@ -218,7 +218,7 @@ extern "C" int dwGuiInGame_GetDroidHeadType(void)
     return v;
 }
 
-// @408f60 dwCog_CheckDroidCaps — (droid capFlags & mask).
+// dwCog_CheckDroidCaps — (droid capFlags & mask).
 extern "C" int dwGuiInGame_GetDroidCaps(int mask)
 {
     if (!dwGuiInGame_pActive || !dwGuiInGame_pActive->pDroidStats)
@@ -226,7 +226,7 @@ extern "C" int dwGuiInGame_GetDroidCaps(int mask)
     return (int)(dwGuiInGame_pActive->pDroidStats->totals.capFlags & (uint32_t)mask);
 }
 
-// @408f90 dwCog_GetArmStrength — max(maxLoadLeft, maxLoadRight).
+// dwCog_GetArmStrength — max(maxLoadLeft, maxLoadRight).
 extern "C" int dwGuiInGame_GetArmStrength(void)
 {
     if (!dwGuiInGame_pActive || !dwGuiInGame_pActive->pDroidStats)
@@ -237,21 +237,21 @@ extern "C" int dwGuiInGame_GetArmStrength(void)
 }
 
 // --- dialog / caption verbs (wrap the already-real dwGuiInGame methods) ---
-// @408de0 dwCog_SetMissionText -> ShowCammyText(id).
+// dwCog_SetMissionText -> ShowCammyText(id).
 extern "C" void dwGuiInGame_ShowCammyTextVerb(int msgCode)
 {
     if (dwGuiInGame_pActive)
         dwGuiInGame_pActive->ShowCammyText((uint32_t)msgCode);
 }
 
-// @409310 dwCog_SetRefTopic -> SetRefTopic(str).
+// dwCog_SetRefTopic -> SetRefTopic(str).
 extern "C" void dwGuiInGame_SetRefTopicVerb(char* pTopic)
 {
     if (dwGuiInGame_pActive)
         dwGuiInGame_pActive->SetRefTopic(pTopic);
 }
 
-// @408d60 dwCog_ClearDialog — clear the response menu + conversation state,
+// dwCog_ClearDialog — clear the response menu + conversation state,
 // then (if an NPC caption exists) stop its speech sound and drop its text.
 extern "C" void dwGuiInGame_ClearDialog(void)
 {
@@ -261,8 +261,8 @@ extern "C" void dwGuiInGame_ClearDialog(void)
     dwGuiSpeech* pNpc = dwGuiInGame_pActive->pNpcSpeech;
     if (pNpc != NULL)
     {
-        dwGuiSpeech_Clear(pNpc);        // @40aa30: stop its speech sound + wake the timed cog
-        pNpc->dwGuiHypText::Clear();    // @438c80: free the caption text + line runs —
+        dwGuiSpeech_Clear(pNpc);        // stop its speech sound + wake the timed cog
+        pNpc->dwGuiHypText::Clear();    // free the caption text + line runs —
                                         // the dialog box draws while text is non-empty,
                                         // so this is what dismisses it (binary calls
                                         // dwGuiHypText_Clear here; dwGuiSpeech::Clear
@@ -275,7 +275,7 @@ extern "C" void dwGuiInGame_ClearDialog(void)
 // dwplaycammyspeech) reach the C++ speech objects through these extern-C shims;
 // the verbs themselves (arg popping + cog-timer arming) live in dwCog.c.
 
-// @408780 body: clear any player response menu, play an NPC/character VO line,
+// body: clear any player response menu, play an NPC/character VO line,
 // and show its localized caption on the NPCSPEECH widget. Returns the caption
 // duration in ms — the real VO wav length when one plays, else a reading-time
 // fallback (~77ms/char of the text key: strlen*1000/13, round-half-up). pCtx is
@@ -306,7 +306,7 @@ extern "C" uint32_t dwGuiInGame_PlayCharacterSpeech(sithCog* pCtx, char* pWav, c
 }
 
 // currentVoiceWav.length != 0 — a VO/caption line is currently active.
-// @408ca0 gate: dwCog_PlayPlayerSpeech only speaks when nothing is playing.
+// gate: dwCog_PlayPlayerSpeech only speaks when nothing is playing.
 extern "C" int dwGuiInGame_HasActiveVoice(void)
 {
     return (dwGuiInGame_pActive != NULL && dwGuiInGame_pActive->currentVoiceWav.length != 0);
@@ -334,7 +334,7 @@ extern "C" int32_t dwGuiInGame_PlaySpeechWav(char* pWav)
     return (int32_t)pSample->GetLengthMs();
 }
 
-// @408c60 dwCog_PlayCammySpeech -> PlayVoiceLineEx(msgCode, wav, priority, 0):
+// dwCog_PlayCammySpeech -> PlayVoiceLineEx(msgCode, wav, priority, 0):
 // show a Cammy caption + play its VO, priority-gated against the running line.
 extern "C" void dwGuiInGame_PlayCammySpeech(int msgCode, char* pWav, int priority)
 {
@@ -343,7 +343,7 @@ extern "C" void dwGuiInGame_PlayCammySpeech(int msgCode, char* pWav, int priorit
 }
 
 // --- conversation response-menu verb helpers -------------------------------
-// @408880 dwCog_AddResponse: append a response to the PLAYERSPEECH menu. The
+// dwCog_AddResponse: append a response to the PLAYERSPEECH menu. The
 // item's data = the owning conversation cog (woken/notified when it is picked),
 // val = the response id, textA = the localized display text, textB = the VO wav.
 // No-op when no response menu exists (binary gates on pPlayerSpeech).
@@ -355,7 +355,7 @@ extern "C" void dwGuiInGame_AddResponse(sithCog* pCtx, int id, char* pTextKey, c
     dwGuiInGame_pActive->pPlayerSpeech->AddItem((void*)pCtx, id, pLoc, pWav);
 }
 
-// @408d20 dwCog_GetPlayerResponse: the id (val) of the selected response, or 0.
+// dwCog_GetPlayerResponse: the id (val) of the selected response, or 0.
 extern "C" int dwGuiInGame_GetSelectedResponseId(void)
 {
     if (dwGuiInGame_pActive == NULL || dwGuiInGame_pActive->pSelectedResponse == NULL)
@@ -363,7 +363,7 @@ extern "C" int dwGuiInGame_GetSelectedResponseId(void)
     return dwGuiInGame_pActive->pSelectedResponse->val;
 }
 
-// @408b60 dwCog_PlayPlayerResponse body: play the selected response's VO wav
+// dwCog_PlayPlayerResponse body: play the selected response's VO wav
 // (textB, item+0x1c). Returns its length in ms, or -1 when nothing plays (no
 // selection / empty wav / no sample).
 extern "C" int32_t dwGuiInGame_PlaySelectedResponse(void)
@@ -382,7 +382,7 @@ extern "C" int32_t dwGuiInGame_PlaySelectedResponse(void)
     return (int32_t)pSample->GetLengthMs();
 }
 
-// @4089c0/@4089e0 dwCog_Enable/DisableEscape: gate whether the Esc key runs
+// dwCog_Enable/DisableEscape: gate whether the Esc key runs
 // StopSounds during a conversation (obj+0x110).
 extern "C" void dwGuiInGame_SetEscapeEnabled(int bEnabled)
 {
@@ -390,7 +390,7 @@ extern "C" void dwGuiInGame_SetEscapeEnabled(int bEnabled)
         dwGuiInGame_pActive->bEscapeEnabled = (uint8_t)(bEnabled != 0);
 }
 
-// @409300 dwCog_FlashInventory body: start the HUD inventory button blinking
+// dwCog_FlashInventory body: start the HUD inventory button blinking
 // (obj+0x194). No-op when no mission is live or the HUD has no INVENTORY_BUTTON.
 extern "C" void dwGuiInGame_FlashInventoryButton(void)
 {
@@ -412,7 +412,7 @@ static void dwGuiInGame_UnlinkWidgetNode(dwList* pList, void* pWidget)
     }
 }
 
-// @41f910 — the world-loader progress callback (installed via
+// the world-loader progress callback (installed via
 // sithWorld_sub_44CDF0). Locks the screen surface, draws the growing progress
 // bar between DAT_0053e810/814, presents. Note: the binary interpolates the
 // bar with a load-fraction global whose source Ghidra lost; a single fill of
@@ -439,7 +439,7 @@ static void dwGuiInGame_DrawLoadProgress(void)
 // ctor / dtor
 // ----------------------------------------------------------------------------
 
-// @41f2a0 — the base ctor screen-name string @0x5287b8 is "hud" (the base
+// the base ctor screen-name string is "hud" (the base
 // LoadControls loads "hud.ifc"). (Was guessed "ingame", which never resolved.)
 dwGuiInGame::dwGuiInGame(dwMission* pMission)
     : dwGuiScreen("hud", NULL)
@@ -490,7 +490,7 @@ dwGuiInGame::dwGuiInGame(dwMission* pMission)
     this->pConsoleFont = dwFont_Load(new dwFont, "Arial12");
 }
 
-// @41f4a0 (scalar-deleting wrapper @41f480; scn thunk @423160)
+// (scalar-deleting wrapper dwGuiInGame_DtorDelete; scn thunk dwGuiInGame_ScnDtorThunk)
 dwGuiInGame::~dwGuiInGame()
 {
     if (dwGuiInGame_pActive == this)
@@ -514,7 +514,7 @@ dwGuiInGame::~dwGuiInGame()
 }
 
 // ----------------------------------------------------------------------------
-// segment lifecycle: StartMission (Activate) — @41f9e0
+// segment lifecycle: StartMission (Activate) — dwGuiInGame_StartMission
 // ----------------------------------------------------------------------------
 
 int dwGuiInGame::Activate()
@@ -775,7 +775,6 @@ int dwGuiInGame::Activate()
 // segment lifecycle: OnHide / Pause / Resume / SegUpdate
 // ----------------------------------------------------------------------------
 
-// @420410
 void dwGuiInGame::Deactivate()
 {
     if (this->deathFadeHandle >= 0)
@@ -796,7 +795,6 @@ void dwGuiInGame::Deactivate()
     dwColormap_Apply();
 }
 
-// @420580
 void dwGuiInGame::StopSounds()
 {
     StopVoiceLine();
@@ -819,7 +817,6 @@ void dwGuiInGame::StopSounds()
         dwGuiSpeech_Clear(this->pNpcSpeech);
 }
 
-// @420be0
 void dwGuiInGame::Suspend()
 {
     sithTime_Pause();
@@ -827,7 +824,6 @@ void dwGuiInGame::Suspend()
     dwGuiScreen::Suspend();
 }
 
-// @420c00
 void dwGuiInGame::Resume()
 {
     sithSoundMixer_ResumeAll();
@@ -836,7 +832,7 @@ void dwGuiInGame::Resume()
     stdPalEffects_RefreshPalette();
 }
 
-// @420c20 — per-frame mission tick. See the FIDELITY NOTE (movement-sound +
+// per-frame mission tick. See the FIDELITY NOTE (movement-sound +
 // physics reads touch DW-forked SithThing fields; the gauge/chatter/energy/
 // death/voice logic is preserved).
 void dwGuiInGame::Update()
@@ -1012,7 +1008,7 @@ void dwGuiInGame::Update()
 }
 
 // ----------------------------------------------------------------------------
-// EndMission — @4205e0
+// EndMission — dwGuiInGame_EndMission
 // ----------------------------------------------------------------------------
 
 void dwGuiInGame::EndMission()
@@ -1103,7 +1099,7 @@ void dwGuiInGame::EndMission()
 }
 
 // ----------------------------------------------------------------------------
-// RebuildViewport — @420a70
+// RebuildViewport — dwGuiInGame_RebuildViewport
 // ----------------------------------------------------------------------------
 
 int dwGuiInGame::RebuildViewport()
@@ -1138,7 +1134,7 @@ int dwGuiInGame::RebuildViewport()
 }
 
 // ----------------------------------------------------------------------------
-// BuildDroidStats — @422050
+// BuildDroidStats — dwGuiInGame_BuildDroidStats
 // ----------------------------------------------------------------------------
 
 void dwGuiInGame::BuildDroidStats(SithThing* pPlayer)
@@ -1161,7 +1157,6 @@ void dwGuiInGame::BuildDroidStats(SithThing* pPlayer)
 // voice line / cammy caption / console
 // ----------------------------------------------------------------------------
 
-// @422100
 void dwGuiInGame::StopVoiceLine()
 {
     if (this->currentVoiceWav.length != 0)
@@ -1173,14 +1168,12 @@ void dwGuiInGame::StopVoiceLine()
     this->voicePriority = 0;
 }
 
-// @422160
 void dwGuiInGame::ClearCammyText()
 {
     StopVoiceLine();
     this->pCammyText->Clear();
 }
 
-// @422180
 void dwGuiInGame_PlayVoiceLine(const char* pCammyText, const char* pWavName, uint32_t priority)
 {
     // Binary: __thiscall on dwGuiInGame_pActive. pCammyText is the caption
@@ -1199,7 +1192,6 @@ extern "C" int dwGuiInGame_VoiceDebug(void)
     return dwGuiInGame_bVoiceDebug;
 }
 
-// @4221a0
 void dwGuiInGame::PlayVoiceLineEx(uint32_t msgCode, char* pWavName, uint32_t priority, char bForce)
 {
     // Added: pWavName may be NULL (caption-only lines); the dwString_Equals
@@ -1247,7 +1239,6 @@ void dwGuiInGame::PlayVoiceLineEx(uint32_t msgCode, char* pWavName, uint32_t pri
     }
 }
 
-// @4222e0
 void dwGuiInGame::ShowCammyText(uint32_t msgCode)
 {
     this->cammyMsgCode = msgCode;
@@ -1275,7 +1266,6 @@ void dwGuiInGame::ShowCammyText(uint32_t msgCode)
     }
 }
 
-// @4214d0
 void dwGuiInGame::ClearPlayerSpeech()
 {
     if (this->pPlayerSpeech != NULL)
@@ -1284,7 +1274,6 @@ void dwGuiInGame::ClearPlayerSpeech()
     this->bConvActive = 0;
 }
 
-// @421510
 void dwGuiInGame::SetRefTopic(char* pTopic)
 {
     if (pTopic != NULL && *pTopic != '\0')
@@ -1301,7 +1290,6 @@ void dwGuiInGame::SetRefTopic(char* pTopic)
 // input
 // ----------------------------------------------------------------------------
 
-// @421540
 int dwGuiInGame::OnMouseMove(int16_t x, int16_t y)
 {
     int r = dwGuiScreen::OnMouseMove(x, y);
@@ -1320,7 +1308,6 @@ int dwGuiInGame::OnMouseMove(int16_t x, int16_t y)
     return r;
 }
 
-// @4209e0
 int dwGuiInGame::OnMouseUp(int16_t x, int16_t y)
 {
     if (this->bActive != 0 && this->pPickedWidget == NULL)
@@ -1339,7 +1326,6 @@ int dwGuiInGame::OnMouseUp(int16_t x, int16_t y)
     return 0;
 }
 
-// @421630
 int dwGuiInGame::OnKey(int key, int repeat)
 {
     int handled = dwGuiScreen::OnKey(key, repeat);
@@ -1383,7 +1369,7 @@ int dwGuiInGame::OnKey(int key, int repeat)
 }
 
 // ----------------------------------------------------------------------------
-// OnMessage — @4218d0
+// OnMessage — dwGuiInGame_OnMessage
 // ----------------------------------------------------------------------------
 
 int dwGuiInGame::OnMessage(dwWidgetMsg* pMsg)
@@ -1402,7 +1388,7 @@ int dwGuiInGame::OnMessage(dwWidgetMsg* pMsg)
     {
         handled = 1;
         // The binary installs the reference-intro segment (dwGuiRefIntroSeg,
-        // vtable 0x51f238). ⚠ A bare dwSegment here NEVER advances (its base
+        // dwGuiRefIntroSeg_vtbl). ⚠ A bare dwSegment here NEVER advances (its base
         // Update is a no-op and never RequestAdvances) -> the segment stack
         // sticks on a do-nothing overlay and the game freezes. Use the real
         // factory so the intro -> reference-room chain runs.
@@ -1455,7 +1441,6 @@ int dwGuiInGame::OnMessage(dwWidgetMsg* pMsg)
 // draw / images
 // ----------------------------------------------------------------------------
 
-// @421ca0
 void dwGuiInGame::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     EnsureImages();
@@ -1599,7 +1584,6 @@ void dwGuiInGame::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
     }
 }
 
-// @421fd0
 void dwGuiInGame::EnsureImages()
 {
     dwGuiScreen::EnsureImages();
@@ -1610,7 +1594,6 @@ void dwGuiInGame::EnsureImages()
         this->pHideHelp->EnsureImages();
 }
 
-// @422010
 void dwGuiInGame::FreeImages()
 {
     dwGuiScreen::FreeImages();
@@ -1622,7 +1605,7 @@ void dwGuiInGame::FreeImages()
 }
 
 // ----------------------------------------------------------------------------
-// CreateControl — @422370
+// CreateControl — dwGuiInGame_CreateControl
 // ----------------------------------------------------------------------------
 
 dwWidget* dwGuiInGame::CreateControl(char* pKeyword, dwConfFile* pConf)
@@ -1751,13 +1734,13 @@ dwWidget* dwGuiInGame::CreateControl(char* pKeyword, dwConfFile* pConf)
     }
     if (dwString_Equals(pKeyword, "REFERENCE_BUTTON"))
     {
-        // @422370: stored @0x190 — the InDex button (dwGuiScreen msg-0x6a).
+        // stored @0x190 — the InDex button (dwGuiScreen msg-0x6a).
         this->pReferenceButton = (dwWcButtonBlink*)dwGuiScreen::CreateControl((char*)"BUTTON_BLINK", pConf);
         return (dwWidget*)this->pReferenceButton;
     }
     if (dwString_Equals(pKeyword, "INVENTORY_BUTTON"))
     {
-        // @422370: stored @0x194 — dwflashinventory blinks this button.
+        // stored @0x194 — dwflashinventory blinks this button.
         this->pInventoryButton = (dwWcButtonBlink*)dwGuiScreen::CreateControl((char*)"BUTTON_BLINK", pConf);
         return (dwWidget*)this->pInventoryButton;
     }
@@ -1785,7 +1768,7 @@ dwWidget* dwGuiInGame::CreateControl(char* pKeyword, dwConfFile* pConf)
 }
 
 // ----------------------------------------------------------------------------
-// UpdateViewSize (sithControl callback) — @422a60
+// UpdateViewSize (sithControl callback) — dwGuiInGame_UpdateViewSize
 // ----------------------------------------------------------------------------
 
 int dwGuiInGame_UpdateViewSize(SithThing* pPlayer, flex_t deltaSecs)
@@ -1803,7 +1786,7 @@ int dwGuiInGame_UpdateViewSize(SithThing* pPlayer, flex_t deltaSecs)
 }
 
 // ----------------------------------------------------------------------------
-// CheckCheatCodes — @422ae0
+// CheckCheatCodes — dwGuiInGame_CheckCheatCodes
 // ----------------------------------------------------------------------------
 
 void dwGuiInGame::CheckCheatCodes(char* pCode)
@@ -1888,10 +1871,10 @@ void dwGuiInGame::CheckCheatCodes(char* pCode)
 }
 
 // ----------------------------------------------------------------------------
-// HELPTEXT callbacks — @422e30 / @422ee0
+// HELPTEXT callbacks — dwGuiInGame_HelpTextLayout / dwGuiInGame_HelpTextDraw
 // ----------------------------------------------------------------------------
 
-// @422e30 (dwGuiHypTextWrapFn) — build one run per '$'-delimited segment.
+// dwGuiHypTextWrapFn — build one run per '$'-delimited segment.
 static void dwGuiInGame_HelpTextLayout(dwString* pText, dwFont* pFont, int width, dwGuiHypTextRun** ppRuns)
 {
     (void)width;
@@ -1920,7 +1903,7 @@ static void dwGuiInGame_HelpTextLayout(dwString* pText, dwFont* pFont, int width
     }
 }
 
-// @422ee0 (dwGuiHypTextDrawGlyphsFn) — draw the run right-aligned to a 0x3c
+// dwGuiHypTextDrawGlyphsFn — draw the run right-aligned to a 0x3c
 // column then continue left, glyph by glyph.
 static void dwGuiInGame_HelpTextDraw(dwImageBits* pBits, dwPoint* pPos, dwFont* pFont, uint8_t color,
                                      dwGuiHypTextRun* pRun, dwRect* pClip)
@@ -1957,7 +1940,7 @@ static void dwGuiInGame_HelpTextDraw(dwImageBits* pBits, dwPoint* pPos, dwFont* 
 }
 
 // ----------------------------------------------------------------------------
-// ConsolePrint (C shim) — @423020
+// ConsolePrint (C shim) — dwGuiInGame_ConsolePrint
 // ----------------------------------------------------------------------------
 
 void dwGuiInGame_ConsolePrint(const char* pText)
@@ -1972,7 +1955,7 @@ void dwGuiInGame_ConsolePrint(const char* pText)
 }
 
 // ----------------------------------------------------------------------------
-// CheckDroidValid + factory — @41f6f0 / @41f2a0
+// CheckDroidValid + factory — dwGuiInGame_CheckDroidValid / dwGuiInGame_Ctor
 // ----------------------------------------------------------------------------
 
 int dwGuiInGame_CheckDroidValid(void)
@@ -2037,19 +2020,17 @@ dwGuiInGamePause::dwGuiInGamePause()
 {
 }
 
-// @421880 (scalar-deleting wrapper @421860; scn thunk @423170)
+// (scalar-deleting wrapper dwGuiInGamePause_DtorDelete; scn thunk dwGuiInGamePause_ScnDtorThunk)
 dwGuiInGamePause::~dwGuiInGamePause()
 {
 }
 
-// @421840
 int dwGuiInGamePause::OnKey(int key, int repeat)
 {
     dwSegment_RequestAdvance();
     return dwGuiScreen::OnKey(key, repeat);
 }
 
-// @421810
 int dwGuiInGamePause::OnMessage(dwWidgetMsg* pMsg)
 {
     if (pMsg->code == 5000)

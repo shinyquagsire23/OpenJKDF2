@@ -7,9 +7,9 @@
 // is a tree of these hanging off the dwCore_pWorkspaceNodes list).
 //
 // Decompiled from DroidWorks.exe:
-//   dwPartNode  0x4267a0-0x426d6f (+ spillover InitSlotsFromModel @426d70,
-//               Mirror @427060 — physically binned in the dwDroidView unit)
-//   dwPart      0x4271b0-0x42873f
+//   dwPartNode  (+ spillover InitSlotsFromModel dwPartNode_InitSlotsFromModel,
+//               Mirror dwPartNode_Mirror — physically binned in the dwDroidView unit)
+//   dwPart
 // Verifiably C++ (dwString members, MSVC EH frames/ExceptionList in
 // ParseBlueprint/Dtor/CreateNode) -> C++ classes.
 //
@@ -76,43 +76,43 @@ typedef struct dwPartNode dwPartNode;
 
 // ---- module statics (reset in dwPart_Startup) -------------------------------
 
-// Blueprint registry: part NAME -> dwPart*. Global @0x53e7b4. The table is
+// Blueprint registry: part NAME -> dwPart*. Global dwPart_hashBlueprints. The table is
 // CREATED + filled + freed by dw_Startup/dw_Shutdown (owner dwMain, P7);
 // this unit only defines the global and looks it up.
 extern tHashTable* dwPart_hashBlueprints;
 
-// ANIMATIONS-section keyword -> aAnimNames index (1..23). Global @0x542714.
+// ANIMATIONS-section keyword -> aAnimNames index (1..23). Global dwPart_hashAnimKeywords.
 // Note: the binary builds this inside the DW-modified sithPuppet_Startup
-// (@0x454deb) from the DW engine's 23-entry anim-name list; the repo engine
+//  from the DW engine's 23-entry anim-name list; the repo engine
 // keeps JK's own table, so this unit owns a private copy built in
-// dwPart_Startup (same keys/indices — list recovered from @0x52bc7c).
+// dwPart_Startup (same keys/indices — list recovered from dwPart_aAnimKeywords).
 extern tHashTable* dwPart_hashAnimKeywords;
 
-// SOUNDS-section keyword -> aSoundNames index (1..93). Global @0x545df4.
-// Binary home: the DW sithSoundClass_Startup (@0x460176; keys @0x52c4ac =
+// SOUNDS-section keyword -> aSoundNames index (1..93). Global dwPart_hashSoundKeywords.
+// Binary home: the DW sithSoundClass_Startup (keys dwPart_aSoundKeywords =
 // exactly JK's 93 soundclass names). Built in dwPart_Startup here.
 extern tHashTable* dwPart_hashSoundKeywords;
 
 // Per-(type, slotMask) blueprint counters, bumped once per parsed blueprint
 // (read by dwDroidStats_PickRandomPart — the random-droid generator, P5).
-extern int dwPart_countHeads;       // @0x53e844: type 0
-extern int dwPart_countArms;        // @0x53e830: types 1/3
-extern int dwPart_countAffectors;   // @0x53e838: types 2/4
-extern int dwPart_countLocoNormal;  // @0x53e83c: type 5, slotMask & 1
-extern int dwPart_countLocoCargo;   // @0x53e834: type 5, slotMask & 2
-extern int dwPart_countTorsoNormal; // @0x53e840: type 6, slotMask & 1
-extern int dwPart_countTorsoCargo;  // @0x53e84c: type 6, slotMask & 2
-extern int dwPart_countCargoArms;   // @0x53e848: types 7/8
+extern int dwPart_countHeads;       // type 0
+extern int dwPart_countArms;        // types 1/3
+extern int dwPart_countAffectors;   // types 2/4
+extern int dwPart_countLocoNormal;  // type 5, slotMask & 1
+extern int dwPart_countLocoCargo;   // type 5, slotMask & 2
+extern int dwPart_countTorsoNormal; // type 6, slotMask & 1
+extern int dwPart_countTorsoCargo;  // type 6, slotMask & 2
+extern int dwPart_countCargoArms;   // types 7/8
 
 // Highest DRAIN rate seen across all blueprints (units/sec at 60fps ticks).
-extern float dwPart_maxDrain; // @0x53e850
+extern float dwPart_maxDrain;
 
 // Reset the module statics + (re)build the two keyword tables. No binary
 // equivalent (see the per-global notes above) — added per the soft-reset
 // rule; call before parsing any blueprint.
 void dwPart_Startup(void);
 
-// @4271b0 — NULL/empty-safe stdHashtbl_Find on dwPart_hashBlueprints.
+// NULL/empty-safe stdHashtbl_Find on dwPart_hashBlueprints.
 dwPart* dwPart_FindBlueprint(const char* pName);
 
 // dwCog verb helpers (C-callable; typed access to the C++ blueprint/node structs).
@@ -170,59 +170,59 @@ struct dwPartNode
                                //       {matchColor, newColor}; (0,0) = free entry
     // (0xf2: 2 pad bytes)
 
-    // @4267a0 — takes ownership of pModel; identity transform; builds the
+    // takes ownership of pModel; identity transform; builds the
     // rdThing + rdPuppet, then InitSlotsFromModel().
     dwPartNode(dwPart* pOwner, rdModel3* pModel);
-    // @426830 — StopAnim, free the owned model + rdThing entry (which frees
+    // StopAnim, free the owned model + rdThing entry (which frees
     // the puppet), then pPart->Release().
     ~dwPartNode();
 
-    void GetPosition(rdVector3* pOut) const;      // @426860: transform translation
-    void Translate(const rdVector3* pDelta);      // @4268d0
+    void GetPosition(rdVector3* pOut) const;      // transform translation
+    void Translate(const rdVector3* pDelta);
 
-    // @426880 — accumulate this node's world-space vertex bbox into
+    // accumulate this node's world-space vertex bbox into
     // pMin/pMax (re-derives transform from the attach slot first). Despite
     // the Ghidra "Draw" name this renders nothing (see dwPart_DrawThing).
     void DrawAt(rdVector3* pMin, rdVector3* pMax);
 
-    void Draw();                                  // @426900: rdThing_Draw + recurse children
-    void DrawHighlighted();                       // @426970: as Draw with curGeoMode forced 4
-    void UpdateTransform();                       // @4269f0: pPart->BuildPreviewModel(...) —
+    void Draw();                                  // rdThing_Draw + recurse children
+    void DrawHighlighted();                       // as Draw with curGeoMode forced 4
+    void UpdateTransform();                       // pPart->BuildPreviewModel(...) —
                                                   //   draws the blueprint preview thing driven
                                                   //   by THIS node's puppet
-    void SetDrawFlag4Rec();                       // @426a10: thing.curGeoMode = 4 (full), recurse
-    void SetDrawFlag2Rec();                       // @426a50: thing.curGeoMode = 2 (wireframe), recurse
+    void SetDrawFlag4Rec();                       // thing.curGeoMode = 4 (full), recurse
+    void SetDrawFlag2Rec();                       // thing.curGeoMode = 2 (wireframe), recurse
 
-    // @426a90 — coarse sphere test then rdRaycast_RayModel (hit record 0x38,
+    // coarse sphere test then rdRaycast_RayModel (hit record 0x38,
     // rdRaycast unit). Returns nonzero on hit.
     int RaycastHit(rdVector3* pOrigin, rdVector3* pDir, void* pHitOut);
 
-    // @426af0 — "paint": recolor every model material through the dwMain
+    // "paint": recolor every model material through the dwMain
     // material cache (matchColor -> newColor) and record the pair in
     // aContacts (first entry whose byte0 == matchColor or == 0; silently
     // dropped when all 9 are taken).
     void CollectContacts(int matchColor, int newColor);
 
-    void PlayIdleAnim();                          // @426b60: keyframe0/1 ("walk"/"rwalk")
-    void PlayActiveAnim();                        // @426b90: keyframe2/3 ("dance"/"rdance"), else idle
-    void PlayAnimTrack(rdKeyframe* pKeyframe);    // @426bc0
-    void FadeAnim(float deltaSecs);               // @426c10: rdPuppet_UpdateTracks + material cel cycle
-    void StopAnim();                              // @426c40
+    void PlayIdleAnim();                          // keyframe0/1 ("walk"/"rwalk")
+    void PlayActiveAnim();                        // keyframe2/3 ("dance"/"rdance"), else idle
+    void PlayAnimTrack(rdKeyframe* pKeyframe);
+    void FadeAnim(float deltaSecs);               // rdPuppet_UpdateTracks + material cel cycle
+    void StopAnim();
 
-    // @426c70 — attach THIS node into pSlot of pParent; mirrors this node
+    // attach THIS node into pSlot of pParent; mirrors this node
     // first when its partType doesn't match the slot type.
     void AttachToSlot(dwPartNode* pParent, dwPartSlot* pSlot);
-    void DetachFromSlot();                        // @426cc0
+    void DetachFromSlot();
 
     // `this` = the PARENT node owning pSlot (matrices come from this->thing).
-    void GetSlotPosition(dwPartSlot* pSlot, rdVector3* pOut); // @426d10
-    void GetSlotMatrix(dwPartSlot* pSlot, rdMatrix34* pOut);  // @426d40
+    void GetSlotPosition(dwPartSlot* pSlot, rdVector3* pOut);
+    void GetSlotMatrix(dwPartSlot* pSlot, rdMatrix34* pOut);
 
-    // @426d70 — classify the model's dummy nodes into pMountNode + aSlots
+    // classify the model's dummy nodes into pMountNode + aSlots
     // (and mirror-remap partType when bMirrored).
     void InitSlotsFromModel();
 
-    // @427060 — swap to the mirrored part type/model: detach children,
+    // swap to the mirrored part type/model: detach children,
     // rebuild the model (mirror variant), replay the paint pairs, re-find
     // slots, re-attach the children by slot ordinal.
     void Mirror();
@@ -276,38 +276,38 @@ struct dwPart
     rdKeyframe* keyframe2;     // 0x668: cached "dance" keyframe (aAnimNames[17])
     rdKeyframe* keyframe3;     // 0x66c: cached "rdance" keyframe (aAnimNames[19])
 
-    // @4271d0 (dwPart_ParseBlueprint) — the conf-record ctor/parser: inits
+    // dwPart_ParseBlueprint — the conf-record ctor/parser: inits
     // every field, then consumes keywords until END_PART/EOF, then applies
     // the name-derived defaults and bumps the type counters.
     dwPart(dwConfFile* pConf);
-    // @427ef0 (dwPart_Dtor) — free models/keyframes/images/material strings.
+    // dwPart_Dtor — free models/keyframes/images/material strings.
     ~dwPart();
 
-    void ParseAnims(dwConfFile* pConf);   // @4280b0: until END_ANIMS
-    void ParseSounds(dwConfFile* pConf);  // @428120: until END_SOUNDS
+    void ParseAnims(dwConfFile* pConf);   // until END_ANIMS
+    void ParseSounds(dwConfFile* pConf);  // until END_SOUNDS
 
-    // @4281a0 — BuildModel(0) + new dwPartNode(this, model); refCount++ on
+    // BuildModel(0) + new dwPartNode(this, model); refCount++ on
     // success. NULL when the model failed to load.
     dwPartNode* CreateNode();
 
-    // @428210 — rdModel3_Load a FRESH instance of modelName/modelNameMirror
+    // rdModel3_Load a FRESH instance of modelName/modelNameMirror
     // and repaint every texinfo's solidColor with dw_aPartSlotColors[type]
     // (the slot-marker color). Caller owns the returned model.
     rdModel3* BuildModel(uint8_t bMirrored);
 
-    // @428290 — refCount--; at zero drop the cached preview models +
+    // refCount--; at zero drop the cached preview models +
     // keyframes (the blueprint object itself stays registered).
     void Release();
 
-    rdKeyframe* GetAnimKeyframe0(); // @4282b0: lazy "walk"   (aAnimNames[2])
-    rdKeyframe* GetAnimKeyframe2(); // @4282f0: lazy "dance"  (aAnimNames[17])
-    rdKeyframe* GetAnimKeyframe1(); // @428330: lazy "rwalk"  (aAnimNames[18])
-    rdKeyframe* GetAnimKeyframe3(); // @428370: lazy "rdance" (aAnimNames[19])
+    rdKeyframe* GetAnimKeyframe0(); // lazy "walk"   (aAnimNames[2])
+    rdKeyframe* GetAnimKeyframe2(); // lazy "dance"  (aAnimNames[17])
+    rdKeyframe* GetAnimKeyframe1(); // lazy "rwalk"  (aAnimNames[18])
+    rdKeyframe* GetAnimKeyframe3(); // lazy "rdance" (aAnimNames[19])
 
-    void FreeKeyframes(); // @4283b0
-    void FreeModels();    // @428420: cached previews + the preview rdThing entry
+    void FreeKeyframes();
+    void FreeModels();    // cached previews + the preview rdThing entry
 
-    // @428470 — draw the blueprint's shared preview thing at pMatrix,
+    // draw the blueprint's shared preview thing at pMatrix,
     // temporarily driven by pPuppet (the caller node's): lazily build the
     // (mirrored) preview model with the material recolor cache DISABLED,
     // swap pPuppet->rdthing to the preview thing, rdThing_Draw, restore.
@@ -320,18 +320,18 @@ struct dwPart
 // fitting). All @ addresses in the dwPart unit.
 extern "C" {
 
-// @428540 — refresh joint matrices when stale (rdFrameNum vs rdroid_frameTrue)
+// refresh joint matrices when stale (rdFrameNum vs rdroid_frameTrue)
 // then walk the selected geoset's hierarchy accumulating into pMin/pMax.
 void dwPart_DrawThing(rdThing* pThing, rdMatrix34* pPlacement, rdVector3* pMin, rdVector3* pMax);
 
-// @428590 — recursive node walk (skips amputated joints).
+// recursive node walk (skips amputated joints).
 void dwPart_DrawNodeTree(rdThing* pThing, rdGeoset* pGeoset, rdHierarchyNode* pNode,
                          rdVector3* pMin, rdVector3* pMax);
 
-// @428630 — min/max every mesh vertex transformed by pMatrix.
+// min/max every mesh vertex transformed by pMatrix.
 void dwPart_AccumNodeBBox(rdMesh* pMesh, rdMatrix34* pMatrix, rdVector3* pMin, rdVector3* pMax);
 
-// @428700 — advance every multi-cel material to its next cel (the "model
+// advance every multi-cel material to its next cel (the "model
 // frame" tick used while a part animates).
 void dwPart_AdvanceModelFrame(rdModel3* pModel);
 

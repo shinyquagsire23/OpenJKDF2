@@ -1,7 +1,7 @@
 // dwPart — droid-part BLUEPRINT class + dwPartNode — part scene-graph node.
 //
-// Decompiled from DroidWorks.exe (dwPartNode 0x4267a0-0x426d6f + spillover
-// @426d70/427060; dwPart 0x4271b0-0x42873f). See dwPart.h for the full class
+// Decompiled from DroidWorks.exe (dwPartNode + spillover
+// dwPartNode_InitSlotsFromModel/dwPartNode_Mirror; dwPart). See dwPart.h for the full class
 // notes, the field maps, and the engine-label -> repo-function table.
 //
 // Module statics: the two keyword hashtables + the per-type blueprint
@@ -14,7 +14,7 @@
 //  - The binary's keyword hashtables live in the DW-modified engine startups
 //    (sithPuppet_Startup / sithSoundClass_Startup); the repo engine keeps
 //    JK's own tables, so dwPart_Startup builds private copies from the DW
-//    binary's keyword lists (@0x52bc7c anims / @0x52c4ac sounds).
+//    binary's keyword lists (anims / sounds).
 
 #include "Dw/dwPart.h"
 
@@ -36,9 +36,9 @@ extern "C" {
 }
 
 // TODO(dw-decomp): provided by dwMain (P7) — the material recolor cache
-// (singleton @0x53d950, struct 0x187c). The binary calls these as __thiscall
+// (singleton dwMain_pMaterialCache, struct 0x187c). The binary calls these as __thiscall
 // methods on that singleton (dwPartNode_CollectContacts loads ECX from
-// 0x53d950); the P7 unit must export these C wrappers over it.
+// dwMain_pMaterialCache); the P7 unit must export these C wrappers over it.
 extern "C" void dwMain_MaterialCache_RecolorMasked(rdMaterial* pMaterial, int matchColor, int newColor);
 extern "C" void dwMain_MaterialCache_Disable(void);
 extern "C" void dwMain_MaterialCache_Enable(void);
@@ -52,23 +52,23 @@ extern "C" void dwMain_MaterialCache_Enable(void);
 // ---------------------------------------------------------------------------
 
 extern "C" {
-tHashTable* dwPart_hashBlueprints = NULL;   // @0x53e7b4 (created/filled by dw_Startup, P7)
-tHashTable* dwPart_hashAnimKeywords = NULL; // @0x542714
-tHashTable* dwPart_hashSoundKeywords = NULL;// @0x545df4
+tHashTable* dwPart_hashBlueprints = NULL;   // created/filled by dw_Startup, P7
+tHashTable* dwPart_hashAnimKeywords = NULL;
+tHashTable* dwPart_hashSoundKeywords = NULL;
 
-int dwPart_countHeads = 0;       // @0x53e844
-int dwPart_countArms = 0;        // @0x53e830
-int dwPart_countAffectors = 0;   // @0x53e838
-int dwPart_countLocoNormal = 0;  // @0x53e83c
-int dwPart_countLocoCargo = 0;   // @0x53e834
-int dwPart_countTorsoNormal = 0; // @0x53e840
-int dwPart_countTorsoCargo = 0;  // @0x53e84c
-int dwPart_countCargoArms = 0;   // @0x53e848
+int dwPart_countHeads = 0;
+int dwPart_countArms = 0;
+int dwPart_countAffectors = 0;
+int dwPart_countLocoNormal = 0;
+int dwPart_countLocoCargo = 0;
+int dwPart_countTorsoNormal = 0;
+int dwPart_countTorsoCargo = 0;
+int dwPart_countCargoArms = 0;
 
-float dwPart_maxDrain = 0.0f;    // @0x53e850
+float dwPart_maxDrain = 0.0f;
 }
 
-// ANIMATIONS keyword -> aAnimNames index (DW binary table @0x52bc7c,
+// ANIMATIONS keyword -> aAnimNames index (DW binary table dwPart_aAnimKeywords,
 // inserted with values 1..23 by the DW sithPuppet_Startup). [0] unused.
 static const char* dwPart_aAnimKeywords[24] = {
     NULL,
@@ -78,7 +78,7 @@ static const char* dwPart_aAnimKeywords[24] = {
     "attack", "death",
 };
 
-// SOUNDS keyword -> aSoundNames index (DW binary table @0x52c4ac, values
+// SOUNDS keyword -> aSoundNames index (DW binary table dwPart_aSoundKeywords, values
 // 1..93 from the DW sithSoundClass_Startup — exactly JK's soundclass keys).
 static const char* dwPart_aSoundKeywords[94] = {
     NULL,
@@ -115,11 +115,11 @@ extern "C" void dwPart_Startup(void)
     if (dwPart_hashSoundKeywords)
         stdHashtbl_Free(dwPart_hashSoundKeywords);
 
-    dwPart_hashAnimKeywords = stdHashtbl_New(0x30); // binary size @0x454e10
+    dwPart_hashAnimKeywords = stdHashtbl_New(0x30); // binary size
     for (i = 1; i < 24; i++)
         stdHashtbl_Add(dwPart_hashAnimKeywords, dwPart_aAnimKeywords[i], (void*)(intptr_t)i);
 
-    dwPart_hashSoundKeywords = stdHashtbl_New(0xbc); // binary size @0x460150
+    dwPart_hashSoundKeywords = stdHashtbl_New(0xbc); // binary size sithSoundClass_Startup
     for (i = 1; i < 94; i++)
         stdHashtbl_Add(dwPart_hashSoundKeywords, dwPart_aSoundKeywords[i], (void*)(intptr_t)i);
 
@@ -138,7 +138,7 @@ extern "C" void dwPart_Startup(void)
     dwPart_maxDrain = 0.0f;
 }
 
-// @4271b0 (dwPart_FindBlueprint)
+// dwPart_FindBlueprint
 extern "C" dwPart* dwPart_FindBlueprint(const char* pName)
 {
     if (pName == NULL || *pName == 0)
@@ -146,7 +146,7 @@ extern "C" dwPart* dwPart_FindBlueprint(const char* pName)
     return (dwPart*)stdHashtbl_Find(dwPart_hashBlueprints, pName);
 }
 
-// Workspace node list sentinel (@0x53d984), owned by dw core / dwDroidStats.
+// Workspace node list sentinel (dwCore_pWorkspaceNodes), owned by dw core / dwDroidStats.
 extern "C" dwListNode* dwCore_pWorkspaceNodes;
 
 // C-callable helper for the dwCog dwenablepart/dwdisablepart verbs: set a
@@ -161,7 +161,7 @@ extern "C" int dwPart_SetAvailableByName(const char* pName, int bAvailable)
     return 1;
 }
 
-// Blueprint list sentinel (@0x53d964).
+// Blueprint list sentinel (dwCore_pBlueprintList).
 extern "C" dwListNode* dwCore_pBlueprintList;
 
 // FITTO cheat: set bAvailable on every blueprint.
@@ -215,7 +215,7 @@ extern "C" int dwCog_WorkspaceHasPart(const char* pName)
 // dwPartNode
 // ---------------------------------------------------------------------------
 
-// @4267a0 (dwPartNode_Ctor)
+// dwPartNode_Ctor
 dwPartNode::dwPartNode(dwPart* pOwner, rdModel3* pModel)
 {
     this->pPart = pOwner;
@@ -223,7 +223,7 @@ dwPartNode::dwPartNode(dwPart* pOwner, rdModel3* pModel)
     this->bMirrored = 0;
     this->slotIdx16 = 0;
     this->animTrack = -1;
-    rdMatrix_Identity34(&this->transform); // binary: 12-dword copy of the identity const @0x520fb8
+    rdMatrix_Identity34(&this->transform); // binary: 12-dword copy of the identity const
 
     rdThing_NewEntry(&this->thing, NULL);
     rdThing_SetModel3(&this->thing, this->pModel3);
@@ -235,7 +235,7 @@ dwPartNode::dwPartNode(dwPart* pOwner, rdModel3* pModel)
     this->InitSlotsFromModel();
 }
 
-// @426830 (dwPartNode_Dtor)
+// dwPartNode_Dtor
 dwPartNode::~dwPartNode()
 {
     this->StopAnim();
@@ -245,7 +245,7 @@ dwPartNode::~dwPartNode()
     this->pPart->Release();
 }
 
-// @426860 (dwPartNode_GetPosition)
+// dwPartNode_GetPosition
 void dwPartNode::GetPosition(rdVector3* pOut) const
 {
     pOut->x = this->transform.scale.x;
@@ -253,7 +253,7 @@ void dwPartNode::GetPosition(rdVector3* pOut) const
     pOut->z = this->transform.scale.z;
 }
 
-// @4268d0 (dwPartNode_Translate)
+// dwPartNode_Translate
 void dwPartNode::Translate(const rdVector3* pDelta)
 {
     this->transform.scale.x += pDelta->x;
@@ -261,7 +261,7 @@ void dwPartNode::Translate(const rdVector3* pDelta)
     this->transform.scale.z += pDelta->z;
 }
 
-// @426880 (dwPartNode_DrawAt) — bbox accumulation, no pixels (see header).
+// dwPartNode_DrawAt — bbox accumulation, no pixels (see header).
 void dwPartNode::DrawAt(rdVector3* pMin, rdVector3* pMax)
 {
     if (this->partType != DW_PARTTYPE_NONE && this->pAttachSlot != NULL)
@@ -269,7 +269,7 @@ void dwPartNode::DrawAt(rdVector3* pMin, rdVector3* pMax)
     dwPart_DrawThing(&this->thing, &this->transform, pMin, pMax);
 }
 
-// @426900 (dwPartNode_Draw)
+// dwPartNode_Draw
 void dwPartNode::Draw()
 {
     uint32_t i;
@@ -284,7 +284,7 @@ void dwPartNode::Draw()
     }
 }
 
-// @426970 (dwPartNode_DrawHighlighted)
+// dwPartNode_DrawHighlighted
 void dwPartNode::DrawHighlighted()
 {
     rdGeoMode_t prevGeoMode;
@@ -303,14 +303,14 @@ void dwPartNode::DrawHighlighted()
     }
 }
 
-// @4269f0 (dwPartNode_UpdateTransform) — draws the blueprint's preview thing
+// dwPartNode_UpdateTransform — draws the blueprint's preview thing
 // at this node's transform, driven by this node's puppet.
 void dwPartNode::UpdateTransform()
 {
     this->pPart->BuildPreviewModel(&this->transform, this->thing.puppet, this->bMirrored);
 }
 
-// @426a10 (dwPartNode_SetDrawFlag4Rec)
+// dwPartNode_SetDrawFlag4Rec
 void dwPartNode::SetDrawFlag4Rec()
 {
     uint32_t i;
@@ -323,7 +323,7 @@ void dwPartNode::SetDrawFlag4Rec()
     }
 }
 
-// @426a50 (dwPartNode_SetDrawFlag2Rec)
+// dwPartNode_SetDrawFlag2Rec
 void dwPartNode::SetDrawFlag2Rec()
 {
     uint32_t i;
@@ -336,7 +336,7 @@ void dwPartNode::SetDrawFlag2Rec()
     }
 }
 
-// @426a90 (dwPartNode_RaycastHit)
+// dwPartNode_RaycastHit
 int dwPartNode::RaycastHit(rdVector3* pOrigin, rdVector3* pDir, void* pHitOut)
 {
     rdVector3 pos;
@@ -347,7 +347,7 @@ int dwPartNode::RaycastHit(rdVector3* pOrigin, rdVector3* pDir, void* pHitOut)
     return rdRaycast_RayModel(pOrigin, pDir, &this->thing, (rdRaycastHit*)pHitOut) != 0;
 }
 
-// @426af0 (dwPartNode_CollectContacts) — "paint": recolor + record the pair.
+// dwPartNode_CollectContacts — "paint": recolor + record the pair.
 void dwPartNode::CollectContacts(int matchColor, int newColor)
 {
     uint32_t i;
@@ -368,7 +368,7 @@ void dwPartNode::CollectContacts(int matchColor, int newColor)
     // All 9 entries taken by other colors: pair silently not recorded (faithful).
 }
 
-// @426b60 (dwPartNode_PlayIdleAnim) — "walk" (or "rwalk" when mirrored).
+// dwPartNode_PlayIdleAnim — "walk" (or "rwalk" when mirrored).
 void dwPartNode::PlayIdleAnim()
 {
     rdKeyframe* pKeyframe;
@@ -381,7 +381,7 @@ void dwPartNode::PlayIdleAnim()
         this->PlayAnimTrack(pKeyframe);
 }
 
-// @426b90 (dwPartNode_PlayActiveAnim) — "dance"/"rdance", else idle.
+// dwPartNode_PlayActiveAnim — "dance"/"rdance", else idle.
 void dwPartNode::PlayActiveAnim()
 {
     rdKeyframe* pKeyframe;
@@ -396,7 +396,7 @@ void dwPartNode::PlayActiveAnim()
         this->PlayIdleAnim();
 }
 
-// @426bc0 (dwPartNode_PlayAnimTrack)
+// dwPartNode_PlayAnimTrack
 void dwPartNode::PlayAnimTrack(rdKeyframe* pKeyframe)
 {
     if (pKeyframe == NULL)
@@ -409,7 +409,7 @@ void dwPartNode::PlayAnimTrack(rdKeyframe* pKeyframe)
     rdPuppet_PlayTrack(this->thing.puppet, this->animTrack);
 }
 
-// @426c10 (dwPartNode_FadeAnim) — advances the anim + cycles material cels.
+// dwPartNode_FadeAnim — advances the anim + cycles material cels.
 void dwPartNode::FadeAnim(float deltaSecs)
 {
     if (this->animTrack != -1)
@@ -419,7 +419,7 @@ void dwPartNode::FadeAnim(float deltaSecs)
     }
 }
 
-// @426c40 (dwPartNode_StopAnim)
+// dwPartNode_StopAnim
 void dwPartNode::StopAnim()
 {
     if (this->animTrack != -1)
@@ -429,7 +429,7 @@ void dwPartNode::StopAnim()
     }
 }
 
-// @426c70 (dwPartNode_AttachToSlot)
+// dwPartNode_AttachToSlot
 void dwPartNode::AttachToSlot(dwPartNode* pParent, dwPartSlot* pSlot)
 {
     if (this->partType != pSlot->type)
@@ -440,7 +440,7 @@ void dwPartNode::AttachToSlot(dwPartNode* pParent, dwPartSlot* pSlot)
     this->pAttachData = pParent;
 }
 
-// @426cc0 (dwPartNode_DetachFromSlot)
+// dwPartNode_DetachFromSlot
 void dwPartNode::DetachFromSlot()
 {
     if (this->partType == DW_PARTTYPE_NONE || this->pAttachSlot == NULL)
@@ -451,7 +451,7 @@ void dwPartNode::DetachFromSlot()
     this->pAttachData = NULL;
 }
 
-// @426d10 (dwPartNode_GetSlotPosition) — `this` = the PARENT owning pSlot.
+// dwPartNode_GetSlotPosition — `this` = the PARENT owning pSlot.
 void dwPartNode::GetSlotPosition(dwPartSlot* pSlot, rdVector3* pOut)
 {
     rdMatrix34* pMat;
@@ -462,7 +462,7 @@ void dwPartNode::GetSlotPosition(dwPartSlot* pSlot, rdVector3* pOut)
     pOut->z = pMat->scale.z;
 }
 
-// @426d40 (dwPartNode_GetSlotMatrix) — `this` = the PARENT owning pSlot.
+// dwPartNode_GetSlotMatrix — `this` = the PARENT owning pSlot.
 void dwPartNode::GetSlotMatrix(dwPartSlot* pSlot, rdMatrix34* pOut)
 {
     *pOut = this->thing.paJointMatrices[pSlot->pNode->idx];
@@ -475,7 +475,7 @@ static int dwPartNode_IsArmType(int type)
         || type == DW_PARTTYPE_ARM_MIRROR || type == DW_PARTTYPE_CARGOARM_MIRROR;
 }
 
-// @426d70 (dwPartNode_InitSlotsFromModel) — classify the model's dummy nodes
+// dwPartNode_InitSlotsFromModel — classify the model's dummy nodes
 // (meshIdx == -1): the parentless one is the MOUNT (except LOCOMOTION, whose
 // root dummy is a child slot); childless ones are attach SLOTS whose
 // node->type tags the accepted part type.
@@ -564,7 +564,7 @@ void dwPartNode::InitSlotsFromModel()
     }
 }
 
-// @427060 (dwPartNode_Mirror)
+// dwPartNode_Mirror
 void dwPartNode::Mirror()
 {
     dwPartNode* apSaved[4];
@@ -623,7 +623,7 @@ void dwPartNode::Mirror()
 // dwPart
 // ---------------------------------------------------------------------------
 
-// @4271d0 (dwPart_ParseBlueprint) — the conf-record ctor/parser.
+// dwPart_ParseBlueprint — the conf-record ctor/parser.
 dwPart::dwPart(dwConfFile* pConf)
     : name(), displayName(), desc(), spinFlcName(),
       modelName(), modelNameMirror(), materials()
@@ -944,7 +944,7 @@ dwPart::dwPart(dwConfFile* pConf)
     }
 }
 
-// @427ef0 (dwPart_Dtor)
+// dwPart_Dtor
 dwPart::~dwPart()
 {
     dwListNode* pNode;
@@ -967,7 +967,7 @@ dwPart::~dwPart()
     // The dwString members/arrays free themselves (idempotent dtors).
 }
 
-// @4280b0 (dwPart_ParseAnims)
+// dwPart_ParseAnims
 void dwPart::ParseAnims(dwConfFile* pConf)
 {
     char* pTok;
@@ -988,7 +988,7 @@ void dwPart::ParseAnims(dwConfFile* pConf)
     }
 }
 
-// @428120 (dwPart_ParseSounds)
+// dwPart_ParseSounds
 void dwPart::ParseSounds(dwConfFile* pConf)
 {
     char* pTok;
@@ -1009,7 +1009,7 @@ void dwPart::ParseSounds(dwConfFile* pConf)
     }
 }
 
-// @4281a0 (dwPart_CreateNode)
+// dwPart_CreateNode
 dwPartNode* dwPart::CreateNode()
 {
     rdModel3* pModel;
@@ -1024,7 +1024,7 @@ dwPartNode* dwPart::CreateNode()
     return pNode;
 }
 
-// @428210 (dwPart_BuildModel)
+// dwPart_BuildModel
 rdModel3* dwPart::BuildModel(uint8_t bMirrored)
 {
     rdModel3* pModel;
@@ -1048,7 +1048,7 @@ rdModel3* dwPart::BuildModel(uint8_t bMirrored)
     return pModel;
 }
 
-// @428290 (dwPart_Release)
+// dwPart_Release
 void dwPart::Release()
 {
     this->refCount--;
@@ -1059,7 +1059,7 @@ void dwPart::Release()
     }
 }
 
-// @4282b0 (dwPart_GetAnimKeyframe0) — lazy "walk" (aAnimNames[2]).
+// dwPart_GetAnimKeyframe0 — lazy "walk" (aAnimNames[2]).
 rdKeyframe* dwPart::GetAnimKeyframe0()
 {
     if (this->keyframe0 == NULL && this->aAnimNames[2].length != 0)
@@ -1067,7 +1067,7 @@ rdKeyframe* dwPart::GetAnimKeyframe0()
     return this->keyframe0;
 }
 
-// @4282f0 (dwPart_GetAnimKeyframe2) — lazy "dance" (aAnimNames[17]).
+// dwPart_GetAnimKeyframe2 — lazy "dance" (aAnimNames[17]).
 rdKeyframe* dwPart::GetAnimKeyframe2()
 {
     if (this->keyframe2 == NULL && this->aAnimNames[17].length != 0)
@@ -1075,7 +1075,7 @@ rdKeyframe* dwPart::GetAnimKeyframe2()
     return this->keyframe2;
 }
 
-// @428330 (dwPart_GetAnimKeyframe1) — lazy "rwalk" (aAnimNames[18]).
+// dwPart_GetAnimKeyframe1 — lazy "rwalk" (aAnimNames[18]).
 rdKeyframe* dwPart::GetAnimKeyframe1()
 {
     if (this->keyframe1 == NULL && this->aAnimNames[18].length != 0)
@@ -1083,7 +1083,7 @@ rdKeyframe* dwPart::GetAnimKeyframe1()
     return this->keyframe1;
 }
 
-// @428370 (dwPart_GetAnimKeyframe3) — lazy "rdance" (aAnimNames[19]).
+// dwPart_GetAnimKeyframe3 — lazy "rdance" (aAnimNames[19]).
 rdKeyframe* dwPart::GetAnimKeyframe3()
 {
     if (this->keyframe3 == NULL && this->aAnimNames[19].length != 0)
@@ -1091,7 +1091,7 @@ rdKeyframe* dwPart::GetAnimKeyframe3()
     return this->keyframe3;
 }
 
-// @4283b0 (dwPart_FreeKeyframes)
+// dwPart_FreeKeyframes
 void dwPart::FreeKeyframes()
 {
     if (this->keyframe0 != NULL)
@@ -1116,7 +1116,7 @@ void dwPart::FreeKeyframes()
     }
 }
 
-// @428420 (dwPart_FreeModels)
+// dwPart_FreeModels
 void dwPart::FreeModels()
 {
     if (this->pPreviewModel != NULL)
@@ -1132,7 +1132,7 @@ void dwPart::FreeModels()
     rdThing_FreeEntry(&this->thing);
 }
 
-// @428470 (dwPart_BuildPreviewModel) — draw the shared preview thing at
+// dwPart_BuildPreviewModel — draw the shared preview thing at
 // pMatrix, temporarily driven by pPuppet.
 void dwPart::BuildPreviewModel(rdMatrix34* pMatrix, rdPuppet* pPuppet, uint8_t bMirrored)
 {
@@ -1179,7 +1179,7 @@ void dwPart::BuildPreviewModel(rdMatrix34* pMatrix, rdPuppet* pPuppet, uint8_t b
 // Model bbox helpers (Ghidra "Draw" names; they accumulate a bbox — no pixels)
 // ---------------------------------------------------------------------------
 
-// @428540 (dwPart_DrawThing)
+// dwPart_DrawThing
 extern "C" void dwPart_DrawThing(rdThing* pThing, rdMatrix34* pPlacement, rdVector3* pMin, rdVector3* pMax)
 {
     rdModel3* pModel;
@@ -1194,7 +1194,7 @@ extern "C" void dwPart_DrawThing(rdThing* pThing, rdMatrix34* pPlacement, rdVect
     dwPart_DrawNodeTree(pThing, &pModel->aGeos[geoset], pModel->aHierarchyNodes, pMin, pMax);
 }
 
-// @428590 (dwPart_DrawNodeTree)
+// dwPart_DrawNodeTree
 extern "C" void dwPart_DrawNodeTree(rdThing* pThing, rdGeoset* pGeoset, rdHierarchyNode* pNode,
                                     rdVector3* pMin, rdVector3* pMax)
 {
@@ -1215,7 +1215,7 @@ extern "C" void dwPart_DrawNodeTree(rdThing* pThing, rdGeoset* pGeoset, rdHierar
     }
 }
 
-// @428630 (dwPart_AccumNodeBBox)
+// dwPart_AccumNodeBBox
 extern "C" void dwPart_AccumNodeBBox(rdMesh* pMesh, rdMatrix34* pMatrix, rdVector3* pMin, rdVector3* pMax)
 {
     rdVector3 v;
@@ -1233,7 +1233,7 @@ extern "C" void dwPart_AccumNodeBBox(rdMesh* pMesh, rdMatrix34* pMatrix, rdVecto
     }
 }
 
-// @428700 (dwPart_AdvanceModelFrame)
+// dwPart_AdvanceModelFrame
 extern "C" void dwPart_AdvanceModelFrame(rdModel3* pModel)
 {
     rdMaterial* pMat;

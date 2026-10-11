@@ -1,7 +1,7 @@
 // dwDroidView — the DroidWorks 3D droid-viewer widget (orbit dwGuiViewBox +
 // mouse-capture ray-pick). See dwDroidView.h for the layout / slot map.
 //
-// Decompiled from DroidWorks.exe, unit range 0x426080-0x426d6f (the
+// Decompiled from DroidWorks.exe (the
 // dwDroidView class only; the dwPartNode functions that share this binary
 // range landed in dwPart.cpp — P5).
 //
@@ -9,7 +9,7 @@
 //   stdBitmapRle_FUN_00444d00 -> dwWidget_DispatchMsg
 //   DAT_005542cc              -> rdCamera_g_pCurCamera
 //   stdDisplay_FUN_004fe010   -> stdDisplay_VBufferFill (canvas->d3d_vbuf)
-//   rd_FUN_0047ebd0/0047ebf0  -> rdAdvanceFrame / rdFinishFrame
+//   rd_FUN_0047ebd0/rd_FUN_0047ebf0  -> rdAdvanceFrame / rdFinishFrame
 //   rdGetRenterOptions bit 0x100 = pick-buffer render pass (skip the fill)
 //
 // No module statics — no dwDroidView_Startup needed (soft-reset rule).
@@ -34,13 +34,13 @@ extern "C" {
 #include "General/stdMath.h"
 }
 
-// dw-core workspace part-node list sentinel @0x53d984 (owner: dwMain, P7).
+// dw-core workspace part-node list sentinel dwCore_pWorkspaceNodes (owner: dwMain, P7).
 // TODO(dw-decomp): provided by dwMain.
 extern "C" dwListNode* dwCore_pWorkspaceNodes;
 
 // ================================ dwDroidView ===================================
 
-// @426080 (Ghidra: dwDroidView_Ctor). Binary ctor arg order: (pRect, dwUnused,
+// (Ghidra: dwDroidView_Ctor). Binary ctor arg order: (pRect, dwUnused,
 // fovPct); the middle argument is dead (kept only so the PANCONTROL factory
 // call reads literally).
 dwDroidView::dwDroidView(dwRect* pRect, int /*dwUnused*/, int fovPct)
@@ -58,7 +58,7 @@ dwDroidView::dwDroidView(dwRect* pRect, int /*dwUnused*/, int fovPct)
     msg.pSender = (void*)(intptr_t)fovPct;
     msg.param = 0;
     msg.pTarget = NULL;
-    this->dwGuiViewBox::OnMessage(&msg); // direct base call (binary CALL 0x434920)
+    this->dwGuiViewBox::OnMessage(&msg); // direct base call (binary CALL)
     dwWidget_DispatchMsg(&msg, NULL);    // broadcast to dwWidget_pDefault
 
     this->tanFovX = (float)fovPct * 0.01f;
@@ -70,12 +70,12 @@ dwDroidView::dwDroidView(dwRect* pRect, int /*dwUnused*/, int fovPct)
     this->pickResult.z = 0.0f;
 }
 
-// @426190 (Ghidra: dwDroidView_Dtor; DtorDelete @426170) — base dtor only.
+// (Ghidra: dwDroidView_Dtor; dwDroidView_DtorDelete) — base dtor only.
 dwDroidView::~dwDroidView()
 {
 }
 
-// @4261d0 (Ghidra: dwDroidView_OnMouseMove) — vtbl +0x04.
+// (Ghidra: dwDroidView_OnMouseMove) — vtbl +0x04.
 int dwDroidView::OnMouseMove(int16_t x, int16_t y)
 {
     if (this->bMouseCaptured != 0)
@@ -88,7 +88,7 @@ int dwDroidView::OnMouseMove(int16_t x, int16_t y)
     return this->bMouseCaptured;
 }
 
-// @426210 (Ghidra: dwDroidView_OnMouseDown) — vtbl +0x08.
+// (Ghidra: dwDroidView_OnMouseDown) — vtbl +0x08.
 int dwDroidView::OnMouseDown(int16_t x, int16_t y)
 {
     bool bWasFree = (this->bMouseCaptured == 0);
@@ -101,7 +101,7 @@ int dwDroidView::OnMouseDown(int16_t x, int16_t y)
     return bWasFree ? 1 : 0;
 }
 
-// @426240 (Ghidra: dwDroidView_OnMouseUp) — vtbl +0x0c. Binary leaves EAX
+// (Ghidra: dwDroidView_OnMouseUp) — vtbl +0x0c. Binary leaves EAX
 // undefined; return 0 (the message pump ignores the result).
 int dwDroidView::OnMouseUp(int16_t /*x*/, int16_t /*y*/)
 {
@@ -114,14 +114,14 @@ int dwDroidView::OnMouseUp(int16_t /*x*/, int16_t /*y*/)
     return 0;
 }
 
-// @4261a0 (Ghidra: dwDroidView_OnHover) — vtbl +0x18. Dispatch the shared
+// (Ghidra: dwDroidView_OnHover) — vtbl +0x18. Dispatch the shared
 // { 0x7531, id } hover notification (id 0x3eb) to pDefault.
 int dwDroidView::OnHover(int16_t /*x*/, int16_t /*y*/)
 {
     return this->OnHoverNotify((void*)0x3eb);
 }
 
-// @426270 (Ghidra: dwDroidView_OnMessage) — vtbl +0x1c.
+// (Ghidra: dwDroidView_OnMessage) — vtbl +0x1c.
 int dwDroidView::OnMessage(dwWidgetMsg* pMsg)
 {
     uint32_t code = (uint32_t)pMsg->code;
@@ -154,7 +154,7 @@ int dwDroidView::OnMessage(dwWidgetMsg* pMsg)
     return this->dwGuiViewBox::OnMessage(pMsg);
 }
 
-// @426370 (Ghidra: dwDroidView_ClampRectToView).
+// (Ghidra: dwDroidView_ClampRectToView).
 bool dwDroidView::ClampRectToView(dwRect* pRect)
 {
     int16_t dRight = this->right - pRect->right;
@@ -184,7 +184,7 @@ bool dwDroidView::ClampRectToView(dwRect* pRect)
     return (0 < dTop) || (0 < dLeft) || (dBottom < 0) || (dRight < 0);
 }
 
-// @4263f0 (Ghidra: dwDroidView_PickPart).
+// (Ghidra: dwDroidView_PickPart).
 void dwDroidView::PickPart(dwPoint* pPoint, uint8_t bForce)
 {
     dwRect rect;
@@ -243,7 +243,7 @@ void dwDroidView::PickPart(dwPoint* pPoint, uint8_t bForce)
     this->Invalidate(); // vtbl +0x34
 }
 
-// @426590 (Ghidra: dwDroidView_ComputeViewExtents). Screen-space pick rect =
+// (Ghidra: dwDroidView_ComputeViewExtents). Screen-space pick rect =
 // the widget rect (minus a 2px inset) scaled by tan(tanFovY/2)/tan(tanFovX/2),
 // centered on *pPoint.
 void dwDroidView::ComputeViewExtents(dwPoint* pPoint, dwRect* pOut)
@@ -263,10 +263,10 @@ void dwDroidView::ComputeViewExtents(dwPoint* pPoint, dwRect* pOut)
     pOut->bottom = (int16_t)(int)(py + halfH);
 }
 
-// @426690 (Ghidra: dwDroidView_Draw) — vtbl +0x44.
+// (Ghidra: dwDroidView_Draw) — vtbl +0x44.
 void dwDroidView::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
-    this->dwGui3DView::Draw(pDestBits, pClipRect); // camera bring-up (binary CALL 0x43b2b0)
+    this->dwGui3DView::Draw(pDestBits, pClipRect); // camera bring-up (binary CALL)
 
     // Added: software-renderer bracket (shared — without it the geometry takes
     // the GL path and the orbit view renders nothing).

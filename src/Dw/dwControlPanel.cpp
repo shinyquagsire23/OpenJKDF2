@@ -2,9 +2,9 @@
 // dwControlPanelHelpRect help-hotspot widget) and the shared
 // dw_aPartSlotColors table init.
 //
-// Decompiled from DroidWorks.exe, unit range 0x4096c0-0x409faf (9 functions;
-// vtables dwControlPanel_vtbl @0x51e708 / dwControlPanelHelpRect_vtbl
-// @0x51e750). Built only by dwGuiReference_CreateControl (keyword
+// Decompiled from DroidWorks.exe (9 functions;
+// vtables dwControlPanel_vtbl / dwControlPanelHelpRect_vtbl
+// dwControlPanelHelpRect_vtbl). Built only by dwGuiReference_CreateControl (keyword
 // CONTROLPANEL); dwGuiScreen_CreateControl's HELPRECT branch builds the
 // help-rect class too (wire-up once this file lands).
 //
@@ -22,20 +22,20 @@
 #include "jk.h"
 #include "stdPlatform.h" // stdPlatform_Printf (stub reporter)
 
-#include <stdlib.h> // atoi (binary: CRT atoi @0x507d10), free
+#include <stdlib.h> // atoi (binary: CRT atoi __atoi), free
 #include <string.h> // memcpy
 
 // ---- module globals ------------------------------------------------------------
 
 // Part connector-type -> DW palette color index for the 3D slot markers.
-// Binary: uchar[10] @0x53d6b8 (.data, but the binary re-writes it in Startup
+// Binary: uchar[10] dw_aPartSlotColors (.data, but the binary re-writes it in Startup
 // anyway — see below).
 extern "C" uint8_t dw_aPartSlotColors[10];
 uint8_t dw_aPartSlotColors[10];
 
 // ---- module init ----------------------------------------------------------------
 
-// @4096c0 (dwControlPanel_Startup, called from dw_Startup @419d40) — the
+// dwControlPanel_Startup (called from dw_Startup) — the
 // function's ONLY job: fill the shared dw_aPartSlotColors table (binary:
 // builtin_memcpy of the 10-byte constant). Not control-panel state — the
 // table merely lives in this compile unit. Doubles as this module's
@@ -50,7 +50,7 @@ extern "C" void dwControlPanel_Startup(void)
 
 // ---- dwControlPanel ---------------------------------------------------------------
 
-// @409710 (dwControlPanel_Ctor) — caller (dwGuiReference_CreateControl
+// dwControlPanel_Ctor — caller (dwGuiReference_CreateControl
 // CONTROLPANEL branch): ParseRect -> rect, ParseULong -> code,
 // LocalizeString(conf cursor) -> filename (skips the build entirely on a
 // sentinel filename), new(0x28). Note: the binary passed the 8-byte rect BY
@@ -69,7 +69,7 @@ dwControlPanel::dwControlPanel(dwRect* pRect, uint32_t code, char* pConfName, dw
     this->EnsureLoaded();
 }
 
-// @4097b0 (dwControlPanel_Dtor; scalar-deleting wrapper @409790, vtbl +0x00).
+// dwControlPanel_Dtor (scalar-deleting wrapper dwControlPanel_DtorDelete, vtbl +0x00).
 // Binary order: delete every child + unlink/free its node (the same
 // unlink-zero-free-then-delete shape as the group dtor), then the confName
 // dwString dtor (implicit member dtor here), then the inlined ~dwWidgetGroup
@@ -100,7 +100,7 @@ dwControlPanel::~dwControlPanel()
     }
 }
 
-// @409920 (dwControlPanel_OnHover, vtbl +0x18) — forward hover to the FIRST
+// dwControlPanel_OnHover (vtbl +0x18) — forward hover to the FIRST
 // child whose rect contains the point (left/top inclusive, right/bottom
 // exclusive; the binary reads the rect fields directly — no enabled check,
 // no virtual ContainsPoint) and return its result. When nothing is under the
@@ -125,14 +125,14 @@ int dwControlPanel::OnHover(int16_t x, int16_t y)
     return this->OnHoverNotify((void*)(intptr_t)this->helpCode); // dispatches + returns 1
 }
 
-// @409f70 (dwControlPanel_Draw, vtbl +0x44) — verbatim pass-through to the
+// dwControlPanel_Draw (vtbl +0x44) — verbatim pass-through to the
 // group paint; kept as a real override to mirror the binary vtable.
 void dwControlPanel::Draw(dwImageBits* pDestBits, dwRect* pClipRect)
 {
     dwWidgetGroup::Draw(pDestBits, pClipRect);
 }
 
-// @409ab0 (dwControlPanel_EnsureLoaded) — parse guard: only while the child
+// dwControlPanel_EnsureLoaded — parse guard: only while the child
 // list is still empty. Only binary caller: the ctor.
 void dwControlPanel::EnsureLoaded()
 {
@@ -140,7 +140,7 @@ void dwControlPanel::EnsureLoaded()
         this->LoadFromConf(this->confName.pBuffer);
 }
 
-// @4099d0 (dwControlPanel_LoadFromConf) — open the .cp conf (the WHOLE body,
+// dwControlPanel_LoadFromConf — open the .cp conf (the WHOLE body,
 // open through close, is skipped when pFilename is NULL), then per line:
 // ReadLine + NextToken -> ParseControl; every control built is PREPENDED to
 // the child list (InsertAfter(pSentinel) — so children sit in REVERSE conf
@@ -171,10 +171,10 @@ void dwControlPanel::LoadFromConf(char* pFilename)
     dwConfFile_Close(&conf);
 }
 
-// @409ad0 (dwControlPanel_ParseControl) — the keyword factory for one conf
+// dwControlPanel_ParseControl — the keyword factory for one conf
 // line. Token layouts (every "localized" token goes through
 // dwGuiScreen_LocalizeString(tok, this->pStringTable) first; atoi = CRT atoi
-// @507d10):
+// __atoi):
 //   CP_RADIOGROUP l t r b nItems, then nItems item LINES (see below)
 //   BUTTON        l t r b cmdId imgNormal sndOff imgPressed sndClick
 //                 (l/t/r/b/cmdId/imgNormal/imgPressed localized; the two
@@ -202,9 +202,9 @@ dwWidget* dwControlPanel::ParseControl(char* pKeyword, dwConfFile* pConf)
         nItems = 0;
         dwConfFile_ParseULong(pConf, &nItems);
 
-        // binary: new(0x18) dwGuiRefRadioGroup_Ctor @42a540(&rect), then one
-        // dwGuiRefRadioGroup_AddCategory @42a6f0 per item line (@409c1c-409d19;
-        // same localized/raw token pattern as the BUTTON branch).
+        // binary: new(0x18) dwGuiRefRadioGroup_Ctor(&rect), then one
+        // dwGuiRefRadioGroup_AddCategory per item line
+        // (same localized/raw token pattern as the BUTTON branch).
         dwGuiRefRadioGroup* pGroup = new dwGuiRefRadioGroup(&rect);
 
         while (nItems != 0)
@@ -248,7 +248,7 @@ dwWidget* dwControlPanel::ParseControl(char* pKeyword, dwConfFile* pConf)
         pImgPressed = dwGuiScreen_LocalizeString(dwConfFile_NextToken(pConf), this->pStringTable);
         pSndClick = dwConfFile_NextToken(pConf); // raw (NOT localized)
 
-        // binary: new(0x50) dwWorkshopCtrl_Ctor @4071a0, momentary (bToggle=0)
+        // binary: new(0x50) dwWorkshopCtrl_Ctor, momentary (bToggle=0)
         return new dwWorkshopCtrl(&rect, pImgNormal, pSndOff, pImgPressed, pSndClick, cmdId, 0);
     }
 
@@ -262,7 +262,7 @@ dwWidget* dwControlPanel::ParseControl(char* pKeyword, dwConfFile* pConf)
         b = 0;
         dwConfFile_ParseULong(pConf, &a);
         dwConfFile_ParseULong(pConf, &b);
-        // binary: new(0x14) dwGuiRefTile_Ctor @42a890(&rect, a, b) — nested-frame
+        // binary: new(0x14) dwGuiRefTile_Ctor(&rect, a, b) — nested-frame
         // decoration (color, count).
         return new dwGuiRefTile(&rect, (uint8_t)a, (uint8_t)b);
     }
@@ -275,7 +275,7 @@ dwWidget* dwControlPanel::ParseControl(char* pKeyword, dwConfFile* pConf)
         code = 0;
         dwConfFile_ParseULong(pConf, &code);
         // binary: new(0x14) built INLINE — dwWidget(&rect), helpCode = code,
-        // vptr = dwControlPanelHelpRect_vtbl @0x51e750
+        // vptr = dwControlPanelHelpRect_vtbl
         return new dwControlPanelHelpRect(&rect, (int32_t)code);
     }
 
@@ -284,7 +284,7 @@ dwWidget* dwControlPanel::ParseControl(char* pKeyword, dwConfFile* pConf)
 
 // ---- dwControlPanelHelpRect ---------------------------------------------------
 
-// No standalone binary ctor — both factories (ParseControl above @409ef5 and
+// No standalone binary ctor — both factories (ParseControl above and
 // dwGuiScreen_CreateControl's HELPRECT branch) build the object inline with
 // exactly this shape.
 dwControlPanelHelpRect::dwControlPanelHelpRect(dwRect* pRect, int32_t code)
@@ -293,14 +293,14 @@ dwControlPanelHelpRect::dwControlPanelHelpRect(dwRect* pRect, int32_t code)
 {
 }
 
-// @409f90 (dwControlPanelHelpRect_DtorDelete, vtbl +0x00) — the dtor body is
-// the plain dwWidget dtor (COMDAT thunk j_dwWidgetDtor @409fb0); nothing of
+// dwControlPanelHelpRect_DtorDelete (vtbl +0x00) — the dtor body is
+// the plain dwWidget dtor (COMDAT thunk j_dwWidgetDtor); nothing of
 // our own to destroy.
 dwControlPanelHelpRect::~dwControlPanelHelpRect()
 {
 }
 
-// vtbl +0x18 @419780 — the shared dwWidget_OnHoverNotify COMDAT body (it
+// vtbl +0x18 — the shared dwWidget_OnHoverNotify COMDAT body (it
 // reads binary +0x10 — this class's helpCode — as the msg sender): dispatch
 // { 0x7531, helpCode, 0, NULL } to dwWidget_pDefault and return 1.
 int dwControlPanelHelpRect::OnHover(int16_t x, int16_t y)
