@@ -1402,6 +1402,7 @@ void Window_SdlVblank()
 
     //static uint32_t roundtrip = 0;
     //uint32_t before = stdPlatform_GetTimeMsec();
+    jkGame_ScreenshotFlush(); // Added: F12 shots capture the finished frame
 #ifdef ARCH_WASM
     if (!jkGuiBuildMulti_bRendering)
 #endif

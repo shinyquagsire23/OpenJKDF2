@@ -46,6 +46,8 @@ void jkGame_Gamma();
 
 #ifdef SDL2_RENDER
 void jkGame_Screenshot();
+void jkGame_ScreenshotFlush(); // Added
+extern int jkGame_bScreenshotMessage; // Added: F12 (not the jkscreenshot cog verb) shows a message
 #elif defined(WIN32)
 static void (*jkGame_Screenshot)() = (void*)jkGame_Screenshot_ADDR;
 #else
