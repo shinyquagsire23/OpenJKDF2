@@ -2197,7 +2197,7 @@ void sithControl_RegisterMouseBindings()
 #ifdef QOL_IMPROVEMENTS
     v10 = sithControl_BindAxis(INPUT_FUNC_PITCH, AXIS_MOUSE_Y, INPUT_MAPPING_FLAG_AXIS_REVERSED | INPUT_MAPPING_FLAG_RAW_AXIS); // Non-inverted by default, fight me lol
     if ( v10 ) 
-        v10->binaryAxisVal = 0.3;
+        v10->binaryAxisVal = 0.4; // Altered: Match horizontal mouse-look sensitivity.
 #else
     v10 = sithControl_BindAxis(INPUT_FUNC_PITCH, AXIS_MOUSE_Y, INPUT_MAPPING_FLAG_RAW_AXIS);
     if ( v10 ) 
