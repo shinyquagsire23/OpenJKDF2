@@ -64,6 +64,7 @@ int jkPlayer_bKeepCorpses = 0;
 int jkPlayer_bFastMissionText = FAST_MISSION_TEXT_DEFAULT;
 int jkPlayer_bUseOldPlayerPhysics = 0;
 int jkPlayer_bLedgeSqueeze = 0;
+int jkPlayer_bEqualStrafeSpeed = 1; // Added: Optional equal forward and sidestep speed.
 flex_t jkPlayer_hudScale = 2.0;
 flex_t jkPlayer_crosshairLineWidth = 1.0;
 flex_t jkPlayer_crosshairScale = 1.0;
@@ -189,6 +190,7 @@ void jkPlayer_StartupVars()
     sithCvar_RegisterBool("menu_bFastMissionText",      FAST_MISSION_TEXT_DEFAULT,  &jkPlayer_bFastMissionText,         CVARFLAG_LOCAL);
     sithCvar_RegisterBool("g_bUseOldPlayerPhysics",     0,                          &jkPlayer_bUseOldPlayerPhysics,     CVARFLAG_LOCAL);
     sithCvar_RegisterBool("g_bLedgeSqueeze",            0,                          &jkPlayer_bLedgeSqueeze,            CVARFLAG_LOCAL);
+    sithCvar_RegisterBool("g_bEqualStrafeSpeed",        1,                          &jkPlayer_bEqualStrafeSpeed,        CVARFLAG_LOCAL); // Added
     sithCvar_RegisterFlex("hud_scale",                  2.0,                        &jkPlayer_hudScale,                 CVARFLAG_LOCAL|CVARFLAG_RESETHUD);
     sithCvar_RegisterFlex("hud_crosshairLineWidth",     1.0,                        &jkPlayer_crosshairLineWidth,       CVARFLAG_LOCAL|CVARFLAG_RESETHUD);
     sithCvar_RegisterFlex("hud_crosshairScale",         1.0,                        &jkPlayer_crosshairScale,           CVARFLAG_LOCAL|CVARFLAG_RESETHUD);
@@ -237,6 +239,7 @@ void jkPlayer_ResetVars()
     jkPlayer_bFastMissionText = FAST_MISSION_TEXT_DEFAULT;
     jkPlayer_bUseOldPlayerPhysics = 0;
     jkPlayer_bLedgeSqueeze = 0;
+    jkPlayer_bEqualStrafeSpeed = 1; // Added
     jkPlayer_hudScale = 2.0;
     jkPlayer_crosshairLineWidth = 1.0;
     jkPlayer_crosshairScale = 1.0;
@@ -590,6 +593,7 @@ void jkPlayer_WriteConf(char16_t *name)
 
         stdJSON_SaveBool(ext_fpath, "bUseOldPlayerPhysics", jkPlayer_bUseOldPlayerPhysics);
         stdJSON_SaveBool(ext_fpath, "bLedgeSqueeze", jkPlayer_bLedgeSqueeze);
+        stdJSON_SaveBool(ext_fpath, "bEqualStrafeSpeed", jkPlayer_bEqualStrafeSpeed); // Added
 
         stdJSON_SaveBool(ext_fpath, "setCrosshairOnLightsaber", jkPlayer_setCrosshairOnLightsaber);
         stdJSON_SaveBool(ext_fpath, "setCrosshairOnFist", jkPlayer_setCrosshairOnFist);
@@ -798,6 +802,7 @@ int jkPlayer_ReadConf(char16_t *name)
 
         jkPlayer_bUseOldPlayerPhysics = stdJSON_GetBool(ext_fpath, "bUseOldPlayerPhysics", jkPlayer_bUseOldPlayerPhysics);
         jkPlayer_bLedgeSqueeze = stdJSON_GetBool(ext_fpath, "bLedgeSqueeze", jkPlayer_bLedgeSqueeze);
+        jkPlayer_bEqualStrafeSpeed = stdJSON_GetBool(ext_fpath, "bEqualStrafeSpeed", jkPlayer_bEqualStrafeSpeed); // Added
 
         jkPlayer_setCrosshairOnLightsaber = stdJSON_GetBool(ext_fpath, "setCrosshairOnLightsaber", jkPlayer_setCrosshairOnLightsaber);
         jkPlayer_setCrosshairOnFist = stdJSON_GetBool(ext_fpath, "setCrosshairOnFist", jkPlayer_setCrosshairOnFist);

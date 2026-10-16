@@ -25,6 +25,16 @@
 #include "Dw/dwCog.h"
 #include "jk.h"
 
+// Altered: Optionally match sidestep thrust to forward thrust in QOL builds.
+static flex_d_t sithControl_GetStrafeSpeedScale(void)
+{
+#ifdef QOL_IMPROVEMENTS
+    return jkPlayer_bEqualStrafeSpeed ? 1.0 : 0.7;
+#else
+    return 0.7;
+#endif // QOL_IMPROVEMENTS
+}
+
 // Added
 static int sithControl_followingPlayer = 0;
 static int sithControl_curDebugCam = 0;
@@ -1485,7 +1495,7 @@ void sithControl_PlayerMovementMots(SithThing *player)
             thing->physicsParams.angularVelocity.y = fVar4;
             fVar4 = sithControl_GetKeyAsAxisNormalized(INPUT_FUNC_SLIDE);
             fVar4 = (thing->actorParams.maxThrust +
-                    thing->actorParams.extraSpeed) * -fVar4 * 0.7;
+                    thing->actorParams.extraSpeed) * -fVar4 * sithControl_GetStrafeSpeedScale();
             if (fVar4 == 0.0) goto joined_r0x00527cfa;
             sithControl_008d7f54 = 1;
             iVar2 = sithThing_MotsTick(4,0,fVar4 * move_multiplier);
@@ -1505,7 +1515,7 @@ void sithControl_PlayerMovementMots(SithThing *player)
                 thing->physicsParams.angularVelocity.y = fVar4;
                 fVar4 = sithControl_GetKeyAsAxisNormalized(INPUT_FUNC_SLIDE);
                 fVar4 = (thing->actorParams.maxThrust +
-                        thing->actorParams.extraSpeed) * -fVar4 * 0.7;
+                        thing->actorParams.extraSpeed) * -fVar4 * sithControl_GetStrafeSpeedScale();
                 if (fVar4 == 0.0) goto joined_r0x00527cfa;
                 sithControl_008d7f54 = 1;
                 iVar2 = sithThing_MotsTick(4,0,fVar4 * move_multiplier);
@@ -1527,7 +1537,7 @@ void sithControl_PlayerMovementMots(SithThing *player)
             fVar4 = 1.0;
         }
         fVar4 = (thing->actorParams.maxThrust +
-                thing->actorParams.extraSpeed) * fVar4 * 0.7;
+                thing->actorParams.extraSpeed) * fVar4 * sithControl_GetStrafeSpeedScale();
         if (fVar4 != 0.0) {
             sithControl_008d7f54 = 1;
             iVar2 = sithThing_MotsTick(4,0,fVar4 * move_multiplier);
@@ -1663,7 +1673,7 @@ void sithControl_PlayerMovement(SithThing *player)
             }
             v7 = player->actorParams.maxThrust + player->actorParams.extraSpeed;
             player->physicsParams.angularVelocity.y = 0.0;
-            player->physicsParams.acceleration.x = v7 * v6 * 0.7;
+            player->physicsParams.acceleration.x = v7 * v6 * sithControl_GetStrafeSpeedScale();
         }
         else
         {
@@ -1691,7 +1701,7 @@ void sithControl_PlayerMovement(SithThing *player)
 
             player->physicsParams.acceleration.x = sithControl_GetKeyAsAxisNormalized(INPUT_FUNC_SLIDE)
                                                             * (player->actorParams.maxThrust + player->actorParams.extraSpeed)
-                                                            * 0.7;
+                                                            * sithControl_GetStrafeSpeedScale();
         }
         v11 = sithControl_GetKeyAsAxisNormalized(0);
         y_vel = (player->actorParams.maxThrust + player->actorParams.extraSpeed) * v11;
@@ -1780,12 +1790,12 @@ void sithControl_FreeCam(SithThing *player)
             }
             v12 = v1->actorParams.extraSpeed + v1->actorParams.maxThrust;
             v1->physicsParams.angularVelocity.y = 0.0;
-            v7->x = v12 * v11 * 0.7;
+            v7->x = v12 * v11 * sithControl_GetStrafeSpeedScale();
         }
         else
         {
             // Why did MoTS do this lol
-            v7->x = (Main_bMotsCompat ? -1 : 1) * sithControl_GetKeyAsAxisNormalized(INPUT_FUNC_SLIDE) * (v1->actorParams.extraSpeed + v1->actorParams.maxThrust) * 0.7;
+            v7->x = (Main_bMotsCompat ? -1 : 1) * sithControl_GetKeyAsAxisNormalized(INPUT_FUNC_SLIDE) * (v1->actorParams.extraSpeed + v1->actorParams.maxThrust) * sithControl_GetStrafeSpeedScale();
             
 #ifdef QOL_IMPROVEMENTS
             // Scale appropriately to high framerates

@@ -17,7 +17,20 @@
 #include "World/sithWeapon.h"
 #include "World/jkPlayer.h"
 
-static jkGuiElement jkGuiControlOptions_buttons[20] = {
+// Added: Keep button shortcuts correct with and without QOL controls.
+enum
+{
+    JKGUI_CONTROLOPTIONS_IDX_CROUCH = 14,
+#ifdef QOL_IMPROVEMENTS
+    JKGUI_CONTROLOPTIONS_IDX_EQUAL_STRAFE,
+#endif
+    JKGUI_CONTROLOPTIONS_IDX_LOAD,
+    JKGUI_CONTROLOPTIONS_IDX_SAVE,
+    JKGUI_CONTROLOPTIONS_IDX_OK,
+    JKGUI_CONTROLOPTIONS_IDX_CANCEL,
+};
+
+static jkGuiElement jkGuiControlOptions_buttons[] = {
     {ELEMENT_TEXT, 0, 0, 0, 3, {0, 410, 640, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXT, 0, 6, "GUI_SETUP", 3, {20, 20, 600, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 100, 2, "GUI_GENERAL", 3, {20, 80, 120, 40},  1, 0, "GUI_GENERAL_HINT", 0, 0, 0, {0}, 0},
@@ -33,6 +46,9 @@ static jkGuiElement jkGuiControlOptions_buttons[20] = {
     {ELEMENT_CHECKBOX, 0, 0, "GUI_VIEWCENTER", 0, {40, 260, 360, 20},  1, 0, "GUI_VIEWCENTER_HINT", 0, 0, 0, {0}, 0},
     {ELEMENT_CHECKBOX, 0, 0, "GUI_ALWAYSRUN", 0, {40, 290, 360, 20}, 1, 0, "GUI_ALWAYSRUN_HINT", 0, 0, 0, {0}, 0},
     {ELEMENT_CHECKBOX, 0, 0, "GUI_CROUCHTOGGLE", 0, {40, 320, 360, 20}, 1, 0, "GUI_CROUCHTOGGLE_HINT", 0, 0, 0, {0}, 0}, // Added: Toggle crouch state
+#ifdef QOL_IMPROVEMENTS
+    {ELEMENT_CHECKBOX, 0, 0, "GUIEXT_EQUAL_STRAFE_SPEED", 0, {40, 350, 360, 20}, 1, 0, "GUIEXT_EQUAL_STRAFE_SPEED_HINT", 0, 0, 0, {0}, 0}, // Added
+#endif
     {ELEMENT_TEXTBUTTON, 4445, 2, "GUI_LOADCONFIG", 3, {0, 170, 320, 50}, 1, 0, "GUI_LOADCONFIG_HINT", 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 4444, 2, "GUI_SAVECONFIG", 3, {320, 170, 320,  50}, 1, 0, "GUI_SAVECONFIG_HINT", 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 1, 2, "GUI_OK", 3, {440, 430, 200, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
@@ -66,10 +82,13 @@ int jkGuiControlOptions_Show()
     jkGuiControlOptions_buttons[12].boxChecked = sithWeapon_controlOptions & 0x10;
     jkGuiControlOptions_buttons[13].boxChecked = sithWeapon_controlOptions & 2;
     jkGuiControlOptions_buttons[14].boxChecked = sithWeapon_controlOptions & 0x40; // Added: Toggle crouch state
+#ifdef QOL_IMPROVEMENTS
+    jkGuiControlOptions_buttons[JKGUI_CONTROLOPTIONS_IDX_EQUAL_STRAFE].boxChecked = jkPlayer_bEqualStrafeSpeed; // Added
+#endif
 
     // Added
-    jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiControlOptions_menu, &jkGuiControlOptions_buttons[17]);
-    jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiControlOptions_menu, &jkGuiControlOptions_buttons[18]);
+    jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiControlOptions_menu, &jkGuiControlOptions_buttons[JKGUI_CONTROLOPTIONS_IDX_OK]);
+    jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiControlOptions_menu, &jkGuiControlOptions_buttons[JKGUI_CONTROLOPTIONS_IDX_CANCEL]);
     jkGuiSetup_sub_412EF0(&jkGuiControlOptions_menu, 1);
     while ( 1 )
     {
@@ -108,6 +127,9 @@ int jkGuiControlOptions_Show()
         else
             sithWeapon_controlOptions &= ~SITHCONTROL_OPTION_TOGGLE_CROUCH;
 
+#ifdef QOL_IMPROVEMENTS
+        jkPlayer_bEqualStrafeSpeed = jkGuiControlOptions_buttons[JKGUI_CONTROLOPTIONS_IDX_EQUAL_STRAFE].boxChecked != 0; // Added
+#endif
         jkPlayer_WriteConf(jkPlayer_playerShortName);
     }
     return v1;
