@@ -194,9 +194,25 @@ int sithPuppet_PlayMode(SithThing *pThing, signed int submode, rdPuppetTrackCall
     v6 = pThing->puppet;
 
     v7 = &v4->modes[v6->majorMode].keyframe[submode];
+
+    // Allow swimming actors to use their armed firing animation
+    // if their swimming mode does not define one.
+    if (pThing->type == SITH_THING_ACTOR &&
+        (v6->majorMode == 3 || v6->majorMode == 4) &&
+        (submode == SITH_ANIM_FIRE || submode == SITH_ANIM_FIRE2) &&
+        !v7->keyframe)
+    {
+        SithPuppetClassSubmode* armedFire =
+            &v4->modes[1].keyframe[submode];
+
+        if (armedFire->keyframe)
+            v7 = armedFire;
+    }
+
     keyframe = v7->keyframe;
-    if ( !v7->keyframe )
+    if (!keyframe)
         return -1;
+
     flags = v7->flags;
     lowPri = v7->lowPri;
     highPri = v7->highPri;
