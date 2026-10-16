@@ -1,4 +1,4 @@
-MSGS 104          # <--- DON'T FORGET TO UPDATE THIS COUNT
+MSGS 114          # <--- DON'T FORGET TO UPDATE THIS COUNT
 
 #  "<key>"     <unused number>   "<string>"
 
@@ -98,6 +98,8 @@ MSGS 104          # <--- DON'T FORGET TO UPDATE THIS COUNT
 #******************************
 #  Controls
 #******************************
+   "GUIEXT_EQUAL_STRAFE_SPEED"                  0 "Equal strafe speed"
+   "GUIEXT_EQUAL_STRAFE_SPEED_HINT"             0 "Move sideways at the same speed as moving forward."
    "GUI_CROUCHTOGGLE"							0 "Toggle Crouch"
    "GUI_CROUCHTOGGLE_HINT"						0 "Press Crouch once to stay crouched; press again to stand."
    "KEY_JOY1_B9"                                0 "Joy 1 Button 9"
