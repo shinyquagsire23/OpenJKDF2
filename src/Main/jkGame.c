@@ -18,6 +18,7 @@
 #include "Main/jkHudScope.h"
 #include "Main/jkHudCameraView.h"
 #include "Main/jkDev.h"
+#include "Main/jkStrings.h"
 #include "Main/jkQuakeConsole.h"
 #include "Main/jkTouchControls.h"
 #include "Engine/rdColormap.h"
@@ -528,6 +529,20 @@ int jkGame_Update()
 }
 
 #ifdef SDL2_RENDER
+// Added: the shot is taken at the end of the frame, once the HUD and messages are drawn.
+static char jkGame_aScreenshotPending[128];
+int jkGame_bScreenshotMessage = 0;
+
+void jkGame_ScreenshotFlush()
+{
+    if (!jkGame_aScreenshotPending[0]) return;
+    std3D_Screenshot(jkGame_aScreenshotPending);
+    jkGame_aScreenshotPending[0] = 0;
+    if (jkGame_bScreenshotMessage)
+        jkDev_PrintUniString(jkStrings_GetUniStringWithFallback("GAME_SCREENSHOT"));
+    jkGame_bScreenshotMessage = 0;
+}
+
 void jkGame_Screenshot()
 {
     //stdPlatform_Printf("TODO: Implement screenshots\n");
@@ -548,7 +563,8 @@ void jkGame_Screenshot()
         }
     } while (!bVar2);
 
-    std3D_Screenshot(local_80);
+    // Fixed: was std3D_Screenshot here, mid-frame, which only saw the 3D scene
+    stdString_SafeStrCopy(jkGame_aScreenshotPending, local_80, sizeof(jkGame_aScreenshotPending));
 }
 #endif
 

@@ -137,7 +137,11 @@ int jkControl_HandleHudKeys(SithThing *player, flex_t b)
         if (v15 && sithThing_MotsTick(0xe,0,6.0))
         {
             jkGame_Screenshot();
+#ifdef SDL2_RENDER // Added: jkGame_ScreenshotFlush prints it after the capture, so it isn't in the shot
+            jkGame_bScreenshotMessage = 1;
+#else
             jkDev_PrintUniString(jkStrings_GetUniStringWithFallback("GAME_SCREENSHOT"));
+#endif
         }
 
         sithControl_GetKey(INPUT_FUNC_TALLY, &v15);
