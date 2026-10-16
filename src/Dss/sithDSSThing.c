@@ -1005,12 +1005,32 @@ int sithDSSThing_ProcessFullDescription(SithMessage *pMsg)
 
     thing = &sithWorld_g_pCurrentWorld->aThings[idx];
     sithThing_Reset(thing);
-    v8 = NETMSG_POPS16();
+    v8 = (uint16_t)NETMSG_POPS16();
 
-    if ( v8 >= sithWorld_g_pCurrentWorld->numThingTemplates )
+    SithThing* pTemplate = NULL;
+
+    if (v8 == 0)
+    {
+        // Template zero is valid for full-description restoration.
+        if (sithWorld_g_pCurrentWorld->numThingTemplates > 0)
+            pTemplate = &sithWorld_g_pCurrentWorld->aThingTemplates[0];
+    }
+    else
+    {
+        pTemplate = sithTemplate_GetTemplateByIndex(v8);
+    }
+
+    if (!pTemplate)
+    {
+        stdPlatform_Printf(
+            "RESTORE ERROR: Could not resolve template %u for thing %d\n",
+            (unsigned int)v8,
+            idx
+        );
         return 0;
+    }
 
-    sithThing_SetThingBasedOn(thing, &sithWorld_g_pCurrentWorld->aThingTemplates[v8]);
+    sithThing_SetThingBasedOn(thing, pTemplate);
 
     thing->signature = NETMSG_POPS32();
     thing->guid = NETMSG_POPS32();
@@ -1143,7 +1163,11 @@ int sithDSSThing_ProcessFullDescription(SithMessage *pMsg)
         else if (!thing->trackParams.sizeFrames && thing->trackParams.loadedFrames < 0) {
             stdPlatform_Printf("OpenJKDF2: Serialized thing has underflowed trackParams.loadedFrames 0x%x, size 0x%x, recovering?\n", thing->trackParams.loadedFrames, thing->trackParams.sizeFrames);
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            stdPlatform_Printf("OpenJKDF2: Template ID %x, %s\n", v8, sithWorld_g_pCurrentWorld->aThingTemplates[v8].aName);
+            stdPlatform_Printf(
+                "OpenJKDF2: Template ID %x, %s\n",
+                v8,
+                pTemplate->aName
+            );
 #endif
             thing->trackParams.loadedFrames = thing->trackParams.sizeFrames;
         }
