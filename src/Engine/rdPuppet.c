@@ -273,6 +273,39 @@ void rdPuppet_BuildJointMatrices(rdThing *prdThing, rdMatrix34 *pPlacement)
     // Added: Fix a crash?
     if (!prdThing->paJointMatrices) return;
 
+    // Detect active firing animations for actors swimming at the water surface.
+    int swimFireActive = 0;
+    int swimFireSubmode = -1;
+
+    if (prdThing->pThing &&
+        prdThing->pThing->type == SITH_THING_ACTOR &&
+        (prdThing->pThing->physicsParams.flags & SITH_PF_ONWATERSURFACE) &&
+        prdThing->pThing->pPuppetClass &&
+        puppet)
+    {
+        rdKeyframe* fireKey =
+            prdThing->pThing->pPuppetClass->modes[1].keyframe[SITH_ANIM_FIRE].keyframe;
+
+        rdKeyframe* fire2Key =
+            prdThing->pThing->pPuppetClass->modes[1].keyframe[SITH_ANIM_FIRE2].keyframe;
+
+        for (int i = 0; i < RDPUPPET_MAX_TRACKS; i++)
+        {
+            rdPuppetTrack* track = &puppet->aTracks[i];
+
+            if ((track->status & 2) &&
+                track->keyframe &&
+                (track->keyframe == fireKey ||
+                    track->keyframe == fire2Key))
+            {
+                swimFireActive = 1;
+                swimFireSubmode =
+                    (track->keyframe == fireKey) ? SITH_ANIM_FIRE : SITH_ANIM_FIRE2;
+                break;
+            }
+        }
+    }
+
     if ( !puppet || puppet->bPaused )
     {
         for (int i = 0; i < model->numHNodes; i++)
@@ -370,6 +403,29 @@ void rdPuppet_BuildJointMatrices(rdThing *prdThing, rdMatrix34 *pPlacement)
             }
             
             v18 = (v17->type & nodeIter->type) ? trackIter->highPri : trackIter->lowPri;
+            // Preserve the swimming torso pose while blending an armed firing animation.
+            if (prdThing->pThing &&
+                prdThing->pThing->type == SITH_THING_ACTOR &&
+                prdThing->pThing->pPuppetClass &&
+                (prdThing->pThing->physicsParams.flags & SITH_PF_ONWATERSURFACE) &&
+                v80 == prdThing->pThing->pPuppetClass->aJoints[JOINTTYPE_TORSO] &&
+                swimFireActive &&
+                swimFireSubmode >= 0 &&
+                prdThing->pThing->puppet &&
+                (prdThing->pThing->puppet->majorMode == 3 ||
+                    prdThing->pThing->puppet->majorMode == 4) &&
+                !prdThing->pThing->pPuppetClass
+                ->modes[prdThing->pThing->puppet->majorMode]
+                .keyframe[swimFireSubmode].keyframe &&
+                (trackIter->status & 2) &&
+                (trackIter->keyframe ==
+                    prdThing->pThing->pPuppetClass->modes[1].keyframe[SITH_ANIM_FIRE].keyframe ||
+                    trackIter->keyframe ==
+                    prdThing->pThing->pPuppetClass->modes[1].keyframe[SITH_ANIM_FIRE2].keyframe))
+            {
+                v18 = 1;
+            }
+
             // Only blend aTracks that are actively playing (status bit 0x2)
             if (!(trackIter->status & 2)) {
                 continue;
@@ -489,6 +545,22 @@ void rdPuppet_BuildJointMatrices(rdThing *prdThing, rdMatrix34 *pPlacement)
         rdVector_NormalizeAngleAcute3(&a3);
         rdVector_Add3Acc(&a4, &nodeIter->pos);
         rdVector_Add3Acc(&a3, &nodeIter->rot);
+
+        // Raise the torso during surface firing without rotating the legs.
+        if (swimFireActive &&
+            prdThing->pThing &&
+            prdThing->pThing->puppet &&
+            (prdThing->pThing->puppet->majorMode == 3 ||
+                prdThing->pThing->puppet->majorMode == 4) &&
+            v80 == prdThing->pThing->pPuppetClass->aJoints[JOINTTYPE_TORSO] &&
+            (prdThing->pThing->physicsParams.flags & SITH_PF_ONWATERSURFACE) &&
+            swimFireSubmode >= 0 &&
+            !prdThing->pThing->pPuppetClass
+            ->modes[prdThing->pThing->puppet->majorMode]
+            .keyframe[swimFireSubmode].keyframe)
+        {
+            a3.x += 35.0;
+        }
 
         rdMatrix_Build34(&prdThing->paJointMatrices[v80], &a3, &a4);
         v61 = &prdThing->hierarchyNodes2[v80];
