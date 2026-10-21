@@ -194,9 +194,25 @@ int sithPuppet_PlayMode(SithThing *pThing, signed int submode, rdPuppetTrackCall
     v6 = pThing->puppet;
 
     v7 = &v4->modes[v6->majorMode].keyframe[submode];
+
+    // Allow swimming actors to use their armed firing animation
+    // if their swimming mode does not define one.
+    if (pThing->type == SITH_THING_ACTOR &&
+        (v6->majorMode == 3 || v6->majorMode == 4) &&
+        (submode == SITH_ANIM_FIRE || submode == SITH_ANIM_FIRE2) &&
+        !v7->keyframe)
+    {
+        SithPuppetClassSubmode* armedFire =
+            &v4->modes[1].keyframe[submode];
+
+        if (armedFire->keyframe)
+            v7 = armedFire;
+    }
+
     keyframe = v7->keyframe;
-    if ( !v7->keyframe )
+    if (!keyframe)
         return -1;
+
     flags = v7->flags;
     lowPri = v7->lowPri;
     highPri = v7->highPri;
@@ -598,8 +614,24 @@ void sithPuppet_sub_4E4A20(SithThing *thing, SithPuppetClassSubmode *animClass)
     if ( rdPup && thing->pPuppetClass )
     {
         sithPup = thing->puppet;
+        int lowPri = animClass->lowPri;
+        int highPri = animClass->highPri;
+
+        if (thing->type == SITH_THING_ACTOR &&
+            (sithPup->majorMode == 3 || sithPup->majorMode == 4) &&
+            sithPup->currentAnimation == SITH_ANIM_STAND &&
+            !thing->pPuppetClass->modes[sithPup->majorMode]
+            .keyframe[SITH_ANIM_FIRE].keyframe)
+        {
+            lowPri = 2;
+            highPri = 2;
+        }
         v4 = &sithPup->playingAnim->keyframe;
-        if ( !v4 || *v4 != animClass->keyframe )
+        if (!v4 ||
+            *v4 != animClass->keyframe ||
+            (sithPup->otherTrack >= 0 &&
+                (rdPup->aTracks[sithPup->otherTrack].lowPri != lowPri ||
+                    rdPup->aTracks[sithPup->otherTrack].highPri != highPri)))
         {
             sithPup->animStartedMs = sithTime_g_msecGameTime;
             v5 = sithPup->currentTrack;
@@ -619,16 +651,16 @@ void sithPuppet_sub_4E4A20(SithThing *thing, SithPuppetClassSubmode *animClass)
                 sithPup = thing->puppet;
                 sithPup->otherTrack = -1;
             }
-            if ( animClass->keyframe )
+            if (animClass->keyframe)
             {
                 sithPup = thing->puppet;
                 sithPup->otherTrack = sithPuppet_PlayKey(
-                                          thing->renderData.puppet,
-                                          animClass->keyframe,
-                                          animClass->lowPri,
-                                          animClass->highPri,
-                                          animClass->flags,
-                                          sithPuppet_DefaultCallback);
+                    thing->renderData.puppet,
+                    animClass->keyframe,
+                    lowPri,
+                    highPri,
+                    animClass->flags,
+                    sithPuppet_DefaultCallback);
             }
         }
         sithPup->playingAnim = animClass;
