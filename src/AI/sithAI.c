@@ -1071,8 +1071,17 @@ int sithAI_CheckSightThing(SithThing *thing, rdVector3 *targetPosition, SithThin
         if ( (targetThing->physicsParams.flags & SITH_PF_ONWATERSURFACE) == 0 )
             return 3;
     }
-    if ( (thing->flags & SITH_TF_WATER) && !(targetThing->flags & SITH_TF_WATER))
-        return 3;
+    // Allow actors at the water surface to see targets on dry ground.
+    // Fully submerged actors retain the original restriction.
+    if ((thing->flags & SITH_TF_WATER) &&
+        !(targetThing->flags & SITH_TF_WATER))
+    {
+        if (thing->moveType != SITH_MT_PHYSICS ||
+            !(thing->physicsParams.flags & SITH_PF_ONWATERSURFACE))
+        {
+            return 3;
+        }
+    }
     if ( v12 - targetThing->collideSize > maxDistance )
         return 1;
     if ( fov > -1.0 )
