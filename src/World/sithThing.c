@@ -1556,6 +1556,17 @@ int sithThing_ReadStaticThingsListText(SithWorld *pWorld, int bSkip)
             break;
         v21 = &sithWorld_g_pCurrentWorld->aThings[_atoi(stdConffile_g_entry.aArgs[0].value)];
         v22 = sithTemplate_GetTemplate(stdConffile_g_entry.aArgs[1].value);
+        // Added: Skip static things with missing or invalid templates to prevent sector list corruption.
+        if (!v22 || v22->type == SITH_THING_FREE)
+        {
+            jk_printf(
+                "OpenJKDF2: Skipping static thing %u: "
+                "missing or invalid template '%s'\n",
+                v21->idx,
+                stdConffile_g_entry.aArgs[1].value
+            );
+            continue;
+        }
         if ( stdConffile_g_entry.numArgs >= 0xAu )
         {
             pos.x = _atof(stdConffile_g_entry.aArgs[3].value);
