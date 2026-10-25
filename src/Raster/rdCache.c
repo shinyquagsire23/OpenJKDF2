@@ -7,6 +7,7 @@
 #include "Engine/rdColormap.h"
 #include "General/stdMath.h"
 #include "stdPlatform.h"
+#include "World/jkPlayer.h"
 
 #include <math.h>
 
@@ -575,12 +576,13 @@ int rdCache_SendFaceListToHardware()
 
             a3 = mipmap_level;
 
-            if ( (sith_tex_sel->alpha_en & 1) != 0 && std3D_HasAlpha() )
+            if ((sith_tex_sel->alpha_en & 1) != 0 && std3D_HasAlpha())
             {
 #ifdef SDL2_RENDER
-                if (sith_tex_sel->has_jkgm_override)
+                if (jkPlayer_bEnableJkgm && sith_tex_sel->has_jkgm_override)
                 {
                     tex2_arr_sel = &sith_tex_sel->alphaMats[mipmap_level];
+
                     if (tex2_arr_sel->albedo_factor[0] != 0.0
                         || tex2_arr_sel->albedo_factor[1] != 0.0
                         || tex2_arr_sel->albedo_factor[2] != 0.0
@@ -588,13 +590,13 @@ int rdCache_SendFaceListToHardware()
                     {
                         flags_idk_ |= 0x0;
                     }
-                    else {
-                        // If a texture is only emissive (blaster shots, etc)
-                        // then we probably want to keep the existing blend modes
+                    else
+                    {
                         flags_idk_ |= 0x400;
                     }
                 }
-                else {
+                else
+                {
                     flags_idk_ |= 0x400;
                 }
 #else
