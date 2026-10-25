@@ -1556,7 +1556,7 @@ int sithThing_ReadStaticThingsListText(SithWorld *pWorld, int bSkip)
             break;
         v21 = &sithWorld_g_pCurrentWorld->aThings[_atoi(stdConffile_g_entry.aArgs[0].value)];
         v22 = sithTemplate_GetTemplate(stdConffile_g_entry.aArgs[1].value);
-        // Skip static things with missing or invalid templates to prevent sector list corruption.
+        // Added: Skip static things with missing or invalid templates to prevent sector list corruption.
         if (!v22 || v22->type == SITH_THING_FREE)
         {
             jk_printf(
