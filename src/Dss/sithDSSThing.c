@@ -1008,7 +1008,7 @@ int sithDSSThing_ProcessFullDescription(SithMessage *pMsg)
     v8 = (uint16_t)NETMSG_POPS16();
 
     SithThing* pTemplate = NULL;
-
+    // Added: Fix MotS restart crash caused by static-world template indices
     if (v8 == 0)
     {
         // Template zero is valid for full-description restoration.
@@ -1020,6 +1020,7 @@ int sithDSSThing_ProcessFullDescription(SithMessage *pMsg)
         pTemplate = sithTemplate_GetTemplateByIndex(v8);
     }
 
+    // Added: Fix MotS restart crash caused by static-world template indices
     if (!pTemplate)
     {
         stdPlatform_Printf(
