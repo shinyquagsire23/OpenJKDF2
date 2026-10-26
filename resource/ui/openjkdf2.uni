@@ -1,4 +1,4 @@
-MSGS 104          # <--- DON'T FORGET TO UPDATE THIS COUNT
+MSGS 115          # <--- DON'T FORGET TO UPDATE THIS COUNT
 
 #  "<key>"     <unused number>   "<string>"
 
@@ -6,6 +6,13 @@ MSGS 104          # <--- DON'T FORGET TO UPDATE THIS COUNT
 #  OpenJKDF2 added UI strings
 #******************************
    "OPENJKDF2_EXAMPLE"    0  "Example!"
+
+#******************************
+#  Multiplayer characters
+#******************************
+   "GUIEXT_MPC_UNREADABLE"                0 "Can't read this character"
+   "GUIEXT_MPC_UNREADABLE_TITLE"          0 "Can't Read Character"
+   "GUIEXT_MPC_UNREADABLE_MSG"            0 "%s can't be read. Remove it, then make it again with New."
 
 #******************************
 #  Gameplay
