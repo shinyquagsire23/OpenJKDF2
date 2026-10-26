@@ -1391,6 +1391,8 @@ void jkPlayer_MpcInitBins(SithPlayer* unk)
     }
 }
 
+static int jkPlayer_MPCBinReadMots(); // Added
+
 // MOTS altered TODO
 int jkPlayer_MPCParse(jkPlayerMpcInfo *info, SithPlayer* unk, char16_t *fname, char16_t *name, int hasBins)
 {
@@ -1404,6 +1406,7 @@ int jkPlayer_MPCParse(jkPlayerMpcInfo *info, SithPlayer* unk, char16_t *fname, c
     const char* pExpected; // Added
     int bGotLine; // Added
     int personality; // Added
+    int bScrambled; // Added
 
     stdString_WcharToChar(a1a, fname, 31);
     a1a[31] = 0;
@@ -1418,16 +1421,29 @@ int jkPlayer_MPCParse(jkPlayerMpcInfo *info, SithPlayer* unk, char16_t *fname, c
     if (!stdConffile_OpenReadBypass(jkl_fname))
         return 0;
 
+    // Added: MotS saves its characters scrambled, as "version 2". OpenJKDF2
+    // saves them as plain "version 1", like Jedi Knight. A file that doesn't
+    // start with plain "version" is read again unscrambled.
+    bScrambled = 0;
+    bGotLine = stdConffile_ReadLine();
+    if ( bGotLine && Main_bMotsCompat && _strncmp(jkPlayer_SkipLinePrefix(stdConffile_g_aLine), "version ", 8) )
+    {
+        stdConffile_Close();
+        if (!stdConffile_OpenReadMotsScrambled(jkl_fname))
+            return 0;
+        bScrambled = 1;
+        bGotLine = stdConffile_ReadLine();
+    }
+
     // Added: pExpected names the line that couldn't be read, for the message
     // below. A byte order mark or spaces before "version 1" are skipped, as
     // for the .plr.
     pExpected = NULL;
-    bGotLine = 0;
     personality = 1; // HACK: JK only has Jedi classes.
-    if ( !(bGotLine = stdConffile_ReadLine())
+    if ( !bGotLine
       || _sscanf(jkPlayer_SkipLinePrefix(stdConffile_g_aLine), "version %d", &v8) != 1
-      || v8 != 1 )
-        pExpected = "version 1";
+      || v8 != (bScrambled ? 2 : 1) )
+        pExpected = bScrambled ? "version 2" : "version 1";
     else if ( !(bGotLine = stdConffile_ReadLine()) || _sscanf(stdConffile_g_aLine, "model: %s", jkPlayer_model) != 1 )
         pExpected = "model:";
     else if ( !(bGotLine = stdConffile_ReadLine()) || _sscanf(stdConffile_g_aLine, "soundclass: %s", jkPlayer_soundClass) != 1 )
@@ -1444,7 +1460,7 @@ int jkPlayer_MPCParse(jkPlayerMpcInfo *info, SithPlayer* unk, char16_t *fname, c
         // GUI_PERSONALITYn string (1-8) showed as GUI_PERSONALITY0.
         if ( !(bGotLine = stdConffile_ReadLine()) )
             pExpected = "personality:";
-        else if ( !_strncmp(stdConffile_g_aLine, "forcepowers:", 12) )
+        else if ( !bScrambled && !_strncmp(stdConffile_g_aLine, "forcepowers:", 12) )
             personality = 1;
         else if ( _sscanf(stdConffile_g_aLine, "personality: %d", &personality) != 1 || personality < 1 || personality > 8 )
             pExpected = "personality: 1 to 8";
@@ -1480,7 +1496,7 @@ int jkPlayer_MPCParse(jkPlayerMpcInfo *info, SithPlayer* unk, char16_t *fname, c
     if ( hasBins )
     {
         // Added: say so when the force powers stop early, the rest are 0
-        if ( !jkPlayer_MPCBinRead() )
+        if ( !(bScrambled ? jkPlayer_MPCBinReadMots() : jkPlayer_MPCBinRead()) )
             stdPlatform_Printf("jkPlayer: %s: force powers after line %d couldn't be read, they're 0\n", jkl_fname, stdConffile_linenum);
     }
     info->jediRank = jkPlayer_GetJediRank();
@@ -1592,6 +1608,57 @@ int jkPlayer_MPCBinRead()
     }
 
     return 0;
+}
+
+// Added: the force powers of a character saved by MotS (JKM.EXE 0x406F00).
+// After "forcepowers:" come bins 19 to 39 in order, each bin number XORed with
+// the scramble key at the start of its line. Then (key & 7) + 2 lines that
+// only hide the format, numbered 0 up in the same way, with the key read again
+// after each, and spendable stars.
+static int jkPlayer_MPCBinReadMots()
+{
+    flex32_t value;
+    int bin;
+    int key;
+    int i;
+
+    for (i = SITHBIN_FP_START; i <= SITHBIN_FP_END; ++i )
+    {
+        sithPlayer_SetInvItemAmount(i, 0.0);
+        sithPlayer_SetInvItemAvailable(i, 1);
+    }
+    sithPlayer_SetInvItemAmount(SITHBIN_SPEND_STARS, 0.0);
+
+    if ( !stdConffile_ReadLine() )
+        return 0;
+
+    for (i = SITHBIN_FP_START; i <= SITHBIN_FP_END; ++i )
+    {
+        key = stdConffile_GetMotsScrambleKey();
+        if ( !stdConffile_ReadLine()
+          || _sscanf(stdConffile_g_aLine, "bin: %d value: %f", &bin, &value) != 2
+          || (bin ^ key) != i )
+            return 0;
+
+        sithPlayer_SetInvItemAmount(i, value);
+    }
+
+    key = stdConffile_GetMotsScrambleKey();
+    for (i = 0; i < (key & 7) + 2; ++i )
+    {
+        if ( !stdConffile_ReadLine()
+          || _sscanf(stdConffile_g_aLine, "bin: %d value: %f", &bin, &value) != 2
+          || (bin ^ key) != i )
+            return 0;
+
+        key = stdConffile_GetMotsScrambleKey();
+    }
+
+    if ( !stdConffile_ReadLine() || _sscanf(stdConffile_g_aLine, "spendable stars: %f", &value) != 1 )
+        return 0;
+
+    sithPlayer_SetInvItemAmount(SITHBIN_SPEND_STARS, value);
+    return 1;
 }
 
 void jkPlayer_InitForceBins()

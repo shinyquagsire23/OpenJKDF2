@@ -9,6 +9,13 @@ static struct HostServices* stdConffile_pHS = 0;
 static BOOL openFileIsBypass[20];
 static BOOL bOpenFileIsBypassed = 0;
 
+// Added: MotS saves multiplayer characters (.mpc) scrambled. Each character
+// is changed by a key byte that starts at 5 plus the file name's characters
+// (uppercase, no folder) and then adds each unscrambled character. Line ends
+// are left as they are. Taken from MotS's own stdConffile (JKM.EXE 0x435580).
+static int stdConffile_bMotsScrambled = 0;
+static uint8_t stdConffile_motsScrambleKey = 0;
+
 int stdConffile_Open(char *pFilename)
 {
     return stdConffile_OpenMode(pFilename, "r");
@@ -103,6 +110,55 @@ fail_open:
     return 0;
 }
 
+// Added: opens a character saved by MotS, see stdConffile_bMotsScrambled.
+// Lines read until stdConffile_Close are unscrambled. Nothing else may be
+// opened before then, the key isn't kept for it.
+int stdConffile_OpenReadMotsScrambled(char *fpath)
+{
+    const char* pName = _strrchr(fpath, '\\');
+    uint8_t key = 5;
+
+    pName = pName ? pName + 1 : fpath;
+    for (; *pName; pName++)
+    {
+        uint8_t c = (uint8_t)*pName;
+        key += (c >= 'a' && c <= 'z') ? c - ('a' - 'A') : c;
+    }
+
+    if (!stdConffile_OpenReadBypass(fpath))
+        return 0;
+
+    stdConffile_motsScrambleKey = key;
+    stdConffile_bMotsScrambled = 1;
+    return 1;
+}
+
+// Added: the key at the start of the next line, as MotS reads it (signed).
+// MotS also scrambles a character's force power bin numbers with it.
+int stdConffile_GetMotsScrambleKey()
+{
+    int key = stdConffile_motsScrambleKey;
+    return key >= 0x80 ? key - 0x100 : key;
+}
+
+// Added
+static void stdConffile_MotsUnscramble(char *pLine)
+{
+    uint8_t key = stdConffile_motsScrambleKey;
+    uint8_t* pIter;
+
+    for (pIter = (uint8_t*)pLine; *pIter; pIter++)
+    {
+        uint8_t c = *pIter;
+        if (c == '\r' || c == '\n')
+            continue;
+
+        *pIter = (c & 0xF8) ^ ((((c - (key >> 3)) & 7) ^ key) & 0x1F);
+        key += *pIter;
+    }
+    stdConffile_motsScrambleKey = key;
+}
+
 int stdConffile_OpenMode(char *pFilename, const char* openMode)
 {
     return stdConffile_OpenModeCommon(pFilename, openMode, 0);
@@ -134,6 +190,8 @@ void stdConffile_Close()
 {
     if (!stdConffile_bOpen)
         return;
+
+    stdConffile_bMotsScrambled = 0; // Added
 
     if (openFile) {
         stdConffile_pHS->fileClose(openFile); // Added: std_g_pHS -> stdConffile_pHS
@@ -275,6 +333,10 @@ int stdConffile_ReadLine()
     // Added: std_g_pHS -> stdConffile_pHS
     if (!stdConffile_pHS->fileGets(openFile, line_iter, buf_left))
       return 0;
+
+    // Added: a character saved by MotS
+    if (stdConffile_bMotsScrambled)
+      stdConffile_MotsUnscramble(line_iter);
 
     ++stdConffile_linenum;
     if ( !(*line_iter == ';') && !(*line_iter == '#') 
