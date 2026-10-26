@@ -429,5 +429,7 @@ void main(void)
 
     fragColorPos = vec4(adjusted_coords.x, adjusted_coords.y, adjusted_coords.z, should_write_normals);
     fragColorNormal = vec4(face_normals, should_write_normals);
-    gl_FragDepth = gl_FragCoord.z;
+    // No gl_FragDepth here: it only wrote back gl_FragCoord.z, the depth the GPU already
+    // had, and writing depth from a shader turns off the early depth test, so every
+    // hidden pixel ran this whole shader.
 }
