@@ -907,8 +907,12 @@ int jkPlayer_RepairConf(char16_t *name)
         return 0;
 
     stdString_snprintf(bakPath, 256, "player\\%s\\%s.plr.bak", nameTmp, nameTmp);
-    if (jkPlayer_CopyFileLowLevel(fpath, bakPath))
+    if (jkPlayer_CopyFileLowLevel(fpath, bakPath)) {
+        // CreateConf reads the old file first, which would print the
+        // "Can't read" message again
+        stdFileUtil_DelFile(fpath);
         stdPlatform_Printf("jkPlayer: Starting %s over with default settings, the old file is kept as %s\n", nameTmp, bakPath);
+    }
     else
         stdPlatform_Printf("jkPlayer: Starting %s over with default settings, couldn't keep a copy of the old file\n", nameTmp);
 
