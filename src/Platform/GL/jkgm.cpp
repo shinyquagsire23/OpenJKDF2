@@ -658,9 +658,7 @@ int jkgm_std3D_AddToTextureCache(tVBuffer *vbuf, rdDDrawSurface *texture, int is
         return 0;
     }
 
-    // Added: same limit as std3D_AddToTextureCache. The texture is added at
-    // std3D_loadedTexturesAmt below, which wrote past the end of the list once
-    // it was full.
+    // same limit as std3D_AddToTextureCache
     if (std3D_loadedTexturesAmt >= STD3D_MAX_TEXTURES) {
         return 0;
     }
@@ -716,11 +714,9 @@ int jkgm_std3D_AddToTextureCache(tVBuffer *vbuf, rdDDrawSurface *texture, int is
 
     if (found_replace) // saberpurple0.mat
     {
-        // Added: PNG rows are tightly packed even when width * channels is not a
+        // PNG rows are tightly packed even when width * channels is not a
         // multiple of 4, so GL's default 4-byte row alignment skewed or overran RGB
-        // uploads. This scope covers the albedo, emissive and displacement uploads
-        // and restores the caller's unpack state on every exit path. Ported from
-        // OpenJKDF2-MotS-Fixes by Andrei Kiralv/Darkahn and Coda Lilitari.
+        // uploads.
         const JkgmScopedPixelUnpack pixel_unpack;
         GLuint image_texture;
         glGenTextures(1, &image_texture);
