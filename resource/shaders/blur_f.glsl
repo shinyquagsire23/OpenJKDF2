@@ -24,10 +24,14 @@ void main(void)
     vec4 Color = texture(tex, f_uv, 1.0);
     
     // Blur calculations
-    for( float d=0.0; d<Pi; d+=Pi/Directions)
+    int nDirections = int(Directions + 0.5);
+    int nQuality = int(Quality + 0.5);
+    for (int di = 0; di < nDirections; di++)
     {
-        for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality)
+        float d = float(di) * Pi / Directions;
+        for (int qi = 1; qi <= nQuality; qi++)
         {
+            float i = float(qi) / Quality;
             Color += texture( tex, f_uv+vec2(cos(d),sin(d))*Radius*i, 1.0);     
         }
     }

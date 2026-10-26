@@ -200,7 +200,7 @@ flex_t rdLight_CalcVertexIntensities(rdLight **apLights, rdVector3 *aLightPos,
     vertexNormals = aVertexNormal;
     for (int vertIdx = 0; vertIdx < numVertices; vertIdx++)
     {
-        *outLights = *aVertexColors;
+        *outLights = *aVertexColors++;
 
         meshLightIter = apLights;
         aVertexNormal = aLightPos;

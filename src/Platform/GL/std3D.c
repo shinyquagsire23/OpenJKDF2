@@ -223,6 +223,12 @@ void std3D_deleteIntermediateFbo(std3DIntermediateFbo* pFbo)
     glDeleteRenderbuffers(1, &pFbo->rbo);
 }
 
+static void std3D_SetSceneDrawBuffers()
+{
+    static const GLenum bufs[4] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
+    glDrawBuffers(jkPlayer_enableSSAO ? 4 : 2, bufs);
+}
+
 void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* pFb)
 {
     // Generate the framebuffer
@@ -298,6 +304,9 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, pFb->rbo);
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         stdPlatform_Printf("std3D: ERROR, Framebuffer is incomplete!\n");
+
+    std3D_SetSceneDrawBuffers();
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     if (jkPlayer_enableSSAO)
@@ -765,6 +774,7 @@ int std3D_StartScene()
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
+    std3D_SetSceneDrawBuffers(); // so the clear below covers tex2-3 when SSAO was just turned on
     glEnable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -1547,9 +1557,9 @@ void std3D_DrawMenu()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, menu_ibo_triangle);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpTrisAmt * 3 * sizeof(GLushort), menu_data_elements, GL_STREAM_DRAW);
 
-    int tris_size = 0;  
-    glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &tris_size);
-    glDrawElements(GL_TRIANGLES, tris_size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
+    // Perf: draw the count just uploaded. Asking GL for the buffer's size makes the
+    // CPU wait for the GPU, every frame.
+    glDrawElements(GL_TRIANGLES, (GLsizei)(GL_tmpTrisAmt * 3), GL_UNSIGNED_SHORT, 0);
 
     glDisableVertexAttribArray(programMenu_attribute_v_uv);
     glDisableVertexAttribArray(programMenu_attribute_v_color);
@@ -1686,9 +1696,9 @@ void std3D_DrawMapOverlay()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, menu_ibo_triangle);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpTrisAmt * 3 * sizeof(GLushort), menu_data_elements, GL_STREAM_DRAW);
 
-    int tris_size = 0;  
-    glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &tris_size);
-    glDrawElements(GL_TRIANGLES, tris_size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
+    // Perf: draw the count just uploaded. Asking GL for the buffer's size makes the
+    // CPU wait for the GPU, every frame.
+    glDrawElements(GL_TRIANGLES, (GLsizei)(GL_tmpTrisAmt * 3), GL_UNSIGNED_SHORT, 0);
 
     glDisableVertexAttribArray(programMenu_attribute_v_uv);
     glDisableVertexAttribArray(programMenu_attribute_v_color);
@@ -2298,42 +2308,21 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
     }
     
     rdTri* tris = GL_tmpTris;
-    glEnableVertexAttribArray(pStage->attribute_coord3d);
-    glEnableVertexAttribArray(pStage->attribute_v_color);
-    glEnableVertexAttribArray(pStage->attribute_v_uv);
-
     glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_all);
     glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * sizeof(D3DVERTEX), GL_tmpVertices, GL_STREAM_DRAW);
-    glVertexAttribPointer(
-        programMenu_attribute_coord3d, // attribute
-        3,                 // number of elements per vertex, here (x,y,z)
-        GL_FLOAT,          // the type of each element
-        GL_FALSE,          // normalize fixed-point data?
-        sizeof(D3DVERTEX),                 // data stride
-        (GLvoid*)offsetof(D3DVERTEX, x)                  // offset of first element
-    );
-    
-    glVertexAttribPointer(
-        programMenu_attribute_v_color, // attribute
-        4,                 // number of elements per vertex, here (R,G,B,A)
-        GL_UNSIGNED_BYTE,  // the type of each element
-        GL_TRUE,          // normalize fixed-point data?
-        sizeof(D3DVERTEX),                 // no extra data between each position
-        (GLvoid*)offsetof(D3DVERTEX, color) // offset of first element
-    );
 
-    glVertexAttribPointer(
-        programMenu_attribute_v_uv,    // attribute
-        2,                 // number of elements per vertex, here (U,V)
-        GL_FLOAT,          // the type of each element
-        GL_FALSE,          // take our values as-is
-        sizeof(D3DVERTEX),                 // no extra data between each position
-        (GLvoid*)offsetof(D3DVERTEX, tu)                  // offset of first element
-    );
-
-    glEnableVertexAttribArray(pStage->attribute_coord3d);
-    glEnableVertexAttribArray(pStage->attribute_v_color);
-    glEnableVertexAttribArray(pStage->attribute_v_uv);
+    if (pStage->attribute_coord3d >= 0) {
+        glVertexAttribPointer(pStage->attribute_coord3d, 3, GL_FLOAT, GL_FALSE, sizeof(D3DVERTEX), (GLvoid*)offsetof(D3DVERTEX, x));
+        glEnableVertexAttribArray(pStage->attribute_coord3d);
+    }
+    if (pStage->attribute_v_color >= 0) {
+        glVertexAttribPointer(pStage->attribute_v_color, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(D3DVERTEX), (GLvoid*)offsetof(D3DVERTEX, color));
+        glEnableVertexAttribArray(pStage->attribute_v_color);
+    }
+    if (pStage->attribute_v_uv >= 0) {
+        glVertexAttribPointer(pStage->attribute_v_uv, 2, GL_FLOAT, GL_FALSE, sizeof(D3DVERTEX), (GLvoid*)offsetof(D3DVERTEX, tu));
+        glEnableVertexAttribArray(pStage->attribute_v_uv);
+    }
     
     rdDDrawSurface* last_tex = (rdDDrawSurface*)(intptr_t)-1;
     int last_tex_idx = 0;
@@ -2348,13 +2337,13 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, menu_ibo_triangle);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpTrisAmt * 3 * sizeof(GLushort), data_elements, GL_STREAM_DRAW);
 
-    int tris_size;  
-    glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &tris_size);
-    glDrawElements(GL_TRIANGLES, tris_size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
+    // Perf: draw the count just uploaded. Asking GL for the buffer's size makes the
+    // CPU wait for the GPU, every frame.
+    glDrawElements(GL_TRIANGLES, (GLsizei)(GL_tmpTrisAmt * 3), GL_UNSIGNED_SHORT, 0);
 
-    glDisableVertexAttribArray(pStage->attribute_v_uv);
-    glDisableVertexAttribArray(pStage->attribute_v_color);
-    glDisableVertexAttribArray(pStage->attribute_coord3d);
+    if (pStage->attribute_v_uv >= 0) glDisableVertexAttribArray(pStage->attribute_v_uv);
+    if (pStage->attribute_v_color >= 0) glDisableVertexAttribArray(pStage->attribute_v_color);
+    if (pStage->attribute_coord3d >= 0) glDisableVertexAttribArray(pStage->attribute_coord3d);
     
     //free(data_elements);
         
@@ -2557,8 +2546,7 @@ void std3D_DrawRenderList()
     glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
     glUseProgram(programDefault);
 
-    GLenum bufs[4] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
-    glDrawBuffers(4, bufs);
+    std3D_SetSceneDrawBuffers();
     
     last_tex = NULL;
 
@@ -2894,9 +2882,8 @@ void std3D_DrawRenderList()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, world_ibo_triangle);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpLinesAmt * 2 * sizeof(GLushort), world_data_elements, GL_STREAM_DRAW);
 
-    int lines_size;
-    glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &lines_size);
-    glDrawElements(GL_LINES, lines_size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
+    // Perf: draw the count just uploaded rather than asking GL for the buffer's size (a GPU wait).
+    glDrawElements(GL_LINES, (GLsizei)(GL_tmpLinesAmt * 2), GL_UNSIGNED_SHORT, 0);
 #endif
         
     // Done drawing    
@@ -2995,7 +2982,7 @@ void std3D_AddRenderListUITris(rdUITri *tris, unsigned int num_tris)
 int std3D_ClearZBuffer()
 {
 #ifdef RDRASTER_SW_ZBUFFER
-    // Added: the software rasterizer keeps its own depth buffer; clear it on the same hook JK uses
+    // the software rasterizer keeps its own depth buffer; clear it on the same hook JK uses
     // (scene start + the POV weapon's clear) so the software path stays in lockstep with the HW one.
     rdZRaster_ClearZBuffer();
 #endif
