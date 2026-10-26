@@ -24,9 +24,6 @@ void main(void)
     vec4 Color = texture(tex, f_uv, 1.0);
     
     // Blur calculations
-    // Added: integer counters. Stepping floats by Pi/Directions and 1.0/Quality left the sample
-    // count to rounding, and on some GPUs the last ring (i == 1.0) was skipped on some frames.
-    // That dropped the blur's alpha to about 0.75, and the combine scaled the 3D view by it.
     int nDirections = int(Directions + 0.5);
     int nQuality = int(Quality + 0.5);
     for (int di = 0; di < nDirections; di++)
