@@ -349,10 +349,14 @@ void main(void)
         discard;
     }
     
+    // Translucent faces (water, glass): the original D3D renderer drew them with
+    // SRCBLEND=SRCALPHA, DESTBLEND=INVSRCALPHA and MODULATE, so the face's vertex
+    // alpha (90/255) is how much of the face shows, about 35%. The blend here is
+    // GL_ONE, GL_ONE_MINUS_SRC_ALPHA, so the color is premultiplied. Using
+    // 1 - alpha instead draws water about 65% solid.
     if (blend_mode == D3DBLEND_INVSRCALPHA)
     {
-        main_color.rgb *= (1.0 - main_color.a);
-        main_color.a = (1.0 - main_color.a);
+        main_color.rgb *= main_color.a;
     }
 
     //if (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA)
