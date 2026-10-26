@@ -274,7 +274,13 @@ int sithDSSThing_ProcessStateUpdate(SithMessage *pMsg)
             pThing->itemParams.flags = NETMSG_POPS32();
             if (pThing->itemParams.flags & SITH_ITEM_BACKPACK)
             {
-                pThing->itemParams.numBins = NETMSG_POPS16();
+                // Added: the count comes from the network, so check it before filling
+                // the array. Ported from OpenJKDF2-MotS-Fixes by Andrei Kiralv/Darkahn and
+                // Coda Lilitari.
+                int numBins = NETMSG_POPS16();
+                if (numBins < 0 || numBins > (int)(sizeof(pThing->itemParams.contents) / sizeof(pThing->itemParams.contents[0])))
+                    return 0;
+                pThing->itemParams.numBins = numBins;
                 for (int i = 0; i < pThing->itemParams.numBins; i++)
                 {
                     pThing->itemParams.contents[i].binIdx = NETMSG_POPS16();
