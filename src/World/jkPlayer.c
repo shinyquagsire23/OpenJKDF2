@@ -1401,6 +1401,9 @@ int jkPlayer_MPCParse(jkPlayerMpcInfo *info, SithPlayer* unk, char16_t *fname, c
     char a1a[32]; // [esp+18h] [ebp-C0h] BYREF
     char v11[32]; // [esp+38h] [ebp-A0h] BYREF
     char jkl_fname[128]; // [esp+58h] [ebp-80h] BYREF
+    const char* pExpected; // Added
+    int bGotLine; // Added
+    int personality; // Added
 
     stdString_WcharToChar(a1a, fname, 31);
     a1a[31] = 0;
@@ -1415,56 +1418,77 @@ int jkPlayer_MPCParse(jkPlayerMpcInfo *info, SithPlayer* unk, char16_t *fname, c
     if (!stdConffile_OpenReadBypass(jkl_fname))
         return 0;
 
-    if ( stdConffile_ReadLine()
-      && _sscanf(stdConffile_g_aLine, "version %d", &v8) == 1
-      && v8 == 1
-      && stdConffile_ReadLine()
-      && _sscanf(stdConffile_g_aLine, "model: %s", jkPlayer_model) == 1
-      && stdConffile_ReadLine()
-      && _sscanf(stdConffile_g_aLine, "soundclass: %s", jkPlayer_soundClass) == 1
-      && stdConffile_ReadLine()
-      && _sscanf(stdConffile_g_aLine, "sidemat: %s", jkPlayer_sideMat) == 1
-      && stdConffile_ReadLine()
-      && _sscanf(stdConffile_g_aLine, "tipmat: %s", jkPlayer_tipMat) == 1 )
+    // Added: pExpected names the line that couldn't be read, for the message
+    // below. A byte order mark or spaces before "version 1" are skipped, as
+    // for the .plr.
+    pExpected = NULL;
+    bGotLine = 0;
+    personality = 1; // HACK: JK only has Jedi classes.
+    if ( !(bGotLine = stdConffile_ReadLine())
+      || _sscanf(jkPlayer_SkipLinePrefix(stdConffile_g_aLine), "version %d", &v8) != 1
+      || v8 != 1 )
+        pExpected = "version 1";
+    else if ( !(bGotLine = stdConffile_ReadLine()) || _sscanf(stdConffile_g_aLine, "model: %s", jkPlayer_model) != 1 )
+        pExpected = "model:";
+    else if ( !(bGotLine = stdConffile_ReadLine()) || _sscanf(stdConffile_g_aLine, "soundclass: %s", jkPlayer_soundClass) != 1 )
+        pExpected = "soundclass:";
+    else if ( !(bGotLine = stdConffile_ReadLine()) || _sscanf(stdConffile_g_aLine, "sidemat: %s", jkPlayer_sideMat) != 1 )
+        pExpected = "sidemat:";
+    else if ( !(bGotLine = stdConffile_ReadLine()) || _sscanf(stdConffile_g_aLine, "tipmat: %s", jkPlayer_tipMat) != 1 )
+        pExpected = "tipmat:";
+    else if (Main_bMotsCompat) {
+        // Added: a Jedi Knight character has no personality line, its force
+        // powers come straight after tipmat, so it's read as a Jedi, the only
+        // kind Jedi Knight has. jkPlayer_MPCBinRead goes on after the
+        // "forcepowers:" line read here. A personality with no
+        // GUI_PERSONALITYn string (1-8) showed as GUI_PERSONALITY0.
+        if ( !(bGotLine = stdConffile_ReadLine()) )
+            pExpected = "personality:";
+        else if ( !_strncmp(stdConffile_g_aLine, "forcepowers:", 12) )
+            personality = 1;
+        else if ( _sscanf(stdConffile_g_aLine, "personality: %d", &personality) != 1 || personality < 1 || personality > 8 )
+            pExpected = "personality: 1 to 8";
+    }
+
+    if ( pExpected )
     {
-        if (Main_bMotsCompat) {
-            if (!stdConffile_ReadLine() || _sscanf(stdConffile_g_aLine, "personality: %d", &jkPlayer_personality) != 1) {
-                stdConffile_Close();
-                return 0;
-            }
+        // Added: say why, since the player only sees GUI_PERSONALITY0
+        if (bGotLine) {
+            char aLine[48];
+            stdString_SafeStrCopy(aLine, stdConffile_g_aLine, sizeof(aLine));
+            stdPlatform_Printf("jkPlayer: Can't read %s: line %d is \"%s\", not \"%s\"\n", jkl_fname, stdConffile_linenum, aLine, pExpected);
         }
         else {
-            jkPlayer_personality = 1; // HACK: JK only has Jedi classes.
+            stdPlatform_Printf("jkPlayer: Can't read %s: it ends before \"%s\"\n", jkl_fname, pExpected);
         }
 
-        _strncpy(info->model, jkPlayer_model, 0x1Fu);
-        info->model[31] = 0;
-        _strncpy(info->soundClass, jkPlayer_soundClass, 0x1Fu);
-        info->soundClass[31] = 0;
-        _strncpy(info->sideMat, jkPlayer_sideMat, 0x1Fu);
-        info->sideMat[31] = 0;
-        _strncpy(info->tipMat, jkPlayer_tipMat, 0x1Fu);
-        info->tipMat[31] = 0;
-        info->personality = jkPlayer_personality; // MOTS added
-        if ( hasBins )
-        {
-            jkPlayer_MPCBinRead();
-        }
-        info->jediRank = jkPlayer_GetJediRank();
-        stdConffile_Close();
-
-        
-        jkPlayer_SetAmmoMaximums(jkPlayer_personality); // MOTS added
-        jkPlayer_mpcInfoSet = 1;
-        return 1;
-    }
-    else
-    {
         stdConffile_Close();
         return 0;
     }
 
-    return 0;
+    jkPlayer_personality = personality;
+
+    _strncpy(info->model, jkPlayer_model, 0x1Fu);
+    info->model[31] = 0;
+    _strncpy(info->soundClass, jkPlayer_soundClass, 0x1Fu);
+    info->soundClass[31] = 0;
+    _strncpy(info->sideMat, jkPlayer_sideMat, 0x1Fu);
+    info->sideMat[31] = 0;
+    _strncpy(info->tipMat, jkPlayer_tipMat, 0x1Fu);
+    info->tipMat[31] = 0;
+    info->personality = jkPlayer_personality; // MOTS added
+    if ( hasBins )
+    {
+        // Added: say so when the force powers stop early, the rest are 0
+        if ( !jkPlayer_MPCBinRead() )
+            stdPlatform_Printf("jkPlayer: %s: force powers after line %d couldn't be read, they're 0\n", jkl_fname, stdConffile_linenum);
+    }
+    info->jediRank = jkPlayer_GetJediRank();
+    stdConffile_Close();
+
+    jkPlayer_SetAmmoMaximums(jkPlayer_personality); // MOTS added
+    jkPlayer_mpcInfoSet = 1;
+    return 1;
 }
 
 int jkPlayer_MPCWrite(SithPlayer* unk, char16_t *mpcName, char16_t *playerName)
@@ -1526,26 +1550,48 @@ int jkPlayer_MPCBinWrite()
 }
 
 // MOTS added: weird xor crypt
+// Added: each "bin: N value: V" line goes into bin N, not the next bin in
+// order, so a Jedi Knight character's rank (bin 20) doesn't land in Force
+// Defense (bin 19) in MotS. Force powers the file leaves out are 0 rather than
+// the last character's. The "forcepowers:" line may already have been read by
+// jkPlayer_MPCParse, for a character with no personality line.
 int jkPlayer_MPCBinRead()
 {
     flex32_t a2;
     int v3;
+    int bFirstLine = 1;
 
-    stdConffile_ReadLine();
     for (int i = SITHBIN_FP_START; i <= SITHBIN_FP_END; ++i )
     {
-        if ( !stdConffile_ReadLine() || _sscanf(stdConffile_g_aLine, "bin: %d value: %f\n", &v3, &a2) != 2 )
-            return 0;
-
-        sithPlayer_SetInvItemAmount(i, a2);
+        sithPlayer_SetInvItemAmount(i, 0.0);
         sithPlayer_SetInvItemAvailable(i, 1);
     }
+    sithPlayer_SetInvItemAmount(SITHBIN_SPEND_STARS, 0.0);
 
-    if ( !stdConffile_ReadLine() || _sscanf(stdConffile_g_aLine, "spendable stars: %f\n", &a2) != 1 )
-        return 0;
+    while ( stdConffile_ReadLine() )
+    {
+        if ( bFirstLine && !_strncmp(stdConffile_g_aLine, "forcepowers:", 12) )
+        {
+            bFirstLine = 0;
+            continue;
+        }
+        bFirstLine = 0;
 
-    sithPlayer_SetInvItemAmount(SITHBIN_SPEND_STARS, a2);
-    return 1;
+        if ( _sscanf(stdConffile_g_aLine, "bin: %d value: %f\n", &v3, &a2) == 2 )
+        {
+            if ( v3 >= SITHBIN_FP_START && v3 <= SITHBIN_FP_END )
+                sithPlayer_SetInvItemAmount(v3, a2);
+            continue;
+        }
+
+        if ( _sscanf(stdConffile_g_aLine, "spendable stars: %f\n", &a2) != 1 )
+            return 0;
+
+        sithPlayer_SetInvItemAmount(SITHBIN_SPEND_STARS, a2);
+        return 1;
+    }
+
+    return 0;
 }
 
 void jkPlayer_InitForceBins()
