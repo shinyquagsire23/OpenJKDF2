@@ -889,15 +889,27 @@ void stdControl_ReadControls()
 
     if ( !stdControl_bDisableKeyboard )
     {
+        // Added: a few game keys come from two scancodes (Page Up and SDL's
+        // Prior, the two backslash keys), and the second one, never held,
+        // let go of the first every frame, so a held Page Up or \ did nothing.
+        // A game key is now held while any of its scancodes is.
         const bool *state = SDL_GetKeyboardState(NULL);
+        uint8_t aDikRead[256] = {0};
+        uint8_t aDikDown[256] = {0};
         for (int i = 0; i < 256; i++)
         {
             int s = !!state[i];
             if (s && stdControl_aDebounce[i]) {
                 continue;
             }
-            stdControl_SetSDLKeydown(i, s, stdControl_curReadTime);
             stdControl_aDebounce[i] = 0;
+            aDikRead[stdControl_aSdlToDik[i]] = 1;
+            aDikDown[stdControl_aSdlToDik[i]] |= s;
+        }
+        for (int dik = 1; dik < 256; dik++)
+        {
+            if (aDikRead[dik])
+                stdControl_UpdateKeyState(dik, aDikDown[dik], stdControl_curReadTime);
         }
         // stdControl_UpdateKeyState(keyNum, keyVal, timestamp)
     }
