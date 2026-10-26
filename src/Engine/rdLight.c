@@ -200,7 +200,9 @@ flex_t rdLight_CalcVertexIntensities(rdLight **apLights, rdVector3 *aLightPos,
     vertexNormals = aVertexNormal;
     for (int vertIdx = 0; vertIdx < numVertices; vertIdx++)
     {
-        *outLights = *aVertexColors;
+        // Added: start each vertex from its own light, as JKM.EXE does (0x450814).
+        // Fix ported from OpenJKDF2-MotS-Fixes by Andrei Kiralv/Darkahn and Coda Lilitari.
+        *outLights = *aVertexColors++;
 
         meshLightIter = apLights;
         aVertexNormal = aLightPos;
