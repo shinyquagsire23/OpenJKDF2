@@ -34,9 +34,6 @@ const char* jkDSS_aKyTeamModels[5] = {
 
 // MOTS added: one row per personality, as in JKM.EXE. Personality 0 (no class) and
 // 1 (Jedi) share the Jedi row; 2-4 are the Bounty Hunter, Scout and Soldier.
-// Added: the decompiled table dropped the first Jedi row, so every class got the
-// next class's skin and the Soldier read past the end. Fix ported from
-// OpenJKDF2-MotS-Fixes by Andrei Kiralv/Darkahn and Coda Lilitari.
 const char* jkDSS_aMotsKyTeamModels[5*5] = {
     "ky.3do",
     "kyX0.3do",
