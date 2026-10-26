@@ -305,6 +305,11 @@ void stdBitmap_ConvertColorFormat(rdTexFormat *formatTo, stdBitmap *bitmap)
     tVBuffer *v5; // eax
     rdTexFormat *formatFrom; // [esp+18h] [ebp+8h]
 
+    // Added: callers such as jkHudInv pass whatever stdBitmap_Load returned, which
+    // is NULL when a HUD icon is missing. Return like stdBitmap_Free does. Guard
+    // ported from OpenJKDF2-MotS-Fixes by Andrei Kiralv/Darkahn and Coda Lilitari.
+    if (!bitmap) return;
+
     formatFrom_ = &bitmap->format;
     formatFrom = &bitmap->format;
     if ( _memcmp(formatTo, formatFrom, sizeof(rdTexFormat)) && (formatFrom_->is16bit || formatTo->is16bit) )
