@@ -723,7 +723,28 @@ LABEL_30:
             }
         }
     }
+    sithControl_FixNumpadTurn(); // Added
     return 1;
+}
+
+// Added: profiles saved with the old default Turn binds have Numpad 4 turning
+// right and Numpad 6 doing nothing. Put Numpad 4 back to left and give Numpad 6
+// right, unless the player has used Numpad 6 for something else.
+void sithControl_FixNumpadTurn()
+{
+    stdControlKeyInfo* pTurn = &sithControl_aInputFuncToKeyinfo[INPUT_FUNC_TURN];
+    if (sithControl_IsKeyBound(DIK_NUMPAD6))
+        return;
+    for (uint32_t i = 0; i < pTurn->numEntries; i++)
+    {
+        stdControlKeyInfoEntry* pEntry = &pTurn->aEntries[i];
+        if ((pEntry->flags & INPUT_MAPPING_FLAG_DXKEY) && pEntry->dxKeyNum == DIK_NUMPAD4 && (pEntry->flags & INPUT_MAPPING_FLAG_AXIS_REVERSED))
+        {
+            pEntry->flags &= ~INPUT_MAPPING_FLAG_AXIS_REVERSED;
+            sithControl_BindControl(INPUT_FUNC_TURN, DIK_NUMPAD6, INPUT_MAPPING_FLAG_AXIS_REVERSED);
+            return;
+        }
+    }
 }
 
 int sithControl_WriteConf()
@@ -1904,9 +1925,7 @@ void sithControl_RegisterKeyboardBindings()
     sithControl_DefaultHelper(INPUT_FUNC_TURN, DIK_LEFT, 2);
     sithControl_DefaultHelper(INPUT_FUNC_TURN, DIK_RIGHT, 6);
     sithControl_DefaultHelper(INPUT_FUNC_TURN, DIK_NUMPAD4, 2);
-    sithControl_DefaultHelper(INPUT_FUNC_TURN, DIK_NUMPAD4, 6);
-    sithControl_DefaultHelper(INPUT_FUNC_TURN, DIK_LEFT, 2);
-    sithControl_DefaultHelper(INPUT_FUNC_TURN, DIK_RIGHT, 6);
+    sithControl_DefaultHelper(INPUT_FUNC_TURN, DIK_NUMPAD6, 6); // Added: as in JK.EXE. Was Numpad 4 again, then Left and Right again
 
     sithControl_DefaultHelper(INPUT_FUNC_FORWARD, DIK_UP, 2);
     sithControl_DefaultHelper(INPUT_FUNC_FORWARD, DIK_DOWN, 6);
@@ -2552,6 +2571,21 @@ void sithControl_MapDefaultsJoystick() {
     sithControl_BindControl(INPUT_FUNC_NEXTINV, KEY_JOY1_B5, 0);
     sithControl_BindControl(INPUT_FUNC_USEINV, KEY_JOY1_B7, 0);
 #endif
+}
+
+// Added: whether any control has this key.
+int sithControl_IsKeyBound(int dxKeyNum)
+{
+    for (int i = 0; i < INPUT_FUNC_MAX; i++)
+    {
+        stdControlKeyInfo* pInfo = &sithControl_aInputFuncToKeyinfo[i];
+        for (uint32_t j = 0; j < pInfo->numEntries; j++)
+        {
+            if ((pInfo->aEntries[j].flags & INPUT_MAPPING_FLAG_DXKEY) && pInfo->aEntries[j].dxKeyNum == dxKeyNum)
+                return 1;
+        }
+    }
+    return 0;
 }
 
 // Common button for both items and force power usage for controllers
