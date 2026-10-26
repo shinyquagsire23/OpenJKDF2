@@ -27,6 +27,48 @@ static void rdMaterial_WordSafeStrCopy(char* pDst, const char* pSrc, int len)
     stdPlatform_Memcpy32(pDst, tmp, _strlen(tmp) + 1);
 }
 
+// Added: read exactly len bytes, or fail
+static int rdMaterial_ReadExact(stdFile_t fhand, void* pOut, size_t len)
+{
+    uint8_t* pIter = (uint8_t*)pOut;
+    while (len)
+    {
+        size_t got = rdroid_g_pHS->fileRead(fhand, pIter, len);
+        if (!got || got > len)
+            return 0;
+        pIter += got;
+        len -= got;
+    }
+    return 1;
+}
+
+// Added: a MAT file stores each mip's rows tightly packed, but the surface's rows
+// are padded to its pitch (SDL rounds it up to 4 bytes). Reading pitch * height
+// bytes in one go took the next cel's bytes for narrow textures (a 2x2 8-bit cel
+// is 4 bytes on disk but 8 in the surface) and shifted every cel after it. Read
+// row by row instead and zero the padding. Fix ported from OpenJKDF2-MotS-Fixes by
+// Andrei Kiralv/Darkahn and Coda Lilitari.
+static int rdMaterial_ReadPackedRows(stdFile_t fhand, uint8_t* pOut, size_t capacity, size_t rowBytes, size_t rows, size_t stride)
+{
+    if (!pOut || !rowBytes || !rows || stride < rowBytes || rows > capacity / stride)
+        return 0;
+    for (size_t y = 0; y < rows; y++, pOut += stride)
+    {
+        if (!rdMaterial_ReadExact(fhand, pOut, rowBytes))
+            return 0;
+        memset(pOut + rowBytes, 0, stride - rowBytes);
+    }
+    return 1;
+}
+
+// Added: a texture header's size and mip count index fixed arrays, so check them
+static int rdMaterial_ValidTextureLayout(uint32_t width, uint32_t height, uint32_t numMipmaps, uint32_t maxMipmaps)
+{
+    if (!width || !height || width > INT32_MAX || height > INT32_MAX || numMipmaps > maxMipmaps)
+        return 0;
+    return !numMipmaps || ((width >> (numMipmaps - 1)) && (height >> (numMipmaps - 1)));
+}
+
 
 #if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
 
@@ -263,7 +305,15 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
       while ( 1 )
       {
         //printf("asdf %x %x\n", tex_numa, material->num_textures);
-        rdroid_g_pHS->fileRead(mat_file_, &tex_header_1, sizeof(rdTextureHeader));
+        // Added: reject a short or bad header before its mip count indexes the arrays
+        if (!rdMaterial_ReadExact(mat_file_, &tex_header_1, sizeof(rdTextureHeader))
+            || !rdMaterial_ValidTextureLayout(tex_header_1.width, tex_header_1.height, tex_header_1.num_mipmaps,
+                   sizeof(material->textures[0].texture_struct) / sizeof(material->textures[0].texture_struct[0])))
+        {
+            stdPlatform_Printf("OpenJKDF2: Material `%s` texture %d has a short or invalid header!\n", mat_fpath, tex_numa);
+            rdroid_g_pHS->fileClose(mat_file_);
+            return 0;
+        }
         texture = &material->textures[tex_numa];
         texture->alpha_en = tex_header_1.alpha_en;
         texture->unk_0c = tex_header_1.unk_0c;
@@ -323,11 +373,21 @@ LABEL_21:
         if ( texture->alpha_en & 1 )
           stdDisplay_VBufferSetColorKey(created_tex, texture->color_transparent);
         stdDisplay_VBufferLock(*texture_struct);
-        rdroid_g_pHS->fileRead(
+        // Added: read the packed rows into the padded surface rows
+        int bPixelsRead = rdMaterial_ReadPackedRows(
           mat_file__,
-          (void *)(*texture_struct)->surface_lock_alloc,
-          (*texture_struct)->format.size);
+          (uint8_t *)(*texture_struct)->surface_lock_alloc,
+          (*texture_struct)->format.size,
+          (size_t)format.width * (format.format.bpp / 8),
+          format.height,
+          (*texture_struct)->format.rowSize);
         stdDisplay_VBufferUnlock(*texture_struct);
+        if (!bPixelsRead)
+        {
+            stdPlatform_Printf("OpenJKDF2: Material `%s` texture %d mip %d is short or doesn't fit!\n", mat_fpath, tex_numa, mipmap_num);
+            rdroid_g_pHS->fileClose(mat_file__);
+            return 0;
+        }
 
 #if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
         material->bDataLoaded = bDoLoad;
