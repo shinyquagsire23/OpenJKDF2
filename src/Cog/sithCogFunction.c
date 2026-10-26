@@ -478,7 +478,7 @@ void sithCogFunction_VectorCross(sithCog *pCog)
 
     sithCogExec_PopVector(pCog, &inA);
     sithCogExec_PopVector(pCog, &inB);
-    rdVector_Cross3(&out, &inA, &inB);
+    rdVector_Cross3(&out, &inB, &inA);
     sithCogExec_PushVector(pCog, &out);
 }
 
