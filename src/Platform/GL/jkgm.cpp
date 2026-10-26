@@ -656,7 +656,13 @@ int jkgm_std3D_AddToTextureCache(tVBuffer *vbuf, rdDDrawSurface *texture, int is
         return 0;
     }
 
-    
+    // Added: same limit as std3D_AddToTextureCache. The texture is added at
+    // std3D_loadedTexturesAmt below, which wrote past the end of the list once
+    // it was full.
+    if (std3D_loadedTexturesAmt >= STD3D_MAX_TEXTURES) {
+        return 0;
+    }
+
     if (!jkgm_cache_once) {
         if (!fs::exists(jkgm_materials_path)) {
             jkgm_fastpath_disable = true;
