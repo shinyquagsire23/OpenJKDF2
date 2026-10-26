@@ -444,6 +444,8 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
     jkGuiRend_DarrayNewStr(&jkGuiNetHost_dArray1, jkEpisode_var2 + 1, 1);
 
     jkEpisodeTypeFlags_t loadMask = (JK_EPISODE_DEATHMATCH | JK_EPISODE_4_UNK | JK_EPISODE_SPECIAL_CTF);
+    if (Main_bMotsCompat)
+        loadMask |= JKM_EPISODE_SABER; // Added: list MotS's saber-only episodes (Sith Lightsaber Training)
 #ifdef QOL_IMPROVEMENTS
     if (jkGuiNetHost_bIsCoop)
         loadMask |= JK_EPISODE_SINGLEPLAYER;
@@ -578,6 +580,8 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
             jkGuiNetHost_bIsCoop = !!jkGuiNetHost_aSettingsElements[5].selectedTextEntry;
 
             jkEpisodeTypeFlags_t loadMask = (JK_EPISODE_DEATHMATCH | JK_EPISODE_4_UNK | JK_EPISODE_SPECIAL_CTF);
+            if (Main_bMotsCompat)
+                loadMask |= JKM_EPISODE_SABER; // Added: list MotS's saber-only episodes (Sith Lightsaber Training)
             if (jkGuiNetHost_bIsCoop)
                 loadMask |= JK_EPISODE_SINGLEPLAYER;
             jkGuiSingleplayer_EnumEpisodes(&jkGuiNetHost_dArray1, &jkGuiNetHost_pElements[NETHOST_EPISODE_LISTBOX], 0, loadMask);
