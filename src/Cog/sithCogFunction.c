@@ -478,7 +478,9 @@ void sithCogFunction_VectorCross(sithCog *pCog)
 
     sithCogExec_PopVector(pCog, &inA);
     sithCogExec_PopVector(pCog, &inB);
-    rdVector_Cross3(&out, &inA, &inB);
+    // Added: arguments pop right to left, so inB is the first one.
+    // JK.EXE and JKM.EXE return first x second (0x506670, 0x557F40).
+    rdVector_Cross3(&out, &inB, &inA);
     sithCogExec_PushVector(pCog, &out);
 }
 
