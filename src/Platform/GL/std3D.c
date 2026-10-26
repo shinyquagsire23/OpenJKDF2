@@ -223,9 +223,6 @@ void std3D_deleteIntermediateFbo(std3DIntermediateFbo* pFbo)
     glDeleteRenderbuffers(1, &pFbo->rbo);
 }
 
-// Added: the position and normal targets (tex2, tex3) are only read by SSAO. With it off,
-// writing them every frame doubled the color bytes each pixel costs, so only the color and
-// glow targets are drawn to then, and the shader's other two outputs are dropped.
 static void std3D_SetSceneDrawBuffers()
 {
     static const GLenum bufs[4] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
@@ -308,8 +305,6 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         stdPlatform_Printf("std3D: ERROR, Framebuffer is incomplete!\n");
 
-    // Added: draw buffers are per framebuffer and were only set in DrawRenderList, so the
-    // StartScene clear of a new buffer missed tex1-3 and its first frame had a black glow.
     std3D_SetSceneDrawBuffers();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -1562,7 +1557,7 @@ void std3D_DrawMenu()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, menu_ibo_triangle);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpTrisAmt * 3 * sizeof(GLushort), menu_data_elements, GL_STREAM_DRAW);
 
-    // Added: draw the count just uploaded. Asking GL for the buffer's size makes the
+    // Perf: draw the count just uploaded. Asking GL for the buffer's size makes the
     // CPU wait for the GPU, every frame.
     glDrawElements(GL_TRIANGLES, (GLsizei)(GL_tmpTrisAmt * 3), GL_UNSIGNED_SHORT, 0);
 
@@ -1701,7 +1696,7 @@ void std3D_DrawMapOverlay()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, menu_ibo_triangle);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpTrisAmt * 3 * sizeof(GLushort), menu_data_elements, GL_STREAM_DRAW);
 
-    // Added: draw the count just uploaded. Asking GL for the buffer's size makes the
+    // Perf: draw the count just uploaded. Asking GL for the buffer's size makes the
     // CPU wait for the GPU, every frame.
     glDrawElements(GL_TRIANGLES, (GLsizei)(GL_tmpTrisAmt * 3), GL_UNSIGNED_SHORT, 0);
 
@@ -2316,11 +2311,6 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
     glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_all);
     glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * sizeof(D3DVERTEX), GL_tmpVertices, GL_STREAM_DRAW);
 
-    // Added: point this stage's own attributes at the data. These used the menu
-    // program's locations, which only worked while they happened to match, and the
-    // blur and SSAO shaders don't read the colour, so its location can be -1, which
-    // GL rejects. Fix ported from OpenJKDF2-MotS-Fixes by Andrei Kiralv/Darkahn and
-    // Coda Lilitari.
     if (pStage->attribute_coord3d >= 0) {
         glVertexAttribPointer(pStage->attribute_coord3d, 3, GL_FLOAT, GL_FALSE, sizeof(D3DVERTEX), (GLvoid*)offsetof(D3DVERTEX, x));
         glEnableVertexAttribArray(pStage->attribute_coord3d);
@@ -2347,7 +2337,7 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, menu_ibo_triangle);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpTrisAmt * 3 * sizeof(GLushort), data_elements, GL_STREAM_DRAW);
 
-    // Added: draw the count just uploaded. Asking GL for the buffer's size makes the
+    // Perf: draw the count just uploaded. Asking GL for the buffer's size makes the
     // CPU wait for the GPU, every frame.
     glDrawElements(GL_TRIANGLES, (GLsizei)(GL_tmpTrisAmt * 3), GL_UNSIGNED_SHORT, 0);
 
@@ -2892,7 +2882,7 @@ void std3D_DrawRenderList()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, world_ibo_triangle);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpLinesAmt * 2 * sizeof(GLushort), world_data_elements, GL_STREAM_DRAW);
 
-    // Added: draw the count just uploaded rather than asking GL for the buffer's size (a GPU wait).
+    // Perf: draw the count just uploaded rather than asking GL for the buffer's size (a GPU wait).
     glDrawElements(GL_LINES, (GLsizei)(GL_tmpLinesAmt * 2), GL_UNSIGNED_SHORT, 0);
 #endif
         
@@ -2992,7 +2982,7 @@ void std3D_AddRenderListUITris(rdUITri *tris, unsigned int num_tris)
 int std3D_ClearZBuffer()
 {
 #ifdef RDRASTER_SW_ZBUFFER
-    // Added: the software rasterizer keeps its own depth buffer; clear it on the same hook JK uses
+    // the software rasterizer keeps its own depth buffer; clear it on the same hook JK uses
     // (scene start + the POV weapon's clear) so the software path stays in lockstep with the HW one.
     rdZRaster_ClearZBuffer();
 #endif
