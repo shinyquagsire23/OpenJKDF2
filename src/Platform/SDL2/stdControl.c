@@ -881,12 +881,8 @@ void stdControl_ReadControls()
     static int stdControl_bDisableKeyboard_last = 0;
     if (!stdControl_bDisableKeyboard && stdControl_bDisableKeyboard_last)
     {
-        const bool *state = SDL_GetKeyboardState(NULL);
-        for (int i = 0; i < 256; i++)
-        {
-            stdControl_aDebounce[i] = !!state[i];
-        }
-        stdControl_aDebounce[SDLK_RETURN] = 1;
+        stdControl_IgnoreHeldKeys();
+        stdControl_aDebounce[SDL_SCANCODE_RETURN] = 1; // Added: was SDLK_RETURN, a keycode, which is J's scancode slot
     }
     stdControl_bDisableKeyboard_last = stdControl_bDisableKeyboard;
     stdControl_bControllerEscapeKey_last = stdControl_bControllerEscapeKey;
