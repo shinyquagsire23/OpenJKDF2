@@ -1044,6 +1044,7 @@ void sithInventory_PickupBackpack(SithThing *pPlayerThing, SithThing *pBackpackT
     {
         SithBackpackItem* item = &pBackpackThing->itemParams.contents[i];
 
+        // Added: bounds checking
         if (item->binIdx < 0 || item->binIdx >= SITHBIN_NUMBINS)
             continue;
         SithInventoryType* desc = &sithInventory_g_aTypes[item->binIdx];
