@@ -751,9 +751,20 @@ void jkHudInv_InputInit()
 {
     // TODO: what is the second param, DIK?
     sithControl_BindControl(INPUT_FUNC_CAMERAMODE, DIK_F1, 0);
-    sithControl_BindControl(INPUT_FUNC_ACTIVATE16, DIK_F2, 0);
-    sithControl_BindControl(INPUT_FUNC_ACTIVATE15, DIK_F3, 0);
-    sithControl_BindControl(INPUT_FUNC_ACTIVATE14, DIK_F4, 0);
+    // MOTS altered: JKM.EXE puts F2-F4 on ACTIVATE19-17. Fix ported from
+    // OpenJKDF2-MotS-Fixes by Andrei Kiralv/Darkahn and Coda Lilitari.
+    if (Main_bMotsCompat)
+    {
+        sithControl_BindControl(INPUT_FUNC_ACTIVATE19, DIK_F2, 0);
+        sithControl_BindControl(INPUT_FUNC_ACTIVATE18, DIK_F3, 0);
+        sithControl_BindControl(INPUT_FUNC_ACTIVATE17, DIK_F4, 0);
+    }
+    else
+    {
+        sithControl_BindControl(INPUT_FUNC_ACTIVATE16, DIK_F2, 0);
+        sithControl_BindControl(INPUT_FUNC_ACTIVATE15, DIK_F3, 0);
+        sithControl_BindControl(INPUT_FUNC_ACTIVATE14, DIK_F4, 0);
+    }
     sithControl_BindControl(INPUT_FUNC_ACTIVATE0, DIK_F5, 0);
     sithControl_BindControl(INPUT_FUNC_ACTIVATE1, DIK_F6, 0);
     sithControl_BindControl(INPUT_FUNC_ACTIVATE2, DIK_F7, 0);

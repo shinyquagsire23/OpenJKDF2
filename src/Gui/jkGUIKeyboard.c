@@ -328,6 +328,10 @@ int jkGuiKeyboard_AddControlClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, in
     stdControl_ReadControls();
     stdControl_FinishRead();
     stdControl_Flush();
+#ifdef SDL2_RENDER
+    // Added: a key held now (Insert, the Add shortcut) isn't the key to bind.
+    stdControl_IgnoreHeldKeys();
+#endif
     v6 = jkGuiRend_GetString(&jkGuiKeyboard_darrEntries, v3);
     memset(v9, 0, sizeof(v9));
     v7 = __wcschr(v6, '\t');

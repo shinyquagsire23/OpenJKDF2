@@ -91,7 +91,8 @@ const uint8_t stdControl_aSdlToDik[256] =
     0,//DIK_PRINTSCREEN,
     DIK_SCROLL,
     DIK_PAUSE,
-    0, // DIK_INSERT, this gets stuck down?
+    DIK_INSERT, // Added: was off ("this gets stuck down?"): as the Controls screen's
+                // Add shortcut it bound itself; stdControl_IgnoreHeldKeys stops that
     DIK_HOME,
     DIK_PRIOR,
     DIK_DELETE,
@@ -102,7 +103,7 @@ const uint8_t stdControl_aSdlToDik[256] =
     DIK_DOWN,
     DIK_UP,
 
-    0,//DIK_NUMLOCKCLEAR,
+    DIK_NUMLOCK, // Added: was 0
     DIK_DIVIDE,
     DIK_MULTIPLY,
     DIK_SUBTRACT,
@@ -121,7 +122,7 @@ const uint8_t stdControl_aSdlToDik[256] =
     DIK_DECIMAL,
 
     DIK_BACKSLASH,
-    0,//DIK_APPLICATION,
+    DIK_APPS, // Added: was 0
     DIK_POWER,
     DIK_NUMPADEQUALS,
     DIK_F13,
@@ -286,6 +287,19 @@ void stdControl_SetSDLKeydown(int keyNum, int bDown, uint32_t readTime)
     }
 
     stdControl_UpdateKeyState(stdControl_aSdlToDik[keyNum], bDown, readTime);
+}
+
+// Added: a key held right now counts again only once it's let go and pressed.
+// The Controls screen calls this as it starts waiting for a key, so the Insert
+// that starts the wait (its Add shortcut) isn't read as the key to bind. The
+// original game read buffered DirectInput key events, which behaved this way.
+void stdControl_IgnoreHeldKeys()
+{
+    const bool *state = SDL_GetKeyboardState(NULL);
+    for (int i = 0; i < 256; i++)
+    {
+        stdControl_aDebounce[i] = !!state[i];
+    }
 }
 
 // Added: see stdControl.h -- tracks real hardware separately from
@@ -867,27 +881,35 @@ void stdControl_ReadControls()
     static int stdControl_bDisableKeyboard_last = 0;
     if (!stdControl_bDisableKeyboard && stdControl_bDisableKeyboard_last)
     {
-        const bool *state = SDL_GetKeyboardState(NULL);
-        for (int i = 0; i < 256; i++)
-        {
-            stdControl_aDebounce[i] = !!state[i];
-        }
-        stdControl_aDebounce[SDLK_RETURN] = 1;
+        stdControl_IgnoreHeldKeys();
+        stdControl_aDebounce[SDL_SCANCODE_RETURN] = 1; // Added: was SDLK_RETURN, a keycode, which is J's scancode slot
     }
     stdControl_bDisableKeyboard_last = stdControl_bDisableKeyboard;
     stdControl_bControllerEscapeKey_last = stdControl_bControllerEscapeKey;
 
     if ( !stdControl_bDisableKeyboard )
     {
+        // Added: a few game keys come from two scancodes (Page Up and SDL's
+        // Prior, the two backslash keys), and the second one, never held,
+        // let go of the first every frame, so a held Page Up or \ did nothing.
+        // A game key is now held while any of its scancodes is.
         const bool *state = SDL_GetKeyboardState(NULL);
+        uint8_t aDikRead[256] = {0};
+        uint8_t aDikDown[256] = {0};
         for (int i = 0; i < 256; i++)
         {
             int s = !!state[i];
             if (s && stdControl_aDebounce[i]) {
                 continue;
             }
-            stdControl_SetSDLKeydown(i, s, stdControl_curReadTime);
             stdControl_aDebounce[i] = 0;
+            aDikRead[stdControl_aSdlToDik[i]] = 1;
+            aDikDown[stdControl_aSdlToDik[i]] |= s;
+        }
+        for (int dik = 1; dik < 256; dik++)
+        {
+            if (aDikRead[dik])
+                stdControl_UpdateKeyState(dik, aDikDown[dik], stdControl_curReadTime);
         }
         // stdControl_UpdateKeyState(keyNum, keyVal, timestamp)
     }
