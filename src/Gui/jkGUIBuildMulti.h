@@ -49,7 +49,7 @@ int jkGuiBuildMulti_Startup();
 void jkGuiBuildMulti_Shutdown();
 void jkGuiBuildMulti_Load(char *pPathOut, int pathOutLen, char16_t *pPlayerName, char16_t *pCharName, int bCharPath);
 int jkGuiBuildMulti_Show();
-int jkGuiBuildMulti_Show2(Darray *pDarray, jkGuiElement *pElement, int minIdk, int maxIdk, int idx);
+int jkGuiBuildMulti_Show2(Darray *pDarray, jkGuiElement *pElement, int minIdk, int maxIdk, int idx, int gameFormat);
 int jkGuiBuildMulti_ShowNewCharacter(int rank, int bGameFormatIsJK, int bHasNoValidChars);
 int jkGuiBuildMulti_menuNewCharacter_rankArrowButtonClickHandler(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL redraw);
 int jkGuiBuildMulti_ShowLoad(jkPlayerMpcInfo *pPlayerMpcInfo, char *pStrEpisode, char *pJklFname, int minIdk, int rank, int bGameFormatIsJK);

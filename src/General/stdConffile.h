@@ -31,6 +31,10 @@ int stdConffile_OpenReadBypass(char *jkl_fname);
 int stdConffile_OpenReadBytesBypass(char *fpath);
 int stdConffile_OpenWriteBypass(char *a1);
 
+// Added: characters saved by MotS
+int stdConffile_OpenReadMotsScrambled(char *fpath);
+int stdConffile_GetMotsScrambleKey();
+
 void stdConffile_Close();
 void stdConffile_CloseWrite();
 int stdConffile_WriteLine(const char *pLine);

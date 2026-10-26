@@ -214,6 +214,10 @@ static jkGuiMenu jkGuiBuildMulti_menuLoadCharacter =
 static int32_t jkGuiBuildMulti_bInitted = 0;
 static char16_t jkGuiBuildMulti_wPlayerShortName[64];
 static jkPlayerMpcInfo jkGuiBuildMulti_aMpcInfo[32];
+// Added: whether each listed character's .mpc could be read. Kept apart since
+// jkPlayerMpcInfo copies the original game's layout.
+static int jkGuiBuildMulti_aMpcReadable[32];
+static void jkGuiBuildMulti_ShowUnreadable(char16_t* pName);
 static char16_t jkGuiBuildMulti_wTmp[128];
 static char16_t jkGuiBuildMulti_wTmp2[32];
 static char16_t jkGuiBuildMulti_wTmp3[32];
@@ -1007,7 +1011,7 @@ int jkGuiBuildMulti_Show()
     v1 = 0;
     do
     {
-        v2 = jkGuiBuildMulti_Show2(&darr, &jkGuiBuildMulti_menuEditCharacter_buttons[3], 0, 9, v1);
+        v2 = jkGuiBuildMulti_Show2(&darr, &jkGuiBuildMulti_menuEditCharacter_buttons[3], 0, 9, v1, -1); // MOTS altered: last arg
         jkGuiBuildMulti_sub_41D680(&jkGuiBuildMulti_menuEditCharacter, jkGuiBuildMulti_menuEditCharacter_buttons[3].selectedTextEntry);
         v3 = 1;
         if ( v2 )
@@ -1031,14 +1035,22 @@ int jkGuiBuildMulti_Show()
                 v3 = 1;
                 if ( jkPlayer_VerifyWcharName(wPlayerName) )
                 {
-                    jkPlayer_MPCParse(
+                    // Added: editing a character that can't be read saved the
+                    // last character's personality and force powers into it
+                    if ( jkPlayer_MPCParse(
                         &jkGuiBuildMulti_aMpcInfo[jkGuiBuildMulti_menuEditCharacter_buttons[3].selectedTextEntry],
                         &jkPlayer_playerInfos[playerThingIdx],
                         jkPlayer_playerShortName,
                         wPlayerName,
-                        1);
-                    jkGuiBuildMulti_ShowEditCharacter(0);
-                    jkPlayer_MPCWrite(&jkPlayer_playerInfos[playerThingIdx], jkPlayer_playerShortName, wPlayerName);
+                        1) )
+                    {
+                        jkGuiBuildMulti_ShowEditCharacter(0);
+                        jkPlayer_MPCWrite(&jkPlayer_playerInfos[playerThingIdx], jkPlayer_playerShortName, wPlayerName);
+                    }
+                    else
+                    {
+                        jkGuiBuildMulti_ShowUnreadable(wPlayerName);
+                    }
                     v1 = jkGuiBuildMulti_menuEditCharacter_buttons[3].selectedTextEntry;
                 }
                 else
@@ -1081,7 +1093,9 @@ LABEL_8:
     return v9;
 }
 
-int jkGuiBuildMulti_Show2(Darray *pDarray, jkGuiElement *pElement, int minIdk, int maxIdk, int idx)
+// MOTS altered: last arg. -1 lists every character, 0 the characters for a personalities
+// game, 1 the Jedi for a ranked Jedi game.
+int jkGuiBuildMulti_Show2(Darray *pDarray, jkGuiElement *pElement, int minIdk, int maxIdk, int idx, int gameFormat)
 {
     int v5; // ebp
     stdFileSearch *v7; // edi
@@ -1117,10 +1131,36 @@ int jkGuiBuildMulti_Show2(Darray *pDarray, jkGuiElement *pElement, int minIdk, i
                 stdFnames_StripExtAndDot(a2a);
                 stdString_CharToWchar(name, a2a, 31);
                 name[31] = 0;
-                jkPlayer_MPCParse(v8, &playerInfo, jkPlayer_playerShortName, name, 1);
-                v9 = jkPlayer_GetJediRank();
-                if ( v9 >= minIdk && v9 <= maxIdk )
+                // Added: a file that can't be read got the rank of the
+                // character read before it
+                int bReadable = jkPlayer_MPCParse(v8, &playerInfo, jkPlayer_playerShortName, name, 1);
+                v9 = bReadable ? jkPlayer_GetJediRank() : 0;
+
+                // MOTS altered
+                int bListed;
+                if (!Main_bMotsCompat)
+                    bListed = (v9 >= minIdk && v9 <= maxIdk);
+                else if (gameFormat < 0)
+                    bListed = 1;
+                else if (gameFormat)
+                    bListed = (v8->personality == 1 && v9 >= minIdk && v9 <= maxIdk);
+                else
+                    bListed = (v9 == 7);
+
+                // Added: a character that can't be read is listed in every
+                // game, marked, so it can be removed. It can't be played.
+                if (!bReadable)
+                    bListed = 1;
+
+                if ( bListed )
                 {
+                    jkGuiBuildMulti_aMpcReadable[v5] = bReadable;
+                    if (!bReadable)
+                    {
+                        v8->model[0] = 0;
+                        v8->personality = 0;
+                        v8->jediRank = 0;
+                    }
                     jkGuiRend_AddStringEntry(pDarray, a2a, 0);
                     if ( !__strcmpi(a2a, a1) )
                         pElement->selectedTextEntry = v5;
@@ -1528,7 +1568,7 @@ LABEL_7:
     v11 = 0;
     while ( 1 )
     {
-        v12 = jkGuiBuildMulti_Show2(&darr, &jkGuiBuildMulti_menuLoadCharacter_buttons[3], minIdk, v9, v11);
+        v12 = jkGuiBuildMulti_Show2(&darr, &jkGuiBuildMulti_menuLoadCharacter_buttons[3], minIdk, v9, v11, bGameFormatIsJK != 0); // MOTS altered: last arg
         jkGuiBuildMulti_sub_41D680(&jkGuiBuildMulti_menuLoadCharacter, jkGuiBuildMulti_menuLoadCharacter_buttons[3].selectedTextEntry);
         v13 = 0;
         v14 = 1;
@@ -1553,7 +1593,14 @@ LABEL_7:
                 v14 = 0;
                 if ( jkPlayer_VerifyWcharName(name) )
                 {
-                    jkPlayer_MPCParse(pPlayerMpcInfo, &jkPlayer_playerInfos[playerThingIdx], jkPlayer_playerShortName, name, 1);
+                    // Added: a character that can't be read was played with
+                    // the last character's personality and force powers
+                    if ( !jkPlayer_MPCParse(pPlayerMpcInfo, &jkPlayer_playerInfos[playerThingIdx], jkPlayer_playerShortName, name, 1) )
+                    {
+                        v14 = 1;
+                        v11 = jkGuiBuildMulti_menuLoadCharacter_buttons[3].selectedTextEntry;
+                        jkGuiBuildMulti_ShowUnreadable(name);
+                    }
                 }
                 else
                 {
@@ -1572,14 +1619,21 @@ LABEL_18:
                 v14 = 1;
                 if ( jkPlayer_VerifyWcharName(name) )
                 {
-                    jkPlayer_MPCParse(
+                    // Added: see the Edit Character screen
+                    if ( jkPlayer_MPCParse(
                         &jkGuiBuildMulti_aMpcInfo[jkGuiBuildMulti_menuLoadCharacter_buttons[3].selectedTextEntry],
                         &jkPlayer_playerInfos[playerThingIdx],
                         jkPlayer_playerShortName,
                         name,
-                        1);
-                    jkGuiBuildMulti_ShowEditCharacter(0);
-                    jkPlayer_MPCWrite(&jkPlayer_playerInfos[playerThingIdx], jkPlayer_playerShortName, name);
+                        1) )
+                    {
+                        jkGuiBuildMulti_ShowEditCharacter(0);
+                        jkPlayer_MPCWrite(&jkPlayer_playerInfos[playerThingIdx], jkPlayer_playerShortName, name);
+                    }
+                    else
+                    {
+                        jkGuiBuildMulti_ShowUnreadable(name);
+                    }
                     v11 = jkGuiBuildMulti_menuLoadCharacter_buttons[3].selectedTextEntry;
                 }
                 else
@@ -1681,6 +1735,45 @@ void jkGuiBuildMulti_sub_41D680(jkGuiMenu *pMenu, int idx)
             jkGuiBuildMulti_menuLoadCharacter_buttons[17].wstr = jkGuiBuildMulti_wTmp3;
         }
     }
+
+    // Added: a character that can't be read showed GUI_PERSONALITY0, a blank
+    // model and the last character's rank
+    if ( idx >= 0 && idx < 32 && !jkGuiBuildMulti_aMpcReadable[idx] )
+    {
+        jkGuiElement* pElements = NULL;
+        int rankIdx = 0, modelIdx = 0, personalityIdx = 0;
+        if ( pMenu == &jkGuiBuildMulti_menuEditCharacter )
+        {
+            pElements = jkGuiBuildMulti_menuEditCharacter_buttons;
+            rankIdx = 7;
+            modelIdx = 9;
+            personalityIdx = 11;
+        }
+        else if ( pMenu == &jkGuiBuildMulti_menuLoadCharacter )
+        {
+            pElements = jkGuiBuildMulti_menuLoadCharacter_buttons;
+            rankIdx = 13;
+            modelIdx = 15;
+            personalityIdx = 17;
+        }
+        if ( pElements )
+        {
+            pElements[rankIdx].wstr = NULL;
+            pElements[modelIdx].wstr = jkStrings_GetUniStringWithFallback("GUIEXT_MPC_UNREADABLE");
+            if (Main_bMotsCompat)
+                pElements[personalityIdx].wstr = NULL;
+        }
+    }
+}
+
+// Added: shown instead of playing or editing a character whose .mpc can't be
+// read. jkPlayer_MPCParse prints which line it stopped at.
+static void jkGuiBuildMulti_ShowUnreadable(char16_t* pName)
+{
+    char16_t wMsg[256];
+
+    jk_snwprintf(wMsg, 256, jkStrings_GetUniStringWithFallback("GUIEXT_MPC_UNREADABLE_MSG"), pName);
+    jkGuiDialog_ErrorDialog(jkStrings_GetUniStringWithFallback("GUIEXT_MPC_UNREADABLE_TITLE"), wMsg);
 }
 
 int jkGuiBuildMulti_sub_41D830(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL redraw)
