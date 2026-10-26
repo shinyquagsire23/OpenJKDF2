@@ -1007,7 +1007,7 @@ int jkGuiBuildMulti_Show()
     v1 = 0;
     do
     {
-        v2 = jkGuiBuildMulti_Show2(&darr, &jkGuiBuildMulti_menuEditCharacter_buttons[3], 0, 9, v1);
+        v2 = jkGuiBuildMulti_Show2(&darr, &jkGuiBuildMulti_menuEditCharacter_buttons[3], 0, 9, v1, -1); // MOTS altered: last arg
         jkGuiBuildMulti_sub_41D680(&jkGuiBuildMulti_menuEditCharacter, jkGuiBuildMulti_menuEditCharacter_buttons[3].selectedTextEntry);
         v3 = 1;
         if ( v2 )
@@ -1081,7 +1081,9 @@ LABEL_8:
     return v9;
 }
 
-int jkGuiBuildMulti_Show2(Darray *pDarray, jkGuiElement *pElement, int minIdk, int maxIdk, int idx)
+// MOTS altered: last arg. -1 lists every character, 0 the characters for a personalities
+// game, 1 the Jedi for a ranked Jedi game.
+int jkGuiBuildMulti_Show2(Darray *pDarray, jkGuiElement *pElement, int minIdk, int maxIdk, int idx, int gameFormat)
 {
     int v5; // ebp
     stdFileSearch *v7; // edi
@@ -1119,7 +1121,19 @@ int jkGuiBuildMulti_Show2(Darray *pDarray, jkGuiElement *pElement, int minIdk, i
                 name[31] = 0;
                 jkPlayer_MPCParse(v8, &playerInfo, jkPlayer_playerShortName, name, 1);
                 v9 = jkPlayer_GetJediRank();
-                if ( v9 >= minIdk && v9 <= maxIdk )
+
+                // MOTS altered
+                int bListed;
+                if (!Main_bMotsCompat)
+                    bListed = (v9 >= minIdk && v9 <= maxIdk);
+                else if (gameFormat < 0)
+                    bListed = 1;
+                else if (gameFormat)
+                    bListed = (v8->personality == 1 && v9 >= minIdk && v9 <= maxIdk);
+                else
+                    bListed = (v9 == 7);
+
+                if ( bListed )
                 {
                     jkGuiRend_AddStringEntry(pDarray, a2a, 0);
                     if ( !__strcmpi(a2a, a1) )
@@ -1528,7 +1542,7 @@ LABEL_7:
     v11 = 0;
     while ( 1 )
     {
-        v12 = jkGuiBuildMulti_Show2(&darr, &jkGuiBuildMulti_menuLoadCharacter_buttons[3], minIdk, v9, v11);
+        v12 = jkGuiBuildMulti_Show2(&darr, &jkGuiBuildMulti_menuLoadCharacter_buttons[3], minIdk, v9, v11, bGameFormatIsJK != 0); // MOTS altered: last arg
         jkGuiBuildMulti_sub_41D680(&jkGuiBuildMulti_menuLoadCharacter, jkGuiBuildMulti_menuLoadCharacter_buttons[3].selectedTextEntry);
         v13 = 0;
         v14 = 1;

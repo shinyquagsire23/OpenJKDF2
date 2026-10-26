@@ -40,11 +40,24 @@ enum jkGuiNetHostElement_t
     NETHOST_TEAMMODE_CHECKBOX = 10,
     NETHOST_SINGLELEVEL_CHECKBOX = 11,
     NETHOST_STARS_TEXT = 13,
+    NETHOST_STARS_LEFT_BUTTON = 14,
+    NETHOST_STARS_RIGHT_BUTTON = 15,
     NETHOST_PASSWORD_TEXTBOX = 17,
     NETHOST_EPISODE_LISTBOX = 19,
     NETHOST_LEVEL_LISTBOX = 21,
+    NETHOST_OK_BUTTON = 23,
+    NETHOST_CANCEL_BUTTON = 24,
 
     NETHOST_PORT_TEXTBOX = 26,
+
+    // MOTS added: only in jkGuiNetHost_aElementsMots
+#ifdef QOL_IMPROVEMENTS
+    NETHOST_PERSONALITIES_CHECKBOX = 27,
+    NETHOST_JEDIONLY_CHECKBOX = 28,
+#else
+    NETHOST_PERSONALITIES_CHECKBOX = 25,
+    NETHOST_JEDIONLY_CHECKBOX = 26,
+#endif
 };
 
 enum jkGuiNetHostAdvancedElement_t
@@ -94,6 +107,55 @@ static jkGuiMenu jkGuiNetHost_menu =
 {
     jkGuiNetHost_aElements, 0, 65535, 65535, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, NULL, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
 };
+
+// MOTS added: MotS's host screen, with its positions. MotS adds the game type checkboxes
+// (personalities or ranked Jedi only) and drops the GUI_MAXSTARS label. The elements keep
+// the order of the list above so the same indices work for both, with the checkboxes last.
+static jkGuiElement jkGuiNetHost_aElementsMots[30] =
+{
+    { ELEMENT_TEXT,         0, 0, NULL, 3, { 0, 410, 640, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_TEXT,         0, 6, "GUI_MULTIPLAYER", 3, { 20, 15, 600, 50 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_TEXT,         0, 0, "GUI_GAMENAME", 2, { 20, 90, 270, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_TEXTBOX,      0, 0, NULL, 16, { 20, 115, 270, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_TEXT,         0, 0, "GUI_MAXPLAYERS", 2, { 20, 145, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_TEXTBOX,      0, 0, NULL, 2, { 225, 150, 65, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_CHECKBOX,     0, 0, "GUI_SCORELIMIT", 0, { 20, 180, 200, 40 }, 1, 0, "GUI_SCORELIMIT_HINT", NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_TEXTBOX,      0, 0, NULL, 3, { 225, 185, 65, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_CHECKBOX,     0, 0, "GUI_TIMELIMIT", 0, { 20, 215, 200, 40 }, 1, 0, "GUI_TIMELIMIT_HINT", NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_TEXTBOX,      0, 0, NULL, 3, { 225, 220, 65, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_CHECKBOX,     0, 0, "GUI_TEAMMODE", 0, { 20, 250, 200, 40 }, 1, 0, "GUI_TEAMMODE_HINT", NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_CHECKBOX,     0, 0, "GUI_SINGLELEVEL", 0, { 20, 285, 200, 40 }, 1, 0, "GUI_SINGLELEVEL_HINT", NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_TEXT,         0, 0, NULL, 2, { 0, 0, 0, 0 }, 0, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 }, // GUI_MAXSTARS in JK
+    { ELEMENT_TEXT,         0, 0, NULL, 2, { 400, 130, 120, 30 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_PICBUTTON,    1, 0, NULL, 33, { 335, 130, 30, 30 }, 1, 0, NULL, NULL, &jkGuiNetHost_sub_411AE0, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_PICBUTTON,    2, 0, NULL, 34, { 365, 130, 30, 30 }, 1, 0, NULL, NULL, &jkGuiNetHost_sub_411AE0, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_TEXT,         0, 0, "GUINET_PASSWORD", 2, { 20, 360, 270, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_TEXTBOX,      0, 0, NULL, 16, { 20, 380, 270, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_TEXT,         0, 0, "GUI_CHOOSEEPISODE", 2, { 310, 173, 240, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_LISTBOX,      0, 0, NULL, 0, { 310, 195, 320, 75 }, 1, 0, NULL, NULL, NULL, jkGuiNetHost_aIdk, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_TEXT,         0, 0, "GUI_CHOOSELEVEL", 2, { 310, 268, 260, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_LISTBOX,      1, 0, NULL, 0, { 310, 290, 320, 110 }, 1, 0, NULL, NULL, NULL, jkGuiNetHost_aIdk, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_TEXTBUTTON,   GUI_ADVANCED, 2, "GUI_ADVANCED", 3, { 220, 430, 200, 40 }, 1, 0, "GUI_ADVANCED_HINT", NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_TEXTBUTTON,   GUI_OK,  2, "GUI_OK", 3, { 420, 430, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_TEXTBUTTON,   GUI_CANCEL, 2, "GUI_CANCEL", 3, { 20, 430, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+#ifdef QOL_IMPROVEMENTS
+    // The checkboxes take JK's Server Port spot, so it moves under Single-level only
+    { ELEMENT_TEXT, 0, 0, "GUIEXT_SERVER_PORT", 2, { 20, 320, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_TEXTBOX, 0, 0, NULL, 16, { 225, 325, 65, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+#endif
+    { ELEMENT_CHECKBOX,     0, 0, "GUI_TYPEPERSONALITIES", 0, { 310, 88, 330, 20 }, 1, 0, "GUI_PERSONALITIES_HINT", NULL, &jkGuiNetHost_PersonalitiesClicked, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_CHECKBOX,     0, 0, "GUI_TYPEJEDIONLY", 0, { 310, 108, 330, 20 }, 1, 0, "GUI_JEDIONLY_HINT", NULL, &jkGuiNetHost_JediOnlyClicked, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_END, 0, 0, NULL, 0, { 0, 0, 0, 0 }, 0, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 }
+};
+
+static jkGuiMenu jkGuiNetHost_menuMots =
+{
+    jkGuiNetHost_aElementsMots, 0, 65535, 65535, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, NULL, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
+};
+
+// MOTS added: the host screen in use
+static jkGuiElement* jkGuiNetHost_pElements = jkGuiNetHost_aElements;
+static jkGuiMenu* jkGuiNetHost_pMenu = &jkGuiNetHost_menu;
 
 static jkGuiElement jkGuiNetHost_aSettingsElements[9] =
 {
@@ -268,6 +330,7 @@ void jkGuiNetHost_Startup()
     stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
     
     jkGui_InitMenu(&jkGuiNetHost_menu, jkGui_stdBitmaps[JKGUI_BM_BK_MULTI]);
+    jkGui_InitMenu(&jkGuiNetHost_menuMots, jkGui_stdBitmaps[JKGUI_BM_BK_MULTI]); // MOTS added
     jkGui_InitMenu(&jkGuiNetHost_menuSettings, jkGui_stdBitmaps[JKGUI_BM_BK_SETUP]);
     
     jkGuiNetHost_LoadSettings();
@@ -293,6 +356,14 @@ void jkGuiNetHost_Shutdown()
     jkGuiNetHost_bIsCoop = 0;
 }
 
+// MOTS added: the rank picker only applies to ranked Jedi games
+static void jkGuiNetHost_SetRankVisible(int bVisible)
+{
+    jkGuiNetHost_aElementsMots[NETHOST_STARS_TEXT].bIsVisible = bVisible;
+    jkGuiNetHost_aElementsMots[NETHOST_STARS_LEFT_BUTTON].bIsVisible = bVisible;
+    jkGuiNetHost_aElementsMots[NETHOST_STARS_RIGHT_BUTTON].bIsVisible = bVisible;
+}
+
 // MOTS altered
 int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
 {
@@ -316,44 +387,60 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
 
     jkGuiNetHost_LoadSettings(); // Added
 
+    // MOTS added
+    if (Main_bMotsCompat) {
+        jkGuiNetHost_pElements = jkGuiNetHost_aElementsMots;
+        jkGuiNetHost_pMenu = &jkGuiNetHost_menuMots;
+    }
+    else {
+        jkGuiNetHost_pElements = jkGuiNetHost_aElements;
+        jkGuiNetHost_pMenu = &jkGuiNetHost_menu;
+    }
+
     stdString_SafeWStrCopy(v25, u"8", 0x20);
     stdString_SafeWStrCopy(v26, u"", 0x20);
     stdString_SafeWStrCopy(v27, u"", 0x20);
-    jkGuiNetHost_aElements[NETHOST_SCORELIMIT_CHECKBOX].selectedTextEntry = jkGuiNetHost_gameFlags & MULTIMODEFLAG_SCORELIMIT;
-    jkGuiNetHost_aElements[NETHOST_TIMELIMIT_CHECKBOX].selectedTextEntry = jkGuiNetHost_gameFlags & MULTIMODEFLAG_TIMELIMIT;
-    jkGuiNetHost_aElements[NETHOST_SINGLELEVEL_CHECKBOX].selectedTextEntry = jkGuiNetHost_gameFlags & MULTIMODEFLAG_SINGLE_LEVEL;
-    jkGuiNetHost_aElements[NETHOST_TEAMMODE_CHECKBOX].selectedTextEntry = jkGuiNetHost_gameFlags & MULTIMODEFLAG_TEAMS;
+    jkGuiNetHost_pElements[NETHOST_SCORELIMIT_CHECKBOX].selectedTextEntry = jkGuiNetHost_gameFlags & MULTIMODEFLAG_SCORELIMIT;
+    jkGuiNetHost_pElements[NETHOST_TIMELIMIT_CHECKBOX].selectedTextEntry = jkGuiNetHost_gameFlags & MULTIMODEFLAG_TIMELIMIT;
+    jkGuiNetHost_pElements[NETHOST_SINGLELEVEL_CHECKBOX].selectedTextEntry = jkGuiNetHost_gameFlags & MULTIMODEFLAG_SINGLE_LEVEL;
+    jkGuiNetHost_pElements[NETHOST_TEAMMODE_CHECKBOX].selectedTextEntry = jkGuiNetHost_gameFlags & MULTIMODEFLAG_TEAMS;
+    // MOTS added: MULTIMODEFLAG_1000 is a ranked Jedi game, otherwise players pick personalities
+    if (Main_bMotsCompat) {
+        jkGuiNetHost_aElementsMots[NETHOST_PERSONALITIES_CHECKBOX].selectedTextEntry = !(jkGuiNetHost_gameFlags & MULTIMODEFLAG_1000);
+        jkGuiNetHost_aElementsMots[NETHOST_JEDIONLY_CHECKBOX].selectedTextEntry = !!(jkGuiNetHost_gameFlags & MULTIMODEFLAG_1000);
+        jkGuiNetHost_SetRankVisible(!!(jkGuiNetHost_gameFlags & MULTIMODEFLAG_1000));
+    }
     if ( !jkGuiNetHost_gameName[0] )
     {
         jk_snwprintf(jkGuiNetHost_gameName, 0x20u, jkStrings_GetUniStringWithFallback("GUI_DEFAULT_GAME_NAME"), jkPlayer_playerShortName);
     }
-    jkGuiNetHost_aElements[NETHOST_GAMENAME_TEXTBOX].wstr = jkGuiNetHost_gameName;
-    jkGuiNetHost_aElements[NETHOST_GAMENAME_TEXTBOX].selectedTextEntry = 16;
+    jkGuiNetHost_pElements[NETHOST_GAMENAME_TEXTBOX].wstr = jkGuiNetHost_gameName;
+    jkGuiNetHost_pElements[NETHOST_GAMENAME_TEXTBOX].selectedTextEntry = 16;
 #ifdef QOL_IMPROVEMENTS
     jk_snwprintf(v25, 0x20u, u"%d", jkGuiNetHost_bIsDedicated ? jkGuiNetHost_maxPlayers-1 : jkGuiNetHost_maxPlayers);
 #else
     jk_snwprintf(v25, 0x20u, u"%d", jkGuiNetHost_maxPlayers);
 #endif
-    jkGuiNetHost_aElements[NETHOST_MAXPLAYERS_TEXTBOX].wstr = v25;
-    jkGuiNetHost_aElements[NETHOST_MAXPLAYERS_TEXTBOX].selectedTextEntry = 3;
+    jkGuiNetHost_pElements[NETHOST_MAXPLAYERS_TEXTBOX].wstr = v25;
+    jkGuiNetHost_pElements[NETHOST_MAXPLAYERS_TEXTBOX].selectedTextEntry = 3;
     jk_snwprintf(v27, 0x20u, u"%d", jkGuiNetHost_scoreLimit);
     //a2[0] = (unsigned int)jkGuiNetHost_timeLimit; wat??
-    jkGuiNetHost_aElements[NETHOST_SCORELIMIT_TEXTBOX].wstr = v27;
-    jkGuiNetHost_aElements[NETHOST_SCORELIMIT_TEXTBOX].selectedTextEntry = 4;
+    jkGuiNetHost_pElements[NETHOST_SCORELIMIT_TEXTBOX].wstr = v27;
+    jkGuiNetHost_pElements[NETHOST_SCORELIMIT_TEXTBOX].selectedTextEntry = 4;
 #ifdef QOL_IMPROVEMENTS
     jk_snwprintf(jkGuiNetHost_portText, 0x20u, u"%d", jkGuiNetHost_portNum);
-    jkGuiNetHost_aElements[NETHOST_PORT_TEXTBOX].wstr = jkGuiNetHost_portText;
-    jkGuiNetHost_aElements[NETHOST_PORT_TEXTBOX].selectedTextEntry = 31;
+    jkGuiNetHost_pElements[NETHOST_PORT_TEXTBOX].wstr = jkGuiNetHost_portText;
+    jkGuiNetHost_pElements[NETHOST_PORT_TEXTBOX].selectedTextEntry = 31;
 #endif
     jk_snwprintf(v26, 0x20u, u"%d", (unsigned int)(__int64)((flex_d_t)(unsigned int)jkGuiNetHost_timeLimit * 0.000016666667));
-    jkGuiNetHost_aElements[NETHOST_TIMELIMIT_TEXTBOX].wstr = v26;
-    jkGuiNetHost_aElements[NETHOST_TIMELIMIT_TEXTBOX].selectedTextEntry = 4;
+    jkGuiNetHost_pElements[NETHOST_TIMELIMIT_TEXTBOX].wstr = v26;
+    jkGuiNetHost_pElements[NETHOST_TIMELIMIT_TEXTBOX].selectedTextEntry = 4;
     __snprintf(v29, 32, "RANK_%d_L", jkGuiNetHost_maxRank); // sprintf -> snprintf
     jk_snwprintf(jkGuiNetHost_wstrStarsText, 0x80u, jkStrings_GetUniStringWithFallback("GUI_RANK"), jkGuiNetHost_maxRank, jkStrings_GetUniStringWithFallback(v29));
     memset(v30, 0, sizeof(v30));
-    jkGuiNetHost_aElements[NETHOST_STARS_TEXT].wstr = jkGuiNetHost_wstrStarsText;
-    jkGuiNetHost_aElements[NETHOST_PASSWORD_TEXTBOX].wstr = v30;
-    jkGuiNetHost_aElements[NETHOST_PASSWORD_TEXTBOX].selectedTextEntry = 16;
+    jkGuiNetHost_pElements[NETHOST_STARS_TEXT].wstr = jkGuiNetHost_wstrStarsText;
+    jkGuiNetHost_pElements[NETHOST_PASSWORD_TEXTBOX].wstr = v30;
+    jkGuiNetHost_pElements[NETHOST_PASSWORD_TEXTBOX].selectedTextEntry = 16;
     jkGuiRend_DarrayNewStr(&jkGuiNetHost_dArray1, jkEpisode_var2 + 1, 1);
 
     jkEpisodeTypeFlags_t loadMask = (JK_EPISODE_DEATHMATCH | JK_EPISODE_4_UNK | JK_EPISODE_SPECIAL_CTF);
@@ -361,21 +448,21 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
     if (jkGuiNetHost_bIsCoop)
         loadMask |= JK_EPISODE_SINGLEPLAYER;
 #endif
-    jkGuiSingleplayer_EnumEpisodes(&jkGuiNetHost_dArray1, &jkGuiNetHost_aElements[NETHOST_EPISODE_LISTBOX], 0, loadMask);
+    jkGuiSingleplayer_EnumEpisodes(&jkGuiNetHost_dArray1, &jkGuiNetHost_pElements[NETHOST_EPISODE_LISTBOX], 0, loadMask);
     jkGuiRend_DarrayNewStr(&jkGuiNetHost_dArray2, 10, 1);
     jkGuiRend_DarrayReallocStr(&jkGuiNetHost_dArray2, 0, 0);
-    jkGuiRend_SetClickableString(&jkGuiNetHost_aElements[NETHOST_LEVEL_LISTBOX], &jkGuiNetHost_dArray2);
-    jkGuiNetHost_aElements[NETHOST_EPISODE_LISTBOX].clickHandlerFunc = jkGuiNetHost_sub_4119D0;
-    jkGui_sub_412E20(&jkGuiNetHost_menu, 100, 101, 101);
-    jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiNetHost_menu, &jkGuiNetHost_aElements[23]);
-    jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiNetHost_menu, &jkGuiNetHost_aElements[24]);
+    jkGuiRend_SetClickableString(&jkGuiNetHost_pElements[NETHOST_LEVEL_LISTBOX], &jkGuiNetHost_dArray2);
+    jkGuiNetHost_pElements[NETHOST_EPISODE_LISTBOX].clickHandlerFunc = jkGuiNetHost_sub_4119D0;
+    jkGui_sub_412E20(jkGuiNetHost_pMenu, 100, 101, 101);
+    jkGuiRend_MenuSetReturnKeyShortcutElement(jkGuiNetHost_pMenu, &jkGuiNetHost_pElements[NETHOST_OK_BUTTON]);
+    jkGuiRend_MenuSetEscapeKeyShortcutElement(jkGuiNetHost_pMenu, &jkGuiNetHost_pElements[NETHOST_CANCEL_BUTTON]);
     
-    jkGuiNetHost_aElements[NETHOST_EPISODE_LISTBOX].selectedTextEntry = 0;
-    jkGuiNetHost_sub_4119D0(&jkGuiNetHost_aElements[NETHOST_EPISODE_LISTBOX], &jkGuiNetHost_menu, -1, -1, 0);
+    jkGuiNetHost_pElements[NETHOST_EPISODE_LISTBOX].selectedTextEntry = 0;
+    jkGuiNetHost_sub_4119D0(&jkGuiNetHost_pElements[NETHOST_EPISODE_LISTBOX], jkGuiNetHost_pMenu, -1, -1, 0);
 
     do
     {
-        v4 = jkGuiRend_DisplayAndReturnClicked(&jkGuiNetHost_menu);
+        v4 = jkGuiRend_DisplayAndReturnClicked(jkGuiNetHost_pMenu);
         if ( v4 == GUI_OK )
         {
             pMultiEntry->multiModeFlags = 0;
@@ -383,8 +470,8 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
             for ( i = __wcschr(pMultiEntry->serverName, ':'); i; i = __wcschr(pMultiEntry->serverName, ':') )
                 *i = '-';
             
-            stdString_SafeStrCopy(pMultiEntry->episodeGobName, jkGuiNetHost_aElements[NETHOST_EPISODE_LISTBOX].unistr[jkGuiNetHost_aElements[NETHOST_EPISODE_LISTBOX].selectedTextEntry].c_str, 0x20);
-            stdString_SafeStrCopy(pMultiEntry->mapJklFname, jkGuiNetHost_aElements[NETHOST_LEVEL_LISTBOX].unistr[jkGuiNetHost_aElements[NETHOST_LEVEL_LISTBOX].selectedTextEntry].c_str + sizeof(int), 0x80); // Added: +sizeof(int)
+            stdString_SafeStrCopy(pMultiEntry->episodeGobName, jkGuiNetHost_pElements[NETHOST_EPISODE_LISTBOX].unistr[jkGuiNetHost_pElements[NETHOST_EPISODE_LISTBOX].selectedTextEntry].c_str, 0x20);
+            stdString_SafeStrCopy(pMultiEntry->mapJklFname, jkGuiNetHost_pElements[NETHOST_LEVEL_LISTBOX].unistr[jkGuiNetHost_pElements[NETHOST_LEVEL_LISTBOX].selectedTextEntry].c_str + sizeof(int), 0x80); // Added: +sizeof(int)
             
             v10 = wstr_to_int_clamped(v25, 1, 32);
 
@@ -404,23 +491,34 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
             v11 = (__int64)((flex_d_t)v23 * 60000.0);
             pMultiEntry->timeLimit = v11;
             jkGuiNetHost_timeLimit = v11;
-            if ( jkGuiNetHost_aElements[NETHOST_TIMELIMIT_CHECKBOX].selectedTextEntry )
+            if ( jkGuiNetHost_pElements[NETHOST_TIMELIMIT_CHECKBOX].selectedTextEntry )
             {
                 pMultiEntry->multiModeFlags |= MULTIMODEFLAG_TIMELIMIT;
             }
             v13 = wstr_to_int_clamped(v27, 0, 999);
             pMultiEntry->scoreLimit = v13;
             jkGuiNetHost_scoreLimit = v13;
-            if ( jkGuiNetHost_aElements[NETHOST_SCORELIMIT_CHECKBOX].selectedTextEntry )
+            if ( jkGuiNetHost_pElements[NETHOST_SCORELIMIT_CHECKBOX].selectedTextEntry )
             {
                 pMultiEntry->multiModeFlags |= MULTIMODEFLAG_SCORELIMIT;
             }
-            if ( jkGuiNetHost_aElements[NETHOST_SINGLELEVEL_CHECKBOX].selectedTextEntry )
+            if ( jkGuiNetHost_pElements[NETHOST_SINGLELEVEL_CHECKBOX].selectedTextEntry )
             {
                 pMultiEntry->multiModeFlags |= MULTIMODEFLAG_SINGLE_LEVEL;
             }
-            if ( jkGuiNetHost_aElements[NETHOST_TEAMMODE_CHECKBOX].selectedTextEntry )
+            if ( jkGuiNetHost_pElements[NETHOST_TEAMMODE_CHECKBOX].selectedTextEntry )
                 pMultiEntry->multiModeFlags |= (MULTIMODEFLAG_100 | MULTIMODEFLAG_2 | MULTIMODEFLAG_TEAMS);
+            // MOTS added: the game type. Episodes of type 0x10 are always ranked Jedi games.
+            // Personality characters are all rank 7, so that's a personalities game's rank.
+            if (Main_bMotsCompat) {
+                pMultiEntry->multiModeFlags &= ~(MULTIMODEFLAG_1000 | MULTIMODEFLAG_2000);
+                if (jkGuiSingleplayer_FUN_0041d590(pMultiEntry->episodeGobName) & 0x10)
+                    pMultiEntry->multiModeFlags |= (MULTIMODEFLAG_1000 | MULTIMODEFLAG_2000);
+                else if (jkGuiNetHost_aElementsMots[NETHOST_JEDIONLY_CHECKBOX].selectedTextEntry)
+                    pMultiEntry->multiModeFlags |= MULTIMODEFLAG_1000;
+                else
+                    pMultiEntry->maxRank = 7;
+            }
             stdString_SafeWStrCopy(pMultiEntry->wPassword, v30, 0x20);
             if (_wcslen(pMultiEntry->wPassword)) {
                 jkGuiNetHost_sessionFlags |= SESSIONFLAG_PASSWORD; // Added: wtf?
@@ -482,7 +580,7 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
             jkEpisodeTypeFlags_t loadMask = (JK_EPISODE_DEATHMATCH | JK_EPISODE_4_UNK | JK_EPISODE_SPECIAL_CTF);
             if (jkGuiNetHost_bIsCoop)
                 loadMask |= JK_EPISODE_SINGLEPLAYER;
-            jkGuiSingleplayer_EnumEpisodes(&jkGuiNetHost_dArray1, &jkGuiNetHost_aElements[NETHOST_EPISODE_LISTBOX], 0, loadMask);
+            jkGuiSingleplayer_EnumEpisodes(&jkGuiNetHost_dArray1, &jkGuiNetHost_pElements[NETHOST_EPISODE_LISTBOX], 0, loadMask);
 #endif
         }
     }
@@ -532,7 +630,7 @@ int jkGuiNetHost_sub_4119D0(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mo
     {
         jkGuiSingleplayer_sub_41AA30(
             &jkGuiNetHost_dArray2,
-            &jkGuiNetHost_aElements[NETHOST_LEVEL_LISTBOX],
+            &jkGuiNetHost_pElements[NETHOST_LEVEL_LISTBOX],
             0,
             jkRes_episodeGobName,
             jkGui_episodeLoad.type,
@@ -545,7 +643,7 @@ int jkGuiNetHost_sub_4119D0(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mo
         jkGuiRend_DarrayFreeEntry(&jkGuiNetHost_dArray2);
         jkGuiRend_DarrayReallocStr(&jkGuiNetHost_dArray2, jkStrings_GetUniStringWithFallback("GUI_NO_LEVELS_IN_EPISODE"), 0);
         jkGuiRend_DarrayReallocStr(&jkGuiNetHost_dArray2, 0, 0);
-        jkGuiRend_SetClickableString(&jkGuiNetHost_aElements[NETHOST_LEVEL_LISTBOX], &jkGuiNetHost_dArray2);
+        jkGuiRend_SetClickableString(&jkGuiNetHost_pElements[NETHOST_LEVEL_LISTBOX], &jkGuiNetHost_dArray2);
     }
 
 #ifdef QOL_IMPROVEMENTS
@@ -558,19 +656,50 @@ int jkGuiNetHost_sub_4119D0(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mo
     }
 #endif
 
-    // MOTS added
-    /*
-    if (jkGuiSingleplayer_FUN_0041d590(a1) & 0x10) {
-        jkGuiNetHost_aElements[16].unlabelled16 = 1;
-        jkGuiNetHost_aElements[15].unlabelled16 = 0;
-        jkGuiNetHost_aElements[12].bIsVisible = 1;
-        jkGuiNetHost_aElements[13].bIsVisible = 1;
-        jkGuiNetHost_aElements[14].bIsVisible = 1;
+    // MOTS added: episodes of type 0x10 can only be ranked Jedi games
+    if (Main_bMotsCompat) {
+        if (jkGuiSingleplayer_FUN_0041d590(pElement->unistr[pElement->selectedTextEntry].c_str) & 0x10) {
+            jkGuiNetHost_aElementsMots[NETHOST_PERSONALITIES_CHECKBOX].bIsVisible = 0;
+            jkGuiNetHost_aElementsMots[NETHOST_JEDIONLY_CHECKBOX].selectedTextEntry = 1;
+            jkGuiNetHost_aElementsMots[NETHOST_PERSONALITIES_CHECKBOX].selectedTextEntry = 0;
+            jkGuiNetHost_SetRankVisible(1);
+        }
+        else {
+            jkGuiNetHost_aElementsMots[NETHOST_PERSONALITIES_CHECKBOX].bIsVisible = 1;
+        }
+
+        if ( mouseX != -1 || mouseY != -1 )
+            jkGuiRend_Paint(pMenu);
+        return 0;
     }
-    */
 
     if ( mouseX != -1 || mouseY != -1 )
-        jkGuiRend_UpdateAndDrawClickable(&jkGuiNetHost_aElements[NETHOST_LEVEL_LISTBOX], &jkGuiNetHost_menu, 1);
+        jkGuiRend_UpdateAndDrawClickable(&jkGuiNetHost_pElements[NETHOST_LEVEL_LISTBOX], jkGuiNetHost_pMenu, 1);
+    return 0;
+}
+
+// MOTS added: the game type checkboxes work as a pair, and the rank picker only shows for ranked Jedi
+int jkGuiNetHost_JediOnlyClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, int redraw)
+{
+    jkGuiNetHost_aElementsMots[NETHOST_JEDIONLY_CHECKBOX].selectedTextEntry = 1;
+    jkGuiNetHost_aElementsMots[NETHOST_PERSONALITIES_CHECKBOX].selectedTextEntry = 0;
+    if (pMenu)
+        jkGuiRend_UpdateAndDrawClickable(pElement, pMenu, 1);
+    jkGuiNetHost_SetRankVisible(1);
+    if (pMenu)
+        jkGuiRend_Paint(pMenu);
+    return 0;
+}
+
+int jkGuiNetHost_PersonalitiesClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, int redraw)
+{
+    jkGuiNetHost_aElementsMots[NETHOST_JEDIONLY_CHECKBOX].selectedTextEntry = 0;
+    jkGuiNetHost_aElementsMots[NETHOST_PERSONALITIES_CHECKBOX].selectedTextEntry = 1;
+    if (pMenu)
+        jkGuiRend_UpdateAndDrawClickable(pElement, pMenu, 1);
+    jkGuiNetHost_SetRankVisible(0);
+    if (pMenu)
+        jkGuiRend_Paint(pMenu);
     return 0;
 }
 
@@ -590,16 +719,16 @@ int jkGuiNetHost_sub_411AE0(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mo
             v9 = jkGuiNetHost_maxRank;
             v7 = jkStrings_GetUniStringWithFallback("GUI_RANK");
             jk_snwprintf(jkGuiNetHost_wstrStarsText, 0x80u, v7, v9, v11);
-            jkGuiNetHost_aElements[NETHOST_STARS_TEXT].wstr = jkGuiNetHost_wstrStarsText;
-            jkGuiRend_UpdateAndDrawClickable(&jkGuiNetHost_aElements[NETHOST_STARS_TEXT], pMenu, 1);
+            jkGuiNetHost_pElements[NETHOST_STARS_TEXT].wstr = jkGuiNetHost_wstrStarsText;
+            jkGuiRend_UpdateAndDrawClickable(&jkGuiNetHost_pElements[NETHOST_STARS_TEXT], pMenu, 1);
         }
     }
     else if ( pElement->hoverId == 2 && (unsigned int)jkGuiNetHost_maxRank < 8 )
     {
         stdString_snprintf(v12, 32, "RANK_%d_L", ++jkGuiNetHost_maxRank);
         jk_snwprintf(jkGuiNetHost_wstrStarsText, 0x80u, jkStrings_GetUniStringWithFallback("GUI_RANK"), jkGuiNetHost_maxRank, jkStrings_GetUniStringWithFallback(v12));
-        jkGuiNetHost_aElements[NETHOST_STARS_TEXT].wstr = jkGuiNetHost_wstrStarsText;
-        jkGuiRend_UpdateAndDrawClickable(&jkGuiNetHost_aElements[NETHOST_STARS_TEXT], pMenu, 1);
+        jkGuiNetHost_pElements[NETHOST_STARS_TEXT].wstr = jkGuiNetHost_wstrStarsText;
+        jkGuiRend_UpdateAndDrawClickable(&jkGuiNetHost_pElements[NETHOST_STARS_TEXT], pMenu, 1);
         return 0;
     }
     return 0;
