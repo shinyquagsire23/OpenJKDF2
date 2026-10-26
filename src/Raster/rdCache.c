@@ -1213,9 +1213,12 @@ LABEL_232:
                     flex_d_t intBlue = active_6c->paBlueIntensities[vtx_idx] * 255.0 - 0.5;
 
 
+                    // Added: green and blue were read from the red channel; JKM.EXE reads
+                    // each one. Fix ported from OpenJKDF2-MotS-Fixes by Andrei Kiralv/Darkahn
+                    // and Coda Lilitari.
                     intRed += (flex_t)v91->colors[baseLight].r; // FLEXTODO
-                    intGreen += (flex_t)v91->colors[baseLight].r; // FLEXTODO
-                    intBlue += (flex_t)v91->colors[baseLight].r; // FLEXTODO
+                    intGreen += (flex_t)v91->colors[baseLight].g; // FLEXTODO
+                    intBlue += (flex_t)v91->colors[baseLight].b; // FLEXTODO
 
                     v94 = (uint8_t)stdMath_Clamp(intGreen, 0.0, 255.0);
                     v95 = (uint8_t)stdMath_Clamp(intBlue, 0.0, 255.0);
