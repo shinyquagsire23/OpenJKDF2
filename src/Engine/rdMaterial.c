@@ -46,8 +46,7 @@ static int rdMaterial_ReadExact(stdFile_t fhand, void* pOut, size_t len)
 // are padded to its pitch (SDL rounds it up to 4 bytes). Reading pitch * height
 // bytes in one go took the next cel's bytes for narrow textures (a 2x2 8-bit cel
 // is 4 bytes on disk but 8 in the surface) and shifted every cel after it. Read
-// row by row instead and zero the padding. Fix ported from OpenJKDF2-MotS-Fixes by
-// Andrei Kiralv/Darkahn and Coda Lilitari.
+// row by row instead and zero the padding.
 static int rdMaterial_ReadPackedRows(stdFile_t fhand, uint8_t* pOut, size_t capacity, size_t rowBytes, size_t rows, size_t stride)
 {
     if (!pOut || !rowBytes || !rows || stride < rowBytes || rows > capacity / stride)
