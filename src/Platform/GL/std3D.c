@@ -298,6 +298,12 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, pFb->rbo);
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         stdPlatform_Printf("std3D: ERROR, Framebuffer is incomplete!\n");
+
+    // Added: draw buffers are per framebuffer and were only set in DrawRenderList, so the
+    // StartScene clear of a new buffer missed tex1-3 and its first frame had a black glow.
+    GLenum bufs[4] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
+    glDrawBuffers(4, bufs);
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     if (jkPlayer_enableSSAO)
