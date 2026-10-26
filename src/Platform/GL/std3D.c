@@ -3011,12 +3011,22 @@ int std3D_AddToTextureCache(tVBuffer *vbuf, rdDDrawSurface *texture, int is_alph
     if (!vbuf || !texture) return 1;
     if (texture->texture_loaded) return 1;
 
-    if (std3D_loadedTexturesAmt >= STD3D_MAX_TEXTURES) {
+    // Added: when the list is full, reuse a slot std3D_PurgeTextureEntry emptied. A material freed
+    // on its own (the character screen's model, each time you change skin) leaves a hole, and the
+    // count only goes back to 0 when a level loads, so going through a few hundred skins filled it.
+    size_t slot = std3D_loadedTexturesAmt;
+    if (slot >= STD3D_MAX_TEXTURES) {
+        for (slot = 0; slot < STD3D_MAX_TEXTURES; slot++) {
+            if (!std3D_aLoadedSurfaces[slot] && !std3D_aLoadedTextures[slot]) break;
+        }
+    }
+
+    if (slot >= STD3D_MAX_TEXTURES) {
         stdPlatform_Printf("ERROR: Texture cache exhausted!! Ask ShinyQuagsire to increase the size.\n");
         return 1;
     }
     //printf("Add to texture cache\n");
-    
+
     GLuint image_texture;
     glGenTextures(1, &image_texture);
     uint8_t* image_8bpp = (uint8_t*)vbuf->sdlSurface->pixels;
@@ -3168,8 +3178,9 @@ int std3D_AddToTextureCache(tVBuffer *vbuf, rdDDrawSurface *texture, int is_alph
     }
 
     
-    std3D_aLoadedSurfaces[std3D_loadedTexturesAmt] = texture;
-    std3D_aLoadedTextures[std3D_loadedTexturesAmt++] = image_texture;
+    std3D_aLoadedSurfaces[slot] = texture;
+    std3D_aLoadedTextures[slot] = image_texture;
+    if (slot == std3D_loadedTexturesAmt) std3D_loadedTexturesAmt++;
     /*ext->surfacebuf = image_data;
     ext->surfacetex = image_texture;
     ext->surfacepaltex = pal_texture;*/
