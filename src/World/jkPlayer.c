@@ -8,6 +8,7 @@
 #include "General/stdString.h"
 #include "General/stdFnames.h"
 #include "General/stdFileUtil.h"
+#include "General/util.h"
 #include "Engine/sithAnimClass.h"
 #include "Dss/sithGamesave.h"
 #include "Engine/rdPuppet.h"
@@ -718,7 +719,8 @@ int jkPlayer_ReadConf(char16_t *name)
     if (!stdConffile_OpenReadBypass(fpath))
         return 0;
 
-    if ( stdConffile_ReadLine() && _sscanf(stdConffile_g_aLine, "version %d", &version) == 1 && version == 1 && stdConffile_ReadLine() )
+    int bReadFirstLine = stdConffile_ReadLine(); // Added: kept for the message below
+    if ( bReadFirstLine && _sscanf(jkPlayer_SkipLinePrefix(stdConffile_g_aLine), "version %d", &version) == 1 && version == 1 && stdConffile_ReadLine() ) // Added: jkPlayer_SkipLinePrefix
     {
         _sscanf(stdConffile_g_aLine, "diff %d", &jkPlayer_setDiff);
         if ( jkPlayer_setDiff < 0 )
@@ -828,6 +830,16 @@ int jkPlayer_ReadConf(char16_t *name)
     }
     else
     {
+        // Added: say why, since the player only sees "Cannot set player"
+        if (bReadFirstLine) {
+            char aFirstLine[48];
+            stdString_SafeStrCopy(aFirstLine, stdConffile_g_aLine, sizeof(aFirstLine));
+            stdPlatform_Printf("jkPlayer: Can't read %s: it starts with \"%s\", not \"version 1\" and a difficulty line\n", fpath, aFirstLine);
+        }
+        else {
+            stdPlatform_Printf("jkPlayer: Can't read %s: it's empty\n", fpath);
+        }
+
         stdConffile_Close();
         jkPlayer_setDiff = 1;
         sithControl_DefaultInit();
@@ -835,6 +847,76 @@ int jkPlayer_ReadConf(char16_t *name)
     }
     return 0;
 }
+
+// Added: a text editor can put a UTF-8 byte order mark or spaces in front of
+// a .plr's "version 1" line, which made the character impossible to pick.
+const char* jkPlayer_SkipLinePrefix(const char* pLine)
+{
+    if ((uint8_t)pLine[0] == 0xEF && (uint8_t)pLine[1] == 0xBB && (uint8_t)pLine[2] == 0xBF)
+        pLine += 3;
+    while (*pLine == ' ' || *pLine == '\t')
+        pLine++;
+    return pLine;
+}
+
+#ifdef QOL_IMPROVEMENTS
+// Added: copies a file as is, through the same file access as the .plr.
+static int jkPlayer_CopyFileLowLevel(const char* pFrom, const char* pTo)
+{
+    char buf[512];
+    size_t len;
+    int ret = 1;
+
+    stdFile_t in = pLowLevelHS->fileOpen(pFrom, "rb");
+    if (!in)
+        return 0;
+    stdFile_t out = pLowLevelHS->fileOpen(pTo, "wb");
+    if (!out) {
+        pLowLevelHS->fileClose(in);
+        return 0;
+    }
+    while ((len = pLowLevelHS->fileRead(in, buf, sizeof(buf))) > 0) {
+        if (pLowLevelHS->fileWrite(out, buf, len) != len) {
+            ret = 0;
+            break;
+        }
+    }
+    pLowLevelHS->fileClose(in);
+    pLowLevelHS->fileClose(out);
+    return ret;
+}
+
+// Added: a character whose .plr is there but can't be read (empty, cut short,
+// or not starting with "version 1") used to be refused with "Cannot set
+// player", with no way to fix it in the game. It's set up again like a new
+// character with the same name, at Medium, and the old file is kept as
+// <name>.plr.bak. Saved games and .mpc files in its folder aren't touched.
+int jkPlayer_RepairConf(char16_t *name)
+{
+    char nameTmp[32];
+    char fpath[256];
+    char bakPath[256];
+
+    if (!jkPlayer_VerifyWcharName(name))
+        return 0;
+
+    stdString_WcharToChar(nameTmp, name, 31);
+    nameTmp[31] = 0;
+    stdString_snprintf(fpath, 256, "player\\%s\\%s.plr", nameTmp, nameTmp);
+    if (!util_FileExistsLowLevel(fpath))
+        return 0;
+
+    stdString_snprintf(bakPath, 256, "player\\%s\\%s.plr.bak", nameTmp, nameTmp);
+    if (jkPlayer_CopyFileLowLevel(fpath, bakPath))
+        stdPlatform_Printf("jkPlayer: Starting %s over with default settings, the old file is kept as %s\n", nameTmp, bakPath);
+    else
+        stdPlatform_Printf("jkPlayer: Starting %s over with default settings, couldn't keep a copy of the old file\n", nameTmp);
+
+    jkPlayer_setDiff = 1;
+    jkPlayer_CreateConf(name);
+    return jkPlayer_ReadConf(name);
+}
+#endif
 
 void jkPlayer_SetPovModel(jkPlayerInfo *info, rdModel3 *model)
 {
