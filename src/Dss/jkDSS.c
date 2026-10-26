@@ -32,7 +32,18 @@ const char* jkDSS_aKyTeamModels[5] = {
     "kyT0.3do",
 };
 
-const char* jkDSS_aMotsKyTeamModels[5*4] = {
+// MOTS added: one row per personality, as in JKM.EXE. Personality 0 (no class) and
+// 1 (Jedi) share the Jedi row; 2-4 are the Bounty Hunter, Scout and Soldier.
+// Added: the decompiled table dropped the first Jedi row, so every class got the
+// next class's skin and the Soldier read past the end. Fix ported from
+// OpenJKDF2-MotS-Fixes by Andrei Kiralv/Darkahn and Coda Lilitari.
+const char* jkDSS_aMotsKyTeamModels[5*5] = {
+    "ky.3do",
+    "kyX0.3do",
+    "kyU0.3do",
+    "kyV0.3do",
+    "kyT0.3do",
+
     "ky.3do",
     "kyX0.3do",
     "kyU0.3do",
@@ -54,9 +65,18 @@ const char* jkDSS_aMotsKyTeamModels[5*4] = {
     "kym13.3do",
     "kym13r.3do",
     "kym13y.3do",
+    "kym13b.3do", // Added: team 3 is blue and team 4 green, as in JKM.EXE
     "kym13g.3do",
-    "kym13b.3do",
 };
+
+// Added: JKM.EXE accepts personalities up to 7, which reads past its five rows,
+// and these values arrive in network messages
+static const char* jkDSS_GetMotsTeamModel(int personality, int teamNum)
+{
+    if (personality < 0 || personality >= 5 || teamNum < 0 || teamNum >= 5)
+        return NULL;
+    return jkDSS_aMotsKyTeamModels[(personality * 5) + teamNum];
+}
 
 
 // MOTS added
@@ -353,12 +373,8 @@ int jkDSS_ProcessSetSaberInfoMots(SithMessage *msg)
         }
         if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_100) != 0 )
         {
-            if (personality < 0 || personality > 7) {
-                stdString_SafeStrCopy(model_3do_fname, "kk.3do", 0x20);
-            }
-            else {
-                stdString_SafeStrCopy(model_3do_fname, jkDSS_aMotsKyTeamModels[(personality * 5) + v11->teamNum], 0x20);
-            }
+            const char* pTeamModel = jkDSS_GetMotsTeamModel(personality, v11->teamNum);
+            stdString_SafeStrCopy(model_3do_fname, pTeamModel ? pTeamModel : "kk.3do", 0x20);
             stdString_SafeStrCopy(v14, "ky.snd", 0x20);
         }
     }
@@ -455,6 +471,9 @@ int jkDSS_ProcessSetSaberInfo(SithMessage *msg)
             return 1;
         if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_100) != 0 )
         {
+            // Added: bounds check, the team number can come from the network
+            if ( (uint32_t)v11->teamNum >= 5 )
+                return 0;
             stdString_SafeStrCopy(model_3do_fname, jkDSS_aKyTeamModels[v11->teamNum], 32);
             stdString_SafeStrCopy(v14, "ky.snd", 32);
         }
@@ -1160,12 +1179,8 @@ int jkDSS_ProcessSetTeam(SithMessage *pMsg)
     {
         // MOTS added: personality
         if (Main_bMotsCompat) {
-            if (personality < 8) {
-                v5 = sithModel_Load(jkDSS_aMotsKyTeamModels[teamNum + (personality * 5)], 1);
-            }
-            else {
-                v5 = NULL;
-            }
+            const char* pTeamModel = jkDSS_GetMotsTeamModel(personality, teamNum);
+            v5 = pTeamModel ? sithModel_Load(pTeamModel, 1) : NULL;
             
             if ( v5 )
             {
