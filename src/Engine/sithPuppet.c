@@ -195,8 +195,8 @@ int sithPuppet_PlayMode(SithThing *pThing, signed int submode, rdPuppetTrackCall
 
     v7 = &v4->modes[v6->majorMode].keyframe[submode];
 
-    // Allow swimming actors to use their armed firing animation
-    // if their swimming mode does not define one.
+    // Added: Fall back to armed FIRE and FIRE2 animations when a swimming
+    // actor does not have corresponding animations in its swimming mode.
     if (pThing->type == SITH_THING_ACTOR &&
         (v6->majorMode == 3 || v6->majorMode == 4) &&
         (submode == SITH_ANIM_FIRE || submode == SITH_ANIM_FIRE2) &&
@@ -614,6 +614,8 @@ void sithPuppet_sub_4E4A20(SithThing *thing, SithPuppetClassSubmode *animClass)
     if ( rdPup && thing->pPuppetClass )
     {
         sithPup = thing->puppet;
+        // Added: Override swimming animation priorities for actors without
+        // swimming FIRE animations, preserving their swimming posture.
         int lowPri = animClass->lowPri;
         int highPri = animClass->highPri;
 
@@ -627,6 +629,8 @@ void sithPuppet_sub_4E4A20(SithThing *thing, SithPuppetClassSubmode *animClass)
             highPri = 2;
         }
         v4 = &sithPup->playingAnim->keyframe;
+        // Added: Restart the secondary animation track when its priority
+        // differs from the required swimming animation priority.
         if (!v4 ||
             *v4 != animClass->keyframe ||
             (sithPup->otherTrack >= 0 &&

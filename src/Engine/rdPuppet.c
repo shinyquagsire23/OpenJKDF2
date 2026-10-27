@@ -266,7 +266,8 @@ void rdPuppet_BuildJointMatrices(rdThing *prdThing, rdMatrix34 *pPlacement)
     model = prdThing->model3;
     puppet = prdThing->puppet;
 
-    // Models requiring the swimming/firing torso yaw correction.
+    // Added: Identify actor models requiring a torso yaw correction
+    // when performing armed firing animations while swimming.
     int swimTorsoYawFix = 0;
 
     if (model)
@@ -278,7 +279,8 @@ void rdPuppet_BuildJointMatrices(rdThing *prdThing, rdMatrix34 *pPlacement)
             strcmp(model->filename, "ro.3do") == 0;
     }
 
-    // Dark Undead models require an additional swimming torso pitch offset.
+    // Added: Identify Dark Undead models requiring additional torso
+    // pitch compensation for their back-floating swimming posture.
     int isDarkUndead = 0;
 
     if (model)
@@ -298,14 +300,17 @@ void rdPuppet_BuildJointMatrices(rdThing *prdThing, rdMatrix34 *pPlacement)
     // Added: Fix a crash?
     if (!prdThing->paJointMatrices) return;
 
-    // Per-call swimming torso pitch.
-    // Never share this data between actors.
+    // Added: Store swimming torso pitch locally for each animation update
+    // to prevent pitch information from being shared between actors.
     float testSwimTorsoPitch = 0.0f;
     int testSwimTorsoPitchValid = 0;
 
+    // Added: Define the blending factor used to restore swimming
+    // torso pitch when an armed firing animation is active.
 #define SWIM_TORSO_PITCH_BLEND 1.25f
 
-    // Detect active firing animations for actors swimming at the water surface.
+    // Added: Detect active armed FIRE and FIRE2 tracks in swimming
+    // animation modes to apply the appropriate joint corrections.
     int swimFireActive = 0;
     int swimFireSubmode = -1;
 
@@ -412,7 +417,8 @@ void rdPuppet_BuildJointMatrices(rdThing *prdThing, rdMatrix34 *pPlacement)
         }
     }
 
-    // Detect quadruped-style limb naming.
+    // Added: Identify quadruped actors by their paw joints so their
+    // front limbs can continue swimming during attack animations.
     int hasPawJoint =
         rdModel3_FindNamedNode("lpaw", model) != NULL ||
         rdModel3_FindNamedNode("rpaw", model) != NULL;
@@ -442,7 +448,8 @@ void rdPuppet_BuildJointMatrices(rdThing *prdThing, rdMatrix34 *pPlacement)
             
             v18 = (v17->type & nodeIter->type) ? trackIter->highPri : trackIter->lowPri;
 
-            // Preserve swimming leg movement during armed attack animations.
+            // Added: Lower firing animation priority on swimming limbs so
+            // legs, feet, paws, and quadruped front limbs continue paddling.
             if (prdThing->pThing &&
                 prdThing->pThing->type == SITH_THING_ACTOR &&
                 //(prdThing->pThing->physicsParams.flags & SITH_PF_ONWATERSURFACE) &&
@@ -467,7 +474,8 @@ void rdPuppet_BuildJointMatrices(rdThing *prdThing, rdMatrix34 *pPlacement)
                 v18 = 1;
             }
 
-            // Preserve the swimming torso pose while blending an armed firing animation.
+            // Added: Adjust armed firing priority on swimming actors' torso
+            // joints while preserving the Stormtrooper's existing behavior.
             if (prdThing->pThing &&
                 prdThing->pThing->type == SITH_THING_ACTOR &&
                 prdThing->pThing->pPuppetClass &&
@@ -514,6 +522,8 @@ void rdPuppet_BuildJointMatrices(rdThing *prdThing, rdMatrix34 *pPlacement)
 
             if (v19 >= v17->numJoints2)
             {
+                // Added: Validate the joint index before accessing keyframe nodes
+                // to prevent out-of-bounds animation data access.
                 continue;
             }
 
@@ -524,9 +534,8 @@ void rdPuppet_BuildJointMatrices(rdThing *prdThing, rdMatrix34 *pPlacement)
                 continue;
             }
 
-            // Capture the swimming torso pitch independently of track priority.
-// A higher-priority firing track may have already been processed,
-// preventing the swimming track from entering the normal blend.
+            // Added: Capture swimming torso pitch independently of track
+            // priority so higher-priority firing tracks cannot suppress it.
             if (swimFireActive &&
                 !testSwimTorsoPitchValid &&
                 prdThing->pThing &&
@@ -682,8 +691,8 @@ void rdPuppet_BuildJointMatrices(rdThing *prdThing, rdMatrix34 *pPlacement)
             rdVector_ScaleAdd3Acc(&a3, &v91, v46);
         }
 
-        // Preserve the swimming torso pitch during firing animations.
-        // Exclude the Stormtrooper's uniquely named torso joint.
+        // Added: Blend the swimming torso pitch into the firing pose
+        // and compensate for the Dark Undead's swimming orientation.
         if (swimFireActive &&
             testSwimTorsoPitchValid &&
             prdThing->pThing &&
@@ -704,7 +713,8 @@ void rdPuppet_BuildJointMatrices(rdThing *prdThing, rdMatrix34 *pPlacement)
             }
         }
 
-        // Correct swimming torso orientation during firing.
+        // Added: Correct torso yaw during swimming attacks for models
+        // requiring an orientation adjustment while preserving other actors.
         if (swimFireActive &&
             prdThing->pThing &&
             prdThing->pThing->type == SITH_THING_ACTOR &&

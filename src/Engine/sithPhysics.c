@@ -39,7 +39,8 @@ void sithPhysics_FindFloor(SithThing *pThing, int bNoThingStateUpdate)
     if (!pThing->sector)
         return;
 
-    // Detect the water surface for players and actors; skip floor detection underwater.
+    // Added: Extend water-surface detection to AI actors using the
+    // existing underwater collision search.
     if ((pThing->sector->flags & SITH_SECTOR_UNDERWATER) &&
         (pThing->type == SITH_THING_PLAYER || pThing->type == SITH_THING_ACTOR))
     {
@@ -747,6 +748,8 @@ void sithPhysics_UpdateUnderwaterThingPhysics(SithThing *pThing, flex_t secDelta
     }
     if ( (pThing->physicsParams.flags & SITH_PF_ONWATERSURFACE) != 0 && pThing->physicsParams.acceleration.z >= 0.0 )
     {
+        // Added: Prevent swimming actors from continuing to rise when they
+        // reach the water surface by clearing upward velocity.
         if (pThing->type == SITH_THING_ACTOR && pThing->physicsParams.vel.z > 0.0)
         {
             pThing->physicsParams.vel.z = 0.0;

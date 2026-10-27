@@ -1071,8 +1071,8 @@ int sithAI_CheckSightThing(SithThing *thing, rdVector3 *targetPosition, SithThin
         if ( (targetThing->physicsParams.flags & SITH_PF_ONWATERSURFACE) == 0 )
             return 3;
     }
-    // Allow actors at the water surface to see targets on dry ground.
-    // Fully submerged actors retain the original restriction.
+    // Added: Allow swimming actors at the water surface to detect targets
+    // on dry ground while preserving the visibility restriction underwater.
     if ((thing->flags & SITH_TF_WATER) &&
         !(targetThing->flags & SITH_TF_WATER))
     {
