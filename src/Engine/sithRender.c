@@ -357,6 +357,7 @@ void sithRender_Draw()
 
     rdSetGeometryMode(sithRender_geoMode);
 
+    // Added: Fullbright console cheat
     if (sithRender_bFullbright)
         rdSetLightingMode(RD_LIGHTMODE_FULLYLIT);
     else if (sithRender_lightingIRMode)
