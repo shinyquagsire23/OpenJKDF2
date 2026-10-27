@@ -146,6 +146,9 @@ flex_t sithActor_DamageActor(SithThing *pActor, SithThing *pThing, flex_t damage
                  0.0,
                  0.0);
         damage = v6;
+        // Removed: instakill
+        //if (v6 == 0.0)
+        //    return 0.0;
     }
     if ( pThing )
     {
