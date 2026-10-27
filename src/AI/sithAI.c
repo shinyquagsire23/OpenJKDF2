@@ -1831,11 +1831,8 @@ LAB_0053a691:
         fVar3 = (pDistractorThing->position).y - (pActorThing->position).y;
         fVar4 = (pDistractorThing->position).z - (pActorThing->position).z;
 
-        // Added: Turbo Mode shortens the AI charge duration.
-        extern int jkDev_bTurbo;
-
         pActor->field_28C = sithTime_g_msecGameTime
-            + ((!sithNet_isMulti && jkDev_bTurbo) ? 1000 : 2000);
+            + ((!sithNet_isMulti && jkDev_bTurbo) ? 1000 : 2000); // Added: turbo
         pActor->moveSpeed = 1313.0;
         pActor->flags &= ~(SITHAI_MODE_TURNING | SITHAI_MODE_MOVING);
         pActor->attackError.x = xDist;
@@ -1927,11 +1924,10 @@ LAB_0053a3b9:
         
         fVar9 = stdMath_Sqrt(fVar8 * (flex_d_t)(flex_t)fVar8 + fVar7 * fVar7 + xDist * (flex_d_t)(flex_t)xDist); // FLEXTODO
 
-        // Added: Turbo Mode adjusts leap timing for doubled movement speed.
-        extern int jkDev_bTurbo;
 
         flex_d_t effectiveLeapSpeed = (flex_d_t)leapSpeed;
 
+        // Added: turbo
         if (!sithNet_isMulti && jkDev_bTurbo)
         {
             effectiveLeapSpeed *= 2.0;
@@ -1977,7 +1973,7 @@ LAB_0053a3b9:
                 if (thing->actorParams.flags & SITH_AF_DELAYFIRE) 
                 {
                     pActor->field_28C = sithTime_g_msecGameTime
-                        + ((!sithNet_isMulti && jkDev_bTurbo) ? 150 : 300);
+                        + ((!sithNet_isMulti && jkDev_bTurbo) ? 150 : 300); // Added: turbo
                     pActor->field_268 = param_7 | 8;
                     pActor->field_264 = leapSpeed;
                     pActor->field_26C = param_5;
