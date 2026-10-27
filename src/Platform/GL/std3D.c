@@ -34,6 +34,9 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #define TEX_MODE_16BPP 5
 #define TEX_MODE_BILINEAR_16BPP 6
 
+// Added: Custom RGB lightsaber triangle marker.
+#define RD_TRI_FLAG_SABER_RGB 0x40000
+
 typedef struct std3DSimpleTexStage
 {
     GLuint program;
@@ -110,6 +113,15 @@ GLint attribute_coord3d, attribute_v_color, attribute_v_light, attribute_v_uv, a
 GLint uniform_mvp, uniform_tex, uniform_texEmiss, uniform_displacement_map, uniform_tex_mode, uniform_blend_mode, uniform_worldPalette, uniform_worldPaletteLights;
 GLint uniform_tint, uniform_filter, uniform_fade, uniform_add, uniform_emissiveFactor, uniform_albedoFactor;
 GLint uniform_light_mult, uniform_displacement_factor, uniform_iResolution;
+
+// Added: Custom RGB lightsaber shader uniforms.
+static GLint uniform_saberRgbEnabled = -1;
+static GLint uniform_saberRgbColor = -1;
+
+// RGB state defined in jkSaber.c.
+extern float jkSaber_rgbRed;
+extern float jkSaber_rgbGreen;
+extern float jkSaber_rgbBlue;
 
 GLint programMenu_attribute_coord3d, programMenu_attribute_v_color, programMenu_attribute_v_uv, programMenu_attribute_v_norm;
 GLint programMenu_uniform_mvp, programMenu_uniform_tex, programMenu_uniform_displayPalette;
@@ -509,6 +521,14 @@ int init_resources()
     uniform_light_mult = std3D_tryFindUniform(programDefault, "light_mult");
     uniform_displacement_factor = std3D_tryFindUniform(programDefault, "displacement_factor");
     uniform_iResolution = std3D_tryFindUniform(programDefault, "iResolution");
+
+    uniform_saberRgbEnabled = std3D_tryFindUniform(
+        programDefault, "saberRgbEnabled"
+    );
+
+    uniform_saberRgbColor = std3D_tryFindUniform(
+        programDefault, "saberRgbColor"
+    );
     
     programMenu_attribute_coord3d = std3D_tryFindAttribute(programMenu, "coord3d");
     programMenu_attribute_v_color = std3D_tryFindAttribute(programMenu, "v_color");
@@ -2714,6 +2734,19 @@ void std3D_DrawRenderList()
 
     last_flags = tris[0].flags;
 
+    // Added: Set custom RGB state for the first triangle batch.
+    glUniform1i(
+        uniform_saberRgbEnabled,
+        (last_flags& RD_TRI_FLAG_SABER_RGB) ? 1 : 0
+    );
+
+    glUniform3f(
+        uniform_saberRgbColor,
+        jkSaber_rgbRed,
+        jkSaber_rgbGreen,
+        jkSaber_rgbBlue
+    );
+
     if (last_flags & 0x800) {
         glDepthFunc(GL_LESS);
         //glClear(GL_DEPTH_BUFFER_BIT);
@@ -2780,6 +2813,15 @@ void std3D_DrawRenderList()
             std3D_DoTex(tex, &tris[j], GL_tmpTrisAmt-j);
             
             int changed_flags = (last_flags ^ tris[j].flags);
+
+            // Added: Switch RGB override when entering or leaving a saber batch.
+            if (changed_flags & RD_TRI_FLAG_SABER_RGB)
+            {
+                glUniform1i(
+                    uniform_saberRgbEnabled,
+                    (tris[j].flags & RD_TRI_FLAG_SABER_RGB) ? 1 : 0
+                );
+            }
 
             if (changed_flags & 0x600)
             {

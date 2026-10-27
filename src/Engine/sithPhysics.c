@@ -1024,9 +1024,20 @@ void sithPhysics_UpdateAttachedThingPhysics(SithThing *pThing, flex_t secDeltaTi
             }
             rdVector_Add3Acc(&pThing->physicsParams.vel, &out);
             rdVector_ClipPrecision3(&pThing->physicsParams.vel);
-            if ( !rdVector_IsZero3(&pThing->physicsParams.vel) )
+            if (!rdVector_IsZero3(&pThing->physicsParams.vel))
             {
                 rdVector_Scale3(&pThing->physicsParams.deltaVelocity, &pThing->physicsParams.vel, secDeltaTime);
+
+                // Added: Turbo Mode for AI actors.
+                extern int jkDev_bTurbo;
+
+                if (!sithNet_isMulti
+                    && jkDev_bTurbo
+                    && pThing->type == SITH_THING_ACTOR
+                    && pThing->controlType == SITH_CT_AI)
+                {
+                    rdVector_Scale3Acc(&pThing->physicsParams.deltaVelocity, 2.0f);
+                }
             }
             return;
         }
@@ -1072,9 +1083,20 @@ void sithPhysics_UpdateAttachedThingPhysics(SithThing *pThing, flex_t secDeltaTi
 #endif
 
     rdVector_ClipPrecision3(&pThing->physicsParams.vel);
-    if ( !rdVector_IsZero3(&pThing->physicsParams.vel) )
+    if (!rdVector_IsZero3(&pThing->physicsParams.vel))
     {
         rdVector_Scale3(&pThing->physicsParams.deltaVelocity, &pThing->physicsParams.vel, secDeltaTime);
+
+        // Added: Turbo Mode for AI actors.
+        extern int jkDev_bTurbo;
+
+        if (!sithNet_isMulti
+            && jkDev_bTurbo
+            && pThing->type == SITH_THING_ACTOR
+            && pThing->controlType == SITH_CT_AI)
+        {
+            rdVector_Scale3Acc(&pThing->physicsParams.deltaVelocity, 2.0f);
+        }
     }
 
     flex_t v131;

@@ -4,6 +4,9 @@
 #include "types.h"
 #include "globals.h"
 
+// Added: Unlimited resources console cheat
+extern int jkDev_bUnlimitedResources;
+
 #define jkDev_Startup_ADDR (0x0041F100)
 #define jkDev_Shutdown_ADDR (0x0041F6A0)
 #define jkDev_Open_ADDR (0x0041F6E0)
@@ -72,6 +75,7 @@ int jkDev_CmdSkipToLevel(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int jkDev_Custom_CmdJumpNextCheckpoint(stdDebugConsoleCmd* pCmd, const char* pArgStr);// strike added
 int jkDev_CmdDebugFlags(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int jkDev_CmdFly(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int jkDev_CmdFullbright(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int jkDev_CmdDebugFlags2(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int jkDev_CmdWarp(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int jkDev_CmdActivate(stdDebugConsoleCmd *pCmd, const char *pArgStr);
@@ -88,6 +92,21 @@ int jkDev_CmdHeal(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int jkDev_CmdAllMap(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int jkDev_CmdMana(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int jkDev_CmdTeam(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int jkDev_CmdUnlimited(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+// Added: Turbo Mode console cheat
+int jkDev_CmdTurbo(stdDebugConsoleCmd* pCmd, const char* pArgStr);
+// Added: One-hit kill/death console cheat
+int jkDev_CmdInstakill(stdDebugConsoleCmd* pCmd, const char* pArgStr);
+int jkDev_CmdInstadeath(stdDebugConsoleCmd* pCmd, const char* pArgStr);
+// Added: True invincibility console cheat
+int jkDev_CmdInvincible(stdDebugConsoleCmd* pCmd, const char* pArgStr);
+// Added: Saber color console cheat
+int jkDev_CmdSaberColor(stdDebugConsoleCmd* pCmd, const char* pArgStr);
+int jkDev_CmdSaberRGB(stdDebugConsoleCmd* pCmd, const char* pArgStr);
+// Added: Big Head Mode console cheat
+int jkDev_CmdBigHead(stdDebugConsoleCmd* pCmd, const char* pArgStr);
+// Added: DK Mode console cheat
+int jkDev_CmdDKMode(stdDebugConsoleCmd* pCmd, const char* pArgStr);
 
 int jkDev_UpdateEntries();
 

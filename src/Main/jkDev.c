@@ -6,6 +6,7 @@
 #include "General/stdString.h"
 #include "General/stdFnames.h"
 #include "Devices/sithConsole.h"
+#include "Engine/sithRender.h"
 #include "Win95/stdDisplay.h"
 #include "Win95/WinIdk.h"
 #include "Gameplay/sithInventory.h"
@@ -24,7 +25,17 @@
 #include "Dss/sithGamesave.h"
 #include "Dss/jkDSS.h"
 #include "../jk.h"
+#include "Primitives/rdModel3.h"
 
+// Added: Turbo Mode cheat
+int jkDev_bTurbo = 0;
+// Added: True invincibility cheat.
+int jkDev_bInvincible = 0;
+// Added: Unlimited resources console cheat
+int jkDev_bUnlimitedResources = 0;
+// Added: One-hit kill/death console cheat
+int jkDev_bInstakill = 0;
+int jkDev_bInstadeath = 0;
 
 void jkDev_DrawEntriesGPU();
 void jkDev_BlitLogToScreenGPU();
@@ -98,7 +109,17 @@ void jkDev_Startup()
 
 #ifdef QOL_IMPROVEMENTS
     jkDev_RegisterCmd(jkDev_CmdNoclip, "noclip", "Noclip", 0);
-	jkDev_RegisterCmd(jkDev_Custom_CmdJumpNextCheckpoint, "checkmate", "", 0);  // cycles to next auto-restart checkpoint
+    jkDev_RegisterCmd(jkDev_CmdTurbo, "turbo", "Turbo Mode", 0);
+    jkDev_RegisterCmd(jkDev_CmdInstakill, "instakill", "Instant Kill", 0);
+    jkDev_RegisterCmd(jkDev_CmdInstadeath, "instadeath", "Instant Death", 0);
+    jkDev_RegisterCmd(jkDev_CmdInvincible, "invincible", "Invincible", 0);
+    jkDev_RegisterCmd(jkDev_CmdSaberColor, "sabercolor", "Saber Color", 0);
+    jkDev_RegisterCmd(jkDev_CmdSaberRGB, "saberrgb", "Custom RGB Saber Color", 0);
+    jkDev_RegisterCmd(jkDev_CmdBigHead, "bighead", "Big Head Mode", 0);
+    jkDev_RegisterCmd(jkDev_CmdDKMode, "dkmode", "DK Mode", 0);
+    jkDev_RegisterCmd(jkDev_CmdFullbright, "fullbright", "Fullbright", 0);
+    jkDev_RegisterCmd(jkDev_CmdUnlimited, "unlimited", "Unlimited Resources", 0);
+    jkDev_RegisterCmd(jkDev_Custom_CmdJumpNextCheckpoint, "checkmate", "", 0);
 #endif
 
     jkDev_bInitted = 1;
@@ -625,6 +646,396 @@ int jkDev_CmdFly(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
         sithCommand_Fly(pCmd, pArgStr);
+    return 1;
+}
+
+// Added: Turbo Mode cheat
+int jkDev_CmdTurbo(stdDebugConsoleCmd* pCmd, const char* pArgStr)
+{
+    if (sithNet_isMulti)
+        return 1;
+
+    if (pArgStr && !__strcmpi(pArgStr, "on"))
+    {
+        jkDev_bTurbo = 1;
+        sithConsole_PrintString("Turbo Mode enabled: Actors move at double speed.");
+    }
+    else if (pArgStr && !__strcmpi(pArgStr, "off"))
+    {
+        jkDev_bTurbo = 0;
+        sithConsole_PrintString("Turbo Mode disabled.");
+    }
+    else
+    {
+        sithConsole_PrintString("Usage: turbo [on|off]");
+    }
+
+    return 1;
+}
+
+// Added: Instant kill cheat
+int jkDev_CmdInstakill(stdDebugConsoleCmd* pCmd, const char* pArgStr)
+{
+    if (sithNet_isMulti)
+        return 1;
+
+    if (pArgStr && !__strcmpi(pArgStr, "on"))
+    {
+        jkDev_bInstakill = 1;
+        sithConsole_PrintString("Instakill enabled: Your attacks kill enemies in one hit.");
+    }
+    else if (pArgStr && !__strcmpi(pArgStr, "off"))
+    {
+        jkDev_bInstakill = 0;
+        sithConsole_PrintString("Instakill disabled.");
+    }
+    else
+    {
+        sithConsole_PrintString("Usage: instakill [on|off]");
+    }
+
+    return 1;
+}
+
+// Added: Instant death cheat
+int jkDev_CmdInstadeath(stdDebugConsoleCmd* pCmd, const char* pArgStr)
+{
+    if (sithNet_isMulti)
+        return 1;
+
+    if (pArgStr && !__strcmpi(pArgStr, "on"))
+    {
+        jkDev_bInstadeath = 1;
+        sithConsole_PrintString("Instadeath enabled: Enemy attacks kill you in one hit.");
+    }
+    else if (pArgStr && !__strcmpi(pArgStr, "off"))
+    {
+        jkDev_bInstadeath = 0;
+        sithConsole_PrintString("Instadeath disabled.");
+    }
+    else
+    {
+        sithConsole_PrintString("Usage: instadeath [on|off]");
+    }
+
+    return 1;
+}
+
+// Added: True invincibility cheat.
+int jkDev_CmdInvincible(stdDebugConsoleCmd* pCmd, const char* pArgStr)
+{
+    if (sithNet_isMulti)
+        return 1;
+
+    if (pArgStr)
+    {
+        if (!__strcmpi(pArgStr, "on") || !__strcmpi(pArgStr, "1"))
+            jkDev_bInvincible = 1;
+        else if (!__strcmpi(pArgStr, "off") || !__strcmpi(pArgStr, "0"))
+            jkDev_bInvincible = 0;
+    }
+
+    if (jkDev_bInvincible)
+        sithConsole_PrintString("Invincibility On");
+    else
+        sithConsole_PrintString("Invincibility Off");
+
+    return 1;
+}
+
+// Added: Custom RGB lightsaber console cheat.
+// Usage: saberrgb R G B
+//        saberrgb reset
+int jkDev_CmdSaberRGB(stdDebugConsoleCmd* pCmd, const char* pArgStr)
+{
+    // Single-player only.
+    if (sithNet_isMulti)
+        return 1;
+
+    // RGB rendering state defined in jkSaber.c.
+    extern int jkSaber_rgbEnabled;
+    extern float jkSaber_rgbRed;
+    extern float jkSaber_rgbGreen;
+    extern float jkSaber_rgbBlue;
+
+    char command[32] = { 0 };
+
+    if (!pArgStr || sscanf(pArgStr, "%31s", command) != 1)
+    {
+        sithConsole_PrintString("Usage: saberrgb R G B | saberrgb reset");
+        return 1;
+    }
+
+    // Restore the original saber appearance.
+    if (!__strcmpi(command, "reset"))
+    {
+        jkSaber_rgbEnabled = 0;
+
+        jkSaber_rgbRed = 1.0f;
+        jkSaber_rgbGreen = 1.0f;
+        jkSaber_rgbBlue = 1.0f;
+
+        sithConsole_PrintString("Custom RGB saber color disabled.");
+        return 1;
+    }
+
+    int red, green, blue;
+    char extra;
+
+    // Require exactly three integer values.
+    if (sscanf(pArgStr, " %d %d %d %c", &red, &green, &blue, &extra) != 3)
+    {
+        sithConsole_PrintString("Usage: saberrgb R G B | saberrgb reset");
+        return 1;
+    }
+
+    // Validate RGB range.
+    if (red < 0 || red > 255 ||
+        green < 0 || green > 255 ||
+        blue < 0 || blue > 255)
+    {
+        sithConsole_PrintString("RGB values must be between 0 and 255.");
+        return 1;
+    }
+
+    // Normalize RGB values for the OpenGL shader.
+    jkSaber_rgbRed = (float)red / 255.0f;
+    jkSaber_rgbGreen = (float)green / 255.0f;
+    jkSaber_rgbBlue = (float)blue / 255.0f;
+
+    // Enable custom RGB saber rendering.
+    jkSaber_rgbEnabled = 1;
+
+    char message[128];
+
+    stdString_snprintf(
+        message,
+        sizeof(message),
+        "Custom saber RGB set to %d %d %d.",
+        red,
+        green,
+        blue
+    );
+
+    sithConsole_PrintString(message);
+
+    return 1;
+}
+
+// Added: Saber Color console cheat
+int jkDev_CmdSaberColor(stdDebugConsoleCmd* pCmd, const char* pArgStr)
+{
+    // Single-player only
+    if (sithNet_isMulti)
+        return 1;
+
+    typedef struct
+    {
+        const char* name;
+        const char* sideMat;
+        const char* tipMat;
+    } SaberColorEntry;
+
+    static const SaberColorEntry colors[] = {
+        { "blue",    "saberblue1.mat",   "saberblue0.mat" },
+        { "darkred", "saberdred1.mat",   "saberdred0.mat" },
+        { "green",   "sabergreen1.mat",  "sabergreen0.mat" },
+        { "orange",  "saberorange1.mat", "saberorange0.mat" },
+        { "pink",    "psabersd.mat",     "psabertp.mat" },
+        { "purple",  "saberpurple1.mat", "saberpurple0.mat" },
+        { "red",     "saberred1.mat",    "saberred0.mat" },
+        { "yellow",  "saberyellow1.mat", "saberyellow0.mat" }
+    };
+
+    // Extract the color name, ignoring leading/trailing whitespace.
+    // This also handles the space appended by TAB completion.
+    char colorArg[32] = { 0 };
+
+    if (pArgStr)
+        sscanf(pArgStr, "%31s", colorArg);
+
+    if (!colorArg[0])
+    {
+        if (Main_bMotsCompat)
+            sithConsole_PrintString(
+                "Usage: sabercolor [blue|darkred|green|orange|pink|purple|red|yellow]"
+            );
+        else
+            sithConsole_PrintString(
+                "Usage: sabercolor [blue|darkred|green|orange|purple|red|yellow]"
+            );
+
+        return 1;
+    }
+
+    // Find the requested color.
+    const SaberColorEntry* selected = NULL;
+
+    for (int i = 0; i < sizeof(colors) / sizeof(colors[0]); i++)
+    {
+        if (!__strcmpi(colorArg, colors[i].name))
+        {
+            selected = &colors[i];
+            break;
+        }
+    }
+
+    if (!selected)
+    {
+        sithConsole_PrintString("Invalid saber color.");
+        return 1;
+    }
+
+    // Added: Pink saber materials are exclusive to Mysteries of the Sith.
+    if (!__strcmpi(selected->name, "pink") && !Main_bMotsCompat)
+    {
+        sithConsole_PrintString("Pink saber color is only available in Mysteries of the Sith.");
+        return 1;
+    }
+
+    // Get the local player.
+    SithThing* player = sithPlayer_g_pLocalPlayerThing;
+
+    if (!player || !player->playerInfo)
+    {
+        sithConsole_PrintString("No active player.");
+        return 1;
+    }
+
+    // Added: Disable custom RGB when selecting an original saber color.
+    extern int jkSaber_rgbEnabled;
+    extern float jkSaber_rgbRed;
+    extern float jkSaber_rgbGreen;
+    extern float jkSaber_rgbBlue;
+
+    jkSaber_rgbEnabled = 0;
+    jkSaber_rgbRed = 1.0f;
+    jkSaber_rgbGreen = 1.0f;
+    jkSaber_rgbBlue = 1.0f;
+
+    jkPlayerInfo* info = player->playerInfo;
+
+    rdMaterial* sideMat = info->polyline.face.material;
+    rdMaterial* tipMat = info->polyline.tipFace.material;
+
+    if (!info->polylineThing.polyline)
+    {
+        sithConsole_PrintString("Saber is not initialized.");
+        return 1;
+    }
+
+    // Preserve the current saber configuration before rebuilding it.
+    flex_t baseRadius = info->polyline.baseRadius;
+    flex_t tipRadius = info->polyline.tipRadius;
+    flex_t saberLength = info->length;
+
+    SithThing* wallSparks = info->wall_sparks;
+    SithThing* bloodSparks = info->blood_sparks;
+    SithThing* saberSparks = info->saber_sparks;
+
+    // Reinitialize the blade using the selected original materials.
+    jkSaber_InitializeSaberInfo(
+        player,
+        (char*)selected->sideMat,
+        (char*)selected->tipMat,
+        baseRadius,
+        tipRadius,
+        saberLength,
+        wallSparks,
+        bloodSparks,
+        saberSparks
+    );
+
+    // Confirm the color change.
+    char msg[80];
+    stdString_snprintf(
+        msg,
+        sizeof(msg),
+        "Saber color changed to %s.",
+        selected->name
+    );
+
+    sithConsole_PrintString(msg);
+
+    return 1;
+}
+
+// Added: Big Head Mode console cheat
+int jkDev_CmdBigHead(stdDebugConsoleCmd* pCmd, const char* pArgStr)
+{
+    if (!sithNet_isMulti)
+    {
+        rdModel3_bBigHeadMode = !rdModel3_bBigHeadMode;
+
+        if (rdModel3_bBigHeadMode)
+        {
+            // Added: Big Head Mode overrides DK Mode
+            rdModel3_bDKMode = 0;
+
+            sithConsole_PrintString("Big Head Mode ON");
+        }
+        else
+        {
+            sithConsole_PrintString("Big Head Mode OFF");
+        }
+    }
+
+    return 1;
+}
+
+// Added: DK Mode console cheat
+int jkDev_CmdDKMode(stdDebugConsoleCmd* pCmd, const char* pArgStr)
+{
+    if (!sithNet_isMulti)
+    {
+        rdModel3_bDKMode = !rdModel3_bDKMode;
+
+        if (rdModel3_bDKMode)
+        {
+            rdModel3_bBigHeadMode = 0;
+            sithConsole_PrintString("DK Mode ON");
+        }
+        else
+        {
+            sithConsole_PrintString("DK Mode OFF");
+        }
+    }
+
+    return 1;
+}
+
+int jkDev_CmdFullbright(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+{
+    if (!sithNet_isMulti)
+    {
+        sithRender_bFullbright = !sithRender_bFullbright;
+
+        if (sithRender_bFullbright)
+            sithConsole_PrintString("Fullbright ON");
+        else
+            sithConsole_PrintString("Fullbright OFF");
+    }
+
+    return 1;
+}
+
+int jkDev_CmdUnlimited(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+{
+    if (!sithNet_isMulti)
+    {
+        jkDev_bUnlimitedResources = !jkDev_bUnlimitedResources;
+
+        if (jkDev_bUnlimitedResources)
+        {
+            sithInventory_EnsureUnlimitedBattery(sithPlayer_g_pLocalPlayerThing);
+            sithConsole_PrintString("Unlimited Resources ON");
+        }
+        else
+        {
+            sithConsole_PrintString("Unlimited Resources OFF");
+        }
+    }
+
     return 1;
 }
 

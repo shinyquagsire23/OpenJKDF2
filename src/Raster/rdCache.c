@@ -11,6 +11,9 @@
 
 #include <math.h>
 
+#define RD_PROC_FLAG_SABER_RGB 0x40000000u
+#define RD_TRI_FLAG_SABER_RGB  0x40000
+
 #ifdef RDCACHE_RENDER_LINES
 static int rdCache_totalLines = 0;
 static rdLine rdCache_aHWLines[1024];
@@ -376,13 +379,18 @@ int rdCache_SendFaceListToHardware()
         mipmap_level = a3;
 
         flags_idk_ = flags_idk;
+        if (active_6c->light_flags & RD_PROC_FLAG_SABER_RGB)
+        {
+            flags_idk_ |= RD_TRI_FLAG_SABER_RGB;
+        }
         if ( (rdroid_g_curRenderOptions & 2) != 0 )
             v148 = active_6c->ambientLight;
         else
             v148 = 0.0;
 
         // Added: We need to know if a face is flex_d_t-sided
-        if (active_6c->type & RD_FF_DOUBLE_SIDED && active_6c->light_flags)
+        if ((active_6c->type & RD_FF_DOUBLE_SIDED) &&
+            (active_6c->light_flags & ~RD_PROC_FLAG_SABER_RGB))
         {
             flags_idk_ |= 0x10000;
         }
