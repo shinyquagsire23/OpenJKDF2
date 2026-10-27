@@ -544,9 +544,7 @@ int sithAICmd_PrimaryFire(SithAIControlBlock *pLocal, SithAIInstinct *pInstinct,
 
     // Added: Turbo Mode accelerates AI firing intervals.
     extern int jkDev_bTurbo;
-
     flex_t turboFireScale = 1.0f;
-
     if (!sithNet_isMulti
         && jkDev_bTurbo
         && v7
@@ -568,7 +566,7 @@ int sithAICmd_PrimaryFire(SithAIControlBlock *pLocal, SithAIInstinct *pInstinct,
             sithPuppet_SetArmedMode(v7, 1);
             pState->param0 = pInstinct->fltArg[8];
             pState->nextUpdate = sithTime_g_msecGameTime
-    + (int64_t)(pInstinct->intArg[5] * turboFireScale);
+    + (int64_t)(pInstinct->intArg[5] * turboFireScale); // Added: turbo
         }
         else
         {
@@ -598,12 +596,12 @@ int sithAICmd_PrimaryFire(SithAIControlBlock *pLocal, SithAIInstinct *pInstinct,
                 pState->param0 = pInstinct->fltArg[8];
                 pState->nextUpdate = sithTime_g_msecGameTime
                     + (int64_t)((_frand() * 0.4 + 0.8)
-                        * pInstinct->fltArg[0] * turboFireScale);
+                        * pInstinct->fltArg[0] * turboFireScale); // Added: turbo
             }
             else
             {
                 pState->nextUpdate = sithTime_g_msecGameTime
-                    + (int64_t)(pInstinct->intArg[9] * turboFireScale);
+                    + (int64_t)(pInstinct->intArg[9] * turboFireScale); // Added: turbo
                 pState->param0 = pState->param0 - 1.0;
             }
             return 0;
@@ -627,7 +625,7 @@ int sithAICmd_PrimaryFire(SithAIControlBlock *pLocal, SithAIInstinct *pInstinct,
             pLocal->flags &= ~SITHAI_MODE_TARGETVISIBLE;
         }
         pState->nextUpdate = sithTime_g_msecGameTime
-            + (int64_t)(250 * turboFireScale);
+            + (int64_t)(250 * turboFireScale); // Added: turbo
         return 0;
     }
     if ( (pLocal->flags & SITHAI_MODE_TARGETVISIBLE) != 0 )
