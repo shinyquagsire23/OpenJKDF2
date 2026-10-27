@@ -790,6 +790,7 @@ int sithCommand_CmdThingNpc(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if (sithNet_isMulti) return 1;
 
+    if (!pArgStr) pArgStr = "";
     char* pArgStrMutable = (char*)malloc(strlen(pArgStr)+1);
     strcpy(pArgStrMutable, pArgStr);
 
@@ -832,6 +833,7 @@ int sithCommand_CmdBind(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     char tmp[512];
     memset(tmp, 0, sizeof(tmp));
 
+    if (!pArgStr) pArgStr = "";
     char* pArgStrMutable = (char*)malloc(strlen(pArgStr)+1);
     strcpy(pArgStrMutable, pArgStr);
 
@@ -872,6 +874,7 @@ int sithCommand_CmdUnbind(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     char tmp[512];
     memset(tmp, 0, sizeof(tmp));
 
+    if (!pArgStr) pArgStr = "";
     char* pArgStrMutable = (char*)malloc(strlen(pArgStr)+1);
     strcpy(pArgStrMutable, pArgStr);
 
