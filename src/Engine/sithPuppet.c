@@ -18,6 +18,9 @@
 
 #include <math.h>
 
+// Added: Turbo Mode doubles AI firing animation speed.
+extern int jkDev_bTurbo;
+
 static const char* sithPuppet_animNames[43+2] = {
     "--RESERVED--",
     "stand",
@@ -218,7 +221,6 @@ int sithPuppet_PlayMode(SithThing *pThing, signed int submode, rdPuppetTrackCall
         return -1;
 
     // Added: Turbo Mode doubles AI firing animation speed.
-    extern int jkDev_bTurbo;
     if (!sithNet_isMulti
         && jkDev_bTurbo
         && pThing->type == SITH_THING_ACTOR
@@ -425,8 +427,6 @@ flex_t sithPuppet_UpdateThingMove(SithThing *pThing)
         rdMatrix_TransformVectorOrtho34(&a1a, &pThing->physicsParams.vel, &pThing->orient);
 
         // Added: Turbo Mode animation synchronization.
-        extern int jkDev_bTurbo;
-
         if (!sithNet_isMulti
             && jkDev_bTurbo
             && pThing->type == SITH_THING_ACTOR
@@ -961,8 +961,6 @@ void sithPuppet_advanceidk(SithThing *pThing, flex_t a2)
                 a3 = v8 * 280.0;
 
                 // Added: Synchronize AI movement animations with Turbo Mode.
-                extern int jkDev_bTurbo;
-
                 if (!sithNet_isMulti
                     && jkDev_bTurbo
                     && pThing->type == SITH_THING_ACTOR
