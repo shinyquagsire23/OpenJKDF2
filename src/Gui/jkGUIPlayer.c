@@ -145,7 +145,7 @@ int jkGuiPlayer_sub_410640(Darray *array, jkGuiElement *element)
                     
                     if ( stdConffile_OpenReadBypass(jkl_fname) )
                     {
-                        if ( stdConffile_ReadLine() && _sscanf(stdConffile_g_aLine, "version %d", &v8) == 1 && v8 == 1 && stdConffile_ReadLine() )
+                        if ( stdConffile_ReadLine() && _sscanf(jkPlayer_SkipLinePrefix(stdConffile_g_aLine), "version %d", &v8) == 1 && v8 == 1 && stdConffile_ReadLine() ) // Added: jkPlayer_SkipLinePrefix
                         {
                             _sscanf(stdConffile_g_aLine, "diff %d", &v9);
                             stdConffile_Close();
@@ -250,6 +250,10 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
             case -1:
                 if ( !jkPlayer_ReadConf(a2) )
                 {
+#ifdef QOL_IMPROVEMENTS
+                    if ( jkPlayer_RepairConf(a2) ) // Added
+                        continue;
+#endif
                     v11 = jkGuiRend_GetStringEntry(&a1a, 0);
                     if ( v11 && v11->str )
                     {
@@ -268,6 +272,10 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
             case 1:
                 if ( !jkPlayer_ReadConf(a2) )
                 {
+#ifdef QOL_IMPROVEMENTS
+                    if ( jkPlayer_RepairConf(a2) ) // Added
+                        continue;
+#endif
                     stdString_SafeWStrCopy(v18, jkPlayer_playerShortName, 32); // Added: keep wide -- %s wants char16_t*
                     Windows_ErrorMsgboxWide("ERR_CANNOT_SET_PLAYER %s", v18);
                 }

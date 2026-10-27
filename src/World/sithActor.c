@@ -87,6 +87,19 @@ flex_t sithActor_DamageActor(SithThing *pActor, SithThing *pThing, flex_t damage
     SITH_ASSERTREL(pActor && (damage > 0.0f));
     SITH_ASSERTREL(pActor->type == SITH_THING_ACTOR || pActor->type == SITH_THING_PLAYER);
 
+    // Added: True invincibility for the local player.
+    extern int jkDev_bInvincible;
+    // Added: One-hit kill/death console cheat
+    extern int jkDev_bInstakill;
+    extern int jkDev_bInstadeath;
+
+    if (!sithNet_isMulti
+        && jkDev_bInvincible
+        && pActor == sithPlayer_g_pLocalPlayerThing)
+    {
+        return 0.0f;
+    }
+
     if ( sithNet_isMulti && (pActor->flags & SITH_TF_INVULN) != 0 )
     {
         receiver_ = pThing;
@@ -97,6 +110,29 @@ flex_t sithActor_DamageActor(SithThing *pActor, SithThing *pThing, flex_t damage
     if ( pActor->actorParams.health <= 0.0 )
         return damage;
     receiver_ = pThing;
+    // Added: Instadeath bypasses shield absorption for enemy attacks.
+    if (!sithNet_isMulti
+        && jkDev_bInstadeath
+        && pActor == sithPlayer_g_pLocalPlayerThing
+        && pThing
+        && pThing != pActor
+        && damage > 0.0f
+        && damageType != 0x20
+        && damageType != 0x40)
+    {
+        SithThing* attacker = sithThing_GetThingParent(pThing);
+
+        if (attacker
+            && attacker != pActor
+            && attacker->type == SITH_THING_ACTOR
+            && attacker->controlType == SITH_CT_AI)
+        {
+            // Use the normal death routine without allowing shields
+            // to absorb the incoming attack.
+            sithActor_KillActor(pActor, attacker, damageType);
+            return damage;
+        }
+    }
     if ( pActor->type == SITH_THING_PLAYER )
     {
         v6 = sithInventory_BroadcastMessage(
@@ -110,8 +146,9 @@ flex_t sithActor_DamageActor(SithThing *pActor, SithThing *pThing, flex_t damage
                  0.0,
                  0.0);
         damage = v6;
-        if ( v6 == 0.0 )
-            return 0.0;
+        // Removed: instakill
+        //if (v6 == 0.0)
+        //    return 0.0;
     }
     if ( pThing )
     {
@@ -145,11 +182,24 @@ flex_t sithActor_DamageActor(SithThing *pActor, SithThing *pThing, flex_t damage
             }
         }
         damage *= damageMult;
-        if ( sithNet_isMulti && (sithNet_MultiModeFlags & MULTIMODEFLAG_2) != 0 && sithPlayer_sub_4C9060(v7, pActor) )
+        if (sithNet_isMulti && (sithNet_MultiModeFlags & MULTIMODEFLAG_2) != 0 && sithPlayer_sub_4C9060(v7, pActor))
             return 0.0;
     }
 
-    pActor->actorParams.health -= damage;
+// Added: Instant kill and instant death cheats.
+if (!sithNet_isMulti && damage > 0.0f)
+{
+    // Instakill: Player attacks instantly kill enemy actors.
+    if (jkDev_bInstakill
+        && pActor->type == SITH_THING_ACTOR
+        && receiver_ == sithPlayer_g_pLocalPlayerThing)
+    {
+        damage = pActor->actorParams.health + 1.0f;
+    }
+}
+
+pActor->actorParams.health -= damage;
+
     if ( pActor == sithPlayer_g_pLocalPlayerThing )
     {
         fR = damage * 0.04;
@@ -165,6 +215,7 @@ LABEL_32:
     }
     if ( sithMessage_g_outputstream )
         sithDSSThing_Death(pActor, receiver_, 0, -1, 255);
+
     sithActor_KillActor(pActor, receiver_, damageType);
     return damage - pActor->actorParams.health;
 }

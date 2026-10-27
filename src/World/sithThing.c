@@ -1556,6 +1556,17 @@ int sithThing_ReadStaticThingsListText(SithWorld *pWorld, int bSkip)
             break;
         v21 = &sithWorld_g_pCurrentWorld->aThings[_atoi(stdConffile_g_entry.aArgs[0].value)];
         v22 = sithTemplate_GetTemplate(stdConffile_g_entry.aArgs[1].value);
+        // Added: Skip static things with missing or invalid templates to prevent sector list corruption.
+        if (!v22 || v22->type == SITH_THING_FREE)
+        {
+            jk_printf(
+                "OpenJKDF2: Skipping static thing %u: "
+                "missing or invalid template '%s'\n",
+                v21->idx,
+                stdConffile_g_entry.aArgs[1].value
+            );
+            continue;
+        }
         if ( stdConffile_g_entry.numArgs >= 0xAu )
         {
             pos.x = _atof(stdConffile_g_entry.aArgs[3].value);
@@ -1859,10 +1870,14 @@ int sithThing_ParseThingArg(StdConffileArg *arg, SithThing* pThing, int param)
                 return 1;
 
             // MOTS added
+            // Added: class cogs run on every machine like in JK, unless flagged
+            // SERVER (flags=0x80), as in JKM.EXE (test cl,0x80 / jne at 0x51DC0C).
+            // This test was inverted, which sent kyle_m.cog's newplayer and skill
+            // messages to the host in multiplayer.
             if (Main_bMotsCompat) {
                 pCog->flags |= SITH_COG_CLASS;
-                if (pCog->flags & SITH_COG_SERVER) {
-                    pCog->flags |= SITH_COG_CLASS | SITH_COG_LOCAL;
+                if (!(pCog->flags & SITH_COG_SERVER)) {
+                    pCog->flags |= SITH_COG_LOCAL;
                 }
             }
             else {

@@ -34,6 +34,9 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #define TEX_MODE_16BPP 5
 #define TEX_MODE_BILINEAR_16BPP 6
 
+// Added: Custom RGB lightsaber triangle marker.
+#define RD_TRI_FLAG_SABER_RGB 0x40000
+
 typedef struct std3DSimpleTexStage
 {
     GLuint program;
@@ -110,6 +113,15 @@ GLint attribute_coord3d, attribute_v_color, attribute_v_light, attribute_v_uv, a
 GLint uniform_mvp, uniform_tex, uniform_texEmiss, uniform_displacement_map, uniform_tex_mode, uniform_blend_mode, uniform_worldPalette, uniform_worldPaletteLights;
 GLint uniform_tint, uniform_filter, uniform_fade, uniform_add, uniform_emissiveFactor, uniform_albedoFactor;
 GLint uniform_light_mult, uniform_displacement_factor, uniform_iResolution;
+
+// Added: Custom RGB lightsaber shader uniforms.
+static GLint uniform_saberRgbEnabled = -1;
+static GLint uniform_saberRgbColor = -1;
+
+// RGB state defined in jkSaber.c.
+extern float jkSaber_rgbRed;
+extern float jkSaber_rgbGreen;
+extern float jkSaber_rgbBlue;
 
 GLint programMenu_attribute_coord3d, programMenu_attribute_v_color, programMenu_attribute_v_uv, programMenu_attribute_v_norm;
 GLint programMenu_uniform_mvp, programMenu_uniform_tex, programMenu_uniform_displayPalette;
@@ -223,6 +235,12 @@ void std3D_deleteIntermediateFbo(std3DIntermediateFbo* pFbo)
     glDeleteRenderbuffers(1, &pFbo->rbo);
 }
 
+static void std3D_SetSceneDrawBuffers()
+{
+    static const GLenum bufs[4] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
+    glDrawBuffers(jkPlayer_enableSSAO ? 4 : 2, bufs);
+}
+
 void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* pFb)
 {
     // Generate the framebuffer
@@ -298,6 +316,9 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, pFb->rbo);
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         stdPlatform_Printf("std3D: ERROR, Framebuffer is incomplete!\n");
+
+    std3D_SetSceneDrawBuffers();
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     if (jkPlayer_enableSSAO)
@@ -500,6 +521,14 @@ int init_resources()
     uniform_light_mult = std3D_tryFindUniform(programDefault, "light_mult");
     uniform_displacement_factor = std3D_tryFindUniform(programDefault, "displacement_factor");
     uniform_iResolution = std3D_tryFindUniform(programDefault, "iResolution");
+
+    uniform_saberRgbEnabled = std3D_tryFindUniform(
+        programDefault, "saberRgbEnabled"
+    );
+
+    uniform_saberRgbColor = std3D_tryFindUniform(
+        programDefault, "saberRgbColor"
+    );
     
     programMenu_attribute_coord3d = std3D_tryFindAttribute(programMenu, "coord3d");
     programMenu_attribute_v_color = std3D_tryFindAttribute(programMenu, "v_color");
@@ -765,6 +794,7 @@ int std3D_StartScene()
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
+    std3D_SetSceneDrawBuffers(); // so the clear below covers tex2-3 when SSAO was just turned on
     glEnable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -1547,9 +1577,9 @@ void std3D_DrawMenu()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, menu_ibo_triangle);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpTrisAmt * 3 * sizeof(GLushort), menu_data_elements, GL_STREAM_DRAW);
 
-    int tris_size = 0;  
-    glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &tris_size);
-    glDrawElements(GL_TRIANGLES, tris_size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
+    // Perf: draw the count just uploaded. Asking GL for the buffer's size makes the
+    // CPU wait for the GPU, every frame.
+    glDrawElements(GL_TRIANGLES, (GLsizei)(GL_tmpTrisAmt * 3), GL_UNSIGNED_SHORT, 0);
 
     glDisableVertexAttribArray(programMenu_attribute_v_uv);
     glDisableVertexAttribArray(programMenu_attribute_v_color);
@@ -1686,9 +1716,9 @@ void std3D_DrawMapOverlay()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, menu_ibo_triangle);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpTrisAmt * 3 * sizeof(GLushort), menu_data_elements, GL_STREAM_DRAW);
 
-    int tris_size = 0;  
-    glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &tris_size);
-    glDrawElements(GL_TRIANGLES, tris_size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
+    // Perf: draw the count just uploaded. Asking GL for the buffer's size makes the
+    // CPU wait for the GPU, every frame.
+    glDrawElements(GL_TRIANGLES, (GLsizei)(GL_tmpTrisAmt * 3), GL_UNSIGNED_SHORT, 0);
 
     glDisableVertexAttribArray(programMenu_attribute_v_uv);
     glDisableVertexAttribArray(programMenu_attribute_v_color);
@@ -2298,42 +2328,21 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
     }
     
     rdTri* tris = GL_tmpTris;
-    glEnableVertexAttribArray(pStage->attribute_coord3d);
-    glEnableVertexAttribArray(pStage->attribute_v_color);
-    glEnableVertexAttribArray(pStage->attribute_v_uv);
-
     glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_all);
     glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * sizeof(D3DVERTEX), GL_tmpVertices, GL_STREAM_DRAW);
-    glVertexAttribPointer(
-        programMenu_attribute_coord3d, // attribute
-        3,                 // number of elements per vertex, here (x,y,z)
-        GL_FLOAT,          // the type of each element
-        GL_FALSE,          // normalize fixed-point data?
-        sizeof(D3DVERTEX),                 // data stride
-        (GLvoid*)offsetof(D3DVERTEX, x)                  // offset of first element
-    );
-    
-    glVertexAttribPointer(
-        programMenu_attribute_v_color, // attribute
-        4,                 // number of elements per vertex, here (R,G,B,A)
-        GL_UNSIGNED_BYTE,  // the type of each element
-        GL_TRUE,          // normalize fixed-point data?
-        sizeof(D3DVERTEX),                 // no extra data between each position
-        (GLvoid*)offsetof(D3DVERTEX, color) // offset of first element
-    );
 
-    glVertexAttribPointer(
-        programMenu_attribute_v_uv,    // attribute
-        2,                 // number of elements per vertex, here (U,V)
-        GL_FLOAT,          // the type of each element
-        GL_FALSE,          // take our values as-is
-        sizeof(D3DVERTEX),                 // no extra data between each position
-        (GLvoid*)offsetof(D3DVERTEX, tu)                  // offset of first element
-    );
-
-    glEnableVertexAttribArray(pStage->attribute_coord3d);
-    glEnableVertexAttribArray(pStage->attribute_v_color);
-    glEnableVertexAttribArray(pStage->attribute_v_uv);
+    if (pStage->attribute_coord3d >= 0) {
+        glVertexAttribPointer(pStage->attribute_coord3d, 3, GL_FLOAT, GL_FALSE, sizeof(D3DVERTEX), (GLvoid*)offsetof(D3DVERTEX, x));
+        glEnableVertexAttribArray(pStage->attribute_coord3d);
+    }
+    if (pStage->attribute_v_color >= 0) {
+        glVertexAttribPointer(pStage->attribute_v_color, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(D3DVERTEX), (GLvoid*)offsetof(D3DVERTEX, color));
+        glEnableVertexAttribArray(pStage->attribute_v_color);
+    }
+    if (pStage->attribute_v_uv >= 0) {
+        glVertexAttribPointer(pStage->attribute_v_uv, 2, GL_FLOAT, GL_FALSE, sizeof(D3DVERTEX), (GLvoid*)offsetof(D3DVERTEX, tu));
+        glEnableVertexAttribArray(pStage->attribute_v_uv);
+    }
     
     rdDDrawSurface* last_tex = (rdDDrawSurface*)(intptr_t)-1;
     int last_tex_idx = 0;
@@ -2348,13 +2357,13 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, menu_ibo_triangle);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpTrisAmt * 3 * sizeof(GLushort), data_elements, GL_STREAM_DRAW);
 
-    int tris_size;  
-    glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &tris_size);
-    glDrawElements(GL_TRIANGLES, tris_size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
+    // Perf: draw the count just uploaded. Asking GL for the buffer's size makes the
+    // CPU wait for the GPU, every frame.
+    glDrawElements(GL_TRIANGLES, (GLsizei)(GL_tmpTrisAmt * 3), GL_UNSIGNED_SHORT, 0);
 
-    glDisableVertexAttribArray(pStage->attribute_v_uv);
-    glDisableVertexAttribArray(pStage->attribute_v_color);
-    glDisableVertexAttribArray(pStage->attribute_coord3d);
+    if (pStage->attribute_v_uv >= 0) glDisableVertexAttribArray(pStage->attribute_v_uv);
+    if (pStage->attribute_v_color >= 0) glDisableVertexAttribArray(pStage->attribute_v_color);
+    if (pStage->attribute_coord3d >= 0) glDisableVertexAttribArray(pStage->attribute_coord3d);
     
     //free(data_elements);
         
@@ -2557,8 +2566,7 @@ void std3D_DrawRenderList()
     glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
     glUseProgram(programDefault);
 
-    GLenum bufs[4] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
-    glDrawBuffers(4, bufs);
+    std3D_SetSceneDrawBuffers();
     
     last_tex = NULL;
 
@@ -2726,6 +2734,19 @@ void std3D_DrawRenderList()
 
     last_flags = tris[0].flags;
 
+    // Added: Set custom RGB state for the first triangle batch.
+    glUniform1i(
+        uniform_saberRgbEnabled,
+        (last_flags& RD_TRI_FLAG_SABER_RGB) ? 1 : 0
+    );
+
+    glUniform3f(
+        uniform_saberRgbColor,
+        jkSaber_rgbRed,
+        jkSaber_rgbGreen,
+        jkSaber_rgbBlue
+    );
+
     if (last_flags & 0x800) {
         glDepthFunc(GL_LESS);
         //glClear(GL_DEPTH_BUFFER_BIT);
@@ -2792,6 +2813,15 @@ void std3D_DrawRenderList()
             std3D_DoTex(tex, &tris[j], GL_tmpTrisAmt-j);
             
             int changed_flags = (last_flags ^ tris[j].flags);
+
+            // Added: Switch RGB override when entering or leaving a saber batch.
+            if (changed_flags & RD_TRI_FLAG_SABER_RGB)
+            {
+                glUniform1i(
+                    uniform_saberRgbEnabled,
+                    (tris[j].flags & RD_TRI_FLAG_SABER_RGB) ? 1 : 0
+                );
+            }
 
             if (changed_flags & 0x600)
             {
@@ -2894,9 +2924,8 @@ void std3D_DrawRenderList()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, world_ibo_triangle);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpLinesAmt * 2 * sizeof(GLushort), world_data_elements, GL_STREAM_DRAW);
 
-    int lines_size;
-    glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &lines_size);
-    glDrawElements(GL_LINES, lines_size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
+    // Perf: draw the count just uploaded rather than asking GL for the buffer's size (a GPU wait).
+    glDrawElements(GL_LINES, (GLsizei)(GL_tmpLinesAmt * 2), GL_UNSIGNED_SHORT, 0);
 #endif
         
     // Done drawing    
@@ -2995,7 +3024,7 @@ void std3D_AddRenderListUITris(rdUITri *tris, unsigned int num_tris)
 int std3D_ClearZBuffer()
 {
 #ifdef RDRASTER_SW_ZBUFFER
-    // Added: the software rasterizer keeps its own depth buffer; clear it on the same hook JK uses
+    // the software rasterizer keeps its own depth buffer; clear it on the same hook JK uses
     // (scene start + the POV weapon's clear) so the software path stays in lockstep with the HW one.
     rdZRaster_ClearZBuffer();
 #endif
@@ -3011,12 +3040,22 @@ int std3D_AddToTextureCache(tVBuffer *vbuf, rdDDrawSurface *texture, int is_alph
     if (!vbuf || !texture) return 1;
     if (texture->texture_loaded) return 1;
 
-    if (std3D_loadedTexturesAmt >= STD3D_MAX_TEXTURES) {
+    // Added: when the list is full, reuse a slot std3D_PurgeTextureEntry emptied. A material freed
+    // on its own (the character screen's model, each time you change skin) leaves a hole, and the
+    // count only goes back to 0 when a level loads, so going through a few hundred skins filled it.
+    size_t slot = std3D_loadedTexturesAmt;
+    if (slot >= STD3D_MAX_TEXTURES) {
+        for (slot = 0; slot < STD3D_MAX_TEXTURES; slot++) {
+            if (!std3D_aLoadedSurfaces[slot] && !std3D_aLoadedTextures[slot]) break;
+        }
+    }
+
+    if (slot >= STD3D_MAX_TEXTURES) {
         stdPlatform_Printf("ERROR: Texture cache exhausted!! Ask ShinyQuagsire to increase the size.\n");
         return 1;
     }
     //printf("Add to texture cache\n");
-    
+
     GLuint image_texture;
     glGenTextures(1, &image_texture);
     uint8_t* image_8bpp = (uint8_t*)vbuf->sdlSurface->pixels;
@@ -3168,8 +3207,9 @@ int std3D_AddToTextureCache(tVBuffer *vbuf, rdDDrawSurface *texture, int is_alph
     }
 
     
-    std3D_aLoadedSurfaces[std3D_loadedTexturesAmt] = texture;
-    std3D_aLoadedTextures[std3D_loadedTexturesAmt++] = image_texture;
+    std3D_aLoadedSurfaces[slot] = texture;
+    std3D_aLoadedTextures[slot] = image_texture;
+    if (slot == std3D_loadedTexturesAmt) std3D_loadedTexturesAmt++;
     /*ext->surfacebuf = image_data;
     ext->surfacetex = image_texture;
     ext->surfacepaltex = pal_texture;*/

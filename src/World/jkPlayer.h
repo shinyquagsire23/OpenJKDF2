@@ -91,6 +91,10 @@ void jkPlayer_nullsub_1(jkPlayerInfo* unk);
 void jkPlayer_CreateConf(char16_t *name);
 void jkPlayer_WriteConf(char16_t *name);
 int jkPlayer_ReadConf(char16_t *name);
+const char* jkPlayer_SkipLinePrefix(const char* pLine); // Added
+#ifdef QOL_IMPROVEMENTS
+int jkPlayer_RepairConf(char16_t *name); // Added
+#endif
 void jkPlayer_SetPovModel(jkPlayerInfo *info, rdModel3 *model);
 MATH_FUNC void jkPlayer_DrawPov();
 MATH_FUNC void jkPlayer_renderSaberWeaponMesh(SithThing *a1);

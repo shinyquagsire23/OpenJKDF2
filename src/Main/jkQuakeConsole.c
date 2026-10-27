@@ -453,6 +453,44 @@ int jkQuakeConsole_AutocompleteConsoleCmds()
     return bPrintOnce;
 }
 
+// Added: Saber color argument autocomplete
+int jkQuakeConsole_AutocompleteSaberColors()
+{
+    if (!jkQuakeConsole_pTabPos)
+        return 0;
+
+    static const char* colors[] = {
+        "blue",
+        "darkred",
+        "green",
+        "orange",
+        "pink",
+        "purple",
+        "red",
+        "yellow"
+    };
+
+    int found = 0;
+
+    for (int i = 0; i < sizeof(colors) / sizeof(colors[0]); i++)
+    {
+        // Added: Pink is exclusive to Mysteries of the Sith.
+        if (!Main_bMotsCompat && !__strcmpi(colors[i], "pink"))
+            continue;
+
+        if (!__strnicmp(jkQuakeConsole_pTabPos, colors[i],
+            strlen(jkQuakeConsole_pTabPos)))
+        {
+            found = 1;
+
+            if (jkQuakeConsole_sortTmpIdx < JKQUAKECONSOLE_SORTED_LIMIT)
+                jkQuakeConsole_aSortTmp[jkQuakeConsole_sortTmpIdx++] = colors[i];
+        }
+    }
+
+    return found;
+}
+
 int jkQuakeConsole_AutocompleteDwCheats()
 {
 #ifdef PLATFORM_DROIDWORKS
@@ -716,6 +754,12 @@ void jkQuakeConsole_SendInput(WPARAM wParam, int bIsChar)
                 bPrintOnce |= jkQuakeConsole_AutocompleteTemplates();
             }
 
+            // Added: Saber color argument autocomplete
+            if (!__strcmpi(baseCmd, "sabercolor "))
+            {
+                bPrintOnce |= jkQuakeConsole_AutocompleteSaberColors();
+            }
+
             if (!jkQuakeConsole_bHasTabbed && bPrintOnce) {
                 jkQuakeConsole_PrintLine(tmp2);
             }
@@ -746,9 +790,15 @@ void jkQuakeConsole_SendInput(WPARAM wParam, int bIsChar)
                 }
             }
 
-            if (tabbedStr) {
-                strncpy(jkQuakeConsole_pTabPos, tabbedStr, JKQUAKECONSOLE_CHAT_LEN-1);
-                strncat(jkQuakeConsole_pTabPos, " ", JKQUAKECONSOLE_CHAT_LEN-1);
+            if (tabbedStr)
+            {
+                size_t offset = jkQuakeConsole_pTabPos - jkQuakeConsole_chatStr;
+                size_t remaining = JKQUAKECONSOLE_CHAT_LEN - offset;
+
+                if (remaining > 1)
+                {
+                    stdString_snprintf(jkQuakeConsole_pTabPos, remaining, "%s ", tabbedStr);
+                }
             }
             free(baseCmd);
 

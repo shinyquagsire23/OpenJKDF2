@@ -30,6 +30,7 @@
 #ifdef SDL2_RENDER
 void stdControl_FreeSdlJoysticks();
 void stdControl_InitSdlJoysticks();
+void stdControl_IgnoreHeldKeys(); // Added
 #endif
 
 void stdControl_Reset();

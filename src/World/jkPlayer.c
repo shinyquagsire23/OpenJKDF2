@@ -8,6 +8,7 @@
 #include "General/stdString.h"
 #include "General/stdFnames.h"
 #include "General/stdFileUtil.h"
+#include "General/util.h"
 #include "Engine/sithAnimClass.h"
 #include "Dss/sithGamesave.h"
 #include "Engine/rdPuppet.h"
@@ -28,6 +29,7 @@
 #include "World/sithWorld.h"
 #include "World/sithSector.h"
 #include "Primitives/rdMatrix.h"
+#include "Primitives/rdModel3.h" // Added: DK Mode POV rendering flag
 #include "Devices/sithControl.h"
 #include "Main/jkHudInv.h"
 #include "Main/jkGame.h"
@@ -36,6 +38,9 @@
 #include "General/stdJSON.h"
 #include "Platform/std3D.h"
 #include "Main/sithCvar.h"
+// Added: Custom RGB lightsaber rendering state.
+extern int jkSaber_rgbEnabled;
+extern int jkSaber_rgbDrawActive;
 
 // DSi has *plenty* of time to read the text.
 #ifdef TARGET_RETRO_HOMEBREW
@@ -722,7 +727,8 @@ int jkPlayer_ReadConf(char16_t *name)
     if (!stdConffile_OpenReadBypass(fpath))
         return 0;
 
-    if ( stdConffile_ReadLine() && _sscanf(stdConffile_g_aLine, "version %d", &version) == 1 && version == 1 && stdConffile_ReadLine() )
+    int bReadFirstLine = stdConffile_ReadLine(); // Added: kept for the message below
+    if ( bReadFirstLine && _sscanf(jkPlayer_SkipLinePrefix(stdConffile_g_aLine), "version %d", &version) == 1 && version == 1 && stdConffile_ReadLine() ) // Added: jkPlayer_SkipLinePrefix
     {
         _sscanf(stdConffile_g_aLine, "diff %d", &jkPlayer_setDiff);
         if ( jkPlayer_setDiff < 0 )
@@ -833,6 +839,16 @@ int jkPlayer_ReadConf(char16_t *name)
     }
     else
     {
+        // Added: say why, since the player only sees "Cannot set player"
+        if (bReadFirstLine) {
+            char aFirstLine[48];
+            stdString_SafeStrCopy(aFirstLine, stdConffile_g_aLine, sizeof(aFirstLine));
+            stdPlatform_Printf("jkPlayer: Can't read %s: it starts with \"%s\", not \"version 1\" and a difficulty line\n", fpath, aFirstLine);
+        }
+        else {
+            stdPlatform_Printf("jkPlayer: Can't read %s: it's empty\n", fpath);
+        }
+
         stdConffile_Close();
         jkPlayer_setDiff = 1;
         sithControl_DefaultInit();
@@ -840,6 +856,80 @@ int jkPlayer_ReadConf(char16_t *name)
     }
     return 0;
 }
+
+// Added: a text editor can put a UTF-8 byte order mark or spaces in front of
+// a .plr's "version 1" line, which made the character impossible to pick.
+const char* jkPlayer_SkipLinePrefix(const char* pLine)
+{
+    if ((uint8_t)pLine[0] == 0xEF && (uint8_t)pLine[1] == 0xBB && (uint8_t)pLine[2] == 0xBF)
+        pLine += 3;
+    while (*pLine == ' ' || *pLine == '\t')
+        pLine++;
+    return pLine;
+}
+
+#ifdef QOL_IMPROVEMENTS
+// Added: copies a file as is, through the same file access as the .plr.
+static int jkPlayer_CopyFileLowLevel(const char* pFrom, const char* pTo)
+{
+    char buf[512];
+    size_t len;
+    int ret = 1;
+
+    stdFile_t in = pLowLevelHS->fileOpen(pFrom, "rb");
+    if (!in)
+        return 0;
+    stdFile_t out = pLowLevelHS->fileOpen(pTo, "wb");
+    if (!out) {
+        pLowLevelHS->fileClose(in);
+        return 0;
+    }
+    while ((len = pLowLevelHS->fileRead(in, buf, sizeof(buf))) > 0) {
+        if (pLowLevelHS->fileWrite(out, buf, len) != len) {
+            ret = 0;
+            break;
+        }
+    }
+    pLowLevelHS->fileClose(in);
+    pLowLevelHS->fileClose(out);
+    return ret;
+}
+
+// Added: a character whose .plr is there but can't be read (empty, cut short,
+// or not starting with "version 1") used to be refused with "Cannot set
+// player", with no way to fix it in the game. It's set up again like a new
+// character with the same name, at Medium, and the old file is kept as
+// <name>.plr.bak. Saved games and .mpc files in its folder aren't touched.
+int jkPlayer_RepairConf(char16_t *name)
+{
+    char nameTmp[32];
+    char fpath[256];
+    char bakPath[256];
+
+    if (!jkPlayer_VerifyWcharName(name))
+        return 0;
+
+    stdString_WcharToChar(nameTmp, name, 31);
+    nameTmp[31] = 0;
+    stdString_snprintf(fpath, 256, "player\\%s\\%s.plr", nameTmp, nameTmp);
+    if (!util_FileExistsLowLevel(fpath))
+        return 0;
+
+    stdString_snprintf(bakPath, 256, "player\\%s\\%s.plr.bak", nameTmp, nameTmp);
+    if (jkPlayer_CopyFileLowLevel(fpath, bakPath)) {
+        // CreateConf reads the old file first, which would print the
+        // "Can't read" message again
+        stdFileUtil_DelFile(fpath);
+        stdPlatform_Printf("jkPlayer: Starting %s over with default settings, the old file is kept as %s\n", nameTmp, bakPath);
+    }
+    else
+        stdPlatform_Printf("jkPlayer: Starting %s over with default settings, couldn't keep a copy of the old file\n", nameTmp);
+
+    jkPlayer_setDiff = 1;
+    jkPlayer_CreateConf(name);
+    return jkPlayer_ReadConf(name);
+}
+#endif
 
 void jkPlayer_SetPovModel(jkPlayerInfo *info, rdModel3 *model)
 {
@@ -963,11 +1053,10 @@ void jkPlayer_DrawPov()
         }
 #endif
         
-        //printf("pov in\n");
-        //jkPlayer_checkPov = 1;
+        // Added: Identify first-person rendering
+        rdModel3_bRenderingPOV = 1;
         rdThing_Draw(&playerThings[playerThingIdx].povModel, &orient);
-        //jkPlayer_checkPov = 0;
-        //printf("pov done\n");
+        rdModel3_bRenderingPOV = 0;
 
         // DSi doesn't really have Z buffer stuff so just batch everything
 #ifndef TARGET_TWL
@@ -1037,6 +1126,13 @@ void jkPlayer_renderSaberWeaponMesh(SithThing *thing)
     rdMatrix34* primaryMat = &thing->renderData.paJointMatrices[primary_mesh];
     rdMatrix34* secondaryMat = &thing->renderData.paJointMatrices[secondary_mesh];
 
+    // Added: DK Mode - attach replacement hand to adjusted wrist
+    rdMatrix34 dkPrimaryMat;
+
+    if (rdModel3_GetDKHandMatrix(&thing->renderData, primary_mesh, &dkPrimaryMat)) {
+        primaryMat = &dkPrimaryMat;
+    }
+
     if (thing->jkFlags & JKFLAG_PERSUASION)
     {
         if ( sithPlayer_g_pLocalPlayer->aItems[SITHBIN_F_SEEING].state & SITHINVENTORY_ITEM_ACTIVATED )
@@ -1064,9 +1160,21 @@ void jkPlayer_renderSaberWeaponMesh(SithThing *thing)
             if (thing->jkFlags & JKFLAG_SABERON)
             {
                 jkSaber_PolylineRand(&playerInfo->polylineThing);
+
+                // Added: Apply custom RGB only to the local player's saber.
+                jkSaber_rgbDrawActive =
+                    jkSaber_rgbEnabled &&
+                    (thing == sithPlayer_g_pLocalPlayerThing);
+
                 rdThing_Draw(&playerInfo->polylineThing, primaryMat);
-                if ( thing->jkFlags & JKFLAG_DUALSABERS)
+
+                if (thing->jkFlags & JKFLAG_DUALSABERS)
+                {
                     rdThing_Draw(&playerInfo->polylineThing, secondaryMat);
+                }
+
+                // Restore normal rendering for other objects.
+                jkSaber_rgbDrawActive = 0;
             }
         }
         else
@@ -1082,9 +1190,21 @@ void jkPlayer_renderSaberWeaponMesh(SithThing *thing)
         if (thing->jkFlags & JKFLAG_SABERON)
         {
             jkSaber_PolylineRand(&playerInfo->polylineThing);
+
+            // Added: Apply custom RGB only to the local player's saber.
+            jkSaber_rgbDrawActive =
+                jkSaber_rgbEnabled &&
+                (thing == sithPlayer_g_pLocalPlayerThing);
+
             rdThing_Draw(&playerInfo->polylineThing, primaryMat);
+
             if (thing->jkFlags & JKFLAG_DUALSABERS)
+            {
                 rdThing_Draw(&playerInfo->polylineThing, secondaryMat);
+            }
+
+            // Restore normal rendering for other objects.
+            jkSaber_rgbDrawActive = 0;
         }
     }
 }
@@ -1310,6 +1430,8 @@ void jkPlayer_MpcInitBins(SithPlayer* unk)
     }
 }
 
+static int jkPlayer_MPCBinReadMots(); // Added
+
 // MOTS altered TODO
 int jkPlayer_MPCParse(jkPlayerMpcInfo *info, SithPlayer* unk, char16_t *fname, char16_t *name, int hasBins)
 {
@@ -1320,6 +1442,10 @@ int jkPlayer_MPCParse(jkPlayerMpcInfo *info, SithPlayer* unk, char16_t *fname, c
     char a1a[32]; // [esp+18h] [ebp-C0h] BYREF
     char v11[32]; // [esp+38h] [ebp-A0h] BYREF
     char jkl_fname[128]; // [esp+58h] [ebp-80h] BYREF
+    const char* pExpected; // Added
+    int bGotLine; // Added
+    int personality; // Added
+    int bScrambled; // Added
 
     stdString_WcharToChar(a1a, fname, 31);
     a1a[31] = 0;
@@ -1334,56 +1460,90 @@ int jkPlayer_MPCParse(jkPlayerMpcInfo *info, SithPlayer* unk, char16_t *fname, c
     if (!stdConffile_OpenReadBypass(jkl_fname))
         return 0;
 
-    if ( stdConffile_ReadLine()
-      && _sscanf(stdConffile_g_aLine, "version %d", &v8) == 1
-      && v8 == 1
-      && stdConffile_ReadLine()
-      && _sscanf(stdConffile_g_aLine, "model: %s", jkPlayer_model) == 1
-      && stdConffile_ReadLine()
-      && _sscanf(stdConffile_g_aLine, "soundclass: %s", jkPlayer_soundClass) == 1
-      && stdConffile_ReadLine()
-      && _sscanf(stdConffile_g_aLine, "sidemat: %s", jkPlayer_sideMat) == 1
-      && stdConffile_ReadLine()
-      && _sscanf(stdConffile_g_aLine, "tipmat: %s", jkPlayer_tipMat) == 1 )
+    // Added: MotS saves its characters scrambled, as "version 2". OpenJKDF2
+    // saves them as plain "version 1", like Jedi Knight. A file that doesn't
+    // start with plain "version" is read again unscrambled.
+    bScrambled = 0;
+    bGotLine = stdConffile_ReadLine();
+    if ( bGotLine && Main_bMotsCompat && _strncmp(jkPlayer_SkipLinePrefix(stdConffile_g_aLine), "version ", 8) )
     {
-        if (Main_bMotsCompat) {
-            if (!stdConffile_ReadLine() || _sscanf(stdConffile_g_aLine, "personality: %d", &jkPlayer_personality) != 1) {
-                stdConffile_Close();
-                return 0;
-            }
+        stdConffile_Close();
+        if (!stdConffile_OpenReadMotsScrambled(jkl_fname))
+            return 0;
+        bScrambled = 1;
+        bGotLine = stdConffile_ReadLine();
+    }
+
+    // Added: pExpected names the line that couldn't be read, for the message
+    // below. A byte order mark or spaces before "version 1" are skipped, as
+    // for the .plr.
+    pExpected = NULL;
+    personality = 1; // HACK: JK only has Jedi classes.
+    if ( !bGotLine
+      || _sscanf(jkPlayer_SkipLinePrefix(stdConffile_g_aLine), "version %d", &v8) != 1
+      || v8 != (bScrambled ? 2 : 1) )
+        pExpected = bScrambled ? "version 2" : "version 1";
+    else if ( !(bGotLine = stdConffile_ReadLine()) || _sscanf(stdConffile_g_aLine, "model: %s", jkPlayer_model) != 1 )
+        pExpected = "model:";
+    else if ( !(bGotLine = stdConffile_ReadLine()) || _sscanf(stdConffile_g_aLine, "soundclass: %s", jkPlayer_soundClass) != 1 )
+        pExpected = "soundclass:";
+    else if ( !(bGotLine = stdConffile_ReadLine()) || _sscanf(stdConffile_g_aLine, "sidemat: %s", jkPlayer_sideMat) != 1 )
+        pExpected = "sidemat:";
+    else if ( !(bGotLine = stdConffile_ReadLine()) || _sscanf(stdConffile_g_aLine, "tipmat: %s", jkPlayer_tipMat) != 1 )
+        pExpected = "tipmat:";
+    else if (Main_bMotsCompat) {
+        // Added: a Jedi Knight character has no personality line, its force
+        // powers come straight after tipmat, so it's read as a Jedi, the only
+        // kind Jedi Knight has. jkPlayer_MPCBinRead goes on after the
+        // "forcepowers:" line read here. A personality with no
+        // GUI_PERSONALITYn string (1-8) showed as GUI_PERSONALITY0.
+        if ( !(bGotLine = stdConffile_ReadLine()) )
+            pExpected = "personality:";
+        else if ( !bScrambled && !_strncmp(stdConffile_g_aLine, "forcepowers:", 12) )
+            personality = 1;
+        else if ( _sscanf(stdConffile_g_aLine, "personality: %d", &personality) != 1 || personality < 1 || personality > 8 )
+            pExpected = "personality: 1 to 8";
+    }
+
+    if ( pExpected )
+    {
+        // Added: say why, since the player only sees GUI_PERSONALITY0
+        if (bGotLine) {
+            char aLine[48];
+            stdString_SafeStrCopy(aLine, stdConffile_g_aLine, sizeof(aLine));
+            stdPlatform_Printf("jkPlayer: Can't read %s: line %d is \"%s\", not \"%s\"\n", jkl_fname, stdConffile_linenum, aLine, pExpected);
         }
         else {
-            jkPlayer_personality = 1; // HACK: JK only has Jedi classes.
+            stdPlatform_Printf("jkPlayer: Can't read %s: it ends before \"%s\"\n", jkl_fname, pExpected);
         }
 
-        _strncpy(info->model, jkPlayer_model, 0x1Fu);
-        info->model[31] = 0;
-        _strncpy(info->soundClass, jkPlayer_soundClass, 0x1Fu);
-        info->soundClass[31] = 0;
-        _strncpy(info->sideMat, jkPlayer_sideMat, 0x1Fu);
-        info->sideMat[31] = 0;
-        _strncpy(info->tipMat, jkPlayer_tipMat, 0x1Fu);
-        info->tipMat[31] = 0;
-        info->personality = jkPlayer_personality; // MOTS added
-        if ( hasBins )
-        {
-            jkPlayer_MPCBinRead();
-        }
-        info->jediRank = jkPlayer_GetJediRank();
-        stdConffile_Close();
-
-        
-        jkPlayer_SetAmmoMaximums(jkPlayer_personality); // MOTS added
-        jkPlayer_mpcInfoSet = 1;
-        return 1;
-    }
-    else
-    {
         stdConffile_Close();
         return 0;
     }
 
-    return 0;
+    jkPlayer_personality = personality;
+
+    _strncpy(info->model, jkPlayer_model, 0x1Fu);
+    info->model[31] = 0;
+    _strncpy(info->soundClass, jkPlayer_soundClass, 0x1Fu);
+    info->soundClass[31] = 0;
+    _strncpy(info->sideMat, jkPlayer_sideMat, 0x1Fu);
+    info->sideMat[31] = 0;
+    _strncpy(info->tipMat, jkPlayer_tipMat, 0x1Fu);
+    info->tipMat[31] = 0;
+    info->personality = jkPlayer_personality; // MOTS added
+    if ( hasBins )
+    {
+        // Added: say so when the force powers stop early, the rest are 0
+        if ( !(bScrambled ? jkPlayer_MPCBinReadMots() : jkPlayer_MPCBinRead()) )
+            stdPlatform_Printf("jkPlayer: %s: force powers after line %d couldn't be read, they're 0\n", jkl_fname, stdConffile_linenum);
+    }
+    info->jediRank = jkPlayer_GetJediRank();
+    stdConffile_Close();
+
+    jkPlayer_SetAmmoMaximums(jkPlayer_personality); // MOTS added
+    jkPlayer_mpcInfoSet = 1;
+    return 1;
 }
 
 int jkPlayer_MPCWrite(SithPlayer* unk, char16_t *mpcName, char16_t *playerName)
@@ -1445,25 +1605,98 @@ int jkPlayer_MPCBinWrite()
 }
 
 // MOTS added: weird xor crypt
+// Added: each "bin: N value: V" line goes into bin N, not the next bin in
+// order, so a Jedi Knight character's rank (bin 20) doesn't land in Force
+// Defense (bin 19) in MotS. Force powers the file leaves out are 0 rather than
+// the last character's. The "forcepowers:" line may already have been read by
+// jkPlayer_MPCParse, for a character with no personality line.
 int jkPlayer_MPCBinRead()
 {
     flex32_t a2;
     int v3;
+    int bFirstLine = 1;
 
-    stdConffile_ReadLine();
     for (int i = SITHBIN_FP_START; i <= SITHBIN_FP_END; ++i )
     {
-        if ( !stdConffile_ReadLine() || _sscanf(stdConffile_g_aLine, "bin: %d value: %f\n", &v3, &a2) != 2 )
-            return 0;
-
-        sithPlayer_SetInvItemAmount(i, a2);
+        sithPlayer_SetInvItemAmount(i, 0.0);
         sithPlayer_SetInvItemAvailable(i, 1);
     }
+    sithPlayer_SetInvItemAmount(SITHBIN_SPEND_STARS, 0.0);
 
-    if ( !stdConffile_ReadLine() || _sscanf(stdConffile_g_aLine, "spendable stars: %f\n", &a2) != 1 )
+    while ( stdConffile_ReadLine() )
+    {
+        if ( bFirstLine && !_strncmp(stdConffile_g_aLine, "forcepowers:", 12) )
+        {
+            bFirstLine = 0;
+            continue;
+        }
+        bFirstLine = 0;
+
+        if ( _sscanf(stdConffile_g_aLine, "bin: %d value: %f\n", &v3, &a2) == 2 )
+        {
+            if ( v3 >= SITHBIN_FP_START && v3 <= SITHBIN_FP_END )
+                sithPlayer_SetInvItemAmount(v3, a2);
+            continue;
+        }
+
+        if ( _sscanf(stdConffile_g_aLine, "spendable stars: %f\n", &a2) != 1 )
+            return 0;
+
+        sithPlayer_SetInvItemAmount(SITHBIN_SPEND_STARS, a2);
+        return 1;
+    }
+
+    return 0;
+}
+
+// Added: the force powers of a character saved by MotS (JKM.EXE 0x406F00).
+// After "forcepowers:" come bins 19 to 39 in order, each bin number XORed with
+// the scramble key at the start of its line. Then (key & 7) + 2 lines that
+// only hide the format, numbered 0 up in the same way, with the key read again
+// after each, and spendable stars.
+static int jkPlayer_MPCBinReadMots()
+{
+    flex32_t value;
+    int bin;
+    int key;
+    int i;
+
+    for (i = SITHBIN_FP_START; i <= SITHBIN_FP_END; ++i )
+    {
+        sithPlayer_SetInvItemAmount(i, 0.0);
+        sithPlayer_SetInvItemAvailable(i, 1);
+    }
+    sithPlayer_SetInvItemAmount(SITHBIN_SPEND_STARS, 0.0);
+
+    if ( !stdConffile_ReadLine() )
         return 0;
 
-    sithPlayer_SetInvItemAmount(SITHBIN_SPEND_STARS, a2);
+    for (i = SITHBIN_FP_START; i <= SITHBIN_FP_END; ++i )
+    {
+        key = stdConffile_GetMotsScrambleKey();
+        if ( !stdConffile_ReadLine()
+          || _sscanf(stdConffile_g_aLine, "bin: %d value: %f", &bin, &value) != 2
+          || (bin ^ key) != i )
+            return 0;
+
+        sithPlayer_SetInvItemAmount(i, value);
+    }
+
+    key = stdConffile_GetMotsScrambleKey();
+    for (i = 0; i < (key & 7) + 2; ++i )
+    {
+        if ( !stdConffile_ReadLine()
+          || _sscanf(stdConffile_g_aLine, "bin: %d value: %f", &bin, &value) != 2
+          || (bin ^ key) != i )
+            return 0;
+
+        key = stdConffile_GetMotsScrambleKey();
+    }
+
+    if ( !stdConffile_ReadLine() || _sscanf(stdConffile_g_aLine, "spendable stars: %f", &value) != 1 )
+        return 0;
+
+    sithPlayer_SetInvItemAmount(SITHBIN_SPEND_STARS, value);
     return 1;
 }
 

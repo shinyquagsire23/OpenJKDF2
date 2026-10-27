@@ -7,8 +7,12 @@
 #include "Engine/rdColormap.h"
 #include "General/stdMath.h"
 #include "stdPlatform.h"
+#include "World/jkPlayer.h"
 
 #include <math.h>
+
+#define RD_PROC_FLAG_SABER_RGB 0x40000000u
+#define RD_TRI_FLAG_SABER_RGB  0x40000
 
 #ifdef RDCACHE_RENDER_LINES
 static int rdCache_totalLines = 0;
@@ -375,13 +379,18 @@ int rdCache_SendFaceListToHardware()
         mipmap_level = a3;
 
         flags_idk_ = flags_idk;
+        if (active_6c->light_flags & RD_PROC_FLAG_SABER_RGB)
+        {
+            flags_idk_ |= RD_TRI_FLAG_SABER_RGB;
+        }
         if ( (rdroid_g_curRenderOptions & 2) != 0 )
             v148 = active_6c->ambientLight;
         else
             v148 = 0.0;
 
         // Added: We need to know if a face is flex_d_t-sided
-        if (active_6c->type & RD_FF_DOUBLE_SIDED && active_6c->light_flags)
+        if ((active_6c->type & RD_FF_DOUBLE_SIDED) &&
+            (active_6c->light_flags & ~RD_PROC_FLAG_SABER_RGB))
         {
             flags_idk_ |= 0x10000;
         }
@@ -575,12 +584,13 @@ int rdCache_SendFaceListToHardware()
 
             a3 = mipmap_level;
 
-            if ( (sith_tex_sel->alpha_en & 1) != 0 && std3D_HasAlpha() )
+            if ((sith_tex_sel->alpha_en & 1) != 0 && std3D_HasAlpha())
             {
 #ifdef SDL2_RENDER
-                if (sith_tex_sel->has_jkgm_override)
+                if (jkPlayer_bEnableJkgm && sith_tex_sel->has_jkgm_override)
                 {
                     tex2_arr_sel = &sith_tex_sel->alphaMats[mipmap_level];
+
                     if (tex2_arr_sel->albedo_factor[0] != 0.0
                         || tex2_arr_sel->albedo_factor[1] != 0.0
                         || tex2_arr_sel->albedo_factor[2] != 0.0
@@ -588,13 +598,13 @@ int rdCache_SendFaceListToHardware()
                     {
                         flags_idk_ |= 0x0;
                     }
-                    else {
-                        // If a texture is only emissive (blaster shots, etc)
-                        // then we probably want to keep the existing blend modes
+                    else
+                    {
                         flags_idk_ |= 0x400;
                     }
                 }
-                else {
+                else
+                {
                     flags_idk_ |= 0x400;
                 }
 #else
@@ -1210,10 +1220,9 @@ LABEL_232:
                     flex_d_t intGreen = active_6c->paGreenIntensities[vtx_idx] * 255.0 - 0.5;
                     flex_d_t intBlue = active_6c->paBlueIntensities[vtx_idx] * 255.0 - 0.5;
 
-
                     intRed += (flex_t)v91->colors[baseLight].r; // FLEXTODO
-                    intGreen += (flex_t)v91->colors[baseLight].r; // FLEXTODO
-                    intBlue += (flex_t)v91->colors[baseLight].r; // FLEXTODO
+                    intGreen += (flex_t)v91->colors[baseLight].g; // FLEXTODO
+                    intBlue += (flex_t)v91->colors[baseLight].b; // FLEXTODO
 
                     v94 = (uint8_t)stdMath_Clamp(intGreen, 0.0, 255.0);
                     v95 = (uint8_t)stdMath_Clamp(intBlue, 0.0, 255.0);
