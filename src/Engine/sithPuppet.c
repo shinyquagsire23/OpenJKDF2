@@ -219,7 +219,6 @@ int sithPuppet_PlayMode(SithThing *pThing, signed int submode, rdPuppetTrackCall
 
     // Added: Turbo Mode doubles AI firing animation speed.
     extern int jkDev_bTurbo;
-
     if (!sithNet_isMulti
         && jkDev_bTurbo
         && pThing->type == SITH_THING_ACTOR
