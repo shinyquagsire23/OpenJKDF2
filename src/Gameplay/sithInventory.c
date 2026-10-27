@@ -1043,7 +1043,11 @@ void sithInventory_PickupBackpack(SithThing *pPlayerThing, SithThing *pBackpackT
     for (int i = 0; i < pBackpackThing->itemParams.numBins; i++)
     {
         SithBackpackItem* item = &pBackpackThing->itemParams.contents[i];
-        SithInventoryType* desc = &sithInventory_g_aTypes[i];
+
+        // Added: bounds checking
+        if (item->binIdx < 0 || item->binIdx >= SITHBIN_NUMBINS)
+            continue;
+        SithInventoryType* desc = &sithInventory_g_aTypes[item->binIdx];
 
         if ((desc->flags & SITHINVENTORY_TYPE_REGISTERED) && (desc->flags & SITHINVENTORY_TYPE_BACKPACKITEM))
         {
@@ -1058,7 +1062,7 @@ int sithInventory_GetBackpackItemID(SithThing *pBackpackThing, signed int itemNu
     SITH_ASSERTREL(pBackpackThing->type == SITH_THING_ITEM);
     SITH_ASSERTREL((pBackpackThing->itemParams.flags & SITH_ITEM_BACKPACK));
 
-    if ( itemNum >= pBackpackThing->itemParams.numBins )
+    if ( itemNum < 0 || itemNum >= pBackpackThing->itemParams.numBins ) // Added: negative check
         return -1;
     else
         return pBackpackThing->itemParams.contents[itemNum].binIdx;
@@ -1070,7 +1074,7 @@ flex_t sithInventory_GetBackpackItemValue(SithThing *pBackpackThing, signed int 
     SITH_ASSERTREL(pBackpackThing->type == SITH_THING_ITEM);
     SITH_ASSERTREL((pBackpackThing->itemParams.flags & SITH_ITEM_BACKPACK));
 
-    if ( itemNum >= pBackpackThing->itemParams.numBins )
+    if ( itemNum < 0 || itemNum >= pBackpackThing->itemParams.numBins ) // Added: negative check
         return -1.0;
     else
         return pBackpackThing->itemParams.contents[itemNum].value;
