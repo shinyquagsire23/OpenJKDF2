@@ -349,10 +349,6 @@ void main(void)
         discard;
     }
     
-    // Fixed: translucent faces (rdCache flag 0x200, alpha 90/255) are blended as JK.EXE asks
-    // Direct3D to (SRCBLEND = SRCALPHA, DESTBLEND = INVSRCALPHA, JK.EXE 0x429ff4): 35% of the
-    // face over 65% of what's behind. This inverted the alpha, so water and glass were 65%
-    // opaque. Premultiplied, since std3D blends these with GL_ONE, GL_ONE_MINUS_SRC_ALPHA.
     if (blend_mode == D3DBLEND_INVSRCALPHA)
     {
         main_color.rgb *= main_color.a;
