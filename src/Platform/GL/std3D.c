@@ -21,6 +21,7 @@
 #include "Platform/GL/jkgm.h"
 
 #include "SDL2_helper.h"
+#include "General/stdString.h"
 
 #ifdef WIN32
 // Force Optimus/AMD to use non-integrated GPUs by default.
@@ -3622,16 +3623,51 @@ void std3D_UpdateSettings()
 }
 
 // Added
+#ifdef TARGET_CAN_JKGM
+// Added: PNG encoding takes ~90 ms at 1440p and froze the game, so it runs on a thread
+typedef struct std3D_ScreenshotJob
+{
+    char aPath[128];
+    int w, h;
+    uint8_t* pData;
+} std3D_ScreenshotJob;
+
+static int std3D_ScreenshotThread(void* pArg)
+{
+    std3D_ScreenshotJob* pJob = (std3D_ScreenshotJob*)pArg;
+    jkgm_write_png(pJob->aPath, pJob->w, pJob->h, pJob->pData);
+    free(pJob->pData);
+    free(pJob);
+    return 0;
+}
+#endif
+
+// Fixed: read the composited window (HUD, messages, console), not the 3D scene FBO.
+// Call between std3D_DrawMenu and the buffer swap (jkGame_ScreenshotFlush does).
 void std3D_Screenshot(const char* pFpath)
 {
 #ifdef TARGET_CAN_JKGM
-    if (!std3D_pFb) return;
+    int w = Window_xSize, h = Window_ySize;
+    if (w <= 0 || h <= 0) return;
 
-    uint8_t* data = (uint8_t*)malloc(std3D_pFb->w * std3D_pFb->h * 3 * sizeof(uint8_t));
-    glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
-    glReadPixels(0, 0, std3D_pFb->w, std3D_pFb->h, GL_RGB, GL_UNSIGNED_BYTE, data);
-    jkgm_write_png(pFpath, std3D_pFb->w, std3D_pFb->h, data);
-    free(data);
+    std3D_ScreenshotJob* pJob = (std3D_ScreenshotJob*)malloc(sizeof(std3D_ScreenshotJob));
+    uint8_t* data = (uint8_t*)malloc(w * h * 3 * sizeof(uint8_t));
+    if (!pJob || !data) { free(pJob); free(data); return; }
+    glBindFramebuffer(GL_FRAMEBUFFER, std3D_windowFbo);
+    if (!std3D_windowFbo) glReadBuffer(GL_BACK);
+    glPixelStorei(GL_PACK_ALIGNMENT, 1); // Fixed: rows are tight, widths like 1366 overflowed
+    glReadPixels(0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glPixelStorei(GL_PACK_ALIGNMENT, 4);
+
+    stdString_SafeStrCopy(pJob->aPath, pFpath, sizeof(pJob->aPath));
+    pJob->w = w;
+    pJob->h = h;
+    pJob->pData = data;
+    SDL_Thread* pThread = SDL_CreateThread(std3D_ScreenshotThread, "std3D_Screenshot", pJob);
+    if (pThread)
+        SDL_DetachThread(pThread);
+    else
+        std3D_ScreenshotThread(pJob);
 #endif
 }
 
