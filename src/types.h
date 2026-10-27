@@ -1353,10 +1353,10 @@ typedef struct SithPuppetClassSubmode
 
 typedef struct sithAnimclassMode
 {
-#ifdef JKM_TYPES
-    SithPuppetClassSubmode keyframe[45];
-#else
+#if defined(GHIDRA_IMPORT) && !defined(JKM_TYPES)
     SithPuppetClassSubmode keyframe[43];
+#else
+    SithPuppetClassSubmode keyframe[45];
 #endif
 } sithAnimclassMode;
 
