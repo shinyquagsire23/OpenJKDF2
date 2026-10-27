@@ -321,6 +321,7 @@ int sithUpdate()
             sithControl_ReadControls();
             if ( g_sithMode != 2 )
             {
+                sithControl_physStepsThisFrame = (int)wholeFramesToApply; // Added: lets mouse turn bank across step-less frames
                 sithControl_Update(sithTime_g_frameTimeFlex, sithTime_g_frameTime);
             }
             sithControl_FinishRead();
@@ -391,6 +392,7 @@ int sithUpdate()
             {
 #ifdef FIXED_TIMESTEP_PHYS
                 sithControl_ReadControls();
+                sithControl_physStepsThisFrame = -1; // Added: physics runs this frame's full delta
 #endif
                 sithControl_Update(sithTime_g_frameTimeFlex, sithTime_g_frameTime);
 #ifdef FIXED_TIMESTEP_PHYS

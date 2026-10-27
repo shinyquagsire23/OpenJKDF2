@@ -136,6 +136,20 @@ void sithCamera_ResetAllCameras()
     SithThing *v0; // eax
     rdVector3 rot; // [esp+Ch] [ebp-Ch] BYREF
 
+    // Added: the debug/dedicated-server spectator controls retype the current camera
+    // to 128 (orbit) every frame. Restore the stock types so it doesn't carry into the next game.
+    sithCamera_g_aCameras[0].type = 0x1;
+    sithCamera_g_aCameras[1].type = 0x4;
+    sithCamera_g_aCameras[2].type = 0x8;
+    sithCamera_g_aCameras[4].type = 0x20;
+    sithCamera_g_aCameras[5].type = 0x40;
+    sithCamera_g_aCameras[6].type = 0x80;
+#ifdef DW_CAMERA
+    if (Main_bDwCompat) {
+        sithCamera_g_aCameras[7].type = 0x100;
+    }
+#endif
+
     v0 = sithWorld_g_pCurrentWorld->pCameraFocusThing;
     sithCamera_g_stateFlags &= ~1u;
     sithCamera_SetCameraFocus(&sithCamera_g_aCameras[0], v0, v0);

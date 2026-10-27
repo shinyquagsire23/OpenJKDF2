@@ -39,6 +39,9 @@
 #define sithControl_PlayerLook_ADDR (0x004D8F40)
 #define SITHCONTROL_OPTION_TOGGLE_CROUCH 0x40
 
+// Added: physics steps sithMain runs after this frame's controls, or -1 when unstepped
+extern int sithControl_physStepsThisFrame;
+
 int sithControl_Startup();
 int sithControl_Shutdown();
 int sithControl_IsOpen();

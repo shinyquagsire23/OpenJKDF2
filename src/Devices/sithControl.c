@@ -48,6 +48,34 @@ static int sithControl_008d7f54 = 0;
 static int sithControl_008d7f58 = 0;
 static int sithControl_008d7f5c = 0;
 
+// Added: physics steps sithMain will run after this frame's controls, or -1 when unstepped
+int sithControl_physStepsThisFrame = -1;
+static flex_t sithControl_turnAxisBank = 0.0;
+
+// Added: the raw turn axis (mouse) is a per-frame delta, turned into a yaw velocity for
+// one frame of physics. With fixed-step physics, frames that run no step dropped their
+// delta and the next step scaled up only its own frame's delta, so far above the step
+// rate yaw moved in coarse jumps. Bank the delta until a step consumes it.
+static flex_t sithControl_GetTurnAxisVelocity(void)
+{
+    flex_t turnAxis = sithControl_GetAxis(INPUT_FUNC_TURN);
+    if (sithControl_physStepsThisFrame < 0)
+    {
+        sithControl_turnAxisBank = 0.0;
+        return turnAxis * sithTime_g_fps;
+    }
+
+    sithControl_turnAxisBank += turnAxis;
+
+    // Not integrated this frame; keep it nonzero so MotS turn start/stop messages stay as-is
+    if (sithControl_physStepsThisFrame == 0)
+        return sithControl_turnAxisBank * sithTime_g_fps;
+
+    flex_t vel = sithControl_turnAxisBank / (sithControl_physStepsThisFrame * DELTA_PHYSTICK_FPS);
+    sithControl_turnAxisBank = 0.0;
+    return vel;
+}
+
 // Added: Toggle crouch state
 static int sithControl_crouchWasSpecialMovement = 0;
 static int sithControl_crouchToggled = 0;
@@ -166,6 +194,10 @@ int sithControl_Startup()
 {
     if ( sithControl_bInitted )
         return 0;
+
+    // Added
+    sithControl_physStepsThisFrame = -1;
+    sithControl_turnAxisBank = 0.0;
 
     if ( stdControl_Startup() )
     {
@@ -1487,13 +1519,7 @@ void sithControl_PlayerMovementMots(SithThing *player)
     }
     iVar2 = sithControl_GetKey(INPUT_FUNC_SLIDETOGGLE,&local_4);
     if (iVar2 == 0) {
-        fVar4 = sithControl_GetAxis(INPUT_FUNC_TURN);
-#ifdef QOL_IMPROVEMENTS
-        // Scale appropriately to high framerates
-        fVar4 = fVar4 * sithTime_g_fps;
-#else
-        fVar4 = fVar4 * sithTime_g_fps;
-#endif
+        fVar4 = sithControl_GetTurnAxisVelocity(); // Added: was GetAxis(TURN) * fps
         if (1.0 <= move_multiplier) {
             local_8 = 1.0;
         }
@@ -1703,9 +1729,9 @@ void sithControl_PlayerMovement(SithThing *player)
             // These base values only come from raw axis fetches
 #ifdef QOL_IMPROVEMENTS
             // Scale appropriately to high and low framerates
-            player->physicsParams.angularVelocity.y = sithControl_GetAxis(INPUT_FUNC_TURN) * sithTime_g_fps;
+            player->physicsParams.angularVelocity.y = sithControl_GetTurnAxisVelocity(); // Added: was GetAxis(TURN) * fps
 #else
-            player->physicsParams.angularVelocity.y = sithControl_GetAxis(INPUT_FUNC_TURN) * sithTime_g_fps;
+            player->physicsParams.angularVelocity.y = sithControl_GetTurnAxisVelocity(); // Added: was GetAxis(TURN) * fps
 #endif
             if ( move_multiplier <= 1.0 )
                 move_multiplier_ = move_multiplier;
@@ -1820,10 +1846,10 @@ void sithControl_FreeCam(SithThing *player)
             
 #ifdef QOL_IMPROVEMENTS
             // Scale appropriately to high framerates
-            v1->physicsParams.angularVelocity.y = sithControl_GetAxis(INPUT_FUNC_TURN) * sithTime_g_fps;
+            v1->physicsParams.angularVelocity.y = sithControl_GetTurnAxisVelocity(); // Added: was GetAxis(TURN) * fps
             v1->physicsParams.angularVelocity.y +=  sithControl_GetKeyAsAxis(INPUT_FUNC_TURN) * v1->actorParams.maxRotVelocity;// * (sithTime_g_fps / 25.0) * 2.0;
 #else
-            v1->physicsParams.angularVelocity.y = sithControl_GetAxis(INPUT_FUNC_TURN) * sithTime_g_fps;
+            v1->physicsParams.angularVelocity.y = sithControl_GetTurnAxisVelocity(); // Added: was GetAxis(TURN) * fps
             v1->physicsParams.angularVelocity.y += sithControl_GetKeyAsAxis(INPUT_FUNC_TURN) * v1->actorParams.maxRotVelocity;
 #endif
         }
