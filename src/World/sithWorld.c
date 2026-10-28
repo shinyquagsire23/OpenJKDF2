@@ -108,7 +108,7 @@ void sithWorld_Shutdown()
 {
     if ( sithWorld_g_pCurrentWorld ) {
 #ifdef NO_JK_MMAP
-        /* Normal close already releases the world. The shutdown fallback must
+        /* Added: normal close already releases the world. The shutdown fallback must
          * also detach its model pages before the world address can be reused. */
         if (sithWorld_g_pCurrentWorld->aModels)
             sithModel_FreeWorldModels(sithWorld_g_pCurrentWorld);
@@ -932,6 +932,7 @@ void sithWorld_GetMemoryUsage(SithWorld *pWorld, int *aMemUsed, int *aCount)
     aCount[10] = pWorld->numModels;
     for (int i = 0; i < pWorld->numModels; i++)
     {
+        // Altered: loaded model headers can also reside in stable overflow pages.
         aMemUsed[10] += sithModel_GetModelMemUsage(sithModel_GetWorldModelByIndex(pWorld, i));
     }
     aCount[11] = pWorld->numKeyframes;

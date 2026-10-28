@@ -945,6 +945,7 @@ rdModel3* sithCogExec_PopModel3(sithCog *pCog)
         idx = -1;
     }
 
+    // Altered: resolve both the initial model array and nonmoving overflow pages.
     return sithModel_GetModelByIndex(idx);
 }
 

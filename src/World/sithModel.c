@@ -10,7 +10,7 @@
 
 static tHashTable* sithModel_hashtable;
 
-/* The injected original executable still indexes aModels directly. Only the
+/* Added: the injected original executable still indexes aModels directly. Only the
  * source-built engine uses overflow pages; its consumers use the accessor. */
 typedef struct sithModelPage {
     struct sithModelPage *next;
@@ -58,7 +58,7 @@ static sithModelPage *sithModel_NewPage(SithWorld *world)
 #ifdef NO_JK_MMAP
     sithModelWorldStore *store = sithModel_FindStore(world);
     if (!store || world->sizeModels >= SITHMODEL_MAX_MODELS) return NULL;
-    uint32_t count = world->sizeModels < 32 ? 32 : world->sizeModels;
+    uint32_t count = world->sizeModels < SITHMODEL_MIN_PAGE_MODELS ? SITHMODEL_MIN_PAGE_MODELS : world->sizeModels;
     if (count > SITHMODEL_MAX_MODELS - world->sizeModels)
         count = SITHMODEL_MAX_MODELS - world->sizeModels;
     sithModelPage *page = SITH_ALLOC(sizeof(*page) + sizeof(rdModel3) * count);
@@ -103,6 +103,7 @@ int sithModel_ReadStaticModelsListText(SithWorld *pWorld, int bSkip)
     stdConffile_ReadArgs();
     if ( _memcmp(stdConffile_g_entry.aArgs[0].value, "world", 6u) || _memcmp(stdConffile_g_entry.aArgs[1].value, "models", 7u) )
         return 0;
+    // Altered: validate the declaration before creating the world-owned model store.
     char *end;
     long declared = strtol(stdConffile_g_entry.aArgs[2].value, &end, 10);
     if (end == stdConffile_g_entry.aArgs[2].value || *end || declared < 0 || declared > SITHMODEL_MAX_MODELS)
@@ -206,6 +207,7 @@ rdModel3* sithModel_Load(const char *pName, int bSkipDefault)
     if (sithWorld_g_pLastLoadedWorld->level_type_maybe & 1)
         model->id |= 0x8000;
     
+    // Added: publish a candidate only after it has a cache entry.
     if (!stdHashtbl_Add(sithModel_hashtable, model->filename, model)) {
         /* A fully loaded candidate owns geometry, while its materials remain
          * world-owned. Never publish an ID for an uncached candidate. */
@@ -279,12 +281,13 @@ uint32_t sithModel_GetModelMemUsage(rdModel3 *pModel)
 
 int sithModel_AllocWorldModels(SithWorld *pWorld, int size)
 {
+    // Added: keep capacity within the existing model ID encoding.
     if (!pWorld || size < 0 || (uint32_t)size > SITHMODEL_MAX_MODELS) return 0;
     SITH_ASSERTREL(pWorld->aModels == NULL); // Added
     if (pWorld->aModels || pWorld->numModels || pWorld->sizeModels) return 0;
 #ifdef NO_JK_MMAP
     if (sithModel_FindStore(pWorld)) return 0;
-    if (!size) size = 32;
+    if (!size) size = SITHMODEL_MIN_PAGE_MODELS;
 #else
     if (!size) return 1;
 #endif
