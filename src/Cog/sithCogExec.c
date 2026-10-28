@@ -1131,9 +1131,11 @@ void sithCogExec_PushStack(sithCog *pCog, SithCogSymbolValue *pValue)
 
     if ( pCog->stackPos == SITHCOGVM_MAX_STACKSIZE )
     {
+        // Added: count complete symbols, not the array or dynamic-stack pointer.
+        const uint32_t numRetained = SITHCOGVM_MAX_STACKSIZE - 1;
         // Added: word-safe shift (stack may be word-addressable-only); dst < src,
         // so a forward copy preserves the memmove semantics.
-        stdPlatform_Memcpy32(pCog->stack, &pCog->stack[1], sizeof(pCog->stack) * (SITHCOGVM_MAX_STACKSIZE-1));
+        stdPlatform_Memcpy32(pCog->stack, &pCog->stack[1], sizeof(pCog->stack[0]) * numRetained);
         --pCog->stackPos;
     }
     
