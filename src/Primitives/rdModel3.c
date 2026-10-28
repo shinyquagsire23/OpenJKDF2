@@ -1903,7 +1903,10 @@ void rdModel3_DrawMesh(rdMesh *pMesh, rdMatrix34 *orient)
             rdModel3_numMeshLights,
             pCurMesh->vertexNormals,
             pCurMesh->aVertices,
-            pCurMesh->vertices_i,
+            // RGB primitives add their static channels separately. Including
+            // the scalar base here would count 3DO light twice and contaminate
+            // architectural RGB with the model's unrelated mono light.
+            rdGetVertexColorMode() == 1 ? NULL : pCurMesh->vertices_i,
             pCurMesh->vertices_unk,
             pCurMesh->numVertices,
             rdCamera_g_pCurCamera->attenuationMin);
