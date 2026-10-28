@@ -1,0 +1,42 @@
+name: MotS host item lifecycle regression
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - src/Dss/sithDSSThing.c
+      - src/World/sithItem.c
+      - src/Tests/takeitem_test.c
+      - src/Tests/run_takeitem_test.py
+      - src/Tests/source_test_utils.py
+      - .github/workflows/mots-host-take.yml
+      - docs/mots-host-take.md
+  push:
+    branches: [master]
+    paths:
+      - src/Dss/sithDSSThing.c
+      - src/World/sithItem.c
+      - src/Tests/takeitem_test.c
+      - src/Tests/run_takeitem_test.py
+      - src/Tests/source_test_utils.py
+      - .github/workflows/mots-host-take.yml
+      - docs/mots-host-take.md
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mots-host-take-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mots-host-take:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Run focused native regression
+        run: python3 -B src/Tests/run_takeitem_test.py --cc gcc --sanitize
