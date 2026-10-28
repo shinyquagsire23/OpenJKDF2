@@ -9,7 +9,7 @@
 #include "jk.h"
 
 #ifdef NO_JK_MMAP
-// Published sound pointers are retained by classes, mixer voices and sectors.
+// Added: published sound pointers are retained by classes, mixer voices and sectors.
 // Overflow pages never move; the legacy world layout and initial array remain.
 typedef struct sithSoundPage {
     struct sithSoundPage *next;
@@ -54,6 +54,7 @@ static int sithSound_ParseCount(const char *text, int *count)
 }
 #endif
 
+// Added: resolve initial-array and page slots without moving a published header.
 static sithSound *sithSound_GetAllocatedSound(SithWorld *world, int idx)
 {
     if (!world || !world->sounds || idx < 0 || idx >= world->numSounds)
@@ -223,6 +224,7 @@ void sithSound_FreeWorldSounds(SithWorld *pWorld)
 int sithSound_New(SithWorld *world, int num)
 {
 #ifdef NO_JK_MMAP
+    // Added: capacity and the MotS reserve must fit the existing sound ID encoding.
     if (!world || world->sounds || world->numSounds || world->numSoundsLoaded
         || num < 0 || num > SITHSOUND_MAX_RECORDS - (Main_bMotsCompat != 0))
         return 0;
@@ -341,6 +343,7 @@ sithSound* sithSound_Load(char *sound_fname, int a2)
             sound->isLoaded = 0;
             sound->infoLoaded = 1;
 #ifdef NO_JK_MMAP
+            // Added: publish a header/page only after its cache entry succeeds.
             if (!stdHashtbl_Add(sithSound_hashtable, sound->sound_fname, sound))
                 goto fail;
             if (pendingPage) {

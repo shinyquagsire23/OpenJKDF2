@@ -10,6 +10,7 @@
 
 #include "file_type.inc"
 #if INTPTR_MAX > INT32_MAX
+_Static_assert(sizeof(stdFile_t) >= sizeof(intptr_t), "wide file handles must fit the production type");
 static const stdFile_t fixture_file = (stdFile_t)UINT64_C(0x100000001);
 #else
 static const stdFile_t fixture_file = 1;

@@ -747,6 +747,7 @@ sithSound* sithCogExec_PopSound(sithCog *pCog)
     
     if ( world && idx >= 0 && idx < world->numSoundsLoaded )
     {
+        // Altered: sound headers can also reside in nonmoving overflow pages.
         return sithSound_GetWorldSoundByIndex(world, idx);
     }
 

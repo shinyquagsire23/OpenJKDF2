@@ -18,10 +18,6 @@
 #define sithSound_FreeUpMemory_ADDR (0x004EF6C0)
 #define sithSound_InitFromPath_ADDR (0x004EF7E0)
 
-// 0x8000 tags static IDs; leave 0xffff available for the -1 wire sentinel.
-#define SITHSOUND_MAX_RECORDS 32767
-#define SITHSOUND_PAGE_RECORDS 256
-
 int sithSound_Startup();
 int sithSound_Shutdown();
 int sithSound_ReadSoundsListText(SithWorld *pWorld, int bSkip);

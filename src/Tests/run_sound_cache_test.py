@@ -19,13 +19,13 @@ def main():
     args.output.mkdir(parents=True, exist_ok=False)
     paths = ['src/Devices/sithSound.c', 'src/Devices/sithSound.h', 'src/World/sithWorld.c',
              'src/Cog/sithCogExec.c', 'src/types.h', 'src/Tests/sound_cache_test.c',
-             'src/Tests/run_sound_cache_test.py']
+             'src/Tests/run_sound_cache_test.py', 'src/engine_config.h']
     sources = {p: (ROOT / p).read_bytes() for p in paths}
     value = re.sub(r'^#include[^\n]*\n', '', sources[paths[0]].decode(), flags=re.M)
     production = value[:value.index('#ifdef TARGET_RETRO_HOMEBREW\n// Added: fileRead')]
     production += value[value.index('int sithSound_UnloadData('):value.index('stdSound_buffer_t* sithSound_LoadData(')]
     production += value[value.index('int sithSound_FreeUpMemory('):value.index('stdSound_buffer_t* sithSound_InitFromPath(')]
-    header = sources[paths[1]].decode()
+    header = sources[paths[1]].decode() + '\n' + sources['src/engine_config.h'].decode()
     api = '\n'.join(line for line in header.splitlines()
                     if line.startswith('#define SITHSOUND_') or re.match(r'^(int|void|sithSound\*) sithSound_.*;', line)
                     and not line.startswith('int sithSound_LoadFileData'))
@@ -42,7 +42,7 @@ def main():
     assert 'return sithSound_GetWorldSoundByIndex(world, idx);' in cog and 'sounds[' not in cog
     memory = world[world.index('    aCount[6] = pWorld->numSoundsLoaded;'):world.index('    aCount[8] = pWorld->numCogScripts;')]
     logs = []
-    with tempfile.TemporaryDirectory(prefix='openmots-sound-cache-') as temp:
+    with tempfile.TemporaryDirectory(prefix='openjkdf2-sound-cache-') as temp:
         stage = Path(temp)
         (stage / 'sound_api.inc').write_text(api)
         (stage / 'sound_type.inc').write_text(sound_type)
@@ -88,7 +88,7 @@ def main():
             check(name + '-negative-control', command, failure)
     for p, data in sources.items():
         assert (ROOT / p).read_bytes() == data, p
-    receipt = dict(schema='openmots.sound-cache-test.v1', sanitizers=['address', 'undefined'], game_launched=False,
+    receipt = dict(schema='openjkdf2.sound-cache-test.v1', sanitizers=['address', 'undefined'], game_launched=False,
                    boundary='production storage, ID lookup, PCM eviction/free, and world shutdown; synthetic WAV/audio/cache IO',
                    logs=logs, source_sha256={p: hashlib.sha256(data).hexdigest() for p, data in sources.items()})
     (args.output / 'receipt.json').write_text(json.dumps(receipt, indent=2) + '\n')
