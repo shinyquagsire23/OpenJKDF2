@@ -1,0 +1,24 @@
+name: MotS lighting CPU paths
+on:
+  pull_request:
+    paths:
+      - 'src/Engine/**'
+      - 'src/Primitives/**'
+      - 'src/Raster/rdCache.c'
+      - 'src/World/**'
+      - 'src/General/stdConffile.c'
+      - 'src/types*'
+      - 'src/Tests/*lighting*'
+      - 'src/Tests/mots_thing_loader_test.c'
+      - 'src/Tests/source_test_utils.py'
+      - '.github/workflows/mots-lighting-state.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  cpu:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 src/Tests/run_mots_lighting_test.py --cc gcc --sanitize
+      - run: python3 src/Tests/run_pov_lighting_test.py --cc gcc --sanitize
