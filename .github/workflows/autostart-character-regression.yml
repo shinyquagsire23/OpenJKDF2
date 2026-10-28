@@ -1,0 +1,43 @@
+name: Named character autostart regression
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'src/Main/Main.c'
+      - 'src/Main/stdAutostartCharacter.h'
+      - 'src/Tests/autostart_test.c'
+      - 'src/Tests/run_autostart_test.py'
+      - '.github/workflows/autostart-character-regression.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'src/Main/Main.c'
+      - 'src/Main/stdAutostartCharacter.h'
+      - 'src/Tests/autostart_test.c'
+      - 'src/Tests/run_autostart_test.py'
+      - '.github/workflows/autostart-character-regression.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  autostart:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      CC: gcc
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Test production command parsing and startup ordering
+        run: timeout --kill-after=5s 180s python3 -B src/Tests/run_autostart_test.py
+
