@@ -1,0 +1,58 @@
+name: Ported fix regressions
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - src/World/sithThing.c
+      - src/Cog/sithCog.c
+      - src/General/stdBitmap.c
+      - src/General/stdBitmap.h
+      - src/Engine/rdMaterial.c
+      - src/types.h
+      - src/types_enums.h
+      - src/Tests/*locality*
+      - src/Tests/*bitmap*
+      - src/Tests/*material*
+      - src/Tests/source_test_utils.py
+      - docs/ported-fix-regressions.md
+      - .github/workflows/ported-fix-regressions.yml
+  push:
+    branches: [master]
+    paths:
+      - src/World/sithThing.c
+      - src/Cog/sithCog.c
+      - src/General/stdBitmap.c
+      - src/General/stdBitmap.h
+      - src/Engine/rdMaterial.c
+      - src/types.h
+      - src/types_enums.h
+      - src/Tests/*locality*
+      - src/Tests/*bitmap*
+      - src/Tests/*material*
+      - src/Tests/source_test_utils.py
+      - docs/ported-fix-regressions.md
+      - .github/workflows/ported-fix-regressions.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ported-fix-regressions-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-regression:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [cog_locality, bitmap, material]
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Run production function regression with UBSan
+        run: python3 -B src/Tests/run_${{ matrix.suite }}_test.py --cc gcc --ubsan
