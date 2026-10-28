@@ -167,17 +167,23 @@ void sithDSSThing_UpdateState(SithThing *pThing, int toID, int outstream)
             NETMSG_PUSHS32(pThing->weaponParams.flags);
             break;
         case SITH_THING_ITEM:
+        {
             NETMSG_PUSHS32(pThing->itemParams.flags);
             if (pThing->itemParams.flags & SITH_ITEM_BACKPACK)
             {
-                NETMSG_PUSHS16(pThing->itemParams.numBins);
-                for (int i = 0; i < pThing->itemParams.numBins; i++)
+                const int capacity = sizeof(pThing->itemParams.contents) / sizeof(pThing->itemParams.contents[0]);
+                int numBins = pThing->itemParams.numBins;
+                if (numBins < 0) numBins = 0;
+                if (numBins > capacity) numBins = capacity;
+                NETMSG_PUSHS16(numBins);
+                for (int i = 0; i < numBins; i++)
                 {
                     NETMSG_PUSHS16(pThing->itemParams.contents[i].binIdx);
                     NETMSG_PUSHF32(pThing->itemParams.contents[i].value);
                 }
             }
             break;
+        }
         default:
             break;
     }
@@ -271,21 +277,25 @@ int sithDSSThing_ProcessStateUpdate(SithMessage *pMsg)
             pThing->weaponParams.flags = NETMSG_POPS32();
             break;
         case SITH_THING_ITEM:
-            pThing->itemParams.flags = NETMSG_POPS32();
-            if (pThing->itemParams.flags & SITH_ITEM_BACKPACK)
+        {
+            const uint32_t itemFlags = NETMSG_POPS32();
+            if (itemFlags & SITH_ITEM_BACKPACK)
             {
-                // Added: bounds checking
-                int numBins = NETMSG_POPS16();
-                if (numBins < 0 || numBins > (int)(sizeof(pThing->itemParams.contents) / sizeof(pThing->itemParams.contents[0])))
+                const int capacity = sizeof(pThing->itemParams.contents) / sizeof(pThing->itemParams.contents[0]);
+                const int numBins = NETMSG_POPS16();
+                // Reject the packet before changing backpack state or indexing contents.
+                if (numBins < 0 || numBins > capacity)
                     return 0;
                 pThing->itemParams.numBins = numBins;
-                for (int i = 0; i < pThing->itemParams.numBins; i++)
+                for (int i = 0; i < numBins; i++)
                 {
                     pThing->itemParams.contents[i].binIdx = NETMSG_POPS16();
                     pThing->itemParams.contents[i].value = NETMSG_POPF32();
                 }
             }
+            pThing->itemParams.flags = itemFlags;
             break;
+        }
         default:
             break;
     }
