@@ -1,5 +1,5 @@
 /* Complete extracted alpha/ARCH functions and RGB primitive/clippers, plus
- * exact solid-cache normalization/encoding blocks. Camera projection, cache
+ * exact opaque setup and solid-cache normalization/encoding blocks. Camera projection, cache
  * submission and unrelated mono/non-Gouraud clippers are explicit stubs.
  * Public lighting records are extracted; world/model fixtures contain only
  * the fields accessed here and do not assert the complete engine ABI.
@@ -95,7 +95,7 @@ static SithSurface* sithRender_aAlphaAdjoins[4];
 static rdMeshinfo sithRender_faceView, meshinfo_out;
 static rdVector3 sithRender_aClipVertices[32];
 static rdClipFrustum sithRender_absoluteMaxFrustum;
-static int sphereResult, submitted, flushes, zbuffer, sorting, monoClipCalls;
+static int sphereResult, submitted, flushes, zbuffer, sorting, occlusion, monoClipCalls;
 static rdProcEntry entry;
 static rdVector3 projected[32];
 static rdVector2 outUv[32];
@@ -103,7 +103,7 @@ static flex_t outMono[32], outR[32], outG[32], outB[32];
 static int rdGetVertexColorMode(void) { return colorMode; }
 static void rdSetVertexColorMode(int v) { colorMode = v; }
 static void rdSetZBufferMethod(int v) { zbuffer = v; }
-static void rdSetOcclusionMethod(int v) { CHECK(v == 0); }
+static void rdSetOcclusionMethod(int v) { occlusion = v; }
 static void rdSetSortingMethod(int v) { sorting = v; }
 static void rdSetProcFaceUserData(int v) { CHECK(v == 7); }
 static void rdCache_Flush(void) { ++flushes; }
@@ -231,6 +231,47 @@ LABEL_232:;
     return (rdColor24){(uint8_t)red_and_alpha, (uint8_t)green, (uint8_t)blue};
 }
 
+// Execute the contiguous production setup, including its accelerated/software
+// decision. The rest of the opaque surface traversal is outside this fixture.
+static void begin_opaque(void) {
+#ifdef OLD_OPAQUE_ACCELERATED
+#include "old_opaque_accelerated.inc"
+#elif defined(OLD_OPAQUE_SOFTWARE)
+#include "old_opaque_software.inc"
+#else
+#include "actual_opaque_setup.inc"
+#endif
+}
+
+static void test_opaque(void) {
+    scenario = "opaque";
+    uint8_t table[64*256] = {0};
+    rdColormap map = {.lightlevel=table};
+    table[7]=3; map.colors[3]=(rdColor24){10,30,70};
+    table[31*256+7]=4; map.colors[4]=(rdColor24){22,44,66};
+    for (int accelerated=0; accelerated<2; ++accelerated)
+    for (int rgb=0; rgb<2; ++rgb)
+    for (int occlusionOff=0; occlusionOff<2; ++occlusionOff)
+    for (int prior=0; prior<2; ++prior) {
+        rdroid_curAcceleration=accelerated;
+        sithRender_renderflags=(rgb ? 0x80 : 0) | (occlusionOff ? 0x20 : 0);
+        colorMode=prior; zbuffer=sorting=occlusion=-1;
+        begin_opaque();
+        CHECK(colorMode == (accelerated && rgb));
+        CHECK(zbuffer == (accelerated ? RD_ZBUFFER_READ_WRITE : RD_ZBUFFER_NOREAD_WRITE));
+        CHECK(sorting == 0);
+        CHECK(occlusion == (accelerated ? -1 : !occlusionOff));
+        // Observe the selected mode's effect through the actual cache blocks,
+        // with independently calculated palette/RGB bytes.
+        flex_t r=.1f,g=.2f,b=.3f,mono=.5f;
+        rdProcEntry e={.numVertices=1,.paRedIntensities=&r,.paGreenIntensities=&g,.paBlueIntensities=&b,
+            .vertexIntensities=&mono,.colormap=&map};
+        rdColor24 got=solid(&e,3,0,7);
+        if (accelerated && rgb) CHECK(got.r==35 && got.g==80 && got.b==146);
+        else CHECK(got.r==22 && got.g==44 && got.b==66);
+    }
+}
+
 static rdVector3 vertices[9], transformed[9];
 static rdVector2 uvs[9];
 static flex_t dynamic[9], intensities[12];
@@ -266,11 +307,16 @@ static void setup_alpha(void) {
     submitted=flushes=monoClipCalls=0; sithRender_008d4098=.1f;
 }
 
+static void render_alpha(void) {
+    sithRender_RenderAlphaAdjoins();
+    CHECK(occlusion == 0);
+}
+
 static void test_alpha(void) {
     for(int clipped=0;clipped<2;++clipped) for(int geo=3;geo<=4;++geo) {
         setup_alpha(); sphereResult=clipped?SPHERE_CLIPPING_EDGE:SPHERE_FULLY_INSIDE;
         surface.surfaceInfo.face.geometryMode=geo;
-        sithRender_RenderAlphaAdjoins();
+        render_alpha();
         CHECK(submitted==1); CHECK(colorMode==1); CHECK(monoClipCalls==0); CHECK(entry.lightingMode==3);
         CHECK(entry.numVertices==3); CHECK(camera.pClipFrustum==&frustum);
         NEAR(camera.ambientLight,.5); NEAR(entry.ambientLight,.2); NEAR(entry.extralight,.05);
@@ -278,16 +324,16 @@ static void test_alpha(void) {
         for(int i=0;i<3;++i) { NEAR(outR[i],.2+.1*i); NEAR(outG[i],.3+.1*i); NEAR(outB[i],.4+.1*i); }
         if(geo==4) { NEAR(outUv[0].x,1); NEAR(outUv[1].x,6); NEAR(outUv[2].x,3); }
     }
-    setup_alpha(); surface.flags=0; sithRender_RenderAlphaAdjoins();
+    setup_alpha(); surface.flags=0; render_alpha();
     for(int i=0;i<3;++i) { NEAR(outR[i],1); NEAR(outG[i],1); NEAR(outB[i],1); }
-    setup_alpha(); sithRender_renderflags=0; colorMode=1; sithRender_RenderAlphaAdjoins();
+    setup_alpha(); sithRender_renderflags=0; colorMode=1; render_alpha();
     CHECK(colorMode==0); CHECK(monoClipCalls==1);
-    setup_alpha(); rdroid_curAcceleration=0; sithRender_RenderAlphaAdjoins(); CHECK(colorMode==0);
-    setup_alpha(); sphereResult=SPHERE_FULLY_OUTSIDE; sithRender_RenderAlphaAdjoins(); CHECK(submitted==0);
+    setup_alpha(); rdroid_curAcceleration=0; render_alpha(); CHECK(colorMode==0);
+    setup_alpha(); sphereResult=SPHERE_FULLY_OUTSIDE; render_alpha(); CHECK(submitted==0);
     // A triangle crossing the near plane produces two new interpolated corners.
     setup_alpha(); sphereResult=SPHERE_CLIPPING_EDGE;
     vertices[8]=(rdVector3){0,.5f,0}; vertices[2]=(rdVector3){.5f,2,0}; vertices[5]=(rdVector3){0,2,.5f};
-    sithRender_RenderAlphaAdjoins(); CHECK(submitted==1); CHECK(entry.numVertices==4);
+    render_alpha(); CHECK(submitted==1); CHECK(entry.numVertices==4);
     int intersections=0;
     for(unsigned i=0;i<entry.numVertices;++i) {
         if(fabs(projected[i].y-1)<.00001) {
@@ -304,7 +350,7 @@ static void test_alpha(void) {
         surface.surfaceInfo.face.geometryMode=geo;
         vertices[8]=outside[plane];
         vertices[2]=(rdVector3){.5f,2,-.5f}; vertices[5]=(rdVector3){-.5f,2,.5f};
-        sithRender_RenderAlphaAdjoins(); CHECK(submitted==1); CHECK(entry.numVertices==4);
+        render_alpha(); CHECK(submitted==1); CHECK(entry.numVertices==4);
         for(unsigned i=0;i<entry.numVertices;++i) {
             CHECK(projected[i].y>=.99999f && projected[i].y<=10.00001f);
             CHECK(projected[i].x>=-projected[i].y-.00001f && projected[i].x<=projected[i].y+.00001f);
@@ -451,6 +497,7 @@ static void test_model(void) {
 }
 
 int main(int argc,char** argv) {
+    if(argc==1 || !strcmp(argv[1],"opaque")) test_opaque();
     if(argc==1 || !strcmp(argv[1],"alpha")) test_alpha();
     if(argc==1 || !strcmp(argv[1],"solid")) test_solid();
     if(argc==1 || !strcmp(argv[1],"arch")) test_arch();

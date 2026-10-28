@@ -4,6 +4,8 @@
 Runs complete alpha-pass, world RGB primitive/clippers and scoped ARCH draw
 functions. Solid-color normalization/encoding are unmodified contiguous blocks
 from rdCache_SendFaceListToHardware, with a synthetic cache/colormap wrapper.
+The opaque-pass setup block is executed before those cache blocks. A separate
+fixture compiles the complete vertex-light calculator without JKM_LIGHTING.
 Also executes the placed-thing loader, template copy/reset and argument tokenizer
 with original text fixtures, in builds with and without JKM_LIGHTING.
 This is CPU data-path validation, not a renderer screenshot or retail parity test.
@@ -41,6 +43,20 @@ def prepare(work):
     def write(name, text):
         (work / name).write_text(text + '\n', encoding='utf-8', newline='\n')
     render = src[PATHS[0]]
+    opaque = extract_block(render, r'^void sithRender_RenderSectors\(', 'opaque world pass')
+    setup_matches = list(re.finditer(
+        r'^    if \(LIKELY\(rdroid_curAcceleration\)\)\n[\s\S]*?^    rdSetSortingMethod\(0\);',
+        opaque, re.M))
+    if len(setup_matches) != 1:
+        raise RuntimeError('Opaque setup block changed')
+    opaque_setup = setup_matches[0].group()
+    write('actual_opaque_setup.inc', opaque_setup)
+    reset = 'rdSetVertexColorMode((sithRender_renderflags & 0x80) != 0);'
+    if opaque_setup.count(reset) != 1 or opaque_setup.count('rdSetVertexColorMode(0);') != 1:
+        raise RuntimeError('Opaque mode controls changed')
+    write('old_opaque_accelerated.inc', opaque_setup.replace(
+        reset, 'if (sithRender_renderflags & 0x80) rdSetVertexColorMode(1);'))
+    write('old_opaque_software.inc', opaque_setup.replace('rdSetVertexColorMode(0);', '(void)0;'))
     alpha = extract_block(render, r'^void sithRender_RenderAlphaAdjoins\(', 'alpha pass')
     write('actual_alpha.inc', alpha)
     arch = extract_block(render, r'^static int sithRender_DrawLevelGeometryThing\(', 'ARCH draw scope')
@@ -62,6 +78,16 @@ def prepare(work):
     if old_light == light:
         raise RuntimeError('Vertex base control changed')
     write('old_light.inc', old_light)
+    # Only the first copy of the scalar iterator belongs to the non-JKM branch.
+    iterator = '        if (idkIter) ++idkIter;'
+    if light.count(iterator) != 2:
+        raise RuntimeError('Scalar iterator control changed')
+    write('old_scalar_iterator.inc', light.replace(iterator, '        (void)idkIter;', 1))
+    null_base = '*outLights = idkIter ? *idkIter : 0.0;'
+    if light.count(null_base) != 2:
+        raise RuntimeError('Scalar null-base control changed')
+    write('old_scalar_null_base.inc', light.replace(null_base,
+        '*outLights = idkIter ? *idkIter : 0.25;', 1))
     model_call = re.search(r'    pMesh->extraLight = rdLight_CalcVertexIntensities\([\s\S]*?\);', src[PATHS[7]])
     if model_call is None:
         raise RuntimeError('Model lighting call changed')
@@ -113,6 +139,8 @@ def prepare(work):
         raise RuntimeError('Palette channel control changed')
     write('old_solid_encode.inc', old_channels)
     types = src[PATHS[4]]
+    write('actual_light_type.inc', extract_block(types, r'^typedef struct rdLight\s*\{',
+                                               'scalar light type') + ' rdLight;')
     write('actual_thing_types.inc', '\n'.join(extract_block(types,
           r'^typedef struct ' + name + r'\s*\{', name) + ' ' + name + ';'
           for name in ('StdConffileArg', 'StdConffileEntry')))
@@ -124,7 +152,8 @@ def prepare(work):
     constants = []
     for name in ('RD_GEOMETRY_SOLID', 'RD_GEOMETRY_FULL', 'RD_LIGHTMODE_FULLYLIT', 'RD_LIGHTMODE_NOTLIT',
                  'RD_LIGHTMODE_DIFFUSE', 'RD_LIGHTMODE_GOURAUD', 'RD_ZBUFFER_READ_NOWRITE',
-                 'RD_ZBUFFER_READ_WRITE', 'SPHERE_FULLY_INSIDE', 'SPHERE_FULLY_OUTSIDE', 'SPHERE_CLIPPING_EDGE',
+                 'RD_ZBUFFER_READ_WRITE', 'RD_ZBUFFER_NOREAD_WRITE',
+                 'SPHERE_FULLY_INSIDE', 'SPHERE_FULLY_OUTSIDE', 'SPHERE_CLIPPING_EDGE',
                  'CLIPSTAT_LEFT', 'CLIPSTAT_RIGHT', 'CLIPSTAT_NONE_VISIBLE', 'RD_THING_MODEL3',
                  'RD_THING_PARTICLE', 'SITH_MT_PATH'):
         matches = re.findall(r'^\s*' + name + r'\s*=\s*(0x[0-9a-fA-F]+|[0-9]+)', enums, re.M)
@@ -133,6 +162,7 @@ def prepare(work):
         constants.append('enum { ' + name + ' = ' + matches[0] + ' };')
     write('actual_constants.inc', '\n'.join(constants))
     shutil.copyfile(Path(__file__).with_name('mots_lighting_test.c'), work / 'mots_lighting_test.c')
+    shutil.copyfile(Path(__file__).with_name('mots_scalar_lighting_test.c'), work / 'mots_scalar_lighting_test.c')
     shutil.copyfile(Path(__file__).with_name('mots_thing_loader_test.c'), work / 'mots_thing_loader_test.c')
     return inputs
 
@@ -157,6 +187,8 @@ def run(cc, sanitize):
         print(subprocess.check_output([cc, '--version'], text=True).splitlines()[0])
         for name, defines, scenario in (
             ('current', [], None), ('old-alpha', ['-DOLD_ALPHA'], 'alpha'),
+            ('missing-opaque-accelerated-reset', ['-DOLD_OPAQUE_ACCELERATED'], 'opaque'),
+            ('missing-opaque-software-reset', ['-DOLD_OPAQUE_SOFTWARE'], 'opaque'),
             ('old-scale', ['-DOLD_SCALE'], 'solid'), ('old-channels', ['-DOLD_CHANNELS'], 'solid'),
             ('old-vertex-base', ['-DOLD_VERTEX_BASE'], 'model'),
             ('old-double-base', ['-DOLD_DOUBLE_BASE'], 'model')):
@@ -167,10 +199,27 @@ def run(cc, sanitize):
             result = execute([str(binary)] + ([scenario] if scenario else []), work, env)
             if scenario:
                 if result.returncode != 1 or 'FAIL ' + scenario not in result.stderr:
-                    raise RuntimeError('Old-behavior control was not rejected: ' + name + '\n' + result.stdout + result.stderr)
+                    raise RuntimeError('Behavior control was not rejected: ' + name + '\n' + result.stdout + result.stderr)
                 print('PASS rejected ' + name + ' by independent expected output')
             elif result.returncode:
                 raise RuntimeError('Production path failure:\n' + result.stdout + result.stderr)
+            else:
+                print(result.stdout, end='')
+        for name, defines, control in (
+            ('scalar-light-no-jkm', [], False),
+            ('stuck-scalar-iterator', ['-DOLD_SCALAR_ITERATOR'], True),
+            ('nonzero-scalar-null-base', ['-DOLD_SCALAR_NULL_BASE'], True)):
+            binary = work / (name + ('.exe' if os.name == 'nt' else ''))
+            built = execute([cc, *flags, *defines, 'mots_scalar_lighting_test.c', '-lm', '-o', str(binary)], work, env)
+            if built.returncode:
+                raise RuntimeError('Compile ' + name + ':\n' + built.stdout + built.stderr)
+            result = execute([str(binary)], work, env)
+            if control:
+                if result.returncode != 1 or 'FAIL scalar-light' not in result.stderr:
+                    raise RuntimeError('Scalar control was not rejected: ' + name + '\n' + result.stdout + result.stderr)
+                print('PASS rejected ' + name + ' by independent scalar-light output')
+            elif result.returncode:
+                raise RuntimeError('Production scalar-light failure:\n' + result.stdout + result.stderr)
             else:
                 print(result.stdout, end='')
         for name, defines, control in (
