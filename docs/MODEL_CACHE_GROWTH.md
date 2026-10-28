@@ -133,6 +133,29 @@ dependency patch reapplication messages remain in the retained build log.
 There were no model-source compiler warnings. The combined capture contract/UI
 tests passed under ASan/UBSan, including the unsafe-window-raise negative control.
 
+## Qualification on the synchronized base, 2026-10-28
+
+The original model-cache commit `bf7a46f8dc30ddc6fd4734326935a6ea07081ef7`
+was carried onto fork main `6fa54630a123485d8c7b602c47992613a1f397b5`, which
+contains upstream `798f930402525a23b94671d85b97b00390342fa0`. Git's three-way
+application preserved the current upstream context. The production model-store
+sanitizer fixture passes on this base, including leak checks, the fixed-layout
+injection build, and the old-capacity negative control. The team/model runner
+also passes its 102 cases and 2,037 assertions under UBSan.
+
+The three changed production units (`sithModel.c`, `sithWorld.c`, and
+`sithCogExec.c`) compile successfully with the current native Linux build's
+CMake-derived flags and dependency headers. This is a focused compilation,
+not a new full-engine link or game launch. The known COG stack-copy warning
+is a separate proposed correction. The new cache CI job runs the asset-free
+model and team checks on relevant pull requests and main pushes.
+
+The September Windows/MotS results above remain historical evidence at their
+named base. This requalification has not rerun the MotS appearance sequence,
+save/load, connected multiplayer, or audible playback on the synchronized
+engine. Those remain acceptance gates before treating this draft as a
+general mod-compatibility guarantee.
+
 ## Remaining boundaries
 
 - Sound allocation is unchanged. This result does not establish complete audio,

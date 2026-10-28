@@ -1,0 +1,48 @@
+name: Stable resource cache regressions
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/cache-regressions.yml
+      - src/Cog/sithCogExec.c
+      - src/World/**
+      - src/Devices/sithSound*
+      - src/types.h
+      - src/engine_config.h
+      - src/Tests/*cache*
+      - src/Tests/*team_model*
+      - docs/*CACHE_GROWTH.md
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/cache-regressions.yml
+      - src/Cog/sithCogExec.c
+      - src/World/**
+      - src/Devices/sithSound*
+      - src/types.h
+      - src/engine_config.h
+      - src/Tests/*cache*
+      - src/Tests/*team_model*
+      - docs/*CACHE_GROWTH.md
+
+permissions:
+  contents: read
+
+concurrency:
+  group: resource-cache-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cache:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Test model storage and ownership
+        run: python3 -B src/Tests/run_model_cache_test.py --output "$RUNNER_TEMP/model-cache"
+      - name: Check team and model-index compatibility
+        run: python3 -B src/Tests/run_team_model_test.py --cc gcc --ubsan
