@@ -1,0 +1,38 @@
+name: Model authoring tools
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/model-authoring-tools.yml
+      - scripts/model-workarounds/**
+      - docs/MODEL_WORKAROUNDS.md
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/model-authoring-tools.yml
+      - scripts/model-workarounds/**
+      - docs/MODEL_WORKAROUNDS.md
+
+permissions:
+  contents: read
+
+concurrency:
+  group: authoring-tools-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tools:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install the image helper dependency in an isolated environment
+        run: |
+          python3 -m venv "$RUNNER_TEMP/authoring-tools"
+          "$RUNNER_TEMP/authoring-tools/bin/python" -m pip install --disable-pip-version-check -r scripts/model-workarounds/png-alignment/requirements.txt
+      - name: Run all four synthetic tool suites
+        run: '"$RUNNER_TEMP/authoring-tools/bin/python" -B scripts/model-workarounds/run_tests.py'
