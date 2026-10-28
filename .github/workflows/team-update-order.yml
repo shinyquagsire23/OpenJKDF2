@@ -1,0 +1,44 @@
+name: Team update ordering regression
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - src/Dss/jkDSS.c
+      - src/Dss/sithMulti.h
+      - src/types_enums.h
+      - src/Tests/team_model_test.c
+      - src/Tests/run_team_model_test.py
+      - src/Tests/source_test_utils.py
+      - .github/workflows/team-update-order.yml
+      - docs/team-update-order.md
+  push:
+    branches: [master]
+    paths:
+      - src/Dss/jkDSS.c
+      - src/Dss/sithMulti.h
+      - src/types_enums.h
+      - src/Tests/team_model_test.c
+      - src/Tests/run_team_model_test.py
+      - src/Tests/source_test_utils.py
+      - .github/workflows/team-update-order.yml
+      - docs/team-update-order.md
+
+permissions:
+  contents: read
+
+concurrency:
+  group: team-update-order-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  team-update-order:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Run focused native regression
+        run: python3 -B src/Tests/run_team_model_test.py --cc gcc --ubsan
