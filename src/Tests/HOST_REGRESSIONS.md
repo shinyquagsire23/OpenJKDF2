@@ -39,7 +39,8 @@ this initial gate does not claim to run tests that are absent from upstream.
 
 ## Receipts and failures
 
-Each command gets separate text logs, argv, exit status, and elapsed time. The
+Each group has stdout/stderr text logs; each command has its own argv, exit
+status, and elapsed-time record in JSON. The
 JSON receipt records the source commit, worktree status, runner hash, compiler
 and Python versions, available Actions run metadata, and PR head identity.
 The gate stops after a failure and leaves remaining groups explicitly
