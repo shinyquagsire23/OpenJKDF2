@@ -12,6 +12,16 @@ Git commit, requires pristine worktrees before configuring, and builds the full
 unmerged regression infrastructure or commit-version environment overrides are
 required. The ordinary Git-based version selection remains in effect.
 
+Each inspection command launched by the Python helper has a 30-second deadline.
+On timeout it terminates the owned process group on POSIX, or the owned process
+tree on Windows, then fails verification with the command name and working
+directory, without retrying. Cleanup waits are separately bounded and incomplete
+cleanup is reported; this is not containment of deliberately detached processes.
+Captured output uses temporary files, avoiding pipe-EOF waits after cleanup failure.
+Git optional locks are disabled in child environments only; the caller's environment
+is preserved. The workflow's separate HEAD check is also bounded to 30 seconds.
+Configure/build steps retain their independent workflow job limit.
+
 ## Records and checks
 
 Only the verification records are uploaded as a short-lived Actions artifact. The
@@ -36,10 +46,15 @@ The job creates no release, distributable binary archive, or game-data upload.
   points and ordinary PE imports require separate runtime testing.
 - `BINARY_ORIGINS.json` and `BINARY_SHA256.json` identify inspection inputs and verify
   their staged bytes. The binaries themselves are never uploaded.
-- `licenses/` and `LICENSE_SOURCES.json` retain an enumerated 32-file notice
+- `licenses/` and `LICENSE_SOURCES.json` retain an enumerated 34-file notice
   inventory with source hashes, including current SDL3 and SDL3_mixer codec paths.
-  This inventory is incomplete: `TARGET_USE_CURL` compiles bundled curl and Mbed TLS,
-  whose embedded notices and standalone license terms are not collected here.
+  The Win64 configuration enables `TARGET_USE_CURL`; the inventory now includes
+  the bundled curl `curl/curlver.h` and Mbed TLS `mbedtls/build_info.h` verbatim,
+  preserving their embedded copyright/license notices and declared versions
+  (`8.0.0-DEV` and `3.3.0`). These headers are notice carriers, not standalone
+  license texts or proof of exact upstream import revisions. Neither vendored tree
+  includes a standalone license file; collecting their complete corresponding
+  terms and reviewing other per-file notices remains an explicit gap.
   Required compiler static archives and any staged compiler runtime DLLs must have
   distro package ownership and copyright notices. `MINGW_RUNTIME_PACKAGES.json`
   records their versions and hashes. Missing enumerated notices are fatal. These
@@ -85,7 +100,9 @@ python3 -B scripts/ci/test_windows_x64_verification.py
 The tests call the production verification helpers, compile a tiny synthetic EXE
 and DLL, check transitive imports, and exercise missing dependencies, malformed or
 wrong-architecture headers, absent inspection tools/licenses, dirty source and
-changed hashes. They use no retail data and never execute the Windows binaries.
+changed hashes. Real sleeping-process fixtures check timeout cleanup, including a
+descendant with inherited output handles, cleanup failure, and child environment isolation. They use
+no retail data and never execute the Windows binaries.
 The workflow YAML can additionally be checked with `actionlint`.
 
 ## Attribution

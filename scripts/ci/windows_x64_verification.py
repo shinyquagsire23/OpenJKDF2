@@ -7,20 +7,25 @@ at 6fa54630a123485d8c7b602c47992613a1f397b5 (andreipemberton/Coda Lilitari).
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
+import signal
 import shutil
 import subprocess
 import sys
+import tempfile
 
 SYSTEM_DLLS = set("""advapi32 avrt bcrypt comctl32 comdlg32 crypt32 dbgcore dbghelp
     dnsapi dwmapi gdi32 imagehlp imm32 iphlpapi kernel32 ksuser msvcrt ntdll ole32
     oleacc oleaut32 opengl32 powrprof psapi rpcrt4 setupapi shell32 shlwapi user32
     uxtheme version winmm wintrust ws2_32""".split())
-# Current SDL3/SDL3_mixer source paths, including the statically enabled codecs.
+# Source notice inventory, including SDL3_mixer codecs and bundled updater headers.
 LICENSES = """
 LICENSE.md
 3rdparty/json/LICENSE.MIT
+src/external/curl/curl/curlver.h
+src/external/mbedtls/mbedtls/build_info.h
 src/external/libsmacker/COPYING
 src/external/libsmusher/LICENSE
 src/external/fcaseopen/LICENSE.txt
@@ -54,11 +59,50 @@ lib/protobuf/LICENSE
 """.split()
 RUNTIME_ARCHIVES = ("libstdc++.a", "libssp.a", "libwinpthread.a", "libmingwex.a",
                     "libmingw32.a", "libgcc.a", "libgcc_eh.a")
+COMMAND_TIMEOUT_SECONDS = 30
 
 
 def run(command, cwd=None):
-    return subprocess.run(command, cwd=cwd, check=True, text=True,
-                          stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout
+    # These commands inspect inputs; the expensive builds run in separate steps.
+    # Never change the caller's environment or rely on the workflow-wide timeout.
+    env = {**os.environ, "GIT_OPTIONAL_LOCKS": "0"}
+    # Files avoid pipe EOF/reader-thread waits if a descendant survives cleanup.
+    with tempfile.TemporaryFile(mode="w+t") as output, tempfile.TemporaryFile(mode="w+t") as errors:
+        process = subprocess.Popen(command, cwd=cwd, env=env,
+                                   start_new_session=os.name == "posix",
+                                   stdout=output, stderr=errors)
+        try:
+            process.wait(timeout=COMMAND_TIMEOUT_SECONDS)
+        except subprocess.TimeoutExpired as error:
+            cleanup_error = None
+            try:
+                if os.name == "posix":
+                    os.killpg(process.pid, signal.SIGKILL)
+                else:
+                    # Only the tree rooted at this still-owned process is targeted.
+                    subprocess.run(["taskkill", "/PID", str(process.pid), "/T", "/F"],
+                                   check=True, capture_output=True, timeout=5,
+                                   creationflags=subprocess.CREATE_NO_WINDOW)
+            except (OSError, subprocess.SubprocessError) as cleanup:
+                cleanup_error = str(cleanup)
+            finally:
+                if process.poll() is None:
+                    process.kill()
+            try:
+                process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                cleanup_error = "direct child did not exit after process-tree cleanup"
+            detail = f"; cleanup incomplete: {cleanup_error}" if cleanup_error else ""
+            raise RuntimeError(
+                f"Command exceeded {COMMAND_TIMEOUT_SECONDS:g}s deadline: {command[0]} "
+                f"(cwd={cwd or Path.cwd()}){detail}") from error
+        output.seek(0)
+        errors.seek(0)
+        stdout, stderr = output.read(), errors.read()
+    if process.returncode:
+        raise subprocess.CalledProcessError(process.returncode, command,
+                                            output=stdout, stderr=stderr)
+    return stdout
 
 
 def sha256(path):

@@ -41,7 +41,7 @@ jobs:
       - name: Record and validate pristine source provenance
         id: provenance
         run: |
-          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(timeout 30s git --no-optional-locks rev-parse HEAD)" = "$GITHUB_SHA"
           python3 -B scripts/ci/windows_x64_verification.py before \
             --source . --records "$RECORDS_DIR"
 

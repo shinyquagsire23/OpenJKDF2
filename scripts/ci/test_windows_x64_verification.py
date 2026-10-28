@@ -1,11 +1,15 @@
 """Asset-free behavioral checks for the verification helpers (synthetic inputs)."""
 import importlib.util
 import json
+import os
 from pathlib import Path
 import subprocess
 import shutil
+import sys
 import tempfile
+import time
 import unittest
+from unittest.mock import patch
 
 spec = importlib.util.spec_from_file_location("verification", Path(__file__).with_name("windows_x64_verification.py"))
 v = importlib.util.module_from_spec(spec)
@@ -26,8 +30,71 @@ class VerificationTests(unittest.TestCase):
         c.write_text(source)
         out = self.root / name
         subprocess.run(["x86_64-w64-mingw32-gcc", str(c), "-o", str(out), *flags], check=True,
-                       capture_output=True)
+                       capture_output=True, timeout=30)
         return out
+
+    def test_command_deadline_stops_child(self):
+        marker = self.root / "finished.txt"
+        command = [sys.executable, "-c",
+                   "import pathlib,sys,time; time.sleep(1); "
+                   "pathlib.Path(sys.argv[1]).write_text('completed')", str(marker)]
+        started = time.monotonic()
+        # Exercise the real subprocess, shortening only the configured deadline.
+        with patch.object(v, "COMMAND_TIMEOUT_SECONDS", 0.1, create=True):
+            with self.assertRaisesRegex(RuntimeError, "deadline"):
+                v.run(command)
+        self.assertLess(time.monotonic() - started, 3)
+        # A timed-out command must not keep running and write its final output.
+        time.sleep(1.1)
+        self.assertFalse(marker.exists())
+
+    def test_child_environment_disables_optional_git_locks_only_in_child(self):
+        with patch.dict(os.environ, {"GIT_OPTIONAL_LOCKS": "1"}):
+            result = v.run([sys.executable, "-c",
+                            "import os; print(os.environ['GIT_OPTIONAL_LOCKS'])"])
+            self.assertEqual(result.strip(), "0")
+            self.assertEqual(os.environ["GIT_OPTIONAL_LOCKS"], "1")
+
+    def test_command_deadline_stops_descendants_with_inherited_output(self):
+        marker = self.root / "grandchild-finished.txt"
+        started = self.root / "grandchild-started.txt"
+        child_code = ("import pathlib,sys,time; pathlib.Path(sys.argv[2]).write_text('ready'); "
+                      "time.sleep(1.5); pathlib.Path(sys.argv[1]).write_text('completed')")
+        parent_code = ("import subprocess,sys,time; "
+                       "subprocess.Popen([sys.executable,'-c',sys.argv[1],sys.argv[2],sys.argv[3]]); "
+                       "time.sleep(10)")
+        command = [sys.executable, "-c", parent_code, child_code, str(marker), str(started)]
+        with patch.object(v, "COMMAND_TIMEOUT_SECONDS", 0.5):
+            with self.assertRaisesRegex(RuntimeError, "deadline"):
+                v.run(command)
+        self.assertTrue(started.exists(), "Grandchild fixture did not reach its wait")
+        time.sleep(1.7)
+        self.assertFalse(marker.exists(), "Timed-out command left a live descendant")
+
+    def test_command_failure_keeps_exit_status_and_stderr(self):
+        with self.assertRaises(subprocess.CalledProcessError) as raised:
+            v.run([sys.executable, "-c",
+                   "import sys; print('inspection failed', file=sys.stderr); sys.exit(7)"])
+        self.assertEqual(raised.exception.returncode, 7)
+        self.assertEqual(raised.exception.stderr.strip(), "inspection failed")
+
+    def test_failed_tree_cleanup_returns_without_waiting_for_descendant_output(self):
+        child_code = "import time; time.sleep(2)"
+        parent_code = ("import subprocess,sys,time; "
+                       "subprocess.Popen([sys.executable,'-c',sys.argv[1]]); time.sleep(10)")
+        # Only the OS tree-termination failure is simulated. Both processes and
+        # their inherited output handles are real; the descendant exits itself.
+        failure = (patch.object(v.subprocess, "run", side_effect=OSError("cleanup fixture"))
+                   if os.name == "nt" else
+                   patch.object(v.os, "killpg", side_effect=OSError("cleanup fixture")))
+        started = time.monotonic()
+        try:
+            with failure, patch.object(v, "COMMAND_TIMEOUT_SECONDS", 0.2):
+                with self.assertRaisesRegex(RuntimeError, "cleanup incomplete"):
+                    v.run([sys.executable, "-c", parent_code, child_code])
+            self.assertLess(time.monotonic() - started, 1.5)
+        finally:
+            time.sleep(2.1)
 
     def test_real_pe_and_case_insensitive_transitive_closure(self):
         dll = self.compile("Example.DLL", "__declspec(dllexport) int answer(void) {return 42;}",
