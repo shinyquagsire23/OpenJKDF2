@@ -1009,6 +1009,7 @@ SithThing* sithInventory_CreateBackpack(SithThing *pThing)
 {
     SithThing *templateThing;
     SithThing *backpack;
+    const int backpackCapacity = sizeof(pThing->itemParams.contents) / sizeof(pThing->itemParams.contents[0]);
 
     if ( !sithNet_isMulti )
         return 0;
@@ -1035,7 +1036,7 @@ SithThing* sithInventory_CreateBackpack(SithThing *pThing)
                 if ( pThing->actorParams.pPlayer != (SithPlayer *)-136 && desc->flags & SITHINVENTORY_TYPE_REGISTERED )
                     amount = pThing->actorParams.pPlayer->aItems[i].amount;
 
-                if ( backpack->itemParams.numBins < 16 && amount > 0.0 )
+                if ( backpack->itemParams.numBins < backpackCapacity && amount > 0.0 )
                 {
                     backpack->itemParams.contents[backpack->itemParams.numBins].binIdx = i;
                     backpack->itemParams.contents[backpack->itemParams.numBins++].value = amount;
@@ -1054,7 +1055,7 @@ SithThing* sithInventory_CreateBackpack(SithThing *pThing)
                 if ( pThing->actorParams.pPlayer != (SithPlayer *)-136 && desc->flags & SITHINVENTORY_TYPE_REGISTERED )
                     amount = pThing->actorParams.pPlayer->aItems[i].amount;
 
-                if ( backpack->itemParams.numBins < 16 && amount > 0.0 )
+                if ( backpack->itemParams.numBins < backpackCapacity && amount > 0.0 )
                 {
                     backpack->itemParams.contents[backpack->itemParams.numBins].binIdx = i;
                     backpack->itemParams.contents[backpack->itemParams.numBins++].value = amount;
@@ -1071,7 +1072,7 @@ SithThing* sithInventory_CreateBackpack(SithThing *pThing)
                 if ( pThing->actorParams.pPlayer != (SithPlayer *)-136 && desc->flags & SITHINVENTORY_TYPE_REGISTERED )
                     amount = pThing->actorParams.pPlayer->aItems[i].amount;
 
-                if ( backpack->itemParams.numBins < 16 && amount > 0.0 )
+                if ( backpack->itemParams.numBins < backpackCapacity && amount > 0.0 )
                 {
                     backpack->itemParams.contents[backpack->itemParams.numBins].binIdx = i;
                     backpack->itemParams.contents[backpack->itemParams.numBins++].value = amount;
@@ -1092,13 +1093,14 @@ void sithInventory_PickupBackpack(SithThing *pPlayerThing, SithThing *pBackpackT
     SITH_ASSERTREL(pBackpackThing->type == SITH_THING_ITEM);
     SITH_ASSERTREL((pBackpackThing->itemParams.flags & SITH_ITEM_BACKPACK));
 
-    for (int i = 0; i < pBackpackThing->itemParams.numBins; i++)
+    const int numBins = sithInventory_GetNumBackpackItems(pBackpackThing);
+    for (int i = 0; i < numBins; i++)
     {
         SithBackpackItem* item = &pBackpackThing->itemParams.contents[i];
-
-        // Added: bounds checking
         if (item->binIdx < 0 || item->binIdx >= SITHBIN_NUMBINS)
             continue;
+
+        // Backpack positions are unrelated to their inventory bin IDs.
         SithInventoryType* desc = &sithInventory_g_aTypes[item->binIdx];
 
         if ((desc->flags & SITHINVENTORY_TYPE_REGISTERED) && (desc->flags & SITHINVENTORY_TYPE_BACKPACKITEM))
@@ -1114,7 +1116,7 @@ int sithInventory_GetBackpackItemID(SithThing *pBackpackThing, signed int itemNu
     SITH_ASSERTREL(pBackpackThing->type == SITH_THING_ITEM);
     SITH_ASSERTREL((pBackpackThing->itemParams.flags & SITH_ITEM_BACKPACK));
 
-    if ( itemNum < 0 || itemNum >= pBackpackThing->itemParams.numBins ) // Added: negative check
+    if ( itemNum < 0 || itemNum >= sithInventory_GetNumBackpackItems(pBackpackThing) )
         return -1;
     else
         return pBackpackThing->itemParams.contents[itemNum].binIdx;
@@ -1126,7 +1128,7 @@ flex_t sithInventory_GetBackpackItemValue(SithThing *pBackpackThing, signed int 
     SITH_ASSERTREL(pBackpackThing->type == SITH_THING_ITEM);
     SITH_ASSERTREL((pBackpackThing->itemParams.flags & SITH_ITEM_BACKPACK));
 
-    if ( itemNum < 0 || itemNum >= pBackpackThing->itemParams.numBins ) // Added: negative check
+    if ( itemNum < 0 || itemNum >= sithInventory_GetNumBackpackItems(pBackpackThing) )
         return -1.0;
     else
         return pBackpackThing->itemParams.contents[itemNum].value;
@@ -1138,6 +1140,11 @@ int sithInventory_GetNumBackpackItems(SithThing *pBackpackThing)
     SITH_ASSERTREL(pBackpackThing->type == SITH_THING_ITEM);
     SITH_ASSERTREL((pBackpackThing->itemParams.flags & SITH_ITEM_BACKPACK));
 
+    const int capacity = sizeof(pBackpackThing->itemParams.contents) / sizeof(pBackpackThing->itemParams.contents[0]);
+    if (pBackpackThing->itemParams.numBins < 0)
+        return 0;
+    if (pBackpackThing->itemParams.numBins > capacity)
+        return capacity;
     return pBackpackThing->itemParams.numBins;
 }
 
