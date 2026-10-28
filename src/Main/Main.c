@@ -258,7 +258,7 @@ int Main_StartupDedicated(int bFullyDedicated)
     sithOpenStatic("static.jkl");
     jkHudInv_InitItems();
 
-    // MPC bin loading requires registered inventory types. Keep profile and
+    // MPC parsing applies personality ammo maxima to inventory types. Keep profile and
     // static-world startup in their existing order and select the character here.
     if (Main_strAutostartCharacter[0]) {
         char16_t characterName[32];
