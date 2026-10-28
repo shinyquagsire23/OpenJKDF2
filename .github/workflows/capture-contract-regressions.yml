@@ -1,0 +1,72 @@
+name: Hidden capture contract regressions
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'src/Main/stdCapture.c'
+      - 'src/Main/stdCapture.h'
+      - 'src/Main/stdAutostartCharacter.h'
+      - 'src/Platform/SDL2/stdCaptureUi.h'
+      - 'src/Platform/GL/render_probe_output.h'
+      - 'src/Win95/RenderProbe.h'
+      - 'src/Tests/capture_*_test.c'
+      - 'src/Tests/run_capture_test.py'
+      - 'src/Tests/render_probe_output_test.c'
+      - 'tests/render_probe_options.c'
+      - '.github/workflows/capture-contract-regressions.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'src/Main/stdCapture.c'
+      - 'src/Main/stdCapture.h'
+      - 'src/Main/stdAutostartCharacter.h'
+      - 'src/Platform/SDL2/stdCaptureUi.h'
+      - 'src/Platform/GL/render_probe_output.h'
+      - 'src/Win95/RenderProbe.h'
+      - 'src/Tests/capture_*_test.c'
+      - 'src/Tests/run_capture_test.py'
+      - 'src/Tests/render_probe_output_test.c'
+      - 'tests/render_probe_options.c'
+      - '.github/workflows/capture-contract-regressions.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      CC: gcc
+      PYTHONDONTWRITEBYTECODE: '1'
+      ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+      UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Install PNG fixture headers
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install --yes --no-install-recommends libpng-dev
+      - name: Test request, writer, launch restrictions and UI policy
+        run: timeout --kill-after=5s 300s python3 -B src/Tests/run_capture_test.py --output "$RUNNER_TEMP/capture-contract-results"
+      - name: Test render probe option boundaries
+        run: |
+          timeout --kill-after=5s 60s gcc -std=c99 -Wall -Wextra -Werror -Isrc \
+            tests/render_probe_options.c -o "$RUNNER_TEMP/render-probe-options"
+          timeout --kill-after=5s 30s "$RUNNER_TEMP/render-probe-options"
+      - name: Test PNG bytes, orientation and checked output completion
+        run: |
+          timeout --kill-after=5s 60s gcc -std=c11 -Wall -Wextra -Werror -Isrc \
+            -fsanitize=address,undefined -fno-omit-frame-pointer -g \
+            src/Tests/render_probe_output_test.c -lpng -o "$RUNNER_TEMP/render-probe-output"
+          timeout --kill-after=5s 30s "$RUNNER_TEMP/render-probe-output" "$RUNNER_TEMP/render-probe-output.png"
+
