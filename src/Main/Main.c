@@ -231,6 +231,35 @@ int Main_StartupDedicated(int bFullyDedicated)
     sithNet_scorelimit = v34.scoreLimit;
     sithNet_multiplayer_timelimit = v34.timeLimit;
 
+    // Explicit selection must fail before creating a host session. Initialize
+    // inventory first so MPC personality ammo maxima survive items.dat loading.
+    if (Main_strAutostartCharacter[0]) {
+        std3D_StartScene();
+        std3D_EndScene();
+        sithOpenStatic("static.jkl");
+        jkHudInv_InitItems();
+        char16_t characterName[32];
+        stdString_CharToWchar(characterName, Main_strAutostartCharacter, 31);
+        characterName[31] = 0;
+        // Match the character menu: load bins before checking the selected
+        // character's eligibility for the host rank, then let ordinary player
+        // startup reload those bins after the world inventory is initialized.
+        // Passing the actual host descriptor avoids the old temporary-info path
+        // that loaded bins but left the host appearance hardcoded to Kyle.
+        if (!jkPlayer_MPCParse(&jkGuiMultiplayer_mpcInfo, NULL,
+                              jkPlayer_playerShortName, characterName, 1)) {
+            fprintf(stderr, "autostart: selected multiplayer character could not be read\n");
+            exit(6);
+        }
+        if (jkGuiMultiplayer_mpcInfo.jediRank < 0
+            || jkGuiMultiplayer_mpcInfo.jediRank > jkGuiNetHost_maxRank) {
+            fprintf(stderr, "autostart: selected character rank %d is outside host range 0..%d\n",
+                    jkGuiMultiplayer_mpcInfo.jediRank, jkGuiNetHost_maxRank);
+            exit(6);
+        }
+    }
+
+
     if (!Main_bAutostartSp) {
         int v21 = sithMulti_CreatePlayer(
               v34.serverName,
@@ -253,33 +282,12 @@ int Main_StartupDedicated(int bFullyDedicated)
     }
     
     
-    std3D_StartScene();
-    std3D_EndScene();
-    sithOpenStatic("static.jkl");
-    jkHudInv_InitItems();
-
-    // MPC parsing applies personality ammo maxima to inventory types. Keep profile and
-    // static-world startup in their existing order and select the character here.
-    if (Main_strAutostartCharacter[0]) {
-        char16_t characterName[32];
-        stdString_CharToWchar(characterName, Main_strAutostartCharacter, 31);
-        characterName[31] = 0;
-        // Match the character menu: load bins before checking the selected
-        // character's eligibility for the host rank, then let ordinary player
-        // startup reload those bins after the world inventory is initialized.
-        // Passing the actual host descriptor avoids the old temporary-info path
-        // that loaded bins but left the host appearance hardcoded to Kyle.
-        if (!jkPlayer_MPCParse(&jkGuiMultiplayer_mpcInfo, NULL,
-                              jkPlayer_playerShortName, characterName, 1)) {
-            fprintf(stderr, "autostart: selected multiplayer character could not be read\n");
-            exit(6);
-        }
-        if (jkGuiMultiplayer_mpcInfo.jediRank < 0
-            || jkGuiMultiplayer_mpcInfo.jediRank > jkGuiNetHost_maxRank) {
-            fprintf(stderr, "autostart: selected character rank %d is outside host range 0..%d\n",
-                    jkGuiMultiplayer_mpcInfo.jediRank, jkGuiNetHost_maxRank);
-            exit(6);
-        }
+    // Preserve ordinary autostart ordering and initialize exactly once.
+    if (!Main_strAutostartCharacter[0]) {
+        std3D_StartScene();
+        std3D_EndScene();
+        sithOpenStatic("static.jkl");
+        jkHudInv_InitItems();
     }
 
 

@@ -41,30 +41,36 @@ static size_t _wcslen(const char16_t* s) {size_t n=0;while(s[n])n++;return n;}
 #define stdDisplay_SetCooperativeLevel 0
 #define Window_SetDrawHandlers(a,b) ((void)0)
 static const char* profile="";
-static int initialized, parseCalls, rank=3, parseResult=1, sceneStarts, confCalls;
+static int initialized, parseCalls, rank=3, parseResult=1, sceneStarts, sceneEnds, staticOpens, hostCalls, confCalls;
 static void wuRegistry_GetStr(const char* key,char* out,size_t n,const char* def) {stdString_SafeStrCopy(out,strcmp(key,"playerShortName")?def:profile,n);}
 static void wuRegistry_GetWString(const char* k,char16_t* out,size_t n,const char16_t* def) {stdString_SafeWStrCopy(out,def,n);}
 #define wuRegistry_SaveStr(a,b) ((void)0)
 static void jkPlayer_CreateConf(const char16_t* name) {assert(name[0]);assert(!initialized);confCalls++;}
 #define jkGuiNetHost_SaveSettings() ((void)0)
 #define jkGuiNetHost_LoadSettings() ((void)0)
-#define sithMulti_CreatePlayer(...) 0
+static int createHost(void) {
+    if (Main_strAutostartCharacter[0]) {assert(initialized);assert(parseCalls==1);}
+    else {assert(!initialized);assert(!parseCalls);}
+    hostCalls++;
+    return 0;
+}
+#define sithMulti_CreatePlayer(...) createHost()
 #define jkStrings_GetUniStringWithFallback(s) (s)
 #define jkGuiDialog_ErrorDialog(a,b) ((void)0)
 static void std3D_StartScene(void) {sceneStarts++;}
-#define std3D_EndScene() ((void)0)
-#define sithOpenStatic(s) ((void)0)
-static void jkHudInv_InitItems(void) {assert(sceneStarts==1);initialized=1;}
+#define std3D_EndScene() (++sceneEnds)
+#define sithOpenStatic(s) (++staticOpens)
+static void jkHudInv_InitItems(void) {assert(sceneStarts==1 && sceneEnds==1 && staticOpens==1);assert(!initialized);initialized=1;}
 static int jkPlayer_MPCParse(Mpc* info,void* unused,char16_t* profileName,char16_t* character,int bins) {
-    assert(initialized);assert(info==&jkGuiMultiplayer_mpcInfo);assert(profileName==jkPlayer_playerShortName);assert(bins==1);
+    assert(initialized);assert(!hostCalls);assert(info==&jkGuiMultiplayer_mpcInfo);assert(profileName==jkPlayer_playerShortName);assert(bins==1);
     assert(character[0]=='P');parseCalls++;info->jediRank=rank;strcpy(info->model,"selected.3do");return parseResult;
 }
 static int jkMain_loadFile2(const char* ep,const char* map) {assert(initialized);return 1;}
 #define jkMain_LoadLevelSingleplayer(a,b) 1
 #include "production.inc"
-static void reset(void) {Main_strAutostartCharacter[0]=0;Main_bAutostart=Main_bAutostartSp=0;Main_strEpisode[0]=Main_strMap[0]=0;initialized=parseCalls=sceneStarts=confCalls=exitCode=0;rank=3;parseResult=1;profile="";}
+static void reset(void) {Main_strAutostartCharacter[0]=0;Main_bAutostart=Main_bAutostartSp=0;Main_strEpisode[0]=Main_strMap[0]=0;initialized=parseCalls=sceneStarts=sceneEnds=staticOpens=hostCalls=confCalls=exitCode=0;rank=3;parseResult=1;profile="";}
 static void parse(const char* text,int expected) {char line[256];strcpy(line,text);if(!setjmp(jump))Main_ParseCmdLine(line);assert(exitCode==expected);}
-static void startup(int dedicated,int expected) {if(!setjmp(jump))assert(Main_StartupDedicated(dedicated)==1);assert(exitCode==expected);}
+static void startup(int dedicated,int expected) {if(!setjmp(jump))assert(Main_StartupDedicated(dedicated)==1);assert(exitCode==expected);assert(hostCalls==((expected || Main_bAutostartSp) ? 0 : 1));assert(sceneStarts==1 && sceneEnds==1 && staticOpens==1);}
 int main(void) {
     assert(stdAutostart_CharacterNameValid("ABCDEFGHIJKLMNOPQRSTUVWXYZ_12-3"));
     assert(!stdAutostart_CharacterNameValid("ABCDEFGHIJKLMNOPQRSTUVWXYZ_12-34"));
@@ -73,6 +79,7 @@ int main(void) {
     reset();parse("-autostart -character Pilot_2",0);startup(0,0);assert(parseCalls==1);assert(!strcmp(jkGuiMultiplayer_mpcInfo.model,"selected.3do"));assert(jkPlayer_playerShortName[0]=='S');
     reset();profile="Existing";parse("-autostart",0);startup(0,0);assert(!parseCalls);assert(jkPlayer_playerShortName[0]=='E');
     reset();startup(1,0);assert(jkPlayer_playerShortName[0]=='S');
+    reset();parse("-autostart -sp",0);startup(0,0);assert(!parseCalls && !hostCalls);
     reset();parse("-autostart -character Pilot -character Pilot",6);
     reset();parse("-autostart -character",6);
     reset();parse("-character Pilot",6);
@@ -82,6 +89,6 @@ int main(void) {
     reset();parse("-autostart -character Pilot",0);rank=-1;startup(0,6);
     reset();parse("-autostart -character Pilot",0);parseResult=0;startup(0,6);
     reset();parse("-autostart -character Pilot",0);rank=4;startup(0,0);
-    puts("PASS: production autostart parse, selection, rank, inventory order, profile fallback");
+    puts("PASS: production autostart parse, selection, rank, inventory order, profile fallback, host side-effect gating");
     return 0;
 }
