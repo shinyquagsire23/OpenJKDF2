@@ -31,6 +31,7 @@ def convert(data, mode=None):
     remaining, face_index = 0, 0
     mesh_modes, face_modes, changes = Counter(), Counter(), []
     mesh_count = 0
+    mesh_mode_seen = False
     for i in range(start, end):
         line = lines[i]
         content = line.split('#', 1)[0].strip()
@@ -46,14 +47,23 @@ def convert(data, mode=None):
             face_index += 1
         else:
             if re.fullmatch(r'MESH\s+\d+', content, re.I):
+                if mesh_count and not mesh_mode_seen:
+                    raise ValueError(f'Missing mesh texture-mode declaration before line {i+1}')
                 mesh_count += 1
+                mesh_mode_seen = False
+                continue
             count = FACES.fullmatch(content)
             if count:
+                if not mesh_count or not mesh_mode_seen:
+                    raise ValueError(f'Faces require a mesh texture-mode declaration at line {i+1}')
                 remaining, face_index = int(count[1]), 0
                 continue
             match = HEADER.match(line)
             if not match:
                 continue
+            if not mesh_count or mesh_mode_seen:
+                raise ValueError(f'Unexpected or duplicate mesh texture-mode declaration at line {i+1}')
+            mesh_mode_seen = True
             field = 2
             mesh_modes[int(match[field])] += 1
         if mode is not None and int(match[field]) != mode:

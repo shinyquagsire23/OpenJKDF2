@@ -53,6 +53,20 @@ class TextureModeTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             convert(fixture().replace(b'TEXTUREMODE 3', b'TEXTUREMODE 7'), 1)
 
+    def test_duplicate_in_one_mesh_cannot_mask_missing_mode_in_another(self):
+        source = fixture().replace(b' TEXTUREMODE 0 # keep',
+                                   b' TEXTUREMODE 0 # keep\r\nTEXTUREMODE 1')
+        source = source.replace(b'TEXTUREMODE 3\r\n', b'')
+        for mode in (None, 0, 1):
+            with self.subTest(mode=mode), self.assertRaises(ValueError):
+                convert(source, mode)
+
+    def test_mesh_mode_before_first_mesh_is_rejected(self):
+        source = fixture().replace(b'MESH 0', b'TEXTUREMODE 0\r\nMESH 0', 1)
+        source = source.replace(b' TEXTUREMODE 0 # keep\r\n', b'')
+        with self.assertRaises(ValueError):
+            convert(source, 1)
+
     def test_new_copy_and_refuse_overwrite(self):
         with tempfile.TemporaryDirectory() as temp:
             source, output = Path(temp)/'in.3do', Path(temp)/'out.3do'
