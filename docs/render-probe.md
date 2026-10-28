@@ -38,7 +38,11 @@ and settings receipts. Each image gets an adjacent
 `.png.txt` metadata file with requested and actual drawable/window/scene-FBO
 dimensions, effective settings, actual bloom/SSAO draw toggles, software-renderer
 state, hidden-window flags, OpenGL vendor, renderer, version and readback error
-status. Metadata and PNGs must be checked together.
+status. Metadata and PNGs must be checked together. A capture advances only
+after both metadata writes and close succeed and libpng completes image/end
+writing followed by a successful stdio close. Failed output pairs are removed
+where possible; a process crash or cleanup failure can still leave partial files.
+This is a checked write contract, not a filesystem crash-durability guarantee.
 
 The run reports `RENDERPROBE_CAPTURE` and finally `RENDERPROBE_COMPLETE` through
 inherited stdout, then leaves the normal loop, shuts down and returns exit code
@@ -85,3 +89,15 @@ themselves prove that a particular mesh used the texture in the captured frame.
 The probe does not enable posed capture's dummy-audio path. Isolated probe
 audio suppression is a launcher/environment choice. Simulation remains timed
 and nondeterministic; frame counts and a fixed view do not freeze simulation.
+
+The probe-only output writer has an asset-free host test using libpng:
+
+```text
+cc -std=c11 -Wall -Wextra -Werror -Isrc src/Tests/render_probe_output_test.c -lpng -o probe-output
+./probe-output /tmp/probe-output.png
+```
+
+It decodes a synthetic image and checks row orientation, then injects safe stdio
+write/close failures. Failure injection uses GNU `fopencookie` on the test host;
+the production writer uses portable stdio/libpng. Ordinary screenshot writing
+is unchanged.

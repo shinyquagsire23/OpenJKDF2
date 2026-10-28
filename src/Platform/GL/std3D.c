@@ -20,6 +20,9 @@
 #include <stdlib.h>
 #include "Platform/GL/shader_utils.h"
 #include "Platform/GL/jkgm.h"
+#if defined(TARGET_CAN_JKGM) && !defined(TARGET_IOS) && !defined(TARGET_ANDROID) && !defined(ARCH_WASM)
+#include "Platform/GL/render_probe_output.h"
+#endif
 
 #include "SDL2_helper.h"
 #include "General/stdString.h"
@@ -3653,7 +3656,7 @@ int std3D_RenderProbeCapture(const char* path, int requestedW, int requestedH, i
     FILE* info = fopen(infoPath, "w");
     if (!info) return 0;
     uint8_t* pixels = malloc((size_t)w * (size_t)h * 3);
-    if (!pixels) { fclose(info); return 0; }
+    if (!pixels) { fclose(info); remove(infoPath); return 0; }
 
     GLint oldReadFbo, oldReadBuffer, oldPack, oldRow, oldSkipRows, oldSkipPixels, oldPbo;
     glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &oldReadFbo);
@@ -3681,30 +3684,35 @@ int std3D_RenderProbeCapture(const char* path, int requestedW, int requestedH, i
     glPixelStorei(GL_PACK_SKIP_ROWS, oldSkipRows);
     glPixelStorei(GL_PACK_SKIP_PIXELS, oldSkipPixels);
 
-    fprintf(info, "capture=post-composite-back-buffer-before-swap\nframe=%d\nrequested_width=%d\nrequested_height=%d\ndrawable_width=%d\ndrawable_height=%d\nwindow_width=%d\nwindow_height=%d\nscene_fbo_width=%d\nscene_fbo_height=%d\nscene_fbo_extra=%d\nbloom=%d\nssao=%d\nssaa=%.9g\ntexture_filter=%d\ngamma=%.9g\nwindow_flags=%llu\ngl_vendor=%s\ngl_renderer=%s\ngl_version=%s\nprior_gl_error=%u\ncapture_gl_error=%u\n",
+    int infoOk = fprintf(info, "capture=post-composite-back-buffer-before-swap\nframe=%d\nrequested_width=%d\nrequested_height=%d\ndrawable_width=%d\ndrawable_height=%d\nwindow_width=%d\nwindow_height=%d\nscene_fbo_width=%d\nscene_fbo_height=%d\nscene_fbo_extra=%d\nbloom=%d\nssao=%d\nssaa=%.9g\ntexture_filter=%d\ngamma=%.9g\nwindow_flags=%llu\ngl_vendor=%s\ngl_renderer=%s\ngl_version=%s\nprior_gl_error=%u\ncapture_gl_error=%u\n",
         frame, requestedW, requestedH, w, h, windowW, windowH,
         std3D_pFb ? std3D_pFb->w : 0, std3D_pFb ? std3D_pFb->h : 0,
         std3D_pFb ? std3D_pFb->enable_extra : 0, jkPlayer_enableBloom, jkPlayer_enableSSAO,
         (double)jkPlayer_ssaaMultiple, jkPlayer_enableTextureFilter, (double)jkPlayer_gamma,
         (unsigned long long)SDL_GetWindowFlags(probeWindow),
         (const char*)glGetString(GL_VENDOR), (const char*)glGetString(GL_RENDERER),
-        (const char*)glGetString(GL_VERSION), (unsigned)priorError, (unsigned)captureError);
-    fprintf(info, "draw_bloom=%d\ndraw_ssao=%d\nsoftware_renderer=%d\n", std3D_probeDrawBloom, std3D_probeDrawSSAO,
+        (const char*)glGetString(GL_VERSION), (unsigned)priorError, (unsigned)captureError) >= 0;
+    if (fprintf(info, "draw_bloom=%d\ndraw_ssao=%d\nsoftware_renderer=%d\n", std3D_probeDrawBloom, std3D_probeDrawSSAO,
 #ifdef RDRASTER_SOFTWARE_RENDERER
         rdroid_bSoftwareRenderer
 #else
         0
 #endif
-    );
-    fclose(info);
-    if (captureError != GL_NO_ERROR) { free(pixels); return 0; }
-    jkgm_write_png(path, w, h, pixels);
+    ) < 0) infoOk = 0;
+    infoOk = RenderProbe_CloseOutput(info, infoOk);
+    if (!infoOk || captureError != GL_NO_ERROR) {
+        free(pixels);
+        remove(infoPath);
+        return 0;
+    }
+    FILE* image = fopen(path, "wb");
+    int ok = image && RenderProbe_WritePng(image, w, h, pixels);
     free(pixels);
-    unsigned char signature[8];
-    FILE* check = fopen(path, "rb");
-    int ok = check && fread(signature, 1, sizeof(signature), check) == sizeof(signature)
-        && !memcmp(signature, "\x89PNG\r\n\x1a\n", 8);
-    if (check) fclose(check);
+    if (!ok) {
+        if (image) remove(path);
+        remove(infoPath);
+        return 0;
+    }
     printf("RENDERPROBE_CAPTURE frame=%d drawable=%dx%d scene_fbo=%dx%d bloom=%d ssao=%d ssaa=%.9g file=%s\n", frame, w, h,
         std3D_pFb ? std3D_pFb->w : 0, std3D_pFb ? std3D_pFb->h : 0,
         jkPlayer_enableBloom, jkPlayer_enableSSAO, (double)jkPlayer_ssaaMultiple, path);
