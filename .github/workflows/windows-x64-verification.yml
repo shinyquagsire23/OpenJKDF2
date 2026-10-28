@@ -1,0 +1,88 @@
+name: Windows x64 source verification
+
+# Deliberately opt-in: a full dependency cross-build is expensive.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Set verification directories
+        run: |
+          echo "BUILD_DIR=$RUNNER_TEMP/openjkdf2-build-win64" >> "$GITHUB_ENV"
+          echo "STAGE_DIR=$RUNNER_TEMP/openjkdf2-stage-win64" >> "$GITHUB_ENV"
+          echo "RECORDS_DIR=$RUNNER_TEMP/openjkdf2-verification-win64" >> "$GITHUB_ENV"
+
+      - name: Check out exact source and recursive submodules
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          submodules: recursive
+          persist-credentials: false
+
+      - name: Install MinGW and host tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            build-essential clang cmake file make mingw-w64 \
+            libgl-dev python3 python3-pip python3-venv
+          sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
+          sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
+          mkdir -p "$RECORDS_DIR"
+          dpkg-query -W -f='${Package} ${Version}\n' > "$RECORDS_DIR/UBUNTU_PACKAGES.txt"
+
+      - name: Record and validate pristine source provenance
+        id: provenance
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          python3 -B scripts/ci/windows_x64_verification.py before \
+            --source . --records "$RECORDS_DIR"
+
+      - name: Test the verification helpers with synthetic inputs
+        run: |
+          python3 -B scripts/ci/test_windows_x64_verification.py 2>&1 \
+            | tee "$RECORDS_DIR/HELPER_TESTS.txt"
+
+      - name: Configure full Windows x64 build
+        run: |
+          cmake -S . -B "$BUILD_DIR" \
+            --toolchain "$GITHUB_WORKSPACE/cmake_modules/toolchain_mingw.cmake" \
+            -DCMAKE_BUILD_TYPE=Release 2>&1 | tee "$RECORDS_DIR/CONFIGURE.txt"
+
+      - name: Build protobuf tools and Windows executable
+        run: |
+          cmake --build "$BUILD_DIR" --target PROTOBUF --parallel 2 2>&1 \
+            | tee "$RECORDS_DIR/BUILD_PROTOBUF.txt"
+          cmake --build "$BUILD_DIR" --target PROTOC --parallel 2 2>&1 \
+            | tee "$RECORDS_DIR/BUILD_PROTOC.txt"
+          cmake --build "$BUILD_DIR" --target openjkdf2-64 --parallel 2 2>&1 \
+            | tee "$RECORDS_DIR/BUILD.txt"
+
+      - name: Record source and dependency worktrees after build
+        if: ${{ always() && steps.provenance.outcome == 'success' }}
+        run: |
+          python3 -B scripts/ci/windows_x64_verification.py after \
+            --source . --records "$RECORDS_DIR"
+
+      - name: Verify PE architecture, runtime closure, licenses and hashes
+        run: |
+          python3 -B scripts/ci/windows_x64_verification.py verify \
+            --source . --build "$BUILD_DIR" --stage "$STAGE_DIR" --records "$RECORDS_DIR"
+
+      # Records contain text/JSON and license notices only. Never upload STAGE_DIR
+      # or BUILD_DIR; the workflow creates no release or distributable archive.
+      - name: Upload verification records
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: windows-x64-verification-${{ github.sha }}
+          path: ${{ env.RECORDS_DIR }}/
+          if-no-files-found: error
+          retention-days: 14
