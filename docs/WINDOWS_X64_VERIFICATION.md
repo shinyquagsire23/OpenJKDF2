@@ -89,6 +89,6 @@ The workflow YAML can additionally be checked with `actionlint`.
 
 Adapted from `.github/workflows/windows-x64-retail-fidelity.yml` in
 [CodaLilitari/OpenJKDF2-MotS-Fixes at 6fa54630](https://github.com/CodaLilitari/OpenJKDF2-MotS-Fixes/blob/6fa54630a123485d8c7b602c47992613a1f397b5/.github/workflows/windows-x64-retail-fidelity.yml),
-authored in that history as andreipemberton (Coda Lilitari). This adaptation retains
+with historical source author andreipemberton. Adaptation by Coda Lilitari retains
 its source/submodule provenance, PE/import, dependency-license and hash checks,
 and scopes delivery to upstream verification records.
