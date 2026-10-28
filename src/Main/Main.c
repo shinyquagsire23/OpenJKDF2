@@ -69,6 +69,7 @@
 #include "General/stdJSON.h"
 #include "Dss/jkDSS.h"
 #include "Main/InstallHelper.h"
+#include "Main/stdCapture.h"
 #include "Main/stdAutostartCharacter.h"
 #include "sithCvar.h"
 
@@ -145,6 +146,7 @@ int Main_StartupDedicated(int bFullyDedicated)
     strcat(Main_strMap, ".jkl");
     stdPlatform_Printf("Autostarting level: `%s`\n", Main_strMap);
 
+    stdCapture_Trace("creating isolated profile");
     if (bFullyDedicated) {
         strcpy(aTmpPlayerShortName, "ServerDed");
         stdString_CharToWchar(jkPlayer_playerShortName, aTmpPlayerShortName, 31);
@@ -169,8 +171,10 @@ int Main_StartupDedicated(int bFullyDedicated)
     }
 
 //#if !defined(TARGET_NO_MULTIPLAYER_MENUS)
+    stdCapture_Trace("profile ready");
     jkGuiNetHost_SaveSettings();
     jkGuiNetHost_LoadSettings();
+    stdCapture_Trace("settings ready");
 //#endif // !defined(TARGET_NO_MULTIPLAYER_MENUS)
 
     // Fake player
@@ -236,7 +240,9 @@ int Main_StartupDedicated(int bFullyDedicated)
     if (Main_strAutostartCharacter[0]) {
         std3D_StartScene();
         std3D_EndScene();
+        stdCapture_Trace("loading static world");
         sithOpenStatic("static.jkl");
+        stdCapture_Trace("registering inventory");
         jkHudInv_InitItems();
         char16_t characterName[32];
         stdString_CharToWchar(characterName, Main_strAutostartCharacter, 31);
@@ -286,7 +292,9 @@ int Main_StartupDedicated(int bFullyDedicated)
     if (!Main_strAutostartCharacter[0]) {
         std3D_StartScene();
         std3D_EndScene();
+        stdCapture_Trace("loading static world");
         sithOpenStatic("static.jkl");
+        stdCapture_Trace("registering inventory");
         jkHudInv_InitItems();
     }
 
@@ -409,7 +417,7 @@ int Main_Startup(const char *cmdline)
         }
     }
     stdStartup(&hs); // Added
-    InstallHelper_SetCwd(); // Added
+    if (!stdCapture_IsActive()) InstallHelper_SetCwd(); // Capture uses only its staged CWD.
 
     wuRegistry_Startup(HKEY_LOCAL_MACHINE, "Software\\LucasArts Entertainment Company\\JediKnight\\v1.0", (BYTE*)"0.1");
     //stdStartup(&hs); // Moved
@@ -787,6 +795,11 @@ void Main_ParseCmdLine(char *cmdline)
         else if (!__strcmpi(pArgTok, "-headless") || !__strcmpi(pArgTok, "/headless") )
         {
             Main_bHeadless = 1;
+        }
+        else if (!__strcmpi(pArgTok, "-capture"))
+        {
+            if (!stdCapture_IsActive()) { fprintf(stderr, "capture: missing or invalid request\n"); exit(6); }
+            Main_bNoHUD = 1;
         }
         else if (!__strcmpi(pArgTok, "-verboseNetworking") || !__strcmpi(pArgTok, "/verboseNetworking") )
         {

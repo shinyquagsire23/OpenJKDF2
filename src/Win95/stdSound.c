@@ -2,6 +2,7 @@
 
 #include "Gui/jkGUISound.h"
 #include "Main/Main.h"
+#include "Main/stdCapture.h"
 #include "stdPlatform.h"
 #include "Platform/wuRegistry.h"
 
@@ -148,7 +149,7 @@ int stdSound_Startup()
 {
     jkGuiSound_b3DSound_3 = 1;
 
-    if (Main_bHeadless) return 1;
+    if ((Main_bHeadless || stdCapture_IsActive())) return 1;
 
 	ALboolean enumeration;
 	const ALCchar *defaultDeviceName = NULL;
@@ -219,7 +220,7 @@ int stdSound_Startup()
 
 void stdSound_Shutdown()
 {
-    if (Main_bHeadless) return;
+    if ((Main_bHeadless || stdCapture_IsActive())) return;
 
 	device = alcGetContextsDevice(context);
 	alcMakeContextCurrent(NULL);
@@ -255,7 +256,7 @@ stdSound_buffer_t* stdSound_BufferCreate(int bStereo, uint32_t nSamplesPerSec, u
     out->vel[1] = 0.0;
     out->vel[2] = 0.0;
     
-    if (!Main_bHeadless)
+    if (!(Main_bHeadless || stdCapture_IsActive()))
         alGenBuffers(1, &out->buffer);
     
     int format = 0;
@@ -312,7 +313,7 @@ void* stdSound_BufferSetData(stdSound_buffer_t* sound, int bufferBytes, int32_t*
     
     _memset(sound->data, 0, sound->bufferBytes);
     
-    if (!Main_bHeadless)
+    if (!(Main_bHeadless || stdCapture_IsActive()))
         alBufferData(sound->buffer, sound->format, sound->data, sound->bufferBytes, sound->nSamplesPerSec);
     
     
@@ -321,7 +322,7 @@ void* stdSound_BufferSetData(stdSound_buffer_t* sound, int bufferBytes, int32_t*
 
 int stdSound_BufferUnlock(stdSound_buffer_t* sound, void* buffer, int bufferRead)
 {
-    if (Main_bHeadless) return 1;
+    if ((Main_bHeadless || stdCapture_IsActive())) return 1;
     
     if (sound->format == AL_FORMAT_STEREO24 || sound->format == AL_FORMAT_MONO24)
     {
@@ -387,7 +388,7 @@ int stdSound_BufferPlay(stdSound_buffer_t* buf, int loop)
 {
     ALint source_type;
 
-    if (Main_bHeadless) return 1;
+    if ((Main_bHeadless || stdCapture_IsActive())) return 1;
 
     //alSourceStop(buf->source);
     
@@ -431,7 +432,7 @@ int stdSound_BufferQueueAfterAnother(stdSound_buffer_t* bufPrev, stdSound_buffer
     ALint source_state = 0;
     ALint processed = 0;
     ALint source_type = AL_UNDETERMINED;
-    if (Main_bHeadless) return 1;
+    if ((Main_bHeadless || stdCapture_IsActive())) return 1;
 
     if (!bufPrev->source)
     {
@@ -499,7 +500,7 @@ void stdSound_BufferRelease(stdSound_buffer_t* sound)
 {
     ALint source_state;
     
-    if (Main_bHeadless)
+    if ((Main_bHeadless || stdCapture_IsActive()))
         goto end;
 
     //sound->refcnt--;
@@ -538,7 +539,7 @@ end:
 
 int stdSound_BufferReset(stdSound_buffer_t* sound)
 {
-    if (Main_bHeadless) return 1;
+    if ((Main_bHeadless || stdCapture_IsActive())) return 1;
 
     //alSourcef(sound->source, AL_PITCH, 1.0);
 	//alSourcef(sound->source, AL_GAIN, 1.0);
@@ -569,7 +570,7 @@ void stdSound_BufferSetPan(stdSound_buffer_t* a1, flex_t a2)
 
 void stdSound_BufferSetFrequency(stdSound_buffer_t* sound, int freq)
 {
-    if (Main_bHeadless) return;
+    if ((Main_bHeadless || stdCapture_IsActive())) return;
 
     flex_t pitch = (flex_d_t)freq / (flex_d_t)sound->nSamplesPerSec;
     
@@ -624,7 +625,7 @@ void stdSound_IA3D_idk(flex_t a)
 
 int stdSound_BufferStop(stdSound_buffer_t* buf)
 {
-    if (Main_bHeadless) return 1;
+    if ((Main_bHeadless || stdCapture_IsActive())) return 1;
 
     if (buf->source)
     {
@@ -636,7 +637,7 @@ int stdSound_BufferStop(stdSound_buffer_t* buf)
 
 void stdSound_BufferSetVolume(stdSound_buffer_t* sound, flex_t vol)
 {
-    if (Main_bHeadless) return;
+    if ((Main_bHeadless || stdCapture_IsActive())) return;
     if (!sound) return;
     
     sound->vol = vol * stdSound_fMenuVolume;
@@ -675,7 +676,7 @@ void stdSound_SetPositionOrientation(rdVector3 *pos, rdVector3 *lvec, rdVector3 
     stdSound_DS3DToAL(&stdSound_listenerOri[0], lvec);
     stdSound_DS3DToAL(&stdSound_listenerOri[3], uvec);
 
-    if (Main_bHeadless) return;
+    if ((Main_bHeadless || stdCapture_IsActive())) return;
 
     alListenerfv(AL_POSITION, stdSound_listenerPos);
     alListenerfv(AL_ORIENTATION, stdSound_listenerOri);
@@ -690,7 +691,7 @@ void stdSound_SetPosition(stdSound_buffer_t* pSoundBuf, rdVector3 *pos)
     if (!pSoundBuf->source)
         return;
 
-    if (Main_bHeadless) return;
+    if ((Main_bHeadless || stdCapture_IsActive())) return;
 
     alSourcei(pSoundBuf->source, AL_SOURCE_RELATIVE, AL_FALSE);
     alSourcefv(pSoundBuf->source, AL_POSITION, pSoundBuf->pos);
@@ -706,7 +707,7 @@ void stdSound_SetVelocity(stdSound_buffer_t* pSoundBuf, rdVector3 *vel)
     if (!pSoundBuf->source)
         return;
 
-    if (Main_bHeadless) return;
+    if ((Main_bHeadless || stdCapture_IsActive())) return;
 
     alSourcei(pSoundBuf->source, AL_SOURCE_RELATIVE, AL_FALSE);
     alSourcefv(pSoundBuf->source, AL_VELOCITY, pSoundBuf->vel); // FLEXTODO
@@ -728,7 +729,7 @@ int stdSound_IsPlaying(stdSound_buffer_t* pSoundBuf, rdVector3 *pos)
     if (pSoundBuf->vol == 0.0)
         return 0;
 
-    if (Main_bHeadless) return 0;
+    if ((Main_bHeadless || stdCapture_IsActive())) return 0;
 
     ALint source_state;
     alGetSourcei(pSoundBuf->source, AL_SOURCE_STATE, &source_state);

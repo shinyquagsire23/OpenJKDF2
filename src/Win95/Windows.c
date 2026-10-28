@@ -20,6 +20,7 @@
 
 #ifdef SDL2_RENDER
 #include <SDL3/SDL.h>
+#include "Platform/SDL2/stdCaptureUi.h"
 #endif
 
 #ifdef TARGET_TWL
@@ -270,7 +271,8 @@ int Windows_ErrorMsgboxWide(const char *a1, ...)
     stdString_WcharToChar(tmp, Text, 1024);
 
     jk_printf("ERROR: %s\n", tmp);
-    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", tmp, NULL);
+    if (Window_bRenderProbe) fprintf(stderr,"RENDERPROBE_FAILED %s\n",tmp);
+    else SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", tmp, NULL);
     return 0;
 #endif
 }
@@ -301,7 +303,8 @@ int Windows_ErrorMsgbox(const char *a1, ...)
     stdString_WcharToChar(tmp, Text, 512);
 
     jk_printf("ERROR: %s\n", tmp);
-    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", tmp, NULL);
+    if (Window_bRenderProbe) fprintf(stderr,"RENDERPROBE_FAILED %s\n",tmp);
+    else SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", tmp, NULL);
     return 0;
 #endif
 }
@@ -327,6 +330,11 @@ void Windows_GameErrorMsgbox(const char *a1, ...)
 #elif defined(SDL2_RENDER)
     vsnprintf(tmp, 0x200u, a1, va);
     jk_printf("FATAL ERROR: %s\n", tmp);
+    if (Window_bRenderProbe) {
+        va_end(va);
+        fprintf(stderr,"RENDERPROBE_FAILED fatal game error: %s\n",tmp);
+        exit(5);
+    }
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", tmp, NULL);
 
 #if !defined(ARCH_WASM)

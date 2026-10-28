@@ -1,4 +1,5 @@
 #include "jkQuakeConsole.h"
+#include "Main/stdCapture.h"
 
 #include "General/stdHashtbl.h"
 #include "General/stdBitmap.h"
@@ -175,7 +176,7 @@ void jkQuakeConsole_Startup()
 
         jkQuakeConsole_bShiftHeld = 0;
 
-        jkQuakeConsole_bShowUpdateText = stdUpdater_CheckForUpdates();
+        jkQuakeConsole_bShowUpdateText = stdCapture_IsRequested() ? 0 : stdUpdater_CheckForUpdates();
         if (jkQuakeConsole_bShowUpdateText) {
             jkQuakeConsole_updateTextCooldown = 10*1000*1000;
         }

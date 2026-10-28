@@ -1,4 +1,5 @@
 #include "sithMain.h"
+#include "Main/stdCapture.h"
 
 #include "Main/jkGame.h"
 #include "Main/Main.h"
@@ -482,6 +483,7 @@ void sithDrawScene()
 
         //sithCamera_g_pCurCamera->rdCamera.aspectRatio += 0.01;
         sithCamera_Update(sithCamera_g_pCurCamera);
+        stdCapture_ApplyCamera();
         sithCamera_RenderScene();
     }
 }

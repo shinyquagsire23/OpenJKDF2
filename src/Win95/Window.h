@@ -20,6 +20,15 @@
 
 extern int Window_xSize;
 extern int Window_ySize;
+#ifdef __cplusplus
+extern "C" {
+#endif
+extern int Window_bRenderProbe;
+#ifdef __cplusplus
+}
+#endif
+void Window_RenderProbeApplySettings(void);
+void Window_RenderProbeGameplayFrame(void);
 
 int Window_AddMsgHandler(WindowHandler_t a1);
 int Window_RemoveMsgHandler(WindowHandler_t a1);

@@ -128,6 +128,9 @@ void std3D_PurgeBitmapRefs(stdBitmap *pBitmap);
 void std3D_PurgeSurfaceRefs(rdDDrawSurface *texture);
 void std3D_UpdateSettings();
 void std3D_Screenshot(const char* pFpath);
+#if defined(SDL2_RENDER) && !defined(RENDER_GL11)
+int std3D_CaptureInspectionFrame(void);
+#endif
 #ifdef RDRASTER_SOFTWARE_RENDERER
 void std3D_ScreenshotWindow(const char* pFpath);
 #endif

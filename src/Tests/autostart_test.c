@@ -67,6 +67,8 @@ static int jkPlayer_MPCParse(Mpc* info,void* unused,char16_t* profileName,char16
 }
 static int jkMain_loadFile2(const char* ep,const char* map) {assert(initialized);return 1;}
 #define jkMain_LoadLevelSingleplayer(a,b) 1
+static int stdCapture_IsActive(void) {return 0;}
+static void stdCapture_Trace(const char* message) {(void)message;}
 #include "production.inc"
 static void reset(void) {Main_strAutostartCharacter[0]=0;Main_bAutostart=Main_bAutostartSp=0;Main_strEpisode[0]=Main_strMap[0]=0;initialized=parseCalls=sceneStarts=sceneEnds=staticOpens=hostCalls=confCalls=exitCode=0;rank=3;parseResult=1;profile="";}
 static void parse(const char* text,int expected) {char line[256];strcpy(line,text);if(!setjmp(jump))Main_ParseCmdLine(line);assert(exitCode==expected);}
