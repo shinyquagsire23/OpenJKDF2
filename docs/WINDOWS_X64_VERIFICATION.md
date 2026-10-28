@@ -36,13 +36,16 @@ The job creates no release, distributable binary archive, or game-data upload.
   points and ordinary PE imports require separate runtime testing.
 - `BINARY_ORIGINS.json` and `BINARY_SHA256.json` identify inspection inputs and verify
   their staged bytes. The binaries themselves are never uploaded.
-- `licenses/` and `LICENSE_SOURCES.json` retain required engine/dependency notices
-  with source hashes, using current SDL3 and SDL3_mixer vendored-codec paths.
+- `licenses/` and `LICENSE_SOURCES.json` retain an enumerated 32-file notice
+  inventory with source hashes, including current SDL3 and SDL3_mixer codec paths.
+  This inventory is incomplete: `TARGET_USE_CURL` compiles bundled curl and Mbed TLS,
+  whose embedded notices and standalone license terms are not collected here.
   Required compiler static archives and any staged compiler runtime DLLs must have
   distro package ownership and copyright notices. `MINGW_RUNTIME_PACKAGES.json`
-  records their versions and hashes. Missing required notices are fatal. These
-  records support review; they do not establish compliance for a future binary
-  distribution, whose packaging and corresponding-source obligations need review.
+  records their versions and hashes. Missing enumerated notices are fatal. These
+  records support review; they do not establish complete dependency notice coverage
+  or redistribution compliance. Future binary distribution requires a separate
+  review of packaging and corresponding-source obligations.
 - `GENERATOR.txt` records the Python executable, Python version, actual installed
   `cogapp` version and frozen packages from **the build's `cogapp_venv`**. Existing
   CMake installs Cog there without a version pin. A separately preinstalled Cog
