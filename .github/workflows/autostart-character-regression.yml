@@ -40,4 +40,3 @@ jobs:
           persist-credentials: false
       - name: Test production command parsing and startup ordering
         run: timeout --kill-after=5s 180s python3 -B src/Tests/run_autostart_test.py
-

@@ -69,4 +69,3 @@ jobs:
             -fsanitize=address,undefined -fno-omit-frame-pointer -g \
             src/Tests/render_probe_output_test.c -lpng -o "$RUNNER_TEMP/render-probe-output"
           timeout --kill-after=5s 30s "$RUNNER_TEMP/render-probe-output" "$RUNNER_TEMP/render-probe-output.png"
-
