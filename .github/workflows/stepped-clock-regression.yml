@@ -1,0 +1,51 @@
+name: Stepped game clock regression
+
+on:
+  pull_request:
+    branches: [main, master]
+    paths:
+      - 'src/Main/sithMain.c'
+      - 'src/Gameplay/sithTime.c'
+      - 'src/Gameplay/sithEvent.c'
+      - 'src/Cog/sithCog.c'
+      - 'src/Cog/sithCogFunction.c'
+      - 'src/engine_config.h'
+      - 'src/Tests/stepped_clock_test.c'
+      - 'src/Tests/run_stepped_clock_test.py'
+      - '.github/workflows/stepped-clock-regression.yml'
+  push:
+    branches: [main, master]
+    paths:
+      - 'src/Main/sithMain.c'
+      - 'src/Gameplay/sithTime.c'
+      - 'src/Gameplay/sithEvent.c'
+      - 'src/Cog/sithCog.c'
+      - 'src/Cog/sithCogFunction.c'
+      - 'src/engine_config.h'
+      - 'src/Tests/stepped_clock_test.c'
+      - 'src/Tests/run_stepped_clock_test.py'
+      - '.github/workflows/stepped-clock-regression.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  clocks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+      UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Test production clocks and negative controls
+        run: timeout --kill-after=5s 300s python3 -B src/Tests/run_stepped_clock_test.py --cc gcc --sanitize --negative-controls
