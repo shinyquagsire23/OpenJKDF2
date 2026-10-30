@@ -25,7 +25,6 @@
 #include "Dss/sithGamesave.h"
 #include "Dss/jkDSS.h"
 #include "../jk.h"
-#include "Primitives/rdModel3.h"
 
 // Added: Turbo Mode cheat
 int jkDev_bTurbo = 0;
@@ -115,8 +114,6 @@ void jkDev_Startup()
     jkDev_RegisterCmd(jkDev_CmdInvincible, "invincible", "Invincible", 0);
     jkDev_RegisterCmd(jkDev_CmdSaberColor, "sabercolor", "Saber Color", 0);
     jkDev_RegisterCmd(jkDev_CmdSaberRGB, "saberrgb", "Custom RGB Saber Color", 0);
-    jkDev_RegisterCmd(jkDev_CmdBigHead, "bighead", "Big Head Mode", 0);
-    jkDev_RegisterCmd(jkDev_CmdDKMode, "dkmode", "DK Mode", 0);
     jkDev_RegisterCmd(jkDev_CmdFullbright, "fullbright", "Fullbright", 0);
     jkDev_RegisterCmd(jkDev_CmdUnlimited, "unlimited", "Unlimited Resources", 0);
     jkDev_RegisterCmd(jkDev_Custom_CmdJumpNextCheckpoint, "checkmate", "", 0);
@@ -956,50 +953,6 @@ int jkDev_CmdSaberColor(stdDebugConsoleCmd* pCmd, const char* pArgStr)
     );
 
     sithConsole_PrintString(msg);
-
-    return 1;
-}
-
-// Added: Big Head Mode console cheat
-int jkDev_CmdBigHead(stdDebugConsoleCmd* pCmd, const char* pArgStr)
-{
-    if (!sithNet_isMulti)
-    {
-        rdModel3_bBigHeadMode = !rdModel3_bBigHeadMode;
-
-        if (rdModel3_bBigHeadMode)
-        {
-            // Added: Big Head Mode overrides DK Mode
-            rdModel3_bDKMode = 0;
-
-            sithConsole_PrintString("Big Head Mode ON");
-        }
-        else
-        {
-            sithConsole_PrintString("Big Head Mode OFF");
-        }
-    }
-
-    return 1;
-}
-
-// Added: DK Mode console cheat
-int jkDev_CmdDKMode(stdDebugConsoleCmd* pCmd, const char* pArgStr)
-{
-    if (!sithNet_isMulti)
-    {
-        rdModel3_bDKMode = !rdModel3_bDKMode;
-
-        if (rdModel3_bDKMode)
-        {
-            rdModel3_bBigHeadMode = 0;
-            sithConsole_PrintString("DK Mode ON");
-        }
-        else
-        {
-            sithConsole_PrintString("DK Mode OFF");
-        }
-    }
 
     return 1;
 }
