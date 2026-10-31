@@ -20,6 +20,7 @@
 #endif
 
 #if defined(SDL2_RENDER) && !defined(ARCH_WASM)
+#include "SDL2_helper.h"
 
 // TODO: TARGET_IOS has no nativefiledialog-extended backend
 #if defined(TARGET_ANDROID)
@@ -1117,6 +1118,7 @@ done:
 
 int InstallHelper_AttemptInstall()
 {
+    if (stdCapture_IsRequested()) { fprintf(stderr, "capture: installation UI is disabled\n"); exit(6); }
     // TODO: Polyglot
     const SDL_MessageBoxButtonData buttons[] = {
         { SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 0, "Install" },
@@ -1218,6 +1220,7 @@ int InstallHelper_AttemptInstall()
 
 void InstallHelper_CheckRequiredAssets(int doInstall)
 {
+    if (stdCapture_IsRequested()) { fprintf(stderr, "capture: required assets unavailable; installation UI is disabled\n"); exit(6); }
     const char* msg = "OpenJKDF2 is missing the following required assets:\n";
 
     const char** paRequiredAssets = Main_bMotsCompat ? aRequiredAssetsMots : aRequiredAssets;

@@ -7,6 +7,7 @@
 #include "Win95/Video.h"
 #include "World/sithWorld.h"
 #include "Engine/rdColormap.h"
+#include "Engine/rdroid.h"
 #include "Main/jkGame.h"
 #include "World/jkPlayer.h"
 #include "General/stdBitmap.h"
@@ -19,6 +20,9 @@
 #include <stdlib.h>
 #include "Platform/GL/shader_utils.h"
 #include "Platform/GL/jkgm.h"
+#if defined(TARGET_CAN_JKGM) && !defined(TARGET_IOS) && !defined(TARGET_ANDROID) && !defined(ARCH_WASM)
+#include "Platform/GL/render_probe_output.h"
+#endif
 
 #include "SDL2_helper.h"
 #include "General/stdString.h"
@@ -103,6 +107,7 @@ std3DFramebuffer std3D_framebuffers[2];
 std3DFramebuffer *std3D_pFb = NULL;
 
 static bool has_initted = false;
+static int std3D_probeDrawBloom = 0, std3D_probeDrawSSAO = 0;
 
 static void* last_overlay = NULL;
 
@@ -773,7 +778,8 @@ int std3D_StartScene()
     {
         if (!init_resources()) {
             stdPlatform_Printf("std3D: Failed to init resources, exiting...");
-            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to init resources, exiting...", NULL);
+            if (Window_bRenderProbe) fprintf(stderr,"RENDERPROBE_FAILED OpenGL resource initialization\n");
+            else SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to init resources, exiting...", NULL);
             exit(-1);
         }
     }
@@ -2405,6 +2411,10 @@ void std3D_DrawSceneFbo()
         draw_ssao = 0;
         //draw_bloom = 0;
     }
+    if (Window_bRenderProbe) {
+        std3D_probeDrawBloom = draw_bloom;
+        std3D_probeDrawSSAO = draw_ssao;
+    }
 
     if (draw_bloom)
     {
@@ -3024,6 +3034,9 @@ void std3D_AddRenderListUITris(rdUITri *tris, unsigned int num_tris)
 
 int std3D_ClearZBuffer()
 {
+    // Headless startup does not initialize a framebuffer or retain a GL context.
+    if (Main_bHeadless) return 1;
+
 #ifdef RDRASTER_SW_ZBUFFER
     // the software rasterizer keeps its own depth buffer; clear it on the same hook JK uses
     // (scene start + the POV weapon's clear) so the software path stays in lockstep with the HW one.
@@ -3623,6 +3636,93 @@ void std3D_UpdateSettings()
 }
 
 // Added
+// Probe capture occurs after the final composite/HUD draw and before swap. The
+// scene FBO alone cannot establish bloom or SSAO output.
+int std3D_RenderProbeCapture(const char* path, int requestedW, int requestedH, int frame)
+{
+#if defined(TARGET_CAN_JKGM) && !defined(TARGET_IOS) && !defined(TARGET_ANDROID) && !defined(ARCH_WASM)
+    SDL_Window* probeWindow = SDL_GL_GetCurrentWindow();
+    if (!Window_bRenderProbe || !probeWindow) return 0;
+    int w = 0, h = 0, windowW = 0, windowH = 0;
+    SDL_GetWindowSizeInPixels(probeWindow, &w, &h);
+    SDL_GetWindowSize(probeWindow, &windowW, &windowH);
+    if (!Window_bRenderProbe || w < 1 || h < 1 || w > 4096 || h > 2160) return 0;
+    char infoPath[800];
+    if (snprintf(infoPath, sizeof(infoPath), "%s.txt", path) >= sizeof(infoPath)) return 0;
+    FILE* existing = fopen(path, "rb");
+    if (existing) { fclose(existing); return 0; }
+    existing = fopen(infoPath, "rb");
+    if (existing) { fclose(existing); return 0; }
+    FILE* info = fopen(infoPath, "w");
+    if (!info) return 0;
+    uint8_t* pixels = malloc((size_t)w * (size_t)h * 3);
+    if (!pixels) { fclose(info); remove(infoPath); return 0; }
+
+    GLint oldReadFbo, oldReadBuffer, oldPack, oldRow, oldSkipRows, oldSkipPixels, oldPbo;
+    glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &oldReadFbo);
+    glGetIntegerv(GL_READ_BUFFER, &oldReadBuffer);
+    glGetIntegerv(GL_PACK_ALIGNMENT, &oldPack);
+    glGetIntegerv(GL_PACK_ROW_LENGTH, &oldRow);
+    glGetIntegerv(GL_PACK_SKIP_ROWS, &oldSkipRows);
+    glGetIntegerv(GL_PACK_SKIP_PIXELS, &oldSkipPixels);
+    glGetIntegerv(GL_PIXEL_PACK_BUFFER_BINDING, &oldPbo);
+    GLenum priorError = glGetError();
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, std3D_windowFbo);
+    glReadBuffer(GL_BACK);
+    glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glPixelStorei(GL_PACK_ROW_LENGTH, 0);
+    glPixelStorei(GL_PACK_SKIP_ROWS, 0);
+    glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
+    glReadPixels(0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+    GLenum captureError = glGetError();
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, oldReadFbo);
+    glReadBuffer(oldReadBuffer);
+    glBindBuffer(GL_PIXEL_PACK_BUFFER, oldPbo);
+    glPixelStorei(GL_PACK_ALIGNMENT, oldPack);
+    glPixelStorei(GL_PACK_ROW_LENGTH, oldRow);
+    glPixelStorei(GL_PACK_SKIP_ROWS, oldSkipRows);
+    glPixelStorei(GL_PACK_SKIP_PIXELS, oldSkipPixels);
+
+    int infoOk = fprintf(info, "capture=post-composite-back-buffer-before-swap\nframe=%d\nrequested_width=%d\nrequested_height=%d\ndrawable_width=%d\ndrawable_height=%d\nwindow_width=%d\nwindow_height=%d\nscene_fbo_width=%d\nscene_fbo_height=%d\nscene_fbo_extra=%d\nbloom=%d\nssao=%d\nssaa=%.9g\ntexture_filter=%d\ngamma=%.9g\nwindow_flags=%llu\ngl_vendor=%s\ngl_renderer=%s\ngl_version=%s\nprior_gl_error=%u\ncapture_gl_error=%u\n",
+        frame, requestedW, requestedH, w, h, windowW, windowH,
+        std3D_pFb ? std3D_pFb->w : 0, std3D_pFb ? std3D_pFb->h : 0,
+        std3D_pFb ? std3D_pFb->enable_extra : 0, jkPlayer_enableBloom, jkPlayer_enableSSAO,
+        (double)jkPlayer_ssaaMultiple, jkPlayer_enableTextureFilter, (double)jkPlayer_gamma,
+        (unsigned long long)SDL_GetWindowFlags(probeWindow),
+        (const char*)glGetString(GL_VENDOR), (const char*)glGetString(GL_RENDERER),
+        (const char*)glGetString(GL_VERSION), (unsigned)priorError, (unsigned)captureError) >= 0;
+    if (fprintf(info, "draw_bloom=%d\ndraw_ssao=%d\nsoftware_renderer=%d\n", std3D_probeDrawBloom, std3D_probeDrawSSAO,
+#ifdef RDRASTER_SOFTWARE_RENDERER
+        rdroid_bSoftwareRenderer
+#else
+        0
+#endif
+    ) < 0) infoOk = 0;
+    infoOk = RenderProbe_CloseOutput(info, infoOk);
+    if (!infoOk || captureError != GL_NO_ERROR) {
+        free(pixels);
+        remove(infoPath);
+        return 0;
+    }
+    FILE* image = fopen(path, "wb");
+    int ok = image && RenderProbe_WritePng(image, w, h, pixels);
+    free(pixels);
+    if (!ok) {
+        if (image) remove(path);
+        remove(infoPath);
+        return 0;
+    }
+    printf("RENDERPROBE_CAPTURE frame=%d drawable=%dx%d scene_fbo=%dx%d bloom=%d ssao=%d ssaa=%.9g file=%s\n", frame, w, h,
+        std3D_pFb ? std3D_pFb->w : 0, std3D_pFb ? std3D_pFb->h : 0,
+        jkPlayer_enableBloom, jkPlayer_enableSSAO, (double)jkPlayer_ssaaMultiple, path);
+    fflush(stdout);
+    return ok;
+#else
+    return 0;
+#endif
+}
+
 #ifdef TARGET_CAN_JKGM
 // Added: PNG encoding takes ~90 ms at 1440p and froze the game, so it runs on a thread
 typedef struct std3D_ScreenshotJob
@@ -3671,9 +3771,51 @@ void std3D_Screenshot(const char* pFpath)
 #endif
 }
 
+// Render-thread capture of the composed back buffer before presentation. PPM
+// writing has a checked, exclusive-file contract unlike the legacy PNG helper.
+int std3D_CaptureInspectionFrame(void)
+{
+    extern SDL_Window* displayWindow;
+    if (!stdCapture_IsActive() || !displayWindow || !std3D_pFb) return 0;
+    int w = Window_xSize, h = Window_ySize;
+    if (w != stdCapture_request.width || h != stdCapture_request.height) return 0;
+    size_t bytes = (size_t)w*h*3;
+    uint8_t* data = (uint8_t*)malloc(bytes);
+    if (!data) return 0;
+    GLint oldFbo, oldReadBuffer, oldPack, oldRow, oldSkipRows, oldSkipPixels, oldBuffer;
+    glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &oldFbo);
+    glGetIntegerv(GL_READ_BUFFER, &oldReadBuffer);
+    glGetIntegerv(GL_PACK_ALIGNMENT, &oldPack);
+    glGetIntegerv(GL_PACK_ROW_LENGTH, &oldRow);
+    glGetIntegerv(GL_PACK_SKIP_ROWS, &oldSkipRows);
+    glGetIntegerv(GL_PACK_SKIP_PIXELS, &oldSkipPixels);
+    glGetIntegerv(GL_PIXEL_PACK_BUFFER_BINDING, &oldBuffer);
+    if (glGetError() != GL_NO_ERROR) { free(data); return 0; }
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, std3D_windowFbo);
+    glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+    glReadBuffer(GL_BACK);
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glPixelStorei(GL_PACK_ROW_LENGTH, 0);
+    glPixelStorei(GL_PACK_SKIP_ROWS, 0);
+    glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
+    glReadPixels(0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, data);
+    int ok = glGetError() == GL_NO_ERROR;
+    glPixelStorei(GL_PACK_ALIGNMENT, oldPack);
+    glPixelStorei(GL_PACK_ROW_LENGTH, oldRow);
+    glPixelStorei(GL_PACK_SKIP_ROWS, oldSkipRows);
+    glPixelStorei(GL_PACK_SKIP_PIXELS, oldSkipPixels);
+    glBindBuffer(GL_PIXEL_PACK_BUFFER, oldBuffer);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, oldFbo);
+    glReadBuffer(oldReadBuffer);
+    if (glGetError() != GL_NO_ERROR) ok = 0;
+    if (ok) ok = stdCapture_WriteRgb(data, w, h);
+    free(data);
+    return ok;
+}
+
 #ifdef RDRASTER_SOFTWARE_RENDERER
 // Capture the presented WINDOW framebuffer (what the user actually sees, including the software
-// world present + HUD overlay), unlike std3D_Screenshot which reads the pre-composite scene FBO.
+// world present + HUD overlay). The ordinary screenshot also reads the finished window.
 // Used for headless verification of the software-renderer full-window present.
 void std3D_ScreenshotWindow(const char* pFpath)
 {

@@ -92,6 +92,7 @@ extern "C" {
 #define GL_R8 GL_RED
 #endif // WIN32
 
+#include "Platform/SDL2/stdCaptureUi.h"
 //#endif // !ARCH_WASM
 #endif // SDL2_RENDER
 
