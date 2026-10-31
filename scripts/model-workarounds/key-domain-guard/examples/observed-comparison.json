@@ -1,0 +1,95 @@
+{
+  "status": "Sanitized observation summary; not an executable engine test in this standalone package.",
+  "observed_on": "2026-09-08",
+  "matrix_error_threshold": 1e-05,
+  "scope": "Headless MP resource loading, model assignment and advancing stock KEY poses, with intended-parent matrix checks. No rendered frame, original retail executable, profile picker, traversal or remote peer claim.",
+  "limitation": "Model tessellation also changed between the two builds; this is not a one-variable benchmark. Synthetic fixtures independently isolate slot reservation.",
+  "runs": [
+    {
+      "stage": "before_slot_reservation",
+      "source_report_sha256": "dd1c5815e742698a5f1252dc040815538d0987d83e44053f05159e17a600a394",
+      "observer_version": 2,
+      "source_revision_recorded_by_harness": "4dc57962e46a72662b59d36c30f15eacef6234b5",
+      "key_names": [
+        "kyfall.key",
+        "kyidle1b.key",
+        "kyidle2b.key",
+        "kysbsabr.key"
+      ],
+      "observed_key_starts": 8,
+      "gates": {
+        "completion_marker": true,
+        "expected_model_passes": true,
+        "expected_key_passes": true,
+        "no_cog_failures": true,
+        "mp_simulation": true,
+        "no_asset_errors": true,
+        "every_model_observed": true,
+        "advancing_finite_animated_poses": true,
+        "source_inputs_unchanged": true,
+        "neutral_children_inherit_correct_parent": false
+      },
+      "models": [
+        {
+          "variant": "segmented_variant",
+          "node_count": 27,
+          "stable_finite_pose_samples": 32,
+          "distinct_pose_frame_numbers": 32,
+          "elapsed_track_frames_observed": true,
+          "max_neutral_child_parent_error": 1.9305978417396545
+        },
+        {
+          "variant": "dense_variant",
+          "node_count": 37,
+          "stable_finite_pose_samples": 33,
+          "distinct_pose_frame_numbers": 33,
+          "elapsed_track_frames_observed": true,
+          "max_neutral_child_parent_error": 1.917439043521881
+        }
+      ]
+    },
+    {
+      "stage": "after_slot_reservation",
+      "source_report_sha256": "db889ff7158c42c9e1b28dafa35d158f77c1412e00a51950de789bb1341b9429",
+      "observer_version": 2,
+      "source_revision_recorded_by_harness": "4dc57962e46a72662b59d36c30f15eacef6234b5",
+      "key_names": [
+        "kyfall.key",
+        "kyidle1b.key",
+        "kyidle2b.key",
+        "kysbsabr.key"
+      ],
+      "observed_key_starts": 8,
+      "gates": {
+        "completion_marker": true,
+        "expected_model_passes": true,
+        "expected_key_passes": true,
+        "no_cog_failures": true,
+        "mp_simulation": true,
+        "no_asset_errors": true,
+        "every_model_observed": true,
+        "advancing_finite_animated_poses": true,
+        "source_inputs_unchanged": true,
+        "neutral_children_inherit_correct_parent": true
+      },
+      "models": [
+        {
+          "variant": "segmented_variant",
+          "node_count": 34,
+          "stable_finite_pose_samples": 31,
+          "distinct_pose_frame_numbers": 31,
+          "elapsed_track_frames_observed": true,
+          "max_neutral_child_parent_error": 0.0
+        },
+        {
+          "variant": "dense_variant",
+          "node_count": 61,
+          "stable_finite_pose_samples": 32,
+          "distinct_pose_frame_numbers": 32,
+          "elapsed_track_frames_observed": true,
+          "max_neutral_child_parent_error": 0.0
+        }
+      ]
+    }
+  ]
+}

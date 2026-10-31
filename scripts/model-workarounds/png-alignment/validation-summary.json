@@ -1,0 +1,16 @@
+{
+  "date": "2026-09-08",
+  "python": "3.13.15",
+  "pillow": "12.3.0",
+  "command": "python -B -m unittest -v",
+  "tests_run": 15,
+  "passed": 14,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 1,
+  "skip_reason": "Host lacks privilege to create a real synthetic Windows symlink",
+  "deterministic_symlink_and_reparse_metadata_rejection": "passed",
+  "input_assets": "Synthetic pixels created by tests in temporary directories",
+  "artifact_scan": "Only source, documentation, license, requirements and sanitized JSON evidence; no artwork or private paths",
+  "publication": "Not performed by implementation agent"
+}
