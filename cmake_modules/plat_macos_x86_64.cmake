@@ -16,9 +16,6 @@ macro(plat_initialize)
     set(BUNDLE "${PROJECT_SOURCE_DIR}/OpenJKDF2_x86_64.app")
     set(HOMEBREW_PREFIX "/usr/local")
 
-    # Added: -fno-builtin-wcslen, same trap as WASM/iOS (see plat_wasm.cmake): Apple clang 21
-    # turns jk.c's char16_t _wcslen loop into libc wcslen(), which counts 4-byte wchar_t
-    # on macOS -> every menu label cut in half.
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -O2 -Wuninitialized -fshort-wchar -fno-builtin-wcslen -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces -Werror=implicit-function-declaration")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar -fno-builtin-wcslen")
     add_link_options(-fshort-wchar)
