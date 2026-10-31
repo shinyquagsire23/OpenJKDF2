@@ -69,6 +69,7 @@
 #include "General/stdJSON.h"
 #include "Dss/jkDSS.h"
 #include "Main/InstallHelper.h"
+#include "Main/stdAutostartCharacter.h"
 #include "sithCvar.h"
 
 #include "Platform/Common/stdHttp.h"
@@ -110,6 +111,7 @@ int32_t Main_bDwCogVerbs = 0; // import DW COG verbs into JK/MOTS
 int32_t Main_bEnhancedCogVerbs = 0;
 char Main_strEpisode[129];
 char Main_strMap[128+4];
+static char Main_strAutostartCharacter[32];
 #endif
 
 #if defined(QOL_IMPROVEMENTS)
@@ -151,6 +153,10 @@ int Main_StartupDedicated(int bFullyDedicated)
     }
     else {
         wuRegistry_GetStr("playerShortName", aTmpPlayerShortName, 32, "ServerDed");
+        // An existing empty registry value is also an unset profile.
+        if (!aTmpPlayerShortName[0]) {
+            stdString_SafeStrCopy(aTmpPlayerShortName, "ServerDed", sizeof(aTmpPlayerShortName));
+        }
         stdString_CharToWchar(jkPlayer_playerShortName, aTmpPlayerShortName, 31);
         jkPlayer_playerShortName[31] = 0;
         jkPlayer_CreateConf(jkPlayer_playerShortName);
@@ -225,6 +231,35 @@ int Main_StartupDedicated(int bFullyDedicated)
     sithNet_scorelimit = v34.scoreLimit;
     sithNet_multiplayer_timelimit = v34.timeLimit;
 
+    // Explicit selection must fail before creating a host session. Initialize
+    // inventory first so MPC personality ammo maxima survive items.dat loading.
+    if (Main_strAutostartCharacter[0]) {
+        std3D_StartScene();
+        std3D_EndScene();
+        sithOpenStatic("static.jkl");
+        jkHudInv_InitItems();
+        char16_t characterName[32];
+        stdString_CharToWchar(characterName, Main_strAutostartCharacter, 31);
+        characterName[31] = 0;
+        // Match the character menu: load bins before checking the selected
+        // character's eligibility for the host rank, then let ordinary player
+        // startup reload those bins after the world inventory is initialized.
+        // Passing the actual host descriptor avoids the old temporary-info path
+        // that loaded bins but left the host appearance hardcoded to Kyle.
+        if (!jkPlayer_MPCParse(&jkGuiMultiplayer_mpcInfo, NULL,
+                              jkPlayer_playerShortName, characterName, 1)) {
+            fprintf(stderr, "autostart: selected multiplayer character could not be read\n");
+            exit(6);
+        }
+        if (jkGuiMultiplayer_mpcInfo.jediRank < 0
+            || jkGuiMultiplayer_mpcInfo.jediRank > jkGuiNetHost_maxRank) {
+            fprintf(stderr, "autostart: selected character rank %d is outside host range 0..%d\n",
+                    jkGuiMultiplayer_mpcInfo.jediRank, jkGuiNetHost_maxRank);
+            exit(6);
+        }
+    }
+
+
     if (!Main_bAutostartSp) {
         int v21 = sithMulti_CreatePlayer(
               v34.serverName,
@@ -247,10 +282,14 @@ int Main_StartupDedicated(int bFullyDedicated)
     }
     
     
-    std3D_StartScene();
-    std3D_EndScene();
-    sithOpenStatic("static.jkl");
-    jkHudInv_InitItems();
+    // Preserve ordinary autostart ordering and initialize exactly once.
+    if (!Main_strAutostartCharacter[0]) {
+        std3D_StartScene();
+        std3D_EndScene();
+        sithOpenStatic("static.jkl");
+        jkHudInv_InitItems();
+    }
+
 
     if (!Main_bAutostartSp) {
         if (jkMain_loadFile2(v34.episodeGobName, v34.mapJklFname))
@@ -592,6 +631,7 @@ void Main_Shutdown()
     Main_bEnhancedCogVerbs = 0;
     memset(Main_strEpisode, 0, sizeof(Main_strEpisode));
     memset(Main_strMap, 0, sizeof(Main_strMap));
+    memset(Main_strAutostartCharacter, 0, sizeof(Main_strAutostartCharacter));
 
     stdPlatform_Printf("OpenJKDF2: %s done\n", __func__);
 
@@ -735,6 +775,15 @@ void Main_ParseCmdLine(char *cmdline)
             char* pArgNext = _strtok(0, " \t");
             stdString_SafeStrCopy(Main_strMap, pArgNext, 0x80);
         }
+        else if (!__strcmpi(pArgTok, "-character"))
+        {
+            char* name = _strtok(0, " \t");
+            if (Main_strAutostartCharacter[0] || !stdAutostart_CharacterNameValid(name)) {
+                fprintf(stderr, "autostart: invalid or repeated multiplayer character name\n");
+                exit(6);
+            }
+            stdString_SafeStrCopy(Main_strAutostartCharacter, name, sizeof(Main_strAutostartCharacter));
+        }
         else if (!__strcmpi(pArgTok, "-headless") || !__strcmpi(pArgTok, "/headless") )
         {
             Main_bHeadless = 1;
@@ -778,6 +827,12 @@ void Main_ParseCmdLine(char *cmdline)
             Main_ShowHelp();
         }
     }
+#ifdef QOL_IMPROVEMENTS
+    if (Main_strAutostartCharacter[0] && (!Main_bAutostart || Main_bAutostartSp)) {
+        fprintf(stderr, "autostart: -character requires -autostart multiplayer mode\n");
+        exit(6);
+    }
+#endif
 }
 
 int Main_FPrintf(const char* fmt, ...) {
