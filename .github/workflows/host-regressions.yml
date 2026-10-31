@@ -1,0 +1,65 @@
+name: Host regressions
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  host-regressions:
+    name: Host regression gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out the tested source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install native host test dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            build-essential git libegl-dev libgl-dev libgl1-mesa-dri python3
+
+      - name: Check failure reporting and evidence boundaries
+        run: |
+          python3 -B src/Tests/test_host_regression_runner.py \
+            > "$RUNNER_TEMP/host-orchestration.stdout.txt" \
+            2> "$RUNNER_TEMP/host-orchestration.stderr.txt"
+
+      - name: Run registered host regressions
+        run: |
+          python3 -B src/Tests/run_host_regressions.py run \
+            --output "$RUNNER_TEMP/host-regression-results"
+
+      - name: Collect text and JSON validation evidence
+        id: evidence
+        if: always()
+        env:
+          CI_JOB_STATUS: ${{ job.status }}
+        run: |
+          python3 -B src/Tests/run_host_regressions.py collect \
+            --host-results "$RUNNER_TEMP/host-regression-results" \
+            --source-records "$RUNNER_TEMP" \
+            --job-status "$CI_JOB_STATUS" \
+            --output "$RUNNER_TEMP/host-regression-evidence"
+
+      - name: Upload text and JSON validation evidence
+        if: ${{ always() && steps.evidence.outcome == 'success' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: host-regression-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/host-regression-evidence/
+          if-no-files-found: error
+          retention-days: 14
+          include-hidden-files: false
