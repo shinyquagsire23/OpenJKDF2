@@ -23,6 +23,7 @@ rdModel3* sithModel_Load(const char *pName, int bSkipDefault);
 uint32_t sithModel_GetModelMemUsage(rdModel3 *pModel);
 int sithModel_AllocWorldModels(SithWorld *pWorld, int size);
 rdModel3* sithModel_GetModelByIndex(int modelIdx);
+rdModel3* sithModel_GetWorldModelByIndex(SithWorld *pWorld, int modelIdx);
 
 //static rdModel3* (*sithModel_LoadEntry_)(const char *model_3do_fname, int unk) = (void*)sithModel_Load_ADDR;
 
