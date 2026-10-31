@@ -16,8 +16,8 @@ macro(plat_initialize)
     set(BUNDLE "${PROJECT_SOURCE_DIR}/OpenJKDF2_x86_64.app")
     set(HOMEBREW_PREFIX "/usr/local")
 
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -O2 -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces -Werror=implicit-function-declaration")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -O2 -Wuninitialized -fshort-wchar -fno-builtin-wcslen -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces -Werror=implicit-function-declaration")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar -fno-builtin-wcslen")
     add_link_options(-fshort-wchar)
 endmacro()
 
