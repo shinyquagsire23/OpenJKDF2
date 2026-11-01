@@ -58,11 +58,11 @@ def main():
         env = dict(os.environ, ASAN_OPTIONS='detect_leaks=1:halt_on_error=1', UBSAN_OPTIONS='halt_on_error=1:print_stacktrace=1')
 
         def check(kind, build_command, expect_failure=None):
-            built = subprocess.run(build_command, cwd=stage, capture_output=True, text=True, timeout=90)
+            built = subprocess.run(build_command, cwd=stage, capture_output=True, text=True, encoding="utf-8", timeout=90)
             if built.returncode:
                 raise RuntimeError(built.stdout + built.stderr)
             result = subprocess.run([str(stage / 'sound-cache')], cwd=stage, env=env,
-                                    capture_output=True, text=True, timeout=90)
+                                    capture_output=True, text=True, encoding="utf-8", timeout=90)
             logs.append(dict(kind=kind, exit_code=result.returncode, stdout=result.stdout, stderr=result.stderr))
             if expect_failure:
                 if result.returncode == 0 or expect_failure not in result.stderr:
@@ -71,6 +71,25 @@ def main():
                 raise RuntimeError(result.stdout + result.stderr)
 
         check('production-standalone', command)
+        # Keep the full shutdown body and compose the adjacent model-cache cleanup.
+        composed = shutdown
+        if 'sithModel_FreeWorldModels(' not in composed:
+            anchor = '        SITH_FREE(sithWorld_g_pCurrentWorld);'
+            if composed.count(anchor) != 1:
+                raise RuntimeError('Review shutdown fallback boundary')
+            composed = composed.replace(anchor,
+                '#ifdef NO_JK_MMAP\n'
+                '        if (sithWorld_g_pCurrentWorld->aModels)\n'
+                '            sithModel_FreeWorldModels(sithWorld_g_pCurrentWorld);\n'
+                '#endif\n' + anchor)
+        (stage / 'sound_shutdown.inc').write_text(composed, encoding='utf-8')
+        check('composed-shutdown', command + ['-DTEST_COMPOSED_SHUTDOWN'])
+        call = 'sithModel_FreeWorldModels(sithWorld_g_pCurrentWorld);'
+        if composed.count(call) != 1: raise RuntimeError('Review counterpart cleanup control')
+        (stage / 'sound_shutdown.inc').write_text(composed.replace(call, '(void)0;'), encoding='utf-8')
+        check('missing-counterpart-cleanup-negative-control', command + ['-DTEST_COMPOSED_SHUTDOWN'],
+              'counterpart_world->aModels')
+        (stage / 'sound_shutdown.inc').write_text(shutdown, encoding='utf-8')
         check('legacy-fixed-allocation', [p for p in command if p != '-DNO_JK_MMAP'])
         mutants = [
             ('fixed-capacity', 'pendingPage = sithSound_NewPage(sithWorld_g_pLastLoadedWorld);',

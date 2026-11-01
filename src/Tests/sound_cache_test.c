@@ -20,6 +20,7 @@ typedef struct stdSound_buffer_t { int playing; } stdSound_buffer_t;
 typedef struct SithWorld {
     int numSoundsLoaded, numSounds, level_type_maybe;
     sithSound *sounds;
+    void *aModels; /* Opaque counterpart: only its shutdown ownership is modeled. */
 } SithWorld;
 typedef struct Entry { const char *key; void *value; struct Entry *next; } Entry;
 typedef struct tHashTable { Entry *buckets[1024]; } tHashTable;
@@ -29,12 +30,15 @@ static SithWorld *sithWorld_g_pLastLoadedWorld, *sithWorld_g_pCurrentWorld, *sit
 static int sithSound_bInit, Main_bMotsCompat, sithSound_var4, sithSound_var5;
 static uint32_t sithSound_curDataLoaded, sithSound_maxDataLoaded;
 static int fail_after = -1, fail_cache, live_allocations, open_files, pcm_live, pcm_released;
+static SithWorld *counterpart_world;
+static unsigned counterpart_frees;
 static void *allocate(size_t size) {
     if (!fail_after) return NULL;
     if (fail_after > 0) --fail_after;
     void *ptr = malloc(size); if (ptr) ++live_allocations; return ptr;
 }
 static void release(void *ptr) {
+    assert(!counterpart_world || ptr != counterpart_world || !counterpart_world->aModels);
     if (ptr) { --live_allocations; assert(live_allocations >= 0); free(ptr); }
 }
 #define SITH_ALLOC allocate
@@ -122,6 +126,11 @@ static int stdConffile_ReadArgs(void) {
 #include "sound_production.inc"
 static int sithWorld_bInitted;
 static void sithWorld_FreeEntry(SithWorld *world) { sithSound_FreeWorldSounds(world); release(world); }
+/* External linkage avoids unused-static warnings on the independent topic. */
+void sithModel_FreeWorldModels(SithWorld *world) {
+    assert(world == counterpart_world && world->aModels && !counterpart_frees);
+    release(world->aModels); world->aModels = NULL; ++counterpart_frees;
+}
 #include "sound_shutdown.inc"
 typedef double flex64_t;
 enum { SITHCOG_VALUE_INT = 1, SITHCOG_VALUE_FLOAT = 2 };
@@ -259,7 +268,13 @@ static void test_shutdown_order(void) {
     set_world(statik); assert(load(0, 't') && load(1, 't'));
     set_world(current); assert(load(0, 'u') && load(1, 'u'));
     assert(sithSound_Shutdown()); assert(!sithSound_hashtable);
+#ifdef TEST_COMPOSED_SHUTDOWN
+    counterpart_world = current; current->aModels = allocate(1); assert(current->aModels);
+#endif
     sithWorld_Shutdown(); assert(!sithSound_pages && !live_allocations);
+#ifdef TEST_COMPOSED_SHUTDOWN
+    assert(counterpart_frees == 1);
+#endif
     assert(!sithWorld_g_pCurrentWorld && !sithWorld_g_pStaticWorld && !sithWorld_g_pLastLoadedWorld);
 }
 #else
