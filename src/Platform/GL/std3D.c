@@ -3847,6 +3847,11 @@ int std3D_PurgeTextureCache(size_t size)
 
 void std3D_PurgeEntireTextureCache()
 {
+    // Added: a new world's colormap can sit where the old one's was, so the
+    // pointer check in std3D_StartScene would keep the old world's palette
+    // (a level loaded after another, a palette switched back and forth).
+    loaded_colormap = NULL;
+
     if (Main_bHeadless) {
         std3D_loadedTexturesAmt = 0;
         return;
