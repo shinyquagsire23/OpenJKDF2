@@ -1,10 +1,10 @@
 /*
  * Adapted from andreipemberton's MotS fixes fork regression (c77fc8f2a67cea15a566678cd00c1acb8b2b7d21).
- * run_cog_locality_test.py supplies the extracted production includes below.
- * Minimal structs and loader/executor/network stubs isolate class binding and
- * message routing; they do not model the production ABI or execute game scripts.
+ * Whole production translation units and real headers cover class binding and
+ * message routing. Loader/executor/network boundaries remain fixture callbacks;
+ * the surrounding argument parser and game scripts are not executed.
  * Co-op branches, debug-name printing, and real multiplayer delivery are outside
- * this matrix. The runner also checks an old-inversion mutation of the case.
+ * this matrix.
  */
 #include <assert.h>
 #include <stdint.h>
@@ -12,56 +12,26 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "production_constants.h"
+#include "World/sithThing.c"
+#include "Cog/sithCogExec.h"
+#include "Dss/sithDSSCog.h"
 
-#define SITH_ASSERTREL assert
-
-/* These member names must match the fields used by the production functions. */
-typedef struct
-{
-    uint32_t trigId;
-    uint32_t trigPc;
-    uint32_t field_8;
-} sithCogTrigger;
-
-typedef struct
-{
-    uint32_t numHandlers;
-    sithCogTrigger aHandlers[3];
-} SithCogScript;
-
-typedef struct sithCog
-{
-    SithCogScript *pScript;
-    uint32_t flags;
-    int32_t idx;
-    int32_t senderId;
-    int32_t senderRef;
-    int32_t senderType;
-    int32_t sourceIdx;
-    int32_t sourceType;
-    cog_flex_t params[4];
-    cog_flex_t returnValue;
-} sithCog;
-
-typedef struct
-{
-    sithCog *pCog;
-    uint32_t flags;
-} SithThing;
-
-typedef struct
-{
-    const char *value;
-} CogArgument;
-
-static int Main_bMotsCompat;
-static int sithNet_isMulti;
-static int sithNet_isServer;
-static int sithMulti_multiModeFlags;
-static int sithNet_serverNetId = 123;
-static sithCog *sithCog_g_pMasterCog;
+int32_t Main_bMotsCompat;
+int32_t sithNet_isMulti;
+int32_t sithNet_isServer;
+int sithMulti_multiModeFlags;
+int32_t sithNet_serverNetId = 123;
+sithCog *sithCog_g_pMasterCog;
+char std_g_genBuffer[1024];
+HostServices *pSithHS;
 static sithCog *loaded_cog;
+
+static void fatal_assert(const char *message, const char *file, int line)
+{
+    fprintf(stderr, "engine assertion: %s (%s:%d)\n", message, file, line);
+    exit(1);
+}
+void sithConsole_PrintString(const char *text) { (void)text; }
 
 static unsigned assertion_count;
 static unsigned dispatch_case_count;
@@ -113,13 +83,13 @@ typedef struct
 
 static DispatchObservation observation;
 
-static sithCog *sithCog_Load(const char *name)
+sithCog *__wrap_sithCog_Load(const char *name)
 {
     CHECK(strcmp(name, "fixture.cog") == 0);
     return loaded_cog;
 }
 
-static void sithCogExec_ExecuteMessage(sithCog *cog, uint32_t handler_index)
+void sithCogExec_ExecuteMessage(sithCog *cog, int32_t handler_index)
 {
     ++observation.execution_count;
     observation.cog = cog;
@@ -127,7 +97,7 @@ static void sithCogExec_ExecuteMessage(sithCog *cog, uint32_t handler_index)
     cog->returnValue = 42.25f;
 }
 
-static void sithDSSCog_SendMessage(
+int sithDSSCog_SendMessage(
     sithCog *cog,
     int message,
     int sender_type,
@@ -154,28 +124,8 @@ static void sithDSSCog_SendMessage(
     observation.params[2] = param2;
     observation.params[3] = param3;
     observation.target_net_id = target_net_id;
+    return 1;
 }
-
-/* Only the switch shell is a test wrapper; its case is extracted verbatim. */
-static int bind_class(SithThing *pThing, CogArgument *arg)
-{
-    sithCog *pCog;
-    int result = 0;
-
-    switch (THINGPARAM_COG)
-    {
-#ifdef OLD_INVERSION
-#include "thingparam_cog_old_inversion.inc"
-#else
-#include "thingparam_cog.inc"
-#endif
-    }
-
-    return result;
-}
-
-#include "sithCog_SendMessage.inc"
-#include "sithCog_SendMessageEx.inc"
 
 typedef struct
 {
@@ -358,11 +308,11 @@ static void run_matrix_case(
     sithCog cog;
     init_cog(&cog, &script, flags->input_flags | guard_flags);
     SithThing thing = {.pCog = NULL, .flags = 0x80000000u};
-    CogArgument argument = {"fixture.cog"};
+    StdConffileArg argument = {.value = "fixture.cog"};
     loaded_cog = &cog;
     uint32_t expected_flags = (mots ? flags->mots_flags : flags->jk_flags) | guard_flags;
 
-    CHECK(bind_class(&thing, &argument) == 1);
+    CHECK(sithThing_BindClassCog(&argument, &thing) == 1);
     ++binding_case_count;
     CHECK(thing.pCog == &cog);
     CHECK(thing.flags == (0x80000000u | SITH_TF_CAPTURED));
@@ -465,9 +415,9 @@ static void test_null_inputs(void)
             .pCog = (sithCog *)(uintptr_t)1,
             .flags = 0x12345678u
         };
-        CogArgument argument = {"fixture.cog"};
+        StdConffileArg argument = {.value = "fixture.cog"};
 
-        CHECK(bind_class(&thing, &argument) == 1);
+        CHECK(sithThing_BindClassCog(&argument, &thing) == 1);
         CHECK(thing.pCog == NULL);
         CHECK(thing.flags == 0x12345678u);
         ++binding_case_count;
@@ -484,12 +434,14 @@ static void test_null_inputs(void)
 
 int main(void)
 {
+    HostServices services = {.assert = fatal_assert};
+    pSithHS = &services;
     test_matrix();
     test_null_inputs();
     printf(
         "PASS assertions=%u binding_cases=%u dispatch_cases=%u\n",
         assertion_count, binding_case_count, dispatch_case_count);
-    puts("Production case and both complete production message-dispatch bodies; "
+    puts("Compiled private class-binding function and complete message-dispatch TU; "
         "stubbed loader, executor and network transport. No game execution.");
     return 0;
 }

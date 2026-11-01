@@ -9,6 +9,12 @@ on:
       - src/General/stdBitmap.c
       - src/General/stdBitmap.h
       - src/Engine/rdMaterial.c
+      - src/**/*.h
+      - src/engine_config.h
+      - src/globals.h.cog
+      - src/jk.c
+      - symbols.syms
+      - src/Tests/cmake/ported-fixes/CMakeLists.txt
       - src/types.h
       - src/types_enums.h
       - src/Tests/*locality*
@@ -25,6 +31,12 @@ on:
       - src/General/stdBitmap.c
       - src/General/stdBitmap.h
       - src/Engine/rdMaterial.c
+      - src/**/*.h
+      - src/engine_config.h
+      - src/globals.h.cog
+      - src/jk.c
+      - symbols.syms
+      - src/Tests/cmake/ported-fixes/CMakeLists.txt
       - src/types.h
       - src/types_enums.h
       - src/Tests/*locality*
@@ -54,5 +66,11 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Run production function regression with UBSan
-        run: python3 -B src/Tests/run_${{ matrix.suite }}_test.py --cc gcc --ubsan
+      - name: Install build tools and globals generator
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes build-essential cmake python3-venv
+          python3 -m venv "$RUNNER_TEMP/source-test-venv"
+          "$RUNNER_TEMP/source-test-venv/bin/pip" install cogapp
+      - name: Run compiled production regression with UBSan
+        run: '"$RUNNER_TEMP/source-test-venv/bin/python" -B src/Tests/run_${{ matrix.suite }}_test.py --cc gcc --ubsan'

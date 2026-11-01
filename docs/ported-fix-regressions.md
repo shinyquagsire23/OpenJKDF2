@@ -1,74 +1,61 @@
 # Native regression coverage for incorporated fixes
 
-These asset-free tests exercise production behavior already incorporated into
-OpenJKDF2. They add coverage without changing production functions, public
-headers, storage layouts, or build feature gates. Run from the repository root:
+These Linux CMake/CTest tests compile complete production translation units
+with production headers and generated global declarations. They replace
+regex extraction and copied structure definitions. The sole production
+refactor moves the existing COG binding case into a private function with
+identical flags, return value, and caller control flow; the public parser
+continues to dispatch to it.
+
+Install CMake, a C compiler and `cogapp` in a Python virtual environment:
 
 ```sh
-python3 -B src/Tests/run_cog_locality_test.py --cc gcc --ubsan
-python3 -B src/Tests/run_bitmap_test.py --cc gcc --ubsan
-python3 -B src/Tests/run_material_test.py --cc gcc --ubsan
+python3 -m venv /tmp/openjk-test-venv
+/tmp/openjk-test-venv/bin/pip install cogapp
+/tmp/openjk-test-venv/bin/python src/Tests/run_cog_locality_test.py --cc gcc --ubsan
+/tmp/openjk-test-venv/bin/python src/Tests/run_bitmap_test.py --cc gcc --ubsan
+/tmp/openjk-test-venv/bin/python src/Tests/run_material_test.py --cc gcc --ubsan
 ```
 
-Python 3 and a native GCC or Clang compiler are required. `--cc` selects the
-compiler; otherwise the runners use `CC`, then search for gcc/clang/cc. `--ubsan`
-requires UndefinedBehaviorSanitizer and stops on its first diagnostic. Omit it
-for a plain native run. There are no game assets, Python package, renderer,
-submodule, or full engine build dependencies. The scripts can also be invoked
-by absolute path from outside the checkout.
+Or configure once and run the four CTest entries:
 
-Each runner extracts complete function bodies from the current source, compiles
-them in a temporary directory, and executes independent assertions. The common
-`source_test_utils.py` supports extraction and explicit compiler/process error
-reporting. Ambiguous or missing source anchors, compiler errors, process
-failures, and timeouts fail the runner. Each successful run prints compiler
-identity and production input hashes and verifies that those files stayed
-unchanged. Extracted source and executable files are removed on exit.
+```sh
+cmake -S src/Tests/cmake/ported-fixes -B /tmp/openjk-source-tests \
+  -DPython3_EXECUTABLE=/tmp/openjk-test-venv/bin/python -DENABLE_UBSAN=ON
+cmake --build /tmp/openjk-source-tests --parallel 1
+ctest --test-dir /tmp/openjk-source-tests --output-on-failure -V
+```
 
-## Coverage and substitutes
+The small Python wrappers retain `--cc`, `--ubsan`, and `--source-root` and
+supply configure/build/test deadlines. CTest bounds each case to 30 seconds.
+There are no source-spelling anchors or automatic source mutations. No retail
+assets, submodules, SDL library, full engine build or display is required.
+The source files use the desktop QOL types with a null sound backend. Unused
+functions are discarded with GNU-compatible section GC; COG's loader seam
+uses the linker's `--wrap`. This focused entry is Linux/GNU-or-Clang host
+coverage, not a claim of validated macOS/MSVC/full-engine integration.
 
-| Suite | Production code executed | Checks and substitutes |
+## Coverage and remaining boundaries
+
+| Suite | Compiled production coverage | Controlled boundary |
 | --- | --- | --- |
-| COG locality | `THINGPARAM_COG` case from `sithThing.c`; complete `sithCog_SendMessage` and `sithCog_SendMessageEx` bodies | JK/MotS class flags, preservation of explicit SERVER/LOCAL/NOSYNC/GLOBAL/DEBUG flags, singleplayer/host/client routing, NEWPLAYER/TIMER/PULSE/STARTUP/SHUTDOWN/DAMAGED messages, both dispatch APIs, disabled/paused/missing/empty handlers, null COGs, argument forwarding, parameters and return values. Minimal named-field structs and loader, executor, and network-transport stubs isolate binding and routing. Constants and scalar COG types come from production declarations. |
-| Bitmap conversion | Complete `stdBitmap_ConvertColorFormat` body; production `stdBitmap` and `rdTexFormat` declarations | Null bitmap without dependent access; identical-format and indexed-format no-ops; zero through three mip surfaces; both RGB565/RGB555 directions; transparent/nontransparent palettes; pointer replacement, metadata commit order, color-key calls and unrelated-field preservation. Both default and SDL2 structure layouts compile and run. Display conversion and one-pixel conversion are deterministic in-memory stubs, so their arithmetic is **not** production pixel-converter coverage. |
-| Packed MAT rows | Unchanged static `rdMaterial_ReadExact`, `rdMaterial_ReadPackedRows`, and `rdMaterial_ValidTextureLayout` bodies from `rdMaterial.c`; production `rdTextureHeader` | Fourteen sequential 2x2 8-bit cels; literal padded-byte and final-offset expectations; 1/2/3/4/6-byte row widths; 8/16-bit synthetic inputs; tight/padded destinations; one-byte and other short reads; EOF/truncated headers/pixels; destination boundary bytes; zeroed padding; invalid stride/capacity/zero dimensions; mip and dimension boundaries. A small HostServices `fileRead` substitute reads an in-memory byte array. The opaque file handle uses `intptr_t`. |
+| COG locality | Full `sithThing.c` included to call its private class-binding function, plus separately compiled `sithCog.c` and `jk.c`. Real COG/script/thing/argument/HostServices types. 2,882 binding and 2,882 dispatch cases; 30,766 assertions. | Loader, executor and network callbacks; console output sink. The surrounding argument parser, script execution, actual packets, co-op and gameplay are not tested. Valid and failed loads, explicit SERVER/LOCAL/NOSYNC/GLOBAL/DEBUG flags, JK/MotS, host/client/singleplayer, disabled/paused/missing handlers and both dispatch APIs remain covered. |
+| Bitmap conversion | Complete `stdBitmap.c` and `jk.c`, real bitmap, raster, buffer, color and HostServices types. Both default and SDL2 member layouts; 393 assertions each. | Display conversion and one-pixel conversion remain deterministic in-memory callbacks. Pixels live in fixture-owned arrays instead of invented tVBuffer members. The production pixel conversion backend is not exercised. |
+| Packed MAT rows | Full `rdMaterial.c` included to call unchanged private I/O/layout helpers, with real HostServices, file-handle and texture-header types. 1,920 assertions and seven packed-cel sequences. | In-memory fileRead callback. Whole MAT loading, display allocation/cleanup, GPU output, retro/LRU paths and portable endian decoding remain separate acceptance. |
 
-The COG suite also builds a **safe behavioral negative control** that only
-inverts the MotS SERVER condition in its temporary binding fragment. It must
-exit at the expected flag assertion, demonstrating that the matrix detects
-the locality inversion. No source file is changed. Bitmap and MAT tests only
-execute corrected production code; no removed-guard or historical memory-path
-mutants are built or run.
+The helper fixtures include whole `.c` files because those functions are
+private; no duplicate helper implementation or public test hook is added.
+They do not prove the full callers execute those helpers. A future linked
+engine test should exercise the parser/loader with authored assets. The
+current change deliberately keeps that larger integration separate.
 
-The MAT fixture uses a maximum of four mip levels, matching the current loader's
-fixed mip storage. It does not invoke the static layout helper with hypothetical
-larger array limits and out-of-width shifts. Generated header bytes are native
-to the host; this tests helper I/O and row alignment, not portable on-disk endian
-decoding or a complete MAT-file parser. No duplicate MAT helper header or test
-seam is added to production.
+The MAT layout domain remains the loader's four mip slots. It does not test
+hypothetical larger limits with out-of-width shifts. The old-inversion
+negative control is a separate development check, not text mutation in the
+normal test runner. The assertions themselves detect the wrong locality.
 
-## Integration boundary
-
-The COG fixture does not load or execute real scripts, validate the production
-struct ABI, deliver network packets, cover co-op objective/death branches, or
-enable debug-name printing. A real MotS host and second client are still needed
-to establish end-to-end class-script delivery and gameplay behavior.
-
-Bitmap tests establish conversion orchestration with defined dependencies.
-They do not allocate real display surfaces, run the actual pixel conversion
-backend, upload textures, or certify rendered output. The SDL2 variant checks
-the conditional bitmap members without linking SDL.
-
-MAT tests establish the behavior of the upstream static I/O/layout helpers.
-They do not execute `rdMaterial_LoadEntry_Common`, create or unlock a display
-surface, cover its platform-specific allocation/cleanup and retro/LRU paths,
-or certify material appearance in-game. Full engine/platform builds and a game
-session with appropriate authored content remain separate acceptance work.
-
-The focused GitHub workflow runs these three suites on Ubuntu with GCC and
-UBSan for relevant pull requests, relevant pushes to `master`, and manual
-dispatch. Local test results do not establish that hosted CI has run.
-EGL pixel unpack and VectorCross coverage belong to their separate submissions.
+CI runs the three bounded commands (bitmap has two CTest cases) for relevant
+source/header/build changes. Local results do not establish hosted CI success.
 
 ## Source attribution
 

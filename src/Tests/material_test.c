@@ -1,6 +1,6 @@
 /* Adapted from andreipemberton's tests/test_rdMaterialIO.c in the MotS fixes fork (685dd18e).
  * Execute the unchanged upstream static helpers, not the fork's helper header.
- * Only HostServices/fileRead and the integer file handle are test substitutes.
+ * Real HostServices/types are used; only fileRead is an in-memory callback.
  * No display surface, whole MAT loader, GPU upload, or retail data is involved.
  */
 #include <stdint.h>
@@ -8,8 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef intptr_t stdFile_t;
-#include "texture_header.inc"
+#include "Engine/rdMaterial.c"
 
 static unsigned checks, read_calls;
 #define CHECK(x) do { ++checks; if (!(x)) { \
@@ -34,12 +33,8 @@ static size_t read_memory(stdFile_t file, void *out, size_t count)
     return count;
 }
 
-static struct TestHostServices {
-    size_t (*fileRead)(stdFile_t, void *, size_t);
-} host = {read_memory};
-static struct TestHostServices *rdroid_g_pHS = &host;
-
-#include "material_helpers.inc"
+static HostServices host = {.fileRead = read_memory};
+HostServices *rdroid_g_pHS = &host;
 
 static void reset(size_t length, size_t short_chunk)
 {
