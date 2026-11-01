@@ -317,6 +317,17 @@ int sithUpdate()
             uint32_t wholeFramesToApply = (uint32_t)(float)round((float)framesToApply);
             sithTime_physicsRolloverFrames = rolloverCombine - (((flex_d_t)wholeFramesToApply) * DELTA_PHYSTICK_FPS);
 
+            uint32_t tmp6 = sithTime_g_msecGameTime;
+            flex32_t secGameTimeBeforeSteps = sithTime_g_secGameTime;
+            if (wholeFramesToApply != 0)
+            {
+                // Input creates weapon/bin deadlines. Use the first simulated
+                // timestamp before those callbacks, then keep both clocks on
+                // that timeline. Frames with no step retain their outer time.
+                sithTime_g_msecGameTime -= sithTime_g_frameTime;
+                sithTime_g_secGameTime = (flex32_t)sithTime_g_msecGameTime * 0.001;
+            }
+
             // TODO figure this out
             sithControl_ReadControls();
             if ( g_sithMode != 2 )
@@ -331,8 +342,6 @@ int sithUpdate()
             flex_t tmp3 = sithTime_g_fps;
             flex_t tmp4 = stdControl_updateKHz;
             flex_t tmp5 = stdControl_updateHz;
-            uint32_t tmp6 = sithTime_g_msecGameTime;
-            sithTime_g_msecGameTime -= sithTime_g_frameTime;
             sithTime_g_frameTimeFlex = DELTA_PHYSTICK_FPS;
             sithTime_g_frameTime = (int)(DELTA_PHYSTICK_FPS * 1000.0);
             sithTime_g_fps = 1.0 / sithTime_g_frameTimeFlex;
@@ -343,6 +352,7 @@ int sithUpdate()
 
             for (int i = 0; i < wholeFramesToApply; i++)
             {
+                sithTime_g_secGameTime = (flex32_t)sithTime_g_msecGameTime * 0.001;
                 sithSoundMixer_Update(sithTime_g_frameTimeFlex);
                 sithEvent_Process();
 
@@ -372,6 +382,7 @@ int sithUpdate()
             sithTime_g_frameTime = tmp2;
             sithTime_g_fps = tmp3;
             sithTime_g_msecGameTime = tmp6;
+            sithTime_g_secGameTime = secGameTimeBeforeSteps;
             //stdControl_updateKHz = tmp4;
             //stdControl_updateHz = tmp5;
         }
