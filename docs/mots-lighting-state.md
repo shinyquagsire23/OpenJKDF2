@@ -6,6 +6,8 @@ Model RGB draws calculate dynamic-only scratch light; primitives add static chan
 
 Level geometry temporarily binds world-owned ARCH channels after validating declared geosets, meshes, vertex coverage and channel presence. Bindings restore on success or rejected draws, and independently owned dynamic scratch stays separate. Invalid ARCH data uses scalar model fallback in RGB mode. Placed ARCH indices are applied after template inheritance and before initialization/named overrides. The ARCH reader and storage formats are unchanged. POV weapon and saber drawing explicitly selects mono mode before drawing/flushing.
 
+Binding snapshots for up to 32 meshes use local storage. Larger scopes reuse idle overflow buffers, growing only when capacity is insufficient. Active buffers are reserved until their draw returns, so a nested scope cannot overwrite an enclosing snapshot. There is no mesh-count truncation. An allocation failure before a larger scope has sufficient capacity leaves all pointers unchanged and skips that draw, matching the previous failure policy. Renderer close/shutdown releases idle buffers. This avoids a recurring allocation/free pair for every visible model; it does not claim a measured frame-rate improvement or that the complete renderer is reentrant.
+
 ## Asset-free validation
 
 Run from the repository root:
@@ -13,9 +15,12 @@ Run from the repository root:
 ```sh
 python3 src/Tests/run_mots_lighting_test.py --sanitize
 python3 src/Tests/run_pov_lighting_test.py --sanitize
+python3 src/Tests/run_arch_lighting_scope_test.py --sanitize --negative-controls
 ```
 
-The first runner compiles complete extracted production alpha/ARCH functions, RGB primitives/clippers and light calculations, the actual model lighting call, contiguous solid-cache conversion blocks, and placed-thing loader/template/tokenizer functions. It checks literal expected colors, indices, pointer restoration, repeated draws, allocation failure, and placement ordering. The loader runs with and without JKM_LIGHTING. Safe controls reject changed alpha mode, scale, palette channels, scalar iteration, double base light and placement ordering. The unsafe old typed-pointer output path is never reconstructed. The POV runner executes the actual function in SDL/QOL and legacy configurations, including a safe mode-reset removal control.
+The first runner compiles the internal ARCH helper header, extracted production alpha functions, RGB primitives/clippers and light calculations, the actual model lighting call, contiguous solid-cache conversion blocks, and placed-thing loader/template/tokenizer functions. It checks literal expected colors, indices, pointer restoration, repeated draws and placement ordering. The loader runs with and without JKM_LIGHTING. Safe controls reject changed alpha mode, scale, palette channels, scalar iteration, double base light and placement ordering. The earlier integer-address output traversal is not reconstructed; its offset variables were already `intptr_t`, and the typed iterators remove an index/output element-size assumption rather than fixing a demonstrated default-build 64-bit narrowing. The POV runner executes the actual function in SDL/QOL and legacy configurations, including a safe mode-reset removal control.
+
+The ARCH scope runner directly includes the actual helper and actual model/world type headers. Only allocation and draw callbacks are controlled. It checks allocator-independent small draws, reuse of large buffers, growth beyond the local capacity, nested scopes, successful/failed draws, exact restoration of arbitrary original pointers and allocation failure before mutation. Safe controls omit a channel restore or permit reuse of an active buffer and must be rejected by restoration assertions. Empty generated-global declarations are replaced by the fixture's explicit globals; model/world layouts are not mirrored.
 
 The opaque-pass check executes the actual contiguous setup block from `sithRender_RenderSectors`, including both accelerated and software branches. Its 16-case matrix varies the incoming RGB/mono state, acceleration, requested RGB flag and occlusion flag. It observes the resulting mode, depth/occlusion/sort state and the palette/RGB bytes produced by the actual solid-cache blocks. Separate safe controls omit the accelerated mono reset or the software reset and must fail by assertion. This covers pass setup, not the complete opaque surface traversal or rasterization.
 

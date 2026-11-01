@@ -28,7 +28,7 @@ PATHS = ('src/Engine/sithRender.c', 'src/Raster/rdCache.c',
          'src/Primitives/rdPrimit3.c', 'src/Engine/rdClip.c',
          'src/types.h', 'src/types_enums.h', 'src/Engine/rdLight.c',
          'src/Primitives/rdModel3.c', 'src/World/sithThing.c',
-         'src/General/stdConffile.c')
+         'src/General/stdConffile.c', 'src/Engine/sithRenderArchLighting.h')
 
 
 def between(text, start, end):
@@ -59,8 +59,7 @@ def prepare(work):
     write('old_opaque_software.inc', opaque_setup.replace('rdSetVertexColorMode(0);', '(void)0;'))
     alpha = extract_block(render, r'^void sithRender_RenderAlphaAdjoins\(', 'alpha pass')
     write('actual_alpha.inc', alpha)
-    arch = extract_block(render, r'^static int sithRender_DrawLevelGeometryThing\(', 'ARCH draw scope')
-    write('actual_arch.inc', arch)
+    write('actual_arch.inc', src[PATHS[10]])
     # Independent controls preserve the production body and remove only each
     # repaired decision. They must be rejected by behavioral expectations.
     old_alpha = alpha.replace('rdSetVertexColorMode(rdroid_curAcceleration && (sithRender_renderflags & 0x80));',

@@ -1272,8 +1272,8 @@ rdPrimit3_ClipFaceRGB
                 pfVar7 = idxInfo->paGreenIntensities;
                 piVar17 = idxInfo->vertexPosIdx;
                 pfVar8 = idxInfo->paBlueIntensities;
-                // Keep typed output iterators. The old pointer differences
-                // were narrowed to int and corrupted writes on 64-bit builds.
+                // Advance each output by its own element type instead of deriving
+                // its stride from the separate int vertex-index array.
                 flex_t* redIter = mesh_out->paRedIntensities;
                 flex_t* greenIter = mesh_out->paGreenIntensities;
                 flex_t* blueIter = mesh_out->paBlueIntensities;

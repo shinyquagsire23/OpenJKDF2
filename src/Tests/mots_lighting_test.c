@@ -428,7 +428,8 @@ static void test_arch(void) {
         CHECK(meshes[0].paRedIntensities==&rgbOld[0]);
     }
     thing.archlightIdx=-1; failAllocation=1;
-    int before=drawCalls; CHECK(sithRender_DrawLevelGeometryThing(&thing)==0); CHECK(drawCalls==before);
+    int before=drawCalls; CHECK(sithRender_DrawLevelGeometryThing(&thing)==drawResult); CHECK(drawCalls==before+1);
+    ++before; // Small scopes no longer need an allocator.
     failAllocation=0; model.numGeos=5;
     CHECK(sithRender_DrawLevelGeometryThing(&thing)==0); CHECK(drawCalls==before);
     model.numGeos=2;
