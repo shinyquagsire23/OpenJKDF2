@@ -69,7 +69,6 @@
 #include "General/stdJSON.h"
 #include "Dss/jkDSS.h"
 #include "Main/InstallHelper.h"
-#include "Main/stdAutostartCharacter.h"
 #include "sithCvar.h"
 
 #include "Platform/Common/stdHttp.h"
@@ -115,6 +114,17 @@ static char Main_strAutostartCharacter[32];
 #endif
 
 #if defined(QOL_IMPROVEMENTS)
+static inline int Autostart_CharacterNameValid(const char* name)
+{
+    if (!name || !name[0]) return 0;
+    size_t length = 0;
+    for (const unsigned char* p = (const unsigned char*)name; *p; ++p) {
+        if (++length > 31 || !((*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z')
+            || (*p >= '0' && *p <= '9') || *p == '_' || *p == '-')) return 0;
+    }
+    return 1;
+}
+
 int Main_StartupDedicated(int bFullyDedicated)
 {
     char* pRemoveExt;
@@ -244,8 +254,6 @@ int Main_StartupDedicated(int bFullyDedicated)
         // Match the character menu: load bins before checking the selected
         // character's eligibility for the host rank, then let ordinary player
         // startup reload those bins after the world inventory is initialized.
-        // Passing the actual host descriptor avoids the old temporary-info path
-        // that loaded bins but left the host appearance hardcoded to Kyle.
         if (!jkPlayer_MPCParse(&jkGuiMultiplayer_mpcInfo, NULL,
                               jkPlayer_playerShortName, characterName, 1)) {
             fprintf(stderr, "autostart: selected multiplayer character could not be read\n");
@@ -778,7 +786,7 @@ void Main_ParseCmdLine(char *cmdline)
         else if (!__strcmpi(pArgTok, "-character"))
         {
             char* name = _strtok(0, " \t");
-            if (Main_strAutostartCharacter[0] || !stdAutostart_CharacterNameValid(name)) {
+            if (Main_strAutostartCharacter[0] || !Autostart_CharacterNameValid(name)) {
                 fprintf(stderr, "autostart: invalid or repeated multiplayer character name\n");
                 exit(6);
             }
