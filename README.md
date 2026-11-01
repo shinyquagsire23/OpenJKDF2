@@ -108,6 +108,15 @@ OpenJKDF2 requires game data from a licensed copy of Jedi Knight: Dark Forces II
 
 See [here](BUILDING.md) for instructions.
 
+## Optional mod-authoring tools
+
+The [community model-authoring toolkit](https://github.com/CodaLilitari/OpenJKDF2-MotS-Fixes/tree/main/scripts/model-workarounds)
+provides KEY animation-domain checks, a PNG conversion helper for affected older
+renderers, MPC v1 model selection, and 3DO texture-mode inspection. Its code,
+dependencies, tests and per-tool licenses are maintained in that fork. See its
+[compatibility and scope guide](https://github.com/CodaLilitari/OpenJKDF2-MotS-Fixes/blob/main/docs/MODEL_WORKAROUNDS.md)
+for the supported formats and renderer versions.
+
 ## Contributing
 
 Contributions in the form of code cleanup and documentation are highly welcomed. See [CONTRIBUTING.md](CONTRIBUTING.md) for details on what kinds of cleanup tasks still need to be done. OpenJKDF2 is not currently accepting monetary donations, however [detailed bug and crash reports](https://github.com/shinyquagsire23/OpenJKDF2/issues) are always appreciated, including bugs/crashes involving mods.

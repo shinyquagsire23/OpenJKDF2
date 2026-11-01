@@ -1,8 +1,0 @@
-# Original synthetic PUP. References all demonstration modes.
-mode=0
-stand synthetic-base.key 0x00 0 0
-mode=1, basedon=0
-stand synthetic-extra-slot.key 0x00 0 0
-joints
-0=0
-end
