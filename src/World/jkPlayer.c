@@ -2222,14 +2222,14 @@ void jkPlayer_DisallowOtherSide(int rank)
     {
         if ( align >= 0.0 )
         {
-            for (int i = SITHBIN_F_THROW; i < SITHBIN_F_DESTRUCTION; i++)
+            for (int i = SITHBIN_F_THROW; i <= SITHBIN_F_DESTRUCTION; i++)
                 sithPlayer_SetInvItemAvailable(i, 1);
             for (int k = SITHBIN_F_HEALING; k <= SITHBIN_F_ABSORB; ++k )
                 sithPlayer_SetInvItemAvailable(k, 1);
         }
         else
         {
-            for (int i = SITHBIN_F_THROW; i < SITHBIN_F_DESTRUCTION; i++)
+            for (int i = SITHBIN_F_THROW; i <= SITHBIN_F_DESTRUCTION; i++)
                 sithPlayer_SetInvItemAvailable(i, 1);
             for (int l = SITHBIN_F_HEALING; l <= SITHBIN_F_ABSORB; ++l )
                 sithPlayer_SetInvItemAvailable(l, 0);
