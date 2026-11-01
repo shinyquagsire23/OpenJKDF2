@@ -73,6 +73,10 @@
 #define MULTI_BIG_UPDATE_INTERVAL_MS (60)
 #endif
 
+// Added: 0x8000 tags static sound IDs; keep 0xffff free for the -1 wire sentinel.
+#define SITHSOUND_MAX_RECORDS 32767
+#define SITHSOUND_PAGE_RECORDS 256
+
 // World limits
 #if !defined(QOL_IMPROVEMENTS)
 #define SITH_MAX_THINGS (641)
