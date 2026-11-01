@@ -50,12 +50,14 @@ def main():
         update='sithTime_g_secGameTime = (flex32_t)sithTime_g_msecGameTime * 0.001;'
         # Remove only the substep assignment; Time_SetFrameTime stays intact.
         head,branch=code.rsplit('static void production_normal_update',1)
-        if branch.count(update)!=1:raise ValueError('expected one substep synchronization')
-        variants['missing-substep-sync']=head+'static void production_normal_update'+branch.replace(update,';',1)
+        loop_start=branch.index('for (int i = 0; i < wholeFramesToApply; i++)')
+        prefix,loop=branch[:loop_start],branch[loop_start:]
+        if loop.count(update)!=1:raise ValueError('expected one substep synchronization')
+        variants['missing-substep-sync']=head+'static void production_normal_update'+prefix+loop.replace(update,';',1)
         restore='sithTime_g_secGameTime = secGameTimeBeforeSteps;'
         if branch.count(restore)!=1:raise ValueError('expected one outer-time restore')
         variants['missing-outer-restore']=head+'static void production_normal_update'+branch.replace(restore,';',1)
-        variants['wrong-clock-units']=head+'static void production_normal_update'+branch.replace(update,'sithTime_g_secGameTime = (flex32_t)sithTime_g_msecGameTime;',1)
+        variants['wrong-clock-units']=head+'static void production_normal_update'+prefix+loop.replace(update,'sithTime_g_secGameTime = (flex32_t)sithTime_g_msecGameTime;',1)
     with tempfile.TemporaryDirectory(prefix='openjkdf2-clock-') as tmp:
         out=Path(tmp);(out/'fixture.c').write_text(fixture)
         for micro in (False,True):
@@ -66,10 +68,10 @@ def main():
                 if micro:cmd+=['-DMICROSECOND_TIME']
                 if args.sanitize:cmd+=['-fsanitize=address,undefined','-fno-omit-frame-pointer','-fno-pie','-no-pie']
                 cmd+=[str(out/'fixture.c'),'-lm','-o',str(exe)]
-                build=subprocess.run(cmd,capture_output=True,text=True,timeout=45)
+                build=subprocess.run(cmd,capture_output=True,text=True,encoding='utf-8',timeout=45)
                 if build.returncode:raise RuntimeError(build.stderr)
                 if build.stderr:print(build.stderr,end='')
-                result=subprocess.run([str(exe)],capture_output=True,text=True,timeout=15)
+                result=subprocess.run([str(exe)],capture_output=True,text=True,encoding='utf-8',timeout=15)
                 label=('microseconds' if micro else 'milliseconds')+'/'+name
                 print(label+': '+result.stdout.strip())
                 if name=='production':

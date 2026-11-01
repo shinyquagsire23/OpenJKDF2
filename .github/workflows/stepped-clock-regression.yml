@@ -7,11 +7,23 @@ on:
       - 'src/Main/sithMain.c'
       - 'src/Gameplay/sithTime.c'
       - 'src/Gameplay/sithEvent.c'
+      - 'src/Gameplay/sithInventory.c'
+      - 'src/World/sithWeapon.c'
+      - 'src/World/sithSoundClass.h'
+      - 'src/AI/sithAI.c'
+      - 'src/AI/sithAICmd.c'
+      - 'src/types*'
+      - 'src/Primitives/rdRect.h'
+      - 'src/Win95/stdVBuffer.h'
+      - 'src/hook.h'
+      - 'src/version.h'
       - 'src/Cog/sithCog.c'
       - 'src/Cog/sithCogFunction.c'
       - 'src/engine_config.h'
       - 'src/Tests/stepped_clock_test.c'
       - 'src/Tests/run_stepped_clock_test.py'
+      - 'src/Tests/clock_consumers_test.c'
+      - 'src/Tests/run_clock_consumers_test.py'
       - '.github/workflows/stepped-clock-regression.yml'
   push:
     branches: [main, master]
@@ -19,11 +31,23 @@ on:
       - 'src/Main/sithMain.c'
       - 'src/Gameplay/sithTime.c'
       - 'src/Gameplay/sithEvent.c'
+      - 'src/Gameplay/sithInventory.c'
+      - 'src/World/sithWeapon.c'
+      - 'src/World/sithSoundClass.h'
+      - 'src/AI/sithAI.c'
+      - 'src/AI/sithAICmd.c'
+      - 'src/types*'
+      - 'src/Primitives/rdRect.h'
+      - 'src/Win95/stdVBuffer.h'
+      - 'src/hook.h'
+      - 'src/version.h'
       - 'src/Cog/sithCog.c'
       - 'src/Cog/sithCogFunction.c'
       - 'src/engine_config.h'
       - 'src/Tests/stepped_clock_test.c'
       - 'src/Tests/run_stepped_clock_test.py'
+      - 'src/Tests/clock_consumers_test.c'
+      - 'src/Tests/run_clock_consumers_test.py'
       - '.github/workflows/stepped-clock-regression.yml'
   workflow_dispatch:
 
@@ -49,3 +73,5 @@ jobs:
           persist-credentials: false
       - name: Test production clocks and negative controls
         run: timeout --kill-after=5s 300s python3 -B src/Tests/run_stepped_clock_test.py --cc gcc --sanitize --negative-controls
+      - name: Compare actual timing consumers and control deadlines
+        run: timeout --kill-after=5s 180s python3 -B src/Tests/run_clock_consumers_test.py --cc gcc --sanitize
