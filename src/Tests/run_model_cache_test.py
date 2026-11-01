@@ -46,14 +46,48 @@ def main():
         compiler = os.environ.get('CC', 'gcc')
         command = [compiler, '-std=c11', '-DNO_JK_MMAP', '-Wall', '-Wextra', '-Werror', '-g', '-O1',
                    '-fsanitize=address,undefined', '-fno-omit-frame-pointer', '-no-pie', 'model_cache_test.c', '-o', 'model-cache']
-        result = subprocess.run(command, cwd=temp, capture_output=True, text=True, timeout=90)
+        result = subprocess.run(command, cwd=temp, capture_output=True, text=True, encoding="utf-8", timeout=90)
         if result.returncode: raise RuntimeError(result.stdout + result.stderr)
-        result = subprocess.run([str(temp / 'model-cache')], cwd=temp, env=env, capture_output=True, text=True, timeout=90)
+        result = subprocess.run([str(temp / 'model-cache')], cwd=temp, env=env, capture_output=True, text=True, encoding="utf-8", timeout=90)
         logs.append(dict(kind='production', exit_code=result.returncode, stdout=result.stdout, stderr=result.stderr))
         if result.returncode: raise RuntimeError(result.stdout + result.stderr)
+        # Exercise the adjacent sound-cache cleanup even when this topic is independent.
+        composed = shutdown
+        if 'sithSound_FreeWorldSounds(' not in composed:
+            anchor = '        SITH_FREE(sithWorld_g_pCurrentWorld);'
+            if composed.count(anchor) != 1:
+                raise RuntimeError('Review shutdown fallback boundary')
+            composed = composed.replace(anchor,
+                '#ifdef NO_JK_MMAP\n'
+                '        if (sithWorld_g_pCurrentWorld->sounds)\n'
+                '            sithSound_FreeWorldSounds(sithWorld_g_pCurrentWorld);\n'
+                '#endif\n' + anchor)
+        (temp / 'model_shutdown.inc').write_text(composed, encoding='utf-8')
+        built = subprocess.run(command + ['-DTEST_COMPOSED_SHUTDOWN'], cwd=temp,
+                               capture_output=True, text=True, encoding='utf-8', timeout=90)
+        if built.returncode: raise RuntimeError(built.stdout + built.stderr)
+        result = subprocess.run([str(temp / 'model-cache')], cwd=temp, env=env,
+                                capture_output=True, text=True, encoding='utf-8', timeout=90)
+        logs.append(dict(kind='composed-shutdown', exit_code=result.returncode,
+                         stdout=result.stdout, stderr=result.stderr))
+        if result.returncode: raise RuntimeError(result.stdout + result.stderr)
+        # A removed counterpart cleanup must fail before its owning world is freed.
+        call = 'sithSound_FreeWorldSounds(sithWorld_g_pCurrentWorld);'
+        if composed.count(call) != 1: raise RuntimeError('Review counterpart cleanup control')
+        (temp / 'model_shutdown.inc').write_text(composed.replace(call, '(void)0;'), encoding='utf-8')
+        built = subprocess.run(command + ['-DTEST_COMPOSED_SHUTDOWN'], cwd=temp,
+                               capture_output=True, text=True, encoding='utf-8', timeout=90)
+        if built.returncode: raise RuntimeError(built.stdout + built.stderr)
+        result = subprocess.run([str(temp / 'model-cache')], cwd=temp, env=env,
+                                capture_output=True, text=True, encoding='utf-8', timeout=90)
+        logs.append(dict(kind='missing-counterpart-cleanup-negative-control', exit_code=result.returncode,
+                         stdout=result.stdout, stderr=result.stderr))
+        if result.returncode == 0 or 'counterpart_world->sounds' not in result.stderr:
+            raise RuntimeError('Counterpart cleanup control missed its ownership assertion\n' + result.stderr)
+        (temp / 'model_shutdown.inc').write_text(shutdown, encoding='utf-8')
         legacy = [part for part in command if part != '-DNO_JK_MMAP']
-        subprocess.run(legacy, cwd=temp, check=True, capture_output=True, text=True, timeout=90)
-        result = subprocess.run([str(temp / 'model-cache')], cwd=temp, env=env, capture_output=True, text=True, timeout=30)
+        subprocess.run(legacy, cwd=temp, check=True, capture_output=True, text=True, encoding="utf-8", timeout=90)
+        result = subprocess.run([str(temp / 'model-cache')], cwd=temp, env=env, capture_output=True, text=True, encoding="utf-8", timeout=30)
         logs.append(dict(kind='injected-executable-layout', exit_code=result.returncode, stdout=result.stdout, stderr=result.stderr))
         if result.returncode: raise RuntimeError(result.stdout + result.stderr)
         # Reintroduce the original fixed-capacity behavior without changing tests.
@@ -61,8 +95,8 @@ def main():
                                      'pendingPage = (0 ? sithModel_NewPage(sithWorld_g_pLastLoadedWorld) : NULL);')
         assert altered != production
         (temp / 'model_production.inc').write_text(altered)
-        subprocess.run(command, cwd=temp, check=True, capture_output=True, text=True, timeout=90)
-        result = subprocess.run([str(temp / 'model-cache')], cwd=temp, env=env, capture_output=True, text=True, timeout=30)
+        subprocess.run(command, cwd=temp, check=True, capture_output=True, text=True, encoding="utf-8", timeout=90)
+        result = subprocess.run([str(temp / 'model-cache')], cwd=temp, env=env, capture_output=True, text=True, encoding="utf-8", timeout=30)
         logs.append(dict(kind='fixed-capacity-negative-control', exit_code=result.returncode, stdout=result.stdout, stderr=result.stderr))
         if result.returncode == 0 or "load(1, 'f')" not in result.stderr:
             raise RuntimeError('Original capacity mutant did not fail the expected growth assertion\n' + result.stderr)

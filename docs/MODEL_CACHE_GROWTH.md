@@ -110,3 +110,23 @@ cleanup is not made transactional, and existing parser-owned geometry/material
 side effects remain outside this change. The cache rollback controls use unique
 canonical flat names; preexisting path-qualified or truncated filename aliases
 and replacement/OOM behavior are not repaired here.
+
+## Shutdown composition and growth policy
+
+The fixture retains the complete production `sithWorld_Shutdown` body. Its
+reduced world represents the other cache's pointer as opaque storage and provides
+an unrelated-cache cleanup stub. The composed run supplies a live counterpart
+allocation and requires its cleanup before the world is freed, while the real
+cache under test must release all of its own pages. The independent run and
+fixed-allocation build remain covered. This is a host ownership boundary test;
+it does not run the other parser/backend or establish full-engine ABI behavior.
+The composed cleanup is added only to a temporary extracted fragment when the
+other topic has not landed; source files are never rewritten by the runner.
+
+Overflow growth is intentionally enabled for `NO_JK_MMAP` source-built engines,
+including source-built non-QOL configurations. It is not currently gated by
+`QOL_IMPROVEMENTS`. Original-executable injection retains fixed contiguous
+storage. This correction changes tests and CI scope, not that feature policy.
+
+A safe control removes only the temporary counterpart cleanup call and must
+fail the pre-world-free ownership assertion; a compile error does not count.

@@ -11,6 +11,7 @@ typedef struct rdModel3 { char filename[32]; int id; void *geometry; } rdModel3;
 typedef struct SithWorld {
     uint32_t numModels, sizeModels;
     rdModel3 *aModels;
+    void *sounds; /* Opaque counterpart: only its shutdown ownership is modeled. */
     int level_type_maybe;
 } SithWorld;
 typedef struct Entry { const char *key; void *value; struct Entry *next; } Entry;
@@ -18,6 +19,8 @@ typedef struct tHashTable { Entry *buckets[1024]; } tHashTable;
 static tHashTable table;
 static SithWorld *sithWorld_g_pLastLoadedWorld, *sithWorld_g_pCurrentWorld, *sithWorld_g_pStaticWorld;
 static int fail_after = -1, fail_cache, live_allocations;
+static SithWorld *counterpart_world;
+static unsigned counterpart_frees;
 static void *allocate(size_t size) {
     if (fail_after == 0) return NULL;
     if (fail_after > 0) --fail_after;
@@ -25,7 +28,9 @@ static void *allocate(size_t size) {
     if (ptr) ++live_allocations;
     return ptr;
 }
-static void release(void *ptr) { if (ptr) { --live_allocations; assert(live_allocations >= 0); free(ptr); } }
+static void release(void *ptr) {
+    assert(!counterpart_world || ptr != counterpart_world || !counterpart_world->sounds);
+    if (ptr) { --live_allocations; assert(live_allocations >= 0); free(ptr); } }
 #define SITH_ALLOC allocate
 #define SITH_FREE release
 #define SITH_ASSERTREL assert
@@ -96,6 +101,11 @@ static void sithWorld_FreeEntry(SithWorld *world) {
     sithModel_FreeWorldModels(world);
     release(world);
     sithWorld_g_pCurrentWorld = NULL;
+}
+/* External linkage avoids unused-static warnings on the independent topic. */
+void sithSound_FreeWorldSounds(SithWorld *world) {
+    assert(world == counterpart_world && world->sounds && !counterpart_frees);
+    release(world->sounds); world->sounds = NULL; ++counterpart_frees;
 }
 #include "model_shutdown.inc"
 
@@ -193,7 +203,13 @@ static void test_shutdown_fallback(void) {
     for (unsigned i = 0; i < 65; ++i) assert(load(i, 'q'));
     sithWorld_g_pLastLoadedWorld = shared;
     for (unsigned i = 0; i < 34; ++i) assert(load(i, 'r'));
+#ifdef TEST_COMPOSED_SHUTDOWN
+    counterpart_world = world; world->sounds = allocate(1); assert(world->sounds);
+#endif
     sithModel_Shutdown(); sithWorld_Shutdown();
+#ifdef TEST_COMPOSED_SHUTDOWN
+    assert(counterpart_frees == 1);
+#endif
     assert(!live_allocations && !sithModel_stores);
     assert(!sithWorld_g_pCurrentWorld && !sithWorld_g_pStaticWorld && !sithWorld_g_pLastLoadedWorld);
 }

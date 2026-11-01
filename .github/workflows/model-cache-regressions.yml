@@ -4,8 +4,34 @@ on:
   workflow_dispatch:
   pull_request:
     branches: [master]
+    paths:
+      - src/World/sithModel.c
+      - src/World/sithModel.h
+      - src/Devices/sithSound.c
+      - src/Devices/sithSound.h
+      - src/World/sithWorld.c
+      - src/Cog/sithCogExec.c
+      - src/types.h
+      - src/engine_config.h
+      - src/Tests/model_cache_test.c
+      - src/Tests/run_model_cache_test.py
+      - .github/workflows/model-cache-regressions.yml
+      - docs/MODEL_CACHE_GROWTH.md
   push:
     branches: [master]
+    paths:
+      - src/World/sithModel.c
+      - src/World/sithModel.h
+      - src/Devices/sithSound.c
+      - src/Devices/sithSound.h
+      - src/World/sithWorld.c
+      - src/Cog/sithCogExec.c
+      - src/types.h
+      - src/engine_config.h
+      - src/Tests/model_cache_test.c
+      - src/Tests/run_model_cache_test.py
+      - .github/workflows/model-cache-regressions.yml
+      - docs/MODEL_CACHE_GROWTH.md
 
 permissions:
   contents: read
