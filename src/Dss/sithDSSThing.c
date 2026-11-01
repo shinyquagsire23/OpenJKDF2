@@ -271,8 +271,9 @@ int sithDSSThing_ProcessStateUpdate(SithMessage *pMsg)
             pThing->weaponParams.flags = NETMSG_POPS32();
             break;
         case SITH_THING_ITEM:
-            pThing->itemParams.flags = NETMSG_POPS32();
-            if (pThing->itemParams.flags & SITH_ITEM_BACKPACK)
+        {
+            const uint32_t itemFlags = NETMSG_POPS32();
+            if (itemFlags & SITH_ITEM_BACKPACK)
             {
                 // Added: bounds checking
                 int numBins = NETMSG_POPS16();
@@ -285,7 +286,9 @@ int sithDSSThing_ProcessStateUpdate(SithMessage *pMsg)
                     pThing->itemParams.contents[i].value = NETMSG_POPF32();
                 }
             }
+            pThing->itemParams.flags = itemFlags;
             break;
+        }
         default:
             break;
     }
