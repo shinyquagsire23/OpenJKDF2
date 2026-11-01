@@ -1,0 +1,46 @@
+cmake_minimum_required(VERSION 3.20)
+project(OpenJKDF2SourceRegressions LANGUAGES C CXX)
+if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    message(FATAL_ERROR "This focused source target requires a Linux host")
+endif()
+enable_testing()
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+get_filename_component(ENGINE_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../../.." ABSOLUTE)
+set(TEST_ROOT "${ENGINE_ROOT}/src/Tests")
+# Only the normal globals header generator is needed; do not configure or build
+# the game and its graphical/audio/network dependencies for this host test.
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/generated")
+set(GLOBALS "${CMAKE_CURRENT_BINARY_DIR}/generated/globals.h")
+add_custom_command(OUTPUT "${GLOBALS}"
+    COMMAND "${Python3_EXECUTABLE}" -m cogapp -d
+        -D "symbols_fpath=${ENGINE_ROOT}/symbols.syms"
+        -D "project_root=${ENGINE_ROOT}" -D "embedded_resources="
+        -o "${GLOBALS}" "${ENGINE_ROOT}/src/globals.h.cog"
+    DEPENDS "${ENGINE_ROOT}/symbols.syms" "${ENGINE_ROOT}/src/globals.h.cog"
+    VERBATIM)
+add_custom_target(source_test_globals DEPENDS "${GLOBALS}")
+option(ENABLE_UBSAN "Enable undefined behavior sanitizer" OFF)
+function(add_source_test name fixture)
+    add_executable(${name} "${TEST_ROOT}/${fixture}" ${ARGN})
+    add_dependencies(${name} source_test_globals)
+    target_include_directories(${name} PRIVATE "${ENGINE_ROOT}/src" "${CMAKE_CURRENT_BINARY_DIR}/generated")
+    target_compile_definitions(${name} PRIVATE LINUX PLATFORM_POSIX NO_JK_MMAP STDSOUND_NULL QOL_IMPROVEMENTS)
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        target_compile_definitions(${name} PRIVATE ARCH_64BIT)
+    endif()
+    target_compile_options(${name} PRIVATE -ffunction-sections -fdata-sections -fshort-wchar)
+    target_link_options(${name} PRIVATE -Wl,--gc-sections)
+    target_link_libraries(${name} PRIVATE m)
+    if(ENABLE_UBSAN)
+        target_compile_options(${name} PRIVATE -fsanitize=undefined -fno-sanitize-recover=undefined)
+        target_link_options(${name} PRIVATE -fsanitize=undefined)
+    endif()
+    add_test(NAME ${name} COMMAND ${name})
+    set_tests_properties(${name} PROPERTIES TIMEOUT 30)
+endfunction()
+add_source_test(cog_locality_test cog_locality_test.c "${ENGINE_ROOT}/src/Cog/sithCog.c" "${ENGINE_ROOT}/src/jk.c")
+target_link_options(cog_locality_test PRIVATE -Wl,--wrap=sithCog_Load)
+add_source_test(bitmap_test bitmap_test.c "${ENGINE_ROOT}/src/General/stdBitmap.c" "${ENGINE_ROOT}/src/jk.c")
+add_source_test(material_test material_test.c)
+add_source_test(bitmap_sdl_test bitmap_test.c "${ENGINE_ROOT}/src/General/stdBitmap.c" "${ENGINE_ROOT}/src/jk.c")
+target_compile_definitions(bitmap_sdl_test PRIVATE SDL2_RENDER)

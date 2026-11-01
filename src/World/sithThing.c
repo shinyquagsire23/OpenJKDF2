@@ -1682,7 +1682,34 @@ LABEL_18:
     return pThing->controlType == SITH_CT_AI && sithAI_ParseArg(arg, pThing, paramIdx);
 }
 
-// MOTS altered
+// Bind a template class cog, preserving the JK/MotS locality rules.
+static int sithThing_BindClassCog(StdConffileArg *arg, SithThing *pThing)
+{
+    sithCog *pCog;
+    pCog = sithCog_Load(arg->value);
+    pThing->pCog = pCog;
+    if ( !pCog )
+        return 1;
+
+    // MOTS added
+    // Added: class cogs run on every machine like in JK, unless flagged
+    // SERVER (flags=0x80), as in JKM.EXE (test cl,0x80 / jne at 0x51DC0C).
+    // This test was inverted, which sent kyle_m.cog's newplayer and skill
+    // messages to the host in multiplayer.
+    if (Main_bMotsCompat) {
+        pCog->flags |= SITH_COG_CLASS;
+        if (!(pCog->flags & SITH_COG_SERVER)) {
+            pCog->flags |= SITH_COG_LOCAL;
+        }
+    }
+    else {
+        pCog->flags |= SITH_COG_CLASS | SITH_COG_LOCAL;
+    }
+
+    pThing->flags |= SITH_TF_CAPTURED;
+    return 1;
+}
+
 int sithThing_ParseThingArg(StdConffileArg *arg, SithThing* pThing, int param)
 {
     int32_t v3; // ebp
@@ -1701,7 +1728,6 @@ int sithThing_ParseThingArg(StdConffileArg *arg, SithThing* pThing, int param)
     rdParticle *pParticle; // edi
     rdSprite *pSprite; // eax
     SithPuppetClass *pAnimClass; // eax
-    sithCog *pCog; // eax
     rdVector3 orientation; // [esp+10h] [ebp-Ch] BYREF
     flex32_t orientationx, orientationy, orientationz;
     uint32_t thingFlags;
@@ -1864,29 +1890,7 @@ int sithThing_ParseThingArg(StdConffileArg *arg, SithThing* pThing, int param)
             result = 1;
             break;
         case THINGPARAM_COG:
-            pCog = sithCog_Load(arg->value);
-            pThing->pCog = pCog;
-            if ( !pCog )
-                return 1;
-
-            // MOTS added
-            // Added: class cogs run on every machine like in JK, unless flagged
-            // SERVER (flags=0x80), as in JKM.EXE (test cl,0x80 / jne at 0x51DC0C).
-            // This test was inverted, which sent kyle_m.cog's newplayer and skill
-            // messages to the host in multiplayer.
-            if (Main_bMotsCompat) {
-                pCog->flags |= SITH_COG_CLASS;
-                if (!(pCog->flags & SITH_COG_SERVER)) {
-                    pCog->flags |= SITH_COG_LOCAL;
-                }
-            }
-            else {
-                pCog->flags |= SITH_COG_CLASS | SITH_COG_LOCAL;
-            }
-
-            pThing->flags |= SITH_TF_CAPTURED;
-            result = 1;
-            break;
+            return sithThing_BindClassCog(arg, pThing);
         case THINGPARAM_PARTICLE:
             pParticle = sithParticle_Load(arg->value);
             if ( !pParticle )
