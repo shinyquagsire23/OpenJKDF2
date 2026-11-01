@@ -61,6 +61,11 @@ Engine shader, window, and game-data error dialogs are redirected to stderr in
 probe mode. OS crash handling is unchanged; use a background process launcher
 with redirected streams and a finite timeout.
 
+On Windows, console suppression is limited to explicit capture/probe requests.
+An ordinary `-headless` dedicated server keeps its console allocation and command
+input. Preserving redirected streams for a probe is a separate launch policy;
+it does not turn redirected pipes into the server's console input device.
+
 Argument validation can be tested without starting SDL or a game:
 
 ```text

@@ -4,6 +4,7 @@ on:
   pull_request:
     branches: [master]
     paths:
+      - 'src/main.c'
       - 'src/Main/stdCapture.c'
       - 'src/Main/stdCapture.h'
       - 'src/Main/stdAutostartCharacter.h'
@@ -18,6 +19,7 @@ on:
   push:
     branches: [master]
     paths:
+      - 'src/main.c'
       - 'src/Main/stdCapture.c'
       - 'src/Main/stdCapture.h'
       - 'src/Main/stdAutostartCharacter.h'
@@ -56,7 +58,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install --yes --no-install-recommends libpng-dev
-      - name: Test request, writer, launch restrictions and UI policy
+      - name: Test request, writer, launch restrictions, UI and console policy
         run: timeout --kill-after=5s 300s python3 -B src/Tests/run_capture_test.py --output "$RUNNER_TEMP/capture-contract-results"
       - name: Test render probe option boundaries
         run: |

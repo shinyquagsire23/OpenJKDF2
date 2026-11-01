@@ -12,6 +12,7 @@ typedef struct stdCaptureRequest {
 } stdCaptureRequest;
 extern stdCaptureRequest stdCapture_request;
 int stdCapture_IsRequested(void);
+int stdCapture_PreserveConsoleStreams(int argc, char** argv);
 int stdCapture_IsActive(void);
 void stdCapture_Trace(const char* message);
 int stdCapture_Parse(const char* text, stdCaptureRequest* request);

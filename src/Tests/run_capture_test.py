@@ -35,7 +35,7 @@ def main():
         (stage / ".openjkdf2-capture-session").write_text("synthetic\n")
         request = stage / "request.txt"
         request.write_text("sed-engine-capture-v1\n64 64 0 3 1000\n0 0 0 0 0 0 75\n" + str(stage / "unused.ppm") + "\n")
-        for name in ("capture_request_test", "capture_ui_test", "capture_launch_test"):
+        for name in ("capture_request_test", "capture_ui_test", "capture_launch_test", "capture_console_test"):
             exe = stage / name
             run([compiler, *flags, "-I", str(ROOT), str(ROOT / "Tests" / (name + ".c")), "-lm", "-o", str(exe)])
             command = [str(exe)]
@@ -48,10 +48,10 @@ def main():
         pixels = stage / "pixels.ppm"
         (args.output / "pixels.ppm").write_bytes(pixels.read_bytes())
         (args.output / "pixels.ppm.json").write_bytes((stage / "pixels.ppm.json").read_bytes())
-    sources = ["Main/stdCapture.c", "Main/stdCapture.h", "Main/stdAutostartCharacter.h", "Platform/SDL2/stdCaptureUi.h", "Tests/capture_request_test.c", "Tests/capture_ui_test.c", "Tests/capture_launch_test.c", "Tests/run_capture_test.py"]
+    sources = ["Main/stdCapture.c", "Main/stdCapture.h", "Main/stdAutostartCharacter.h", "Platform/SDL2/stdCaptureUi.h", "Tests/capture_request_test.c", "Tests/capture_ui_test.c", "Tests/capture_launch_test.c", "Tests/capture_console_test.c", "Tests/run_capture_test.py"]
     receipt = {
         "schemaVersion": 1, "gameLaunched": False, "windowSystemLinked": False,
-        "sanitizers": ["address", "undefined"], "testGroupsPassed": 3,
+        "sanitizers": ["address", "undefined"], "testGroupsPassed": len(logs),
         "ordinaryModeControlPassed": True, "compiler": run([compiler, "--version"]).stdout.splitlines()[0],
         "sources": {name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest() for name in sources},
         "logs": logs,

@@ -7,6 +7,7 @@
 #include <math.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <ctype.h>
 #ifdef _WIN32
 #include <io.h>
 #define capture_open _open
@@ -27,6 +28,25 @@ static int active, renderedFrames, cameraApplied;
 static uint64_t firstMs;
 static int write_world_state(FILE* file);
 int stdCapture_IsRequested(void) { const char* p = getenv("OPENJKDF2_CAPTURE_REQUEST"); return p && *p; }
+static int capture_option_equals(const char* value, const char* option)
+{
+    while (*value && *option) {
+        if (tolower((unsigned char)*value++) != (unsigned char)*option++) return 0;
+    }
+    return !*value && !*option;
+}
+int stdCapture_PreserveConsoleStreams(int argc, char** argv)
+{
+    // Preserve redirection for explicit capture/probe, including invalid
+    // requests that must report failure without opening desktop UI.
+    // Ordinary headless servers still need their Windows console for commands.
+    if (stdCapture_IsRequested()) return 1;
+    for (int i = 1; i < argc; ++i) {
+        if (capture_option_equals(argv[i], "-capture")
+            || capture_option_equals(argv[i], "-renderprobe") || capture_option_equals(argv[i], "/renderprobe")) return 1;
+    }
+    return 0;
+}
 int stdCapture_IsActive(void) { return active; }
 void stdCapture_Trace(const char* message) { if (active) { fprintf(stderr, "capture startup: %s\n", message); fflush(stderr); } }
 static int absolute_path(const char* p) {

@@ -633,17 +633,7 @@ int main(int argc, char** argv)
     openjkdf2_bIsExtraLowMemoryPlatform = 0;
 #endif // TARGET_DREAMCAST
 #ifdef WIN64_STANDALONE
-    int skipConsoleWindow = stdCapture_IsRequested();
-    // Main_Startup parses this later. Preserve inherited streams for headless
-    // launches instead of allocating a console and replacing redirected output.
-    for (int i = 1; i < argc; i++) {
-        if (!__strcmpi(argv[i], "-headless") || !__strcmpi(argv[i], "/headless")
-            || !__strcmpi(argv[i], "-capture")
-            || !__strcmpi(argv[i], "-renderprobe") || !__strcmpi(argv[i], "/renderprobe")) {
-            skipConsoleWindow = 1;
-            break;
-        }
-    }
+    int skipConsoleWindow = stdCapture_PreserveConsoleStreams(argc, argv);
     if ((SDL_GetHintBoolean("SteamClientLaunch", 0) || SDL_GetHintBoolean("SteamOS", 0) || SDL_GetHintBoolean("SteamDeck", 0)) && SDL_GetHintBoolean("SteamGamepadUI", 0)) {
         skipConsoleWindow = 1;
     }
