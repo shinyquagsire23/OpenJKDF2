@@ -1,0 +1,42 @@
+name: MotS lighting CPU paths
+on:
+  pull_request:
+    paths:
+      - 'src/Engine/sithRender.c'
+      - 'src/Engine/sithRender.h'
+      - 'src/Engine/sithRenderArchLighting.h'
+      - 'src/Engine/rdLight.c'
+      - 'src/Engine/rdClip.c'
+      - 'src/Engine/rdMaterial.h'
+      - 'src/Primitives/rdModel3.c'
+      - 'src/Primitives/rdModel3.h'
+      - 'src/Primitives/rdPrimit3.c'
+      - 'src/Primitives/rdVector.h'
+      - 'src/Primitives/rdRect.h'
+      - 'src/Primitives/rdMatrix.h'
+      - 'src/Raster/rdFace.h'
+      - 'src/Raster/rdCache.c'
+      - 'src/World/sithThing.c'
+      - 'src/World/sithWorld.h'
+      - 'src/World/jkPlayer.c'
+      - 'src/Win95/stdVBuffer.h'
+      - 'src/General/stdConffile.c'
+      - 'src/types*'
+      - 'src/engine_config.h'
+      - 'src/hook.h'
+      - 'src/version.h'
+      - 'src/Tests/*lighting*'
+      - 'src/Tests/mots_thing_loader_test.c'
+      - 'src/Tests/source_test_utils.py'
+      - '.github/workflows/mots-lighting-state.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  cpu:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 src/Tests/run_mots_lighting_test.py --cc gcc --sanitize
+      - run: python3 src/Tests/run_pov_lighting_test.py --cc gcc --sanitize
+      - run: python3 src/Tests/run_arch_lighting_scope_test.py --cc gcc --sanitize --negative-controls

@@ -34,6 +34,10 @@
 #include "Primitives/rdMath.h"
 #include "stdPlatform.h"
 
+#ifdef JKM_LIGHTING
+#include "Engine/sithRenderArchLighting.h"
+#endif
+
 #if defined(TARGET_TWL)
 #include <nds.h>
 #endif
@@ -249,11 +253,16 @@ void sithRender_Close()
     //rdThing_Free(lightDebugThing);
 
     sithRenderSky_Close();
+#ifdef JKM_LIGHTING
+    sithRender_FreeArchLightingBuffers();
+#endif
 }
 
 void sithRender_Shutdown()
 {
-    ;
+#ifdef JKM_LIGHTING
+    sithRender_FreeArchLightingBuffers();
+#endif
 }
 
 void sithRender_SetRenderFlags(int flags)
@@ -1677,6 +1686,10 @@ rdClipFrustum sithRender_absoluteMaxFrustum = {
 #endif
 
 // MOTS altered
+#ifdef JKM_LIGHTING
+
+#endif
+
 void sithRender_RenderSectors()
 {
     rdVector2 *vertices_uvs; // edx
@@ -1746,9 +1759,7 @@ void sithRender_RenderSectors()
     if (LIKELY(rdroid_curAcceleration))
     {
         rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
-        if (sithRender_renderflags & 0x80) {
-            rdSetVertexColorMode(1);
-        }
+        rdSetVertexColorMode((sithRender_renderflags & 0x80) != 0);
     }
     else
     {
@@ -2468,53 +2479,12 @@ LABEL_150:
             else
                 i->renderData.curLightMode = i->renderData.desiredLightMode;
 
-            // MOTS added
 #ifdef JKM_LIGHTING
-            if ((i->archlightIdx != -1) && ((i->renderData).type == RD_THING_MODEL3)) {
-                rdModel3* iVar22 = i->renderData.model3;
-                for (int k = 0; k < 4; k++) {
-                    for (int j = 0; j < iVar22->aGeos[k].numMeshes; j++) 
-                    {
-                        if (rdGetVertexColorMode() == 0) {
-                            iVar22->aGeos[k].aMeshes[j].vertices_unk = iVar22->aGeos[k].aMeshes[j].vertices_i;
-                            iVar22->aGeos[k].aMeshes[j].vertices_i = sithWorld_g_pCurrentWorld->aArchlights[i->archlightIdx].aMeshes[j].aMono;
-                        }
-                        else {
-                            iVar22->aGeos[k].aMeshes[j].paRedIntensities = sithWorld_g_pCurrentWorld->aArchlights[i->archlightIdx].aMeshes[j].aRed;
-                            iVar22->aGeos[k].aMeshes[j].paGreenIntensities = sithWorld_g_pCurrentWorld->aArchlights[i->archlightIdx].aMeshes[j].aGreen;
-                            iVar22->aGeos[k].aMeshes[j].paBlueIntensities = sithWorld_g_pCurrentWorld->aArchlights[i->archlightIdx].aMeshes[j].aBlue;
-                        }
-                    }
-                }
-            }
-            if ((i->archlightIdx == -1) && (rdGetVertexColorMode() == 1)) {
-                rdModel3* iVar13 = i->renderData.model3;
-                for (int k = 0; k < 4; k++) {
-                    for (int j = 0; j < iVar13->aGeos[k].numMeshes; j++) 
-                    {
-                        iVar13->aGeos[k].aMeshes[j].paRedIntensities = iVar13->aGeos[k].aMeshes[j].vertices_i;
-                        iVar13->aGeos[k].aMeshes[j].paGreenIntensities = iVar13->aGeos[k].aMeshes[j].vertices_i;
-                        iVar13->aGeos[k].aMeshes[j].paBlueIntensities = iVar13->aGeos[k].aMeshes[j].vertices_i;
-                    }
-                }
-            }
-#endif // JKM_LIGHTING
-
-            if ( sithRender_RenderThing(i) )
-                ++sithRender_geoThingsDrawn;
-
-            // MOTS added
-#ifdef JKM_LIGHTING
-            if (((i->archlightIdx != -1) && (i->renderData.type == RD_THING_MODEL3)) && (rdGetVertexColorMode() == 0)) {
-                rdModel3* iVar14 = i->renderData.model3;
-                for (int k = 0; k < 4; k++) {
-                    for (int j = 0; j < iVar14->aGeos[k].numMeshes; j++) 
-                    {
-                        iVar14->aGeos[k].aMeshes[j].vertices_i = iVar14->aGeos[k].aMeshes[j].vertices_unk;
-                    }
-                }
-            }
+            if (sithRender_DrawLevelGeometryThing(i))
+#else
+            if (sithRender_RenderThing(i))
 #endif
+                ++sithRender_geoThingsDrawn;
         }
 
         ++sithRender_numRenderedSectors;
@@ -3093,6 +3063,13 @@ void sithRender_RenderAlphaAdjoins()
     rdSetOcclusionMethod(0);
     rdSetSortingMethod(2);
 
+    // The intervening thing pass selects mono lighting. Deferred world faces
+    // must use the same explicit mode and world arrays as opaque world faces.
+    rdSetVertexColorMode(rdroid_curAcceleration && (sithRender_renderflags & 0x80));
+    sithRender_faceView.aVertices = sithWorld_g_pCurrentWorld->aTransformedVertices;
+    sithRender_faceView.aTexVerticies = sithWorld_g_pCurrentWorld->aTexVerticies;
+    sithRender_faceView.paDynamicLight = sithWorld_g_pCurrentWorld->aVertDynamicLights;
+
     for (int i = 0; i < sithRender_numAlphaAdjoins; i++)
     {
         v0 = sithRender_aAlphaAdjoins[i];
@@ -3200,10 +3177,30 @@ void sithRender_RenderAlphaAdjoins()
             v9->geometryMode = RD_GEOMETRY_SOLID;
         }
 
+#ifdef JKM_LIGHTING
+        if (rdGetVertexColorMode() == 1) {
+            flex_t* mono = v0->surfaceInfo.intensities;
+            uint32_t count = sithRender_faceView.numVertices;
+            sithRender_faceView.paRedIntensities = (v0->flags & SITH_SURFACE_1000000) ? mono + count : mono;
+            sithRender_faceView.paGreenIntensities = (v0->flags & SITH_SURFACE_1000000) ? mono + count * 2 : mono;
+            sithRender_faceView.paBlueIntensities = (v0->flags & SITH_SURFACE_1000000) ? mono + count * 3 : mono;
+            meshinfo_out.paRedIntensities = v9->paRedIntensities;
+            meshinfo_out.paGreenIntensities = v9->paGreenIntensities;
+            meshinfo_out.paBlueIntensities = v9->paBlueIntensities;
+            // The model NoClipFaceRGB indexes static light by global vertex,
+            // whereas world surfaces store light by local corner. Use the
+            // world clipper in both sphere cases, as the opaque pass does.
+            rdPrimit3_ClipFaceRGBLevel(pSurfaceFrustum, v9->geometryMode,
+                v9->lightingMode, v9->textureMode, &sithRender_faceView,
+                &meshinfo_out, &v0->surfaceInfo.face.texVertOffset);
+        }
+        else
+#endif
+        {
 #ifdef SITHRENDER_SPHERE_TEST_SURFACES
         if (clipResult != SPHERE_FULLY_INSIDE) {
 #endif
-        rdPrimit3_ClipFace(pSurfaceFrustum, 
+        rdPrimit3_ClipFace(pSurfaceFrustum,
             v9->geometryMode, 
             v9->lightingMode, 
             v9->textureMode, 
@@ -3221,6 +3218,7 @@ void sithRender_RenderAlphaAdjoins()
                 &v0->surfaceInfo.face.texVertOffset);
         }
 #endif
+        }
         
         if ( meshinfo_out.numVertices < 3u )
         {
@@ -3245,7 +3243,7 @@ void sithRender_RenderAlphaAdjoins()
                     v9->lightingMode = RD_LIGHTMODE_NOTLIT;
                 }
             }
-            else if ( v9->lightingMode == RD_LIGHTMODE_GOURAUD)
+            else if ( rdGetVertexColorMode() == 0 && v9->lightingMode == RD_LIGHTMODE_GOURAUD)
             {
                 v20 = v9->vertexIntensities;
                 v21 = 1;
@@ -3346,5 +3344,4 @@ void sithRender_WorldFlash(flex_t arg1,flex_t arg2)
     sithRender_008d409c = arg2;
   }
 }
-
 

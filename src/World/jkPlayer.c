@@ -970,6 +970,11 @@ void jkPlayer_DrawPov()
     {
         SithThing* player = playerThings[playerThingIdx].actorThing;
 
+        // POV models have scalar 3DO lighting, not world architectural RGB
+        // arrays. Select their mode explicitly after any world/alpha pass,
+        // before drawing either the weapon or saber and flushing that cache.
+        rdSetVertexColorMode(0);
+
         // TODO: I think this explains some weird duplication
 #ifndef QOL_IMPROVEMENTS
         flex_t waggleAmt = (stdMath_Fabs(player->waggle) > 0.02 ? 0.02 : stdMath_Fabs(player->waggle)) * jkPlayer_waggleMag;

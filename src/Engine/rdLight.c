@@ -102,7 +102,7 @@ flex_t rdLight_CalcVertexIntensities(rdLight **apLights, rdVector3 *aLightPos,
     vertexIter = aVertices;
     for (j = 0; j < numVertices; j++)
     {
-        *outLights = *idkIter;
+        *outLights = idkIter ? *idkIter : 0.0;
         meshLightIter = apLights;
         for (i = 0; i < numLights; i++)
         {
@@ -123,7 +123,7 @@ flex_t rdLight_CalcVertexIntensities(rdLight **apLights, rdVector3 *aLightPos,
 
         ++vertexIter;
         ++outLights;
-        ++idkIter;
+        if (idkIter) ++idkIter;
         ++vertexNormals;
     }
     return 0.0;
@@ -153,7 +153,7 @@ flex_t rdLight_CalcVertexIntensities(rdLight **apLights, rdVector3 *aLightPos,
         vertexIter = aVertices;
         for (j = 0; j < numVertices; j++)
         {
-            *outLights = *idkIter;
+            *outLights = idkIter ? *idkIter : 0.0;
             meshLightIter = apLights;
             for (i = 0; i < numLights; i++)
             {
@@ -174,7 +174,7 @@ flex_t rdLight_CalcVertexIntensities(rdLight **apLights, rdVector3 *aLightPos,
 
             ++vertexIter;
             ++outLights;
-            ++idkIter;
+            if (idkIter) ++idkIter;
             ++vertexNormals;
         }
         return 0.0;
@@ -200,7 +200,9 @@ flex_t rdLight_CalcVertexIntensities(rdLight **apLights, rdVector3 *aLightPos,
     vertexNormals = aVertexNormal;
     for (int vertIdx = 0; vertIdx < numVertices; vertIdx++)
     {
-        *outLights = *aVertexColors++;
+        // RGB draws add their static RGB (or scalar 3DO fallback) after this
+        // calculation. A null base requests dynamic-only scratch lighting.
+        *outLights = aVertexColors ? *aVertexColors++ : 0.0;
 
         meshLightIter = apLights;
         aVertexNormal = aLightPos;

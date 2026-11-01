@@ -1272,10 +1272,11 @@ rdPrimit3_ClipFaceRGB
                 pfVar7 = idxInfo->paGreenIntensities;
                 piVar17 = idxInfo->vertexPosIdx;
                 pfVar8 = idxInfo->paBlueIntensities;
-                pfVar10 = mesh_out->paGreenIntensities;
-                pfVar11 = mesh_out->paRedIntensities;
-                iVar20 = (intptr_t)pfVar10 - (intptr_t)piVar17;
-                iVar22 = (intptr_t)mesh_out->paBlueIntensities - (intptr_t)piVar17;
+                // Advance each output by its own element type instead of deriving
+                // its stride from the separate int vertex-index array.
+                flex_t* redIter = mesh_out->paRedIntensities;
+                flex_t* greenIter = mesh_out->paGreenIntensities;
+                flex_t* blueIter = mesh_out->paBlueIntensities;
                 int idkIn_ = idxInfo->numVertices;
                 do {
                     iVar12 = *piVar17;
@@ -1290,8 +1291,7 @@ rdPrimit3_ClipFaceRGB
                     else if (fVar14 > 1.0) {
                         fVar14 = 1.0;
                     }
-                    pfVar2 = (flex_t *)(iVar20 + (intptr_t)piVar17);
-                    *(flex_t *)((intptr_t)pfVar2 + ((intptr_t)pfVar11 - (intptr_t)pfVar10)) = fVar14;
+                    *redIter++ = fVar14;
                     fVar14 = pfVar7[iVar12] + pfVar6[iVar12];
                     if (fVar14 < 0.0) {
                         fVar14 = 0.0;
@@ -1299,7 +1299,7 @@ rdPrimit3_ClipFaceRGB
                     else if (fVar14 > 1.0) {
                         fVar14 = 1.0;
                     }
-                    *pfVar2 = fVar14;
+                    *greenIter++ = fVar14;
                     fVar14 = pfVar8[iVar12] + pfVar6[iVar12];
                     if (fVar14 < 0.0) {
                         fVar14 = 0.0;
@@ -1308,7 +1308,7 @@ rdPrimit3_ClipFaceRGB
                         fVar14 = 1.0;
                     }
                     prVar19 = prVar19 + 1;
-                    *(flex_t *)(iVar22 + (intptr_t)piVar17) = fVar14;
+                    *blueIter++ = fVar14;
                     piVar17 = piVar17 + 1;
                     idkIn_ -= 1;
                 } while (idkIn_ != 0x0);
