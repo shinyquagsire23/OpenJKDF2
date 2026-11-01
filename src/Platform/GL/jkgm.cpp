@@ -59,7 +59,7 @@ void jkgm_aligned_free(void* p)
 #ifdef SDL2_RENDER
 #if defined(TARGET_CAN_JKGM)
 
-#include "Platform/GL/jkgm_pixel_unpack.hpp"
+#include "Platform/GL/jkgm_texture_upload.hpp"
 
 extern "C" {
 
@@ -717,7 +717,6 @@ int jkgm_std3D_AddToTextureCache(tVBuffer *vbuf, rdDDrawSurface *texture, int is
         // PNG rows are tightly packed even when width * channels is not a
         // multiple of 4, so GL's default 4-byte row alignment skewed or overran RGB
         // uploads.
-        const JkgmScopedPixelUnpack pixel_unpack;
         GLuint image_texture;
         glGenTextures(1, &image_texture);
         glActiveTexture(GL_TEXTURE0);
@@ -757,7 +756,9 @@ int jkgm_std3D_AddToTextureCache(tVBuffer *vbuf, rdDDrawSurface *texture, int is
                 //glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, entry->albedo_hasAlpha ? GL_RGBA : GL_RGB, GL_UNSIGNED_INT_8_8_8_8_REV, data);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-                glTexImage2D(GL_TEXTURE_2D, 0, entry->albedo_hasAlpha ? GL_RGBA8 : GL_RGB8, entry->albedo_width, entry->albedo_height, 0,  entry->albedo_hasAlpha ?  GL_BGRA : GL_BGR,     GL_UNSIGNED_BYTE, data);
+                jkgm_upload_texture_2d(entry->albedo_hasAlpha ? GL_RGBA8 : GL_RGB8,
+                    entry->albedo_width, entry->albedo_height,
+                    entry->albedo_hasAlpha ? GL_BGRA : GL_BGR, data);
                 //glGetTexImage(GL_TEXTURE_2D, 0, entry->albedo_hasAlpha ? GL_BGRA : GL_BGR, GL_UNSIGNED_BYTE, data);
                 //printf("%x\n", *(uint32_t*)data);
                 texture->texture_id = image_texture;
@@ -825,7 +826,9 @@ int jkgm_std3D_AddToTextureCache(tVBuffer *vbuf, rdDDrawSurface *texture, int is
                 //glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, entry->emissive_hasAlpha ? GL_RGBA : GL_RGB, GL_UNSIGNED_INT_8_8_8_8_REV, data);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-                glTexImage2D(GL_TEXTURE_2D, 0, entry->emissive_hasAlpha ? GL_RGBA8 : GL_RGB8, entry->emissive_width, entry->emissive_height, 0,  entry->emissive_hasAlpha ? GL_RGBA : GL_RGB,     GL_UNSIGNED_BYTE, data);
+                jkgm_upload_texture_2d(entry->emissive_hasAlpha ? GL_RGBA8 : GL_RGB8,
+                    entry->emissive_width, entry->emissive_height,
+                    entry->emissive_hasAlpha ? GL_RGBA : GL_RGB, data);
                 //glGetTexImage(GL_TEXTURE_2D, 0, entry->emissive_hasAlpha ? GL_BGRA : GL_BGR, GL_UNSIGNED_BYTE, data);
                 //printf("%x\n", *(uint32_t*)data);
                 texture->emissive_texture_id = emiss_texture;
@@ -878,7 +881,9 @@ int jkgm_std3D_AddToTextureCache(tVBuffer *vbuf, rdDDrawSurface *texture, int is
                 //glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, entry->displacement_hasAlpha ? GL_RGBA : GL_RGB, GL_UNSIGNED_INT_8_8_8_8_REV, data);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-                glTexImage2D(GL_TEXTURE_2D, 0, entry->displacement_hasAlpha ? GL_RGBA8 : GL_RGB8, entry->displacement_width, entry->displacement_height, 0,  entry->displacement_hasAlpha ? GL_RGBA : GL_RGB,     GL_UNSIGNED_BYTE, data);
+                jkgm_upload_texture_2d(entry->displacement_hasAlpha ? GL_RGBA8 : GL_RGB8,
+                    entry->displacement_width, entry->displacement_height,
+                    entry->displacement_hasAlpha ? GL_RGBA : GL_RGB, data);
                 //glGetTexImage(GL_TEXTURE_2D, 0, entry->displacement_hasAlpha ? GL_BGRA : GL_BGR, GL_UNSIGNED_BYTE, data);
                 //printf("%x\n", *(uint32_t*)data);
                 texture->displacement_texture_id = displace_texture;

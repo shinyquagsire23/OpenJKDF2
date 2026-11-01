@@ -1,0 +1,16 @@
+cmake_minimum_required(VERSION 3.20)
+project(OpenJKDF2PixelUnpackTest LANGUAGES CXX)
+enable_testing()
+get_filename_component(ENGINE_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../../.." ABSOLUTE)
+set(TEST_ROOT "${ENGINE_ROOT}/src/Tests")
+find_package(OpenGL REQUIRED)
+find_library(EGL_LIBRARY EGL REQUIRED)
+add_executable(jkgm_pixel_unpack_gl_test "${TEST_ROOT}/jkgm_pixel_unpack_gl_test.cpp"
+    "${ENGINE_ROOT}/src/Platform/GL/jkgm_texture_upload.cpp")
+target_compile_features(jkgm_pixel_unpack_gl_test PRIVATE cxx_std_17)
+target_compile_definitions(jkgm_pixel_unpack_gl_test PRIVATE OPENJKDF2_GL_HOST_TEST)
+target_include_directories(jkgm_pixel_unpack_gl_test PRIVATE "${ENGINE_ROOT}/src")
+target_link_libraries(jkgm_pixel_unpack_gl_test PRIVATE OpenGL::GL ${EGL_LIBRARY})
+add_test(NAME jkgm_pixel_unpack COMMAND jkgm_pixel_unpack_gl_test)
+set_tests_properties(jkgm_pixel_unpack PROPERTIES TIMEOUT 30
+    ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;EGL_PLATFORM=surfaceless")

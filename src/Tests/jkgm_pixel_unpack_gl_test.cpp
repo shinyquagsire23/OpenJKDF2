@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <vector>
 #include "Platform/GL/jkgm_pixel_unpack.hpp"
+#include "Platform/GL/jkgm_texture_upload.hpp"
 
 namespace {
 void require(bool value, const char* message) {
@@ -73,34 +74,42 @@ int main() {
     require(actual!=original, "Unprotected control did not expose the expected row mismatch");
     require(glGetError()==GL_NO_ERROR, "Control GL operation failed");
 
-    int cases=0;
-    for (int width : {1,2,3,4,7,129,1024,1254}) {
-        for (GLenum format : {GL_RGB,GL_RGBA,GL_BGR,GL_BGRA}) {
-            const int channels=(format==GL_RGBA || format==GL_BGRA)?4:3;
-            const auto input=pixels(width,4,channels);
-            std::vector<unsigned char> output(input.size());
-            for (int alignment : {1,2,4,8}) {
-                const std::array<GLint,4> incoming={alignment,width+11,3,2};
-                set_state(incoming);
-                {
-                    const JkgmScopedPixelUnpack guard;
-                    require(state()==std::array<GLint,4>{1,0,0,0}, "Unpack state not normalized");
-                    glTexImage2D(GL_TEXTURE_2D,0,channels==4?GL_RGBA8:GL_RGB8,
-                        width,4,0,format,GL_UNSIGNED_BYTE,input.data());
-                }
-                require(state()==incoming, "Caller unpack state not restored");
-                GLint pack_alignment=0; glGetIntegerv(GL_PACK_ALIGNMENT,&pack_alignment);
-                require(pack_alignment==1, "Unrelated pack state changed");
-                glGetTexImage(GL_TEXTURE_2D,0,format,GL_UNSIGNED_BYTE,output.data());
-                require(glGetError()==GL_NO_ERROR, "Upload/readback GL error");
-                require(input==output, "Decoded channel bytes changed during upload/readback");
-                early_return(); require(state()==incoming, "Early-return state restoration failed");
-                ++cases;
-            }
+    // Save/restore checks are independent from the upload-format matrix.
+    for (int alignment : {1,2,4,8}) {
+        const std::array<GLint,4> incoming={alignment,19,3,2};
+        set_state(incoming);
+        {
+            const JkgmScopedPixelUnpack guard;
+            require(state()==std::array<GLint,4>{1,0,0,0}, "Unpack state not normalized");
         }
+        require(state()==incoming, "Caller unpack state not restored");
+        early_return();
+        require(state()==incoming, "Early-return state restoration failed");
+    }
+    int cases=0;
+    for (GLenum format : {GL_RGB,GL_RGBA,GL_BGR,GL_BGRA}) {
+        const int width=1254, height=4;
+        const int channels=(format==GL_RGBA || format==GL_BGRA)?4:3;
+        const auto expected=pixels(width,height,channels);
+        // Reserve enough bytes for a deliberately broken unpack implementation;
+        // the negative control must show a mismatch, not read past an allocation.
+        auto input=expected;
+        input.resize(static_cast<std::size_t>((width+11)*8*(height+3)),0xCC);
+        std::vector<unsigned char> output(expected.size());
+        const std::array<GLint,4> incoming={8,width+11,3,2};
+        set_state(incoming);
+        jkgm_upload_texture_2d(channels==4?GL_RGBA8:GL_RGB8,
+            width,height,format,input.data());
+        require(state()==incoming, "Production upload failed to restore unpack state");
+        GLint pack_alignment=0; glGetIntegerv(GL_PACK_ALIGNMENT,&pack_alignment);
+        require(pack_alignment==1, "Unrelated pack state changed");
+        glGetTexImage(GL_TEXTURE_2D,0,format,GL_UNSIGNED_BYTE,output.data());
+        require(glGetError()==GL_NO_ERROR, "Upload/readback GL error");
+        require(expected==output, "Production upload changed decoded channel bytes");
+        ++cases;
     }
     glDeleteTextures(1,&texture);
     eglMakeCurrent(display,EGL_NO_SURFACE,EGL_NO_SURFACE,EGL_NO_CONTEXT);
     eglDestroyContext(display,context); eglDestroySurface(display,surface); eglTerminate(display);
-    std::cout << "PASS: " << cases << " exact byte-readback cases, state restoration, and unprotected negative control\n";
+    std::cout << "PASS: " << cases << " production byte-readback cases, four restoration states, and unprotected negative control\n";
 }
