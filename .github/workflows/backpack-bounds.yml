@@ -1,12 +1,13 @@
-name: Backpack bounds regression
+name: Rejected backpack count flags regression
 
 on:
   workflow_dispatch:
   pull_request:
     paths:
-      - src/Gameplay/sithInventory.c
       - src/Dss/sithDSSThing.c
       - src/types.h
+      - src/types_win_enums.h
+      - src/Primitives/rdRect.h
       - src/types_enums.h
       - src/engine_config.h
       - src/Tests/backpack_test.c
@@ -17,9 +18,10 @@ on:
   push:
     branches: [master]
     paths:
-      - src/Gameplay/sithInventory.c
       - src/Dss/sithDSSThing.c
       - src/types.h
+      - src/types_win_enums.h
+      - src/Primitives/rdRect.h
       - src/types_enums.h
       - src/engine_config.h
       - src/Tests/backpack_test.c
@@ -45,4 +47,4 @@ jobs:
         with:
           persist-credentials: false
       - name: Run focused native regression
-        run: python3 -B src/Tests/run_backpack_test.py --cc gcc --ubsan
+        run: python3 -B src/Tests/run_backpack_test.py --cc gcc --ubsan --negative-controls
