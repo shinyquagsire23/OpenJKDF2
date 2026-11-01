@@ -1133,7 +1133,7 @@ void sithCogExec_PushStack(sithCog *pCog, SithCogSymbolValue *pValue)
     {
         // Added: word-safe shift (stack may be word-addressable-only); dst < src,
         // so a forward copy preserves the memmove semantics.
-        stdPlatform_Memcpy32(pCog->stack, &pCog->stack[1], sizeof(pCog->stack) * (SITHCOGVM_MAX_STACKSIZE-1));
+        stdPlatform_Memcpy32(pCog->stack, &pCog->stack[1], sizeof(pCog->stack[0]) * (SITHCOGVM_MAX_STACKSIZE - 1));
         --pCog->stackPos;
     }
     
