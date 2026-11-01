@@ -73,6 +73,10 @@
 #define MULTI_BIG_UPDATE_INTERVAL_MS (60)
 #endif
 
+// Added: bit 15 tags static model IDs; cache growth must preserve that encoding.
+#define SITHMODEL_MAX_MODELS 0x8000u
+#define SITHMODEL_MIN_PAGE_MODELS 32u
+
 // World limits
 #if !defined(QOL_IMPROVEMENTS)
 #define SITH_MAX_THINGS (641)
