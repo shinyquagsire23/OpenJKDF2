@@ -19,17 +19,30 @@ class VersionOverride(unittest.TestCase):
         self.git('update-ref','HEAD',self.commit)
         self.short=self.git('rev-parse','--short=8','HEAD').strip()
     def git(self,*args,data=None):
-        return subprocess.check_output([GIT,*args],cwd=self.root,env=self.env,input=data).decode()
+        return subprocess.check_output([GIT,*args],cwd=self.root,env=self.env,input=data,timeout=30).decode()
     def run_case(self,overrides):
         resultfile=self.root/'result.txt'
         script=self.root/'case.cmake'
         script.write_text('include("'+CANDIDATE.as_posix()+'")\nfile(WRITE "'+resultfile.as_posix()+'" "${OPENJKDF2_RELEASE_COMMIT}\\n${OPENJKDF2_RELEASE_COMMIT_SHORT}\\n")\n')
-        result=subprocess.run([CMAKE,'-P',str(script)],cwd=self.root,env={**self.env,**overrides},capture_output=True,text=True)
+        result=subprocess.run([CMAKE,'-P',str(script)],cwd=self.root,env={**self.env,**overrides},capture_output=True,text=True,timeout=30)
         return result,resultfile.read_text().splitlines() if resultfile.exists() else None
     def test_absent_override_preserves_original_git_behavior(self):
         new,new_values=self.run_case({})
         self.assertEqual(new.returncode,0,new.stderr)
         self.assertEqual(new_values,[self.commit,self.short])
+    def test_empty_exported_values_preserve_git_fallback(self):
+        for overrides in ({'OPENJKDF2_RELEASE_COMMIT':'','OPENJKDF2_RELEASE_COMMIT_SHORT':''},
+                          {'OPENJKDF2_RELEASE_COMMIT':''}, {'OPENJKDF2_RELEASE_COMMIT_SHORT':''}):
+            with self.subTest(overrides=overrides):
+                result,values=self.run_case(overrides)
+                self.assertEqual(result.returncode,0,result.stderr)
+                self.assertEqual(values,[self.commit,self.short])
+    def test_empty_exported_values_preserve_no_checkout_behavior(self):
+        with tempfile.TemporaryDirectory(prefix='openjkdf2-version-no-git-') as directory:
+            self.root=Path(directory)
+            result,values=self.run_case({'OPENJKDF2_RELEASE_COMMIT':'','OPENJKDF2_RELEASE_COMMIT_SHORT':''})
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertEqual(values,['',''])
     def test_valid_override_wins_over_different_git_checkout(self):
         full='0123456789abcdef'*2+'01234567'
         for short in (full[:8],full[:12],full):
@@ -42,7 +55,7 @@ class VersionOverride(unittest.TestCase):
         self.assertEqual(result.returncode,0,result.stderr);self.assertEqual(values,[full.lower(),full[:8].lower()])
     def test_invalid_overrides_fail_closed(self):
         good='0123456789abcdef'*2+'01234567'
-        cases=[{}, {'OPENJKDF2_RELEASE_COMMIT_SHORT':good[:8]}, {'OPENJKDF2_RELEASE_COMMIT':good}, {'OPENJKDF2_RELEASE_COMMIT':'','OPENJKDF2_RELEASE_COMMIT_SHORT':''}]
+        cases=[{}, {'OPENJKDF2_RELEASE_COMMIT_SHORT':good[:8]}, {'OPENJKDF2_RELEASE_COMMIT':good}]
         cases=cases[1:]
         for bad in (good[:-1],good+'0','g'+good[1:],good+'\n',' '+good,good[:10]+';'+good[11:]):
             cases.append({'OPENJKDF2_RELEASE_COMMIT':bad,'OPENJKDF2_RELEASE_COMMIT_SHORT':good[:8]})

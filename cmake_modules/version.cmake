@@ -1,7 +1,9 @@
 set(OPENJKDF2_PROJECT_VERSION 0.9.9.0)
-# Automated builds may pin both values through the environment. Reject an
-# incomplete or inconsistent override instead of labeling a different build.
-if(DEFINED ENV{OPENJKDF2_RELEASE_COMMIT} OR DEFINED ENV{OPENJKDF2_RELEASE_COMMIT_SHORT})
+# Existing build scripts export empty values when Git cannot identify the
+# source. Preserve the original Git fallback when neither value is supplied.
+# Nonempty overrides must still supply a complete, consistent pair.
+if(NOT "$ENV{OPENJKDF2_RELEASE_COMMIT}" STREQUAL "" OR
+   NOT "$ENV{OPENJKDF2_RELEASE_COMMIT_SHORT}" STREQUAL "")
     set(OPENJKDF2_RELEASE_COMMIT "$ENV{OPENJKDF2_RELEASE_COMMIT}")
     set(OPENJKDF2_RELEASE_COMMIT_SHORT "$ENV{OPENJKDF2_RELEASE_COMMIT_SHORT}")
     string(LENGTH "${OPENJKDF2_RELEASE_COMMIT}" _release_commit_length)
