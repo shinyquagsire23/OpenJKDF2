@@ -40,6 +40,13 @@ def main():
                 'missing-green-restore':('mesh->paGreenIntensities = saved[j].green;', '(void)0;'),
                 'reused-active-buffer':('if (buffer->inUse) continue;', '(void)0;'),
             }
+            # On a 32-bit target the size_t guard independently rejects the same
+            # count. Select this control from the compiled fixture, not Python.
+            if 'ARCH allocator width exceeds host count: yes' in result.stdout:
+                controls['allocator-width-overflow']=('if (count > (UINT32_MAX - sizeof(SithRenderArchBuffer)) / sizeof(SithRenderMeshLightBinding)) return NULL;', '(void)0;')
+            elif 'ARCH allocator width exceeds host count: no' in result.stdout:
+                print('SKIP allocator-width-only control: size_t already bounds the allocator')
+            else:raise RuntimeError('Missing compiled allocator-width evidence')
             for name,(old,new) in controls.items():
                 if header.count(old)!=1:raise RuntimeError('Control anchor changed: '+name)
                 (work/'Engine/sithRenderArchLighting.h').write_text(header.replace(old,new),encoding='utf-8')
@@ -47,6 +54,10 @@ def main():
                 if rejected.returncode!=1 or 'CHECK' in rejected.stderr or 'ERROR: AddressSanitizer' in rejected.stderr:
                     raise RuntimeError('Control not cleanly rejected: '+name+'\n'+rejected.stdout+rejected.stderr)
                 if 'failures' not in rejected.stdout or not rejected.stderr:raise RuntimeError('No assertion evidence: '+name)
-                print('PASS rejected '+name+' by pointer-restoration assertions')
+                if name=='allocator-width-overflow':
+                    if 'allocationAttempts == before' not in rejected.stderr:raise RuntimeError('Missing allocator-boundary assertion: '+rejected.stderr)
+                    print('PASS rejected '+name+' before any huge allocation/write')
+                else:
+                    print('PASS rejected '+name+' by pointer-restoration assertions')
 
 if __name__=='__main__':main()

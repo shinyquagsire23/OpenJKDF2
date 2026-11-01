@@ -11,11 +11,15 @@ static int mode = 1, failAlloc, allocations, releases, checks, failures;
 static int drawCalls, drawResult = 1, nesting, maxNesting;
 static SithThing* nestedThing;
 static flex_t* outerRed;
+static unsigned allocationAttempts;
+static uint32_t lastAllocationBytes;
 #define CHECK(c) do { ++checks; if (!(c)) { ++failures; fprintf(stderr,"%d: %s\n",__LINE__,#c); } } while (0)
-static void* test_alloc(size_t n) { if(failAlloc)return NULL;void*p=malloc(n);if(p)++allocations;return p; }
+static void* test_alloc(uint32_t n) { ++allocationAttempts;lastAllocationBytes=n;if(failAlloc)return NULL;void*p=malloc(n);if(p)++allocations;return p; }
 static void test_free(void*p) { if(p){++releases;free(p);} }
-#define SITH_ALLOC test_alloc
-#define SITH_FREE test_free
+/* Use the actual host-services member types, including its 32-bit byte count. */
+static HostServices testHost = {.alloc=test_alloc,.free=test_free};
+#define SITH_ALLOC(n) testHost.alloc(n)
+#define SITH_FREE(p) testHost.free(p)
 static int rdGetVertexColorMode(void) {return mode;}
 static int sithRender_RenderThing(SithThing*);
 #ifdef ARCH_SCOPE_BASELINE
@@ -72,7 +76,34 @@ static void failure_case(unsigned meshes) {
     failAlloc=0;free(data);
 }
 
+#ifndef ARCH_SCOPE_BASELINE
+static void allocator_boundaries(void) {
+    const size_t bindingBytes=sizeof(SithRenderMeshLightBinding);
+    const size_t headerBytes=sizeof(SithRenderArchBuffer);
+    const size_t maxCount=(UINT32_MAX-headerBytes)/bindingBytes;
+    unsigned before=allocationAttempts;
+    /* All requests in this case are recorded and rejected by the callback;
+     * no huge allocation or write occurs, even against the missing-width guard. */
+    failAlloc=1;
+    CHECK(sithRender_AcquireArchBuffer(maxCount+1)==NULL);
+    CHECK(allocationAttempts == before);
+    before=allocationAttempts;
+    CHECK(sithRender_AcquireArchBuffer(SIZE_MAX)==NULL);
+    CHECK(allocationAttempts == before);
+    before=allocationAttempts;
+    CHECK(sithRender_AcquireArchBuffer(maxCount)==NULL);
+    CHECK(allocationAttempts==before+1);
+    CHECK(lastAllocationBytes==headerBytes+maxCount*bindingBytes);
+    CHECK(!sithRender_archBuffers);
+    failAlloc=0;
+    printf("ARCH allocator width exceeds host count: %s\n",SIZE_MAX>UINT32_MAX?"yes":"no");
+}
+#endif
+
 int main(void) {
+#ifndef ARCH_SCOPE_BASELINE
+    allocator_boundaries();
+#endif
     /* Small models must render even if allocator is unavailable. This fails
      * behaviorally on the previous per-draw-allocation helper. */
     failAlloc=1;model_case(2,0);failAlloc=0;CHECK(allocations==0);

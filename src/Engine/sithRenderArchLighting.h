@@ -34,6 +34,8 @@ static SithRenderArchBuffer* sithRender_AcquireArchBuffer(size_t count)
         grow = slot;
     }
     if (count > (SIZE_MAX - sizeof(SithRenderArchBuffer)) / sizeof(SithRenderMeshLightBinding)) return NULL;
+    /* HostServices.alloc accepts uint32_t bytes, even on a 64-bit host. */
+    if (count > (UINT32_MAX - sizeof(SithRenderArchBuffer)) / sizeof(SithRenderMeshLightBinding)) return NULL;
     SithRenderArchBuffer* buffer = (SithRenderArchBuffer*)SITH_ALLOC(
         sizeof(*buffer) + count * sizeof(buffer->bindings[0]));
     if (!buffer) return NULL;
