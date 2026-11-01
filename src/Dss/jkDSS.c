@@ -1171,20 +1171,13 @@ int jkDSS_ProcessSetTeam(SithMessage *pMsg)
     if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) == 0 || (sithNet_MultiModeFlags & MULTIMODEFLAG_100) == 0 )
         return 1;
 
-    const char* teamModel = NULL;
-    if (Main_bMotsCompat) {
-        teamModel = jkDSS_GetMotsTeamModel(personality, teamNum);
-        if (!teamModel) {
-            return 0;
-        }
-    }
-
     jkPlayer_playerInfos[playerIdx].teamNum = teamNum;
     if ( jkPlayer_playerInfos[playerIdx].pLocalPlayer )
     {
         // MOTS added: personality
         if (Main_bMotsCompat) {
-            v5 = sithModel_Load(teamModel, 1);
+            const char* pTeamModel = jkDSS_GetMotsTeamModel(personality, teamNum);
+            v5 = pTeamModel ? sithModel_Load(pTeamModel, 1) : NULL;
             
             if ( v5 )
             {

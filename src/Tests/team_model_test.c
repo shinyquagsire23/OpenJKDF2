@@ -279,18 +279,20 @@ static void test_invalid(void)
         expect_saber("kk.3do", "ky.snd");
         CHECK(mots_broadcasts == 1 && broadcast_personality == personality);
         for (int no_local_thing = 0; no_local_thing <= 1; ++no_local_thing) {
-            reset("invalid-class-team-no-state-change");
+            reset("invalid-class-team-compatible-update");
             if (no_local_thing) jkPlayer_playerInfos[1].pLocalPlayer = NULL;
             SithPlayer before_infos[4];
             memcpy(before_infos, jkPlayer_playerInfos, sizeof(before_infos));
             SithThing before_player = player;
             message = team_packet(1, 4, personality, 1);
-            CHECK(jkDSS_ProcessSetTeam(&message) == 0);
+            CHECK(jkDSS_ProcessSetTeam(&message) == 1);
+            CHECK(jkPlayer_playerInfos[1].teamNum == 4);
+            before_infos[1].teamNum = 4;
             CHECK(memcmp(before_infos, jkPlayer_playerInfos, sizeof(before_infos)) == 0);
             CHECK(memcmp(&before_player, &player, sizeof(player)) == 0);
             CHECK(model_calls == 0 && model_assignments == 0);
             CHECK(sound_calls == 0 && sound_assignments == 0 && saber_calls == 0);
-            CHECK(scores == 0 && mots_broadcasts == 0 && jk_broadcasts == 0);
+            CHECK(scores == 1 && mots_broadcasts == 0 && jk_broadcasts == 0);
             CHECK(jkDSS_005aec8c == 99);
         }
     }

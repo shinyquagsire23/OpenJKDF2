@@ -3,7 +3,7 @@
 
 Usage: python3 src/Tests/run_team_model_test.py --cc gcc --ubsan
 Independent expectations cover the upstream five-row mapping and ensure
-rejected mappings leave player state and subsequent side effects unchanged.
+lookup misses skip model changes without rejecting otherwise valid team updates.
 Generated fragments and executables live only in a temporary directory.
 """
 
@@ -65,7 +65,7 @@ def extract_production(directory):
 
 def execute(command, directory, environment):
     return subprocess.run(command, cwd=directory, env=environment, capture_output=True,
-                          text=True, errors="replace", timeout=120, check=False)
+                          text=True, encoding="utf-8", errors="replace", timeout=120, check=False)
 
 
 def require_success(result, label):

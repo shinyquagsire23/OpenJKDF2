@@ -1,35 +1,29 @@
-# Team update ordering regression
+# Compatible team update regression
 
-Resolve MotS class/team mappings before player state mutation or score/model/broadcast work.
-
-Run from the repository root with Python 3 and a native GCC/Clang compiler:
+This is test-only coverage of existing upstream behavior. Production `jkDSS.c`
+is unchanged from the upstream base; no team assignment is reordered.
 
 ```sh
 python3 -B src/Tests/run_team_model_test.py --cc gcc --ubsan
 ```
 
-The standard-library-only runner extracts current production code, compiles a
-synthetic fixture with `-Wall -Wextra -Werror`, executes it in a temporary
-directory, and prints production input SHA-256 hashes. It verifies those inputs
-are unchanged. `source_test_utils.py` is self-contained; no unmerged PR or
-fork-only runner is required. No retail data is used.
+The runner extracts upstream's five-row model table, bounded helper, complete
+JK/MotS saber handlers and team handler, using actual packet macros. Literal
+expectations cover valid models and colors. An out-of-range personality returns
+no team model; an otherwise valid active-team request still assigns the team
+and synchronizes scores, with or without a local player thing, without loading
+or broadcasting a replacement model. Invalid player/team requests remain
+rejected; disabled team modes, model-load failures and JK controls are retained.
+A lookup failure and a rejected team request are different outcomes.
 
-The fixture uses upstream's five-row MotS table and helper unchanged and
-independent model-name expectations for personalities 0 through 4 and teams 0
-through 4. It runs complete extracted MotS/JK saber handlers and the team
-handler with actual packet macros. Rejected MotS class mappings preserve all
-player descriptors and the thing, with and without a local player thing, and
-perform no model, sound, saber, score or broadcast side effects. Valid teams,
-missing model loads, disabled team modes, and JK behavior remain covered.
-The historical unsafe table-indexing mutants are intentionally omitted.
+The compatible-behavior test fails against the previously proposed early
+rejection, then passes against the unchanged upstream function. No unsafe
+historical table-index mutant is executed.
+The fixture uses reduced structs and controlled asset/transport callbacks. It
+is not a full engine translation-unit/ABI build, renderer test, retail session
+or joined-peer multiplayer qualification. Temporary files stay outside the
+checkout and production input hashes are checked before and after execution.
 
-This is native host unit coverage with reduced engine stubs. It does not
-establish full engine ABI/link compatibility, platform hardware behavior,
-joined-peer synchronization or multiplayer runtime acceptance. No new
-multiplayer runtime qualification is claimed. The existing platform workflows
-remain responsible for normal engine build coverage.
-
-Adapted from andreipemberton's original synthetic fixtures and fixes in
-CodaLilitari/OpenJKDF2-MotS-Fixes, source snapshot
-`6fa54630a123485d8c7b602c47992613a1f397b5`, preserving current upstream fixes.
-Original contribution: `1bfba38600e2ccee7bbd7fbe5f6b5d947b7cc78a` by andreipemberton.
+Adapted from andreipemberton's original synthetic coverage, contribution
+`1bfba38600e2ccee7bbd7fbe5f6b5d947b7cc78a`, preserved in fork snapshot
+`6fa54630a123485d8c7b602c47992613a1f397b5`; compatibility correction by Coda Lilitari.

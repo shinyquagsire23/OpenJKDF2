@@ -1,4 +1,4 @@
-name: Team update ordering regression
+name: Compatible team model regression
 
 on:
   workflow_dispatch:
