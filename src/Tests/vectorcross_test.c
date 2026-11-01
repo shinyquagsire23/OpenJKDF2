@@ -1,51 +1,30 @@
-/*
- * The runner extracts complete production VectorCross, rdVector_Cross3,
- * PopSymbol/PopVector and PushStack/PushVector functions into the includes.
- * This exercises real vector stack conversion and return placement, rather
- * than a hand-written cross or a mock that supplies preordered operands.
- * Surrounding structs and symbol lookup are deliberately minimal test doubles.
- * Desktop float, uncompressed fixed-stack behavior is tested. Parsing, complete
- * game ABI, compressed/dynamic stacks, and stack overflow are outside scope.
+/* Compile with the production headers and complete source translation units.
+ * Covers the desktop float VM stack and symbol lookup. No script parser, game
+ * initialization, compressed stacks or overflow path is exercised here.
  */
-#include <assert.h>
 #include <math.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "Cog/sithCogExec.h"
+#include "Cog/sithCogFunction.h"
+#include "Cog/sithCogParse.h"
+#include "stdPlatform.h"
 
-#define SITH_ASSERTREL assert
-#define _memset memset
-#define SITHCOGVM_MAX_STACKSIZE 64
-typedef float flex_t;
-typedef float cog_flex_t;
-typedef struct { flex_t x, y, z; } rdVector3;
-typedef struct {
-    uint32_t type;
-    union { int32_t data[3]; cog_flex_t dataAsFloat[3]; intptr_t dataAsPtrs[3]; };
-} SithCogSymbolValue;
-typedef struct { SithCogSymbolValue val; } SithCogSymbol;
-typedef struct { SithCogSymbol symbols[2]; } SithCogSymbolTable;
-typedef struct {
-    SithCogSymbolTable *pSymbolTable;
-    SithCogSymbolValue stack[SITHCOGVM_MAX_STACKSIZE];
-    uint32_t stackPos;
-} sithCog;
+/* This verb is registered by sithCogFunction_Startup, but has no public header
+ * declaration. Keep its real signature here, without copying its body. */
+extern void sithCogFunction_VectorCross(sithCog *pCog);
 
-static SithCogSymbol *sithCogParse_GetSymbolByID(SithCogSymbolTable *table, int32_t id)
+#ifdef OPENJKDF2_FOCUSED_TEST
+HostServices *pSithHS;
+SithCogSymbolTable *sithCog_g_pSymbolTable;
+#endif
+
+static void assertion_failed(const char *expression, const char *file, int line)
 {
-    return table && id >= 0 && id < 2 ? &table->symbols[id] : NULL;
-}
-
-static void stdPlatform_Memcpy32(void *dst, const void *src, size_t size)
-{
-    (void)dst; (void)src; (void)size;
-    fprintf(stderr, "FAIL unexpected stack overflow path\n");
+    fprintf(stderr, "engine assertion: %s (%s:%d)\n", expression, file, line);
     exit(1);
 }
-
-#include "production.inc"
-#include "wrapper.inc"
 
 static unsigned assertions;
 static const char *case_name;
@@ -76,7 +55,7 @@ static void push_argument(sithCog *cog, const rdVector3 *v, int symbol_id, int u
 {
     sithCogExec_PushVector(cog, v);
     if (use_symbol) {
-        check(sithCogExec_PopSymbol(cog, &cog->pSymbolTable->symbols[symbol_id].val), "prepare symbol vector");
+        check(sithCogExec_PopSymbol(cog, &cog->pSymbolTable->aSymbols[symbol_id].val), "prepare symbol vector");
         SithCogSymbolValue ref = {0};
         ref.type = SITHCOG_VALUE_SYMBOLID;
         ref.data[0] = symbol_id;
@@ -86,6 +65,9 @@ static void push_argument(sithCog *cog, const rdVector3 *v, int symbol_id, int u
 
 int main(void)
 {
+    HostServices services = {0};
+    services.assert = assertion_failed;
+    pSithHS = &services;
     static const struct { const char *name; rdVector3 a, b, expected; } cases[] = {
         {"x-cross-y", {1,0,0}, {0,1,0}, {0,0,1}},
         {"y-cross-x", {0,1,0}, {1,0,0}, {0,0,-1}},
@@ -103,7 +85,11 @@ int main(void)
     unsigned runs = 0;
     for (unsigned i = 0; i < sizeof(cases)/sizeof(cases[0]); ++i) {
         for (unsigned mode = 0; mode < 4; ++mode) {
+            SithCogSymbol values[2] = {0};
             SithCogSymbolTable symbols = {0};
+            symbols.aSymbols = values;
+            symbols.numUsedSymbols = 2;
+            symbols.tableSize = 2;
             sithCog cog = {0};
             rdVector3 result;
             cog.pSymbolTable = &symbols;

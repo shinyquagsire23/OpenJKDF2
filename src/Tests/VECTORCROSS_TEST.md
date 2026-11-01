@@ -13,7 +13,7 @@ corrected wrapper call. This contribution adds regression coverage and its
 CI job without changing the production implementation. On that upstream
 source, GCC 13.3 and UBSan pass all 40 case/binding combinations and 520
 assertions, and the old operand-order control fails the expected direction
-assertion. The source hashes are printed by the runner.
+assertion. This paragraph describes the original extractor-based run; the current build is described below.
 
 ## Historical reproduction, 2026-10-26
 
@@ -40,43 +40,48 @@ compensated for the reversed result may need adjustment.
 
 ## Run the regression
 
-From the repository root, using a native GCC or Clang compiler:
+On a Linux host, install a C compiler, CMake, and `cogapp` in a Python virtual
+environment, then run:
 
 ```sh
-python3 src/Tests/run_vectorcross_test.py --cc gcc --ubsan
+python3 -m venv /tmp/openjk-test-venv
+/tmp/openjk-test-venv/bin/pip install cogapp
+/tmp/openjk-test-venv/bin/python src/Tests/run_vectorcross_test.py --cc gcc --ubsan
 ```
 
-Python's standard library is sufficient. No engine build, game assets,
-submodules, or third-party Python packages are required. Omit `--ubsan` only
-when the compiler lacks UndefinedBehaviorSanitizer. `--source-root PATH` can
-select an explicit source checkout or snapshot.
+The runner delegates to `cmake -S src/Tests/cmake/vectorcross`, builds serially in a temporary
+directory, and invokes CTest. Its build and test subprocesses have deadlines.
+It does not extract or modify source text. No game assets or submodules are
+needed. The normal `globals.h.cog` generator supplies the real declarations.
 
-The runner extracts the complete current production bodies of
-`sithCogFunction_VectorCross`, `rdVector_Cross3`, `sithCogExec_PopSymbol`,
-`sithCogExec_PopVector`, `sithCogExec_PushStack`, and
-`sithCogExec_PushVector`, plus the current COG value enum. It compiles those
-bodies with the sibling test harness in a temporary directory and removes
-the generated files on exit.
+The target compiles complete `sithCogFunction.c`, `sithCogExec.c`,
+`sithCogParse.c`, `rdVector.c`, `stdPlatform.c`, and `jk.c` translation units
+with the fixture and production headers. Unused functions are removed by
+linker section GC; this is a host regression, not a complete engine link.
+The fixture supplies only the host-services and global-symbol-table roots;
+symbol lookup, stack conversion, vector math, and the verb are production code.
 
-Ten vector cases cover standard axes in both orders, signed nontrivial
-integer and fractional vectors, parallel vectors, and zero vectors. Each
-runs with literal/literal, symbol/literal, literal/symbol, and symbol/symbol
-arguments. Checks include result type and components, consumption of two
-arguments, exactly one return value, and preservation of an underlying
-stack sentinel: **40 case/binding combinations and 520 assertions**.
+Ten vector cases cover axes in both orders, signed integer and fractional
+vectors, parallel vectors, and zero vectors, each with four literal/symbol
+bindings. Result type/components, stack consumption, and the underlying
+sentinel give **40 case/binding combinations and 520 assertions**. The test
+oracle uses mathematical results, with no dependency on production local
+variable names or expression spelling. Historical negative-control evidence
+above remains distinct from this normal test command.
 
-The runner then restores only the old wrapper operand order and requires
-that mutation to fail the `X × Y = +Z` assertion. It also verifies that its
-production source inputs remained unchanged and prints their hashes.
-
+A full configured game build also exposes `vectorcross_test` and CTest when
+`-DTARGET_BUILD_TESTS=ON` is set on macOS, retaining the existing platform gate. That target links
+`sith_engine` and requires its usual dependencies and generated globals. It has not been
+configured or linked in the Linux host validation.
+This is an additional entry point, not a claim that the small host CI run
+has built or initialized the full engine.
 
 ## Scope
 
-The test uses actual production wrapper, vector-math and stack-conversion
-functions with minimal surrounding structs and a symbol-lookup test
-double. It covers desktop float values with uncompressed, fixed stacks.
-It does not compile the parser or the complete engine, certify the game
-ABI, exercise compressed/dynamic stacks or stack overflow, or establish
-multiplayer/gameplay behavior. The pre-fix game probe and the compiled
-regression are separate evidence; a rebuilt game's acceptance remains a
-separate check.
+The host target uses the real desktop QOL float, uncompressed fixed-stack
+structures. It compiles the parser TU for its real symbol lookup but does
+not parse a COG script or initialize a game. Compressed/dynamic stacks,
+overflow behavior, multiplayer and gameplay remain separate acceptance.
+The upstream baseline's PushStack overflow-size expression produces a
+compiler warning with the real QOL stack size; the path is not exercised
+here and its separate element-size fix is outside this regression PR.

@@ -78,7 +78,7 @@ option(OPENJKDF2_DROIDWORKS "Build the DroidWorks app layer (src/Dw, -droidworks
 # Options for compiling
 if(DEFINED ENV{TARGET_BUILD_TESTS})
     set(TARGET_BUILD_TESTS $ENV{TARGET_BUILD_TESTS})
-else()
+elseif(NOT DEFINED TARGET_BUILD_TESTS)
     set(TARGET_BUILD_TESTS FALSE)
 endif()
 
@@ -318,6 +318,19 @@ else()
         target_compile_options(sith_engine PRIVATE -fsanitize=address -fno-omit-frame-pointer -g)
         target_compile_options(${BIN_NAME} PRIVATE -fsanitize=address -fno-omit-frame-pointer -g)
         target_link_options(${BIN_NAME} PRIVATE -fsanitize=address)
+    endif()
+
+    # Optional full-engine regression; the small host entry is src/Tests/cmake/vectorcross/CMakeLists.txt.
+    if(TARGET_BUILD_TESTS AND TARGET_MACOS AND NOT EXPERIMENTAL_FIXED_POINT)
+        enable_testing()
+        add_executable(vectorcross_test src/Tests/vectorcross_test.c)
+        add_dependencies(vectorcross_test generate_globals)
+        target_link_libraries(vectorcross_test PRIVATE ${SDL2_COMMON_LIBS} sith_engine)
+        if(TARGET_MACOS)
+            macos_target_add_standard_deps(vectorcross_test)
+        endif()
+        add_test(NAME vectorcross COMMAND vectorcross_test)
+        set_tests_properties(vectorcross PROPERTIES TIMEOUT 30)
     endif()
 
     if(TARGET_BUILD_TESTS AND TARGET_MACOS)

@@ -7,7 +7,15 @@ on:
       - .github/workflows/vectorcross-regression.yml
       - src/Cog/**
       - src/Primitives/rdVector.c
-      - src/types_enums.h
+      - src/**/*.h
+      - src/types*.h
+      - src/engine_config.h
+      - src/globals.h.cog
+      - symbols.syms
+      - src/jk.*
+      - src/stdPlatform.*
+      - src/Tests/cmake/vectorcross/CMakeLists.txt
+      - CMakeLists.txt
       - src/Tests/*vectorcross*
       - src/Tests/VECTORCROSS_TEST.md
   push:
@@ -16,7 +24,15 @@ on:
       - .github/workflows/vectorcross-regression.yml
       - src/Cog/**
       - src/Primitives/rdVector.c
-      - src/types_enums.h
+      - src/**/*.h
+      - src/types*.h
+      - src/engine_config.h
+      - src/globals.h.cog
+      - symbols.syms
+      - src/jk.*
+      - src/stdPlatform.*
+      - src/Tests/cmake/vectorcross/CMakeLists.txt
+      - CMakeLists.txt
       - src/Tests/*vectorcross*
       - src/Tests/VECTORCROSS_TEST.md
 
@@ -36,5 +52,11 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Test the production wrapper and stack helpers
-        run: python3 -B src/Tests/run_vectorcross_test.py --cc gcc --ubsan
+      - name: Install build tools and globals generator
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes build-essential cmake python3-venv
+          python3 -m venv "$RUNNER_TEMP/vectorcross-venv"
+          "$RUNNER_TEMP/vectorcross-venv/bin/pip" install cogapp
+      - name: Test the compiled production wrapper and stack helpers
+        run: '"$RUNNER_TEMP/vectorcross-venv/bin/python" -B src/Tests/run_vectorcross_test.py --cc gcc --ubsan'
