@@ -1,46 +1,70 @@
-"""CMake driver for focused source regressions; no source-text extraction."""
-import argparse
+"""Shared source extraction and native-test helpers; no game assets required."""
+
 import os
-from pathlib import Path
+import re
+import shutil
 import subprocess
-import signal
 import sys
-import tempfile
+
+def unique_match(pattern, text, description):
+    matches = list(re.finditer(pattern, text, re.MULTILINE))
+    if len(matches) != 1:
+        raise RuntimeError(
+            f"Expected one {description}; found {len(matches)}. "
+            "Review the extractor against the current production source."
+        )
+    return matches[0]
 
 
-def run_checked(command, timeout):
-    """Bound the whole POSIX build process group, including compiler children."""
-    process = subprocess.Popen(command, start_new_session=True)
-    try:
-        code = process.wait(timeout=timeout)
-    except subprocess.TimeoutExpired:
-        try:
-            os.killpg(process.pid, signal.SIGKILL)
-        except ProcessLookupError:
-            pass
-        process.wait(timeout=5)
-        raise
-    if code:
-        raise subprocess.CalledProcessError(code, command)
+def extract_block(text, marker, description):
+    """Include the complete brace-delimited body, ignoring comments/literals."""
+    match = unique_match(marker, text, description)
+    opening = text.index("{", match.start())
+    tokens = re.finditer(
+        r'/\*.*?\*/|//[^\n]*|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'|[{}]',
+        text[opening:],
+        re.DOTALL,
+    )
+    depth = 0
+    for token in tokens:
+        if token.group() == "{":
+            depth += 1
+        elif token.group() == "}":
+            depth -= 1
+            if depth == 0:
+                return text[match.start():opening + token.end()]
+    raise RuntimeError(f"Unbalanced production body: {description}")
 
 
-def run(suite):
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--source-root", type=Path, default=Path(__file__).resolve().parents[2])
-    parser.add_argument("--cc", default=os.environ.get("CC", "cc"))
-    parser.add_argument("--ubsan", action="store_true")
-    args = parser.parse_args()
-    if not sys.platform.startswith("linux"):
-        parser.error("the focused host target requires Linux; use the normal engine build on other platforms")
-    with tempfile.TemporaryDirectory(prefix="openjk-" + suite + "-") as build:
-        run_checked(["cmake", "-S", str(args.source_root / "src/Tests/cmake/ported-fixes"), "-B", build,
-                        "-DCMAKE_C_COMPILER=" + args.cc,
-                        "-DPython3_EXECUTABLE=" + sys.executable,
-                        "-DENABLE_UBSAN=" + ("ON" if args.ubsan else "OFF")], timeout=60)
-        targets = [suite + "_test"]
-        if suite == "bitmap":
-            targets.append("bitmap_sdl_test")
-        run_checked(["cmake", "--build", build, "--parallel", "1", "--target", *targets],
-                       timeout=120)
-        run_checked(["ctest", "--test-dir", build, "--output-on-failure", "-V", "-R", "^" + suite],
-                       timeout=75)
+def write_fragment(directory, name, text):
+    with (directory / name).open("w", encoding="utf-8", newline="\n") as output:
+        output.write(text + "\n")
+
+
+def find_compiler(requested):
+    candidates = [requested] if requested else ["gcc", "clang", "cc"]
+    for name in candidates:
+        compiler = shutil.which(name)
+        if compiler:
+            return compiler
+    raise RuntimeError(
+        "Native GCC/Clang compiler not found. Set --cc to its executable path "
+        "or add gcc/clang to PATH; do not select a cross compiler."
+    )
+
+
+def execute(command, directory, environment, timeout):
+    return subprocess.run(
+        command, cwd=directory, env=environment, capture_output=True,
+        text=True, errors="replace", timeout=timeout, check=False,
+    )
+
+
+def require_success(result, description):
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"{description} exited {result.returncode}\n"
+            f"{result.stdout}{result.stderr}"
+        )
+    if result.stderr:
+        print(result.stderr, file=sys.stderr, end="")

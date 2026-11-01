@@ -21,6 +21,7 @@ on:
       - src/Tests/*bitmap*
       - src/Tests/*material*
       - src/Tests/source_test_utils.py
+      - src/Tests/source_build_test_utils.py
       - docs/ported-fix-regressions.md
       - .github/workflows/ported-fix-regressions.yml
   push:
@@ -43,6 +44,7 @@ on:
       - src/Tests/*bitmap*
       - src/Tests/*material*
       - src/Tests/source_test_utils.py
+      - src/Tests/source_build_test_utils.py
       - docs/ported-fix-regressions.md
       - .github/workflows/ported-fix-regressions.yml
 
