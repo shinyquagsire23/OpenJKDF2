@@ -427,7 +427,9 @@ int rdModel3_LoadEntry(char *pFilename, rdModel3 *pModel3)
                 v36 = _atoi(tmpTxt);
                 face->num = j;
                 // Added: model->sizeMaterials bounds
-                if (v36 > pModel3->sizeMaterials) {
+                // Altered: compare as signed, so -1 (no material, as in JK.EXE) is not promoted to UINT32_MAX
+                // and clamped to the last material, and clamp an index equal to sizeMaterials as well
+                if (v36 >= 0 && (uint32_t)v36 >= pModel3->sizeMaterials) {
                     v36 = pModel3->sizeMaterials-1;
                 }
                 else if (v36 < 0 && v36 != -1) {
