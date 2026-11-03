@@ -99,6 +99,22 @@ static jkGuiElement jkGuiMouse_aElements[26] =
 
 static jkGuiMenu jkGuiMouse_menu = {jkGuiMouse_aElements, 0, 225, 255, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, (intptr_t)&jkGUIMouse_listbox_paddings, NULL, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
+static void jkGuiMouse_SetSensitivity(jkGuiMouseSubEntry* pEntry, flex_t sensitivity)
+{
+    pEntry->field_8 = sensitivity;
+#ifdef QOL_IMPROVEMENTS
+    // Altered: Share look sensitivity between mouse X and Y; keep the wheel independent.
+    if (pEntry == jkGuiMouse_aEntries[0].pSubEnt || pEntry == jkGuiMouse_aEntries[1].pSubEnt)
+    {
+        for (int32_t i = 0; i < 2; ++i)
+        {
+            if (jkGuiMouse_aEntries[i].pSubEnt)
+                jkGuiMouse_aEntries[i].pSubEnt->field_8 = sensitivity;
+        }
+    }
+#endif
+}
+
 void jkGuiMouse_SensitivityDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, BOOL redraw)
 {
 #ifdef QOL_IMPROVEMENTS
@@ -175,7 +191,7 @@ void jkGuiMouse_sub_416D40(jkGuiMenu *pMenu, int a2)
                     v6 = (flex_d_t)(jkGuiMouse_aElements[20].selectedTextEntry - 100) * (3.0 / 100.0) - -1.0;
                 else
                     v6 = (flex_d_t)jkGuiMouse_aElements[20].selectedTextEntry * (1.0/100.0);
-                v5->field_8 = v6;
+                jkGuiMouse_SetSensitivity(v5, v6);
             }
             if ( jkGuiMouse_aElements[18].bIsVisible )
                 v5->bitflag = v5->bitflag & ~8u | (jkGuiMouse_aElements[18].selectedTextEntry != 0 ? 8 : 0);
@@ -686,7 +702,7 @@ int jkGuiMouse_Show()
             v2 = (flex_d_t)(jkGuiMouse_aElements[20].selectedTextEntry - 100) * (3.0 / 100.0) - -1.0;
         else
             v2 = (flex_d_t)jkGuiMouse_aElements[20].selectedTextEntry * (1.0/100.0);
-        pSubEnt->field_8 = v2;
+        jkGuiMouse_SetSensitivity(pSubEnt, v2);
     }
     if ( jkGuiMouse_aElements[18].bIsVisible )
         pSubEnt->bitflag = pSubEnt->bitflag & ~8u | (jkGuiMouse_aElements[18].selectedTextEntry != 0 ? 8 : 0);
