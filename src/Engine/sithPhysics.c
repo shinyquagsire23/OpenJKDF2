@@ -39,8 +39,10 @@ void sithPhysics_FindFloor(SithThing *pThing, int bNoThingStateUpdate)
     if (!pThing->sector)
         return;
 
-    // There are no floors underwater, unless you're the player
-    if ((pThing->sector->flags & SITH_SECTOR_UNDERWATER) && pThing->type == SITH_THING_PLAYER)
+    // Added: Extend water-surface detection to AI actors using the
+    // existing underwater collision search.
+    if ((pThing->sector->flags & SITH_SECTOR_UNDERWATER) &&
+        (pThing->type == SITH_THING_PLAYER || pThing->type == SITH_THING_ACTOR))
     {
         sithCollision_SearchForCollisions(pThing->sector, pThing, &pThing->position, &rdroid_zVector3, 0.05, 0.0, RAYCAST_1);
         v5 = sithCollision_PopStack();
@@ -746,6 +748,13 @@ void sithPhysics_UpdateUnderwaterThingPhysics(SithThing *pThing, flex_t secDelta
     }
     if ( (pThing->physicsParams.flags & SITH_PF_ONWATERSURFACE) != 0 && pThing->physicsParams.acceleration.z >= 0.0 )
     {
+        // Added: Prevent swimming actors from continuing to rise when they
+        // reach the water surface by clearing upward velocity.
+        if (pThing->type == SITH_THING_ACTOR && pThing->physicsParams.vel.z > 0.0)
+        {
+            pThing->physicsParams.vel.z = 0.0;
+            pThing->physicsParams.deltaVelocity.z = 0.0;
+        }
         v51 = pThing->field_48 - 0.01;
         if ( pThing->physicsParams.deltaVelocity.z > 0.0 && pThing->physicsParams.deltaVelocity.z < (flex_d_t)secDeltaTime * 0.2 ) // verify first
             pThing->physicsParams.deltaVelocity.z = 0.0;
