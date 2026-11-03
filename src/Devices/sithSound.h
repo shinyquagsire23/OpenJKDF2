@@ -25,6 +25,7 @@ void sithSound_FreeWorldSounds(SithWorld *pWorld);
 int sithSound_New(SithWorld *world, int num);
 sithSound* sithSound_Load(char *sound_fname, int a2);
 sithSound* sithSound_GetFromIdx(int idx);
+sithSound* sithSound_GetWorldSoundByIndex(SithWorld *world, int idx);
 int sithSound_LoadFileData(sithSound *sound);
 int sithSound_UnloadData(sithSound *sound);
 stdSound_buffer_t* sithSound_LoadData(sithSound *sound);

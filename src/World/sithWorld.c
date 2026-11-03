@@ -106,8 +106,14 @@ int sithWorld_Startup()
 
 void sithWorld_Shutdown()
 {
-    if ( sithWorld_g_pCurrentWorld )
+    if ( sithWorld_g_pCurrentWorld ) {
+#ifdef NO_JK_MMAP
+        // Added: release sound pages before the shutdown fallback frees their world.
+        if (sithWorld_g_pCurrentWorld->sounds)
+            sithSound_FreeWorldSounds(sithWorld_g_pCurrentWorld);
+#endif
         SITH_FREE(sithWorld_g_pCurrentWorld);
+    }
     if ( sithWorld_g_pStaticWorld ) {
         //SITH_FREE(sithWorld_g_pStaticWorld); // Added: Actually free everything
         sithWorld_FreeEntry(sithWorld_g_pStaticWorld); // Added: Actually free everything
@@ -910,7 +916,10 @@ void sithWorld_GetMemoryUsage(SithWorld *pWorld, int *aMemUsed, int *aCount)
     aCount[6] = pWorld->numSoundsLoaded;
     for (int i = 0; i < pWorld->numSoundsLoaded; i++)
     {
-        aMemUsed[6] += pWorld->sounds[i].bufferBytes + sizeof(sithSound);
+        // Altered: include loaded sound headers from stable overflow pages.
+        sithSound *sound = sithSound_GetWorldSoundByIndex(pWorld, i);
+        if (sound)
+            aMemUsed[6] += sound->bufferBytes + sizeof(sithSound);
     }
     aCount[8] = pWorld->numCogScripts;
     for (int i = 0; i < pWorld->numCogScripts; i++)
