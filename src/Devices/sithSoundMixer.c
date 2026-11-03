@@ -457,9 +457,7 @@ sithPlayingSound* sithSoundMixer_PlaySoundThing(sithSound *hSnd, SithThing *pThi
     }
     if ( (playflags & SITHSOUNDFLAG_LOOP) != 0 || (sithCamera_g_pCurCamera && (v34 <= maxRadius)) )
     {
-        // Fixed: parenthesized the priority mask to match JK.EXE (test bh, 3). Unparenthesized, this was
-        // ((playflags & SITHSOUNDFLAG_HIGHEST_PRIO) | SITHSOUNDFLAG_HIGHPRIO) == 0, which is never true,
-        // so the voice gate below never ran and an actor's voice sounds could overlap.
+        // Altered: parenthesized the priority bits (JK.EXE tests both); without them this was never true and the voice gate never ran
         if ( (pThing->type == SITH_THING_ACTOR || pThing->type == SITH_THING_PLAYER) && (playflags & SITHSOUNDFLAG_VOICE) != 0 && (playflags & (SITHSOUNDFLAG_HIGHEST_PRIO|SITHSOUNDFLAG_HIGHPRIO)) == 0 )
         {
             if ( pThing->actorParams.field_1BC > sithTime_g_msecGameTime )
