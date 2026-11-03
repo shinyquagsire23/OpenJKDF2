@@ -31,6 +31,112 @@
 #include <errno.h>
 #endif
 
+#if defined(PLATFORM_POSIX) && !defined(WIN32)
+// Added: build a complete search pattern or fail, rather than storing a
+// truncated directory/filter in the fixed-size legacy search structure.
+static int stdFileUtil_PrepareSearchPath(char* pOut, size_t outSize,
+    const char* pPath, int mode, const char* pFilter)
+{
+    char aDirectory[sizeof(((stdFileSearch*)0)->path)];
+    const char* pExtension = "*";
+    size_t pathLen;
+    int written;
+
+    if (!pOut || !outSize) return 0;
+    pOut[0] = 0;
+    if (!pPath || mode < 0 || mode > 3) return 0;
+    if (mode == 3) {
+        if (!pFilter) return 0;
+        pExtension = *pFilter == '.' ? pFilter + 1 : pFilter;
+        if (strpbrk(pExtension, "/\\")
+            || (strchr(pExtension, '*') && strcmp(pExtension, "*"))) return 0;
+    }
+    if (strlen(pExtension) >= outSize) return 0;
+    pathLen = strlen(pPath);
+    if (pathLen >= sizeof(aDirectory)) return 0;
+
+    // Added: an empty directory means the current directory. Normalize the
+    // separators before case correction, and keep an absolute root intact.
+    if (!pathLen) {
+        strcpy(aDirectory, ".");
+        pathLen = 1;
+    }
+    else {
+        memcpy(aDirectory, pPath, pathLen + 1);
+    }
+    for (size_t i = 0; i < pathLen; ++i) {
+        if (aDirectory[i] == '\\') aDirectory[i] = '/';
+    }
+    while (pathLen > 1 && aDirectory[pathLen - 1] == '/') {
+        aDirectory[--pathLen] = 0;
+    }
+
+#ifdef FS_POSIX
+    // Added: preserve stdFnames_MakePath's existing case correction without
+    // letting its path concatenation truncate the search pattern.
+    char aCasedDirectory[sizeof(aDirectory) + 16];
+    if (casepath(aDirectory, aCasedDirectory)) {
+        const char* pCased = aCasedDirectory;
+        if (pCased[0] == '.' && pCased[1] == '/') pCased += 2;
+        pathLen = strlen(pCased);
+        if (!pathLen || pathLen >= sizeof(aDirectory)) return 0;
+        memcpy(aDirectory, pCased, pathLen + 1);
+    }
+#endif
+
+    written = snprintf(pOut, outSize, "%s%s*.%s", aDirectory,
+        aDirectory[pathLen - 1] == '/' ? "" : "/", pExtension);
+    if (written < 0 || (size_t)written >= outSize) {
+        pOut[0] = 0;
+        return 0;
+    }
+    return 1;
+}
+
+// Added: inspect the final pattern component before removing it. A missing
+// separator means the current directory; '/' must never become an empty path.
+static int stdFileUtil_PrepareSearchDirectory(const char* pPath, size_t pathSize,
+    char* pOut, size_t outSize, const char** ppExtension)
+{
+    const char* pEnd;
+    const char* pPattern;
+    size_t directoryLen;
+
+    if (!pPath || !pOut || !outSize || !ppExtension) return 0;
+    pOut[0] = 0;
+    *ppExtension = NULL;
+    pEnd = memchr(pPath, 0, pathSize);
+    if (!pEnd) return 0;
+    pPattern = pPath;
+    for (const char* p = pPath; p < pEnd; ++p) {
+        if (*p == '/' || *p == '\\') pPattern = p + 1;
+    }
+    if (pEnd - pPattern < 2 || pPattern[0] != '*' || pPattern[1] != '.') return 0;
+    if (strchr(pPattern + 2, '*') && strcmp(pPattern, "*.*")) return 0;
+
+    directoryLen = (size_t)(pPattern - pPath);
+    if (!directoryLen) {
+        if (outSize < 2) return 0;
+        strcpy(pOut, ".");
+    }
+    else {
+        // Altered: only remove actual trailing separators, keeping the root.
+        while (directoryLen > 1
+            && (pPath[directoryLen - 1] == '/' || pPath[directoryLen - 1] == '\\')) {
+            --directoryLen;
+        }
+        if (directoryLen >= outSize) return 0;
+        memcpy(pOut, pPath, directoryLen);
+        pOut[directoryLen] = 0;
+        for (size_t i = 0; i < directoryLen; ++i) {
+            if (pOut[i] == '\\') pOut[i] = '/';
+        }
+    }
+    if (strcmp(pPattern, "*.*")) *ppExtension = strrchr(pPattern, '.');
+    return 1;
+}
+#endif
+
 stdFileSearch* stdFileUtil_NewFind(const char *path, int mode, const char *pFilter)
 {
     stdFileSearch* search = (stdFileSearch *)STD_ALLOC(sizeof(stdFileSearch));
@@ -39,6 +145,14 @@ stdFileSearch* stdFileUtil_NewFind(const char *path, int mode, const char *pFilt
     }
     _memset(search, 0, sizeof(stdFileSearch));
 
+#if defined(PLATFORM_POSIX) && !defined(WIN32)
+    // Added: reject unsupported/incomplete patterns before any enumeration.
+    if (!stdFileUtil_PrepareSearchPath(search->path, sizeof(search->path), path, mode, pFilter)) {
+        STD_FREE(search);
+        return NULL;
+    }
+    if (mode <= 2) return search;
+#else
     if ( mode < 0 )
         return search;
     if ( mode <= 2 )
@@ -60,8 +174,7 @@ stdFileSearch* stdFileUtil_NewFind(const char *path, int mode, const char *pFilt
             search->path[i] = '/';
     }
 #endif
-
-
+#endif
 
     stdPlatform_Printf("OpenJKDF2: %s %s\n", __func__, search->path);
     
@@ -331,7 +444,7 @@ int stdFileUtil_Deltree(const char* lpPathName)
 
 #if defined(PLATFORM_POSIX) && !defined(WIN32)
 
-static char* search_ext = "";
+static const char* search_ext = "";
 
 /* when return 1, scandir will put this dirent to the list */
 static int parse_ext(const struct dirent *dir)
@@ -363,7 +476,7 @@ static int parse_ext(const struct dirent *dir)
 int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2)
 {
     struct dirent *iter;
-    char tmp[128];
+    char tmp[sizeof(a1->path)];
 
     if ( !a1 )
         return 0;
@@ -371,56 +484,38 @@ int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2)
     // Added: isNotFirst is 1 + the index of the next namelist entry to return.
     if (!a1->isNotFirst)
     {
-#ifdef TARGET_DREAMCAST
-        // Added: asset directories (resource/, episode/, ...) live on the GD-ROM;
-        // route their listing to the asset root. Writable dirs (player/) fall
-        // through to the getcwd() path below, i.e. the writable CWD.
-        if (dcStorage_ResolveAssetPath(a1->path, tmp, 128)) {
-        }
-        else {
-            getcwd(tmp, 128-1);
-            strncat(tmp, "/", 128-1);
-            strncat(tmp, a1->path, 128-1);
-        }
-#elif defined(TARGET_RETRO_HOMEBREW)
-        getcwd(tmp, 128-1);
-        //strncpy(tmp, pcwd, 128-1);
-        strncat(tmp, "/", 128-1);
-        strncat(tmp, a1->path, 128-1);
-#else
-        strncpy(tmp, a1->path, 128);
-#endif
+        // Added: a failed preparation is an empty search until FindReset.
+        a1->isNotFirst = 1;
+        if (!stdFileUtil_PrepareSearchDirectory(a1->path, sizeof(a1->path),
+            tmp, sizeof(tmp), &search_ext)) return 0;
 
-        // Clear out extension
-        // TODO: ehhhh
-        if (!strcmp(strrchr(tmp,'*'), "*")) {
-            *strrchr(tmp,'.') = 0;
-            *strrchr(tmp,'*') = 0;
-            search_ext = strrchr(a1->path,'.');
-            search_ext = NULL;
-        }
-        else
-        {
-            *strrchr(tmp,'.') = 0;
-            *strrchr(tmp,'*') = 0;
-            search_ext = strrchr(a1->path,'.');
-        }
-        
-        for (int i = 0; i < strlen(tmp); i++)
-        {
-            if (tmp[i] == '\\') {
-                tmp[i] = '/';
-            }
-        }
-        if (tmp[strlen(tmp)-1] = '/') {
-            tmp[strlen(tmp)-1] = 0;
-        }
+        const char* pDirectory = tmp;
 
 #ifdef TARGET_RETRO_HOMEBREW
+        // Added: the Dreamcast asset root and the search path each fit 128
+        // bytes. Reserve room for both instead of truncating the resolved path.
+        char aResolvedDirectory[sizeof(a1->path) * 2];
+#ifdef TARGET_DREAMCAST
+        // Added: retain GD-ROM asset routing and writable-CWD fallback. An
+        // explicit current directory or absolute root keeps its own meaning.
+        if (strcmp(tmp, ".")
+            && dcStorage_ResolveAssetPath(tmp, aResolvedDirectory, sizeof(aResolvedDirectory))) {
+            pDirectory = aResolvedDirectory;
+        }
+        else
+#endif
+        if (tmp[0] != '/') {
+            char aCwd[sizeof(aResolvedDirectory)];
+            if (!getcwd(aCwd, sizeof(aCwd))) return 0;
+            size_t cwdLen = strlen(aCwd);
+            int written = snprintf(aResolvedDirectory, sizeof(aResolvedDirectory), "%s%s%s",
+                aCwd, cwdLen && aCwd[cwdLen - 1] == '/' ? "" : "/", tmp);
+            if (written < 0 || (size_t)written >= sizeof(aResolvedDirectory)) return 0;
+            pDirectory = aResolvedDirectory;
+        }
         errno = 0;
 #endif
-        a1->nFoundFiles = scandir(tmp, &a1->namelist, search_ext ? parse_ext : NULL, alphasort);
-        a1->isNotFirst = 1;
+        a1->nFoundFiles = scandir(pDirectory, &a1->namelist, search_ext ? parse_ext : NULL, alphasort);
 
         if (!a1->namelist || a1->nFoundFiles <= 0) return 0;
     }
