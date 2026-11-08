@@ -242,6 +242,22 @@ void jkCog_SetWeaponMesh(sithCog *ctx)
     }
 }
 
+// Added: Extended jkEndLevel modes for direct level transitions.
+//
+// jkEndLevel(0) - Normal transition using alternate episode path.
+// jkEndLevel(1) - Normal transition using primary episode path.
+// jkEndLevel(2) - Direct transition using primary episode path.
+// jkEndLevel(3) - Direct transition using alternate episode path.
+//
+// Modes 2 and 3 bypass the end-level statistics and Force power
+// allocation screens while retaining normal episode progression.
+//
+// Vanilla JK/MotS compatibility:
+// Vanilla treats nonzero arguments as the primary episode path.
+// Therefore, jkEndLevel(2) performs a normal primary-path transition
+// with the standard end-level screens in vanilla engines.
+// Note: jkEndLevel(3) also follows the primary path in vanilla,
+// rather than the alternate path used by modified OpenJKDF2.
 void jkCog_EndLevel(sithCog* ctx)
 {
     // Added: Direct level transition modes for jkEndLevel
