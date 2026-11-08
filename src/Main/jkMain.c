@@ -1234,9 +1234,29 @@ int jkMain_cd_swap_reverify(jkEpisodeEntry *ent)
     //if ( !v4 )
     //    return jkMain_StartNextLevelInEpisode(0, 1);
 
-    // Added: Cutscenes disabled
-    if ( jkPlayer_setDisableCutscenes )
+// Added: Cutscenes disabled
+    if (jkPlayer_setDisableCutscenes)
         return jkMain_StartNextLevelInEpisode(0, 1);
+
+    // Added: Allow JKL files to be used as CUT episode entries.
+    // These cinematic levels are skipped entirely when cutscenes are disabled.
+    const char* pExt = strrchr(ent->fileName, '.');
+
+    if (pExt && !__strcmpi(pExt, ".jkl"))
+    {
+        // Added: Load a cinematic JKL using the normal level-loading state.
+        stdString_SafeStrCopy(jkMain_aLevelJklFname, ent->fileName, 128);
+
+        jkSmack_gameMode = 0;
+
+        if (jkGuiRend_menuNestDepth)
+            jkGuiRend_bStateChangePending = 1;
+
+        jkSmack_stopTick = 1;
+        jkSmack_nextGuiState = JK_GAMEMODE_GAMEPLAY;
+
+        return 1;
+    }
 
     _sprintf(v9, "video%c%s", 92, ent->fileName);
     if ( !util_FileExists(v9) ) {
