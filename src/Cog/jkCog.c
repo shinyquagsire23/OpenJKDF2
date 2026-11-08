@@ -242,19 +242,28 @@ void jkCog_SetWeaponMesh(sithCog *ctx)
     }
 }
 
-void jkCog_EndLevel(sithCog *ctx)
+void jkCog_EndLevel(sithCog* ctx)
 {
-    int v1; // esi
+    // Added: Direct level transition modes for jkEndLevel
+    int mode = sithCogExec_PopInt(ctx);
+    int bIsAPath = (mode == 3) ? 0 : (mode != 0);
 
-    v1 = sithCogExec_PopInt(ctx) != 0;
-    if ( sithNet_isMulti )
+    if (sithNet_isMulti)
     {
-        if ( sithNet_isServer )
+        if (sithNet_isServer)
             jkDSS_SendEndLevel();
     }
     else
     {
-        jkMain_EndLevel(v1);
+        // Added: Modes 2 and 3 bypass the end-level screens
+        if (mode == 2 || mode == 3)
+        {
+            jkMain_NextLevelDirect(bIsAPath);
+        }
+        else
+        {
+            jkMain_EndLevel(bIsAPath);
+        }
     }
 }
 

@@ -131,6 +131,7 @@ int jkMain_MissionReload();
 int jkMain_MenuReturn();
 
 int jkMain_EndLevel(int bIsAPath);
+int jkMain_NextLevelDirect(int bIsAPath);  // Added: Direct level transition modes for jkEndLevel
 void jkMain_CdSwitchShow(int a1, int a2);
 void jkMain_VideoShow(int a1, int a2);
 void jkMain_VideoTick(int a2);

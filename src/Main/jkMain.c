@@ -52,6 +52,9 @@
 #include "Dss/jkDSS.h"
 #include "stdPlatform.h"
 
+// Added: Direct level transition modes for jkEndLevel
+static int jkMain_bDirectLevelTransition = 0;
+
 #if defined(TARGET_RETRO_HOMEBREW)
 #define TICKRATE_MS (0) // no cap
 #elif defined(QOL_IMPROVEMENTS)
@@ -1130,8 +1133,14 @@ int jkMain_StartNextLevelInEpisode(int a1, int bIsAPath)
         jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
         return 0;
     }
-    if ( v3->level == v2->level || jkSmack_currentGuiState == JK_GAMEMODE_ENDLEVEL )
+    // Added: Direct level transition modes for jkEndLevel - Begin
+    if (v3->level == v2->level
+        || jkSmack_currentGuiState == JK_GAMEMODE_ENDLEVEL
+        || jkMain_bDirectLevelTransition)
     {
+        jkMain_bDirectLevelTransition = 0;
+        // Added: Direct level transition modes for jkEndLevel - End
+
         if ( v2->type == 1 && jkSmack_currentGuiState == JK_GAMEMODE_GAMEPLAY )
         {
             if ( jkGuiRend_menuNestDepth )
@@ -1335,6 +1344,25 @@ int jkMain_MenuReturn()
         jkGuiRend_bStateChangePending = 1;
     jkSmack_stopTick = 1;
     jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
+    return result;
+}
+
+// Added: Direct level transition modes for jkEndLevel
+int jkMain_NextLevelDirect(int bIsAPath)
+{
+    int result;
+
+    // Added: Ensure the next episode entry is selected
+    jkPlayer_bLoadingSomething = 1;
+
+    // Added: Bypass end-level statistics and Force power screens
+    jkMain_bDirectLevelTransition = 1;
+
+    result = jkMain_EndLevel(bIsAPath);
+
+    // Added: Prevent the bypass flag from affecting later transitions
+    jkMain_bDirectLevelTransition = 0;
+
     return result;
 }
 
