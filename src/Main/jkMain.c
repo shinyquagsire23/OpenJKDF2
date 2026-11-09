@@ -31,6 +31,7 @@
 #include "Gui/jkGUITitle.h"
 #include "Gui/jkGUIDialog.h"
 #include "Gui/jkGUIEsc.h"
+#include "Gui/jkGUISingleplayer.h"
 #include "Gui/jkGUISingleTally.h"
 #include "Gui/jkGUIMultiplayer.h"
 #include "Gui/jkGUIDisplay.h"
@@ -65,6 +66,11 @@ char jkMain_motsIdk[128];
 
 jkEpisodeEntry* jkMain_pEpisodeEnt = NULL;
 jkEpisodeEntry* jkMain_pEpisodeEnt2 = NULL;
+
+// Added: Track whether the level being loaded is a cinematic JKL.
+int jkMain_bLoadingCinematicJkl = 0;
+// Added: Track standalone videos launched through Debug Play.
+static int jkMain_bDebugVideoPlayback = 0;
 
 static jkGuiStateFuncs jkMain_aGuiStateFuncs[16] = {
     {0,  0,  0},
@@ -583,6 +589,8 @@ void jkMain_GameplayShow(int a1, int a2)
 
         level_loaded = v3;
         jkGuiTitle_LoadingFinalize();
+        // Added: Clear cinematic JKL status after loading.
+        jkMain_bLoadingCinematicJkl = 0;
         if ( !level_loaded )
         {
             if ( jkGame_isDDraw )
@@ -1160,6 +1168,7 @@ int jkMain_StartNextLevelInEpisode(int a1, int bIsAPath)
 
 int jkMain_cd_swap_reverify(jkEpisodeEntry *ent)
 {
+    jkMain_bLoadingCinematicJkl = 0;  // Added: Reset cinematic JKL status for each episode entry.
     int v1; // eax
     int v2; // eax
     signed int result; // eax
@@ -1244,6 +1253,9 @@ int jkMain_cd_swap_reverify(jkEpisodeEntry *ent)
 
     if (pExt && !__strcmpi(pExt, ".jkl"))
     {
+        // Added: Skip mission confirmation for this cinematic JKL.
+        jkMain_bLoadingCinematicJkl = 1;
+
         // Added: Load a cinematic JKL using the normal level-loading state.
         stdString_SafeStrCopy(jkMain_aLevelJklFname, ent->fileName, 128);
 
@@ -1418,10 +1430,16 @@ void jkMain_VideoShow(int a1, int a2)
                 break;
             case JK_GAMEMODE_VIDEO2:
                 result = 1;
-                if ( jkGuiRend_menuNestDepth )
+                if (jkGuiRend_menuNestDepth)
                     jkGuiRend_bStateChangePending = 1;
                 jkSmack_stopTick = 1;
-                jkSmack_nextGuiState = JK_GAMEMODE_CUTSCENE;
+
+                // Added: Return debug-launched videos to the main menu.
+                jkSmack_nextGuiState = jkMain_bDebugVideoPlayback
+                    ? JK_GAMEMODE_MAIN
+                    : JK_GAMEMODE_CUTSCENE;
+
+                jkMain_bDebugVideoPlayback = 0;
                 break;
             case JK_GAMEMODE_VIDEO3:
             case JK_GAMEMODE_VIDEO4:
@@ -1465,10 +1483,16 @@ void jkMain_VideoTick(int a2)
                 break;
             case JK_GAMEMODE_VIDEO2:
                 result = 1;
-                if ( jkGuiRend_menuNestDepth )
+                if (jkGuiRend_menuNestDepth)
                     jkGuiRend_bStateChangePending = 1;
                 jkSmack_stopTick = 1;
-                jkSmack_nextGuiState = JK_GAMEMODE_CUTSCENE;
+
+                // Added: Return debug-launched videos to the main menu.
+                jkSmack_nextGuiState = jkMain_bDebugVideoPlayback
+                    ? JK_GAMEMODE_MAIN
+                    : JK_GAMEMODE_CUTSCENE;
+
+                jkMain_bDebugVideoPlayback = 0;
                 break;
             case JK_GAMEMODE_VIDEO3:
                 result = 1;
@@ -1580,6 +1604,31 @@ int jkMain_SwitchTo4(const char *pFpath)
     jkSmack_stopTick = 1;
     jkSmack_nextGuiState = JK_GAMEMODE_VIDEO2;
     return result;
+}
+
+// Added: Launch a standalone video from Debug Play.
+int jkMain_SwitchToDebugVideo(const char* pFpath)
+{
+    jkMain_bDebugVideoPlayback = 1;
+    return jkMain_SwitchTo4(pFpath);
+}
+
+// Added: Launch a Debug Play video as a campaign cutscene,
+// allowing normal episode progression when playback finishes.
+int jkMain_SwitchToDebugEpisodeVideo(const char* pFpath)
+{
+    if (!pFpath)
+        return 0;
+
+    jkRes_FileExists(pFpath, jkMain_aLevelJklFname, 128);
+
+    if (jkGuiRend_menuNestDepth)
+        jkGuiRend_bStateChangePending = 1;
+
+    jkSmack_stopTick = 1;
+    jkSmack_nextGuiState = JK_GAMEMODE_VIDEO4;
+
+    return 1;
 }
 
 // MOTS added
