@@ -361,15 +361,22 @@ void jkGuiTitle_ShowLoading(char *a1, char16_t *a2)
 
 int jkGuiTitle_bSkipLoadingWait = 0; // Added: autoboot skips the mission-text wait
 
+#ifdef QOL_IMPROVEMENTS
+// Added: headless runs and background captures have nobody to acknowledge the mission briefing dialog.
+static int jkGuiTitle_IsUnattended()
+{
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    if (stdCapture_IsActive() || Window_bRenderProbe)
+        return 1;
+#endif
+    return Main_bHeadless;
+}
+#endif
+
 void jkGuiTitle_LoadingFinalize()
 {
 #ifdef QOL_IMPROVEMENTS
-    // Background captures cannot acknowledge the mission briefing dialog.
-    int shouldSkip = Main_bHeadless ||
-#ifdef OPENJKDF2_ENABLE_CAPTURE
-        stdCapture_IsActive() || Window_bRenderProbe ||
-#endif
-        jkPlayer_bFastMissionText || sithNet_isMulti || !sithWorld_g_pCurrentWorld
+    int shouldSkip = jkPlayer_bFastMissionText || sithNet_isMulti || !sithWorld_g_pCurrentWorld
                   || jkGuiTitle_bSkipLoadingWait; // Added
     if ( jkGuiTitle_whichLoading != 1)
     {
@@ -381,7 +388,7 @@ void jkGuiTitle_LoadingFinalize()
 
         while (1)
         {
-            if (shouldSkip) break;
+            if (shouldSkip || jkGuiTitle_IsUnattended()) break;
             int selected = jkGuiRend_DisplayAndReturnClicked(&jkGuiTitle_menuLoad);
 
 #if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
