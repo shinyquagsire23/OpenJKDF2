@@ -5,6 +5,8 @@
 #include "General/stdFont.h"
 #include "General/stdStrTable.h"
 #include "General/stdFileUtil.h"
+// Added: File existence check for Debug Play cutscenes.
+#include "General/util.h"
 #include "Engine/rdMaterial.h" // TODO move tVBuffer
 #include "stdPlatform.h"
 #include "jk.h"
