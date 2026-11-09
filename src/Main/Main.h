@@ -10,6 +10,7 @@
 #define Main_FPrintf_ADDR (0x00401870)
 
 #ifdef QOL_IMPROVEMENTS
+int Main_CharacterNameValid(const char* name);
 extern int32_t Main_bDedicatedServer;
 extern int32_t Main_bHeadless;
 extern int32_t Main_bVerboseNetworking;

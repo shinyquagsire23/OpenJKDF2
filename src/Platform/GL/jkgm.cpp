@@ -73,6 +73,9 @@ extern int jkPlayer_enableTextureFilter;
 extern int jkPlayer_bEnableJkgm;
 extern int jkPlayer_bEnableTexturePrecache;
 extern int Main_bHeadless;
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+extern int Window_bRenderProbe;
+#endif
 extern int jkGuiBuildMulti_bRendering;
 extern GLuint worldpal_texture;
 
@@ -745,6 +748,11 @@ int jkgm_std3D_AddToTextureCache(tVBuffer *vbuf, rdDDrawSurface *texture, int is
             const char* path = albedo_tex.c_str();
 
             GLubyte* data = (GLubyte*)entry->albedo_data;
+#if !defined(TARGET_IOS) && !defined(TARGET_ANDROID) && !defined(ARCH_WASM)
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+            const bool albedoWasCached = data != NULL;
+#endif
+#endif
 
             if (data) {
                 //printf("Using precached %s\n", path);
@@ -763,9 +771,42 @@ int jkgm_std3D_AddToTextureCache(tVBuffer *vbuf, rdDDrawSurface *texture, int is
                 texture->texture_id = image_texture;
                 texture->albedo_data = data;
                 entry->albedo_data = data;
+#if !defined(TARGET_IOS) && !defined(TARGET_ANDROID) && !defined(ARCH_WASM)
+                // Probe receipts use desktop texture queries, outside the GLES3.0 API.
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+                if (Window_bRenderProbe) {
+                    GLint gpuWidth = 0, gpuHeight = 0, gpuFormat = 0;
+                    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &gpuWidth);
+                    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &gpuHeight);
+                    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT, &gpuFormat);
+                    const bool allocated = gpuWidth > 0 && gpuHeight > 0
+                        && gpuWidth == entry->albedo_width && gpuHeight == entry->albedo_height;
+                    const nlohmann::json receipt = {
+                        {"status", allocated ? "uploaded" : "storage_mismatch"}, {"kind", "albedo"},
+                        {"material", material->mat_full_fpath}, {"cel", cel}, {"path", path},
+                        {"texture_id", image_texture}, {"cpu_cached", albedoWasCached},
+                        {"decoded_width", entry->albedo_width}, {"decoded_height", entry->albedo_height},
+                        {"has_alpha", entry->albedo_hasAlpha != 0},
+                        {"gpu_width", gpuWidth}, {"gpu_height", gpuHeight}, {"gpu_internal_format", gpuFormat}
+                    };
+                    printf("RENDERPROBE_JKGM_UPLOAD %s\n", receipt.dump().c_str());
+                    fflush(stdout);
+                }
+#endif
+#endif
             }
             else
             {
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+                if (Window_bRenderProbe) {
+                    const nlohmann::json receipt = {
+                        {"status", "decode_failed"}, {"kind", "albedo"},
+                        {"material", material->mat_full_fpath}, {"cel", cel}, {"path", path}
+                    };
+                    printf("RENDERPROBE_JKGM_UPLOAD %s\n", receipt.dump().c_str());
+                    fflush(stdout);
+                }
+#endif
                 texture->albedo_data = NULL;
                 entry->albedo_data = NULL;
                 glDeleteTextures(1, &image_texture);

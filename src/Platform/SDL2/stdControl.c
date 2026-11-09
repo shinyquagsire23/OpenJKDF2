@@ -7,6 +7,7 @@
 #include "Main/jkTouchControls.h"
 
 #include <SDL3/SDL.h>
+#include "Platform/SDL2/stdCaptureUi.h"
 
 #include "jk.h"
 
@@ -717,6 +718,9 @@ LABEL_19:
 
 void stdControl_SetActivation(int a)
 {
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    if (Window_bRenderProbe) { stdControl_bControlsActive = 0; return; }
+#endif
     extern SDL_Window* displayWindow;
 
     if ( stdControl_bOpen )
@@ -859,6 +863,9 @@ void stdControl_ReadGamepad(int idx) {
 
 void stdControl_ReadControls()
 {
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    if (stdCapture_IsActive() || Window_bRenderProbe) return;
+#endif
     flex_d_t khz;
 
     if (!stdControl_bControlsActive)
@@ -1134,6 +1141,9 @@ void stdControl_ReadMouse()
 }
 
 void stdControl_ShowSystemKeyboard() {
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    if (Window_bRenderProbe) return;
+#endif
     extern SDL_Window* displayWindow;
     if (stdControl_bKeyboardBeingShown) {
         return;
@@ -1148,6 +1158,9 @@ void stdControl_ShowSystemKeyboard() {
 }
 
 void stdControl_HideSystemKeyboard() {
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    if (Window_bRenderProbe) return;
+#endif
     extern SDL_Window* displayWindow;
     if (!stdControl_bKeyboardBeingShown) {
         return;

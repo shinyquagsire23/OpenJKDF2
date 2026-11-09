@@ -69,6 +69,7 @@
 #include "General/stdJSON.h"
 #include "Dss/jkDSS.h"
 #include "Main/InstallHelper.h"
+#include "Main/stdCapture.h"
 #include "sithCvar.h"
 
 #include "Platform/Common/stdHttp.h"
@@ -114,7 +115,7 @@ static char Main_strAutostartCharacter[32];
 #endif
 
 #if defined(QOL_IMPROVEMENTS)
-static inline int Autostart_CharacterNameValid(const char* name)
+int Main_CharacterNameValid(const char* name)
 {
     if (!name || !name[0]) return 0;
     size_t length = 0;
@@ -155,6 +156,9 @@ int Main_StartupDedicated(int bFullyDedicated)
     strcat(Main_strMap, ".jkl");
     stdPlatform_Printf("Autostarting level: `%s`\n", Main_strMap);
 
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    stdCapture_Trace("creating isolated profile");
+#endif
     if (bFullyDedicated) {
         strcpy(aTmpPlayerShortName, "ServerDed");
         stdString_CharToWchar(jkPlayer_playerShortName, aTmpPlayerShortName, 31);
@@ -179,8 +183,14 @@ int Main_StartupDedicated(int bFullyDedicated)
     }
 
 //#if !defined(TARGET_NO_MULTIPLAYER_MENUS)
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    stdCapture_Trace("profile ready");
+#endif
     jkGuiNetHost_SaveSettings();
     jkGuiNetHost_LoadSettings();
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    stdCapture_Trace("settings ready");
+#endif
 //#endif // !defined(TARGET_NO_MULTIPLAYER_MENUS)
 
     // Fake player
@@ -246,7 +256,13 @@ int Main_StartupDedicated(int bFullyDedicated)
     if (Main_strAutostartCharacter[0]) {
         std3D_StartScene();
         std3D_EndScene();
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+        stdCapture_Trace("loading static world");
+#endif
         sithOpenStatic("static.jkl");
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+        stdCapture_Trace("registering inventory");
+#endif
         jkHudInv_InitItems();
         char16_t characterName[32];
         stdString_CharToWchar(characterName, Main_strAutostartCharacter, 31);
@@ -294,7 +310,13 @@ int Main_StartupDedicated(int bFullyDedicated)
     if (!Main_strAutostartCharacter[0]) {
         std3D_StartScene();
         std3D_EndScene();
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+        stdCapture_Trace("loading static world");
+#endif
         sithOpenStatic("static.jkl");
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+        stdCapture_Trace("registering inventory");
+#endif
         jkHudInv_InitItems();
     }
 
@@ -417,7 +439,10 @@ int Main_Startup(const char *cmdline)
         }
     }
     stdStartup(&hs); // Added
-    InstallHelper_SetCwd(); // Added
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    if (!stdCapture_IsActive()) // Capture uses only its staged CWD.
+#endif
+    InstallHelper_SetCwd();
 
     wuRegistry_Startup(HKEY_LOCAL_MACHINE, "Software\\LucasArts Entertainment Company\\JediKnight\\v1.0", (BYTE*)"0.1");
     //stdStartup(&hs); // Moved
@@ -786,7 +811,7 @@ void Main_ParseCmdLine(char *cmdline)
         else if (!__strcmpi(pArgTok, "-character"))
         {
             char* name = _strtok(0, " \t");
-            if (Main_strAutostartCharacter[0] || !Autostart_CharacterNameValid(name)) {
+            if (Main_strAutostartCharacter[0] || !Main_CharacterNameValid(name)) {
                 fprintf(stderr, "autostart: invalid or repeated multiplayer character name\n");
                 exit(6);
             }
@@ -796,6 +821,13 @@ void Main_ParseCmdLine(char *cmdline)
         {
             Main_bHeadless = 1;
         }
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+        else if (!__strcmpi(pArgTok, "-capture"))
+        {
+            if (!stdCapture_IsActive()) { fprintf(stderr, "capture: missing or invalid request\n"); exit(6); }
+            Main_bNoHUD = 1;
+        }
+#endif
         else if (!__strcmpi(pArgTok, "-verboseNetworking") || !__strcmpi(pArgTok, "/verboseNetworking") )
         {
             Main_bVerboseNetworking = 1;

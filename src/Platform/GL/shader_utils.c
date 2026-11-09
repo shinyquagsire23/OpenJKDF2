@@ -14,6 +14,7 @@
 #include <string.h>
 
 #include "stdPlatform.h"
+#include "Win95/Window.h"
 
 #ifdef LINUX
 #include "external/fcaseopen/fcaseopen.h"
@@ -44,6 +45,12 @@ void print_log(GLuint object) {
 		glGetProgramInfoLog(object, log_length, NULL, log);
 	
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR, "%s\n", log);
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+
+	if (Window_bRenderProbe) fprintf(stderr,"RENDERPROBE_FAILED shader: %s\n",log);
+
+	else
+#endif
 	
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", log, NULL);
 	
@@ -58,6 +65,10 @@ GLuint load_shader_file(const char* filepath, GLenum type)
     {
     	char errtmp[256];
         snprintf(errtmp, 256, "std3D: Failed to load shader file `%s`!\n", filepath);
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+        if (Window_bRenderProbe) fprintf(stderr,"RENDERPROBE_FAILED %s",errtmp);
+        else
+#endif
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errtmp, NULL);
         return -1;
     }
