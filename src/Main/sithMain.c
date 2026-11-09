@@ -352,7 +352,6 @@ int sithUpdate()
 
             for (int i = 0; i < wholeFramesToApply; i++)
             {
-                sithTime_g_secGameTime = (flex32_t)sithTime_g_msecGameTime * 0.001;
                 sithSoundMixer_Update(sithTime_g_frameTimeFlex);
                 sithEvent_Process();
 
@@ -376,6 +375,7 @@ int sithUpdate()
                 // COG scripts will sleep for periods of time based on sithTime_g_msecGameTime,
                 // so we have to emulate the current time as well
                 sithTime_g_msecGameTime += sithTime_g_frameTime;
+                sithTime_g_secGameTime = (flex32_t)sithTime_g_msecGameTime * 0.001;
             }
 
             sithTime_g_frameTimeFlex = tmp;
