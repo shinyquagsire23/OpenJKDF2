@@ -17,6 +17,7 @@ jobs:
       OPENJKDF2_BUILD_DIR: /tmp/OpenJKDF2/Linux/x86_64/Debug
       CC: clang
       CXX: clang++
+      TARGET_BUILD_TESTS: "1"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -36,3 +37,5 @@ jobs:
         run: cmake -DCMAKE_BUILD_TYPE=Debug -B "$OPENJKDF2_BUILD_DIR"
       - name: Make
         run: make -C "$OPENJKDF2_BUILD_DIR"
+      - name: Engine subsystem tests
+        run: ctest --test-dir "$OPENJKDF2_BUILD_DIR" --output-on-failure --no-tests=error
