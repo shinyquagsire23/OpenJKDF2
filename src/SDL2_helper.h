@@ -92,6 +92,9 @@ extern "C" {
 #define GL_R8 GL_RED
 #endif // WIN32
 
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+#include "Platform/SDL2/stdCaptureUi.h"
+#endif
 //#endif // !ARCH_WASM
 #endif // SDL2_RENDER
 

@@ -1,4 +1,6 @@
 #include "jkGUITitle.h"
+#include "Main/stdCapture.h"
+#include "Win95/Window.h"
 
 #include "General/Darray.h"
 #include "General/stdBitmap.h"
@@ -11,6 +13,7 @@
 #include "Gui/jkGUIRend.h"
 #include "Gui/jkGUI.h"
 #include "Cog/jkCog.h"
+#include "Main/Main.h"
 #include "Main/jkStrings.h"
 #include "Win95/stdDisplay.h"
 #include "World/sithWorld.h"
@@ -358,6 +361,18 @@ void jkGuiTitle_ShowLoading(char *a1, char16_t *a2)
 
 int jkGuiTitle_bSkipLoadingWait = 0; // Added: autoboot skips the mission-text wait
 
+#ifdef QOL_IMPROVEMENTS
+// Added: headless runs and background captures have nobody to acknowledge the mission briefing dialog.
+static int jkGuiTitle_IsUnattended()
+{
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    if (stdCapture_IsActive() || Window_bRenderProbe)
+        return 1;
+#endif
+    return Main_bHeadless;
+}
+#endif
+
 void jkGuiTitle_LoadingFinalize()
 {
 #ifdef QOL_IMPROVEMENTS
@@ -373,7 +388,7 @@ void jkGuiTitle_LoadingFinalize()
 
         while (1)
         {
-            if (shouldSkip) break;
+            if (shouldSkip || jkGuiTitle_IsUnattended()) break;
             int selected = jkGuiRend_DisplayAndReturnClicked(&jkGuiTitle_menuLoad);
 
 #if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)

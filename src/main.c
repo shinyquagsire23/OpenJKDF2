@@ -10,6 +10,8 @@
 #include "types.h"
 
 #include "General/stdMath.h"
+#include "Main/stdCapture.h"
+#include "Main/stdCaptureLaunch.h"
 
 #ifndef NO_JK_MMAP
 #include "Cog/sithCog.h"
@@ -185,6 +187,7 @@ void do_hooks();
 
 #ifdef WIN64_STANDALONE
 #include "exchndl.h"
+#include <SDL_hints.h>
 
 #include <windows.h>
 #endif
@@ -351,6 +354,12 @@ KOS_INIT_FLAGS(INIT_DEFAULT | INIT_CONTROLLER);
 
 int main(int argc, char** argv)
 {
+#ifndef OPENJKDF2_ENABLE_CAPTURE
+    if (stdCapture_LaunchRequested(argc, argv)) {
+        fprintf(stderr, "Capture/render probes are disabled; rebuild with -DOPENJKDF2_ENABLE_CAPTURE=ON.\n");
+        return 6;
+    }
+#endif
 #ifdef TARGET_DREAMCAST
     // Added: on-screen CPU fault reporter (KOS default only prints to serial)
     dcFault_Install();
@@ -631,7 +640,12 @@ int main(int argc, char** argv)
     openjkdf2_bIsExtraLowMemoryPlatform = 0;
 #endif // TARGET_DREAMCAST
 #ifdef WIN64_STANDALONE
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    int skipConsoleWindow = stdCapture_PreserveConsoleStreams(argc, argv);
+#endif
+#ifndef OPENJKDF2_ENABLE_CAPTURE
     int skipConsoleWindow = 0;
+#endif
     if ((SDL_GetHintBoolean("SteamClientLaunch", 0) || SDL_GetHintBoolean("SteamOS", 0) || SDL_GetHintBoolean("SteamDeck", 0)) && SDL_GetHintBoolean("SteamGamepadUI", 0)) {
         skipConsoleWindow = 1;
     }
@@ -644,7 +658,13 @@ int main(int argc, char** argv)
         freopen_s(&fp, "CONOUT$", "w", stdout);
     }
 
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    int can_has_crashdumps = !stdCapture_IsRequested();
+    if (stdCapture_IsRequested()) SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX | SEM_NOOPENFILEERRORBOX);
+#endif
+#ifndef OPENJKDF2_ENABLE_CAPTURE
     int can_has_crashdumps = 1;
+#endif
 
     OSVERSIONINFOEX info;
     ZeroMemory(&info, sizeof(OSVERSIONINFOEX));
@@ -741,6 +761,9 @@ int main(int argc, char** argv)
         }
     }
 
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    int windowResult = 1;
+#endif
     while (1)
     {
         OpenJKDF2_Globals_Reset();
@@ -752,7 +775,13 @@ int main(int argc, char** argv)
 
         openjkdf2_restartMode = OPENJKDF2_RESTART_NONE;
         memset(openjkdf2_aRestartPath, 0, sizeof(openjkdf2_aRestartPath));
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+        windowResult = Window_Main_Linux(argc, argv);
+        if (stdCapture_IsRequested() || windowResult == 6) return 6;
+#endif
+#ifndef OPENJKDF2_ENABLE_CAPTURE
         Window_Main_Linux(argc, argv);
+#endif
 
         printf("openjkdf2_bOrigWasRunningFromExistingInstall %x\n", openjkdf2_bOrigWasRunningFromExistingInstall);
         printf("openjkdf2_bIsRunningFromExistingInstall %x\n", openjkdf2_bIsRunningFromExistingInstall);
@@ -815,7 +844,12 @@ int main(int argc, char** argv)
     }
 #endif
 
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    return Window_bRenderProbe ? windowResult : 1;
+#endif
+#ifndef OPENJKDF2_ENABLE_CAPTURE
     return 1;
+#endif
 }
 
 #ifdef LINUX
