@@ -2,6 +2,7 @@
 #define _JKGUITITLE_H
 
 #include "types.h"
+#include "Main/jkMain.h"
 
 #define jkGuiTitle_Startup_ADDR (0x00418960)
 #define jkGuiTitle_Shutdown_ADDR (0x00418990)

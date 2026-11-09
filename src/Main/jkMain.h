@@ -88,6 +88,9 @@ typedef struct jkGuiStateFuncs
 extern jkEpisodeEntry* jkMain_pEpisodeEnt;
 extern jkEpisodeEntry* jkMain_pEpisodeEnt2;
 
+// Added: Track cinematic JKL loading for mission confirmation.
+extern int jkMain_bLoadingCinematicJkl;
+
 void jkMain_Startup();
 void jkMain_Shutdown();
 MATH_FUNC int jkMain_SetVideoMode();
@@ -147,6 +150,9 @@ void jkMain_CutsceneLeave(int a1, int a2);
 int jkMain_SwitchTo13();
 int jkMain_SwitchTo12();
 int jkMain_SwitchTo4(const char *pFpath);
+int jkMain_SwitchToDebugVideo(const char* pFpath);
+// Added: Start a Debug Play video with episode progression.
+int jkMain_SwitchToDebugEpisodeVideo(const char* pFpath);
 
 void jkMain_StartupCutscene(char *pCutsceneStr); // MOTS added
 
