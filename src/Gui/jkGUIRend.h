@@ -158,6 +158,7 @@ void jkGuiRend_TextButtonDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *
 // Added: PNG menu background support
 int jkGuiRend_PngIsMenuBuffer(tVBuffer* vbuf);
 void jkGuiRend_PngMaskSetPixel(int x, int y);
+void jkGuiRend_PngMaskSetRect(int x, int y, int width, int height);
 const uint8_t* jkGuiRend_PngMaskGetData(void);
 const char* jkGuiRend_PngGetBackgroundPath(void);
 
