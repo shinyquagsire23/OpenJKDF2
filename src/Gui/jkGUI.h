@@ -21,6 +21,9 @@ typedef struct stdBitmap stdBitmap;
 typedef struct stdFont stdFont;
 typedef struct jkEpisodeLoad jkEpisodeLoad;
 
+// Added: PNG menu background support
+extern const char* jkGui_aBitmaps[35];
+
 void jkGui_InitMenu(jkGuiMenu *menu, stdBitmap *bgBitmap);
 #ifdef JKGUI_SMOL_SCREEN
 void jkGui_SmolScreenFixup(jkGuiMenu *menu, BOOL bForce);

@@ -47,6 +47,111 @@ int jkGuiRend_IsMenuActive(void)
     return jkGuiRend_HandlerIsSet > 0;
 }
 static int32_t jkGuiRend_fillColor = 0;
+
+// Added: PNG menu background support
+#define JKGUI_PNG_MASK_WIDTH 640
+#define JKGUI_PNG_MASK_HEIGHT 480
+
+// Added: PNG menu background support
+int jkGuiRend_PngIsMenuBuffer(tVBuffer* vbuf)
+{
+    return vbuf != NULL && vbuf == jkGuiRend_menuBuffer;
+}
+
+static uint8_t jkGuiRend_pngMask[JKGUI_PNG_MASK_WIDTH * JKGUI_PNG_MASK_HEIGHT];
+
+// Added: PNG menu background support
+void jkGuiRend_PngMaskClear(void)
+{
+    memset(jkGuiRend_pngMask, 0, sizeof(jkGuiRend_pngMask));
+}
+
+// Added: PNG menu background support
+void jkGuiRend_PngMaskSetPixel(int x, int y)
+{
+    if (x < 0 || x >= JKGUI_PNG_MASK_WIDTH ||
+        y < 0 || y >= JKGUI_PNG_MASK_HEIGHT)
+    {
+        return;
+    }
+
+    jkGuiRend_pngMask[y * JKGUI_PNG_MASK_WIDTH + x] = 255;
+}
+
+// Added: PNG menu background support
+void jkGuiRend_PngMaskClearRect(int x, int y, int width, int height)
+{
+    if (width <= 0 || height <= 0)
+        return;
+
+    int x1 = x < 0 ? 0 : x;
+    int y1 = y < 0 ? 0 : y;
+    int x2 = x + width;
+    int y2 = y + height;
+
+    if (x2 > JKGUI_PNG_MASK_WIDTH)
+        x2 = JKGUI_PNG_MASK_WIDTH;
+
+    if (y2 > JKGUI_PNG_MASK_HEIGHT)
+        y2 = JKGUI_PNG_MASK_HEIGHT;
+
+    for (int row = y1; row < y2; row++)
+    {
+        if (x2 > x1)
+        {
+            memset(
+                &jkGuiRend_pngMask[row * JKGUI_PNG_MASK_WIDTH + x1],
+                0,
+                x2 - x1
+            );
+        }
+    }
+}
+
+// Added: PNG menu background support
+const uint8_t* jkGuiRend_PngMaskGetData(void)
+{
+    return jkGuiRend_pngMask;
+}
+
+// Added: PNG menu background support
+const char* jkGuiRend_PngGetBackgroundPath(void)
+{
+    jkGuiMenu* menu = jkGuiRend_activeMenu;
+
+    if (!menu)
+        return NULL;
+
+#ifdef STDBITMAP_PARTIAL_LOAD
+    // Match the menu's original background bitmap.
+    // Do not use a texture override as a PNG background.
+    if (!menu->pBgBitmap)
+        return NULL;
+#else
+    // Non-partial-load builds store the background as a VBuffer.
+    if (!menu->texture)
+        return NULL;
+#endif
+
+    for (int i = 0; i < 35; i++)
+    {
+        stdBitmap* bitmap = jkGui_stdBitmaps[i];
+
+        if (!bitmap)
+            continue;
+
+#ifdef STDBITMAP_PARTIAL_LOAD
+        if (menu->pBgBitmap == bitmap)
+            return jkGui_aBitmaps[i];
+#else
+        if (bitmap->mipSurfaces[0] == menu->texture)
+            return jkGui_aBitmaps[i];
+#endif
+    }
+
+    return NULL;
+}
+
 static int32_t jkGuiRend_paletteChecksum = 0;
 static int32_t jkGuiRend_dword_85620C = 0;
 static int32_t jkGuiRend_lastKeyScancode = 0;
@@ -75,6 +180,16 @@ void jkGuiRend_CopyVBuffer(jkGuiMenu *menu, rdRect *rect)
 {
     if ( g_app_suspended && !jkGuiRend_bIsSurfaceValid )
     {
+        // Added: PNG menu background support
+        if (rect)
+        {
+            jkGuiRend_PngMaskClearRect(
+                rect->x,
+                rect->y,
+                rect->width,
+                rect->height
+            );
+        }
 #ifdef STDBITMAP_PARTIAL_LOAD
         if (menu->pBgBitmap) {
             stdBitmap_EnsureData(menu->pBgBitmap);
@@ -240,6 +355,28 @@ LABEL_22:
     }
 
     stdDisplay_VBufferUnlock(vbuf);
+
+    // Added: PNG menu background support
+    if (jkGuiRend_PngIsMenuBuffer(vbuf) && rect &&
+        rect->width > 0 && rect->height > 0)
+    {
+        int left = rect->x;
+        int top = rect->y;
+        int right = rect->x + rect->width - 1;
+        int bottom = rect->y + rect->height - 1;
+
+        for (int x = left; x <= right; x++)
+        {
+            jkGuiRend_PngMaskSetPixel(x, top);
+            jkGuiRend_PngMaskSetPixel(x, bottom);
+        }
+
+        for (int y = top; y <= bottom; y++)
+        {
+            jkGuiRend_PngMaskSetPixel(left, y);
+            jkGuiRend_PngMaskSetPixel(right, y);
+        }
+    }
 }
 
 void jkGuiRend_UpdateDrawMenu(jkGuiMenu *menu)
@@ -272,6 +409,9 @@ void jkGuiRend_Paint(jkGuiMenu *menu)
     
     stdControl_ShowMouseCursor(0);
     stdDisplay_SetMasterPalette(jkGuiRend_palette);
+
+    // Added: PNG menu background support
+    jkGuiRend_PngMaskClear();
 
 #ifndef TARGET_RETRO_HOMEBREW
 #ifdef STDBITMAP_PARTIAL_LOAD
@@ -445,6 +585,10 @@ void jkGuiRend_sub_50FAD0(jkGuiMenu *menu)
         if ( g_app_suspended && !jkGuiRend_bIsSurfaceValid)
         {
             stdDisplay_ClearRect(jkGuiRend_menuBuffer, jkGuiRend_fillColor, 0);
+
+            // Added: PNG menu background support
+            jkGuiRend_PngMaskClear();
+
             jkGuiRend_FlipAndDraw(jkGuiRend_activeMenu, 0);
         }
     }
@@ -734,6 +878,10 @@ void jkGuiRend_UpdateSurface()
         return;
 
     stdDisplay_ClearRect(jkGuiRend_menuBuffer, jkGuiRend_fillColor, 0);
+
+    // Added: PNG menu background support
+    jkGuiRend_PngMaskClear();
+
     jkGuiRend_FlipAndDraw(jkGuiRend_activeMenu, 0);
 }
 

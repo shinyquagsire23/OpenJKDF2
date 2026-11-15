@@ -8,6 +8,7 @@
 #include "World/sithWorld.h"
 #include "Engine/rdColormap.h"
 #include "Main/jkGame.h"
+#include "Gui/jkGUIRend.h"   // Added: PNG menu background support
 #include "World/jkPlayer.h"
 #include "General/stdBitmap.h"
 #include "stdPlatform.h"
@@ -127,6 +128,14 @@ extern float jkSaber_rgbBlue;
 GLint programMenu_attribute_coord3d, programMenu_attribute_v_color, programMenu_attribute_v_uv, programMenu_attribute_v_norm;
 GLint programMenu_uniform_mvp, programMenu_uniform_tex, programMenu_uniform_displayPalette;
 
+// Added: PNG menu background support
+static GLint programMenu_uniform_pngBackground;
+static GLint programMenu_uniform_pngMask;
+static GLint programMenu_uniform_usePngBackground;
+static GLint programMenu_uniform_pngUvScale;
+static GLint programMenu_uniform_pngFullscreen;
+static GLint programMenu_uniform_pngCropScale;
+
 std3DSimpleTexStage std3D_uiProgram;
 std3DSimpleTexStage std3D_texFboStage;
 std3DSimpleTexStage std3D_blurStage;
@@ -134,6 +143,14 @@ std3DSimpleTexStage std3D_ssaoStage;
 std3DSimpleTexStage std3D_ssaoMixStage;
 
 GLuint blank_tex, blank_tex_white;
+
+// Added: PNG menu background support
+static GLuint std3D_pngMenuTexture = 0;
+static int std3D_pngMenuWidth = 0;
+static int std3D_pngMenuHeight = 0;
+static char std3D_pngMenuCurrentPath[256] = { 0 };
+static GLuint std3D_pngMenuMaskTexture = 0;
+
 void* blank_data = NULL, *blank_data_white = NULL;
 GLuint worldpal_texture;
 void* worldpal_data = NULL;
@@ -537,6 +554,26 @@ int init_resources()
     programMenu_uniform_mvp = std3D_tryFindUniform(programMenu, "mvp");
     programMenu_uniform_tex = std3D_tryFindUniform(programMenu, "tex");
     programMenu_uniform_displayPalette = std3D_tryFindUniform(programMenu, "displayPalette");
+
+    // Added: PNG menu background support
+    programMenu_uniform_pngBackground =
+        std3D_tryFindUniform(programMenu, "pngMenuBackground");
+
+    programMenu_uniform_pngMask =
+        std3D_tryFindUniform(programMenu, "pngMenuMask");
+
+    programMenu_uniform_usePngBackground =
+        std3D_tryFindUniform(programMenu, "usePngMenuBackground");
+
+    programMenu_uniform_pngUvScale =
+        std3D_tryFindUniform(programMenu, "pngMenuUvScale");
+
+    // Added: PNG menu background support
+    programMenu_uniform_pngFullscreen =
+        std3D_tryFindUniform(programMenu, "pngMenuFullscreen");
+
+    programMenu_uniform_pngCropScale =
+        std3D_tryFindUniform(programMenu, "pngMenuCropScale");
     
     // Blank texture
     glGenTextures(1, &blank_tex);
@@ -707,6 +744,23 @@ void std3D_Shutdown()
 void std3D_FreeResources()
 {
     std3D_PurgeEntireTextureCache();
+
+    // Added: PNG menu background support
+    if (std3D_pngMenuTexture)
+    {
+        glDeleteTextures(1, &std3D_pngMenuTexture);
+        std3D_pngMenuTexture = 0;
+    }
+
+    if (std3D_pngMenuMaskTexture)
+    {
+        glDeleteTextures(1, &std3D_pngMenuMaskTexture);
+        std3D_pngMenuMaskTexture = 0;
+    }
+
+    std3D_pngMenuWidth = 0;
+    std3D_pngMenuHeight = 0;
+    std3D_pngMenuCurrentPath[0] = '\0';
 
     glDeleteProgram(programDefault);
     glDeleteProgram(programMenu);
@@ -1161,6 +1215,11 @@ static void std3D_PresentSWWorld(void)
     glDepthFunc(GL_ALWAYS);
     glUseProgram(programMenu);
 
+    // Added: PNG menu background support
+    // Software-rendered world frames must use the original palette shader path.
+    glUniform1i(programMenu_uniform_pngFullscreen, 0);
+    glUniform1i(programMenu_uniform_usePngBackground, 0);
+
     // Full-window quad sampling the entire world texture, same tv convention as the menu present
     // (screen top y=0 -> tv=0), so the top-down 8bpp buffer renders upright.
     GL_tmpVertices[0].x = 0.0;           GL_tmpVertices[0].y = 0.0;           GL_tmpVertices[0].tu = 0.0; GL_tmpVertices[0].tv = 0.0;
@@ -1224,9 +1283,203 @@ static void std3D_PresentSWWorld(void)
 }
 #endif
 
+// Added: PNG menu background support
+static void std3D_UpdatePngMenuMask(void)
+{
+#if defined(SDL2_RENDER) && defined(TARGET_CAN_JKGM)
+    const uint8_t* mask = jkGuiRend_PngMaskGetData();
+
+    if (!mask)
+        return;
+
+    if (!std3D_pngMenuMaskTexture)
+    {
+        glGenTextures(1, &std3D_pngMenuMaskTexture);
+
+        if (!std3D_pngMenuMaskTexture)
+            return;
+
+        glBindTexture(GL_TEXTURE_2D, std3D_pngMenuMaskTexture);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    }
+    else
+    {
+        glBindTexture(GL_TEXTURE_2D, std3D_pngMenuMaskTexture);
+    }
+
+    GLint oldUnpackAlignment = 4;
+    glGetIntegerv(GL_UNPACK_ALIGNMENT, &oldUnpackAlignment);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0,
+        GL_R8,
+        640,
+        480,
+        0,
+        GL_RED,
+        GL_UNSIGNED_BYTE,
+        mask
+    );
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, oldUnpackAlignment);
+#endif
+}
+
+// Added: PNG menu background support
+static void std3D_LoadPngMenuBackground(void)
+{
+#if defined(SDL2_RENDER) && defined(TARGET_CAN_JKGM)
+    const char* bmPath = jkGuiRend_PngGetBackgroundPath();
+
+    char pngPath[256] = { 0 };
+
+    if (bmPath && bmPath[0])
+    {
+        const char* filename = strrchr(bmPath, '\\');
+
+        if (!filename)
+            filename = strrchr(bmPath, '/');
+
+        filename = filename ? filename + 1 : bmPath;
+
+        snprintf(
+            pngPath,
+            sizeof(pngPath),
+            "RESOURCE/ui/bm/%s",
+            filename
+        );
+
+        char* extension = strrchr(pngPath, '.');
+
+        if (extension &&
+            (extension[1] == 'b' || extension[1] == 'B') &&
+            (extension[2] == 'm' || extension[2] == 'M') &&
+            extension[3] == '\0')
+        {
+            strcpy(extension, ".png");
+        }
+        else
+        {
+            pngPath[0] = '\0';
+        }
+    }
+
+    // Added: PNG menu background support
+    // Keep the existing texture when the background has not changed.
+    if (strcmp(std3D_pngMenuCurrentPath, pngPath) == 0)
+        return;
+
+    // Release the previous menu background.
+    if (std3D_pngMenuTexture)
+    {
+        glDeleteTextures(1, &std3D_pngMenuTexture);
+        std3D_pngMenuTexture = 0;
+    }
+
+    std3D_pngMenuWidth = 0;
+    std3D_pngMenuHeight = 0;
+
+    strcpy(std3D_pngMenuCurrentPath, pngPath);
+
+    // No supported background or filename.
+    if (!pngPath[0])
+        return;
+
+    int width = 0;
+    int height = 0;
+    int hasAlpha = 0;
+    unsigned char* pixels = NULL;
+
+    if (!jkgm_loadPngImage(
+        pngPath,
+        &width,
+        &height,
+        &hasAlpha,
+        &pixels,
+        0
+    ))
+    {
+        // Added: PNG menu background support
+        // The original BM remains active when no PNG is available.
+        return;
+    }
+
+    if (!pixels || width <= 0 || height <= 0)
+    {
+        jkgm_aligned_free(pixels);
+        return;
+    }
+
+    glGenTextures(1, &std3D_pngMenuTexture);
+
+    if (!std3D_pngMenuTexture)
+    {
+        jkgm_aligned_free(pixels);
+        return;
+    }
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, std3D_pngMenuTexture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    GLint oldUnpackAlignment = 4;
+    glGetIntegerv(GL_UNPACK_ALIGNMENT, &oldUnpackAlignment);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    GLenum format = hasAlpha ? GL_RGBA : GL_RGB;
+
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0,
+        format,
+        width,
+        height,
+        0,
+        format,
+        GL_UNSIGNED_BYTE,
+        pixels
+    );
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, oldUnpackAlignment);
+
+    std3D_pngMenuWidth = width;
+    std3D_pngMenuHeight = height;
+
+    jkgm_aligned_free(pixels);
+
+    stdPlatform_Printf(
+        "PNG menu background loaded: %s (%dx%d)\n",
+        pngPath,
+        width,
+        height
+    );
+#endif
+}
+
 void std3D_DrawMenu()
 {
     if (Main_bHeadless) return;
+
+    // Added: PNG menu background support
+    if (jkGuiRend_IsMenuActive() &&
+        !jkCutscene_isRendering &&
+        !jkGuiBuildMulti_bRendering)
+    {
+        std3D_LoadPngMenuBackground();
+
+        if (std3D_pngMenuTexture)
+            std3D_UpdatePngMenuMask();
+    }
 
     //printf("Draw menu\n");
     std3D_DrawSceneFbo();
@@ -1247,6 +1500,10 @@ void std3D_DrawMenu()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDepthFunc(GL_ALWAYS);
     glUseProgram(programMenu);
+
+    // Added: PNG menu background support
+    glUniform1i(programMenu_uniform_usePngBackground, 0);
+    glUniform1i(programMenu_uniform_pngFullscreen, 0);
     
     float menu_w, menu_h, menu_u, menu_v, menu_x;
     menu_w = (double)Window_xSize;
@@ -1496,6 +1753,40 @@ void std3D_DrawMenu()
     glUniform1i(programMenu_uniform_tex, 0);
     glUniform1i(programMenu_uniform_displayPalette, 1);
 
+    // Added: PNG menu background support
+    glUniform1i(programMenu_uniform_pngBackground, 2);
+    glUniform1i(programMenu_uniform_pngMask, 3);
+    glUniform2f(
+        programMenu_uniform_pngUvScale,
+        (float)Video_menuBuffer.format.width / 640.0f,
+        (float)Video_menuBuffer.format.height / 480.0f
+    );
+
+    // Added: PNG menu background support
+    int usePngMenuBackground =
+        jkGuiRend_IsMenuActive() &&
+        !jkCutscene_isRendering &&
+        !jkGuiBuildMulti_bRendering &&
+        GL_tmpTrisAmt > 0 &&
+        std3D_pngMenuTexture != 0 &&
+        std3D_pngMenuMaskTexture != 0;
+
+    glUniform1i(
+        programMenu_uniform_usePngBackground,
+        usePngMenuBackground
+    );
+
+    if (usePngMenuBackground)
+    {
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, std3D_pngMenuTexture);
+
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, std3D_pngMenuMaskTexture);
+
+        glActiveTexture(GL_TEXTURE0);
+    }
+
     D3DVERTEX* vertexes = GL_tmpVertices;
 
     glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_all);
@@ -1562,6 +1853,162 @@ void std3D_DrawMenu()
     glViewport(0, 0, width, height);
 
     }
+
+    // Added: PNG menu background support
+    // Draw the PNG fullscreen, scaling to screen height and cropping horizontally.
+    if (usePngMenuBackground &&
+        std3D_pngMenuWidth > 0 &&
+        std3D_pngMenuHeight > 0)
+    {
+        // Added: PNG menu background support
+        float screenAspect =
+            (float)Window_xSize / (float)Window_ySize;
+
+        float pngAspect =
+            (float)std3D_pngMenuWidth / (float)std3D_pngMenuHeight;
+
+        // Preserve traditional 4:3 PNGs without zooming.
+        // Widescreen PNGs retain proportional fullscreen cover scaling.
+        int isTraditionalPng = pngAspect <= (4.0f / 3.0f + 0.01f);
+
+        float cropX = screenAspect / pngAspect;
+        float cropY = 1.0f;
+
+        if (!isTraditionalPng && cropX > 1.0f)
+        {
+            cropY = 1.0f / cropX;
+            cropX = 1.0f;
+        }
+
+        // Added: PNG menu background support
+        // Center traditional 4:3 PNGs without stretching or cropping.
+        // Clear the background to black for centered traditional PNGs.
+        if (isTraditionalPng && screenAspect > (4.0f / 3.0f))
+        {
+            GLfloat previousClearColor[4];
+            glGetFloatv(GL_COLOR_CLEAR_VALUE, previousClearColor);
+
+            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT);
+
+            glClearColor(
+                previousClearColor[0],
+                previousClearColor[1],
+                previousClearColor[2],
+                previousClearColor[3]
+            );
+        }
+        float pngLeft = 0.0f;
+        float pngRight = (float)Window_xSize;
+
+        if (isTraditionalPng && screenAspect > (4.0f / 3.0f))
+        {
+            float pngDisplayWidth = (float)Window_ySize * (4.0f / 3.0f);
+
+            pngLeft = ((float)Window_xSize - pngDisplayWidth) * 0.5f;
+            pngRight = pngLeft + pngDisplayWidth;
+
+            cropX = 1.0f;
+            cropY = 1.0f;
+        }
+
+        D3DVERTEX fullscreenVertices[4] = { 0 };
+
+        fullscreenVertices[0].x = pngLeft;
+        fullscreenVertices[0].y = 0.0f;
+        fullscreenVertices[0].tu = 0.0f;
+        fullscreenVertices[0].tv = 0.0f;
+
+        fullscreenVertices[1].x = pngLeft;
+        fullscreenVertices[1].y = (float)Window_ySize;
+        fullscreenVertices[1].tu = 0.0f;
+        fullscreenVertices[1].tv = 1.0f;
+
+        fullscreenVertices[2].x = pngRight;
+        fullscreenVertices[2].y = (float)Window_ySize;
+        fullscreenVertices[2].tu = 1.0f;
+        fullscreenVertices[2].tv = 1.0f;
+
+        fullscreenVertices[3].x = pngRight;
+        fullscreenVertices[3].y = 0.0f;
+        fullscreenVertices[3].tu = 1.0f;
+        fullscreenVertices[3].tv = 0.0f;
+
+        for (int i = 0; i < 4; i++)
+        {
+            fullscreenVertices[i].color = 0xFFFFFFFF;
+        }
+
+        const GLushort fullscreenIndices[6] = {
+            1, 0, 2,
+            0, 3, 2
+        };
+
+        glUniform1i(programMenu_uniform_usePngBackground, 0);
+        glUniform1i(programMenu_uniform_pngFullscreen, 1);
+        glUniform2f(programMenu_uniform_pngCropScale, cropX, cropY);
+
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, std3D_pngMenuTexture);
+        glActiveTexture(GL_TEXTURE0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_all);
+        glBufferData(
+            GL_ARRAY_BUFFER,
+            sizeof(fullscreenVertices),
+            fullscreenVertices,
+            GL_STREAM_DRAW
+        );
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, menu_ibo_triangle);
+        glBufferData(
+            GL_ELEMENT_ARRAY_BUFFER,
+            sizeof(fullscreenIndices),
+            fullscreenIndices,
+            GL_STREAM_DRAW
+        );
+
+        // Added: PNG menu background support
+        // Configure vertex attributes for the fullscreen quad.
+        glVertexAttribPointer(
+            programMenu_attribute_coord3d,
+            3, GL_FLOAT, GL_FALSE,
+            sizeof(D3DVERTEX),
+            (GLvoid*)offsetof(D3DVERTEX, x)
+        );
+
+        glVertexAttribPointer(
+            programMenu_attribute_v_color,
+            4, GL_UNSIGNED_BYTE, GL_TRUE,
+            sizeof(D3DVERTEX),
+            (GLvoid*)offsetof(D3DVERTEX, color)
+        );
+
+        glVertexAttribPointer(
+            programMenu_attribute_v_uv,
+            2, GL_FLOAT, GL_FALSE,
+            sizeof(D3DVERTEX),
+            (GLvoid*)offsetof(D3DVERTEX, tu)
+        );
+
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+
+        // Added: PNG menu background support
+        // Restore the original GUI rendering mode.
+        glUniform1i(programMenu_uniform_pngFullscreen, 0);
+        glUniform1i(
+            programMenu_uniform_usePngBackground,
+            usePngMenuBackground
+        );
+
+        glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_all);
+        glBufferData(
+            GL_ARRAY_BUFFER,
+            GL_tmpVerticesAmt * sizeof(D3DVERTEX),
+            GL_tmpVertices,
+            GL_STREAM_DRAW
+        );
+    }
     
     rdTri* tris = GL_tmpTris;
     
@@ -1581,6 +2028,20 @@ void std3D_DrawMenu()
     // Perf: draw the count just uploaded. Asking GL for the buffer's size makes the
     // CPU wait for the GPU, every frame.
     glDrawElements(GL_TRIANGLES, (GLsizei)(GL_tmpTrisAmt * 3), GL_UNSIGNED_SHORT, 0);
+
+    // Added: PNG menu background support
+    glUniform1i(programMenu_uniform_usePngBackground, 0);
+
+    if (usePngMenuBackground)
+    {
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        glActiveTexture(GL_TEXTURE0);
+    }
 
     glDisableVertexAttribArray(programMenu_attribute_v_uv);
     glDisableVertexAttribArray(programMenu_attribute_v_color);
