@@ -11,6 +11,8 @@ uniform vec2 pngMenuUvScale;
 // Added: PNG menu background support
 uniform int pngMenuFullscreen;
 uniform vec2 pngMenuCropScale;
+// Added: PNG menu background support - multiplayer character compositing.
+uniform int pngMenuCharacterPreview;
 
 in vec4 f_color;
 in vec2 f_uv;
@@ -31,6 +33,12 @@ void main(void)
         return;
     }
 
+    // Added: PNG menu background support - draw the RGBA character preview.
+    if (pngMenuCharacterPreview != 0)
+    {
+        fragColor = texture(tex, vec2(f_uv.x, 1.0 - f_uv.y));
+        return;
+    }
     vec4 sampled = texture(tex, f_uv);
     float index = sampled.r;
 

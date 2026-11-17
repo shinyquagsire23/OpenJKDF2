@@ -135,6 +135,8 @@ static GLint programMenu_uniform_usePngBackground;
 static GLint programMenu_uniform_pngUvScale;
 static GLint programMenu_uniform_pngFullscreen;
 static GLint programMenu_uniform_pngCropScale;
+// Added: PNG menu background support - multiplayer character preview.
+static GLint programMenu_uniform_pngCharacterPreview;
 
 std3DSimpleTexStage std3D_uiProgram;
 std3DSimpleTexStage std3D_texFboStage;
@@ -574,6 +576,10 @@ int init_resources()
 
     programMenu_uniform_pngCropScale =
         std3D_tryFindUniform(programMenu, "pngMenuCropScale");
+
+    // Added: PNG menu background support - multiplayer character preview.
+    programMenu_uniform_pngCharacterPreview =
+        std3D_tryFindUniform(programMenu, "pngMenuCharacterPreview");
     
     // Blank texture
     glGenTextures(1, &blank_tex);
@@ -860,7 +866,9 @@ int std3D_StartScene()
     //glClampColor(GL_CLAMP_FRAGMENT_COLOR, GL_FALSE);
 
     // Technically this should be from Clear2
-    glClearColor(0.0, 0.0, 0.0, 1.0);
+    // Added: PNG menu background support
+    // Preserve transparency around the multiplayer character preview.
+    glClearColor(0.0, 0.0, 0.0, jkGuiBuildMulti_bRendering ? 0.0 : 1.0);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     
     if (jkGuiBuildMulti_bRendering && rdColormap_pCurMap && loaded_colormap != rdColormap_pCurMap)
@@ -1472,8 +1480,7 @@ void std3D_DrawMenu()
 
     // Added: PNG menu background support
     if (jkGuiRend_IsMenuActive() &&
-        !jkCutscene_isRendering &&
-        !jkGuiBuildMulti_bRendering)
+        !jkCutscene_isRendering)
     {
         std3D_LoadPngMenuBackground();
 
@@ -1504,6 +1511,8 @@ void std3D_DrawMenu()
     // Added: PNG menu background support
     glUniform1i(programMenu_uniform_usePngBackground, 0);
     glUniform1i(programMenu_uniform_pngFullscreen, 0);
+    // Added: PNG menu background support - default to normal GUI rendering.
+    glUniform1i(programMenu_uniform_pngCharacterPreview, 0);
     
     float menu_w, menu_h, menu_u, menu_v, menu_x;
     menu_w = (double)Window_xSize;
@@ -1766,7 +1775,6 @@ void std3D_DrawMenu()
     int usePngMenuBackground =
         jkGuiRend_IsMenuActive() &&
         !jkCutscene_isRendering &&
-        !jkGuiBuildMulti_bRendering &&
         GL_tmpTrisAmt > 0 &&
         std3D_pngMenuTexture != 0 &&
         std3D_pngMenuMaskTexture != 0;
@@ -1992,6 +2000,26 @@ void std3D_DrawMenu()
         );
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+
+        // Added: PNG menu background support - composite the multiplayer
+        // character preview over the fullscreen PNG.
+        if (jkGuiBuildMulti_bRendering)
+        {
+            glUniform1i(programMenu_uniform_pngFullscreen, 0);
+            glUniform1i(programMenu_uniform_pngCharacterPreview, 1);
+
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex0);
+
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+            // Reuse the fullscreen quad already uploaded for the PNG.
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+
+            // Restore the indexed GUI texture and normal shader mode.
+            glBindTexture(GL_TEXTURE_2D, Video_menuTexId);
+            glUniform1i(programMenu_uniform_pngCharacterPreview, 0);
+        }
 
         // Added: PNG menu background support
         // Restore the original GUI rendering mode.
