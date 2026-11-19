@@ -1875,18 +1875,16 @@ void std3D_DrawMenu()
         float pngAspect =
             (float)std3D_pngMenuWidth / (float)std3D_pngMenuHeight;
 
-        // Preserve traditional 4:3 PNGs without zooming.
-        // Widescreen PNGs retain proportional fullscreen cover scaling.
+        // Added: PNG menu background support
+        // Identify traditional 4:3 PNGs so they remain centered.
         int isTraditionalPng = pngAspect <= (4.0f / 3.0f + 0.01f);
 
+        // Added: PNG menu background support
+        // Preserve height-based scaling for widescreen PNGs.
+        // This keeps the central 4:3 artwork aligned with the GUI
+        // while allowing additional artwork to extend horizontally.
         float cropX = screenAspect / pngAspect;
         float cropY = 1.0f;
-
-        if (!isTraditionalPng && cropX > 1.0f)
-        {
-            cropY = 1.0f / cropX;
-            cropX = 1.0f;
-        }
 
         // Added: PNG menu background support
         // Center traditional 4:3 PNGs without stretching or cropping.

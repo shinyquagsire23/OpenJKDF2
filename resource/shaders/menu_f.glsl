@@ -29,7 +29,17 @@ void main(void)
             0.5 + (f_uv.y - 0.5) * pngMenuCropScale.y
         );
 
-        fragColor = texture(pngMenuBackground, pngUv);
+        // Added: PNG menu background support
+        // Display black borders instead of stretching the PNG's edge pixels.
+        if (pngUv.x < 0.0 || pngUv.x > 1.0 ||
+            pngUv.y < 0.0 || pngUv.y > 1.0)
+        {
+            fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+        }
+        else
+        {
+            fragColor = texture(pngMenuBackground, pngUv);
+        }
         return;
     }
 
