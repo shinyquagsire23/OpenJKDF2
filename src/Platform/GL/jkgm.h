@@ -2,10 +2,21 @@
 #define _PLATFORM_GL_JKGM_H
 
 #include "types.h"
+#include <stdbool.h>   // Added: PNG menu background support
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+// Added: PNG menu background support
+bool jkgm_loadPngImage(
+    const char* name,
+    int* outWidth,
+    int* outHeight,
+    int* outHasAlpha,
+    unsigned char** outData,
+    int flip_bgr
+);
 
 void* jkgm_alloc_aligned(size_t amt);
 void jkgm_aligned_free(void* p);

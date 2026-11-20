@@ -17,4 +17,14 @@ int jkGuiDialog_OkCancelDialog(char16_t *stringA, char16_t *stringB);
 void jkGuiDialog_ErrorDialog(char16_t *stringA, char16_t *stringB);
 int jkGuiDialog_YesNoDialog(char16_t *stringA, char16_t *stringB);
 
+// Added: PNG menu background support
+// Returns the position and dimensions of the dialog background panel.
+void jkGuiDialog_GetPngPanelRect(int* x, int* y, int* width, int* height);
+// Added: PNG menu background support
+// Identifies standard dialogs that use the temporary background.
+int jkGuiDialog_IsPngPanelMenu(jkGuiMenu* menu);
+// Added: PNG menu background support
+// Identifies standard dialogs that use the temporary background.
+int jkGuiDialog_IsPngPanelMenu(jkGuiMenu* menu);
+
 #endif // _JKGUIDIALOG_H

@@ -196,6 +196,12 @@ bool loadPngImage(const char *name, int* outWidth, int* outHeight, int* outHasAl
  
     size_t row_bytes = png_get_rowbytes(png_ptr, info_ptr);
     *outData = (unsigned char*) jkgm_alloc_aligned(row_bytes * height);
+    // Added: PNG menu background support
+    if (!*outData) {
+        png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+        fclose(fp);
+        return false;
+    }
     //intptr_t orig_ptr = (intptr_t)*outData;
     _memset(*outData, 0, row_bytes * height);
     //*outData = (GLubyte*)(((intptr_t)(*outData)) & ~0x1F); // TODO ehhh
@@ -299,7 +305,28 @@ bool loadPngImage(const char *name, int* outWidth, int* outHeight, int* outHasAl
     /* That's it */
     return true;
 }
+
+// Added: PNG menu background support
+bool jkgm_loadPngImage(
+    const char* name,
+    int* outWidth,
+    int* outHeight,
+    int* outHasAlpha,
+    unsigned char** outData,
+    int flip_bgr
+)
+{
+    return loadPngImage(
+        name,
+        outWidth,
+        outHeight,
+        outHasAlpha,
+        outData,
+        flip_bgr
+    );
 }
+
+} // extern "C"
 
 static std::vector<uint8_t> hex_to_bytes(const std::string& hex) {
   std::vector<uint8_t> bytes;

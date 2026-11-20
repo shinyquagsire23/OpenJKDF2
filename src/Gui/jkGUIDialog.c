@@ -12,6 +12,22 @@
 #include "Main/jkStrings.h"
 #include "Win95/stdDisplay.h"
 
+// Added: PNG menu background support
+// Store the dialog panel rectangle before its bitmap data is unloaded.
+static int jkGuiDialog_pngPanelX = 0;
+static int jkGuiDialog_pngPanelY = 0;
+static int jkGuiDialog_pngPanelWidth = 0;
+static int jkGuiDialog_pngPanelHeight = 0;
+
+// Added: PNG menu background support
+void jkGuiDialog_GetPngPanelRect(int* x, int* y, int* width, int* height)
+{
+    if (x) *x = jkGuiDialog_pngPanelX;
+    if (y) *y = jkGuiDialog_pngPanelY;
+    if (width) *width = jkGuiDialog_pngPanelWidth;
+    if (height) *height = jkGuiDialog_pngPanelHeight;
+}
+
 jkGuiElement jkGuiDialog_Ok_buttons[4] = {
     {ELEMENT_TEXT, 0, 2, 0, 3, {0x82, 0x8C, 0x186, 0x28}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXT, 0, 0, 0, 3, {0x82, 0xBE, 0x186, 0x5A}, 1, 0, 0, 0, 0, 0, {0}, 0},
@@ -30,6 +46,14 @@ jkGuiElement jkGuiDialog_OkCancel_buttons[5] = {
 };
 
 jkGuiMenu jkGuiDialog_OkCancel_menu  = {jkGuiDialog_OkCancel_buttons, -1, 0xE1, 0xFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
+
+// Added: PNG menu background support
+// Identify standard dialogs that use the temporary background panel.
+int jkGuiDialog_IsPngPanelMenu(jkGuiMenu* menu)
+{
+    return menu == &jkGuiDialog_Ok_menu ||
+        menu == &jkGuiDialog_OkCancel_menu;
+}
 
 void jkGuiDialog_Startup()
 {
@@ -61,6 +85,14 @@ tVBuffer *jkGuiDialog_sub_416900()
         copyX = (int)((flex_t)copyX * 0.4);
         copyY = (int)((flex_t)copyY * 0.4);
 #endif
+        // Added: PNG menu background support
+        // Capture the panel rectangle before its bitmap data is unloaded.
+        jkGuiDialog_pngPanelX = copyX;
+        jkGuiDialog_pngPanelY = copyY;
+        jkGuiDialog_pngPanelWidth =
+            jkGui_stdBitmaps[JKGUI_BM_BK_DIALOG]->mipSurfaces[0]->format.width;
+        jkGuiDialog_pngPanelHeight =
+            jkGui_stdBitmaps[JKGUI_BM_BK_DIALOG]->mipSurfaces[0]->format.height;
         stdDisplay_VBufferCopy(v0, &Video_menuBuffer, 0, 0, 0, 0);
         stdDisplay_VBufferCopy(v1, *jkGui_stdBitmaps[JKGUI_BM_BK_DIALOG]->mipSurfaces, copyX, copyY, 0, 0);
     }

@@ -155,6 +155,13 @@ void jkGuiRend_PicButtonDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *v
 int jkGuiRend_TextButtonEventHandler(jkGuiElement *element, jkGuiMenu *menu, int32_t a3, int32_t b);
 void jkGuiRend_TextButtonDraw(jkGuiElement *element, jkGuiMenu *menu, tVBuffer *vbuf, BOOL redraw);
 
+// Added: PNG menu background support
+int jkGuiRend_PngIsMenuBuffer(tVBuffer* vbuf);
+void jkGuiRend_PngMaskSetPixel(int x, int y);
+void jkGuiRend_PngMaskSetRect(int x, int y, int width, int height);
+const uint8_t* jkGuiRend_PngMaskGetData(void);
+const char* jkGuiRend_PngGetBackgroundPath(void);
+
 void jkGuiRend_FocusElementDir(jkGuiMenu *pMenu, int32_t dir);
 void jkGuiRend_UpdateController();
 

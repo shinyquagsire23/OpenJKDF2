@@ -788,6 +788,14 @@ void jkGuiBuildMulti_SaberDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, tVBuf
     if ( rect.height >= bmHeight )
         rect.height = bmHeight;
     stdDisplay_VBufferCopy(pVbuf, *pSabBm->mipSurfaces, pElement->rect.x, pElement->rect.y, &rect, 0);
+    // Added: PNG menu background support
+    // Preserve the lightsaber selector over the PNG background.
+    jkGuiRend_PngMaskSetRect(
+        pElement->rect.x,
+        pElement->rect.y,
+        rect.width,
+        rect.height
+    );
 }
 
 // MOTS altered
