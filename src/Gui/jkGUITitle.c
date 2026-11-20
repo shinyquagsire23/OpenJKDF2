@@ -361,8 +361,13 @@ int jkGuiTitle_bSkipLoadingWait = 0; // Added: autoboot skips the mission-text w
 void jkGuiTitle_LoadingFinalize()
 {
 #ifdef QOL_IMPROVEMENTS
-    int shouldSkip = jkPlayer_bFastMissionText || sithNet_isMulti || !sithWorld_g_pCurrentWorld
-                  || jkGuiTitle_bSkipLoadingWait; // Added
+    // Added: Automatically skip mission confirmation for cinematic JKLs.
+    int shouldSkip =
+        jkPlayer_bFastMissionText ||
+        sithNet_isMulti ||
+        !sithWorld_g_pCurrentWorld ||
+        jkGuiTitle_bSkipLoadingWait ||
+        jkMain_bLoadingCinematicJkl;
     if ( jkGuiTitle_whichLoading != 1)
     {
         int selected = -1;

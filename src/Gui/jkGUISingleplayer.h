@@ -19,6 +19,8 @@ void jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, int a3, 
 void jkGuiSingleplayer_sub_41AC70(Darray *array, jkGuiElement *element, int idx);
 int jkGuiSingleplayer_sub_41AD00(Darray *array);
 int jkGuiSingleplayer_FUN_0041d590(const char* pName);
+void jkGuiSingleplayer_SetDebugReturnEpisode(const char* episode);
+void jkGuiSingleplayer_RequestDebugReturn(void);
 
 //static void (*jkGuiSingleplayer_sub_41AA30)(Darray *array, jkGuiElement *element, int a3, char *episodeDir, int a5, int a6, int a7, int a8) = (void*)jkGuiSingleplayer_sub_41AA30_ADDR;
 
