@@ -48,6 +48,21 @@
 // Added: FoV fixes
 flex_t sithMain_lastAspect = 1.0;
 
+#ifdef FIXED_TIMESTEP_PHYS
+// Whole milliseconds for the next fixed physics step (6 or 7 at 150 Hz). The fraction
+// carries over, so the steps' milliseconds add up to the time that passed.
+static double sithMain_physStepMsecCarry = 0.0;
+
+static int sithMain_PhysStepMsec(void)
+{
+    int msec;
+    sithMain_physStepMsecCarry += DELTA_PHYSTICK_FPS * 1000.0;
+    msec = (int)sithMain_physStepMsecCarry;
+    sithMain_physStepMsecCarry -= msec;
+    return msec;
+}
+#endif
+
 int sithMain_Startup(HostServices *commonFuncs)
 {
     int is_started; // esi
@@ -279,8 +294,9 @@ int sithUpdate()
             sithTime_g_frameTimeFlex = DELTA_PHYSTICK_FPS;
             sithTime_g_frameTime = (int)(DELTA_PHYSTICK_FPS * 1000.0);
 
-            for (int i = (int)framesToApply; i > 0; i--)
+            for (uint32_t i = 0; i < wholeFramesToApply; i++)
             {
+                sithTime_g_frameTime = sithMain_PhysStepMsec();
                 sithSurface_Tick(sithTime_g_frameTimeFlex);
                 sithThing_Update(sithTime_g_frameTimeFlex, sithTime_g_frameTime);
             }
@@ -343,6 +359,7 @@ int sithUpdate()
 
             for (int i = 0; i < wholeFramesToApply; i++)
             {
+                sithTime_g_frameTime = sithMain_PhysStepMsec();
                 sithSoundMixer_Update(sithTime_g_frameTimeFlex);
                 sithEvent_Process();
 
