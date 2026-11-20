@@ -156,6 +156,11 @@ LABEL_8:
 
 void sithPhysics_UpdateThing(SithThing *pThing, flex_t secDeltaTime)
 {
+#ifdef FIXED_TIMESTEP_PHYS
+    rdVector3 keptAcceleration;
+    int bKeepAcceleration;
+#endif
+
     if (!pThing->sector)
         return;
 
@@ -167,6 +172,14 @@ void sithPhysics_UpdateThing(SithThing *pThing, flex_t secDeltaTime)
     {
         rdVector_Zero3(&pThing->physicsParams.acceleration);
     }
+
+#ifdef FIXED_TIMESTEP_PHYS
+    // The air and water physics scale a player's acceleration in place, and the controls
+    // set it once per frame: each fixed step starts again from the controls' value.
+    bKeepAcceleration = (pThing->type == SITH_THING_PLAYER) && (NEEDS_STEPPED_PHYS);
+    if (bKeepAcceleration)
+        rdVector_Copy3(&keptAcceleration, &pThing->physicsParams.acceleration);
+#endif
 
     if (pThing->attach_flags & (SITH_ATTACH_THINGFACE | SITH_ATTACH_SURFACE))
     {
@@ -202,6 +215,11 @@ void sithPhysics_UpdateThing(SithThing *pThing, flex_t secDeltaTime)
     {
         sithPhysics_UpdateThingPhysics(pThing, secDeltaTime);
     }
+
+#ifdef FIXED_TIMESTEP_PHYS
+    if (bKeepAcceleration)
+        rdVector_Copy3(&pThing->physicsParams.acceleration, &keptAcceleration);
+#endif
 }
 
 void sithPhysics_ApplyForce(SithThing *pThing, rdVector3 *force)
