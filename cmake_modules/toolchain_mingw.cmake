@@ -51,7 +51,10 @@ elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL x86_64 OR
        CMAKE_SYSTEM_PROCESSOR STREQUAL AMD64 OR
        CMAKE_SYSTEM_PROCESSOR STREQUAL arm64 OR
        CMAKE_SYSTEM_PROCESSOR STREQUAL aarch64)
-set(MINGW_STACK_SIZE  0x20000,0x2000)
+# Preserve GNU ld's 2 MiB default reserve for application and library threads.
+# Default-sized driver workers can inherit this PE setting, so do not constrain
+# them to 128 KiB. Keep the existing 8 KiB initial commit.
+set(MINGW_STACK_SIZE  0x200000,0x2000)
 set(MINGW_HEAP_SIZE 0x200000,0x20000)
 else()
 set(MINGW_STACK_SIZE  0x10000,0x1000)
