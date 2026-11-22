@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.15)
+project(sound_identity_tests LANGUAGES CXX)
+enable_testing()
+add_executable(sound_identity_tests sound_identity_test.cpp)
+target_compile_features(sound_identity_tests PRIVATE cxx_std_11)
+add_test(NAME sound_identity COMMAND sound_identity_tests)
