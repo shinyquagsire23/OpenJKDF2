@@ -1,0 +1,49 @@
+name: POSIX file-search regression
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [master]
+    paths:
+      - .github/workflows/file-search-regression.yml
+      - src/General/stdFileUtil.*
+      - src/General/stdFnames.*
+      - src/external/fcaseopen/**
+      - src/Platform/Dreamcast/dcStorage.*
+      - src/types.h
+      - src/types_enums.h
+      - src/engine_config.h
+      - src/Tests/file_search_test.c
+      - src/Tests/run_file_search_test.py
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/file-search-regression.yml
+      - src/General/stdFileUtil.*
+      - src/General/stdFnames.*
+      - src/external/fcaseopen/**
+      - src/Platform/Dreamcast/dcStorage.*
+      - src/types.h
+      - src/types_enums.h
+      - src/engine_config.h
+      - src/Tests/file_search_test.c
+      - src/Tests/run_file_search_test.py
+
+permissions:
+  contents: read
+
+concurrency:
+  group: file-search-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  file-search:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Test POSIX searches and platform routing with sanitizers
+        run: python3 -B src/Tests/run_file_search_test.py --cc gcc --sanitize --output "$RUNNER_TEMP/file-search"
