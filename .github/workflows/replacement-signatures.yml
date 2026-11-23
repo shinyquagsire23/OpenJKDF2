@@ -1,0 +1,18 @@
+name: Replacement signature selection
+on:
+  pull_request:
+    paths:
+      - 'src/Platform/GL/jkgm.cpp'
+      - 'src/Platform/GL/jkgm_cache_lookup.hpp'
+      - 'src/Tests/*replacement_signatures*'
+      - 'src/Tests/source_test_utils.py'
+      - '.github/workflows/replacement-signatures.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  cpu:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 src/Tests/run_replacement_signatures_test.py --cxx g++ --sanitize
