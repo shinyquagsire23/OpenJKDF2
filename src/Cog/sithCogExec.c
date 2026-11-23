@@ -5,6 +5,7 @@
 #include "jk.h"
 #include "stdPlatform.h"
 #include "World/sithWorld.h"
+#include "World/sithModel.h"
 #include "World/sithThing.h"
 #include "World/sithSector.h"
 #include "Gameplay/sithPlayer.h"
@@ -911,7 +912,6 @@ rdModel3* sithCogExec_PopModel3(sithCog *pCog)
 {
     SithCogSymbolValue tmp;
     int32_t idx;
-    SithWorld* world = sithWorld_g_pCurrentWorld;
 
     SITH_ASSERTREL(pCog); // Added: ported J3D assert
     if (!sithCogExec_PopSymbol(pCog, &tmp))
@@ -945,21 +945,8 @@ rdModel3* sithCogExec_PopModel3(sithCog *pCog)
         idx = -1;
     }
 
-    if (idx == -1)
-        return NULL;
-    
-    if ( idx & 0x8000 )
-    {
-        world = sithWorld_g_pStaticWorld;
-        idx &= ~0x8000; // ?
-    }
-    
-    if ( world && idx >= 0 && idx < world->numModels )
-    {
-        return &world->aModels[idx];
-    }
-
-    return NULL;
+    // Altered: resolve both the initial model array and nonmoving overflow pages.
+    return sithModel_GetModelByIndex(idx);
 }
 
 rdKeyframe* sithCogExec_PopKeyframe(sithCog *pCog)
