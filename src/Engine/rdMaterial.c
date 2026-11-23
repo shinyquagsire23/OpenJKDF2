@@ -60,14 +60,44 @@ static int rdMaterial_ReadPackedRows(stdFile_t fhand, uint8_t* pOut, size_t capa
     return 1;
 }
 
-// Added: a texture header's size and mip count index fixed arrays, so check them
-static int rdMaterial_ValidTextureLayout(uint32_t width, uint32_t height, uint32_t numMipmaps, uint32_t maxMipmaps)
+// A MAT may include a complete chain down to 1x1. The renderer has a fixed
+// number of slots and expects both dimensions of each retained mip to be nonzero.
+static int rdMaterial_ResidentMipCount(uint32_t width, uint32_t height, uint32_t fileMips, uint32_t slots)
 {
-    if (!width || !height || width > INT32_MAX || height > INT32_MAX || numMipmaps > maxMipmaps)
-        return 0;
-    return !numMipmaps || ((width >> (numMipmaps - 1)) && (height >> (numMipmaps - 1)));
+    if (!width || !height || width > INT32_MAX || height > INT32_MAX || fileMips > 31)
+        return -1;
+    uint32_t longest = width > height ? width : height;
+    uint32_t shortest = width < height ? width : height;
+    if (fileMips && (longest >> (fileMips - 1)) == 0)
+        return -1;
+
+    uint32_t count = fileMips < slots ? fileMips : slots;
+    while (count && (shortest >> (count - 1)) == 0)
+        --count;
+    return (int)count;
 }
 
+static int rdMaterial_ReadMipTail(stdFile_t file, const rdTextureHeader* header, uint32_t firstMip, uint32_t bpp)
+{
+    uint8_t scratch[1024];
+    if (!bpp || bpp > 32 || bpp % 8)
+        return 0;
+
+    for (uint32_t i = firstMip; i < header->num_mipmaps; ++i)
+    {
+        uint32_t w = header->width >> i;
+        uint32_t h = header->height >> i;
+        uint64_t bytes = (uint64_t)(w ? w : 1) * (h ? h : 1) * (bpp / 8);
+        while (bytes)
+        {
+            size_t n = bytes < sizeof(scratch) ? (size_t)bytes : sizeof(scratch);
+            if (!rdMaterial_ReadExact(file, scratch, n))
+                return 0;
+            bytes -= n;
+        }
+    }
+    return 1;
+}
 
 #if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
 
@@ -304,10 +334,10 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
       while ( 1 )
       {
         //printf("asdf %x %x\n", tex_numa, material->num_textures);
-        // Added: reject a short or bad header before its mip count indexes the arrays
+        int residentMips;
         if (!rdMaterial_ReadExact(mat_file_, &tex_header_1, sizeof(rdTextureHeader))
-            || !rdMaterial_ValidTextureLayout(tex_header_1.width, tex_header_1.height, tex_header_1.num_mipmaps,
-                   sizeof(material->textures[0].texture_struct) / sizeof(material->textures[0].texture_struct[0])))
+            || (residentMips = rdMaterial_ResidentMipCount(tex_header_1.width, tex_header_1.height, tex_header_1.num_mipmaps,
+                   sizeof(material->textures[0].texture_struct) / sizeof(material->textures[0].texture_struct[0]))) < 0)
         {
             stdPlatform_Printf("OpenJKDF2: Material `%s` texture %d has a short or invalid header!\n", mat_fpath, tex_numa);
             rdroid_g_pHS->fileClose(mat_file_);
@@ -320,7 +350,7 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
         texture->width_minus_1 = tex_header_1.width - 1;
         mipmap_num = 0;
         texture->height_minus_1 = tex_header_1.height - 1;
-        texture->num_mipmaps = tex_header_1.num_mipmaps;
+        texture->num_mipmaps = residentMips;
         texture->color_transparent = tex_header_1.unk_10;
         format.width = tex_header_1.width;
         format.height = tex_header_1.height;
@@ -445,6 +475,15 @@ no_loading:
         ++texture_struct;
         if ( mipmap_num >= texture->num_mipmaps )
         {
+          // The next texture header (or the material palette) follows every
+          // declared mip, including the ones we didn't keep in runtime slots.
+          if (mipmap_num < tex_header_1.num_mipmaps
+              && !rdMaterial_ReadMipTail(mat_file__, &tex_header_1, mipmap_num, format.format.bpp))
+          {
+            stdPlatform_Printf("OpenJKDF2: Material `%s` texture %d has an unreadable mip tail!\n", mat_fpath, tex_numa);
+            rdroid_g_pHS->fileClose(mat_file__);
+            return 0;
+          }
           goto LABEL_21;
         }
       }
