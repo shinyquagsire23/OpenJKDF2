@@ -8,6 +8,80 @@
 #include "stdPlatform.h" // Added: word-safe read bounce for VRAM-resident PCM
 #include "jk.h"
 
+#ifdef NO_JK_MMAP
+// Added: published sound pointers are retained by classes, mixer voices and sectors.
+// Overflow pages never move; the legacy world layout and initial array remain.
+typedef struct sithSoundPage {
+    struct sithSoundPage *next;
+    SithWorld *world;
+    int first;
+    int count;
+    sithSound records[];
+} sithSoundPage;
+
+static sithSoundPage *sithSound_pages;
+
+static sithSoundPage *sithSound_NewPage(SithWorld *world)
+{
+    if (world->numSounds < 1 || world->numSounds >= SITHSOUND_MAX_RECORDS)
+        return NULL;
+    int count = SITHSOUND_MAX_RECORDS - world->numSounds;
+    if (count > SITHSOUND_PAGE_RECORDS)
+        count = SITHSOUND_PAGE_RECORDS;
+    sithSoundPage *page = SITH_ALLOC(sizeof(*page) + sizeof(sithSound) * count);
+    if (!page)
+        return NULL;
+    _memset(page, 0, sizeof(*page) + sizeof(sithSound) * count);
+    page->world = world;
+    page->first = world->numSounds;
+    page->count = count;
+    return page;
+}
+
+static int sithSound_ParseCount(const char *text, int *count)
+{
+    int value = 0;
+    if (!text || !*text)
+        return 0;
+    for (; *text; ++text) {
+        if (*text < '0' || *text > '9'
+            || value > (SITHSOUND_MAX_RECORDS - (*text - '0')) / 10)
+            return 0;
+        value = value * 10 + (*text - '0');
+    }
+    *count = value;
+    return 1;
+}
+#endif
+
+// Added: resolve initial-array and page slots without moving a published header.
+static sithSound *sithSound_GetAllocatedSound(SithWorld *world, int idx)
+{
+    if (!world || !world->sounds || idx < 0 || idx >= world->numSounds)
+        return NULL;
+#ifdef NO_JK_MMAP
+    int baseCount = world->numSounds;
+    for (sithSoundPage *page = sithSound_pages; page; page = page->next) {
+        if (page->world != world)
+            continue;
+        if (idx >= page->first && idx - page->first < page->count)
+            return &page->records[idx - page->first];
+        if (page->first < baseCount)
+            baseCount = page->first;
+    }
+    if (idx >= baseCount)
+        return NULL;
+#endif
+    return &world->sounds[idx];
+}
+
+sithSound *sithSound_GetWorldSoundByIndex(SithWorld *world, int idx)
+{
+    if (!world || idx < 0 || idx >= world->numSoundsLoaded)
+        return NULL;
+    return sithSound_GetAllocatedSound(world, idx);
+}
+
 // Un-inlined: searches semicolon-delimited directory list for a sound file.
 // Returns file handle on success, 0 on failure. outPath receives the full path found.
 static stdFile_t sithSound_FindInSearchPaths(const char *filename, char *outPath, int outPathSize)
@@ -85,11 +159,22 @@ int sithSound_ReadSoundsListText(SithWorld *pWorld, int bSkip)
         sithSound_FreeWorldSounds(pWorld);
         return 0;
     }
+#ifdef NO_JK_MMAP
+    if (stdConffile_g_entry.numArgs < 3
+        || !sithSound_ParseCount(stdConffile_g_entry.aArgs[2].value, &numSounds))
+        return 0;
+#else
     numSounds = _atoi(stdConffile_g_entry.aArgs[2].value);
+#endif
     if ( !numSounds )
         return 1;
 
+#ifdef NO_JK_MMAP
+    if (!sithSound_New(pWorld, numSounds))
+        return 0;
+#else
     sithSound_New(pWorld, numSounds);
+#endif
     
     while ( stdConffile_ReadArgs() )
     {
@@ -109,9 +194,25 @@ void sithSound_FreeWorldSounds(SithWorld *pWorld)
     {
         for (int i = 0; i < pWorld->numSoundsLoaded; i++)
         {
-            sithSound_UnloadData(&pWorld->sounds[i]);
-            stdHashtbl_Remove(sithSound_hashtable, pWorld->sounds[i].sound_fname);
+            sithSound *sound = sithSound_GetWorldSoundByIndex(pWorld, i);
+            if (sound) {
+                sithSound_UnloadData(sound);
+                stdHashtbl_Remove(sithSound_hashtable, sound->sound_fname);
+            }
         }
+#ifdef NO_JK_MMAP
+        sithSoundPage **link = &sithSound_pages;
+        while (*link) {
+            sithSoundPage *page = *link;
+            if (page->world == pWorld) {
+                *link = page->next;
+                SITH_FREE(page);
+            }
+            else {
+                link = &page->next;
+            }
+        }
+#endif
         SITH_FREE(pWorld->sounds);
         pWorld->numSoundsLoaded = 0;
         pWorld->numSounds = 0;
@@ -122,16 +223,30 @@ void sithSound_FreeWorldSounds(SithWorld *pWorld)
 // MOTS altered
 int sithSound_New(SithWorld *world, int num)
 {
+#ifdef NO_JK_MMAP
+    // Added: capacity and the MotS reserve must fit the existing sound ID encoding.
+    if (!world || world->sounds || world->numSounds || world->numSoundsLoaded
+        || num < 0 || num > SITHSOUND_MAX_RECORDS - (Main_bMotsCompat != 0))
+        return 0;
+#endif
     // MOTS added: reserve sound 0?
     if (Main_bMotsCompat) {
         num++;
     }
 
+#ifdef NO_JK_MMAP
+    if (!num)
+        num = 1; // A lazily populated empty world must remain visible to cleanup.
+#endif
+
     sithSound* sounds  = (sithSound *)SITH_ALLOC(sizeof(sithSound) * num);
+#ifndef NO_JK_MMAP
     world->sounds = sounds;
+#endif
     if ( sounds )
     {
         _memset(sounds, 0, sizeof(sithSound) * num);
+        world->sounds = sounds;
         world->numSounds = num;
         world->numSoundsLoaded = 0;
 
@@ -147,7 +262,10 @@ int sithSound_New(SithWorld *world, int num)
 sithSound* sithSound_Load(char *sound_fname, int a2)
 {
     stdFile_t sound_file; // ebp
-    sithSound *sound; // esi
+    sithSound *sound = NULL; // esi
+#ifdef NO_JK_MMAP
+    sithSoundPage *pendingPage = NULL;
+#endif
     uint32_t v7; // eax
     uint32_t v10; // eax
     uint32_t frequencyKHz; // eax
@@ -180,9 +298,30 @@ sithSound* sithSound_Load(char *sound_fname, int a2)
     if ( !sound_file )
         return 0;
 
+#ifdef NO_JK_MMAP
+    if (!sithWorld_g_pLastLoadedWorld)
+        goto fail;
+    if (!sithWorld_g_pLastLoadedWorld->sounds
+        && !sithSound_New(sithWorld_g_pLastLoadedWorld, 0))
+        goto fail;
+    if (sithWorld_g_pLastLoadedWorld->numSoundsLoaded == sithWorld_g_pLastLoadedWorld->numSounds) {
+        pendingPage = sithSound_NewPage(sithWorld_g_pLastLoadedWorld);
+        if (!pendingPage)
+            goto fail;
+    }
+    if (pendingPage || sithWorld_g_pLastLoadedWorld->numSoundsLoaded < sithWorld_g_pLastLoadedWorld->numSounds)
+#else
     if ( sithWorld_g_pLastLoadedWorld->numSoundsLoaded < sithWorld_g_pLastLoadedWorld->numSounds )
+#endif
     {
+#ifdef NO_JK_MMAP
+        sound = pendingPage ? &pendingPage->records[0] :
+            sithSound_GetAllocatedSound(sithWorld_g_pLastLoadedWorld, sithWorld_g_pLastLoadedWorld->numSoundsLoaded);
+        if (!sound)
+            goto fail;
+#else
         sound = &sithWorld_g_pLastLoadedWorld->sounds[sithWorld_g_pLastLoadedWorld->numSoundsLoaded];
+#endif
         sound->id = sithWorld_g_pLastLoadedWorld->numSoundsLoaded;
         if ((sithWorld_g_pLastLoadedWorld->level_type_maybe & 1))
         {
@@ -203,13 +342,32 @@ sithSound* sithSound_Load(char *sound_fname, int a2)
                 sound->sound_len = sound->sound_len >> 1;
             sound->isLoaded = 0;
             sound->infoLoaded = 1;
+#ifdef NO_JK_MMAP
+            // Added: publish a header/page only after its cache entry succeeds.
+            if (!stdHashtbl_Add(sithSound_hashtable, sound->sound_fname, sound))
+                goto fail;
+            if (pendingPage) {
+                pendingPage->next = sithSound_pages;
+                sithSound_pages = pendingPage;
+                sithWorld_g_pLastLoadedWorld->numSounds += pendingPage->count;
+                pendingPage = NULL;
+            }
+#else
             stdHashtbl_Add(sithSound_hashtable, sound->sound_fname, sound);
+#endif
             v12 = pSithHS;
             ++sithWorld_g_pLastLoadedWorld->numSoundsLoaded;
             v12->fileClose(sound_file);
             return sound;
         }
     }
+#ifdef NO_JK_MMAP
+fail:
+    if (sound)
+        _memset(sound, 0, sizeof(*sound));
+    if (pendingPage)
+        SITH_FREE(pendingPage);
+#endif
     if ( sound_file )
         pSithHS->fileClose(sound_file);
     return 0;
@@ -225,11 +383,7 @@ sithSound* sithSound_GetFromIdx(int idx)
         idx &= ~0x8000;
     }
 
-    if ( idx < 0 || idx >= world->numSoundsLoaded )
-        return 0;
-
-
-    return &world->sounds[idx];
+    return sithSound_GetWorldSoundByIndex(world, idx);
 }
 
 
@@ -388,24 +542,25 @@ int sithSound_FreeUpMemory(uint32_t numBytesNeeded)
 
         for (uint32_t v3 = sithSound_var4; v3 < world->numSoundsLoaded; v3++)
         {
-            if ((world->sounds[v3].isLoaded & 1) 
-                && !world->sounds[v3].field_40
-                && !stdSound_IsPlaying(world->sounds[v3].dsoundBuffer2, 0))
+            sithSound *sound = sithSound_GetWorldSoundByIndex(world, v3);
+            if (sound && (sound->isLoaded & 1)
+                && !sound->field_40
+                && !stdSound_IsPlaying(sound->dsoundBuffer2, 0))
             {
-                if (world->sounds[v3].infoLoaded)
+                if (sound->infoLoaded)
                 {
-                    world->sounds[v3].infoLoaded = 0;
+                    sound->infoLoaded = 0;
                 }
                 else
                 {
-                    result = world->sounds[v3].bufferBytes + v9;
+                    result = sound->bufferBytes + v9;
                     v9 = result;
-                    if ((world->sounds[v3].isLoaded & 1))
+                    if ((sound->isLoaded & 1))
                     {
-                        stdSound_BufferRelease(world->sounds[v3].dsoundBuffer2);
-                        world->sounds[v3].isLoaded &= ~1u;
-                        world->sounds[v3].dsoundBuffer2 = 0;
-                        sithSound_curDataLoaded -= world->sounds[v3].bufferBytes;
+                        stdSound_BufferRelease(sound->dsoundBuffer2);
+                        sound->isLoaded &= ~1u;
+                        sound->dsoundBuffer2 = 0;
+                        sithSound_curDataLoaded -= sound->bufferBytes;
                         result = v9;
                     }
                     if ( result >= numBytesNeeded )
@@ -476,4 +631,3 @@ stdSound_buffer_t* sithSound_InitFromPath(char *path)
     }
     return NULL;
 }
-
