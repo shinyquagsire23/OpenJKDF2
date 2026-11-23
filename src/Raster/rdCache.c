@@ -1065,13 +1065,15 @@ solid_tri:
                 do
                 {
                     v73 = stdMath_Clamp(stdMath_Clamp(*iterRedIntense + active_6c->extralight, 0.0, 1.0), v148, 1.0);
-                    *iterRedIntense = v73 * 63.0;
+                    // RGB is converted directly to bytes below; only the mono
+                    // palette lookup uses a 0..63 light-table row index.
+                    *iterRedIntense = v73;
 
                     v73 = stdMath_Clamp(stdMath_Clamp(*iterGreenIntense + active_6c->extralight, 0.0, 1.0), v148, 1.0);
-                    *iterGreenIntense = v73 * 63.0;
+                    *iterGreenIntense = v73;
 
                     v73 = stdMath_Clamp(stdMath_Clamp(*iterBlueIntense + active_6c->extralight, 0.0, 1.0), v148, 1.0);
-                    *iterBlueIntense = v73 * 63.0;
+                    *iterBlueIntense = v73;
 
                     ++iterRedIntense;
                     ++iterGreenIntense;
@@ -1221,8 +1223,15 @@ LABEL_232:
                     flex_d_t intBlue = active_6c->paBlueIntensities[vtx_idx] * 255.0 - 0.5;
 
                     intRed += (flex_t)v91->colors[baseLight].r; // FLEXTODO
-                    intGreen += (flex_t)v91->colors[baseLight].g; // FLEXTODO
-                    intBlue += (flex_t)v91->colors[baseLight].b; // FLEXTODO
+                    intGreen += (flex_t)v91->colors[baseLight].g;
+                    intBlue += (flex_t)v91->colors[baseLight].b;
+
+#ifdef SDL2_RENDER
+                    rdCache_aHWVertices[rdCache_totalVerts].lightLevel =
+                        0.2126 * active_6c->paRedIntensities[vtx_idx]
+                        + 0.7152 * active_6c->paGreenIntensities[vtx_idx]
+                        + 0.0722 * active_6c->paBlueIntensities[vtx_idx];
+#endif
 
                     v94 = (uint8_t)stdMath_Clamp(intGreen, 0.0, 255.0);
                     v95 = (uint8_t)stdMath_Clamp(intBlue, 0.0, 255.0);

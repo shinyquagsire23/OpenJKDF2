@@ -1580,14 +1580,16 @@ int sithThing_ReadStaticThingsListText(SithWorld *pWorld, int bSkip)
             if ( v23 >= 0 && v23 < sithWorld_g_pCurrentWorld->numSectors )
             {
                 v24 = &sithWorld_g_pCurrentWorld->aSectors[v23];
+                sithThing_SetThingBasedOn(v21, v22);
+#ifdef JKM_LIGHTING
+                // The positional ARCH index belongs to this placement, so apply
+                // it after inheriting the template (which copies the whole thing).
                 if ( stdConffile_g_entry.numArgs >= 11 && (stdConffile_g_entry.aArgs[10].key == stdConffile_g_entry.aArgs[10].value)) // MOTS added (w/o comparison)
                 {
-                    // && (!stdConffile_g_entry.aArgs[10].key || strlen(stdConffile_g_entry.aArgs[10].key) == 0)
                     v23 = _atoi(stdConffile_g_entry.aArgs[10].value);
                     v21->archlightIdx = v23;
-                    //printf("%p %p %x\n", , v21->archlightIdx);
                 }
-                sithThing_SetThingBasedOn(v21, v22);
+#endif
                 sithThing_SetPositionAndOrient(v21, &pos, &a);
                 sithThing_EnterSector(v21, v24, 1, 1);
                 sithThing_Initialize(v21);
