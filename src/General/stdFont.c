@@ -2,7 +2,7 @@
 
 #include <string.h>
 #include "stdPlatform.h"
-#include "GUI/jkGUIRend.h"
+#include "Gui/jkGUIRend.h"
 #include "General/stdBitmap.h"
 #include "General/stdString.h"
 #include "Win95/stdDisplay.h"

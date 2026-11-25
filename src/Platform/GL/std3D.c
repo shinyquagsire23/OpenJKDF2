@@ -154,6 +154,8 @@ static int std3D_pngMenuHeight = 0;
 static char std3D_pngMenuCurrentPath[256] = { 0 };
 static GLuint std3D_pngMenuMaskTexture = 0;
 
+#if defined(SDL2_RENDER) && defined(TARGET_CAN_JKGM)
+
 // Added: PNG font replacement - maximum registered font atlases.
 #define STD3D_MAX_PNG_FONT_ATLASES 64
 
@@ -166,6 +168,7 @@ typedef struct std3DPngFontAtlas
     int originalHeight;
     int scale;
     GLuint textureId;
+    int uploadFailed;  // Added: PNG font replacement - prevent repeated failed uploads.
 } std3DPngFontAtlas;
 
 // Added: PNG font replacement - atlas registry.
@@ -195,6 +198,8 @@ typedef struct std3DPngFontGlyph
 // Added: PNG font replacement - tracked glyph registry.
 static std3DPngFontGlyph std3D_pngFontGlyphs[STD3D_MAX_PNG_FONT_GLYPHS];
 static int std3D_pngFontGlyphCount = 0;
+
+#endif // SDL2_RENDER && TARGET_CAN_JKGM
 
 void* blank_data = NULL, *blank_data_white = NULL;
 GLuint worldpal_texture;
@@ -796,6 +801,7 @@ void std3D_FreeResources()
 {
     std3D_PurgeEntireTextureCache();
 
+#if defined(SDL2_RENDER) && defined(TARGET_CAN_JKGM)
     // Added: PNG font replacement - release GPU atlases during graphics cleanup.
     for (int i = 0; i < std3D_pngFontAtlasCount; i++)
     {
@@ -806,7 +812,11 @@ void std3D_FreeResources()
             glDeleteTextures(1, &atlas->textureId);
             atlas->textureId = 0;
         }
+
+        // Added: PNG font replacement - permit uploads after graphics recreation.
+        atlas->uploadFailed = 0;
     }
+#endif // SDL2_RENDER && TARGET_CAN_JKGM
 
     if (std3D_pngMenuTexture)
     {
@@ -1393,6 +1403,8 @@ static void std3D_UpdatePngMenuMask(void)
 #endif
 }
 
+#if defined(SDL2_RENDER) && defined(TARGET_CAN_JKGM)
+
 // Added: PNG font replacement - validate optional high-resolution atlas.
 static int std3D_ValidatePngFontAtlas(
     const char* pngPath,
@@ -1519,6 +1531,18 @@ void std3D_UnregisterPngFontAtlas(const tVBuffer* originalBitmap)
     if (!originalBitmap)
         return;
 
+    // Added: PNG font replacement - invalidate glyphs referencing a freed atlas.
+    for (int i = 0; i < std3D_pngFontGlyphCount; i++)
+    {
+        std3DPngFontGlyph* glyph = &std3D_pngFontGlyphs[i];
+
+        if (glyph->originalBitmap == originalBitmap)
+        {
+            glyph->active = 0;
+            glyph->originalBitmap = NULL;
+        }
+    }
+
     for (int i = 0; i < std3D_pngFontAtlasCount; i++)
     {
         std3DPngFontAtlas* atlas = &std3D_pngFontAtlases[i];
@@ -1526,11 +1550,7 @@ void std3D_UnregisterPngFontAtlas(const tVBuffer* originalBitmap)
         if (atlas->originalBitmap != originalBitmap)
             continue;
 
-        // Added: PNG font replacement - GPU textures will be managed
-        // separately through std3D_FreeResources().
-        // No texture should exist at this stage.
-        // Added: PNG font replacement - GPU texture deletion will be
-        // coordinated with the active OpenGL context.
+        // Added: PNG font replacement - release the atlas GPU texture.
         if (atlas->textureId != 0)
         {
             glDeleteTextures(1, &atlas->textureId);
@@ -1871,6 +1891,8 @@ void std3D_InvalidatePngFontGlyphs(const rdRect* rect)
     }
 }
 
+#endif // SDL2_RENDER && TARGET_CAN_JKGM
+
 // PNG menu background support
 static void std3D_LoadPngMenuBackground(void)
 {
@@ -2004,16 +2026,43 @@ static void std3D_LoadPngMenuBackground(void)
 #endif
 }
 
+#if defined(SDL2_RENDER) && defined(TARGET_CAN_JKGM)
+
 // Added: PNG font replacement - upload registered atlases to OpenGL.
 static void std3D_UploadPngFontAtlases(void)
 {
+    GLint maxTextureSize = 0;
+
     for (int i = 0; i < std3D_pngFontAtlasCount; i++)
     {
         std3DPngFontAtlas* atlas = &std3D_pngFontAtlases[i];
 
-        // Added: PNG font replacement - skip previously uploaded atlases.
-        if (atlas->textureId != 0)
+        // Added: PNG font replacement - skip uploaded or failed atlases.
+        if (atlas->textureId != 0 || atlas->uploadFailed)
             continue;
+
+        // Added: PNG font replacement - query hardware texture limits.
+        if (maxTextureSize == 0)
+        {
+            glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
+
+            if (maxTextureSize <= 0)
+                return;
+        }
+
+        // Added: PNG font replacement - reject unsupported atlas dimensions.
+        if ((long long)atlas->originalWidth * atlas->scale > maxTextureSize ||
+            (long long)atlas->originalHeight * atlas->scale > maxTextureSize)
+        {
+            stdPlatform_Printf(
+                "PNG font exceeds GPU texture limit: %s (maximum %d)\n",
+                atlas->pngPath,
+                maxTextureSize
+            );
+
+            atlas->uploadFailed = 1;
+            continue;
+        }
 
         int width = 0;
         int height = 0;
@@ -2029,6 +2078,12 @@ static void std3D_UploadPngFontAtlases(void)
             &pixels,
             0))
         {
+            stdPlatform_Printf(
+                "PNG font decode failed: %s\n",
+                atlas->pngPath
+            );
+
+            atlas->uploadFailed = 1;
             continue;
         }
 
@@ -2039,7 +2094,22 @@ static void std3D_UploadPngFontAtlases(void)
         {
             if (pixels)
                 jkgm_aligned_free(pixels);
+
+            stdPlatform_Printf(
+                "PNG font validation failed: %s\n",
+                atlas->pngPath
+            );
+
+            atlas->uploadFailed = 1;
             continue;
+        }
+
+        // Added: PNG font replacement - clear previous OpenGL errors.
+        // Limit attempts to avoid an indefinite loop.
+        for (int errorIndex = 0; errorIndex < 16; errorIndex++)
+        {
+            if (glGetError() == GL_NO_ERROR)
+                break;
         }
 
         GLuint texture = 0;
@@ -2048,6 +2118,13 @@ static void std3D_UploadPngFontAtlases(void)
         if (!texture)
         {
             jkgm_aligned_free(pixels);
+
+            stdPlatform_Printf(
+                "PNG font texture creation failed: %s\n",
+                atlas->pngPath
+            );
+
+            atlas->uploadFailed = 1;
             continue;
         }
 
@@ -2081,6 +2158,24 @@ static void std3D_UploadPngFontAtlases(void)
         // Added: PNG font replacement - release decoded CPU pixels.
         jkgm_aligned_free(pixels);
 
+        // Added: PNG font replacement - verify successful GPU upload.
+        GLenum uploadError = glGetError();
+
+        if (uploadError != GL_NO_ERROR)
+        {
+            glDeleteTextures(1, &texture);
+
+            stdPlatform_Printf(
+                "PNG font texture upload failed: %s (GL error 0x%04X)\n",
+                atlas->pngPath,
+                (unsigned int)uploadError
+            );
+
+            atlas->uploadFailed = 1;
+            continue;
+        }
+
+        // Added: PNG font replacement - mark only successful uploads as ready.
         atlas->textureId = texture;
 
         stdPlatform_Printf(
@@ -2092,26 +2187,16 @@ static void std3D_UploadPngFontAtlases(void)
     }
 }
 
+#endif // SDL2_RENDER && TARGET_CAN_JKGM
+
 void std3D_DrawMenu()
 {
     if (Main_bHeadless) return;
 
+#if defined(SDL2_RENDER) && defined(TARGET_CAN_JKGM)
     // Added: PNG font replacement - upload atlases with active GL context.
     std3D_UploadPngFontAtlases();
-
-    // Added: PNG font replacement - verify recorded glyph count.
-    static int pngGlyphCountLogged = 0;
-
-    if (!pngGlyphCountLogged &&
-        std3D_pngFontGlyphCount > 0)
-    {
-        stdPlatform_Printf(
-            "PNG font replacement: %d glyphs recorded\n",
-            std3D_pngFontGlyphCount
-        );
-
-        pngGlyphCountLogged = 1;
-    }
+#endif
 
     // PNG menu background support
     if (jkGuiRend_IsMenuActive() &&
@@ -2682,6 +2767,7 @@ void std3D_DrawMenu()
     // CPU wait for the GPU, every frame.
     glDrawElements(GL_TRIANGLES, (GLsizei)(GL_tmpTrisAmt * 3), GL_UNSIGNED_SHORT, 0);
 
+#if defined(SDL2_RENDER) && defined(TARGET_CAN_JKGM)
     // Added: PNG font replacement - render GPU glyphs over the menu.
     if (std3D_CanRenderPngMenuFonts() &&
         GL_tmpTrisAmt > 0)
@@ -2693,6 +2779,7 @@ void std3D_DrawMenu()
             pngFontScale
         );
     }
+#endif
 
     glUniform1i(programMenu_uniform_usePngBackground, 0);
 
