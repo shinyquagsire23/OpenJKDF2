@@ -12,12 +12,22 @@ uniform vec2 pngMenuCropScale;
 // PNG menu background support - multiplayer character compositing.
 uniform int pngMenuCharacterPreview;
 
+// Added: PNG font replacement - enable direct RGBA glyph rendering.
+uniform int pngFontRendering;
+
 in vec4 f_color;
 in vec2 f_uv;
 out vec4 fragColor;
 
 void main(void)
 {
+    // Added: PNG font replacement - render RGBA glyphs directly.
+    if (pngFontRendering != 0)
+    {
+        fragColor = texture(tex, f_uv) * f_color;
+        return;
+    }
+
     // Draw a fullscreen PNG with centered, height-based cropping.
     if (pngMenuFullscreen != 0)
     {

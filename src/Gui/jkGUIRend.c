@@ -8,6 +8,7 @@
 #include "Devices/sithSound.h"
 #include "Primitives/rdVector.h"
 #include "Win95/stdDisplay.h"
+#include "Platform/std3D.h"
 #include "Platform/stdControl.h"
 #include "Win95/Window.h"
 #include "Win95/stdGdi.h"
@@ -227,10 +228,12 @@ static jkGuiElementHandlers jkGuiRend_elementHandlers[8] =
     {NULL, NULL, NULL},
 };
 
-void jkGuiRend_CopyVBuffer(jkGuiMenu *menu, rdRect *rect)
+void jkGuiRend_CopyVBuffer(jkGuiMenu* menu, rdRect* rect)
 {
-    if ( g_app_suspended && !jkGuiRend_bIsSurfaceValid )
+    if (g_app_suspended && !jkGuiRend_bIsSurfaceValid)
     {
+        // Added: PNG font replacement - track background restoration.
+        int pngFontBackgroundRestored = 0;
         // Added: PNG menu background support
         // Preserve the dialog panel mask during partial redraws.
         if (rect && !jkGuiDialog_IsPngPanelMenu(menu))
@@ -248,14 +251,27 @@ void jkGuiRend_CopyVBuffer(jkGuiMenu *menu, rdRect *rect)
 
             if (menu->pBgBitmap->mipSurfaces[0]) {
                 stdDisplay_VBufferCopy(jkGuiRend_menuBuffer, menu->pBgBitmap->mipSurfaces[0], rect->x, rect->y, rect, 0);
+                // Added: PNG font replacement - track successful background restoration.
+                pngFontBackgroundRestored = 1;
             }
         }
         else if (menu->pTextureOverride) {
             stdDisplay_VBufferCopy(jkGuiRend_menuBuffer, menu->pTextureOverride, rect->x, rect->y, rect, 0);   
+            // Added: PNG font replacement - track successful background restoration.
+            pngFontBackgroundRestored = 1;
         }
 #else
         if (menu->texture) {
             stdDisplay_VBufferCopy(jkGuiRend_menuBuffer, menu->texture, rect->x, rect->y, rect, 0);
+            // Added: PNG font replacement - track successful background restoration.
+            pngFontBackgroundRestored = 1;
+        }
+#endif
+        // Added: PNG font replacement - invalidate restored glyphs.
+#if defined(SDL2_RENDER) && defined(TARGET_CAN_JKGM)
+        if (pngFontBackgroundRestored && rect)
+        {
+            std3D_InvalidatePngFontGlyphs(rect);
         }
 #endif
     }
@@ -464,6 +480,11 @@ void jkGuiRend_Paint(jkGuiMenu *menu)
 
     // Added: PNG menu background support
     jkGuiRend_PngMaskClear();
+
+    // Added: PNG font replacement - clear glyphs before full menu repaint.
+#if defined(SDL2_RENDER) && defined(TARGET_CAN_JKGM)
+    std3D_ClearPngFontGlyphs();
+#endif
 
 #ifndef TARGET_RETRO_HOMEBREW
 #ifdef STDBITMAP_PARTIAL_LOAD

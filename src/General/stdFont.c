@@ -1,6 +1,8 @@
 #include "stdFont.h"
 
+#include <string.h>
 #include "stdPlatform.h"
+#include "GUI/jkGUIRend.h"
 #include "General/stdBitmap.h"
 #include "General/stdString.h"
 #include "Win95/stdDisplay.h"
@@ -9,7 +11,74 @@
 #include "World/jkPlayer.h"
 #include "General/stdString.h"
 
+// Added: PNG font replacement - shared glyph rendering helper.
+static int stdFont_CopyGlyph(
+    tVBuffer* dest,
+    tVBuffer* source,
+    unsigned int x,
+    int y,
+    rdRect* rect,
+    int alpha
+);
+
 #define INT_FLOAT_SCALED(x, s) ((int)((flex_t)(x) * (flex_t)(s))) // FLEXTODO
+
+// Added: PNG font replacement - construct optional PNG atlas filename.
+static void stdFont_RegisterPngReplacement(stdFont* font, const char* fpath)
+{
+    if (!font || !font->pBitmap || !fpath)
+        return;
+
+    char pngPath[256];
+    const char* filename = fpath;
+
+    // Added: PNG font replacement - locate filename after final separator.
+    for (const char* p = fpath; *p; p++)
+    {
+        if (*p == '\\' || *p == '/')
+            filename = p + 1;
+    }
+
+    // Added: PNG font replacement - copy filename without .sft extension.
+    size_t len = strlen(filename);
+
+    if (len < 5 || len >= 200)
+        return;
+
+    if (strcmp(filename + len - 4, ".sft") != 0)
+        return;
+
+    char baseName[200];
+    memcpy(baseName, filename, len - 4);
+    baseName[len - 4] = '\0';
+
+    // Added: PNG font replacement - construct resource path.
+    stdString_snprintf(
+        pngPath,
+        sizeof(pngPath),
+        "RESOURCE/ui/sft/%s.png",
+        baseName
+    );
+
+    // Added: PNG font replacement - validate optional atlas dimensions.
+#if defined(SDL2_RENDER) && defined(TARGET_CAN_JKGM)
+    // Added: PNG font replacement - report original atlas dimensions.
+    stdPlatform_Printf(
+        "SFT font atlas: %s (%dx%d)\n",
+        fpath,
+        font->pBitmap->mipSurfaces[0]->format.width,
+        font->pBitmap->mipSurfaces[0]->format.height
+    );
+
+    // Added: PNG font replacement - associate PNG with original SFT bitmap.
+    std3D_RegisterPngFontAtlas(
+        pngPath,
+        font->pBitmap->mipSurfaces[0],
+        font->pBitmap->mipSurfaces[0]->format.width,
+        font->pBitmap->mipSurfaces[0]->format.height
+    );
+#endif
+}
 
 // Un-inlined: Find the charset containing a character, falling back to the font's default character.
 // Returns the charset, or NULL if not found. *pChar may be changed to the default character on fallback.
@@ -176,6 +245,11 @@ LABEL_21:
         result = 0;
     }
     fontAlloc_->monospaceW = 0; // Added
+
+    // Added: PNG font replacement - register optional atlas after SFT loading.
+    if (result)
+        stdFont_RegisterPngReplacement(result, fpath);
+
     return result;
 }
 
@@ -263,7 +337,7 @@ LABEL_21:
             }
             if ( (int)(v9 + v16) < (int)(blit_x + a5) )
             {
-                stdDisplay_VBufferCopy(vbuf, a2a, v9, blit_y, &a5a, alpha_maybe);
+                stdFont_CopyGlyph(vbuf, a2a, v9, blit_y, &a5a, alpha_maybe);
                 v13 = a5a.width + font->marginY;
                 goto LABEL_26;
             }
@@ -378,7 +452,7 @@ LABEL_19:
                             v17 = v16 - a4;
                             if ( rect.height >= v17 )
                                 rect.height = v17;
-                            stdDisplay_VBufferCopy(a1, v10, v9, a4, &rect, a7);
+                            stdFont_CopyGlyph(a1, v10, v9, a4, &rect, a7);
                             v13 = rect.width + a2->marginY;
                         }
                         v9 += v13;
@@ -597,7 +671,7 @@ LABEL_51:
                                 rect.height = vbuf2->format.height;
                                 if (rect.height >= v28 )
                                     rect.height = v28;
-                                stdDisplay_VBufferCopy(paintSurface, vbuf2, v24, a3, &rect, a7);
+                                stdFont_CopyGlyph(paintSurface, vbuf2, v24, a3, &rect, a7);
                                 v24 += rect.width + font->marginY;
                             }
                             ++v23;
@@ -1062,8 +1136,16 @@ void stdFont_Free(stdFont *font)
     if (!font)
         return;
 
-    if ( font->pBitmap )
+    if (font->pBitmap)
+    {
+        // Added: PNG font replacement - unregister before freeing SFT bitmap.
+    #if defined(SDL2_RENDER) && defined(TARGET_CAN_JKGM)
+        if (font->pBitmap->mipSurfaces[0])
+            std3D_UnregisterPngFontAtlas(font->pBitmap->mipSurfaces[0]);
+    #endif
+
         stdBitmap_Free(font->pBitmap);
+    }
     v1 = font->charsetHead.previous;
     STD_FREE(font);
     if ( v1 )
@@ -1161,7 +1243,7 @@ LABEL_24:
             }
             if ( (int)(v9 + v17) < (int)(v8 + x_max) )
             {
-                stdDisplay_VBufferCopy(a1, v10, v9, blit_y, &a5a, alpha_maybe);
+                stdFont_CopyGlyph(a1, v10, v9, blit_y, &a5a, alpha_maybe);
                 v14 = a5a.width + a2->marginY;
                 goto LABEL_29;
             }
@@ -1325,6 +1407,45 @@ int stdFont_sub_4356B0(const char16_t *text, stdFont *font, int *pMaxWidth)
     return maxWidth;
 }
 
+// Added: PNG font replacement - shared glyph rendering helper.
+static int stdFont_CopyGlyph(
+    tVBuffer* dest,
+    tVBuffer* source,
+    unsigned int x,
+    int y,
+    rdRect* rect,
+    int alpha
+)
+{
+#if defined(SDL2_RENDER) && defined(TARGET_CAN_JKGM)
+    // Added: PNG font replacement - use GPU glyph in supported menu rendering.
+    if (jkGuiRend_PngIsMenuBuffer(dest) &&
+        std3D_CanRenderPngMenuFonts() &&
+        std3D_IsPngFontAtlasReady(source))
+    {
+        if (std3D_RecordPngFontGlyph(
+            source,
+            (int)x,
+            y,
+            rect))
+        {
+            // Added: PNG font replacement - omit underlying SFT pixels.
+            return 1;
+        }
+    }
+#endif
+
+    // Added: PNG font replacement - preserve original SFT fallback.
+    return stdDisplay_VBufferCopy(
+        dest,
+        source,
+        x,
+        y,
+        rect,
+        alpha
+    );
+}
+
 void stdFont_sub_435190(tVBuffer *vbuf, stdFont *font, int destX, int destY, uint16_t ch, int alpha)
 {
     rdRect srcRect;
@@ -1345,7 +1466,8 @@ void stdFont_sub_435190(tVBuffer *vbuf, stdFont *font, int destX, int destY, uin
     srcRect.y = 0;
     srcRect.width = glyphWidth;
     srcRect.height = fontSurf->format.height;
-    stdDisplay_VBufferCopy(vbuf, fontSurf, destX, destY, &srcRect, alpha);
+    // Added: PNG font replacement - use shared glyph rendering helper.
+    stdFont_CopyGlyph(vbuf, fontSurf, destX, destY, &srcRect, alpha);
 }
 
 int stdFont_Write(const char *fpath, stdFont *font)
