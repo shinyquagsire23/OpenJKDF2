@@ -73,6 +73,7 @@ set(TARGET_CAN_JKGM FALSE)
 set(TARGET_NO_MULTIPLAYER_MENUS FALSE)
 set(TARGET_CAN_DROIDWORKS TRUE)
 set(OPENJKDF2_USE_BLOBS FALSE CACHE BOOL "Use blobs")
+option(OPENJKDF2_ENABLE_CAPTURE "Build developer-only hidden capture and render probes" OFF)
 option(OPENJKDF2_DROIDWORKS "Build the DroidWorks app layer (src/Dw, -droidworks) on platforms that support it" ON)
 
 # Options for compiling
@@ -166,6 +167,12 @@ endif()
 # Establishes compile options, binary/library names, defines, etc
 plat_initialize()
 
+if(OPENJKDF2_ENABLE_CAPTURE AND
+   (NOT TARGET_USE_SDL2 OR NOT TARGET_USE_OPENGL OR TARGET_USE_OPENGL11 OR
+    NOT TARGET_CAN_JKGM OR TARGET_IOS OR TARGET_ANDROID OR TARGET_WASM OR TARGET_HOOKS))
+    message(FATAL_ERROR "OPENJKDF2_ENABLE_CAPTURE requires the desktop SDL/OpenGL renderer with PNG support")
+endif()
+
 if(TARGET_CAN_DROIDWORKS AND OPENJKDF2_DROIDWORKS)
     set(TARGET_DROIDWORKS TRUE)
 else()
@@ -226,6 +233,9 @@ file(GLOB GAME_MAIN_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/main.c)
 file(GLOB TEST_SRCS ${PROJECT_SOURCE_DIR}/src/Tests/*.c)
 list(REMOVE_ITEM ENGINE_SOURCE_FILES ${TEST_SRCS})
 list(REMOVE_ITEM ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/main.c)
+if(NOT OPENJKDF2_ENABLE_CAPTURE)
+    list(REMOVE_ITEM ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/Main/stdCapture.c)
+endif()
 
 # The software (CPU) renderer is desktop-only (RDRASTER_SOFTWARE_RENDERER, off on
 # TARGET_RETRO_HOMEBREW — TWL/DC can't afford CPU rasterization). rdAFRaster.c/rdNRaster.c/
@@ -288,6 +298,10 @@ if (EXPERIMENTAL_FIXED_POINT)
 endif()
 
 add_library(sith_engine OBJECT ${ENGINE_SOURCE_FILES})
+if(OPENJKDF2_ENABLE_CAPTURE)
+    # PUBLIC keeps the executable's main.c and all engine consumers consistent.
+    target_compile_definitions(sith_engine PUBLIC OPENJKDF2_ENABLE_CAPTURE=1)
+endif()
 # Generate cog headers (generated/globals.h) fully before compiling any engine
 # source -- many include it transitively, and a parallel build otherwise races the
 # generation and reads a half-written header. See precompile_globals.cmake.

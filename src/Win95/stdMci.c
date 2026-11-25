@@ -1,4 +1,5 @@
 #include "stdMci.h"
+#include "Main/stdCapture.h"
 
 #include "Main/jkMain.h"
 #include "stdPlatform.h"
@@ -27,6 +28,9 @@ int stdMci_bIsGOG = 1;
 
 int stdMci_Startup()
 {
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    if (stdCapture_IsActive()) return 1;
+#endif
     // Added
     stdMci_bIsGOG = 1;
 
@@ -63,6 +67,9 @@ int stdMci_Startup()
 
 void stdMci_Shutdown()
 {
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    if (stdCapture_IsActive()) return;
+#endif
     if (stdMci_mciId)
     {
         jk_mciSendCommandA(stdMci_mciId, MCI_STOP, 0, NULL);
@@ -81,6 +88,9 @@ void stdMci_Shutdown()
 
 int stdMci_Play(uint8_t trackFrom, uint8_t trackTo)
 {
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    if (stdCapture_IsActive()) return 1;
+#endif
     MCI_PLAY_PARMS playParams;
 
     if (!stdMci_bInitted)
@@ -177,6 +187,9 @@ static int stdMci_dcCddaTrack(int gog)
 
 int stdMci_Startup()
 {
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    if (stdCapture_IsActive()) return 1;
+#endif
     stdMci_bInitted = 1;
     stdMci_bIsGOG = 1; // real track IDs, no CD-offset guessing needed on our disc
     // The GD-ROM is brought up by KOS (INIT_CDROM, part of INIT_DEFAULT); nothing else.
@@ -185,6 +198,9 @@ int stdMci_Startup()
 
 void stdMci_Shutdown()
 {
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    if (stdCapture_IsActive()) return;
+#endif
     stdMci_Stop();
     stdMci_bInitted = 0;
     stdMci_dcFrom = stdMci_dcTo = 0;
@@ -193,6 +209,9 @@ void stdMci_Shutdown()
 
 int stdMci_Play(uint8_t trackFrom, uint8_t trackTo)
 {
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    if (stdCapture_IsActive()) return 1;
+#endif
     stdMci_dcFrom = trackFrom;
     stdMci_dcTo   = trackTo;
 
@@ -399,6 +418,9 @@ static void* stdMci_dcPumpThread(void* arg)
 
 int stdMci_Startup()
 {
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    if (stdCapture_IsActive()) return 1;
+#endif
     // snd_stream_init implicitly snd_init()s; run it at startup, before any SPU
     // sfx are loaded, so it can't clobber them later.
     if (snd_stream_init() < 0) {
@@ -421,6 +443,9 @@ int stdMci_Startup()
 
 void stdMci_Shutdown()
 {
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    if (stdCapture_IsActive()) return;
+#endif
     stdMci_Stop();
     if (stdMci_pPumpThd) {
         stdMci_bPumpRun = 0;
@@ -436,6 +461,9 @@ void stdMci_Shutdown()
 
 int stdMci_Play(uint8_t trackFrom, uint8_t trackTo)
 {
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    if (stdCapture_IsActive()) return 1;
+#endif
     if (stdMci_shnd == SND_STREAM_INVALID) return 0;
 
     mutex_lock(&stdMci_mtx);
@@ -514,6 +542,9 @@ int stdMci_music;
 
 int stdMci_Startup()
 {
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    if (stdCapture_IsActive()) return 1;
+#endif
     stdMci_uDeviceID = 0;
 
     stdMci_bInitted = 1;
@@ -526,6 +557,9 @@ int stdMci_Startup()
 
 void stdMci_Shutdown()
 {
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    if (stdCapture_IsActive()) return;
+#endif
     stdMci_bInitted = 0;
 
     // Added: Clean reset
@@ -554,6 +588,9 @@ void stdMci_trackFinished()
 
 int stdMci_Play(uint8_t trackFrom, uint8_t trackTo)
 {
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    if (stdCapture_IsActive()) return 1;
+#endif
     stdMci_trackFrom = trackFrom;
     stdMci_trackTo = trackTo;
 
@@ -634,6 +671,9 @@ static void stdMci_StopTrackNoAdvance()
 
 int stdMci_Startup()
 {
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    if (stdCapture_IsActive()) return 1;
+#endif
     stdMci_uDeviceID = 0;
     stdMci_music = NULL;
 
@@ -674,6 +714,9 @@ int stdMci_Startup()
 
 void stdMci_Shutdown()
 {
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    if (stdCapture_IsActive()) return;
+#endif
     stdMci_bInitted = 0;
 
     // A playing track is stopped as part of destruction, which would fire the
@@ -833,6 +876,9 @@ done:
 
 int stdMci_Play(uint8_t trackFrom, uint8_t trackTo)
 {
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    if (stdCapture_IsActive()) return 1;
+#endif
     char tmp[256];
     
     stdPlatform_Printf("stdMci: play track %d to %d\n", trackFrom, trackTo);

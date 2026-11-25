@@ -1,4 +1,5 @@
 #include "jkGame.h"
+#include "Main/stdCapture.h"
 
 #include "General/stdPalEffects.h"
 #include "Main/sithMain.h"
@@ -10,6 +11,7 @@
 #include "World/jkPlayer.h"
 #include "World/sithSector.h"
 #include "Win95/Video.h"
+#include "Win95/Window.h"
 #include "Win95/stdComm.h"
 #include "Platform/std3D.h"
 #include "Win95/stdDisplay.h"
@@ -274,6 +276,9 @@ int jkGame_Update()
     // renders through the software path into the menu buffer, exactly as the original did (JK ran
     // the whole frame in software). DrawPov itself calls std3D_ClearZBuffer + RD_ZBUFFER_READ_WRITE
     // (which now also clears the software depth buffer), so the weapon draws in front of the world.
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    if (!stdCapture_IsActive())
+#endif
     jkPlayer_DrawPov();
     if (rdsw_bActive)
     {
@@ -290,6 +295,9 @@ int jkGame_Update()
         rdroid_curAcceleration = rdsw_savedAccel;
     }
 #else
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    if (!stdCapture_IsActive())
+#endif
     jkPlayer_DrawPov();
 #endif
     jkGame_Update_DrawPov = stdPlatform_GetTimeMsec();
@@ -409,6 +417,11 @@ int jkGame_Update()
 #endif
 #if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
     std3D_DrawMenu();
+#if defined(SDL2_RENDER) && defined(TARGET_CAN_JKGM) && !defined(RENDER_GL11)
+#ifdef OPENJKDF2_ENABLE_CAPTURE
+    Window_RenderProbeGameplayFrame();
+#endif
+#endif
     rdFinishFrame();
 #endif
 
