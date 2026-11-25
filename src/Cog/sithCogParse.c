@@ -34,9 +34,12 @@ void sithCogParse_FreeParseTree()
     if ( cogparser_nodes_alloc )
     {
         SITH_FREE(cogparser_nodes_alloc);
-        cogparser_num_nodes = 0;
-        cogparser_current_nodeidx = 0;
     }
+    // A later COG startup must allocate a fresh parser arena.
+    cogparser_nodes_alloc = NULL;
+    cogparser_topnode = NULL;
+    cogparser_num_nodes = 0;
+    cogparser_current_nodeidx = 0;
 
     // Added
     sithCogParse_lastParsedFile = "INVALID";

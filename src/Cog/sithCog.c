@@ -649,7 +649,13 @@ sithCog* sithCog_Load(const char *pName)
         v9 = sithWorld_g_pLastLoadedWorld->numCogScripts;
         if ( v9 < sithWorld_g_pLastLoadedWorld->sizeCogScripts && (v8 = &sithWorld_g_pLastLoadedWorld->aCogScripts[v9], sithCogParse_Load(aName, v8, 0)) )
         {
-            stdHashtbl_Add(sithCog_g_pHashtable, aName, v8); // Added: v8 -> no v8 for aName
+            // The desktop hash table retains its key pointer. Use the script's
+            // owned basename; CRC-key tables consume the input immediately.
+#ifdef STDHASHTABLE_CRC32_KEYS
+            stdHashtbl_Add(sithCog_g_pHashtable, pName, v8);
+#else
+            stdHashtbl_Add(sithCog_g_pHashtable, v8->aName, v8);
+#endif
             ++sithWorld_g_pLastLoadedWorld->numCogScripts;
         }
         else

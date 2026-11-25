@@ -335,6 +335,29 @@ else()
             macos_target_add_standard_deps(rdNRaster_test)
         endif()
     endif()
+
+    # Subsystem tests use the same engine objects and platform services as the
+    # game. Their generated fixtures live in isolated build-tree directories.
+    if(TARGET_BUILD_TESTS AND (TARGET_LINUX OR TARGET_MACOS) AND NOT EXPERIMENTAL_FIXED_POINT)
+        enable_testing()
+        foreach(test_name resource cog)
+            add_executable(${test_name}_test src/Tests/${test_name}_test.c)
+            add_dependencies(${test_name}_test generate_globals)
+            target_link_libraries(${test_name}_test PRIVATE ${SDL2_COMMON_LIBS} sith_engine)
+            if(DEFINED ENV{OPENJKDF2_FORCE_ASAN} AND "$ENV{OPENJKDF2_FORCE_ASAN}" STREQUAL "1")
+                target_compile_options(${test_name}_test PRIVATE -fsanitize=address -fno-omit-frame-pointer -g)
+                target_link_options(${test_name}_test PRIVATE -fsanitize=address)
+            endif()
+            if(TARGET_MACOS)
+                macos_target_add_standard_deps(${test_name}_test)
+            endif()
+            file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/tests/${test_name}/cog)
+            add_test(NAME ${test_name}_lifecycle COMMAND ${test_name}_test)
+            set_tests_properties(${test_name}_lifecycle PROPERTIES
+                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/tests/${test_name}
+                TIMEOUT 30)
+        endforeach()
+    endif()
 endif()
 
 # TODO byacc and flex
