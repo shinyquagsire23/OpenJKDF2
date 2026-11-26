@@ -487,11 +487,34 @@ void jkGuiRend_Paint(jkGuiMenu *menu)
     stdDisplay_SetMasterPalette(jkGuiRend_palette);
 
     // Added: PNG menu background support
-    jkGuiRend_PngMaskClear();
+    // Preserve the underlying menu mask when painting a dialog.
+    int isPngPanelMenu = jkGuiDialog_IsPngPanelMenu(menu);
 
-    // Added: PNG font replacement - clear glyphs before full menu repaint.
+    if (!isPngPanelMenu)
+    {
+        jkGuiRend_PngMaskClear();
+    }
+
 #if defined(SDL2_RENDER) && defined(TARGET_CAN_JKGM)
-    std3D_ClearPngFontGlyphs();
+    // Added: PNG font replacement - preserve underlying menu glyphs
+    // outside the dialog panel.
+    if (isPngPanelMenu)
+    {
+        rdRect panelRect;
+
+        jkGuiDialog_GetPngPanelRect(
+            &panelRect.x,
+            &panelRect.y,
+            &panelRect.width,
+            &panelRect.height
+        );
+
+        std3D_InvalidatePngFontGlyphs(&panelRect);
+    }
+    else
+    {
+        std3D_ClearPngFontGlyphs();
+    }
 #endif
 
 #ifndef TARGET_RETRO_HOMEBREW
