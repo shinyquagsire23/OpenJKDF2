@@ -23,10 +23,16 @@ static int stdFont_CopyGlyph(
 
 #define INT_FLOAT_SCALED(x, s) ((int)((flex_t)(x) * (flex_t)(s))) // FLEXTODO
 
+#if defined(SDL2_RENDER) && defined(TARGET_CAN_JKGM)
+
 // Added: PNG font replacement - construct optional PNG atlas filename.
 static void stdFont_RegisterPngReplacement(stdFont* font, const char* fpath)
 {
     if (!font || !font->pBitmap || !fpath)
+        return;
+
+    // Added: PNG font replacement - require a valid original atlas.
+    if (!font->pBitmap->mipSurfaces[0])
         return;
 
     char pngPath[256];
@@ -60,16 +66,6 @@ static void stdFont_RegisterPngReplacement(stdFont* font, const char* fpath)
         baseName
     );
 
-    // Added: PNG font replacement - validate optional atlas dimensions.
-#if defined(SDL2_RENDER) && defined(TARGET_CAN_JKGM)
-    // Added: PNG font replacement - report original atlas dimensions.
-    stdPlatform_Printf(
-        "SFT font atlas: %s (%dx%d)\n",
-        fpath,
-        font->pBitmap->mipSurfaces[0]->format.width,
-        font->pBitmap->mipSurfaces[0]->format.height
-    );
-
     // Added: PNG font replacement - associate PNG with original SFT bitmap.
     std3D_RegisterPngFontAtlas(
         pngPath,
@@ -77,8 +73,9 @@ static void stdFont_RegisterPngReplacement(stdFont* font, const char* fpath)
         font->pBitmap->mipSurfaces[0]->format.width,
         font->pBitmap->mipSurfaces[0]->format.height
     );
-#endif
 }
+
+#endif // SDL2_RENDER && TARGET_CAN_JKGM
 
 // Un-inlined: Find the charset containing a character, falling back to the font's default character.
 // Returns the charset, or NULL if not found. *pChar may be changed to the default character on fallback.
@@ -246,9 +243,11 @@ LABEL_21:
     }
     fontAlloc_->monospaceW = 0; // Added
 
+#if defined(SDL2_RENDER) && defined(TARGET_CAN_JKGM)
     // Added: PNG font replacement - register optional atlas after SFT loading.
     if (result)
         stdFont_RegisterPngReplacement(result, fpath);
+#endif
 
     return result;
 }

@@ -232,8 +232,10 @@ void jkGuiRend_CopyVBuffer(jkGuiMenu* menu, rdRect* rect)
 {
     if (g_app_suspended && !jkGuiRend_bIsSurfaceValid)
     {
+#if defined(SDL2_RENDER) && defined(TARGET_CAN_JKGM)
         // Added: PNG font replacement - track background restoration.
         int pngFontBackgroundRestored = 0;
+#endif
         // Added: PNG menu background support
         // Preserve the dialog panel mask during partial redraws.
         if (rect && !jkGuiDialog_IsPngPanelMenu(menu))
@@ -251,20 +253,26 @@ void jkGuiRend_CopyVBuffer(jkGuiMenu* menu, rdRect* rect)
 
             if (menu->pBgBitmap->mipSurfaces[0]) {
                 stdDisplay_VBufferCopy(jkGuiRend_menuBuffer, menu->pBgBitmap->mipSurfaces[0], rect->x, rect->y, rect, 0);
+#if defined(SDL2_RENDER) && defined(TARGET_CAN_JKGM)
                 // Added: PNG font replacement - track successful background restoration.
                 pngFontBackgroundRestored = 1;
+#endif
             }
         }
         else if (menu->pTextureOverride) {
             stdDisplay_VBufferCopy(jkGuiRend_menuBuffer, menu->pTextureOverride, rect->x, rect->y, rect, 0);   
+#if defined(SDL2_RENDER) && defined(TARGET_CAN_JKGM)
             // Added: PNG font replacement - track successful background restoration.
             pngFontBackgroundRestored = 1;
+#endif
         }
 #else
         if (menu->texture) {
             stdDisplay_VBufferCopy(jkGuiRend_menuBuffer, menu->texture, rect->x, rect->y, rect, 0);
+#if defined(SDL2_RENDER) && defined(TARGET_CAN_JKGM)
             // Added: PNG font replacement - track successful background restoration.
             pngFontBackgroundRestored = 1;
+#endif
         }
 #endif
         // Added: PNG font replacement - invalidate restored glyphs.

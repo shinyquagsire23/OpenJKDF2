@@ -1642,6 +1642,17 @@ int std3D_RecordPngFontGlyph(
     if (sourceRect->width <= 0 || sourceRect->height <= 0)
         return 0;
 
+    // Added: PNG font replacement - reject out-of-bounds glyph rectangles.
+    if (sourceRect->x < 0 ||
+        sourceRect->y < 0 ||
+        (long long)sourceRect->x + sourceRect->width >
+        originalBitmap->format.width ||
+        (long long)sourceRect->y + sourceRect->height >
+        originalBitmap->format.height)
+    {
+        return 0;
+    }
+
     if (!std3D_HasPngFontAtlas(originalBitmap))
         return 0;
 
