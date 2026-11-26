@@ -322,6 +322,18 @@ void main(void)
         if (sampled_color.a < 0.01) {
             discard;
         }
+
+        // Cutout textures (leaves, grates, railings) are solid or see-through, like the
+        // unfiltered path above: keep a pixel where at least half of the filtered texels are
+        // solid and draw it solid. A faint edge pixel still wrote depth, so whatever was drawn
+        // behind it afterwards was hidden and the sky showed through as a thin bright outline
+        // around every leaf. Dividing by coverage takes back out the black of index 0.
+        if (blend_mode == D3DBLEND_SRCALPHA) {
+            if (sampled_color.a < 0.5) {
+                discard;
+            }
+            sampled_color = vec4(sampled_color.rgb / sampled_color.a, 1.0);
+        }
     }
 #endif
 
