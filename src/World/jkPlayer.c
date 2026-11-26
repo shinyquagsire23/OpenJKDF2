@@ -27,6 +27,7 @@
 #include "Gameplay/sithPlayer.h"
 #include "World/sithWeapon.h"
 #include "World/sithWorld.h"
+#include "World/sithArchLighting.h"
 #include "World/sithSector.h"
 #include "Primitives/rdMatrix.h"
 #include "Devices/sithControl.h"
@@ -1016,6 +1017,10 @@ void jkPlayer_DrawPov()
 #endif
 
         flex_t ambLight = stdMath_Clamp(sithCamera_g_pCurCamera->sector->extraLight + sithCamera_g_pCurCamera->sector->ambientLight, 0.0, 1.0);
+#ifdef JKM_LIGHTING
+        // Added: with the baked light of the floor the player stands on, as the player is lit
+        ambLight = sithArchLighting_ThingAmbient(playerThings[playerThingIdx].actorThing, ambLight);
+#endif
 
         rdCamera_SetAmbientLight(&sithCamera_g_pCurCamera->rdCamera, ambLight);
         rdColormap_SetCurrent(sithCamera_g_pCurCamera->sector->colormap);

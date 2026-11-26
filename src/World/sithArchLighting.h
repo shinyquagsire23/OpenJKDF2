@@ -7,6 +7,7 @@
 
 void sithArchLighting_Free(SithWorld* pWorld);
 int sithArchLighting_ParseSection(SithWorld *pWorld, int unk);
+flex_t sithArchLighting_ThingAmbient(SithThing* pThing, flex_t ambient); // Added
 
 #endif // JKM_LIGHTING
 
