@@ -27,6 +27,7 @@
 #include "Gameplay/sithPlayer.h"
 #include "World/sithSector.h"
 #include "World/sithWorld.h"
+#include "World/sithArchLighting.h"
 #include "World/sithExplosion.h"
 #include "Main/Main.h"
 #include "Dw/dwLaser.h"
@@ -2769,15 +2770,23 @@ void sithRender_RenderThings()
                 {
                     // Allow aThings to peek their light around corners w/o screwing with frustums
 #ifdef QOL_IMPROVEMENTS
+                    // Added: in a level with baked light on its 3DO architecture, a thing that is not part
+                    // of it (a player, a pickup) takes the baked light of the floor where it stands
+                    // when that is more than its sector's flat ambient light.
+                    flex_t thingAmbient = a2;
+#ifdef JKM_LIGHTING
+                    if (!sithRender_lightingIRMode)
+                        thingAmbient = sithArchLighting_ThingAmbient(thingIter, a2);
+#endif
                     if ( (thingIter->flags & SITH_TF_EMITLIGHT) != 0
                       && thingIter->light > 0.0
-                      && a2 <= stdMath_Clamp(thingIter->light, 0.0, 1.0) )
+                      && thingAmbient <= stdMath_Clamp(thingIter->light, 0.0, 1.0) )
                     {
                         rdCamera_SetAmbientLight(rdCamera_g_pCurCamera, stdMath_Clamp(thingIter->light, 0.0, 1.0));
                     }
                     else
                     {
-                        rdCamera_SetAmbientLight(rdCamera_g_pCurCamera, a2);
+                        rdCamera_SetAmbientLight(rdCamera_g_pCurCamera, thingAmbient);
                     }
 
                     if (!v1->pClipFrustum) {
