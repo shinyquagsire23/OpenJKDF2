@@ -199,6 +199,18 @@ typedef struct std3DPngFontGlyph
 static std3DPngFontGlyph std3D_pngFontGlyphs[STD3D_MAX_PNG_FONT_GLYPHS];
 static int std3D_pngFontGlyphCount = 0;
 
+// Added: PNG font replacement - maximum glyphs per rendering batch.
+#define STD3D_MAX_PNG_FONT_BATCH_GLYPHS 256
+
+// Added: PNG font replacement - temporary batch geometry.
+static D3DVERTEX std3D_pngFontBatchVertices[
+    STD3D_MAX_PNG_FONT_BATCH_GLYPHS * 4
+];
+
+static GLushort std3D_pngFontBatchIndices[
+    STD3D_MAX_PNG_FONT_BATCH_GLYPHS * 6
+];
+
 #endif // SDL2_RENDER && TARGET_CAN_JKGM
 
 void* blank_data = NULL, *blank_data_white = NULL;
@@ -1757,12 +1769,56 @@ static void std3D_BuildPngFontGlyphQuad(
     }
 }
 
-// Added: PNG font replacement - render one glyph using its RGBA atlas.
+// Added: PNG font replacement - upload and draw a batch of glyphs.
+static void std3D_DrawPngFontBatch(
+    GLuint textureId,
+    int glyphCount
+)
+{
+    if (!textureId || glyphCount <= 0)
+        return;
+
+    // Added: PNG font replacement - upload batched glyph vertices.
+    glBufferData(
+        GL_ARRAY_BUFFER,
+        glyphCount * 4 * sizeof(D3DVERTEX),
+        std3D_pngFontBatchVertices,
+        GL_STREAM_DRAW
+    );
+
+    // Added: PNG font replacement - upload batched glyph indices.
+    glBufferData(
+        GL_ELEMENT_ARRAY_BUFFER,
+        glyphCount * 6 * sizeof(GLushort),
+        std3D_pngFontBatchIndices,
+        GL_STREAM_DRAW
+    );
+
+    // Added: PNG font replacement - select the batch atlas.
+    glBindTexture(GL_TEXTURE_2D, textureId);
+
+    // Added: PNG font replacement - draw all glyphs in the batch.
+    glDrawElements(
+        GL_TRIANGLES,
+        glyphCount * 6,
+        GL_UNSIGNED_SHORT,
+        0
+    );
+}
+
+// Added: PNG font replacement - render glyphs in ordered atlas batches.
 static void std3D_DrawPngFontGlyphs(
     float menuX,
     float menuScale
 )
 {
+    if (std3D_pngFontGlyphCount <= 0)
+        return;
+
+    GLuint batchTexture = 0;
+    int batchGlyphCount = 0;
+    int renderingStarted = 0;
+
     for (int i = 0; i < std3D_pngFontGlyphCount; i++)
     {
         std3DPngFontGlyph* glyph = &std3D_pngFontGlyphs[i];
@@ -1773,81 +1829,104 @@ static void std3D_DrawPngFontGlyphs(
         std3DPngFontAtlas* atlas =
             std3D_FindPngFontAtlas(glyph->originalBitmap);
 
-        if (!atlas)
+        if (!atlas || !atlas->textureId)
             continue;
 
-        // Added: PNG font replacement - construct glyph geometry.
-        D3DVERTEX vertices[4];
+        // Added: PNG font replacement - configure rendering once per pass.
+        if (!renderingStarted)
+        {
+            glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_all);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, menu_ibo_triangle);
 
+            glVertexAttribPointer(
+                programMenu_attribute_coord3d,
+                3, GL_FLOAT, GL_FALSE,
+                sizeof(D3DVERTEX),
+                (GLvoid*)offsetof(D3DVERTEX, x)
+            );
+
+            glVertexAttribPointer(
+                programMenu_attribute_v_color,
+                4, GL_UNSIGNED_BYTE, GL_TRUE,
+                sizeof(D3DVERTEX),
+                (GLvoid*)offsetof(D3DVERTEX, color)
+            );
+
+            glVertexAttribPointer(
+                programMenu_attribute_v_uv,
+                2, GL_FLOAT, GL_FALSE,
+                sizeof(D3DVERTEX),
+                (GLvoid*)offsetof(D3DVERTEX, tu)
+            );
+
+            glUniform1i(programMenu_uniform_pngFontRendering, 1);
+            glActiveTexture(GL_TEXTURE0);
+
+            renderingStarted = 1;
+        }
+
+        // Added: PNG font replacement - flush on atlas change or capacity.
+        if (batchGlyphCount > 0 &&
+            (batchTexture != atlas->textureId ||
+                batchGlyphCount >= STD3D_MAX_PNG_FONT_BATCH_GLYPHS))
+        {
+            std3D_DrawPngFontBatch(
+                batchTexture,
+                batchGlyphCount
+            );
+
+            batchGlyphCount = 0;
+        }
+
+        batchTexture = atlas->textureId;
+
+        // Added: PNG font replacement - calculate batch geometry offsets.
+        int vertexOffset = batchGlyphCount * 4;
+        int indexOffset = batchGlyphCount * 6;
+
+        // Added: PNG font replacement - append glyph geometry.
         std3D_BuildPngFontGlyphQuad(
             glyph,
             atlas,
             menuX,
             menuScale,
-            vertices
+            &std3D_pngFontBatchVertices[vertexOffset]
         );
 
-        const GLushort indices[6] = {
-            1, 0, 2,
-            0, 3, 2
-        };
+        // Added: PNG font replacement - preserve original triangle winding.
+        std3D_pngFontBatchIndices[indexOffset + 0] =
+            (GLushort)(vertexOffset + 1);
 
-        // Added: PNG font replacement - upload temporary glyph vertices.
-        glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_all);
+        std3D_pngFontBatchIndices[indexOffset + 1] =
+            (GLushort)(vertexOffset + 0);
 
-        glBufferData(
-            GL_ARRAY_BUFFER,
-            sizeof(vertices),
-            vertices,
-            GL_STREAM_DRAW
+        std3D_pngFontBatchIndices[indexOffset + 2] =
+            (GLushort)(vertexOffset + 2);
+
+        std3D_pngFontBatchIndices[indexOffset + 3] =
+            (GLushort)(vertexOffset + 0);
+
+        std3D_pngFontBatchIndices[indexOffset + 4] =
+            (GLushort)(vertexOffset + 3);
+
+        std3D_pngFontBatchIndices[indexOffset + 5] =
+            (GLushort)(vertexOffset + 2);
+
+        batchGlyphCount++;
+    }
+
+    // Added: PNG font replacement - draw the remaining glyph batch.
+    if (batchGlyphCount > 0)
+    {
+        std3D_DrawPngFontBatch(
+            batchTexture,
+            batchGlyphCount
         );
+    }
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, menu_ibo_triangle);
-
-        glBufferData(
-            GL_ELEMENT_ARRAY_BUFFER,
-            sizeof(indices),
-            indices,
-            GL_STREAM_DRAW
-        );
-
-        // Added: PNG font replacement - configure glyph vertex attributes.
-        glVertexAttribPointer(
-            programMenu_attribute_coord3d,
-            3, GL_FLOAT, GL_FALSE,
-            sizeof(D3DVERTEX),
-            (GLvoid*)offsetof(D3DVERTEX, x)
-        );
-
-        glVertexAttribPointer(
-            programMenu_attribute_v_color,
-            4, GL_UNSIGNED_BYTE, GL_TRUE,
-            sizeof(D3DVERTEX),
-            (GLvoid*)offsetof(D3DVERTEX, color)
-        );
-
-        glVertexAttribPointer(
-            programMenu_attribute_v_uv,
-            2, GL_FLOAT, GL_FALSE,
-            sizeof(D3DVERTEX),
-            (GLvoid*)offsetof(D3DVERTEX, tu)
-        );
-
-        // Added: PNG font replacement - select RGBA rendering.
-        glUniform1i(programMenu_uniform_pngFontRendering, 1);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, atlas->textureId);
-
-        // Added: PNG font replacement - draw the glyph.
-        glDrawElements(
-            GL_TRIANGLES,
-            6,
-            GL_UNSIGNED_SHORT,
-            0
-        );
-
-        // Added: PNG font replacement - restore original shader and texture.
+    // Added: PNG font replacement - restore original menu rendering state.
+    if (renderingStarted)
+    {
         glBindTexture(GL_TEXTURE_2D, Video_menuTexId);
         glUniform1i(programMenu_uniform_pngFontRendering, 0);
     }
