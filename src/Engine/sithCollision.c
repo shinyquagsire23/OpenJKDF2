@@ -654,6 +654,11 @@ flex_t sithCollision_MoveThing(SithThing *pThing, rdVector3 *moveNorm, flex_t mo
     rdVector3 out; // [esp+3Ch] [ebp-18h] BYREF
     rdVector3 v72; // [esp+48h] [ebp-Ch] BYREF
     SithSector* sectTmp;
+    // Added: riders and how far they were moved, see below
+    SithThing* aRiders[16];
+    flex_t aRiderMoved[16];
+    int numRiders = 0;
+    rdVector3 riderDir;
 
     v64 = 0.0;
     v65 = 0.0;
@@ -686,6 +691,11 @@ flex_t sithCollision_MoveThing(SithThing *pThing, rdVector3 *moveNorm, flex_t mo
             continue;
 
         v11 = sithCollision_MoveThing(v10, moveNorm, moveDist, RAYCAST_40);
+        if (numRiders < 16)
+        {
+            aRiders[numRiders] = v10;
+            aRiderMoved[numRiders++] = v11;
+        }
         if ( v11 >= moveDist ) continue;
         
         if ( (v10->attach_flags & SITH_ATTACH_THINGFACE) != 0 )
@@ -883,6 +893,21 @@ LABEL_81:
                     sithPlayer_bNoClippingRend = 1;
                 }
             }
+        }
+    }
+
+    // Fixed: riders were moved the full distance before their path-moved parent (elevator)
+    // found out it was blocked, e.g. by an actor below it. They sank into it a little every
+    // frame, faster than attached physics lifts them back, until they fell through and were
+    // crushed. Move them back by the distance the parent didn't make.
+    if (v5->moveType == SITH_MT_PATH)
+    {
+        rdVector_Neg3(&riderDir, moveNorm);
+        for (int r = 0; r < numRiders; r++)
+        {
+            flex_t back = stdMath_ClipNearZero(aRiderMoved[r] - v64);
+            if (back > 0.0 && aRiders[r]->attachedThing == v5)
+                sithCollision_MoveThing(aRiders[r], &riderDir, back, RAYCAST_40);
         }
     }
 
