@@ -85,6 +85,7 @@ typedef struct std3DFramebuffer
 
     // Added: Processed multiplayer character preview framebuffer.
     std3DIntermediateFbo characterPreview;
+    int characterPreviewReady;
 
     int enable_extra;
     std3DIntermediateFbo blur1;
@@ -1996,7 +1997,8 @@ void std3D_DrawMenu()
 
             glActiveTexture(GL_TEXTURE0);
 
-            if (std3D_pFb->characterPreview.tex)
+            if (std3D_pFb->characterPreviewReady &&
+                std3D_pFb->characterPreview.tex)
             {
                 glBindTexture(
                     GL_TEXTURE_2D,
@@ -2867,11 +2869,17 @@ void std3D_DrawSceneFbo()
     // Added: Select the destination for scene post-processing.
     std3DIntermediateFbo* sceneOutput = &std3D_pFb->window;
 
+    // Added: Invalidate the previous processed character preview.
+    std3D_pFb->characterPreviewReady = 0;
+
     // Added: Preserve the processed character for PNG menu compositing.
     if (jkGuiBuildMulti_bRendering &&
-        std3D_pngMenuTexture &&
         jkGuiRend_IsMenuActive() &&
-        !jkCutscene_isRendering)
+        !jkCutscene_isRendering &&
+        std3D_pngMenuTexture != 0 &&
+        std3D_pngMenuMaskTexture != 0 &&
+        std3D_pngMenuWidth > 0 &&
+        std3D_pngMenuHeight > 0)
     {
         std3DIntermediateFbo* preview = &std3D_pFb->characterPreview;
 
@@ -2888,9 +2896,22 @@ void std3D_DrawSceneFbo()
                 preview,
                 0
             );
+
+            // Added: Fall back to the original preview if framebuffer
+            // allocation fails or the framebuffer is incomplete.
+            glBindFramebuffer(GL_FRAMEBUFFER, preview->fbo);
+
+            if (!preview->fbo ||
+                !preview->tex ||
+                glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            {
+                std3D_deleteIntermediateFbo(preview);
+                memset(preview, 0, sizeof(*preview));
+            }
         }
 
-        sceneOutput = preview;
+        if (preview->fbo && preview->tex)
+            sceneOutput = preview;
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, sceneOutput->fbo);
@@ -3052,6 +3073,10 @@ void std3D_DrawSceneFbo()
         std3D_DrawSimpleTex(&std3D_texFboStage, sceneOutput, std3D_pFb->blur4.tex, 0, 0, 1.0, bloom_intensity * 0.8, jkPlayer_gamma, 0);
     }
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // Added: Mark the processed character preview as ready.
+    std3D_pFb->characterPreviewReady =
+        (sceneOutput == &std3D_pFb->characterPreview);
 }
 
 void std3D_DoTex(rdDDrawSurface* tex, rdTri* tri, int tris_left)
@@ -3109,7 +3134,12 @@ void std3D_DoTex(rdDDrawSurface* tex, rdTri* tri, int tris_left)
     }
     //if (tex->emissive_factor[0] != 0.0 || tex->emissive_factor[1] != 0.0 || tex->emissive_factor[2] != 0.0)
     //    stdPlatform_Printf("%f %f %f\n", tex->emissive_factor[0], tex->emissive_factor[1], tex->emissive_factor[2]);
-    float emissive_mult = (jkPlayer_enableBloom ? 1.0 : 5.0);
+    // Added: Preserve fullbright emissive intensity in multiplayer
+    // character previews regardless of the bloom setting.
+    float emissive_mult =
+        (jkPlayer_enableBloom && !jkGuiBuildMulti_bRendering)
+        ? 1.0f
+        : 5.0f;
     glUniform3f(uniform_emissiveFactor, tex->emissive_factor[0] * emissive_mult, tex->emissive_factor[1] * emissive_mult, tex->emissive_factor[2] * emissive_mult);
     glUniform4f(uniform_albedoFactor, tex->albedo_factor[0], tex->albedo_factor[1], tex->albedo_factor[2], tex->albedo_factor[3]);
     if (tex->displacement_factor) {
