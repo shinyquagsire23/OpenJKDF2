@@ -83,6 +83,10 @@ typedef struct std3DFramebuffer
     std3DIntermediateFbo window;
     std3DIntermediateFbo main;
 
+    // Added: Processed multiplayer character preview framebuffer.
+    std3DIntermediateFbo characterPreview;
+    int characterPreviewReady;
+
     int enable_extra;
     std3DIntermediateFbo blur1;
     std3DIntermediateFbo blur2;
@@ -391,6 +395,7 @@ void std3D_deleteFramebuffer(std3DFramebuffer* pFb)
     glDeleteTextures(1, &pFb->tex2);
     glDeleteTextures(1, &pFb->tex3);
     glDeleteRenderbuffers(1, &pFb->rbo);
+    std3D_deleteIntermediateFbo(&pFb->characterPreview);  // Added: Release the processed multiplayer character preview framebuffer.
 
     std3D_deleteIntermediateFbo(&pFb->blur1);
     std3D_deleteIntermediateFbo(&pFb->blur2);
@@ -1983,16 +1988,31 @@ void std3D_DrawMenu()
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
 
-        // composite the multiplayer character preview over the fullscreen PNG.
+        // Added: Composite the fully processed multiplayer character preview
+        // over the fullscreen PNG background.
         if (jkGuiBuildMulti_bRendering)
         {
             glUniform1i(programMenu_uniform_pngFullscreen, 0);
             glUniform1i(programMenu_uniform_pngCharacterPreview, 1);
 
             glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex0);
 
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            if (std3D_pFb->characterPreviewReady &&
+                std3D_pFb->characterPreview.tex)
+            {
+                glBindTexture(
+                    GL_TEXTURE_2D,
+                    std3D_pFb->characterPreview.tex
+                );
+
+                // The processed preview contains premultiplied color.
+                glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+            }
+            else
+            {
+                glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex0);
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            }
 
             // Reuse the fullscreen quad already uploaded for the PNG.
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
@@ -2000,6 +2020,7 @@ void std3D_DrawMenu()
             // Restore the indexed GUI texture and normal shader mode.
             glBindTexture(GL_TEXTURE_2D, Video_menuTexId);
             glUniform1i(programMenu_uniform_pngCharacterPreview, 0);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         }
 
         // Restore the original GUI rendering mode.
@@ -2843,11 +2864,78 @@ void std3D_DrawSceneFbo()
 {
     //printf("Draw scene FBO\n");
     glEnable(GL_BLEND);
-    
     glBlendEquation(GL_FUNC_ADD);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->window.fbo);
-    glClear( GL_COLOR_BUFFER_BIT );
+    // Added: Select the destination for scene post-processing.
+    std3DIntermediateFbo* sceneOutput = &std3D_pFb->window;
+
+    // Added: Invalidate the previous processed character preview.
+    std3D_pFb->characterPreviewReady = 0;
+
+    // Added: Preserve the processed character for PNG menu compositing.
+    if (jkGuiBuildMulti_bRendering &&
+        jkGuiRend_IsMenuActive() &&
+        !jkCutscene_isRendering &&
+        std3D_pngMenuTexture != 0 &&
+        std3D_pngMenuMaskTexture != 0 &&
+        std3D_pngMenuWidth > 0 &&
+        std3D_pngMenuHeight > 0)
+    {
+        std3DIntermediateFbo* preview = &std3D_pFb->characterPreview;
+
+        if (!preview->fbo ||
+            preview->w != std3D_pFb->window.w ||
+            preview->h != std3D_pFb->window.h)
+        {
+            if (preview->fbo)
+                std3D_deleteIntermediateFbo(preview);
+
+            std3D_generateIntermediateFbo(
+                std3D_pFb->window.w,
+                std3D_pFb->window.h,
+                preview,
+                0
+            );
+
+            // Added: Fall back to the original preview if framebuffer
+            // allocation fails or the framebuffer is incomplete.
+            glBindFramebuffer(GL_FRAMEBUFFER, preview->fbo);
+
+            if (!preview->fbo ||
+                !preview->tex ||
+                glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            {
+                std3D_deleteIntermediateFbo(preview);
+                memset(preview, 0, sizeof(*preview));
+            }
+        }
+
+        if (preview->fbo && preview->tex)
+            sceneOutput = preview;
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, sceneOutput->fbo);
+
+    // Added: Preserve a transparent background in the character preview.
+    if (sceneOutput == &std3D_pFb->characterPreview)
+    {
+        GLfloat oldClearColor[4];
+        glGetFloatv(GL_COLOR_CLEAR_VALUE, oldClearColor);
+
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        glClearColor(
+            oldClearColor[0],
+            oldClearColor[1],
+            oldClearColor[2],
+            oldClearColor[3]
+        );
+    }
+    else
+    {
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
 
     static float frameNum = 1.0;
     //frameNum += (rand() % 16);
@@ -2901,8 +2989,20 @@ void std3D_DrawSceneFbo()
 
     if (!draw_ssao)
     {
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex0, 0, 0, 1.0, 1.0, jkPlayer_gamma, 0);
+        // Added: Preserve character coverage in the transparent preview.
+        if (sceneOutput == &std3D_pFb->characterPreview)
+        {
+            glBlendFuncSeparate(
+                GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA,
+                GL_ONE, GL_ONE_MINUS_SRC_ALPHA
+            );
+        }
+        else
+        {
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        }
+
+        std3D_DrawSimpleTex(&std3D_texFboStage, sceneOutput, std3D_pFb->tex0, 0, 0, 1.0, 1.0, jkPlayer_gamma, 0);
         //std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0, 0, 0.0, 1.0, jkPlayer_gamma, 0); // test emission output
     }
     else
@@ -2914,12 +3014,25 @@ void std3D_DrawSceneFbo()
         //std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->ssaoBlur3, std3D_pFb->ssaoBlur2.tex, 0, 0, 8.0, 3.0, 4.0);
 
         glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
-        std3D_DrawSimpleTex(&std3D_ssaoMixStage, &std3D_pFb->window, std3D_pFb->ssaoBlur2.tex, std3D_pFb->tex0, 0, 0.0, 0.0, jkPlayer_gamma, 0);
+        std3D_DrawSimpleTex(&std3D_ssaoMixStage, sceneOutput, std3D_pFb->ssaoBlur2.tex, std3D_pFb->tex0, 0, 0.0, 0.0, jkPlayer_gamma, 0);
     }
 
-    glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
+    // Added: Preserve character preview color and transparency
+    // when compositing emissive lighting without bloom.
+    if (jkGuiBuildMulti_bRendering)
+    {
+        glBlendFuncSeparate(
+            GL_SRC_ALPHA, GL_ONE,
+            GL_ZERO, GL_ONE
+        );
+    }
+    else
+    {
+        glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
+    }
+
     if (!draw_bloom)
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0, 0, 1.0, 1.0, jkPlayer_gamma, 0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, sceneOutput, std3D_pFb->tex1, 0, 0, 1.0, 1.0, jkPlayer_gamma, 0);
 
     if (draw_bloom)
     {
@@ -2940,15 +3053,30 @@ void std3D_DrawSceneFbo()
         std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->blurBlend, std3D_pFb->blur4.tex, 0, 0, 1.0, bloom_intensity * 1.2, bloom_gamma, 0);
         */
 
-        glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
-        //std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blurBlend.tex, 0, 0, 1.0, 1.0, 1.0, 0);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0, 0, 1.0, 1.5, jkPlayer_gamma, 0);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur1.tex, 0, 0, 1.0, bloom_intensity * 1.5, jkPlayer_gamma, 0);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur2.tex, 0, 0, 1.0, bloom_intensity * 1.0, jkPlayer_gamma, 0);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur3.tex, 0, 0, 1.0, bloom_intensity * 1.0, jkPlayer_gamma, 0);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur4.tex, 0, 0, 1.0, bloom_intensity * 0.8, jkPlayer_gamma, 0);
+        // Added: Preserve character preview color and transparency
+        // when compositing emissive lighting and bloom.
+        if (jkGuiBuildMulti_bRendering)
+        {
+            glBlendFuncSeparate(
+                GL_SRC_ALPHA, GL_ONE,
+                GL_ZERO, GL_ONE
+            );
+        }
+        else
+        {
+            glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
+        }
+        std3D_DrawSimpleTex(&std3D_texFboStage, sceneOutput, std3D_pFb->tex1, 0, 0, 1.0, 1.5, jkPlayer_gamma, 0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, sceneOutput, std3D_pFb->blur1.tex, 0, 0, 1.0, bloom_intensity * 1.5, jkPlayer_gamma, 0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, sceneOutput, std3D_pFb->blur2.tex, 0, 0, 1.0, bloom_intensity * 1.0, jkPlayer_gamma, 0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, sceneOutput, std3D_pFb->blur3.tex, 0, 0, 1.0, bloom_intensity * 1.0, jkPlayer_gamma, 0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, sceneOutput, std3D_pFb->blur4.tex, 0, 0, 1.0, bloom_intensity * 0.8, jkPlayer_gamma, 0);
     }
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // Added: Mark the processed character preview as ready.
+    std3D_pFb->characterPreviewReady =
+        (sceneOutput == &std3D_pFb->characterPreview);
 }
 
 void std3D_DoTex(rdDDrawSurface* tex, rdTri* tri, int tris_left)
@@ -3006,7 +3134,12 @@ void std3D_DoTex(rdDDrawSurface* tex, rdTri* tri, int tris_left)
     }
     //if (tex->emissive_factor[0] != 0.0 || tex->emissive_factor[1] != 0.0 || tex->emissive_factor[2] != 0.0)
     //    stdPlatform_Printf("%f %f %f\n", tex->emissive_factor[0], tex->emissive_factor[1], tex->emissive_factor[2]);
-    float emissive_mult = (jkPlayer_enableBloom ? 1.0 : 5.0);
+    // Added: Preserve fullbright emissive intensity in multiplayer
+    // character previews regardless of the bloom setting.
+    float emissive_mult =
+        (jkPlayer_enableBloom && !jkGuiBuildMulti_bRendering)
+        ? 1.0f
+        : 5.0f;
     glUniform3f(uniform_emissiveFactor, tex->emissive_factor[0] * emissive_mult, tex->emissive_factor[1] * emissive_mult, tex->emissive_factor[2] * emissive_mult);
     glUniform4f(uniform_albedoFactor, tex->albedo_factor[0], tex->albedo_factor[1], tex->albedo_factor[2], tex->albedo_factor[3]);
     if (tex->displacement_factor) {
