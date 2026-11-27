@@ -39,9 +39,9 @@ int jkGuiBuildMulti_jediRank = 0;
 static jkGuiElement jkGuiBuildMulti_buttons[17] =
 {
   { ELEMENT_TEXT, 0, 5, "GUI_EDIT_CHARACTER", 3, { 240, 20, 400, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 1, NULL, 3, { 240, 60, 400, 30 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+  { ELEMENT_TEXT, 0, 1, NULL, 3,{ 240, 62, 400, 26 }, 1, 0, NULL, NULL, NULL, NULL,{ 0, 0, 0, 0, 0,{ 0, 0, 0, 0 } }, 0 },  // Added: PNG font replacement - prevent overlap with character name glyphs.
   { ELEMENT_TEXT, 0, 0, NULL, 3, { 30, 60, 140, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 2, NULL, 3, { 310, 90, 270, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+  { ELEMENT_TEXT, 0, 2, NULL, 3,{ 310, 88, 270, 24 }, 1, 0, NULL, NULL, NULL, NULL,{ 0, 0, 0, 0, 0,{ 0, 0, 0, 0 } }, 0 },  // Added: PNG font replacement - encompass the full character name glyph height.
   { ELEMENT_PICBUTTON, 105, 0, NULL, 33, { 6, 90, 24, 24 }, 1, 0, NULL, NULL, jkGuiBuildMulti_SaberButtonClicked, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
   { ELEMENT_PICBUTTON, 104, 0, NULL, 34, { 170, 90, 24, 24 }, 1, 0, NULL, NULL, jkGuiBuildMulti_SaberButtonClicked, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
   { ELEMENT_CUSTOM, 0, 0, NULL, 0, { 315, 115, 260, 260 }, 1, 0, NULL, jkGuiBuildMulti_ModelDrawer, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },

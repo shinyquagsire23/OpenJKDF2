@@ -140,9 +140,38 @@ void std3D_DrawUIClearedRect(uint8_t palIdx, rdRect* dstRect);
 void std3D_DrawUIClearedRectRGBA(uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a, rdRect* dstRect);
 int std3D_IsReady();
 
+// Added: PNG font replacement - register atlas with original SFT bitmap.
+#if defined(SDL2_RENDER) && defined(TARGET_CAN_JKGM)
+// Added: PNG font replacement - invalidate glyphs in a redrawn region.
+void std3D_InvalidatePngFontGlyphs(const rdRect* rect);
+// Added: PNG font replacement - clear tracked glyphs.
+void std3D_ClearPngFontGlyphs(void);
+// Added: PNG font replacement - record glyph for GPU rendering.
+int std3D_RecordPngFontGlyph(
+    const tVBuffer* originalBitmap,
+    int destX,
+    int destY,
+    const rdRect* sourceRect
+);
+int std3D_RegisterPngFontAtlas(
+    const char* pngPath,
+    const tVBuffer* originalBitmap,
+    int originalWidth,
+    int originalHeight
+);
+
+// Added: PNG font replacement - unregister atlas when SFT font is freed.
+void std3D_UnregisterPngFontAtlas(const tVBuffer* originalBitmap);
+// Added: PNG font replacement - detect registered glyph atlas.
+int std3D_HasPngFontAtlas(const tVBuffer* originalBitmap);
+// Added: PNG font replacement - query uploaded GPU atlas.
+int std3D_IsPngFontAtlasReady(const tVBuffer* originalBitmap);
+// Added: PNG font replacement - query supported menu rendering mode.
+int std3D_CanRenderPngMenuFonts(void);
+#endif
+
 #ifdef __cplusplus
 }
 #endif
-
 
 #endif // _STD3D_H
