@@ -265,6 +265,33 @@ void rdPuppet_BuildJointMatrices(rdThing *prdThing, rdMatrix34 *pPlacement)
 
     model = prdThing->model3;
     puppet = prdThing->puppet;
+
+    // Added: Identify actor models requiring a torso yaw correction
+    // when performing armed firing animations while swimming.
+    int swimTorsoYawFix = 0;
+
+    if (model)
+    {
+        swimTorsoYawFix =
+            strcmp(model->filename, "ic.3do") == 0 ||
+            strcmp(model->filename, "io.3do") == 0 ||
+            strcmp(model->filename, "rc.3do") == 0 ||
+            strcmp(model->filename, "ro.3do") == 0;
+    }
+
+    // Added: Identify Dark Undead models requiring additional torso
+    // pitch compensation for their back-floating swimming posture.
+    int isDarkUndead = 0;
+
+    if (model)
+    {
+        isDarkUndead =
+            strcmp(model->filename, "du.3do") == 0 ||
+            strcmp(model->filename, "dualt.3do") == 0 ||
+            strcmp(model->filename, "du2.3do") == 0 ||
+            strcmp(model->filename, "du2alt.3do") == 0;
+    }
+
     if ( prdThing->field_18 )
     {
         return;
@@ -272,6 +299,50 @@ void rdPuppet_BuildJointMatrices(rdThing *prdThing, rdMatrix34 *pPlacement)
 
     // Added: Fix a crash?
     if (!prdThing->paJointMatrices) return;
+
+    // Added: Store swimming torso pitch locally for each animation update
+    // to prevent pitch information from being shared between actors.
+    float testSwimTorsoPitch = 0.0f;
+    int testSwimTorsoPitchValid = 0;
+
+    // Added: Define the blending factor used to restore swimming
+    // torso pitch when an armed firing animation is active.
+#define SWIM_TORSO_PITCH_BLEND 1.25f
+
+    // Added: Detect active armed FIRE and FIRE2 tracks in swimming
+    // animation modes to apply the appropriate joint corrections.
+    int swimFireActive = 0;
+    int swimFireSubmode = -1;
+
+    if (prdThing->pThing &&
+        prdThing->pThing->type == SITH_THING_ACTOR &&
+        prdThing->pThing->pPuppetClass &&
+        prdThing->pThing->puppet &&
+        (prdThing->pThing->puppet->majorMode == 3 ||
+            prdThing->pThing->puppet->majorMode == 4))
+    {
+        rdKeyframe* fireKey =
+            prdThing->pThing->pPuppetClass->modes[1].keyframe[SITH_ANIM_FIRE].keyframe;
+
+        rdKeyframe* fire2Key =
+            prdThing->pThing->pPuppetClass->modes[1].keyframe[SITH_ANIM_FIRE2].keyframe;
+
+        for (int i = 0; i < RDPUPPET_MAX_TRACKS; i++)
+        {
+            rdPuppetTrack* track = &puppet->aTracks[i];
+
+            if ((track->status & 2) &&
+                track->keyframe &&
+                (track->keyframe == fireKey ||
+                    track->keyframe == fire2Key))
+            {
+                swimFireActive = 1;
+                swimFireSubmode =
+                    (track->keyframe == fireKey) ? SITH_ANIM_FIRE : SITH_ANIM_FIRE2;
+                break;
+            }
+        }
+    }
 
     if ( !puppet || puppet->bPaused )
     {
@@ -346,6 +417,12 @@ void rdPuppet_BuildJointMatrices(rdThing *prdThing, rdMatrix34 *pPlacement)
         }
     }
 
+    // Added: Identify quadruped actors by their paw joints so their
+    // front limbs can continue swimming during attack animations.
+    int hasPawJoint =
+        rdModel3_FindNamedNode("lpaw", model) != NULL ||
+        rdModel3_FindNamedNode("rpaw", model) != NULL;
+
     for (v80 = 0; v80 < model->numHNodes; v80++)
     {
         rdHierarchyNode* nodeIter = &model->aHierarchyNodes[v80];
@@ -370,15 +447,142 @@ void rdPuppet_BuildJointMatrices(rdThing *prdThing, rdMatrix34 *pPlacement)
             }
             
             v18 = (v17->type & nodeIter->type) ? trackIter->highPri : trackIter->lowPri;
+
+            // Added: Lower firing animation priority on swimming limbs so
+            // legs, feet, paws, and quadruped front limbs continue paddling.
+            if (prdThing->pThing &&
+                prdThing->pThing->type == SITH_THING_ACTOR &&
+                //(prdThing->pThing->physicsParams.flags & SITH_PF_ONWATERSURFACE) &&
+                prdThing->pThing->puppet &&
+                (prdThing->pThing->puppet->majorMode == 3 ||
+                    prdThing->pThing->puppet->majorMode == 4) &&
+                ((nodeIter->type & 0x60) ||
+                    strstr(nodeIter->name, "leg") != NULL ||
+                    strstr(nodeIter->name, "ankle") != NULL ||
+                    strstr(nodeIter->name, "foot") != NULL ||
+                    strstr(nodeIter->name, "paw") != NULL ||
+                    (hasPawJoint &&
+                        (strstr(nodeIter->name, "shoulder") != NULL ||
+                            strstr(nodeIter->name, "wrist") != NULL))) &&
+                //swimFireActive &&
+                (trackIter->status & 2) &&
+                (trackIter->keyframe ==
+                    prdThing->pThing->pPuppetClass->modes[1].keyframe[SITH_ANIM_FIRE].keyframe ||
+                    trackIter->keyframe ==
+                    prdThing->pThing->pPuppetClass->modes[1].keyframe[SITH_ANIM_FIRE2].keyframe))
+            {
+                v18 = 1;
+            }
+
+            // Added: Adjust armed firing priority on swimming actors' torso
+            // joints while preserving the Stormtrooper's existing behavior.
+            if (prdThing->pThing &&
+                prdThing->pThing->type == SITH_THING_ACTOR &&
+                prdThing->pThing->pPuppetClass &&
+                v80 == prdThing->pThing->pPuppetClass->aJoints[JOINTTYPE_TORSO] &&
+                swimFireActive &&
+                swimFireSubmode >= 0 &&
+                prdThing->pThing->puppet &&
+                (prdThing->pThing->puppet->majorMode == 3 ||
+                    prdThing->pThing->puppet->majorMode == 4) &&
+                !prdThing->pThing->pPuppetClass
+                ->modes[prdThing->pThing->puppet->majorMode]
+                .keyframe[swimFireSubmode].keyframe &&
+                (trackIter->status & 2) &&
+                (trackIter->keyframe ==
+                    prdThing->pThing->pPuppetClass->modes[1].keyframe[SITH_ANIM_FIRE].keyframe ||
+                    trackIter->keyframe ==
+                    prdThing->pThing->pPuppetClass->modes[1].keyframe[SITH_ANIM_FIRE2].keyframe))
+            {
+                // Allow the Tusken's firing animation to take precedence
+                // over swimming on the torso joint.
+                // Preserve the Stormtrooper's existing behavior.
+                if (strcmp(nodeIter->name, "sttorso") == 0)
+                {
+                    v18 = 2;
+                }
+                else
+                {
+                    v18 = 3;
+                }
+            }
+
             // Only blend aTracks that are actively playing (status bit 0x2)
             if (!(trackIter->status & 2)) {
                 continue;
             }
             
+            //v19 = nodeIter->idx;
+            //v20 = &v17->aNodes[v19]; // overflow in orig? added (moved): v19 < v17->numJoints2, added v20->aEntries nullptr check
+            //if (!(v19 < v17->numJoints2 && v20->numEntries && v20->aEntries)) {
+            //    continue;
+            //}
+
             v19 = nodeIter->idx;
-            v20 = &v17->aNodes[v19]; // overflow in orig? added (moved): v19 < v17->numJoints2, added v20->aEntries nullptr check
-            if (!(v19 < v17->numJoints2 && v20->numEntries && v20->aEntries)) {
+
+            if (v19 >= v17->numJoints2)
+            {
+                // Added: Validate the joint index before accessing keyframe nodes
+                // to prevent out-of-bounds animation data access.
                 continue;
+            }
+
+            v20 = &v17->aNodes[v19];
+
+            if (!v20->numEntries || !v20->aEntries)
+            {
+                continue;
+            }
+
+            // Added: Capture swimming torso pitch independently of track
+            // priority so higher-priority firing tracks cannot suppress it.
+            if (swimFireActive &&
+                !testSwimTorsoPitchValid &&
+                prdThing->pThing &&
+                prdThing->pThing->type == SITH_THING_ACTOR &&
+                prdThing->pThing->pPuppetClass &&
+                v80 == prdThing->pThing->pPuppetClass->aJoints[JOINTTYPE_TORSO] &&
+                v18 == 2 &&
+                v17 != prdThing->pThing->pPuppetClass
+                ->modes[1].keyframe[SITH_ANIM_FIRE].keyframe &&
+                v17 != prdThing->pThing->pPuppetClass
+                ->modes[1].keyframe[SITH_ANIM_FIRE2].keyframe &&
+                v19 < v17->numJoints2)
+            {
+                rdJoint* swimJoint = &v17->aNodes[v19];
+
+                if (swimJoint->numEntries &&
+                    swimJoint->aEntries)
+                {
+                    uint32_t entryIdx = trackIter->aCurKfNodeEntryNums[v19];
+
+                    if (entryIdx >= swimJoint->numEntries)
+                        entryIdx = swimJoint->numEntries - 1;
+
+                    rdAnimEntry* entry = &swimJoint->aEntries[entryIdx];
+
+                    flex_t frameDelta =
+                        trackIter->field_120 - entry->frameNum;
+
+                    rdVector3 swimRotation;
+
+                    rdVector_Copy3(&swimRotation, &entry->orientation);
+
+                    if (entry->flags & 2)
+                    {
+                        rdVector_ScaleAdd3Acc(
+                            &swimRotation,
+                            &entry->angularVelocity,
+                            frameDelta
+                        );
+                    }
+
+                    rdVector_Sub3Acc(&swimRotation, &nodeIter->rot);
+                    rdVector_NormalizeAngleAcute3(&swimRotation);
+
+                    testSwimTorsoPitch = swimRotation.x;
+                    testSwimTorsoPitchValid = 1;
+                }
             }
             
             if ( v18 >= v73 && (v18 >= v75 || v70 < 1.0) && v19 < v17->numJoints2 )
@@ -418,6 +622,7 @@ void rdPuppet_BuildJointMatrices(rdThing *prdThing, rdMatrix34 *pPlacement)
                 rdVector_Sub3Acc(&v89, &nodeIter->pos);
                 rdVector_Sub3Acc(&tmp1, &nodeIter->rot);
                 rdVector_NormalizeAngleAcute3(&tmp1);
+
                 if (trackIter->playSpeed <= 1.0)
                 {
                     // Added: Make sure anims don't leak in blending
@@ -484,6 +689,45 @@ void rdPuppet_BuildJointMatrices(rdThing *prdThing, rdMatrix34 *pPlacement)
             v46 = 1.0 - v70;
             rdVector_ScaleAdd3Acc(&a4, &v90, v46);
             rdVector_ScaleAdd3Acc(&a3, &v91, v46);
+        }
+
+        // Added: Blend the swimming torso pitch into the firing pose
+        // and compensate for the Dark Undead's swimming orientation.
+        if (swimFireActive &&
+            testSwimTorsoPitchValid &&
+            prdThing->pThing &&
+            prdThing->pThing->type == SITH_THING_ACTOR &&
+            prdThing->pThing->pPuppetClass &&
+            v80 == prdThing->pThing->pPuppetClass->aJoints[JOINTTYPE_TORSO] &&
+            strcmp(nodeIter->name, "sttorso") != 0)
+        {
+            float originalPitch = a3.x;
+
+            a3.x = originalPitch * (1.0f - SWIM_TORSO_PITCH_BLEND)
+                + testSwimTorsoPitch * SWIM_TORSO_PITCH_BLEND;
+
+            // Dark Undead: compensate for its back-floating swimming posture.
+            if (isDarkUndead)
+            {
+                a3.x -= 50.0f;
+            }
+        }
+
+        // Added: Correct torso yaw during swimming attacks for models
+        // requiring an orientation adjustment while preserving other actors.
+        if (swimFireActive &&
+            prdThing->pThing &&
+            prdThing->pThing->type == SITH_THING_ACTOR &&
+            prdThing->pThing->pPuppetClass &&
+            v80 == prdThing->pThing->pPuppetClass->aJoints[JOINTTYPE_TORSO])
+        {
+            // Preserve natural yaw for other actors,
+            // but correct the Stormtrooper's torso yaw.
+            if (strcmp(nodeIter->name, "sttorso") == 0 ||
+                swimTorsoYawFix)
+            {
+                a3.y = 0.0f;
+            }
         }
 
         rdVector_NormalizeAngleAcute3(&a3);
