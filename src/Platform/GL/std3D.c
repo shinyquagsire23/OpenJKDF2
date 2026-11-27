@@ -2987,7 +2987,7 @@ void std3D_DrawSceneFbo()
 
     float rad_scale = (float)std3D_pFb->w / 640.0;
 
-    if (!draw_ssao) 
+    if (!draw_ssao)
     {
         // Added: Preserve character coverage in the transparent preview.
         if (sceneOutput == &std3D_pFb->characterPreview)
